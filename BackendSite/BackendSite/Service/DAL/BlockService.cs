@@ -6,6 +6,7 @@ using Dapper;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
+using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
@@ -430,7 +431,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BlockBankAcc>("Admin_BlockAccount_Get", p);
         }
 
-        public IEnumerable<BlockCryptoWallet> GetBlockCryptoWallet(DateTime startDate, DateTime endDate, int blockStatus, string address, IEnumerable<int> currencyId, string userName, IEnumerable<int> cryptoType, IEnumerable<string> netWork)
+        public IEnumerable<BlockCryptoWallet> GetBlockCryptoWallet(DateTime startDate, DateTime endDate, int blockStatus, string address, IEnumerable<int> currencyId, string userName, IEnumerable<int> cryptoType, IEnumerable<string> netWork, int siteId)
         {
             var jsonSelectStatus = string.Empty;
             if (blockStatus == 0)
@@ -458,7 +459,8 @@ namespace BackendSite.Service.DAL
                 SelectStatus = jsonSelectStatus,
                 SelectCurrency = JsonConvert.SerializeObject(currencyId),
                 SelectCrypto = JsonConvert.SerializeObject(cryptoType),
-                SelectNetWork = JsonConvert.SerializeObject(netWork)
+                SelectNetWork = JsonConvert.SerializeObject(netWork),
+                SiteId = siteId
             });
 
             return _reportDbClient.Query<BlockCryptoWallet>("Admin_BlockCryptoWallet_Get", p);
@@ -621,13 +623,11 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", input.Operator);
 
             #endregion
-            var custSameAddress = _reportDbClient.Query<USDTDetail>("Service_CustCryptoWalletDetail_Get", new DynamicParameters(new { CustId = input.Before.CustId })).ToList().FindAll(x=> x.USDTAddress == input.Before.Address);
 
-            if(custSameAddress.Count > 0)
-            {
-                result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Del", p, conn, trans);
-            }
-            
+            var custSameAddress = _reportDbClient.Query<CustCryptoWalletList>("Admin_CustCryptoWalletList_Get", new DynamicParameters(new { CustId = input.Before.CustId }));
+
+            result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Del", p, conn, trans);
+
             if (result > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
@@ -641,21 +641,22 @@ namespace BackendSite.Service.DAL
 
                 if (custInfo != null)
                 {
-                    foreach(var cryptoWallet in custSameAddress)
+                    foreach (var cryptoWallet in custSameAddress)
                     {
-                        var prop = new DynamicParameters(new
+                        var logProp = new DynamicParameters(new
                         {
                             CustId = input.Before.CustId,
                             SiteId = custInfo.SiteId,
                             AccountName = string.Empty,
                             Address = input.Before.Address,
-                            NickName = string.Empty,
+                            NickName = cryptoWallet.NickName,
                             Network = cryptoWallet.Network,
                             CurrencyId = cryptoWallet.CurrencyId,
                             Status = CustUSDTInfoLogStatus.Release,
                             Operator = input.Operator
                         });
-                        if (_mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", prop, conn, trans) <= 0)
+
+                        if (_mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", logProp, conn, trans) <= 0)
                         {
                             trans.Rollback();
                             return 0;
