@@ -21,8 +21,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class PersonalMessageController : ControllerBase
     {
-        #region Fields
-
         private readonly MessageBLL _messageBll;
         private readonly ServerInfoService _serverInfoService;
         private readonly CustInfoBLL _custInfoBll;
@@ -31,10 +29,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ExcelBLL _excelBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
-
-        #endregion
-
-        #region Constructor
 
         public PersonalMessageController(IServiceProvider provider)
         {
@@ -47,10 +41,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
-
-        #endregion
-
-        #region Model
 
         public class ExportMessageBatchReq
         {
@@ -106,9 +96,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public int SiteId { get; set; }
         }
-        #endregion
-
-        #region Action
 
         /// <summary>
         /// PersonalMessage/SendMessageBatch 發送批次訊息
@@ -404,132 +391,5 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
-        #endregion
-
-        #region Private Methods
-
-        private void PreSendBatchMessage(ExcelData data, string personalMsg, AuthData authData, int optSite, int batchId)
-        {
-            var resultMessage = string.Empty;
-            var errorCode = 0;
-            if (data.CustInfoDetail == null)
-            {
-                resultMessage =
-                    $"Not found. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
-            }
-            else
-            {
-                switch (data.CustInfoDetail.Status)
-                {
-                    case (int)CustomerStatusEnum.Running:
-                        SendBatchMessage(personalMsg,
-                            data.CustInfoDetail.CustId,
-                            optSite,
-                            authData.UserName,
-                            batchId,
-                            data.CustUserName,
-                            data.SabaId,
-                            (CustomerStatusEnum)data.CustInfoDetail.Status,
-                            out errorCode,
-                            out resultMessage);
-                        break;
-
-                    case (int)CustomerStatusEnum.Suspend:
-                        resultMessage =
-                            $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Suspend.GetDescription()}";
-                        break;
-
-                    case (int)CustomerStatusEnum.Closed:
-                        resultMessage =
-                            $"Fail. CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}. Status={CustomerStatusEnum.Closed.GetDescription()}";
-                        break;
-
-                    case (int)CustomerStatusEnum.Lock:
-                        SendBatchMessage(personalMsg,
-                            data.CustInfoDetail.CustId,
-                            optSite,
-                            authData.UserName,
-                            batchId,
-                            data.CustUserName,
-                            data.SabaId,
-                            (CustomerStatusEnum)data.CustInfoDetail.Status,
-                            out errorCode,
-                            out resultMessage);
-                        break;
-                }
-            }
-
-            int status = (errorCode == 1) ? 3 : 4;
-
-            InsertBatchMessageSendLog(batchId,
-                data.RowId,
-                data.CustInfoDetail?.CustId ?? 0,
-                data.CustUserName,
-                data.SabaId,
-                resultMessage,
-                authData.UserName,
-                status);
-        }
-
-
-        private void SendBatchMessage(string personalMsg,
-            int custId,
-            int siteId,
-            string updater,
-            int batchMessageId,
-            string userName,
-            string sabaId,
-            CustomerStatusEnum custStatus,
-            out int errorCode,
-            out string resultMessage)
-        {
-
-            try
-            {
-                if (_messageBll.SendMessageBatch(personalMsg, custId, siteId, updater, batchMessageId))
-                {
-                    resultMessage = $"Success. CustId:{custId}. Username: {userName}. SabaId: {sabaId}. Status: {custStatus.GetDescription()}. ";
-                    errorCode = (int)SendMessageStatus.Success;
-                }
-                else
-                {
-                    resultMessage = $"Fail. CustId:{custId}. Username: {userName}. SabaId: {sabaId}. Status: {custStatus.GetDescription()}. Insert done but affect count != 1 ";
-                    errorCode = (int)SendMessageStatus.Failed;
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                resultMessage = ex.Message;
-                errorCode = (int)SendMessageStatus.Failed;
-            }
-        }
-
-        private void InsertBatchMessageSendLog(int batchMessageId,
-            int rowId,
-            int custId,
-            string userName,
-            string sabaId,
-            string resultMessage,
-            string updator,
-            int status)
-        {
-
-            if (!_messageBll.InsertBatchMessageSendLog(batchMessageId,
-                rowId,
-                custId,
-                userName,
-                sabaId,
-                resultMessage,
-                updator,
-                status))
-            {
-                _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +
-                    $@"BatchId: {batchMessageId}. CustId: {custId}. Username: {userName}." +
-                    $@" SabaId: {sabaId}. Result: {resultMessage}. Status:{status}");
-            }
-        }
-
-        #endregion
     }
 }
