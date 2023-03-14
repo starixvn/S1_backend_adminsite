@@ -1940,14 +1940,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var data = _depositBll.GetDepositListByCust(request.CustId,
                                                        request.TransId,
-                                                       request.Status == 0 ? (int?)null : request.Status,
+                                                       request.Status == 0 ? null : request.Status,
                                                        request.StartDate,
                                                        request.EndDate,
                                                        request.PageSize,
                                                        request.PageNumber,
-                                                       out int totalPages,
-                                                       out int rowCount,
-                                                       out decimal totalAmount);
+                                                       out var totalPages,
+                                                       out var rowCount,
+                                                       out var totalApproveAmount,
+                                                       out var totalApproveRow);
 
             return new ApiListResultTotalAmount<DepositRequest>
             {
@@ -1955,7 +1956,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 TotalPages = totalPages,
                 PageNumber = request.PageNumber,
                 RowCount = rowCount,
-                TotalAmount = totalAmount,
+                TotalApproveAmount = totalApproveAmount,
+                TotalApproveRow = totalApproveRow,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -2016,17 +2018,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalInfoByCustId(GetWithdrawalListByCustIdRequest request)
         {
-            var CurrencyAmount = new List<string>();
             var data = _withdrawalBll.GetWithdrawalListByCust(request.CustId,
                 request.TransId,
-                request.Status == 0 ? (int?)null : request.Status,
+                request.Status == 0 ? null : request.Status,
                 request.StartDate,
                 request.EndDate,
                 request.PageSize,
                 request.PageNumber,
-                out int totalPages,
-                out int rowCount,
-                ref CurrencyAmount);
+                out var totalPages,
+                out var rowCount,
+                out var totalApproveAmount,
+                out var totalApproveRow);
 
             return new ApiListResultCurrencyAmount<WithdrawalRequest>()
             {
@@ -2034,7 +2036,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 TotalPages = totalPages,
                 PageNumber = request.PageNumber,
                 RowCount = rowCount,
-                CurrencyAmount = CurrencyAmount,
+                TotalApproveAmount = totalApproveAmount,
+                TotalApproveRow = totalApproveRow,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }

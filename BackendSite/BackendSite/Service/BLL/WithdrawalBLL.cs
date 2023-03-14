@@ -347,7 +347,8 @@ namespace BackendSite.Service.BLL
             int pageNumber,
             out int totalPages,
             out int rowCount,
-            ref List<string> currencyAmount)
+            out decimal totalApproveAmount,
+            out int totalApproveRow)
         {
             return _withdrawalService.GetWithdrawalListByCust(custId,
                 transId,
@@ -358,7 +359,8 @@ namespace BackendSite.Service.BLL
                  (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                  out totalPages,
                  out rowCount,
-                 ref currencyAmount);
+                out totalApproveAmount,
+                out totalApproveRow);
         }
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(
