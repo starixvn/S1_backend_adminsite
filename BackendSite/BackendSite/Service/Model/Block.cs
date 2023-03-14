@@ -181,9 +181,9 @@ namespace BackendSite.Service.Model
     public class ReleaseCryptoWalletRequest
     {
         public string Address { get; set; }
+        public int CustId { get; set; }
         public string Network { get; set; }
         public int CurrencyId { get; set; }
-        public int CustId { get; set; }
     }
     public class CustCryptoWalletList
     {

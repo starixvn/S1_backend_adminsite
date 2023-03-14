@@ -251,7 +251,8 @@ namespace BackendSite.Service.BLL
                 GroupByCurrency = groupCurrencyData,
                 GroupByCurrencySum = groupByCurrencySum,
                 GroupByBonusCode = list,
-                GroupByBonusCodeSum = groupByBonusCodeSum
+                GroupByBonusCodeSum = groupByBonusCodeSum,
+                TotalBonusClaimants = data.Count
             };
             
             return result;

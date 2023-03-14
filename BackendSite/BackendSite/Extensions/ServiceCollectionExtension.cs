@@ -1,8 +1,5 @@
-﻿using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.BLL.Mpa;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
-using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Extensions

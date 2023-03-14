@@ -229,6 +229,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public int Number { get; set; }
         }
         
+        public class GetExchangeInfoRequest
+        {
+            public string CryptoCurrencyName { get; set; }
+            public string Network { get; set; }
+            public int CurrencyId { get; set; }
+            public decimal Amount { get; set; }
+        }
+
         #endregion
 
         #region Actions
@@ -978,6 +986,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
+        
+        [HttpPost]
+        public async Task<ApiResult<CryptoExchangeInfo>> GetExchangeInfoAsync(GetExchangeInfoRequest req)
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var exchangeReq = new CryptoExchangeReq
+            {
+                SiteId = authData.SiteId,
+                CurrencyId = req.CurrencyId,
+                Amount = req.Amount,
+                ChannelName = req.CryptoCurrencyName.GetChannelName(req.Network),
+                Type = ExchangeTypeEnum.Sell
+            };
+            var myUrl = $"{_payApiUrl}CryptoExchange";
+            return await _courierAdapter.MyPostAsync<CryptoExchangeInfo, CryptoExchangeReq>(myUrl, exchangeReq);
+        }
 
         #endregion
 
@@ -1070,6 +1094,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             {
                 usableActionButton.Remove(WithdrawalActionEnum.Verified);
                 usableActionButton.Remove(WithdrawalActionEnum.Approved);
+            }
+            
+            if (withdrawalRequest.Status == WithdrawalStatusEnum.Rejected &&
+                withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
+            {
+                usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
             }
             
             return usableActionButton;

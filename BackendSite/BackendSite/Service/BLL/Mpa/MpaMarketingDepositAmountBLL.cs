@@ -51,7 +51,7 @@ namespace BackendSite.Service.BLL.Mpa
             return response;
         }
 
-        private async Task MultiplyExchangeRateAmountSummary<TEntity>(List<TEntity> source,
+        public async Task MultiplyExchangeRateAmountSummary<TEntity>(List<TEntity> source,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
             int baseCurrencyId)
@@ -314,7 +314,7 @@ namespace BackendSite.Service.BLL.Mpa
             return config;
         }
 
-        private async Task MultiplyExchangeRateSinUpSummary<TEntity>(List<TEntity> source,
+        public async Task MultiplyExchangeRateSinUpSummary<TEntity>(List<TEntity> source,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
             int baseCurrencyId)
