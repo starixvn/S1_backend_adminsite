@@ -123,9 +123,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             if (req.excelUpload != null)
             {
                 if (!_excelBll.IsValidFile(req.excelUpload.ContentType))
-                    return new ApiResult<int>() { ErrorCode = -1, Message = "File Type Error" };
+                    return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "File Type Error" };
 
                 var excelList = _excelBll.Read(req.excelUpload);
+                if(!excelList.Any())
+                    return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Empty File" };
+
                 batchId = await _messageBll.BatchMessageByFile(req.optSite, req.personalMsg, req.IsPopup, authData.UserName, excelList);
                 _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
             }
