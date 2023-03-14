@@ -77,7 +77,8 @@ namespace BackendSite.Service.BLL
             int pageNumber,
             out int totalPages,
             out int rowCount,
-            out decimal totalAmount)
+            out decimal totalApproveAmount,
+            out int totalApproveRow)
         {
             return depositService.GetDepositListByCust(CustId,
                 TransId,
@@ -88,7 +89,8 @@ namespace BackendSite.Service.BLL
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 out totalPages,
                 out rowCount,
-                out totalAmount);
+                out totalApproveAmount,
+                out totalApproveRow);
         }
 
         public async Task<int> CreateDeposit(DepositDetailInfo deposit, IFormFile receipt)
