@@ -127,23 +127,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 if (!_excelBll.IsValidFile(req.excelUpload.ContentType))
                     return new ApiResult<int>() { ErrorCode = -1, Message = "File Type Error" };
 
-                _messageBll.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
+                batchId = await _messageBll.CreateBatchMessage(req.optSite, authData.UserName, req.personalMsg);
                 var excelList = _excelBll.Read(req.excelUpload);
 
-                var row = 1;
                 foreach (var data in excelList)
                 {
-                    var dataMessage = $"Username={data.CustUserName}. SabaId={data.SabaId}.";
-                    var (resultMessage, customer) = await _messageBll.IsValidMember(req.optSite, data.CustId, data.CustUserName, dataMessage);
-                    var custId = 0;
-                    if (string.IsNullOrEmpty(resultMessage)) 
-                    {
-                        custId = customer.CustId;
-                        await _messageBll.CreateMessage(customer.CustId, batchId, req.IsPopup);
-                        resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
-                    }
-                    _messageBll.CreateLog(batchId, row, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName);
-                    row++;
+                    await DoInsertRecipient(batchId, req.IsPopup, req.optSite, data.CustId, data.CustUserName, data.SabaId, authData.UserName);
                 }
                 _messageBll.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
                 _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
@@ -208,7 +197,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Message = "Send Process Finish."
             };
         }
-
+        private async Task DoInsertRecipient(int batchId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
+        {
+            var dataMessage = $"Username={userName}. SabaId={sabaId}.";
+            var (resultMessage, customer) = await _messageBll.IsValidMember(siteId, custId, userName, dataMessage);
+            var tmpCustId = 0;
+            if (string.IsNullOrEmpty(resultMessage))
+            {
+                tmpCustId = customer.CustId;
+                await _messageBll.InsertRecipient(customer.CustId, batchId, isPopup);
+                resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
+            }
+            _messageBll.CreateLog(batchId, 0, tmpCustId, userName, sabaId, resultMessage, adminName);
+        }
         /// <summary>
         ///  PersonalMessage/ExportSendMessageBatchResultReport 匯出指定批次訊息發送結果
         /// </summary>

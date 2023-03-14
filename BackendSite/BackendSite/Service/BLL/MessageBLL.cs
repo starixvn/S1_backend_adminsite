@@ -276,7 +276,11 @@ namespace BackendSite.Service.BLL
             return ("", custInfosDetail);
         }
 
-        public async Task CreateMessage(int custId, int batchId, bool isPopup) 
+        public async Task<int> CreateBatchMessage(int siteId, string author, string personalMsg)
+        {
+            return await messageService.NewBatchMessage(siteId, author, personalMsg);
+        }
+        public async Task InsertRecipient(int custId, int batchId, bool isPopup) 
         {
             await messageService.AddCustBatchMessage(custId, batchId, isPopup);
         }

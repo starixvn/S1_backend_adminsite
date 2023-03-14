@@ -184,12 +184,6 @@ namespace BackendSite.Service.DAL
             p.Add("_IsPopup", isPopup);
             return await _mainDbClient.ExecuteAsync("Admin_Msg_Batch_Ins_V3", p);
         }
-
-        public async Task<int> AddCustBatchMessage(int custId, int batchId, bool isPopup)
-        {
-            return await _mainDbClient.ExecuteAsync("Admin_CustBatchMessage_Ins", new { _CustId = custId, _BatchId  = batchId, _IsPopup = isPopup });
-        }
-
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
             return _mainDbClient.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator });
@@ -340,6 +334,19 @@ namespace BackendSite.Service.DAL
         internal async Task<IEnumerable<PersonalMsg>> GetMessageById(int id, bool isBatch)
         {
             return await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_GetById", new DynamicParameters(new { _Id = id, _IsBatch = isBatch }));
+        }
+
+        public async Task<int> AddCustBatchMessage(int custId, int batchId, bool isPopup)
+        {
+            return await _mainDbClient.ExecuteAsync("Admin_CustBatchMessage_Ins", new { _CustId = custId, _BatchId = batchId, _IsPopup = isPopup });
+        }
+        public async Task<int> NewBatchMessage(int siteId, string author, string personalMsg)
+        {
+            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author, _Message = personalMsg });
+            p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            await _mainDbClient.ExecuteAsync("Admin_BatchMessage_Ins_V3", p);
+            var batchId = p.Get<int?>("BatchId") ?? 0;
+            return batchId;
         }
     }
 }
