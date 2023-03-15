@@ -281,9 +281,11 @@ namespace BackendSite.Service.BLL
             {
                 await messageService.BeginTransaction();
                 var batchId = await messageService.NewBatchMessage(siteId, adminName, personalMsg);
+                var rowId = 1;
                 foreach (var data in excelList)
                 {
-                    await DoInsertRecipient(batchId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
+                    await DoInsertRecipient(batchId, rowId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
+                    rowId++;
                 }
                 await messageService.Commit();
                 return batchId;
@@ -294,7 +296,7 @@ namespace BackendSite.Service.BLL
                 return 0;
             }
         }
-        private async Task DoInsertRecipient(int batchId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
+        private async Task DoInsertRecipient(int batchId, int rawId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
         {
             var dataMessage = $"Username={userName}. SabaId={sabaId}.";
             var (resultMessage, customer) = await IsValidMember(siteId, custId, userName, dataMessage);
@@ -305,7 +307,7 @@ namespace BackendSite.Service.BLL
                 await messageService.AddCustBatchMessage(customer.CustId, batchId, isPopup);
                 resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
             }
-            await messageService.InsertBatchMessageSendLog(batchId, 0, tmpCustId, userName, sabaId, resultMessage, adminName);
+            await messageService.InsertBatchMessageSendLog(batchId, rawId, tmpCustId, userName, sabaId, resultMessage, adminName);
         }
 
         public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
