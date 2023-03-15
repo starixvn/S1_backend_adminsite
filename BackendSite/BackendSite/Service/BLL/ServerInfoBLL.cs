@@ -254,10 +254,5 @@ namespace BackendSite.Service.BLL
                 return null;
             }
         }
-
-        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
-        {
-            return await serverInfoService.GetLanguageList(siteId, currencyId);
-        }
     }
 }
