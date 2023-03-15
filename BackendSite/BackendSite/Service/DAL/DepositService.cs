@@ -110,6 +110,7 @@ namespace BackendSite.Service.DAL
             int startIndex,
             out int totalPages,
             out int rowCount,
+            out decimal totalAmount,
             out decimal totalApproveAmount,
             out int totalApproveRow)
         {
@@ -123,12 +124,14 @@ namespace BackendSite.Service.DAL
             p.Add("_PageSize", pageSize, dbType: DbType.Int32);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_TotalApproveAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_TotalApproveRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositInfoListByCust_Get_V6", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
+            totalAmount = p.Get<decimal?>("_TotalAmount") ?? 0;
             totalApproveAmount = p.Get<decimal?>("_TotalApproveAmount") ?? 0;
             totalApproveRow = p.Get<int?>("_TotalApproveRow") ?? 0;
             

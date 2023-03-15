@@ -1939,6 +1939,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                        request.PageNumber,
                                                        out var totalPages,
                                                        out var rowCount,
+                                                       out var totalAmount,
                                                        out var totalApproveAmount,
                                                        out var totalApproveRow);
 
@@ -1948,6 +1949,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 TotalPages = totalPages,
                 PageNumber = request.PageNumber,
                 RowCount = rowCount,
+                TotalAmount = totalAmount,
                 TotalApproveAmount = totalApproveAmount,
                 TotalApproveRow = totalApproveRow,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -2019,6 +2021,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.PageNumber,
                 out var totalPages,
                 out var rowCount,
+                out var totalAmount,
                 out var totalApproveAmount,
                 out var totalApproveRow);
 
@@ -2028,6 +2031,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 TotalPages = totalPages,
                 PageNumber = request.PageNumber,
                 RowCount = rowCount,
+                TotalAmount = totalAmount,
                 TotalApproveAmount = totalApproveAmount,
                 TotalApproveRow = totalApproveRow,
                 ErrorCode = (int)ErrorCodeEnum.Success
