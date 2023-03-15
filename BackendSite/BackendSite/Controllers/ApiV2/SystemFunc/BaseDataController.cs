@@ -131,16 +131,18 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int CategoryId { get; set; }
         }
         
-        public class GetTpListByCategoryReq
-        {
-            public int CategoryId { get; set; }
-        }
-        
         public class GetTpGameTypeByCategoryAndTpIdReq
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
         }
+        
+         public class GetTpListByCategoryReq
+        {
+
+            public int CategoryId { get; set; }
+        }
+
 
 
         public class GameCasinoByTpIdReq
@@ -1004,6 +1006,20 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
             {
                 Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
+                
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public ApiResult GetFinancialAccountList(GetFinancialAccountListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
+            {
+                Data = _bankFinancialBll.GetFinancialAccountList(request.SiteId, request.Purposes),
+                
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
