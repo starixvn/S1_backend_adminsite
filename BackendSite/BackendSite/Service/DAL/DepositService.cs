@@ -225,7 +225,7 @@ namespace BackendSite.Service.DAL
                 props.Add("DepositPic", depositPic);
                 props.Add("Creator", creator);
                 props.Add("CreateFrom", 2);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set", trans, props);
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set_V2", trans, props);
 
                 if (result > 0)
                 {
