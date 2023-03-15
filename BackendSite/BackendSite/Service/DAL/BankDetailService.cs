@@ -141,8 +141,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var r = _mainDbClient.Execute("BankCard_Set", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
+            var r = _mainDbClient.Execute("BankCard_Set", trans, props);
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog);
             if (result > 0)
             {
                 trans.Commit();
@@ -189,8 +189,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var r = _mainDbClient.Execute("BankCardwithIFSC_Set", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
+            var r = _mainDbClient.Execute("BankCardwithIFSC_Set", trans, props);
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog);
             if (result > 0)
             {
                 trans.Commit();
@@ -225,8 +225,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var r =  _mainDbClient.Execute("BankCard_Del", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans);
+            var r =  _mainDbClient.Execute("BankCard_Del", trans, props);
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog);
             if (result > 0)
             {
                 trans.Commit();

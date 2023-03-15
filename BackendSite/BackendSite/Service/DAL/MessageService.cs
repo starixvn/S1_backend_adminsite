@@ -158,7 +158,7 @@ namespace BackendSite.Service.DAL
                 using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
                 connection.Open();
                 using var trans = connection.BeginTransaction();
-                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins", new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }), connection, trans);
+                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins", trans, new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }));
 
                 if (result == 1)
                 {
@@ -342,7 +342,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters(new { _SiteId = siteId, _Author = author, _Message = personalMsg });
             p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            await _mainDbClient.ExecuteAsync("Admin_BatchMessage_Ins_V3", p, _connection, _transaction);
+            await _mainDbClient.ExecuteAsync("Admin_BatchMessage_Ins_V3", _transaction, p);
             var batchId = p.Get<int?>("BatchId") ?? 0;
             return batchId;
         }
@@ -350,9 +350,8 @@ namespace BackendSite.Service.DAL
         {
             return await _mainDbClient.ExecuteAsync(
                 "Admin_CustBatchMessage_Ins",
-                new DynamicParameters(new { _CustId = custId, _BatchId = batchId, _IsPopup = isPopup }),
-                _connection,
-                _transaction);
+                _transaction,
+                new DynamicParameters(new { _CustId = custId, _BatchId = batchId, _IsPopup = isPopup }));
         }
         public async Task<int> InsertBatchMessageSendLog(int batchId, int rowId, int custId, string userName, string sabaId, string resultMessage, string updator)
         {
@@ -364,7 +363,7 @@ namespace BackendSite.Service.DAL
             props.Add("_SabaId", sabaId);
             props.Add("_Result", resultMessage);
             props.Add("_Creator", updator);
-            return await _mainDbClient.ExecuteAsync("Admin_BatchMessageSendLog_Ins_V2", props, _connection, _transaction);
+            return await _mainDbClient.ExecuteAsync("Admin_BatchMessageSendLog_Ins_V2", _transaction, props);
         }
         public async Task BeginTransaction()
         {

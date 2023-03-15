@@ -622,7 +622,7 @@ namespace BackendSite.Service.DAL
             else
             {
                 //Execute in transaction
-                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set_V2", p, conn, trans);
+                result = _mainDbClient.Execute("Admin_WithdrawalInfo_Set_V2", trans, p);
             }
 
             custId = p.Get<int?>("_CustId") ?? 0;

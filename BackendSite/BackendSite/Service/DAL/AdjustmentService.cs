@@ -40,7 +40,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { adjustmentInfo.AdjustType, adjustmentInfo.CustId, adjustmentInfo.UserName, adjustmentInfo.CurrencyId, adjustmentInfo.SiteId, AdjustIdInfo = adjustmentInfo.AdjustIdInfo, adjustmentInfo.Amount, Prefix = $"A{common.GetEnv()}" });
             p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = _mainDbClient.Execute("Admin_Adjustment_Ins", p, conn, trans);
+            var result = _mainDbClient.Execute("Admin_Adjustment_Ins", trans, p);
             transId = p.Get<string>("TransId");
             if (result > 0)
             {
@@ -84,7 +84,7 @@ namespace BackendSite.Service.DAL
                 var p = new DynamicParameters(new { AdjustId = adjustId, SiteId = siteId, RefId = (string)null, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-                result = _mainDbClient.Execute("Adjustment_Set", p, conn, trans);
+                result = _mainDbClient.Execute("Adjustment_Set", trans, p);
 
                 if (result > 0)
                 {
@@ -129,7 +129,7 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("AdjustId", adjustId);
-            return _mainDbClient.Execute("AdjustmentInfoFirstDeposit_Set", props, conn, trans);
+            return _mainDbClient.Execute("AdjustmentInfoFirstDeposit_Set", trans, props);
         }
         private void SetAdjustmentLog(int adjustId, int siteId, string comment, int status, string Operator)
         {
@@ -275,7 +275,7 @@ namespace BackendSite.Service.DAL
                 });
                 p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-                _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", p, conn, trans);
+                _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", trans, p);
                 var transId = p.Get<string>("TransId");
 
                 if (string.IsNullOrEmpty(transId))
@@ -302,7 +302,7 @@ namespace BackendSite.Service.DAL
                     propsLog.Add("Operator", Operator);
                     #endregion
 
-                    _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
+                    _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", trans, propsLog);
                     trans.Commit();
                     return 0;
                 }
@@ -400,7 +400,7 @@ namespace BackendSite.Service.DAL
                             });
                             withdrawalLimitP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-                            _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", withdrawalLimitP, conn, trans);
+                            _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", trans, withdrawalLimitP);
                             var transId = withdrawalLimitP.Get<string>("TransId");
 
                             if (string.IsNullOrEmpty(transId))
@@ -445,7 +445,7 @@ namespace BackendSite.Service.DAL
             props.Add("_AfterAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _ = _mainDbClient.Execute("Admin_AdjustmentActualDeposit_Set", props, conn, trans);
+            _ = _mainDbClient.Execute("Admin_AdjustmentActualDeposit_Set", trans, props);
 
             var beforeAmount = props.Get<decimal>("_BeforeAmount");
             var afterAmount = props.Get<decimal>("_AfterAmount");
@@ -465,7 +465,7 @@ namespace BackendSite.Service.DAL
             props.Add("_BeforeAmount", beforeAmount);
             props.Add("_AfterAmount", afterAmount);
 
-            if (_mainDbClient.Execute("Admin_AdjustmentDepositLog_Ins", props, conn, trans) < 1)
+            if (_mainDbClient.Execute("Admin_AdjustmentDepositLog_Ins", trans, props) < 1)
             {
                 _logger.LogError($"AdjustmentDepositLog insert failed, depositId: {input.DepositId}");
                 
@@ -489,7 +489,7 @@ namespace BackendSite.Service.DAL
             }), DbType.String);
             props.Add("_Operator", input.Operator);
             
-            return _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", props, conn, trans);
+            return _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, props);
         }
 
         public IEnumerable<AdjustmentLimitData> GetAdjustmentData(string siteId, string currencyId,
@@ -535,7 +535,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
             logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
             logParam.Add("_Operator", input.Operator);
-            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, tran) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
 
             if (!logResult)
             {
@@ -543,7 +543,7 @@ namespace BackendSite.Service.DAL
                 return false;
             }
 
-            var result = _mainDbClient.Execute("Admin_AdjustmentLimitInfo_Set", props, conn, tran) > 0;
+            var result = _mainDbClient.Execute("Admin_AdjustmentLimitInfo_Set", tran, props) > 0;
 
             if (!result)
             {

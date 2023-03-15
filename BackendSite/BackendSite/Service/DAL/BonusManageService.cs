@@ -657,7 +657,7 @@ namespace BackendSite.Service.DAL
             p.Add("_BlockTagList", JsonConvert.SerializeObject(promotion.BlockTagList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_Promotion_Set_V6", p, connection, transaction);
+            _mainDbClient.Execute("Admin_Promotion_Set_V6", transaction, p);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
@@ -684,7 +684,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V6", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V6", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -712,7 +712,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionSpecific_Del", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Del", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -740,7 +740,7 @@ namespace BackendSite.Service.DAL
             p.Add("_ConditionList", JsonConvert.SerializeObject(conditionData));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionDisplayCondition_Set", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionDisplayCondition_Set", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -769,7 +769,7 @@ namespace BackendSite.Service.DAL
             p.Add("_ConditionList", JsonConvert.SerializeObject(conditionData));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionDisplayCondition_Del", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionDisplayCondition_Del", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -795,7 +795,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewSpecialCode", newSpecialCode);
             p.Add("_IsSpecial", isSpecial ? 1 : 0);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            _mainDbClient.Execute("Admin_PromotionDuplicate_Set_V3", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionDuplicate_Set_V3", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
             return affectCount == 1;
@@ -822,7 +822,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewBonusCode", newBonusCode);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionSpecificDuplicate_Set_V2", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionSpecificDuplicate_Set_V2", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -850,7 +850,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewBonusCode", newBonusCode);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionDisplayConditionDuplicate_Set", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionDisplayConditionDuplicate_Set", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -881,7 +881,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("ActionType", 1);
             propsLog.Add("DetailInfo", detailInfo);
             propsLog.Add("Operator", Operator);
-            return _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, connection, transaction);
+            return _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", transaction, propsLog);
         }
         #endregion
 
@@ -895,7 +895,7 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            return _mainDbClient.Execute("Admin_PromotionCashBack_Del", p, connection, transaction) > 0;
+            return _mainDbClient.Execute("Admin_PromotionCashBack_Del", transaction, p) > 0;
         }
 
         private bool InsertPromotionCashBack(string bonusCode, int siteId, string Operator, List<PromotionCashBackSetting> cashbackList,
@@ -909,7 +909,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Operator", Operator);
             p.Add("_CashBackList", JsonConvert.SerializeObject(cashbackList));
 
-            return _mainDbClient.Execute("Admin_PromotionCashBack_Set", p, connection, transaction) > 0;
+            return _mainDbClient.Execute("Admin_PromotionCashBack_Set", transaction, p) > 0;
         }
 
         public IEnumerable<PromotionCashBack1> GetPromotionCashBack(string bonusCode, int siteId)
@@ -934,7 +934,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Operator", Operator);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionCashBackDuplicate_Set", p, connection, transaction);
+            _mainDbClient.Execute("Admin_PromotionCashBackDuplicate_Set", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
