@@ -535,11 +535,11 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            result = _mainDbClient.Execute("Admin_BlockCryptoWallet_Set", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_BlockCryptoWallet_Set", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -557,7 +557,7 @@ namespace BackendSite.Service.DAL
                         Status = input.After.Status == BlockCryptoWalletStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
                     });
 
-                    result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Set", parameter, conn, trans);
+                    result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Set", trans, parameter);
 
                     if (result > 0)
                     {
@@ -574,7 +574,7 @@ namespace BackendSite.Service.DAL
                             Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", prop, conn, trans);
+                        result = _mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", trans, prop);
                         if (result == 0)
                         {
                             trans.Rollback();
@@ -626,11 +626,11 @@ namespace BackendSite.Service.DAL
 
             var custSameAddress = _reportDbClient.Query<CustCryptoWalletList>("Admin_CustCryptoWalletList_Get", new DynamicParameters(new { CustId = input.Before.CustId }));
 
-            result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Del", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Del", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -656,7 +656,7 @@ namespace BackendSite.Service.DAL
                             Operator = input.Operator
                         });
 
-                        if (_mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", logProp, conn, trans) <= 0)
+                        if (_mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", trans, logProp) <= 0)
                         {
                             trans.Rollback();
                             return 0;
