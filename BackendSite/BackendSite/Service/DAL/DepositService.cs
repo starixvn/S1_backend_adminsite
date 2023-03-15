@@ -214,7 +214,7 @@ namespace BackendSite.Service.DAL
                 });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-                result = _mainDbClient.Execute("Admin_DepositInfo_Set_V2", p, conn, trans);
+                result = _mainDbClient.Execute("Admin_DepositInfo_Set_V2", trans, p);
 
                 if (result > 0)
                 {
@@ -288,7 +288,7 @@ namespace BackendSite.Service.DAL
                             BankId = draftInfo.BankId,
                             Operator = Operator
                         });
-                        result = _mainDbClient.Execute("Admin_DepositInfoDraft_Set", p2, conn, trans);
+                        result = _mainDbClient.Execute("Admin_DepositInfoDraft_Set", trans, p2);
                     }
 
                     if (result > 0)
@@ -310,12 +310,12 @@ namespace BackendSite.Service.DAL
         private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlConnection conn, MySqlTransaction trans)
         {
             return _mainDbClient.Execute("DepositInfoFirstDeposit_Set",
+                trans,
                 new DynamicParameters(new
                 {
                     DepositId = depositId,
                     SiteId = siteId
-                }),
-                conn, trans);
+                }));
         }
 
         public int SetDepositLog(int depositId, int siteId, string comment, int status, decimal actualDeposit, string Operator)

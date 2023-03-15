@@ -147,7 +147,7 @@ namespace BackendSite.Service.DAL
             p.Add("_LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = _mainDbClient.Execute("Common_CancelBonusByBonusId_SetV3", p, conn, trans);
+            var result = _mainDbClient.Execute("Common_CancelBonusByBonusId_SetV3", trans, p);
 
             var siteId = p.Get<int?>("_SiteId") ?? 0;
             var custId = p.Get<int?>("_CustId") ?? 0;
@@ -187,7 +187,7 @@ namespace BackendSite.Service.DAL
                 if (cancelBonusAmount > 0 && result > 0)
                 {
                     var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
-                    result = _mainDbClient.Execute("Service_CancelBonusAmount_Set", cp, conn, trans);
+                    result = _mainDbClient.Execute("Service_CancelBonusAmount_Set", trans, cp);
                 }
             }
 
