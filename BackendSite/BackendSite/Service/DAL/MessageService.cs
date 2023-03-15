@@ -338,11 +338,19 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_GetById", new DynamicParameters(new { _Id = id, _IsBatch = isBatch }));
         }
 
-        public async Task<int> NewBatchMessage(int siteId, string author, string personalMsg)
+        public async Task<int> NewBatchMessageTransaction(int siteId, int currencyId, string author, string personalMsg)
         {
-            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author, _Message = personalMsg });
+            var p = new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Author = author, _Message = personalMsg });
             p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
             await _mainDbClient.ExecuteAsync("Admin_BatchMessage_Ins_V3", p, _connection, _transaction);
+            var batchId = p.Get<int?>("BatchId") ?? 0;
+            return batchId;
+        }
+        public async Task<int> NewBatchMessage(int siteId, int currencyId, string author, string personalMsg)
+        {
+            var p = new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Author = author, _Message = personalMsg });
+            p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            await _mainDbClient.ExecuteAsync("Admin_BatchMessage_Ins_V3", p);
             var batchId = p.Get<int?>("BatchId") ?? 0;
             return batchId;
         }

@@ -204,6 +204,10 @@ namespace BackendSite.Service.BLL
         {
             return messageService.NewBatchMessage(siteId, author, personalMsg, isPopup, ref batchId);
         }
+        public async Task<int> NewBatchMessage(int siteId, int currencyId, string author, string personalMsg)
+        {
+            return await messageService.NewBatchMessage(siteId, currencyId, author, personalMsg);
+        }
         public bool DeleteBatchMessage(int batchId)
         {
             return messageService.DeleteBatchMessage(batchId);
@@ -275,12 +279,12 @@ namespace BackendSite.Service.BLL
             return ("", custInfosDetail);
         }
 
-        public async Task<int> BatchMessageByFile(int siteId, string personalMsg, bool isPopup, string adminName, List<ExcelData> excelList)
+        public async Task<int> BatchMessageByFile(int siteId, int currencyId, string personalMsg, bool isPopup, string adminName, List<ExcelData> excelList)
         {
             try
             {
                 await messageService.BeginTransaction();
-                var batchId = await messageService.NewBatchMessage(siteId, adminName, personalMsg);
+                var batchId = await messageService.NewBatchMessageTransaction(siteId, currencyId, adminName, personalMsg);
                 var rowId = 1;
                 foreach (var data in excelList)
                 {
@@ -290,9 +294,10 @@ namespace BackendSite.Service.BLL
                 await messageService.Commit();
                 return batchId;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 await messageService.RollBack();
+                _logger.LogError(ex, ex.Message);
                 return 0;
             }
         }
