@@ -192,6 +192,16 @@ namespace BackendSite.Service.BLL
             }
         }
 
+        public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
+        {
+            if (currencyId == 0) 
+            {
+                var serverInfo = serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
+                return serverInfo.ILangList;
+            }
+            return await serverInfoService.GetLanguageList(siteId, currencyId);
+        }
+
         public IEnumerable<ServerInfo> GetSiteListByLoginUserV2()
         {
             List<AssignBrand> assignSites = new List<AssignBrand>();
