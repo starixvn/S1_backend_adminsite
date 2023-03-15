@@ -920,11 +920,7 @@ namespace BackendSite.Service.BLL
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
         {
-            var custProfile = GetCustProfile(custId);
-            if (string.IsNullOrWhiteSpace(custProfile.USDTInfo))
-                return Task.FromResult(Enumerable.Empty<USDTDetail>());
-            else
-                return Task.FromResult(JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo));
+            return _custInfoService.GetCustCryptoWalletDetailAsync(custId);
         }
 
         private bool IsWithdrawalInfoTransId(string transId)
@@ -1265,6 +1261,11 @@ namespace BackendSite.Service.BLL
             });
 
             return string.Join(",", temp);
+        }
+
+        public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
+        {
+            return _custInfoService.GetCryptoList(custId);
         }
     }
 }
