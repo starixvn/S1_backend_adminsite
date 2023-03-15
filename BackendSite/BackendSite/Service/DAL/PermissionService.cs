@@ -65,7 +65,7 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", Operator);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminRole_Ins_V2", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminRole_Ins_V2", trans, props);
 
             if(result <= 0)
             {
@@ -82,7 +82,7 @@ namespace BackendSite.Service.DAL
             }
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_RolePermission_Ins", new DynamicParameters(new { Role= SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList)}), conn, trans);
+                _mainDbClient.Execute("Admin_RolePermission_Ins", trans, new DynamicParameters(new { Role= SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList)}));
             }
             trans.Commit();
             return result;
@@ -101,7 +101,7 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
             props.Add("Operator", Operator);
 
-            result = _mainDbClient.Execute("Admin_AdminRole_Set_V2", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminRole_Set_V2", trans, props);
 
             if (result <= 0)
             {
@@ -109,11 +109,11 @@ namespace BackendSite.Service.DAL
                 return result;
             }
 
-            _mainDbClient.Execute("Admin_RolePermission_Del", new DynamicParameters(new { Role = role }), conn, trans);
+            _mainDbClient.Execute("Admin_RolePermission_Del", trans, new DynamicParameters(new { Role = role }));
 
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_RolePermission_Ins", new DynamicParameters(new { Role = role, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+                _mainDbClient.Execute("Admin_RolePermission_Ins", trans, new DynamicParameters(new { Role = role, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
             trans.Commit();
             return result;
@@ -124,9 +124,8 @@ namespace BackendSite.Service.DAL
             using var conn = new MySqlConnection(_connectionString);
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var props = new DynamicParameters();
-            _mainDbClient.Execute("Admin_AdminRole_Del", new DynamicParameters(new { Id = role }), conn, trans);
-            _mainDbClient.Execute("Admin_RolePermission_Del", new DynamicParameters(new { Role = role }), conn, trans);
+            _mainDbClient.Execute("Admin_AdminRole_Del", trans, new DynamicParameters(new { Id = role }));
+            _mainDbClient.Execute("Admin_RolePermission_Del", trans, new DynamicParameters(new { Role = role }));
             trans.Commit();
         }
 
@@ -155,7 +154,7 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", Operator);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminUser_Ins_V2", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminUser_Ins_V2", trans, props);
 
             if (result <= 0)
             {
@@ -171,8 +170,8 @@ namespace BackendSite.Service.DAL
                 return result;
             }
 
-            result = _mainDbClient.Execute("Admin_AdminBrand_Ins", new DynamicParameters
-                (new { UserId = SEQ, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }), conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminBrand_Ins", trans, new DynamicParameters
+                (new { UserId = SEQ, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }));
 
             if (result <= 0)
             {
@@ -182,7 +181,7 @@ namespace BackendSite.Service.DAL
 
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_UserPermission_Ins", new DynamicParameters(new { UserId = SEQ, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+                _mainDbClient.Execute("Admin_UserPermission_Ins", trans, new DynamicParameters(new { UserId = SEQ, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
             trans.Commit();
             return result;
@@ -197,8 +196,8 @@ namespace BackendSite.Service.DAL
             List<int> roleList = new List<int>();
             roleList.Add(role);
 
-            result = _mainDbClient.Execute("Admin_AdminBrandRole_Set", new DynamicParameters
-                (new { UserId = userId, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }), conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminBrandRole_Set", trans, new DynamicParameters
+                (new { UserId = userId, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }));
 
             if (result <= 0)
             {
@@ -206,7 +205,7 @@ namespace BackendSite.Service.DAL
                 return result;
             }
 
-            result = _mainDbClient.Execute("Admin_AdminUser_Set", new DynamicParameters(new { UserId = userId, Operator = Operator }), conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminUser_Set", trans, new DynamicParameters(new { UserId = userId, Operator = Operator }));
 
             if (result <= 0)
             {
@@ -214,11 +213,11 @@ namespace BackendSite.Service.DAL
                 return result;
             }
 
-            _mainDbClient.Execute("Admin_UserPermission_Del", new DynamicParameters(new { UserId = userId, SiteId = siteId}), conn, trans);
+            _mainDbClient.Execute("Admin_UserPermission_Del", trans, new DynamicParameters(new { UserId = userId, SiteId = siteId}));
 
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_UserPermission_Ins", new DynamicParameters(new { UserId = userId, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+                _mainDbClient.Execute("Admin_UserPermission_Ins", trans, new DynamicParameters(new { UserId = userId, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
             trans.Commit();
             return result;
@@ -246,8 +245,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var result = _mainDbClient.Execute("Admin_UserPassword_Set_V2", props, conn, trans) > 0;
-            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_UserPassword_Set_V2", trans, props) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog) > 0;
             if (logResult & result)
             {
                 trans.Commit();
@@ -283,8 +282,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var r = _mainDbClient.Execute("Admin_UserStatus_Set_V2", props, conn, trans) > 0;
-            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            var r = _mainDbClient.Execute("Admin_UserStatus_Set_V2", trans, props) > 0;
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog) > 0;
             if (r & result)
             {
                 trans.Commit();
@@ -335,8 +334,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", userName);
             #endregion
 
-            var result =  _mainDbClient.Execute("Admin_AdminBrand_Set", props, conn, trans) > 0;
-            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentBrandLog_Ins", propsLog, conn, trans) > 0;
+            var result =  _mainDbClient.Execute("Admin_AdminBrand_Set", trans, props) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentBrandLog_Ins", trans, propsLog) > 0;
             if (logResult & result)
             {
                 trans.Commit();

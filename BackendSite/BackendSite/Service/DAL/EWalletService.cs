@@ -93,7 +93,7 @@ namespace BackendSite.Service.DAL
                 _Operator = input.Operator
             };
 
-            result = _mainDbClient.Execute("Admin_BlockEWallet_Set", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_BlockEWallet_Set", trans, p);
 
             if (result > 0)
             {
@@ -117,7 +117,7 @@ namespace BackendSite.Service.DAL
                         Status = input.After.Status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
                     });
 
-                    result = _mainDbClient.Execute("Member_CustEWalletDetail_Set", parameter, conn, trans);
+                    result = _mainDbClient.Execute("Member_CustEWalletDetail_Set", trans, parameter);
 
                     if (result > 0)
                     {
@@ -132,7 +132,7 @@ namespace BackendSite.Service.DAL
                             Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", prop, conn, trans);
+                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", trans, prop);
                         if (result == 0)
                         {
                             trans.Rollback();
@@ -182,11 +182,11 @@ namespace BackendSite.Service.DAL
             #endregion
 
             var releaseEWalletList = GetBlockEWalletList(input.Before.SysId, input.Before.AccountNum).ToList();
-            result = _mainDbClient.Execute("Admin_CustEWalletDetail_Del", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_CustEWalletDetail_Del", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog) > 0;
 
                 if (!logResult)
                 {
@@ -206,7 +206,7 @@ namespace BackendSite.Service.DAL
                         Status = (int)EWalletinfoLogStatusEnum.Release,
                         Operator = input.Operator
                     });
-                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", prop, conn, trans);
+                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", trans, prop);
                     if (result == 0)
                     {
                         trans.Rollback();

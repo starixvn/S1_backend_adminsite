@@ -328,7 +328,7 @@ namespace BackendSite.Service.DAL
                 return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p) > 0;
             }
 
-            return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p, conn, trans) > 0;
+            return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", trans, p) > 0;
         }
 
         public IEnumerable<CustNote> GetCustNotes(int custId,
@@ -520,7 +520,7 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", input.Operator);
 
             var success = _mainDbClient
-                .Execute("Admin_Tag_Set", props, conn, trans) > 0;
+                .Execute("Admin_Tag_Set", trans, props) > 0;
 
             if (success)
             {
@@ -535,7 +535,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
                 if (logSuccess)
                 {
@@ -582,7 +582,7 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", input.Operator);
 
             var success = _mainDbClient
-                .Execute("Admin_TagStatus_Set", props, conn, trans) > 0;
+                .Execute("Admin_TagStatus_Set", trans, props) > 0;
 
             if (success)
             {
@@ -596,7 +596,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
                 if (logSuccess)
                 {

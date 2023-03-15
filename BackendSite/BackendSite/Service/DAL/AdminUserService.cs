@@ -55,7 +55,7 @@ namespace BackendSite.Service.DAL
             var para = new DynamicParameters();
             para.Add("UserId", UserId);
             var SpName = "Admin_AuthorSite_Del";
-            _mainDbClient.Execute(SpName, para, conn, tran);
+            _mainDbClient.Execute(SpName, tran, para);
 
             if (SiteIds != null && SiteIds.Any())
             {
@@ -65,7 +65,7 @@ namespace BackendSite.Service.DAL
                     var para2 = new DynamicParameters();
                     para2.Add("UserId", UserId);
                     para2.Add("SiteId", id);
-                    _mainDbClient.Execute(SpName, para2, conn, tran);
+                    _mainDbClient.Execute(SpName, tran, para2);
                 }
             }
 
@@ -82,13 +82,13 @@ namespace BackendSite.Service.DAL
             if (GroupSEQ == null)
             {
                 var SpName = "Admin_AuthorGroup_Del";
-                _mainDbClient.Execute(SpName, para, conn, tran);
+                _mainDbClient.Execute(SpName, tran, para);
             }
             else
             {
                 para.Add("GroupSEQ", GroupSEQ);
                 var SpName = "Admin_AuthorGroup_Set";
-                _mainDbClient.Execute(SpName, para, conn, tran);
+                _mainDbClient.Execute(SpName, tran, para);
             }
 
             tran.Commit();
@@ -123,7 +123,7 @@ namespace BackendSite.Service.DAL
             UserInfo.Add("@IsSuper", 0);
             UserInfo.Add("@Status", 1);
 
-            _mainDbClient.Execute("Admin_User_Ins", UserInfo, conn, tran);
+            _mainDbClient.Execute("Admin_User_Ins", tran, UserInfo);
 
             var UserId = UserInfo.Get<int?>("@UserId");
 
@@ -135,7 +135,7 @@ namespace BackendSite.Service.DAL
                     para.Add("UserId", UserId);
                     para.Add("GroupSEQ", GroupSEQ);
                     var SpName = "Admin_AuthorGroup_Set";
-                    _mainDbClient.Execute(SpName, para, conn, tran);
+                    _mainDbClient.Execute(SpName, tran, para);
                 }
 
                 if (SiteList != null)
@@ -145,7 +145,7 @@ namespace BackendSite.Service.DAL
                         var para2 = new DynamicParameters();
                         para2.Add("UserId", UserId);
                         para2.Add("SiteId", SiteId);
-                        _mainDbClient.Execute("Admin_AuthorSite_Ins", para2, conn, tran);
+                        _mainDbClient.Execute("Admin_AuthorSite_Ins", tran, para2);
                     }
                 }
 

@@ -95,10 +95,10 @@ namespace BackendSite.Service.DAL
                     Memo = input.After.Memo,
                     Operator = input.Operator
                 });
-                result = _mainDbClient.Execute("Admin_BlockIP_Set", p, conn, trans);
+                result = _mainDbClient.Execute("Admin_BlockIP_Set", trans, p);
                 if (result > 0)
                 {
-                    var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                    var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                     if (!logResult)
                     {
                         trans.Rollback();
@@ -145,11 +145,11 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            result = _mainDbClient.Execute("Admin_BlockIP_Del", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_BlockIP_Del", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -260,11 +260,11 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            result = _mainDbClient.Execute("Admin_BlockAccount_Set", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_BlockAccount_Set", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -284,7 +284,7 @@ namespace BackendSite.Service.DAL
                         Status = input.After.Status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
                     });
 
-                    result = _mainDbClient.Execute("Member_CustBankDetail_Set", parameter, conn, trans);
+                    result = _mainDbClient.Execute("Member_CustBankDetail_Set", trans, parameter);
 
                     if (result > 0)
                     {
@@ -300,7 +300,7 @@ namespace BackendSite.Service.DAL
                             Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
+                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", trans, prop);
                         if (result == 0)
                         {
                             trans.Rollback();
@@ -351,11 +351,11 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            result = _mainDbClient.Execute("Admin_CustBankDetail_Del", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_CustBankDetail_Del", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -378,7 +378,7 @@ namespace BackendSite.Service.DAL
                         Operator = input.Operator
                     });
 
-                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
+                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", trans, prop);
 
                     if (result <= 0)
                     {

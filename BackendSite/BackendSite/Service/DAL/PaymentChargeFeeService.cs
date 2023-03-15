@@ -69,7 +69,7 @@ public class PaymentChargeFeeService
         
         parameters.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
         
-        _ = _mainDbClient.Execute("Admin_ModifyPaymentChargeFeeLog_Ins", parameters, conn, trans);
+        _ = _mainDbClient.Execute("Admin_ModifyPaymentChargeFeeLog_Ins", trans, parameters);
 
         var result = parameters.Get<int>("_Result");
 
