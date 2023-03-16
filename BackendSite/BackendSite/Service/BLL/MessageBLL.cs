@@ -279,12 +279,11 @@ namespace BackendSite.Service.BLL
             return ("", custInfosDetail);
         }
 
-        public async Task<int> BatchMessageByFile(int siteId, int currencyId, string personalMsg, bool isPopup, string adminName, List<ExcelData> excelList)
+        public async Task<int> BatchMessageByFile(int siteId, int batchId, bool isPopup, string adminName, List<ExcelData> excelList)
         {
             try
             {
                 await messageService.BeginTransaction();
-                var batchId = await messageService.NewBatchMessageTransaction(siteId, currencyId, adminName, personalMsg);
                 var rowId = 1;
                 foreach (var data in excelList)
                 {
@@ -309,7 +308,7 @@ namespace BackendSite.Service.BLL
             if (string.IsNullOrEmpty(resultMessage))
             {
                 tmpCustId = customer.CustId;
-                await messageService.AddCustBatchMessage(customer.CustId, batchId, isPopup);
+                await messageService.AddCustBatchMessage(customer.CustId, batchId, customer.UserLang, isPopup, "", "");
                 resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
             }
             await messageService.InsertBatchMessageSendLog(batchId, rawId, tmpCustId, userName, sabaId, resultMessage, adminName);
