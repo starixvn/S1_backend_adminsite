@@ -128,7 +128,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 if(!excelList.Any())
                     return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Empty File" };
 
-                batchId = await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.personalMsg);
+                batchId = await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
 
                 _ = Task.Run(async () => 
                 {
@@ -154,7 +154,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
                 #endregion
 
-                batchId = await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.personalMsg);
+                batchId = await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
                 
                 _ = Task.Run(() =>
                 {
