@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -49,7 +48,7 @@ namespace BackendSite.Service.DAL
 
         public void AssignSiteList(int UserId, IEnumerable<int> SiteIds)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var para = new DynamicParameters();
@@ -74,7 +73,7 @@ namespace BackendSite.Service.DAL
 
         public void AssignGroup(int UserId, int? GroupSEQ)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var para = new DynamicParameters();
@@ -113,7 +112,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<AdminUser> AddUser(string UserName, string MD5Pwd, IEnumerable<int> SiteList, int? GroupSEQ)
         {
             IEnumerable<AdminUser> userList = null;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var UserInfo = new DynamicParameters();

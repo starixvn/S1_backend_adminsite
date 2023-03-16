@@ -4,7 +4,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Extensions;
 using MySql.Data.MySqlClient;
-using System.Data;
 
 namespace BackendSite.Service.DAL
 {
@@ -26,12 +25,12 @@ namespace BackendSite.Service.DAL
         {
             var result = true;
 
-            using var conn = _mainDbClient.GetMySqlConnection();
+            await using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
-            using var trans = conn.BeginTransaction();
+            await using var trans = await conn.BeginTransactionAsync();
             var beforeData = GetAppLinkTable(siteId);
 
-            var asignBeforeData = beforeData.Where(x => x.SiteId == siteId && x.AppType == appType).FirstOrDefault() ?? null;
+            var asignBeforeData = beforeData.FirstOrDefault(x => x.SiteId == siteId && x.AppType == appType);
             var afterData = new { SiteId = siteId, AppType = appType.GetDescription(), Domain = domain, ProtocolType = protocolType.GetDescription() };
 
             var parameters = new
@@ -43,26 +42,24 @@ namespace BackendSite.Service.DAL
                 LastUpdateUser = lastUpdateUser
             };
 
-            if (conn.Execute("Admin_AppLinkTable_Set",
-                new DynamicParameters(parameters),
-                commandType: CommandType.StoredProcedure) == 0)
+            if (_mainDbClient.Execute("Admin_AppLinkTable_Set", trans, new DynamicParameters(parameters)) == 0)
                 result = false;
 
             if (!await AddNewOprateLog(siteId, asignBeforeData, afterData, AdminAdjustmentLogMenuEnum.AppQRCode,
-                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, conn, trans))
+                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, trans))
                 result = false;
 
 
             if (result)
             {
                 trans.Commit();
-                conn.Close();
+                await conn.CloseAsync();
                 return true;
             }
             else
             {
                 trans.Rollback();
-                conn.Close();
+                await conn.CloseAsync();
                 return false;
             }
         }
@@ -70,7 +67,7 @@ namespace BackendSite.Service.DAL
 
         private async Task<bool> AddNewOprateLog(int siteId, object beofreData, object afterData,
             AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType,
-            string updater, MySqlConnection conn, MySqlTransaction trans)
+            string updater, MySqlTransaction trans)
         {
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", siteId);
@@ -82,7 +79,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", afterData.ToLog());
             logParam.Add("_Operator", updater);
 
-            var logSuccess = await conn.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+            var logSuccess = await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
             if (logSuccess)
             {

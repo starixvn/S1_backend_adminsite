@@ -12,13 +12,11 @@ namespace BackendSite.Service.DAL
 {
     public class BonusManageService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
         public BonusManageService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -347,7 +345,7 @@ namespace BackendSite.Service.DAL
             using var trans = conn.BeginTransaction();
 
             //Step1:Set Promotion
-            var setAffectCount = SetPromotion(promotion, conn, trans);
+            var setAffectCount = SetPromotion(promotion, trans);
 
             if (setAffectCount == 0)
             {
@@ -365,7 +363,7 @@ namespace BackendSite.Service.DAL
 
             //Setp:inset AdjustmentinfoLog
             #region
-            var insertCount = InsertAdjustmentInfoLog(promotion, conn, trans, Operator);
+            var insertCount = InsertAdjustmentInfoLog(promotion, trans, Operator);
             if (insertCount == 0)
             {
                 trans.Rollback();
@@ -402,7 +400,7 @@ namespace BackendSite.Service.DAL
             }
 
             //Step2-1:Set Promotion Specific
-            if (!SetPromotionSpecific(promotion.BonusCode, promotion.SiteId, specificList, conn, trans))
+            if (!SetPromotionSpecific(promotion.BonusCode, promotion.SiteId, specificList, trans))
             {
                 trans.Rollback();
                 return false;
@@ -411,8 +409,7 @@ namespace BackendSite.Service.DAL
             //Step2-2:If Update,Delete old Promotion Specific
             if (isUpdate)
             {
-                DeletePromotionSpecific(promotion.BonusCode, promotion.SiteId, specificList,
-                    conn, trans);
+                DeletePromotionSpecific(promotion.BonusCode, promotion.SiteId, specificList, trans);
             }
 
             //Step3-1:Set Promotion Display Condition
@@ -429,8 +426,7 @@ namespace BackendSite.Service.DAL
             
             if (promotionDisplayConditionList.Any())
             {
-                if (!SetPromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList,
-                    conn, trans))
+                if (!SetPromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList, trans))
                 {
                     trans.Rollback();
                     return false;
@@ -440,8 +436,7 @@ namespace BackendSite.Service.DAL
             //Step3-2:If Update,Delete old Promotion Display Condition
             if (isUpdate)
             {
-                DeletePromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList,
-                    conn, trans);
+                DeletePromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList, trans);
             }
 
             if (promotion.PromotionType == (int)PromotionTypeEnum.Cashback)
@@ -518,13 +513,13 @@ namespace BackendSite.Service.DAL
                     }
                 }
 
-                if (isUpdate && !DeletePromotionCashBack(promotion.BonusCode, promotion.SiteId, conn, trans))
+                if (isUpdate && !DeletePromotionCashBack(promotion.BonusCode, promotion.SiteId, trans))
                 {
                     trans.Rollback();
                     return false;
                 }
 
-                if (!InsertPromotionCashBack(promotion.BonusCode, promotion.SiteId, Operator, cashBackList, conn,
+                if (!InsertPromotionCashBack(promotion.BonusCode, promotion.SiteId, Operator, cashBackList,
                         trans))
                 {
                     trans.Rollback();
@@ -553,17 +548,17 @@ namespace BackendSite.Service.DAL
         public bool DuplicatePromotionFlow(string bonusCode, int siteId, string newBonusCode, int expectedSpecificRow,
             int expectedConditionRow, int expectedCashBackRow, string Operator, string newSpecialCode, bool isSpecial)
         {
-            using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var connection = _mainDbClient.GetMySqlConnection();
             connection.Open();
             using var transaction = connection.BeginTransaction();
-            var promotionResult = DuplicatePromotion(bonusCode, siteId, newBonusCode, newSpecialCode, isSpecial, connection, transaction);
+            var promotionResult = DuplicatePromotion(bonusCode, siteId, newBonusCode, newSpecialCode, isSpecial, transaction);
 
             if (!promotionResult)
             {
                 transaction.Rollback();
                 return false;
             }
-            var promotionSpecificResult = DuplicatePromotionSpecific(bonusCode, siteId, newBonusCode, expectedSpecificRow, connection, transaction);
+            var promotionSpecificResult = DuplicatePromotionSpecific(bonusCode, siteId, newBonusCode, expectedSpecificRow, transaction);
             if (!promotionSpecificResult)
             {
                 transaction.Rollback();
@@ -572,7 +567,7 @@ namespace BackendSite.Service.DAL
 
             if (expectedConditionRow > 0)
             {
-                var promotionConditionResult = DuplicatePromotionDisplayCondition(bonusCode, siteId, newBonusCode, expectedConditionRow, connection, transaction);
+                var promotionConditionResult = DuplicatePromotionDisplayCondition(bonusCode, siteId, newBonusCode, expectedConditionRow, transaction);
                 if (!promotionConditionResult)
                 {
                     transaction.Rollback();
@@ -582,7 +577,7 @@ namespace BackendSite.Service.DAL
 
             if (expectedCashBackRow > 0)
             {
-                var promotionCashBackResult = DuplicatePromotionCashBack(bonusCode, siteId, newBonusCode, expectedCashBackRow, connection, transaction, Operator);
+                var promotionCashBackResult = DuplicatePromotionCashBack(bonusCode, siteId, newBonusCode, expectedCashBackRow, transaction, Operator);
                 if (!promotionCashBackResult)
                 {
                     transaction.Rollback();
@@ -610,11 +605,9 @@ namespace BackendSite.Service.DAL
         /// 設定促銷基本資料
         /// </summary>
         /// <param name="promotion"></param>
-        /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private int SetPromotion(PromotionInfoReq promotion, MySqlConnection connection,
-            MySqlTransaction transaction)
+        private int SetPromotion(PromotionInfoReq promotion, MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
 
@@ -670,11 +663,9 @@ namespace BackendSite.Service.DAL
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
         /// <param name="specificList"></param>
-        /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private bool SetPromotionSpecific(string bonusCode, int siteId, List<PromotionSpecific> specificList,
-            MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -698,11 +689,9 @@ namespace BackendSite.Service.DAL
         /// <param name="siteId"></param>
         /// <param name="specificList"></param>
         /// <param name="expectedRow"></param>
-        /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private int DeletePromotionSpecific(string bonusCode, int siteId, List<PromotionSpecific> specificList,
-            MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -725,12 +714,10 @@ namespace BackendSite.Service.DAL
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
         /// <param name="conditionData"></param>
-        /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private bool SetPromotionDisplayCondition(string bonusCode, int siteId,
             List<PromotionDisplayConditionModel> conditionData,
-            MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -754,12 +741,10 @@ namespace BackendSite.Service.DAL
         /// <param name="siteId"></param>
         /// <param name="conditionData"></param>
         /// <param name="expectedRow"></param>
-        /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private int DeletePromotionDisplayCondition(string bonusCode, int siteId,
             List<PromotionDisplayConditionModel> conditionData,
-            MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -782,10 +767,9 @@ namespace BackendSite.Service.DAL
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
         /// <param name="newBonusCode"></param>
-        /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, string newSpecialCode, bool isSpecial, MySqlConnection connection,
+        private bool DuplicatePromotion(string bonusCode, int siteId, string newBonusCode, string newSpecialCode, bool isSpecial,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -808,11 +792,9 @@ namespace BackendSite.Service.DAL
         /// <param name="siteId"></param>
         /// <param name="newBonusCode"></param>
         /// <param name="expectedRow"></param>
-        /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private bool DuplicatePromotionSpecific(string bonusCode, int siteId, string newBonusCode, int expectedRow,
-            MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -836,12 +818,10 @@ namespace BackendSite.Service.DAL
         /// <param name="siteId"></param>
         /// <param name="newBonusCode"></param>
         /// <param name="expectedRow"></param>
-        /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
         private bool DuplicatePromotionDisplayCondition(string bonusCode, int siteId, string newBonusCode,
-            int expectedRow, MySqlConnection connection,
-            MySqlTransaction transaction)
+            int expectedRow, MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
 
@@ -860,8 +840,7 @@ namespace BackendSite.Service.DAL
         #endregion
 
         #region
-        private int InsertAdjustmentInfoLog(PromotionInfoReq promotion, MySqlConnection connection,
-            MySqlTransaction transaction, string Operator)
+        private int InsertAdjustmentInfoLog(PromotionInfoReq promotion, MySqlTransaction transaction, string Operator)
         {
             var propsLog = new DynamicParameters();
 
@@ -887,7 +866,6 @@ namespace BackendSite.Service.DAL
 
         #region
         private bool DeletePromotionCashBack(string bonusCode, int siteId,
-            MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -899,7 +877,6 @@ namespace BackendSite.Service.DAL
         }
 
         private bool InsertPromotionCashBack(string bonusCode, int siteId, string Operator, List<PromotionCashBackSetting> cashbackList,
-            MySqlConnection connection,
             MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
@@ -923,8 +900,7 @@ namespace BackendSite.Service.DAL
         }
 
         private bool DuplicatePromotionCashBack(string bonusCode, int siteId, string newBonusCode,
-            int expectedRow, MySqlConnection connection,
-            MySqlTransaction transaction, string Operator)
+            int expectedRow, MySqlTransaction transaction, string Operator)
         {
             var p = new DynamicParameters();
 

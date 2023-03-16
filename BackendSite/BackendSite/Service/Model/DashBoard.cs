@@ -1,6 +1,4 @@
 ﻿using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
-using System.Security.Policy;
 
 namespace BackendSite.Service.Model
 {

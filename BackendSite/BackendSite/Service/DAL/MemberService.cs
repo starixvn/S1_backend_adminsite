@@ -238,7 +238,7 @@ public class MemberService : IMemberService
                 item.TagList = item.TagList.Append((int) CustTagEnum.Duplicate);
             }
             
-            success = await SetCustInfoTagList(custTags, conn, trans);
+            success = await SetCustInfoTagList(custTags, trans);
             if (success)
             {
                 _mainSqlClient.CommitAndDisposeConnection(conn, trans);
@@ -380,7 +380,7 @@ public class MemberService : IMemberService
         return await _mainSqlClient.ExecuteAsync("Admin_CustLineProfile_Del", p);
     }
     
-    public async Task<bool> SetCustInfoTagList(IEnumerable<CustTagList> tagList, MySqlConnection conn, MySqlTransaction trans)
+    public async Task<bool> SetCustInfoTagList(IEnumerable<CustTagList> tagList, MySqlTransaction trans)
     {
         var parameter = new DynamicParameters(new
         {

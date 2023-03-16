@@ -1,12 +1,10 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
-using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
@@ -37,11 +35,7 @@ namespace BackendSite.Service.DAL
 
         public VipLevelInfo GetVipLevelInfo(int CustId)
         {
-            var props = new DynamicParameters(new
-            {
-                CustId = CustId
-            });
-            var vipLevelInfo = _mainDbClient.QueryFirst<VipLevelInfo>("Admin_CustVipLevel_Get_V3",props);
+            var vipLevelInfo = _reportDbClient.QueryFirst<VipLevelInfo>("Admin_CustVipLevel_Get_V3", new { CustId });
             return vipLevelInfo;
         }
         
@@ -60,7 +54,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props);
+            var result = _reportDbClient.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props, commandType: CommandType.StoredProcedure);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -76,8 +70,7 @@ namespace BackendSite.Service.DAL
 
         public int SetVipLevel(int SiteId, int CustId, string UserName, int VipLevel, string Memo, string Operator)
         {
-            var result = _mainDbClient.Execute("Admin_CustVipLevel_Set",
-                new { SiteId, CustId, UserName, VipLevel, Memo, Operator });
+            var result = _mainDbClient.Execute("Admin_CustVipLevel_Set", new { SiteId, CustId, UserName, VipLevel, Memo, Operator });
             return result;
         }
         
@@ -94,8 +87,7 @@ namespace BackendSite.Service.DAL
         public int SetVipLevelManually(int SiteId, int CustId, string UserName, int Manually, string Memo,
             string Operator)
         {
-            var result = _mainDbClient.Execute("Admin_CustVipLevelManually_Set",
-                new { SiteId, CustId, UserName, Manually, Memo, Operator });
+            var result = _mainDbClient.Execute("Admin_CustVipLevelManually_Set", new { SiteId, CustId, UserName, Manually, Memo, Operator });
             return result;
         }
 
@@ -198,42 +190,6 @@ namespace BackendSite.Service.DAL
         }
 
         #region Private Methods
-
-        private int CheckRowForUpdateVipDowngradeReview(string custIdList,
-            string calculateYearMonth,
-            int newStatus,
-            MySqlConnection conn,
-            MySqlTransaction trans)
-        {
-            var props = new DynamicParameters();
-            props.Add("_CustIdList", custIdList);
-            props.Add("_CalculateYearMonth", calculateYearMonth);
-            props.Add("_Status", newStatus);
-
-            return conn.ExecuteScalar<int>("Admin_VipDowngradeReviewForSet_Get", props, trans,
-                commandType: CommandType.StoredProcedure);
-        }
-
-        private bool UpdateVipDowngradeReview(string custIdList,
-            string calculateYearMonth,
-            int newStatus,
-            string updater,
-            int expectedCount,
-            MySqlConnection conn,
-            MySqlTransaction trans)
-        {
-            var props = new DynamicParameters();
-            props.Add("_CustIdList", custIdList);
-            props.Add("_CalculateYearMonth", calculateYearMonth);
-            props.Add("_Status", newStatus);
-            props.Add("_LastUpdateUser", updater);
-
-            var affectCount = conn.Execute("Admin_VipDowngradeReview_Set", props, trans,
-                commandType: CommandType.StoredProcedure);
-
-
-            return expectedCount == affectCount;
-        }
 
         #endregion
     }

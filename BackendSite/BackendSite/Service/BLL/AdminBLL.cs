@@ -3,9 +3,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using System.Linq;
 using System.Security.Claims;
 
 namespace BackendSite.Service.BLL

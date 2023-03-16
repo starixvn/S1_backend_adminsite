@@ -4,7 +4,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -34,7 +33,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<int> InsertOrUpdate(ParamsWithLog<CustBetLimit> input)
         {
-            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            await using var conn = MainDbClient.GetMySqlConnection();
             conn.Open();
             await using var trans = await conn.BeginTransactionAsync();
             
@@ -97,7 +96,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<int> Delete(ParamsWithLog<DeleteCustBetLimit> input)
         {
-            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            await using var conn = MainDbClient.GetMySqlConnection();
             conn.Open();
             await using var trans = await conn.BeginTransactionAsync();
             

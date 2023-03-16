@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BackendSite.Service.Model.GameStatisticalReport
+﻿namespace BackendSite.Service.Model.GameStatisticalReport
 {
     public class GetListInputModel
     {

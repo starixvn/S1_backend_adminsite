@@ -1,9 +1,6 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
-using System.Data;
-using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {

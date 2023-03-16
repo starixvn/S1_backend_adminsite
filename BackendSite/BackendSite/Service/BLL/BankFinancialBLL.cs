@@ -9,10 +9,6 @@ using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.ApiModel;
-using System.Drawing;
-using System.Transactions;
-using BackendSite.Service.Library;
-using Microsoft.Extensions.DependencyInjection;
 using NPOI.XSSF.UserModel;
 using NuGet.Packaging;
 

@@ -81,6 +81,25 @@ namespace BackendSite.Service.Library
             return result;
         }
         
+        public T QueryFirst<T>(string name, IDbTransaction transaction, object parameters, int? commandTimeout = null)
+        {
+            T result;
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                result = transaction.Connection.QueryFirstOrDefault<T>(name, parameters, commandTimeout: commandTimeout, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, name);
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+        
          public IEnumerable<T> Query<T>(string name)
         {
             IEnumerable<T> result;
@@ -147,6 +166,32 @@ namespace BackendSite.Service.Library
                 
                 var multiple = connection.QueryMultiple(command);
                 result = func.Invoke(multiple);
+                connection.Close();
+                connection.Dispose();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, name);
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+        
+        public T QuerySingle<T>(string name, object parameters, CommandType commandType = CommandType.StoredProcedure)
+        {
+            T result;
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                using var connection = new MySqlConnection(_connectionString);
+                var command = new CommandDefinition(name, parameters, // 使用 CommandDefinition 不讓 Dapper 用預設值建立
+                    commandType: commandType);
+
+                result = connection.QuerySingle<T>(command);
                 connection.Close();
                 connection.Dispose();
             }
