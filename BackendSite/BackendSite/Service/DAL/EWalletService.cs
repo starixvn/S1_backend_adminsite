@@ -3,7 +3,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 
@@ -68,7 +67,7 @@ namespace BackendSite.Service.DAL
         public int BlockEWalletSet(ParamsWithLog<BlockEWalletSetRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -97,7 +96,7 @@ namespace BackendSite.Service.DAL
 
             if (result > 0)
             {
-                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
                 if (!logResult)
                 {
@@ -158,7 +157,7 @@ namespace BackendSite.Service.DAL
         public int ReleaseAccount(ParamsWithLog<ReleaseEWalletAccountRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 

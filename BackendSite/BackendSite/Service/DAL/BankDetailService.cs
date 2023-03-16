@@ -1,10 +1,8 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Extensions;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
@@ -13,17 +11,13 @@ namespace BackendSite.Service.DAL
 {
     public class BankDetailService
     {
-        private readonly IConfiguration configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        private readonly string _connectionString;
 
-        public BankDetailService(IConfiguration configuration, ILogger<MySqlClient> logger)
+        public BankDetailService(IEnumerable<MySqlClient> sqlClients)
         {
-            this.configuration = configuration;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
-            _connectionString = configuration.GetConnectionString("ConnectionString");
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
         public async Task<(IEnumerable<OfflineBankingSetting> Datas, int TotalPages, int RowCount)> GetOfflineBankingSettingListAsync
@@ -109,7 +103,7 @@ namespace BackendSite.Service.DAL
 
         public int SetBankCard(ParamsWithLog<SetBankCard> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -156,7 +150,7 @@ namespace BackendSite.Service.DAL
 
         public int SetBankCardwithIFSC(ParamsWithLog<SetBankCard> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -203,7 +197,7 @@ namespace BackendSite.Service.DAL
         }
         public int DelBankCard(ParamsWithLog<DeleteBankCard> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -240,8 +234,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankInfoSys> GetSysBankList()
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<BankInfoSys>("BankInfoSysList_Get", new { SiteId = (int?)null }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<BankInfoSys>("BankInfoSysList_Get", new { SiteId = (int?)null }, commandType: CommandType.StoredProcedure);
         }
     }
 }
