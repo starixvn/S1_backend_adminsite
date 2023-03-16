@@ -1,5 +1,4 @@
-﻿using BackendSite.Controllers.ApiV2.CMS.Setting;
-using BackendSite.Service.DAL;
+﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using Newtonsoft.Json;
 

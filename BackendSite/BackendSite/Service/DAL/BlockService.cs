@@ -3,10 +3,8 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
-using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
@@ -63,7 +61,7 @@ namespace BackendSite.Service.DAL
         public int SetBlockIP(ParamsWithLog<SetBlockIPRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -123,7 +121,7 @@ namespace BackendSite.Service.DAL
         public int DeleteBlockIP(ParamsWithLog<BlockIPRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -234,7 +232,7 @@ namespace BackendSite.Service.DAL
         public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -327,7 +325,7 @@ namespace BackendSite.Service.DAL
         public int ReleaseAccount(ParamsWithLog<ReleaseAccountRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -509,7 +507,7 @@ namespace BackendSite.Service.DAL
         public int BlockCryptoWalletSet(ParamsWithLog<BlockCryptoWalletSetRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -600,7 +598,7 @@ namespace BackendSite.Service.DAL
         public int ReleaseCryptoWallet(ParamsWithLog<ReleaseCryptoWalletRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 

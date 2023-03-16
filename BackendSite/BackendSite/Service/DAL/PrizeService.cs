@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using System;
 
 namespace BackendSite.Service.DAL
 {

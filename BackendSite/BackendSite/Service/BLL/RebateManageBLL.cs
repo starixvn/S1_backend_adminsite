@@ -8,7 +8,6 @@ namespace BackendSite.Service.BLL
     public class RebateManageBLL
     {
         private readonly RebateManageService _rebateManageService;
-        private readonly UserBetLimitBLL _userBetLimitBLL;
         private readonly VipLevelBLL _vipLevelBLL;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly TpBLL _tpBLL;
@@ -21,7 +20,6 @@ namespace BackendSite.Service.BLL
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<RebateManageBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
-            _userBetLimitBLL = provider.GetRequiredService<UserBetLimitBLL>();
             _vipLevelBLL = provider.GetRequiredService<VipLevelBLL>();
             _tpBLL = provider.GetRequiredService<TpBLL>();
         }
@@ -109,7 +107,7 @@ namespace BackendSite.Service.BLL
 
             foreach (var item in details)
             {
-                if (!await _rebateManageService.SetRebateGameTypeAsync(siteId, currencyId, item.GameType, item.Level, (decimal)item.Percentage, lastUpdateUser, conn, trans))
+                if (!await _rebateManageService.SetRebateGameTypeAsync(siteId, currencyId, item.GameType, item.Level, (decimal)item.Percentage, lastUpdateUser, trans))
                 {
                     _logger.LogError($"SetRebateGameType Fail.SiteId={siteId}. CurrencyId={currencyId}. GameType={item.GameType}. Level={item.Level}. Percentage={item.Percentage}. lastUpdateUser={lastUpdateUser}");
                     trans.Rollback();
@@ -120,10 +118,7 @@ namespace BackendSite.Service.BLL
             trans.Commit();
             return true;
         }
-        public bool DelRebatePeriod(int siteId, string lastUpdateUser)
-        {
-            return _rebateManageService.DelRebatePeriod(siteId, lastUpdateUser);
-        }
+
         public IEnumerable<RebateLevelData> GetRebateDataByCategory(int siteId, int categoryId, int currencyId)
         {
             return _rebateManageService.GetRebateDataByCategory(siteId, categoryId, currencyId);
@@ -149,10 +144,7 @@ namespace BackendSite.Service.BLL
             result.CategoryDataList = categoryDataList;
             return result;
         }
-        public IEnumerable<RebateLevelData> GetRebateDataByGameType(int siteId, int gameType, int currencyId)
-        {
-            return _rebateManageService.GetRebateDataByGameType(siteId, gameType, currencyId);
-        }
+
         public async Task<bool> SetRebateCategoryAsync(int siteId, int currencyId, int categoryId, int level, decimal percentage, string lastUpdateUser)
         {
             return await _rebateManageService.SetRebateCategoryAsync(siteId, currencyId, categoryId, level, percentage, lastUpdateUser);

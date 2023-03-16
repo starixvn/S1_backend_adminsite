@@ -1,5 +1,4 @@
-﻿using BackendSite.Service.Model.Mpa.WinLoss;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss
 {

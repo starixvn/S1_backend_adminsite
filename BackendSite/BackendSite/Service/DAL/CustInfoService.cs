@@ -12,13 +12,11 @@ namespace BackendSite.Service.DAL
 {
     public class CustInfoService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
         public CustInfoService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -231,8 +229,7 @@ namespace BackendSite.Service.DAL
                 SelectStatus = SelectStatus,
                 SelectTagList = jsonSelectTagList
             });
-
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
+            
             var custInfoDetailList = _reportDbClient.Query<T>("Admin_CustInfoSearchForExport_Get_V9", p);
             return custInfoDetailList;
         }
@@ -313,7 +310,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_CustPhotoId_Del", parameter) > 0;
         }
 
-        public bool AddCustNote(int custId, string note, string @operator, MySqlConnection conn = null, MySqlTransaction trans = null, bool canEdit = false)
+        public bool AddCustNote(int custId, string note, string @operator, MySqlTransaction trans = null, bool canEdit = false)
         {
             var p = new DynamicParameters(new
             {
@@ -322,13 +319,10 @@ namespace BackendSite.Service.DAL
                 _Operator = @operator,
                 _CanEdit = canEdit
             });
-
-            if (conn == null)
-            {
-                return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p) > 0;
-            }
-
-            return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", trans, p) > 0;
+            const string spName = "Admin_CustNotes_Ins_V2";
+            return trans != null
+                ? _mainDbClient.Execute(spName, trans, p) > 0
+                : _mainDbClient.Execute(spName, p) > 0;
         }
 
         public IEnumerable<CustNote> GetCustNotes(int custId,
@@ -454,7 +448,6 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<CustBonus> GetCustBonus(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var parameter = new DynamicParameters();
 
             parameter.Add("CustId", custId);
@@ -508,7 +501,7 @@ namespace BackendSite.Service.DAL
         #region Tag
         public bool EditTagManagement(ParamsWithLog<EditTagManagement> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -573,7 +566,7 @@ namespace BackendSite.Service.DAL
 
         public bool SetTagStatus(ParamsWithLog<SetTagStatus> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -640,9 +633,9 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_CustInofoEnablePromotion_Set", props) > 0;
         }
 
-        public async Task<bool> SetEnableRebateAsync(int custId, int status, MySqlConnection conn, MySqlTransaction trans)
+        public async Task<bool> SetEnableRebateAsync(int custId, int status, MySqlTransaction trans)
         {
-            return await _mainDbClient.ExecuteAsync("Admin_CustInfoEnableRebate_Set", new DynamicParameters(new { _CustId = custId, _EnableRebate = status })) > 0;
+            return await _mainDbClient.ExecuteAsync("Admin_CustInfoEnableRebate_Set", trans, new DynamicParameters(new { _CustId = custId, _EnableRebate = status })) > 0;
         }
 
         public IEnumerable<VipLevelModel> GetAllSiteVipLevelList()
@@ -743,7 +736,7 @@ namespace BackendSite.Service.DAL
         }
 
         public async Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beofreData, object afterData,
-           AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
+           AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlTransaction trans)
         {
 
             var logParam = new DynamicParameters();
@@ -757,7 +750,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", afterData.ToLog());
             logParam.Add("_Operator", updater);
 
-            return await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins_V2", logParam) > 0;
+            return await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins_V2", trans, logParam) > 0;
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
