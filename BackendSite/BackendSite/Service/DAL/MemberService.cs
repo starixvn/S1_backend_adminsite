@@ -154,11 +154,13 @@ public class MemberService : IMemberService
         };
         return loginLogData;
     }
-    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
+
+     public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
     {
-        var p = new DynamicParameters(new { CustId = custId });
-        return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _sqlClienct.QueryAsync<CustomerAssociateBankInfo>("Admin_AssociateBankAccountNo_Get", p);
     }
+    
     public async Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo)
     {
         return await _sqlClienct.ExecuteScalarAsync<int>("Admin_ExistsPhoneNo_Get",
@@ -365,7 +367,13 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_ResetCustEWallet_Set", p);
     }
-    
+
+    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
+    }
+
     public async Task<int> DeleteLineProfileAsync(int custId)
     {
         var p = new DynamicParameters(new { _CustId = custId });

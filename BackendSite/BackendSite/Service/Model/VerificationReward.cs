@@ -125,7 +125,7 @@ namespace BackendSite.Service.Model
             }
         }
     }
-    
+
     public class CustVerificationRewardModel
     {
         private DateTimeOffset? _phoneRewardTime;

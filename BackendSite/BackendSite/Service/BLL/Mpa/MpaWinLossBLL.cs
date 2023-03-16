@@ -2007,8 +2007,12 @@ namespace BackendSite.Service.BLL.Mpa
 
             if (_redisHelper.KeyExists(redisKey))
                 return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
+
             var data = await _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, request.StarTime,
                 request.EndTime, format, request.DateType);
+
+            data = data.Where(x => !string.IsNullOrEmpty(x.UserName));
+
             var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
             return data;
         }
@@ -2052,7 +2056,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                       TpUserName = item.TpUserName,
                                                       SummaryType = item.SummaryType,
                                                       TransactionType = item.TransactionType,
-                                                      Amount = item.Amount / rate,
+                                                      Amount = item.Amount * rate,
                                                       RowCount = item.RowCount
                                                   }).ToList();
 
@@ -2100,7 +2104,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                 UserName = item.UserName,
                                                 TpUserName = item.TpUserName,
                                                 CurrencyId = item.CurrencyId,
-                                                BonusAmountClaim = item.BonusAmountClaim / rate
+                                                BonusAmountClaim = item.BonusAmountClaim * rate
                                             }).ToList();
 
             var wrapperResult = new MpaWinLossBonusWrapper()
@@ -2171,13 +2175,13 @@ namespace BackendSite.Service.BLL.Mpa
                                                               BonusId = item.BonusId,
                                                               PromotionType = item.PromotionType,
                                                               TicketStatus = item.TicketStatus,
-                                                              StakeSummary = item.StakeSummary / rate,
-                                                              ValidBetSummary = item.ValidBetSummary / rate,
-                                                              WinLossSummary = item.WinLossSummary / rate,
-                                                              RevenueSummary = item.RevenueSummary / rate,
-                                                              ProgressiveWinSummary = item.ProgressiveWinSummary / rate,
-                                                              ProgressiveBetSummary = item.ProgressiveBetSummary / rate,
-                                                              ClosingBalance = item.ClosingBalance / rate,
+                                                              StakeSummary = item.StakeSummary * rate,
+                                                              ValidBetSummary = item.ValidBetSummary * rate,
+                                                              WinLossSummary = item.WinLossSummary * rate,
+                                                              RevenueSummary = item.RevenueSummary * rate,
+                                                              ProgressiveWinSummary = item.ProgressiveWinSummary * rate,
+                                                              ProgressiveBetSummary = item.ProgressiveBetSummary * rate,
+                                                              ClosingBalance = item.ClosingBalance * rate,
                                                               RowCount = item.RowCount,
                                                           }).ToList();
 

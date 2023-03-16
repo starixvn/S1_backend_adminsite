@@ -1932,14 +1932,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var data = _depositBll.GetDepositListByCust(request.CustId,
                                                        request.TransId,
-                                                       request.Status == 0 ? (int?)null : request.Status,
+                                                       request.Status == 0 ? null : request.Status,
                                                        request.StartDate,
                                                        request.EndDate,
                                                        request.PageSize,
                                                        request.PageNumber,
-                                                       out int totalPages,
-                                                       out int rowCount,
-                                                       out decimal totalAmount);
+                                                       out var totalPages,
+                                                       out var rowCount,
+                                                       out var totalAmount,
+                                                       out var totalApproveAmount,
+                                                       out var totalApproveRow);
 
             return new ApiListResultTotalAmount<DepositRequest>
             {
@@ -1948,6 +1950,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 PageNumber = request.PageNumber,
                 RowCount = rowCount,
                 TotalAmount = totalAmount,
+                TotalApproveAmount = totalApproveAmount,
+                TotalApproveRow = totalApproveRow,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -2008,17 +2012,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetWithdrawalInfoByCustId(GetWithdrawalListByCustIdRequest request)
         {
-            var CurrencyAmount = new List<string>();
             var data = _withdrawalBll.GetWithdrawalListByCust(request.CustId,
                 request.TransId,
-                request.Status == 0 ? (int?)null : request.Status,
+                request.Status == 0 ? null : request.Status,
                 request.StartDate,
                 request.EndDate,
                 request.PageSize,
                 request.PageNumber,
-                out int totalPages,
-                out int rowCount,
-                ref CurrencyAmount);
+                out var totalPages,
+                out var rowCount,
+                out var totalAmount,
+                out var totalApproveAmount,
+                out var totalApproveRow);
 
             return new ApiListResultCurrencyAmount<WithdrawalRequest>()
             {
@@ -2026,7 +2031,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 TotalPages = totalPages,
                 PageNumber = request.PageNumber,
                 RowCount = rowCount,
-                CurrencyAmount = CurrencyAmount,
+                TotalAmount = totalAmount,
+                TotalApproveAmount = totalApproveAmount,
+                TotalApproveRow = totalApproveRow,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
@@ -2402,6 +2409,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                    request.GameTypes,
                                                    request.StartDate.ToUniversalTime().DateTime,
                                                    request.EndDate.ToUniversalTime().DateTime);
+
             return new ApiResult<dynamic>
             {
                 Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName }),
@@ -3009,6 +3017,49 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return result;
         }
+        
+        /// <summary>
+        /// CustomerManage/GetAdjustmentWithdrawalLimitLog 取得手動調整提款額度限額的log
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        [HttpPost]
+        public AdjustmentWithdrawalLimitLogData GetAdjustmentWithdrawalLimitLog(CustIdWithDateRangeRequest request)
+        {
+            var result = new AdjustmentWithdrawalLimitLogData
+            {
+                AdjustmentWithdrawalLimitLogList = new List<AdjustmentWithdrawalLimitLog>(),
+                TotalAmount = 0
+            };
+
+            var searchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, 1, 1000);
+            
+            foreach (var model in searchResult.WithdrawalLimitLogList)
+            {
+                if (model.CreateFrom == (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment)
+                {
+                    var modelResult = new AdjustmentWithdrawalLimitLog
+                    {
+                        MainType = model.MainType,
+                        Amount = model.ChangeWithdrawalLimit,
+                        Memo = model.Memo,
+                        ReasonId = model.ReasonId,
+                        RefTransId = model.RefTransId,
+                        Creator = model.Creator,
+                        CreateTime = model.CreateTime
+                    };
+                    result.AdjustmentWithdrawalLimitLogList.Add(modelResult);
+                }
+            }
+            
+            result.TotalAmount = result.AdjustmentWithdrawalLimitLogList.Sum(x => x.MainType == (int)DirectionEnum.Add ? x.Amount : x.Amount * -1);
+            
+            return result;
+        }
+        
         #endregion
 
         #region CSD > Customer Administration > CustInfo [Get TPWallet]

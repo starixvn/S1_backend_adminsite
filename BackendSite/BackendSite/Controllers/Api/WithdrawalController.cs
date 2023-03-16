@@ -101,9 +101,10 @@ namespace BackendSite.Controllers.Api
 
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(
                 withdrawalListReq.SelectSite,
-                withdrawalListReq.withdrawalType, 
+                withdrawalListReq.withdrawalType,
                 startTime, 
                 endTime,
+                WithdrawalDateTypeEnum.CreateTime,
                 withdrawalListReq.WithdrawalId,
                 userNames , 
                 withdrawalListReq.CurrencyId,
@@ -518,7 +519,9 @@ namespace BackendSite.Controllers.Api
                 withdrawalReq.PageNumber,
                 out totalPages,
                 out rowCount,
-                ref CurrencyAmount);
+                out _ ,
+                out _ ,
+                out _ );
 
             return new ApiListResultCurrencyAmount<WithdrawalRequest>()
             {

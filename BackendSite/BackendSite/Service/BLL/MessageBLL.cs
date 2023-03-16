@@ -1,15 +1,12 @@
 ﻿using System.Text.RegularExpressions;
-using Amazon.Runtime.Internal.Util;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL
 {
@@ -207,6 +204,10 @@ namespace BackendSite.Service.BLL
         {
             return messageService.NewBatchMessage(siteId, author, personalMsg, isPopup, ref batchId);
         }
+        public async Task<int> NewBatchMessage(int siteId, int currencyId, string author, string personalMsg)
+        {
+            return await messageService.NewBatchMessage(siteId, currencyId, author, personalMsg);
+        }
         public bool DeleteBatchMessage(int batchId)
         {
             return messageService.DeleteBatchMessage(batchId);
@@ -266,11 +267,59 @@ namespace BackendSite.Service.BLL
             return !string.IsNullOrEmpty(input) ? Regex.Replace(input, "<.*?>", string.Empty) : input;
         }
 
+        public async Task<(string, CustomerWhoWaitToSend)> IsValidMember(int siteId, int? custId, string userName, string dataMessage)
+        {
+            var custInfosDetail = await custInfoBLL.GetCustInfoByCust(siteId, custId, userName);
+            if (custInfosDetail == null)
+                return ($"Not found. {dataMessage}", null);
+
+            if (custInfosDetail.Status != CustomerStatusEnum.Running && custInfosDetail.Status != CustomerStatusEnum.Lock)
+                return ($"Fail. {dataMessage} Status={custInfosDetail.Status.GetDescription()}", null);
+
+            return ("", custInfosDetail);
+        }
+
+        public async Task<int> BatchMessageByFile(int siteId, int currencyId, string personalMsg, bool isPopup, string adminName, List<ExcelData> excelList)
+        {
+            try
+            {
+                await messageService.BeginTransaction();
+                var batchId = await messageService.NewBatchMessageTransaction(siteId, currencyId, adminName, personalMsg);
+                var rowId = 1;
+                foreach (var data in excelList)
+                {
+                    await DoInsertRecipient(batchId, rowId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
+                    rowId++;
+                }
+                await messageService.Commit();
+                return batchId;
+            }
+            catch (Exception ex)
+            {
+                await messageService.RollBack();
+                _logger.LogError(ex, ex.Message);
+                return 0;
+            }
+        }
+        private async Task DoInsertRecipient(int batchId, int rawId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
+        {
+            var dataMessage = $"Username={userName}. SabaId={sabaId}.";
+            var (resultMessage, customer) = await IsValidMember(siteId, custId, userName, dataMessage);
+            var tmpCustId = 0;
+            if (string.IsNullOrEmpty(resultMessage))
+            {
+                tmpCustId = customer.CustId;
+                await messageService.AddCustBatchMessage(customer.CustId, batchId, isPopup);
+                resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
+            }
+            await messageService.InsertBatchMessageSendLog(batchId, rawId, tmpCustId, userName, sabaId, resultMessage, adminName);
+        }
+
         public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
         {
             string resultMessage;
             var errorCode = 0;
-            var dataMessage = $"CustId={data.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
+            var dataMessage = $"CustId={customer.CustId}. Username={data.CustUserName}. SabaId={data.SabaId}.";
 
             if (customer == null)
             {
@@ -309,7 +358,7 @@ namespace BackendSite.Service.BLL
 
             var status = (errorCode == 1) ? 3 : 4;
             var custId = customer?.CustId ?? 0;
-            if (!messageService.InsertBatchMessageSendLog(batchId, data.RowId, custId, data.CustUserName, data.SabaId, resultMessage, authData.UserName, status))
+            if (!messageService.InsertBatchMessageSendLog(batchId, data.RowId, custId, customer.UserName, data.SabaId, resultMessage, authData.UserName, status))
             {
                 _logger.LogError($@"MessageService-InsertBatchMessageSendLog Fail. " +
                                  $@"BatchId: {batchId}. CustId: {custId}. Username: {data.CustUserName}." +
@@ -344,9 +393,9 @@ namespace BackendSite.Service.BLL
 
                 case (int)CurrencyEnum.THB:
                     if (JObject.Parse(personalMsg)["th"] == null ||
-                        JObject.Parse(personalMsg)["th_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'th' or 'th_en' Msg";
+                        errorMsg = "Missing 'th' or 'en' Msg";
                         result = false;
                     }
                     break;
@@ -354,18 +403,18 @@ namespace BackendSite.Service.BLL
 
                 case (int)CurrencyEnum.IDR:
                     if (JObject.Parse(personalMsg)["id"] == null ||
-                        JObject.Parse(personalMsg)["id_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'id' or 'id_en' Msg";
+                        errorMsg = "Missing 'id' or 'en' Msg";
                         result = false;
                     }
                     break;
 
                 case (int)CurrencyEnum.INR:
                     if (JObject.Parse(personalMsg)["hi"] == null ||
-                        JObject.Parse(personalMsg)["hi_en"] == null)
+                        JObject.Parse(personalMsg)["en"] == null)
                     {
-                        errorMsg = "Missing 'hi' or 'hi_en' Msg";
+                        errorMsg = "Missing 'hi' or 'en' Msg";
                         result = false;
                     }
                     break;
@@ -380,13 +429,6 @@ namespace BackendSite.Service.BLL
             }
 
             return (result, errorMsg);
-        }
-
-        public ServerInfo GetServerInfo(int siteId)
-        {
-            List<ServerInfo> userSiteList = new List<ServerInfo>();
-            userSiteList = serverInfoService.GetSiteList().ToList();
-            return userSiteList.FirstOrDefault(x => x.SiteId == siteId);
         }
     }
 }

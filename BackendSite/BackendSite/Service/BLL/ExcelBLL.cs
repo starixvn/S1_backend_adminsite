@@ -1,12 +1,9 @@
-﻿using System.Drawing;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Reflection;
 using BackendSite.Attributes;
-using Org.BouncyCastle.Utilities;
-using NPOI.SS.Formula.Functions;
-using BackendSite.Service.Model.Mpa.Marketing;
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL
 {
@@ -34,6 +31,41 @@ namespace BackendSite.Service.BLL
         public bool IsValidFile(string contentType)
         {
             return _excelContentType.Exists(a => a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public List<ExcelData> Read(IFormFile formFile) 
+        {
+            var excelList = new List<ExcelData>();
+            var excelPkg = new ExcelPackage(formFile.OpenReadStream());
+            var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+            var isLastRow = false;
+            var rowId = 2; // 因為有標題列，所以從第2列開始讀起
+
+            do // 讀取資料，直到讀到空白列為止
+            {
+                var custUsername = sheet.Cells[rowId, 1].Text.Trim();
+                var sabaId = sheet.Cells[rowId, 2].Text.Trim();
+                var tmp = sabaId.Split('_');
+                int? custId = (tmp.Length == 2 && int.TryParse(tmp[1], out var id)) ? id : null;
+
+                if (string.IsNullOrEmpty(custUsername) && custId == null)
+                {
+                    isLastRow = true;
+                }
+                else
+                {
+                    excelList.Add(new ExcelData
+                    {
+                        CustId = custId,
+                        CustUserName = string.IsNullOrEmpty(custUsername) ? null : custUsername,
+                        SabaId = sabaId,
+                        RowId = rowId,
+                    });
+                    rowId += 1;
+                }
+            } while (!isLastRow);
+
+            return excelList;
         }
 
         public byte[] ExportToMultiSheet(List<ExportDataToExcel> t)
@@ -108,9 +140,9 @@ namespace BackendSite.Service.BLL
             {
                 if (propertyInfo == null)
                 {
-                    propertyInfo = t.FirstOrDefault().GetType().GetProperties();
+                    propertyInfo = t.FirstOrDefault().GetType().GetProperties()
+                    	.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 }
-
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
 
                 ExportBody(ws, t, propertyInfo, offset);
@@ -256,6 +288,14 @@ namespace BackendSite.Service.BLL
             return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
                 FileDownloadName = $"{fileName}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx"
+            };
+        }
+        
+        public FileContentResult ExcelFileDateRange(byte[] data, DateTime from , DateTime to ,string fileName)
+        {
+            return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = $"{fileName}_{from:yyyyMMdd}_{to:yyyyMMdd}.xlsx"
             };
         }
     }

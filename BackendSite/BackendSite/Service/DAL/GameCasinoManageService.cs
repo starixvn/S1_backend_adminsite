@@ -104,18 +104,16 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyDataV2> GetCurrency(GetGameCasinoDetailPara para)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
-            return conn.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props);
         }
         public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para,int SiteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             props.Add("SiteId", SiteId);
-            return conn.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId", props, commandType: CommandType.StoredProcedure).ToList();
+            return _mainDbClient.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId").ToList();
         }
     }
 }

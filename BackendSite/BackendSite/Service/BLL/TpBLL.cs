@@ -4,6 +4,8 @@ using BackendSite.Service.Model;
 using static BackendSite.Controllers.Api.TpController;
 using BackendSite.Service.Model.TpMaintain;
 using TpGameType = BackendSite.Service.Model.TpGameType;
+using System.Drawing.Drawing2D;
+using Amazon.S3.Model.Internal.MarshallTransformations;
 
 namespace BackendSite.Service.BLL
 {

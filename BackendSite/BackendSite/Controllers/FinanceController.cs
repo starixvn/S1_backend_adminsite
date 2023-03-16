@@ -66,15 +66,21 @@ namespace BackendSite.Controllers
             return View(pendingFund.ToList());
         }
         [HttpGet]
-        public IActionResult GetDepositReceiptPic(string transId)
+        public List<IActionResult> GetDepositReceiptPic(string transId)
         {
             var depositReceipt = depositBLL.GetDepositReceipt(transId);
             if (depositReceipt == null)
             {
-                return StatusCode(404);
+                return null;
             }
-            var image = depositReceipt.DepositPic;
-            return File(image, "image/jpeg");
+            var result = new List<IActionResult>();
+            foreach (var receipt in depositReceipt)
+            {
+                var image = receipt.DepositPic;
+                result.Add(File(image, "image/jpeg"));
+            }
+           
+            return result;
         }
 
         public class DepositListReq
@@ -117,6 +123,7 @@ namespace BackendSite.Controllers
                 depositListReq.SelectCalCode,
                 depositListReq.DepositType,
                 startTime, endTime,
+                DepositDateTypeEnum.CreateTime,
                 depositListReq.DepositId,
                 new List<string> {depositListReq.UserName},
                 null,
@@ -173,6 +180,7 @@ namespace BackendSite.Controllers
                 withdrawalType,
                 startTime, 
                 endTime, 
+                WithdrawalDateTypeEnum.CreateTime,
                 withdrawalListReq.WithdrawalId,
                 withdrawalListReq.UserName, 
                 currencyId,
@@ -297,13 +305,13 @@ namespace BackendSite.Controllers
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
-        public IActionResult BonusPayout()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
+        public IActionResult CryptoWithdrawalLimitManagement()
         {
             return View();
         }
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/USDTWithdrawalLimitManagement" })]
-        public IActionResult CryptoWithdrawalLimitManagement()
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BonusPayout" })]
+        public IActionResult BonusPayout()
         {
             return View();
         }
