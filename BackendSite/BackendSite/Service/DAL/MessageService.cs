@@ -338,14 +338,7 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_GetById", new DynamicParameters(new { _Id = id, _IsBatch = isBatch }));
         }
 
-        public async Task<int> NewBatchMessageTransaction(int siteId, int currencyId, string author, string personalMsg)
-        {
-            var p = new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Author = author, _Message = personalMsg });
-            p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            await _mainDbClient.ExecuteAsync("Admin_BatchMessage_Ins_V3", _transaction, p);
-            var batchId = p.Get<int?>("BatchId") ?? 0;
-            return batchId;
-        }
+
         public async Task<int> NewBatchMessage(int siteId, int currencyId, string author, string personalMsg)
         {
             var p = new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Author = author, _Message = personalMsg });
@@ -354,12 +347,12 @@ namespace BackendSite.Service.DAL
             var batchId = p.Get<int?>("BatchId") ?? 0;
             return batchId;
         }
-        public async Task<int> AddCustBatchMessage(int custId, int batchId, bool isPopup)
+        public async Task<int> AddCustBatchMessage(int custId, int batchId, string langId, bool isPopup, string title, string content)
         {
             return await _mainDbClient.ExecuteAsync(
                 "Admin_CustBatchMessage_Ins",
                 _transaction,
-                new DynamicParameters(new { _CustId = custId, _BatchId = batchId, _IsPopup = isPopup }));
+                new { _CustId = custId, _BatchId = batchId, _LangId = langId, _IsPopup = isPopup, _Title = title, _Content = content });
         }
         public async Task<int> InsertBatchMessageSendLog(int batchId, int rowId, int custId, string userName, string sabaId, string resultMessage, string updator)
         {
