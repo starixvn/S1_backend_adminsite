@@ -328,7 +328,7 @@ namespace BackendSite.Service.DAL
                 return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p) > 0;
             }
 
-            return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", p, conn, trans) > 0;
+            return _mainDbClient.Execute("Admin_CustNotes_Ins_V2", trans, p) > 0;
         }
 
         public IEnumerable<CustNote> GetCustNotes(int custId,
@@ -520,7 +520,7 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", input.Operator);
 
             var success = _mainDbClient
-                .Execute("Admin_Tag_Set", props, conn, trans) > 0;
+                .Execute("Admin_Tag_Set", trans, props) > 0;
 
             if (success)
             {
@@ -535,7 +535,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
                 if (logSuccess)
                 {
@@ -582,7 +582,7 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", input.Operator);
 
             var success = _mainDbClient
-                .Execute("Admin_TagStatus_Set", props, conn, trans) > 0;
+                .Execute("Admin_TagStatus_Set", trans, props) > 0;
 
             if (success)
             {
@@ -596,7 +596,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
                 if (logSuccess)
                 {
@@ -669,7 +669,7 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("CustId", custId);
-            return _reportDbClient.QueryFirst<CustProfileReq>("Admin_CustProfile_Get_V2", props);
+            return _reportDbClient.QueryFirst<CustProfileReq>("Admin_CustProfile_Get_V3", props);
         }
 
         public async Task<CustomerWhoWaitToSend> GetCustInfoByCust(int siteId, int? custId, string userName)
@@ -822,7 +822,7 @@ namespace BackendSite.Service.DAL
 
         public bool NewBatchCustInfo(int siteId, string memo, string author, ref int batchId)
         {
-            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author , _Memo = memo });
+            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author, _Memo = memo });
             p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var result = _mainDbClient.Execute("Admin_BatchCustInfo_Ins", p);
             batchId = p.Get<int>("BatchId");
@@ -839,7 +839,17 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BatchCustInfo> GetBatchCustInfo(int siteId)
         {
-            return _reportDbClient.Query<BatchCustInfo>("Admin_BatchCustInfo_Get", new DynamicParameters(new { _SiteId = siteId , _Top = 10}));
+            return _reportDbClient.Query<BatchCustInfo>("Admin_BatchCustInfo_Get", new DynamicParameters(new { _SiteId = siteId, _Top = 10 }));
+        }
+
+        public Task<IEnumerable<USDTDetail>> GetCustCryptoWalletDetailAsync(int custId)
+        {
+            return _reportDbClient.QueryAsync<USDTDetail>("Service_CustCryptoWalletDetail_Get", new DynamicParameters(new { CustId = custId }));
+        }
+
+        public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
+        {
+            return _reportDbClient.Query<CustCryptoWalletList>("Admin_CustCryptoWalletList_Get", new DynamicParameters(new { CustId = custId }));
         }
     }
 }

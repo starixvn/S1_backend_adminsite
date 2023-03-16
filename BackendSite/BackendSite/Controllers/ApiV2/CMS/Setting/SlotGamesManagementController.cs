@@ -39,6 +39,29 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         /// <summary>
+        /// SlotGamesManagement/GetSlotCategoryList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        ///
+        /// Func Path：CMS >  Slot Games Management
+        /// </remarks>
+        [HttpPost]
+        public ApiResult<IEnumerable<SlotCategoryInfo>> GetSlotCategoryList()
+        {
+            var all = new SlotCategoryInfo { Id = 0, Name = "All (Set Status)" };
+            var data = _gameCasinoManageBLL.GetSlotCategoryList();
+
+            var apiResult = new ApiResult<IEnumerable<SlotCategoryInfo>>
+            {
+                Data = data.Append(all).OrderBy(x => x.Id),
+                ErrorCode = 0
+            };
+
+            return apiResult;
+        }
+
+        /// <summary>
         /// SlotGamesManagement/GetSlotGameList 
         /// </summary>
         /// <remarks>

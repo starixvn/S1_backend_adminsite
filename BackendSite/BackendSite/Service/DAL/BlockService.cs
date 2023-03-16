@@ -6,6 +6,7 @@ using Dapper;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
+using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
@@ -95,10 +96,10 @@ namespace BackendSite.Service.DAL
                     Memo = input.After.Memo,
                     Operator = input.Operator
                 });
-                result = _mainDbClient.Execute("Admin_BlockIP_Set", p, conn, trans);
+                result = _mainDbClient.Execute("Admin_BlockIP_Set", trans, p);
                 if (result > 0)
                 {
-                    var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                    var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                     if (!logResult)
                     {
                         trans.Rollback();
@@ -145,11 +146,11 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            result = _mainDbClient.Execute("Admin_BlockIP_Del", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_BlockIP_Del", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -217,13 +218,13 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<IPUser>("Admin_IPUserList_Get", p);
         }
-        
+
         public async Task<IEnumerable<DeviceUser>> GetIoavationAssociatedList(string deviceId)
         {
             var p = new DynamicParameters(new { _DeviceId = deviceId });
             return await _reportDbClient.QueryAsync<DeviceUser>("Admin_IoavationAssociatedList_Get", p);
         }
-        
+
         public async Task<IEnumerable<DeviceUser>> GetShieldAssociatedList(string deviceId)
         {
             var p = new DynamicParameters(new { _DeviceId = deviceId });
@@ -260,11 +261,11 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            result = _mainDbClient.Execute("Admin_BlockAccount_Set", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_BlockAccount_Set", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -284,7 +285,7 @@ namespace BackendSite.Service.DAL
                         Status = input.After.Status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
                     });
 
-                    result = _mainDbClient.Execute("Member_CustBankDetail_Set", parameter, conn, trans);
+                    result = _mainDbClient.Execute("Member_CustBankDetail_Set", trans, parameter);
 
                     if (result > 0)
                     {
@@ -300,7 +301,7 @@ namespace BackendSite.Service.DAL
                             Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
+                        result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", trans, prop);
                         if (result == 0)
                         {
                             trans.Rollback();
@@ -351,11 +352,11 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            result = _mainDbClient.Execute("Admin_CustBankDetail_Del", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_CustBankDetail_Del", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -378,7 +379,7 @@ namespace BackendSite.Service.DAL
                         Operator = input.Operator
                     });
 
-                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", prop, conn, trans);
+                    result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", trans, prop);
 
                     if (result <= 0)
                     {
@@ -428,6 +429,252 @@ namespace BackendSite.Service.DAL
             });
 
             return _reportDbClient.Query<BlockBankAcc>("Admin_BlockAccount_Get", p);
+        }
+
+        public IEnumerable<BlockCryptoWallet> GetBlockCryptoWallet(DateTime startDate, DateTime endDate, int blockStatus, string address, IEnumerable<int> currencyId, string userName, IEnumerable<int> cryptoType, IEnumerable<string> netWork, int siteId)
+        {
+            var jsonSelectStatus = string.Empty;
+            if (blockStatus == 0)
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock, (int)BlockAccountStatus.UnLock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+            else if (blockStatus == 1)
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+            else
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.UnLock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+
+            var p = new DynamicParameters(new
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                Address = string.IsNullOrWhiteSpace(address) ? null : address,
+                UserName = string.IsNullOrWhiteSpace(userName) ? null : userName,
+                SelectStatus = jsonSelectStatus,
+                SelectCurrency = JsonConvert.SerializeObject(currencyId),
+                SelectCrypto = JsonConvert.SerializeObject(cryptoType),
+                SelectNetWork = JsonConvert.SerializeObject(netWork),
+                SiteId = siteId
+            });
+
+            return _reportDbClient.Query<BlockCryptoWallet>("Admin_BlockCryptoWallet_Get", p);
+        }
+
+        public IEnumerable<BlockCryptoWallet> GetBlockCryptoAddress(DateTime startDate, DateTime endDate, int blockStatus, string address)
+        {
+            var jsonSelectStatus = string.Empty;
+            if (blockStatus == 0)
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock, (int)BlockAccountStatus.UnLock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+            else if (blockStatus == 1)
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.Lock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+            else
+            {
+                var tempList = new List<int>() { (int)BlockAccountStatus.UnLock };
+                jsonSelectStatus = JsonConvert.SerializeObject(tempList);
+            }
+
+            var p = new DynamicParameters(new
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                Address = string.IsNullOrWhiteSpace(address) ? null : address,
+                SelectStatus = jsonSelectStatus
+            });
+
+            return _reportDbClient.Query<BlockCryptoWallet>("Admin_BlockCryptoAddress_Get", p);
+        }
+
+        public IEnumerable<BlockCryptoWalletList> GetBlockCryptoWalletList(string address)
+        {
+            var p = new DynamicParameters(new
+            {
+                Address = address
+            });
+
+            return _reportDbClient.Query<BlockCryptoWalletList>("Admin_BlockCryptoWalletList_Get", p);
+        }
+
+        public int BlockCryptoWalletSet(ParamsWithLog<BlockCryptoWalletSetRequest> input)
+        {
+            var result = 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters(new
+            {
+                _Address = input.After.Address,
+                _Status = (int)input.After.Status,
+                _UpdateOperator = input.Operator,
+                _Memo = input.After.Memo
+            });
+
+            #region propsLog
+
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetBlockCryptoWallet);
+            logParam.Add("_ActionType", (int)ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", input.After.ToLog());
+            logParam.Add("_Operator", input.Operator);
+
+            #endregion
+
+            result = _mainDbClient.Execute("Admin_BlockCryptoWallet_Set", trans, p);
+
+            if (result > 0)
+            {
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
+                if (!logResult)
+                {
+                    trans.Rollback();
+                    return 0;
+                }
+
+                var blockCryptoWalletList = GetBlockCryptoWalletList(input.After.Address).ToList();
+
+                foreach (var x in blockCryptoWalletList)
+                {
+                    var parameter = new DynamicParameters(new
+                    {
+                        CustId = x.CustId,
+                        Address = input.After.Address,
+                        Status = input.After.Status == BlockCryptoWalletStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
+                    });
+
+                    result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Set", trans, parameter);
+
+                    if (result > 0)
+                    {
+                        var prop = new DynamicParameters(new
+                        {
+                            CustId = x.CustId,
+                            SiteId = x.SiteId,
+                            AccountName = x.AccountName,
+                            Address = input.After.Address,
+                            NickName = x.NickName,
+                            Network = x.Network,
+                            CurrencyId = x.CurrencyId,
+                            Status = input.After.Status == BlockCryptoWalletStatus.Lock ? CustUSDTInfoLogStatus.Lock : CustUSDTInfoLogStatus.Unlock,
+                            Operator = input.Operator
+                        });
+
+                        result = _mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", trans, prop);
+                        if (result == 0)
+                        {
+                            trans.Rollback();
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        trans.Rollback();
+                        return result;
+                    }
+                }
+                trans.Commit();
+            }
+            else
+            {
+                trans.Rollback();
+            }
+
+            return result;
+        }
+
+        public int ReleaseCryptoWallet(ParamsWithLog<ReleaseCryptoWalletRequest> input)
+        {
+            var result = 0;
+            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+
+            var p = new DynamicParameters(new
+            {
+                CustId = input.Before.CustId,
+                Address = input.Before.Address
+            });
+
+            #region propsLog
+
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.ReleaseCryptoWallet);
+            logParam.Add("_ActionType", (int)ActionType.Delete);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", null, DbType.String);
+            logParam.Add("_Operator", input.Operator);
+
+            #endregion
+
+            var custSameAddress = _reportDbClient.Query<CustCryptoWalletList>("Admin_CustCryptoWalletList_Get", new DynamicParameters(new { CustId = input.Before.CustId }));
+
+            result = _mainDbClient.Execute("Admin_CustCryptoWalletDetail_Del", trans, p);
+
+            if (result > 0)
+            {
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
+                if (!logResult)
+                {
+                    trans.Rollback();
+                    return 0;
+                }
+
+                var custInfo = _custInfoService.GetCustInfo(input.Before.CustId);
+
+                if (custInfo != null)
+                {
+                    foreach (var cryptoWallet in custSameAddress)
+                    {
+                        var logProp = new DynamicParameters(new
+                        {
+                            CustId = input.Before.CustId,
+                            SiteId = custInfo.SiteId,
+                            AccountName = string.Empty,
+                            Address = input.Before.Address,
+                            NickName = cryptoWallet.NickName,
+                            Network = cryptoWallet.Network,
+                            CurrencyId = cryptoWallet.CurrencyId,
+                            Status = CustUSDTInfoLogStatus.Release,
+                            Operator = input.Operator
+                        });
+
+                        if (_mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", trans, logProp) <= 0)
+                        {
+                            trans.Rollback();
+                            return 0;
+                        }
+                    }
+                }
+                else
+                {
+                    trans.Rollback();
+                }
+
+            }
+            else
+            {
+                trans.Rollback();
+            }
+            trans.Commit();
+            return result;
         }
     }
 }

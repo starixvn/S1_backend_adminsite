@@ -64,7 +64,7 @@ namespace BackendSite.Service.DAL
             _UserGroup.Add("@GroupName", GroupInfo.GroupName);
             _UserGroup.Add("@Remark", GroupInfo.Remark);
 
-            _mainDbClient.Execute(SpName, _UserGroup, conn, tran);
+            _mainDbClient.Execute(SpName, tran, _UserGroup);
 
             var SEQ = _UserGroup.Get<int?>("@SEQ");
             if (SEQ != null && GroupInfo.Permission != null)
@@ -78,7 +78,7 @@ namespace BackendSite.Service.DAL
                     para.Add("GroupSEQ", SEQ);
                     para.Add("FuncKey", data.FuncKey);
                     para.Add("SubFuncKeys", SubFunctionKeys);
-                    _mainDbClient.Execute(SpName, para, conn ,tran);
+                    _mainDbClient.Execute(SpName, tran, para);
                 }
             }
 
@@ -93,10 +93,10 @@ namespace BackendSite.Service.DAL
             var para = new DynamicParameters();
             para.Add("GroupSEQ", GroupSEQ);
             var SpName = "Admin_GroupFunc_Del";
-            _mainDbClient.Execute(SpName, para, conn, tran);
+            _mainDbClient.Execute(SpName, tran, para);
 
             SpName = "Admin_Group_Del";
-            _mainDbClient.Execute(SpName, para, conn, tran);
+            _mainDbClient.Execute(SpName, tran, para);
 
             tran.Commit();
         }
@@ -111,12 +111,12 @@ namespace BackendSite.Service.DAL
             para.Add("GroupSEQ", GroupInfo.GroupSEQ);
             para.Add("GroupName", GroupInfo.GroupName);
             para.Add("Remark", GroupInfo.Remark);
-            _mainDbClient.Execute(SpName, para, conn, tran);
+            _mainDbClient.Execute(SpName, tran, para);
 
             SpName = "Admin_GroupFunc_Del";
             var para2 = new DynamicParameters();
             para2.Add("GroupSEQ", GroupInfo.GroupSEQ);
-            _mainDbClient.Execute(SpName, para2 , conn, tran);
+            _mainDbClient.Execute(SpName, tran, para2);
 
             if (GroupInfo.Permission != null)
             {
@@ -129,7 +129,7 @@ namespace BackendSite.Service.DAL
                     para3.Add("GroupSEQ", GroupInfo.GroupSEQ);
                     para3.Add("FuncKey", data.FuncKey);
                     para3.Add("SubFuncKeys", SubFunctionKeys);
-                    _mainDbClient.Execute(SpName, para3, conn, tran);
+                    _mainDbClient.Execute(SpName, tran, para3);
                 }
             }
 

@@ -66,11 +66,11 @@ namespace BackendSite.Service.DAL
             p.Add("Sort", input.After.Sort);
             p.Add("AdminUser", input.Operator);
             
-            var result = _mainDbClient.Execute("Admin_Banner_Set_V3", p, conn, trans);
+            var result = _mainDbClient.Execute("Admin_Banner_Set_V3", trans, p);
             
             if(result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -170,11 +170,11 @@ namespace BackendSite.Service.DAL
             p.Add("Status", (int)input.After.Status);
             p.Add("AdminUser", input.Operator);
             
-            var result = _mainDbClient.Execute("Admin_BannerStatus_Set", p, conn, trans);
+            var result = _mainDbClient.Execute("Admin_BannerStatus_Set", trans, p);
             
             if(result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();
@@ -215,11 +215,11 @@ namespace BackendSite.Service.DAL
             p.Add("_CurrencyId", input.CurrencyId);
             p.Add("_BannerName", input.Before.BannerName);
 
-            var result = _mainDbClient.Execute("Admin_Banner_Del", p, conn, trans);
+            var result = _mainDbClient.Execute("Admin_Banner_Del", trans, p);
             
             if(result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
                     trans.Rollback();

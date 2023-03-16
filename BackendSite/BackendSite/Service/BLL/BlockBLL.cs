@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -37,7 +38,22 @@ namespace BackendSite.Service.BLL
                 return obj.AccountNum == null ? 0 : obj.AccountNum.GetHashCode();
             }
         }
+        class BlockCryptoWalletComparer : IEqualityComparer<BlockCryptoWallet>
+        {
+            public bool Equals(BlockCryptoWallet x, BlockCryptoWallet y)
+            {
+                if (Object.ReferenceEquals(x, y)) return true;
+                if (Object.ReferenceEquals(x, null) || Object.ReferenceEquals(y, null))
+                    return false;
+                return x.Address == y.Address;
+            }
 
+            public int GetHashCode(BlockCryptoWallet obj)
+            {
+                if (object.ReferenceEquals(obj, null)) return 0;
+                return obj.Address == null ? 0 : obj.Address.GetHashCode();
+            }
+        }
         public async Task<BlockIPPageData> GetBlockIPList(string ip, DateTime startDate, DateTime endDate, int pageSize, int pageNumber)
         {
             return await _blockService.GetBlockIPList(ip, startDate, endDate, pageNumber, Math.Abs(pageSize));
@@ -73,7 +89,7 @@ namespace BackendSite.Service.BLL
                 List<BlockBankAcc> noUseAcc = blockBankAcc.Except(custBlockBankAcc, new BlockBankAccComparer()).ToList();
                 custBlockBankAcc.AddRange(noUseAcc);
             }
-            
+
             return custBlockBankAcc;
         }
         public IEnumerable<BlockList> GetBlockBankAccList(int sysId, string accountNum)
@@ -97,9 +113,37 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<DeviceUser>> GetDeviceUserList(int siteId, string deviceId)
         {
-            if(siteId == (int)SiteEnum.NOVA88) 
+            if (siteId == (int)SiteEnum.NOVA88)
                 return await _blockService.GetIoavationAssociatedList(deviceId);
             return await _blockService.GetShieldAssociatedList(deviceId);
+        }
+
+        public IEnumerable<BlockCryptoWallet> GetBlockCryptoWallet(DateTime startDate, DateTime endDate, int status, string address, IEnumerable<int> currencyId, string userName, IEnumerable<int> cryptoType, IEnumerable<string> netWork, int siteId)
+        {
+            List<BlockCryptoWallet> custBlockCryptoWallet = _blockService.GetBlockCryptoWallet(startDate, endDate, status, address, currencyId, userName, cryptoType, netWork, siteId).ToList();
+
+            if (string.IsNullOrEmpty(userName))
+            {
+                List<BlockCryptoWallet> blockCryptoAddress = _blockService.GetBlockCryptoAddress(startDate, endDate, status, address).ToList();
+                List<BlockCryptoWallet> noUseAcc = blockCryptoAddress.Except(custBlockCryptoWallet, new BlockCryptoWalletComparer()).ToList();
+                custBlockCryptoWallet.AddRange(noUseAcc);
+            }
+            return custBlockCryptoWallet;
+        }
+
+        public IEnumerable<BlockCryptoWalletList> GetBlockCryptoWalletList(string address)
+        {
+            return _blockService.GetBlockCryptoWalletList(address);
+        }
+
+        public int BlockCryptoWalletSet(ParamsWithLog<BlockCryptoWalletSetRequest> input)
+        {
+            return _blockService.BlockCryptoWalletSet(input);
+        }
+
+        public int ReleaseCryptoWallet(ParamsWithLog<ReleaseCryptoWalletRequest> input)
+        {
+            return _blockService.ReleaseCryptoWallet(input);
         }
     }
 }

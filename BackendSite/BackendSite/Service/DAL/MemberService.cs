@@ -206,7 +206,7 @@ public class MemberService : IMemberService
         conn.Open();
         await using var trans = await conn.BeginTransactionAsync();
         
-        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p, conn, trans) > 0;
+        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", trans, p) > 0;
 
         if (success)
         {
@@ -357,7 +357,7 @@ public class MemberService : IMemberService
     public async Task<int> ResetCryptoInfoAsync(int custId)
     {
         var p = new DynamicParameters(new { CustId = custId });
-        return await _mainSqlClient.ExecuteAsync("Admin_ResetCustUSDTInfo_Set", p);
+        return await _mainSqlClient.ExecuteAsync("Admin_ResetCryptoWallet_Set", p);
     }
 
     public async Task<int> ResetEWalletAsync(int custId)
@@ -379,7 +379,7 @@ public class MemberService : IMemberService
             _Infos = JsonConvert.SerializeObject(tagList)
         });
             
-        return await _mainSqlClient.ExecuteAsync("Service_CustInfoTagList_Set", parameter, conn, trans) > 0;
+        return await _mainSqlClient.ExecuteAsync("Service_CustInfoTagList_Set", trans, parameter) > 0;
     }
 
     public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)

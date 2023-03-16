@@ -34,5 +34,23 @@
         "Childs": null
       }
     ]
+  },
+  {
+    "Key": "",
+    "Title": "CMS",
+    "Icon": "icon-csd",
+    "Roles": null,
+    "Childs": [
+      {
+        "Key": "LeaderBoardExtraPoint",
+        "Title": "LeaderBoard ExtraPoint",
+        "FuncKey": "CMS/LeaderBoardExtraPoint",
+        "Controller": "Marketing",
+        "Action": "LeaderBoardExtraPoint",
+        "Icon": "",
+        "Roles": null,
+        "Childs": null
+      }
+    ]
   }
 ]
