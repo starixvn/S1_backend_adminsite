@@ -204,9 +204,9 @@ namespace BackendSite.Service.BLL
         {
             return messageService.NewBatchMessage(siteId, author, personalMsg, isPopup, ref batchId);
         }
-        public async Task<int> NewBatchMessage(int siteId, int currencyId, string author, string personalMsg)
+        public async Task<int> NewBatchMessage(int siteId, int currencyId, string author, bool isPopup, string personalMsg)
         {
-            return await messageService.NewBatchMessage(siteId, currencyId, author, personalMsg);
+            return await messageService.NewBatchMessage(siteId, currencyId, author, isPopup, personalMsg);
         }
         public bool DeleteBatchMessage(int batchId)
         {
@@ -290,6 +290,7 @@ namespace BackendSite.Service.BLL
                     await DoInsertRecipient(batchId, rowId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
                     rowId++;
                 }
+                await messageService.UpdateBatchMessage((int)SendBatchMessageStatus.Finished, batchId);
                 await messageService.Commit();
                 return batchId;
             }
