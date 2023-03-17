@@ -4,6 +4,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
 using Dapper;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using NPOI.OpenXmlFormats.Dml.Chart;
 
