@@ -2330,11 +2330,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                if (_messageBll.SendMessageToPlayer(authData.UserName,
-                    request.Title,
-                    request.Content,
-                    request.CustId,
-                    authData.UserId) == 0)
+                if (_messageBll.SendMessageToPlayer(authData.UserName, request.Title, request.Content, request.CustId) == 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Send Fail.";

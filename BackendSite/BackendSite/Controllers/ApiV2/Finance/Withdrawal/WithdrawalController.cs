@@ -646,7 +646,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             title = string.Format(title, request.TransId);
                             var content = _selLangBll.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
                             content = string.Format(content, request.TransId);
-                            _messageBll.SendMessageToPlayer(withdrawConfirmResult, title, content);
+                            _messageBll.SendMessageToPlayer(sender, title, content, withdrawConfirmResult);
 
                             #region Copy Picture
 
@@ -675,7 +675,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             title = string.Format(title, request.TransId);
                             var content = _selLangBll.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
                             content = string.Format(content, request.TransId);
-                            _messageBll.SendMessageToPlayer(withdrawConfirmResult, title, content);
+                            _messageBll.SendMessageToPlayer(sender, title, content, withdrawConfirmResult);
                         }
                         break;
                     }

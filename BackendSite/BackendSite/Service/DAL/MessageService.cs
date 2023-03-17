@@ -29,20 +29,11 @@ namespace BackendSite.Service.DAL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-
-        public int SendMessageToPlayer(int siteId, string sender, string title, string content, int custId, string CustUserName, string lang)
-        {
-            return _mainDbClient.Execute("Msg_Ins", new DynamicParameters(new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = siteId, Sender = sender, Title = title, Content = content, MainId = 0 }));
-        }
-        public int SendMessageToPlayer(int custId, string lang, string title, string content)
+        public int SendMessageToPlayer(string sender, int custId, string lang, string title, string content)
         {
             return _mainDbClient.Execute(
                 "Admin_CustBatchMessage_Ins",
-                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = 0, _Title = title, _Content = content});
-        }
-        public int SendMessageToPlayer(int siteId, string sender, string title, string content, int custId, string CustUserName, string lang, int SenderCustId)
-        {
-            return _mainDbClient.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 });
+                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = 0, _Title = title, _Content = content, _Sender = sender });
         }
 
         public IEnumerable<Announcement> GetAnnouncements(string siteIds,
