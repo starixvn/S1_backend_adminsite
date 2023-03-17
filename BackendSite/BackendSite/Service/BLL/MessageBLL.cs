@@ -296,7 +296,7 @@ namespace BackendSite.Service.BLL
                 }
                 await messageService.UpdateBatchMessage((int)SendBatchMessageStatus.Finished, batchId);
                 await messageService.Commit();
-                return batchId;
+                return 1;
             }
             catch (Exception ex)
             {
