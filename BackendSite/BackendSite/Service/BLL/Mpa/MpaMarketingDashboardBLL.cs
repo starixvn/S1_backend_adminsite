@@ -274,14 +274,14 @@ namespace BackendSite.Service.BLL
             #endregion
 
             #region Churn Rate
-
-            result.ChurnRate = (decimal)result.NoBetUsers / result.BasedOnReportTotalUsers * 100;
-
+            
+            result.ChurnRate =  result.BasedOnReportTotalUsers != 0 ? (decimal)result.NoBetUsers / result.BasedOnReportTotalUsers * 100 : 0;
+            
             #endregion
             
             #region Retention Rate
-
-            result.RetentionRate = (decimal)result.HasBetUsers / result.BasedOnReportTotalUsers * 100;
+            
+            result.RetentionRate = result.BasedOnReportTotalUsers != 0 ? (decimal)result.HasBetUsers / result.BasedOnReportTotalUsers * 100 : 0;
 
             #endregion
             
@@ -294,10 +294,10 @@ namespace BackendSite.Service.BLL
                     input.EndDateCompared.DateTime
                 );
 
-                result.DepositUsersComparedRate = ((decimal)result.DepositUsers / resultCompared.DepositUsers - 1 ) * 100;
-                result.ActiveUsersComparedRate = ((decimal)result.ActiveUsers / resultCompared.ActiveUsers - 1 ) * 100;
-                result.NRUComparedRate = ((decimal)result.NRU / resultCompared.NRU - 1 ) * 100;
-                result.ActiveNRUComparedRate = ((decimal)result.ActiveNRU / resultCompared.ActiveNRU - 1 ) * 100;
+                result.DepositUsersComparedRate = resultCompared.DepositUsers != 0 ? ((decimal)result.DepositUsers / resultCompared.DepositUsers - 1 ) * 100 : 0;
+                result.ActiveUsersComparedRate =  resultCompared.ActiveUsers != 0 ? ((decimal)result.ActiveUsers / resultCompared.ActiveUsers - 1 ) * 100 : 0;
+                result.NRUComparedRate =  resultCompared.NRU != 0 ? ((decimal)result.NRU / resultCompared.NRU - 1 ) * 100 : 0;
+                result.ActiveNRUComparedRate =  resultCompared.ActiveNRU != 0 ? ((decimal)result.ActiveNRU / resultCompared.ActiveNRU - 1 ) * 100 : 0;
 
                 #region Withdrawal Amount Compared
 
@@ -309,7 +309,7 @@ namespace BackendSite.Service.BLL
                 _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(compareWithWithdrawalSummaryResult, input.StartDateCompared, input.GetCompareEndDate(), input.BaseCurrencyId).Wait();
                 
                 var withdrawalAmountCompared = compareWithWithdrawalSummaryResult.Sum(x => x.WithdrawalAmount);
-                result.WithdrawalAmountComparedRate = (result.WithdrawalAmount / withdrawalAmountCompared - 1 ) * 100;
+                result.WithdrawalAmountComparedRate = withdrawalAmountCompared != 0 ? (result.WithdrawalAmount / withdrawalAmountCompared - 1 ) * 100 : 0;
                 
                 #endregion
                
@@ -323,14 +323,14 @@ namespace BackendSite.Service.BLL
                 _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(compareWithDepositSummaryResult, input.StartDateCompared, input.GetCompareEndDate(), input.BaseCurrencyId).Wait();
             
                 var depositAmountCompared = compareWithDepositSummaryResult.Sum(x => x.DepositAmount);
-                result.DepositAmountComparedRate = (result.DepositAmount / depositAmountCompared - 1 ) * 100;
+                result.DepositAmountComparedRate = depositAmountCompared != 0 ? (result.DepositAmount / depositAmountCompared - 1 ) * 100 : 0;
                 
                 #endregion
                 
                 #region NetCash Amount Compared
 
                 var netCashAmountCompared = depositAmountCompared - withdrawalAmountCompared;
-                result.NetCashAmountComparedRate = (result.NetCashAmount / netCashAmountCompared - 1 ) * 100;
+                result.NetCashAmountComparedRate = netCashAmountCompared != 0 ? (result.NetCashAmount / netCashAmountCompared - 1 ) * 100 : 0;
                 
                 #endregion
 
@@ -341,14 +341,15 @@ namespace BackendSite.Service.BLL
                 #endregion
                 
                 #region Churn Rate Compared
-
-                result.ChurnComparedRate =  (decimal)(result.NoBetUsers - resultCompared.NoBetUsers)  / result.BasedOnReportTotalUsers;
+                
+                result.ChurnComparedRate =  result.BasedOnReportTotalUsers != 0 ? (decimal) (result.NoBetUsers - resultCompared.NoBetUsers) / result.BasedOnReportTotalUsers : 0;
                 
                 #endregion
                 
                 #region Retention Rate Compared
 
-                result.RetentionComparedRate =  (decimal)(result.HasBetUsers - resultCompared.HasBetUsers)  / result.BasedOnReportTotalUsers ;
+      
+                result.RetentionComparedRate =  result.BasedOnReportTotalUsers != 0 ? (decimal) (result.HasBetUsers - resultCompared.HasBetUsers)  / result.BasedOnReportTotalUsers : 0;
                 
                 #endregion
             }
