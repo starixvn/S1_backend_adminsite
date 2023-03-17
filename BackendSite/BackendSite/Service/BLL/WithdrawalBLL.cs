@@ -826,7 +826,7 @@ namespace BackendSite.Service.BLL
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!_withdrawalService.CreateWithdrawalInfo(custId, custInfo.UserName, custInfo.CurrencyId,
-            custInfo.SiteId, amount, memo, updater, convertData.WithdrawalInfo, _common.GetEnv(), conn, trans, out decimal afterAmount, out string transId))
+            custInfo.SiteId, amount, memo, updater, convertData.WithdrawalInfo, _common.GetEnv(), trans, out decimal afterAmount, out string transId))
             {
                 trans.Rollback();
                 return (false, string.Empty);

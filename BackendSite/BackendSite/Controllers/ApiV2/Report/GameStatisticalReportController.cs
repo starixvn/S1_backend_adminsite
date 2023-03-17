@@ -3,10 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 using BackendSite.Service.Model.GameStatisticalReport;
 using BackendSite.ExceptionHandling;
 

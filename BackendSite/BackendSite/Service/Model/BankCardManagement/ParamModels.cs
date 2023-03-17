@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 
@@ -19,7 +18,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             AccountNo = req.AccountNo;
             Agent = req.Agent;
             SupportChannels = req.SupportChannels.Select(x => (int) x);
-            var (startIndex, absPageSize) = req.PageNumber.GetStartIndex(req.PageSize);
+            var (startIndex, absPageSize) = req.PageNumber.GetStartIndexAndPageSize(req.PageSize);
             PageSize = absPageSize;
             StartIndex = startIndex;
         }

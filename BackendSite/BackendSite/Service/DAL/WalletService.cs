@@ -4,25 +4,21 @@ using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.DAL
 {
     public class WalletService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
         public WalletService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public int SetBalance(int custId, int siteId, string userName, decimal Amount, int type, string Memo, string RefTransId, out decimal afterAmount, out byte is1stDepoist, MySqlConnection conn, MySqlTransaction trans)
+        public int SetBalance(int custId, int siteId, string userName, decimal Amount, int type, string Memo, string RefTransId, out decimal afterAmount, out byte is1stDepoist, MySqlTransaction trans)
         {
             var p = new DynamicParameters(new { CustId = custId, SiteId = siteId, UserName = userName, Amount = Amount, Type = type, Memo = Memo, RefTransId = RefTransId });
             p.Add("Is1stDepoist", dbType: DbType.Boolean, direction: ParameterDirection.Output);
@@ -34,16 +30,14 @@ namespace BackendSite.Service.DAL
         }
         public decimal GetBalance(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.ExecuteScalar<decimal>("Balance_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.ExecuteScalar<decimal>("Balance_Get", new { CustId = custId });
         }
         public Task<decimal> GetBalanceAsync(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.ExecuteScalarAsync<decimal>("Balance_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _mainDbClient.ExecuteScalarAsync<decimal>("Balance_Get", new { CustId = custId });
         }
 
-        public int SetPayDummy(int siteId, int payId, int currencyId, decimal amount, MySqlConnection conn, MySqlTransaction trans)
+        public int SetPayDummy(int siteId, int payId, int currencyId, decimal amount, MySqlTransaction trans)
         {
             return _mainDbClient.Execute("PayDummy_Set",
                 trans,
@@ -55,7 +49,7 @@ namespace BackendSite.Service.DAL
                     Amount = amount
                 }));
         }
-        public int SetBankOffDummy(int siteId, int sysId, string accountNo, int currencyId, decimal amount, MySqlConnection conn, MySqlTransaction trans)
+        public int SetBankOffDummy(int siteId, int sysId, string accountNo, int currencyId, decimal amount, MySqlTransaction trans)
         {
             return _mainDbClient.Execute("BankOffDummy_Set",
                 trans,
@@ -68,27 +62,7 @@ namespace BackendSite.Service.DAL
                     Amount = amount
                 }));
         }
-        public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
-        {
-            var p = new DynamicParameters(new
-            {
-                CustId = custId,
-                StartDate = startDate,
-                EndDate = endDate,
-                RefTransId = refTransId,
-                PageSize = Math.Abs(pageSize)
-            });
-            p.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
-            p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportDbClient.Query<FinancialLog>("Admin_FinancialLogList_Get_V3", p);
-            pageNumber = p.Get<int?>("PageNumber") ?? 0;
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
-            return depositList;
-        }
         public IEnumerable<BonusLog> GetBonusLog(int custId, string promoCategoryIds, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             totalPages = 0;
@@ -111,6 +85,7 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
         }
+
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {
             var result = _reportDbClient.Query<PromotionCategory>("Common_PromotionCategory_Get");

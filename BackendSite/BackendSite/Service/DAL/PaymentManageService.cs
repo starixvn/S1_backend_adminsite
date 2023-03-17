@@ -1,7 +1,6 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Extensions;
@@ -11,16 +10,12 @@ namespace BackendSite.Service.DAL
 {
     public class PaymentManageService
     {
-        private readonly IConfiguration configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        private readonly string _connectionString;
-        public PaymentManageService(IConfiguration configuration, ILogger<MySqlClient> logger)
+        public PaymentManageService(IEnumerable<MySqlClient> sqlClients)
         {
-            this.configuration = configuration;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
-            _connectionString = configuration.GetConnectionString("ConnectionString");
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
         [Obsolete("請改用GetPayList(int siteId)")]
@@ -44,7 +39,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -85,7 +80,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdatePayChannel(ParamsWithLog<UpdatePayChannel> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -128,7 +123,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdatePayCurrency(ParamsWithLog<UpdatePayCurrency> input, string amountShow)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             
@@ -173,7 +168,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdatePayCurrencyAmount(ParamsWithLog<UpdatePayCurrency> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -222,7 +217,7 @@ namespace BackendSite.Service.DAL
 
         public void UpdateBankInfo(int payId, int sysId, int status, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -269,7 +264,7 @@ namespace BackendSite.Service.DAL
         
         public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var pay = GetPayList(siteId)
@@ -321,7 +316,7 @@ namespace BackendSite.Service.DAL
         
         public bool SetPayListLoginInfo(SetPayListLoginInfoParams input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var pay = GetPayList(input.SiteId)
@@ -422,7 +417,7 @@ namespace BackendSite.Service.DAL
         
         public bool UpdatePaySetting(UpdatePaySettingParams input, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
@@ -487,7 +482,7 @@ namespace BackendSite.Service.DAL
         
         public bool UpdatePaySettingStatus(UpdatePaySettingStatusParams input, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
@@ -536,7 +531,7 @@ namespace BackendSite.Service.DAL
         
         public bool UpdatePaySettingChargeFee(UpdatePaySettingChargeFeeParams input, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
@@ -606,7 +601,7 @@ namespace BackendSite.Service.DAL
         
         public bool UpdateBankInfo(int siteId, int payId, int sysId, BankInfoPayStatusEnum status, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var bankSysInfo = GetBankSysInfoList(siteId, payId)
@@ -661,7 +656,7 @@ namespace BackendSite.Service.DAL
         
         public bool SetCryptoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 

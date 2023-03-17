@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
@@ -128,6 +126,12 @@ namespace BackendSite.Service.Model.BankFinancial
     public class GetAccountListRequest
     {
         public int SiteId { get; set; }
+    }
+    
+    public class GetFinancialAccountListRequest
+    {
+        public int SiteId { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
     }
 
     public class GetTransferInfoListRequest : ApiRequestPageModel

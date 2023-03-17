@@ -1,7 +1,6 @@
 ﻿using System.Data;
 
 using BackendSite.Extensions;
-using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -27,7 +26,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<OTPLog> GetOTPLogList(GetOTPLogListRequest request, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
-            var (StartIndex, PageSize) = request.PageNumber.GetStartIndex(request.PageSize);
+            var (StartIndex, PageSize) = request.PageNumber.GetStartIndexAndPageSize(request.PageSize);
             
             var p = new 
             {

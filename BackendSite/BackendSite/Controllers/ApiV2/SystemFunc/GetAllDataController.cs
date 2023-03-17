@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.TpMaintain;
-using BackendSite.Service.Model.BankFinancial;
-using static BackendSite.Controllers.ApiV2.Member.Process.PersonalMessageController;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
