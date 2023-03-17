@@ -518,7 +518,9 @@ namespace BackendSite.Controllers.Api
                 withdrawalReq.PageNumber,
                 out totalPages,
                 out rowCount,
-                ref CurrencyAmount);
+                out _ ,
+                out _ ,
+                out _ );
 
             return new ApiListResultCurrencyAmount<WithdrawalRequest>()
             {

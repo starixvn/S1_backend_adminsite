@@ -147,41 +147,31 @@ namespace BackendSite.Service.DAL
             int startIndex,
             out int totalPages,
             out int rowCount,
-            ref List<string> currencyAmount)
+            out decimal totalAmount,
+            out decimal totalApproveAmount,
+            out int totalApproveRow)
         {
-            var tempCurrencyTotalAmount = new List<string>();
             var p = new DynamicParameters();
             p.Add("_CustId", custId, dbType: DbType.Int32);
             p.Add("_TransId", transId, dbType: DbType.String);
             p.Add("_Status", status, dbType: DbType.Int32);
             p.Add("_StartDate", startDate.DateTime, dbType: DbType.DateTime);
             p.Add("_EndDate", endDate.DateTime, dbType: DbType.DateTime);
-
-            #region GetCurrencyTotalAmount
-
-            var CurrencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmountByCust_Get_V3", p,
-                commandType: CommandType.StoredProcedure).ToList();
-            if (CurrencyTotalAmount.Count > 0)
-            {
-                CurrencyTotalAmount.ForEach(x =>
-                {
-                    tempCurrencyTotalAmount.Add(string.Format("{0}:{1}", x.Currency, Math.Round(x.Amount, 2)));
-                });
-            }
-
-            currencyAmount = tempCurrencyTotalAmount;
-
-            #endregion
             p.Add("_PageSize", pageSize, dbType: DbType.Int32);
             p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-
-            var depositList = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get_V3", p,
-                commandType: CommandType.StoredProcedure);
+            p.Add("_TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_TotalApproveAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_TotalApproveRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            var depositList = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get_V4", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
+            totalAmount = p.Get<decimal?>("_TotalAmount") ?? 0;
+            totalApproveAmount = p.Get<decimal?>("_TotalApproveAmount") ?? 0;
+            totalApproveRow = p.Get<int?>("_TotalApproveRow") ?? 0;
+            
             return depositList;
         }
 
