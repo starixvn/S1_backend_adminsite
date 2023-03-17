@@ -417,7 +417,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                messageBLL.SendMessageToPlayer(authData.UserName, Title, Content, CustId, authData.UserId);
+                messageBLL.SendMessageToPlayer(authData.UserName, Title, Content, CustId);
                 apiResult.Data =
                     messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
