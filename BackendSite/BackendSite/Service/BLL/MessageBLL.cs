@@ -175,7 +175,7 @@ namespace BackendSite.Service.BLL
             }
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, msgBeforeInfo.First(), null,
-                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, trans))
             {
                 _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
                 trans.Rollback();

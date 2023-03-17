@@ -1,5 +1,4 @@
 ﻿using BackendSite.Service.Model;
-using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;
 using BackendSite.Extensions;
@@ -250,8 +249,6 @@ namespace BackendSite.Service.DAL
         {
             var result = new PaymentAdjustmentWrapper();
 
-            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
             p.Add("_CustId", custId, dbType: DbType.Int32);
@@ -261,7 +258,7 @@ namespace BackendSite.Service.DAL
             
             #region GetCurrencyTotalAmount
 
-            var currencyTotalAmount = (await conn.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V4", p, commandType: CommandType.StoredProcedure)).ToList();
+            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V4", p)).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.Add(new TotalAmount()
@@ -279,7 +276,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result.Data = await conn.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
+            result.Data = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoByCust_Get_V4", p);
             result.CurrencyAmount = currencyTotalAmount;
             result.TotalPages = p.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = p.Get<int?>("_RowCount") ?? 0;
@@ -289,7 +286,7 @@ namespace BackendSite.Service.DAL
 
         public bool SetLogAdminAdjustWallet(ParamsWithLog<SetAdjustment> input, int transferId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -330,7 +327,7 @@ namespace BackendSite.Service.DAL
 
         public bool SetAdjustmentInfo(ParamsWithLog<SetAdjustment> input, int adjustId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 

@@ -4,7 +4,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using NPOI.OpenXmlFormats.Dml.Chart;
 
@@ -156,7 +155,7 @@ namespace BackendSite.Service.DAL
         {
             try
             {
-                using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+                using var connection = _mainDbClient.GetMySqlConnection();
                 connection.Open();
                 using var trans = connection.BeginTransaction();
                 var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins", trans, new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }));
@@ -203,18 +202,18 @@ namespace BackendSite.Service.DAL
         {
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Start.");
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
             var p = new DynamicParameters();
             p.Add("_BatchId", batchId);
-            var batchMessageCount = conn.QueryFirst<int>("Admin_BatchMessageForDelete_Get", p, trans, commandType: CommandType.StoredProcedure);
+            var batchMessageCount = _reportDbClient.QueryFirst<int>("Admin_BatchMessageForDelete_Get", p);
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={batchMessageCount}.");
 
             if (batchMessageCount > 0)
             {
-                var affectCount = conn.QueryFirstOrDefault<int>("Admin_BatchMessageV2_Del", p, trans, commandType: CommandType.StoredProcedure);
+                var affectCount = _mainDbClient.QueryFirst<int>("Admin_BatchMessageV2_Del", trans, p);
                 if (affectCount != batchMessageCount)
                 {
                     trans.Rollback();
@@ -223,12 +222,12 @@ namespace BackendSite.Service.DAL
                 }
             }
 
-            var messageCount = conn.QueryFirstOrDefault<int>("Admin_MessageForDelete_Get", p, trans, commandType: CommandType.StoredProcedure);
+            var messageCount = _mainDbClient.QueryFirst<int>("Admin_MessageForDelete_Get", trans, p);
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={messageCount}.");
 
             if (messageCount > 0)
             {
-                var affectCount = conn.QueryFirstOrDefault<int>("Admin_MessageByBatchId_Del", p, trans, commandType: CommandType.StoredProcedure);
+                var affectCount = _mainDbClient.QueryFirst<int>("Admin_MessageByBatchId_Del", trans, p);
                 if (affectCount != messageCount)
                 {
                     trans.Rollback();
@@ -237,12 +236,12 @@ namespace BackendSite.Service.DAL
                 }
             }
 
-            var custMessageCount = conn.QueryFirstOrDefault<int>("Admin_CustBatchMessageForDelete_Get", p, trans, commandType: CommandType.StoredProcedure);
+            var custMessageCount = _mainDbClient.QueryFirst<int>("Admin_CustBatchMessageForDelete_Get", trans, p);
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={custMessageCount}.");
 
             if (custMessageCount > 0)
             {
-                var affectCount = conn.QueryFirstOrDefault<int>("Admin_CustBatchMessageByBatchId_Del", p, trans, commandType: CommandType.StoredProcedure);
+                var affectCount = _mainDbClient.QueryFirst<int>("Admin_CustBatchMessageByBatchId_Del", trans, p);
                 if (affectCount != custMessageCount)
                 {
                     trans.Rollback();

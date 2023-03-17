@@ -4,13 +4,9 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OfficeOpenXml;
-using System.Security.Policy;
-using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
-using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
 using Common = BackendSite.Service.Library.Common;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus

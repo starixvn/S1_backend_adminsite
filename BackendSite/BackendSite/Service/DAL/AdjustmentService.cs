@@ -11,22 +11,18 @@ namespace BackendSite.Service.DAL
 {
     public class AdjustmentService
     {
-        private readonly IConfiguration configuration;
         private readonly Common common;
         private readonly WalletService walletService;
         private readonly WithdrawalLimitService withdrawalLimitService;
-        private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly ILogger<AdjustmentService> _logger;
 
         public AdjustmentService(IServiceProvider provider)
         {
-            configuration = provider.GetRequiredService<IConfiguration>();
             common = provider.GetRequiredService<Common>();
             walletService = provider.GetRequiredService<WalletService>();
             withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
-            _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _logger = provider.GetRequiredService<ILogger<AdjustmentService>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
@@ -34,7 +30,7 @@ namespace BackendSite.Service.DAL
         public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
         {
             transId = null;
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var p = new DynamicParameters(new { adjustmentInfo.AdjustType, adjustmentInfo.CustId, adjustmentInfo.UserName, adjustmentInfo.CurrencyId, adjustmentInfo.SiteId, AdjustIdInfo = adjustmentInfo.AdjustIdInfo, adjustmentInfo.Amount, Prefix = $"A{common.GetEnv()}" });
@@ -46,7 +42,7 @@ namespace BackendSite.Service.DAL
             {
                 var forStatus = new List<int>();
                 forStatus.Add((int)AdjustmentInfoStatusEnum.Pending);
-                if (SetAdjustmentInfo(transId, adjustmentInfo.SiteId, $"Payment Adjustment: {adjustmentInfo.Amount * (adjustmentInfo.AdjustType == 1 ? 1 : -1)}", Operator, forStatus, AdjustmentInfoStatusEnum.Approved, adjustmentInfo, conn, trans) > 0)
+                if (SetAdjustmentInfo(transId, adjustmentInfo.SiteId, $"Payment Adjustment: {adjustmentInfo.Amount * (adjustmentInfo.AdjustType == 1 ? 1 : -1)}", Operator, forStatus, AdjustmentInfoStatusEnum.Approved, adjustmentInfo, trans) > 0)
                 {
                     trans.Commit();
                     transId = p.Get<string>("TransId");
@@ -60,7 +56,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int SetAdjustmentInfo(string transId, int siteId, string comment, string Operator, IEnumerable<int> forStatus, AdjustmentInfoStatusEnum status, AdjustmentInfo adjustmentInfo, MySqlConnection conn, MySqlTransaction trans)
+        public int SetAdjustmentInfo(string transId, int siteId, string comment, string Operator, IEnumerable<int> forStatus, AdjustmentInfoStatusEnum status, AdjustmentInfo adjustmentInfo, MySqlTransaction trans)
         {
             var adjustId = 0;
             var type = 1 + adjustmentInfo.AdjustType;
@@ -103,11 +99,11 @@ namespace BackendSite.Service.DAL
 
                         var custId = p.Get<int?>("CustId") ?? 0;
                         var UserName = p.Get<string>("UserName");
-                        result = walletService.SetBalance(custId, siteId, UserName, amount, type, $"Payment Adjustment: {amount}", transId, out afterAmount, out is1stDepoist, conn, trans);
+                        result = walletService.SetBalance(custId, siteId, UserName, amount, type, $"Payment Adjustment: {amount}", transId, out afterAmount, out is1stDepoist, trans);
 
                         if (is1stDepoist == 1 && result > 0)
                         {
-                            result = SetAdjustmentInfoFirstDeposit(adjustId, conn, trans);
+                            result = SetAdjustmentInfoFirstDeposit(adjustId, trans);
                         }
                     }
 
@@ -125,7 +121,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        private int SetAdjustmentInfoFirstDeposit(int adjustId, MySqlConnection conn, MySqlTransaction trans)
+        private int SetAdjustmentInfoFirstDeposit(int adjustId, MySqlTransaction trans)
         {
             var props = new DynamicParameters();
             props.Add("AdjustId", adjustId);
@@ -164,7 +160,7 @@ namespace BackendSite.Service.DAL
 
         public (int ResultCode, string TransId) SetAdjustWithdrawalLimitV2(SetAdjustWithdrawalLimitParams input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             
@@ -184,7 +180,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TransId", dbType: DbType.String, direction: ParameterDirection.Output);
             p.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _ = conn.Execute("Admin_AdjustWithdrawalLimitInfo_Ins_V2", p, trans, commandType: CommandType.StoredProcedure);
+            _ = _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins_V2", trans, p);
             
             var transId = p.Get<string>("_TransId") ?? string.Empty;
             var resultCode = p.Get<int>("_Result");
@@ -196,7 +192,7 @@ namespace BackendSite.Service.DAL
             
             var amount = input.AdjustType == WithdrawalLimitAdjustmentAdjustTypeEnum.Debit ? input.Amount * -1 : input.Amount;
             var result = withdrawalLimitService.SetWithdrawalLimit(input.CustId, input.UserName, input.SiteId,
-                amount, input.Memo, transId, out var afterAmount, conn, trans);
+                amount, input.Memo, transId, out var afterAmount, trans);
 
             if (result < 1)
             {
@@ -221,7 +217,7 @@ namespace BackendSite.Service.DAL
             }), DbType.String);
             p.Add("_Operator", input.Operator);
             
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", p, trans, commandType: CommandType.StoredProcedure);
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, p);
             
             if (logResult < 1)
             {
@@ -240,7 +236,7 @@ namespace BackendSite.Service.DAL
             int SiteId,
             string Operator)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -286,7 +282,7 @@ namespace BackendSite.Service.DAL
                 else
                 {
                     var amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
-                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, out var AfterAmount, conn, trans);
+                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, out var AfterAmount, trans);
 
                     #region propsLog
                     var propsLog = new DynamicParameters();
@@ -320,7 +316,7 @@ namespace BackendSite.Service.DAL
         {
             Adjustment_transId = null;
             
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var adjustmentP = new DynamicParameters(new
@@ -338,13 +334,13 @@ namespace BackendSite.Service.DAL
             });
             adjustmentP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = conn.Execute("Admin_Adjustment_Ins_V2", adjustmentP, trans, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Admin_Adjustment_Ins_V2", trans, adjustmentP);
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {
 
                 var forStatus = new List<int> { (int)AdjustmentInfoStatusEnum.Pending };
-                result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/ ? 1 : -1)}", Operator, forStatus, AdjustmentInfoStatusEnum.Approved, adjustmentAndWithdrawalLimit, conn, trans);
+                result = SetAdjustmentInfo(Adjustment_transId, adjustmentAndWithdrawalLimit.SiteId, $"Payment Adjustment: {adjustmentAndWithdrawalLimit.Amount * (adjustmentAndWithdrawalLimit.AdjustType % 2 == 1/*1, 3(Add)2, 4(Deduct)*/ ? 1 : -1)}", Operator, forStatus, AdjustmentInfoStatusEnum.Approved, adjustmentAndWithdrawalLimit, trans);
 
                 if (result > 0)
                 {
@@ -359,7 +355,7 @@ namespace BackendSite.Service.DAL
                             : adjustmentAndWithdrawalLimit.Amount * -1;
 
                         result = AdjustmentActualDeposit(adjustmentAndWithdrawalLimit, Adjustment_transId,
-                            adjustAmount, conn, trans);
+                            adjustAmount, trans);
                         
                         
                     }
@@ -411,7 +407,7 @@ namespace BackendSite.Service.DAL
                             else
                             {
                                 var amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 ? adjustmentAndWithdrawalLimit.WithdrawalLimitAmount * -1 : adjustmentAndWithdrawalLimit.WithdrawalLimitAmount;
-                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Memo, transId, out _, conn, trans);
+                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Memo, transId, out _, trans);
                                 //return 0;
                             }
                         }
@@ -435,8 +431,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public int AdjustmentActualDeposit(AdjustmentAndWithdrawalLimit input, string transId, decimal adjustAmount,
-            MySqlConnection conn, MySqlTransaction trans)
+        public int AdjustmentActualDeposit(AdjustmentAndWithdrawalLimit input, string transId, decimal adjustAmount, MySqlTransaction trans)
         {
             var props = new DynamicParameters();
             props.Add("_DepositId", input.DepositId);
@@ -516,7 +511,7 @@ namespace BackendSite.Service.DAL
 
         public bool SetAdjustmentLimitInfo(ParamsWithLog<AdjustmentLimit> input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
