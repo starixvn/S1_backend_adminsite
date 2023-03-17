@@ -36,7 +36,11 @@ namespace BackendSite.Service.BLL
             var customer = custInfoBLL.GetCustInfoWithCache(custId);
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang);
         }
-
+        public int SendMessageToPlayer(int custId, string title, string content) 
+        {
+            var customer = custInfoBLL.GetCustInfoWithCache(custId);
+            return messageService.SendMessageToPlayer(custId, customer.UserLang, title, content);
+        }
         public int SendMessageToPlayer(string sender, string title, string content, int custId, int SenderCustId)
         {
             var customer = custInfoBLL.GetCustInfoWithCache(custId);
