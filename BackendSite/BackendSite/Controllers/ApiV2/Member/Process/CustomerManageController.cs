@@ -2285,21 +2285,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> GetPersonalMsg(CustIdWithPageRequest request)
+        public async Task<ApiListResult<PersonalMsg>> GetPersonalMsg(CustIdWithPageRequest request)
         {
-            var pageNumber = request.PageNumber;
-            var TotalPages = 0;
-            var RowCount = 0;
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                apiResult.Data = _messageBll.GetPersonalMsg(request.CustId, request.PageNumber, request.PageSize,
-                    ref TotalPages, ref RowCount);
-
+                var personMsg = await _messageBll.GetPersonalMsg(request.CustId, request.PageNumber, request.PageSize);
+                apiResult.Data = personMsg.Data;
+                apiResult.PageNumber = personMsg.PageNumber;
+                apiResult.RowCount = personMsg.RowCount;
+                apiResult.TotalPages = personMsg.TotalPages;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.PageNumber = pageNumber;
-                apiResult.RowCount = RowCount;
-                apiResult.TotalPages = TotalPages;
             }
             catch (Exception ex)
             {
@@ -2324,9 +2320,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> SendPersonalMsg(SendCustMessageRequest request)
+        public ApiResult SendPersonalMsg(SendCustMessageRequest request)
         {
-            var apiResult = new ApiListResult<PersonalMsg>();
+            var apiResult = new ApiResult();
             try
             {
                 var authData = _authorizeBll.GetAuthData();
@@ -2365,7 +2361,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             try
             {
-                if (!await _messageBll.DeletePersonalMsg(request.Id, request.IsBatch, User.Identity.Name))
+                if (!await _messageBll.DeletePersonalMsg(request.Id, User.Identity.Name))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Delete Fail.";
