@@ -148,6 +148,15 @@ namespace BackendSite.Service.BLL
             });
             return personMsg;
         }
+        public async Task<DataWithPage<PersonalMsg>> GetPersonalMsg(int custId, int pageNumber, int pageSize)
+        {
+            var personMsg = await messageService.GetPersonalMsg(custId, (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), Math.Abs(pageSize));
+            personMsg.Data.ToList().ForEach(x =>
+            {
+                x.ContentRemoveTag = StripHTML(x.Content);
+            });
+            return personMsg;
+        }
 
         public CustLang GetCustLang(int CustId)
         {

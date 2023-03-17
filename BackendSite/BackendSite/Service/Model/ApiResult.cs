@@ -107,4 +107,12 @@ namespace BackendSite.Service.Model
         public List<string> CurrencyAmount { get; set; }
         public string PageRange { get; set; }
     }
+
+    public class DataWithPage<T>
+    {
+        public IEnumerable<T> Data { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
+    }
 }

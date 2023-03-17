@@ -135,6 +135,23 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        public async Task<DataWithPage<PersonalMsg>> GetPersonalMsg(int custId, int startIndex, int PageSize)
+        {
+            var props = new DynamicParameters();
+            props.Add("_CustId", custId, dbType: DbType.Int32);
+            props.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            props.Add("_PageSize", PageSize, dbType: DbType.Int32);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_Get_V4", props);
+            return new DataWithPage<PersonalMsg>() 
+            {
+                Data = result,
+                PageNumber = startIndex,
+                TotalPages = props.Get<int?>("_TotalPages") ?? 0,
+                RowCount = props.Get<int?>("_RowCount") ?? 0
+            };
+        }
 
         public CustLang GetCustLang(int CustId)
         {
