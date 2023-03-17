@@ -1,7 +1,5 @@
-﻿using Amazon.Runtime.Internal;
-using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
-using StackExchange.Redis;
 
 namespace BackendSite.Service.BLL.Mpa.Extension
 {

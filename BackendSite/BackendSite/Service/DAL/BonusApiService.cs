@@ -1,7 +1,6 @@
 ﻿using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using Microsoft.Extensions.Options;
 
 namespace BackendSite.Service.DAL;
 

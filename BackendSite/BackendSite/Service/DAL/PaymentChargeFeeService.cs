@@ -3,7 +3,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL;
 
@@ -51,7 +50,7 @@ public class PaymentChargeFeeService
     
     public int CreateModifyPaymentChargeFeeLog(ModifyPaymentChargeFeeParams input)
     {
-        using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+        using var conn = _mainDbClient.GetMySqlConnection();
         conn.Open();
         using var trans = conn.BeginTransaction();
         var parameters = new DynamicParameters(

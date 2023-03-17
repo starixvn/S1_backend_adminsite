@@ -6,19 +6,16 @@ using BackendSite.Controllers.ApiV2.CMS.Setting;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
     public class BettingMonitorService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
         public BettingMonitorService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -55,7 +52,7 @@ namespace BackendSite.Service.DAL
         
         public bool SetSetting(ParamsWithLog<BettingMonitorController.SetRequest> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -79,14 +76,14 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
                 tran.Rollback();
                 return false;
             }
             
-            var result = _mainDbClient.Execute("Admin_BettingMonitorSetting_Set", param) > 0;
+            var result = _mainDbClient.Execute("Admin_BettingMonitorSetting_Set", tran, param) > 0;
             if (!result)
             {
                 tran.Rollback();
@@ -101,7 +98,7 @@ namespace BackendSite.Service.DAL
         
         public bool DelSetting(ParamsWithLog<BettingMonitorController.BaseSetting> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -123,14 +120,14 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", null , DbType.String);
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
                 tran.Rollback();
                 return false;
             }
             
-            var result = _mainDbClient.Execute("Admin_BettingMonitorSetting_Del", param) > 0;
+            var result = _mainDbClient.Execute("Admin_BettingMonitorSetting_Del", tran, param) > 0;
             if (!result)
             {
                 tran.Rollback();

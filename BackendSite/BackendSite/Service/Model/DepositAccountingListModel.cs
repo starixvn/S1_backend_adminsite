@@ -1,6 +1,4 @@
-﻿using NPOI.SS.Formula.Functions;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     public class GetDepositAccountingListModel
     {

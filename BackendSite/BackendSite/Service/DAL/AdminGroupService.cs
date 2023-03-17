@@ -2,7 +2,6 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 
@@ -55,7 +54,7 @@ namespace BackendSite.Service.DAL
 
         public void AddGroup(GroupWithPermission GroupInfo)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var SpName = "Admin_Group_Ins";
@@ -87,7 +86,7 @@ namespace BackendSite.Service.DAL
 
         public void DeleteGroup(int GroupSEQ)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var para = new DynamicParameters();
@@ -103,7 +102,7 @@ namespace BackendSite.Service.DAL
 
         public void UpdateGroup(GroupWithPermission GroupInfo)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var SpName = "Admin_Group_Set";

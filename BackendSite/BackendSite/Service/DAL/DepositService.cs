@@ -113,7 +113,6 @@ namespace BackendSite.Service.DAL
 
         public DepositRequest GetDepositRequest(int depositId, int siteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V4", new DynamicParameters(new { DepositId = depositId/*, SiteId = siteId*/ }));
         }
 
@@ -125,7 +124,7 @@ namespace BackendSite.Service.DAL
 
         public string InsertDepositRequest(DepositDetailInfo deposit)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -197,7 +196,7 @@ namespace BackendSite.Service.DAL
             {
                 var beforeDepositData = GetDepositRequest(depositId, siteId);
                 
-                using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+                using var conn = _mainDbClient.GetMySqlConnection();
                 conn.Open();
                 using var trans = conn.BeginTransaction();
                 var sForStatus = JsonConvert.SerializeObject(forStatus);
@@ -238,16 +237,16 @@ namespace BackendSite.Service.DAL
 
                         var custId = p.Get<int?>("CustId") ?? 0;
                         var userName = p.Get<string>("UserName");
-                        result = walletService.SetBalance(custId, siteId, userName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out _, out var is1stDepoist, conn, trans);
+                        result = walletService.SetBalance(custId, siteId, userName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out _, out var is1stDepoist, trans);
 
                         if (result >= 0)
                         {
-                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, $"WithdrawalLimit: {actualDeposit}", transId, out _, conn, trans);
+                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, $"WithdrawalLimit: {actualDeposit}", transId, out _, trans);
                         }
 
                         if (is1stDepoist == 1 && result > 0)
                         {
-                            result = SetDepositInfoFirstDeposit(depositId, siteId, conn, trans);
+                            result = SetDepositInfoFirstDeposit(depositId, siteId, trans);
                         }
 
                         if (result > 0)
@@ -255,18 +254,18 @@ namespace BackendSite.Service.DAL
                             if (depositRequest.DepositType == 3)
                             {
                                 var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
-                                result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, conn, trans);
+                                result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, trans);
                             }
                             else if (depositRequest.oDepositInfo is IPay)
                             {
                                 var pay = (IPay)depositRequest.oDepositInfo;
-                                result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, conn, trans);
+                                result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, trans);
                             }
                         }
 
                         if (result > 0 && canReward)
                         {
-                            var resultCode = InsertDepositRewardPointQueue(transId, conn, trans);
+                            var resultCode = InsertDepositRewardPointQueue(transId, trans);
                             if (resultCode != (int)ErrorCodeEnum.Success)
                             {
                                 _logger.LogError($"InsertDepositRewardPointQueue Failed. ResultCode({resultCode}), TransId: {transId}");
@@ -307,7 +306,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlConnection conn, MySqlTransaction trans)
+        private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlTransaction trans)
         {
             return _mainDbClient.Execute("DepositInfoFirstDeposit_Set",
                 trans,
@@ -320,7 +319,6 @@ namespace BackendSite.Service.DAL
 
         public int SetDepositLog(int depositId, int siteId, string comment, int status, decimal actualDeposit, string Operator)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             return _mainDbClient.Execute("DepositLog_Ins",
                 new DynamicParameters(new
                 {
@@ -408,7 +406,7 @@ namespace BackendSite.Service.DAL
 
         public bool AddDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -448,7 +446,7 @@ namespace BackendSite.Service.DAL
 
         public bool AddDepositLimitInfo(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
 
@@ -486,7 +484,7 @@ namespace BackendSite.Service.DAL
 
         public bool EditDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -526,7 +524,7 @@ namespace BackendSite.Service.DAL
 
         public bool EditDepositLimitInfo(ParamsWithLog<IEnumerable<DepositLimitModel>> input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -568,7 +566,7 @@ namespace BackendSite.Service.DAL
 
         public bool DeleteDepositLimitInfo(ParamsWithLog<DepositLimitModel> input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -605,7 +603,7 @@ namespace BackendSite.Service.DAL
 
         public bool DeleteDepositLimitInfoV2(ParamsWithLog<DepositLimitModel> input)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -722,7 +720,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<PaymentGateWayOptions>("Admin_PaymentGateWayOptions_Get");
         }
 
-        public int InsertDepositRewardPointQueue(string transId, IDbConnection conn, IDbTransaction trans)
+        public int InsertDepositRewardPointQueue(string transId, IDbTransaction trans)
         {
             var para = new DynamicParameters();
             para.Add("_TransId", transId);

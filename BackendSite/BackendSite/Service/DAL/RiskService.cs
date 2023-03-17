@@ -4,7 +4,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -46,7 +45,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<bool> UpdateStatus(ParamsWithLog<DisableDisableUser> input)
         {
-            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            await using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             await using var trans = await conn.BeginTransactionAsync();
             
@@ -113,7 +112,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<bool> DeleteTpDisableUser(ParamsWithLog<DeleteDisableUser> input)
         {
-            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            await using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             await using var trans = await conn.BeginTransactionAsync();
             

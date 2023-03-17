@@ -6,10 +6,6 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 using System.Transactions;
-using System.Linq;
-using BarcodeReader.ImageSharp;
-using NPOI.SS.Formula.Functions;
-using NuGet.Protocol;
 using OfficeOpenXml;
 using System.Text.RegularExpressions;
 using Amazon.S3.Model;
@@ -458,7 +454,7 @@ namespace BackendSite.Service.BLL
             {
                 var afterData = new { Note = note, CanEdit = false };
                 if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, null, afterData,
-                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator))
+                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, trans))
                 {
                     _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
                     trans.Rollback();
@@ -501,7 +497,7 @@ namespace BackendSite.Service.BLL
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData,
                 actionType == ActionType.Delete ? null : afterData,
-                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator))
+                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, trans))
             {
                 _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}..");
                 trans.Rollback();
@@ -751,13 +747,13 @@ namespace BackendSite.Service.BLL
             conn.Open();
             await using var trans = await conn.BeginTransactionAsync();
 
-            if (!await _custInfoService.SetEnableRebateAsync(custId, (int)status, conn, trans))
+            if (!await _custInfoService.SetEnableRebateAsync(custId, (int)status, trans))
             {
                 _logger.LogError($"SetEnableRebate: Update EnableRebate Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
                 trans.Rollback();
                 return false;
             }
-            if (!_custInfoService.AddCustNote(custId, status == EnableRebateEnum.Disable ? "Disable Rebate Payout" : "Enable Rebate Payout", Operator, conn, trans))
+            if (!_custInfoService.AddCustNote(custId, status == EnableRebateEnum.Disable ? "Disable Rebate Payout" : "Enable Rebate Payout", Operator, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert CustNote Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
                 trans.Rollback();
@@ -767,7 +763,7 @@ namespace BackendSite.Service.BLL
             var afterData = new { UserName = custSimpleInfo.UserName, EnableRebate = status };
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData, afterData,
-                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator))
+                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert Operate Log Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
                 trans.Rollback();

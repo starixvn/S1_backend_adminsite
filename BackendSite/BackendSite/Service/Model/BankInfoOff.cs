@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using Google.Protobuf.WellKnownTypes;
+﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
