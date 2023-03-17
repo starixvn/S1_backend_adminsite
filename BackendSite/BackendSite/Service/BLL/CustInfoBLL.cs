@@ -458,7 +458,7 @@ namespace BackendSite.Service.BLL
             {
                 var afterData = new { Note = note, CanEdit = false };
                 if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, null, afterData,
-                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, conn, trans))
+                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator))
                 {
                     _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
                     trans.Rollback();
@@ -501,7 +501,7 @@ namespace BackendSite.Service.BLL
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData,
                 actionType == ActionType.Delete ? null : afterData,
-                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator))
             {
                 _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}..");
                 trans.Rollback();
@@ -767,7 +767,7 @@ namespace BackendSite.Service.BLL
             var afterData = new { UserName = custSimpleInfo.UserName, EnableRebate = status };
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData, afterData,
-                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator))
             {
                 _logger.LogError($"SetEnableRebate: Insert Operate Log Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
                 trans.Rollback();

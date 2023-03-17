@@ -193,7 +193,7 @@ namespace BackendSite.Service.DAL
 
             var custSimpleInfo = await _custInfoService.GetCustId(custId, null, null);
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custId, custSimpleInfo.CurrencyId, new { BonusId = bonusId, Status = "Running" },
-               new { BonusId = bonusId, Status = "Cancel" }, AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, ActionType.Update, @operator, conn, trans))
+               new { BonusId = bonusId, Status = "Cancel" }, AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, ActionType.Update, @operator))
             {
                 trans.Rollback();
                 return (0, custId);

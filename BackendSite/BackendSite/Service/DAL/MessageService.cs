@@ -152,16 +152,17 @@ namespace BackendSite.Service.DAL
                 RowCount = props.Get<int?>("_RowCount") ?? 0
             };
         }
+        internal async Task<PersonalMsg> GetMessageById(int id) =>
+            await _reportDbClient.QueryFirstAsync<PersonalMsg>("Admin_PersonalMessageById_Get", new { _Id = id });
+
+        public async Task<int> DeletePersonalMessage(int id, MySqlTransaction transaction) =>
+             await _mainDbClient.ExecuteAsync("Admin_PersonalMsg_Del_V3", transaction, new { _Id = id });
 
         public CustLang GetCustLang(int CustId)
         {
             return _reportDbClient.Query<CustLang>("Admin_CustLang_Get", new { CustId }).FirstOrDefault();
         }
 
-        public bool DeletePersonalMsg(int id, bool isBatch)
-        {
-            return _mainDbClient.Execute("Admin_PersonalMsg_Del_V2", new { id, isBatch }) > 0;
-        }
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
             try
@@ -343,11 +344,6 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_BatchId", batchId);
             return _reportDbClient.Query<BatchMessageSendLogListModel>("Admin_BatchMessageSendLog_Get", props);
-        }
-
-        internal async Task<IEnumerable<PersonalMsg>> GetMessageById(int id, bool isBatch)
-        {
-            return await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_GetById", new DynamicParameters(new { _Id = id, _IsBatch = isBatch }));
         }
     }
 }

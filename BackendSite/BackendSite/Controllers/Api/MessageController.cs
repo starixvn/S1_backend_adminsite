@@ -461,7 +461,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                await messageBLL.DeletePersonalMsg(Id, IsBatch, User.Identity.Name);
+                await messageBLL.DeletePersonalMsg(Id, User.Identity.Name);
                 apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 

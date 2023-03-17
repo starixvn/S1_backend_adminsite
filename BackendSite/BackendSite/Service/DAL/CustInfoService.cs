@@ -741,9 +741,8 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
-
         public async Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beofreData, object afterData,
-           AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
+           AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater)
         {
 
             var logParam = new DynamicParameters();
@@ -758,6 +757,23 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", updater);
 
             return await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins_V2", logParam) > 0;
+        }
+        public async Task<int> InsertLogAsync(int siteId, int custId, int currencyId, object beofreData, object afterData,
+           AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlTransaction trans)
+        {
+
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", siteId);
+            logParam.Add("_CustId", custId);
+            logParam.Add("_CurrencyId", currencyId);
+            logParam.Add("_Menu", (int)adminAdjustmentLogMenu);
+            logParam.Add("_ActionType", (int)actionType);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", beofreData.ToLog());
+            logParam.Add("_AfterDetailInfo", afterData.ToLog());
+            logParam.Add("_Operator", updater);
+
+            return await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins_V2", trans, logParam);
         }
 
         public Task<IEnumerable<BankInfoDetail>> GetCustBankDetailAsync(int custId)
