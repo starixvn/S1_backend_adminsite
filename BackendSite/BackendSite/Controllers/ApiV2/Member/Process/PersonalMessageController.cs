@@ -116,8 +116,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult<int>> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
             var authData = _newAuthorizeBLL.GetAuthData();
-            var batchId = 0;
-            
+            var batchId =  await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
             if (req.excelUpload != null)
@@ -128,15 +127,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var excelList = _excelBll.Read(req.excelUpload);
                 if(!excelList.Any())
                     return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Empty File" };
-
-                batchId = await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
-
+                
                 _ = Task.Run(async () => 
                 {
                     await _messageBll.BatchMessageByFile(req.optSite, batchId, req.IsPopup, authData.UserName, excelList);
                 });
-                if (batchId == 0)
-                    return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Upload Failed" };
                 _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
             }
             else
@@ -155,8 +150,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
                 #endregion
 
-                batchId = await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
-                
                 _ = Task.Run(() =>
                 {
                     var userSiteList = _serverInfoService.GetSiteList();
