@@ -60,6 +60,11 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize), out totalPages, out rowCount);
         }
         
+        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointListExport(int siteId, IEnumerable<int> categoryIds, IEnumerable<int> currencyIds, DateTime startDate, DateTime endDate)
+        {
+            return _leaderBoardService.GetLeaderboardExtraPointListExport(siteId, JsonConvert.SerializeObject(categoryIds), JsonConvert.SerializeObject(currencyIds), startDate, endDate);
+        }
+        
         public int SetLeaderboardExtraPoint(
             DateTime activeDate, 
             int siteId, 

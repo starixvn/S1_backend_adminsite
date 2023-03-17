@@ -67,6 +67,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 2 })]
+        public IActionResult GetExtraPointListExport(LeaderboardExtraPointReq request)
+        {
+            var data = _leaderBoardBll.GetLeaderboardExtraPointListExport(
+                request.SiteId,
+                request.CategoryIds,
+                request.CurrencyIds,
+                request.StartDate,
+                request.EndDate);
+            
+            var stream = _excelBll.ExportV2(data);
+            return _excelBll.ExcelFile(stream, "LeaderboardExtraPoint");
+        }
+        
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 5 })]
         public ApiResult SetExtraPoint(SetLeaderboardExtraPointReq request)
         {

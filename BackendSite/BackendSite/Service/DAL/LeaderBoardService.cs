@@ -61,6 +61,19 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointListExport(int siteId, string categoryIds, string currencyIds, DateTime startDate, DateTime endDate)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyIds", currencyIds);
+            p.Add("_CategoryIds", categoryIds);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            var result = _reportDbClient.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPointExport_Get", p);
+            
+            return result;
+        }
+        
         public int SetLeaderboardExtraPoint(DateTime activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
         {
             var p = new DynamicParameters();
