@@ -59,6 +59,9 @@ namespace BackendSite.Service.Model.BankCardManagement
             => JsonConvert.DeserializeObject<IEnumerable<BankCardManagementSupportChannelEnum>>(JsonSupportChannels ?? "[]");
         public IEnumerable<string> SupportChannelNames =>
             SupportChannels.Select(x => x.ToString());
+        
+        public int GroupId { get; set; }
+        public string GroupName { set; get; }
         public string QrCodeUrl { set; get; }
         public DateTimeOffset LastUpdateTime
         {
