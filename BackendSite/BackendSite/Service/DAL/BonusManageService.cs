@@ -107,46 +107,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<ScratchCardExport>("Admin_ScratchCardCodeListExport_Get_V2", new DynamicParameters(new { SpecialCode = specialCode }));
         }
-        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(string selectSite,
-            string categoryType,
-            string currencyId,
-            DateTime startDate,
-            DateTime endDate,
-            int startIndex,
-            int pageSize,
-            out int totalPages,
-            out int rowCount)
-        {
-
-            var p = new DynamicParameters();
-            p.Add("_SiteIds", selectSite);
-            p.Add("_CurrencyIds", currencyId);
-            p.Add("_CategoryIds", categoryType);
-            p.Add("_StartDate", startDate);
-            p.Add("_EndDate", endDate.AddDays(1).AddSeconds(-1));
-            p.Add("_StartIndex", startIndex);
-            p.Add("_PageSize", pageSize);
-            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var result = _reportDbClient.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPoint_Get_V3", p);
-
-            totalPages = p.Get<int?>("_TotalPages") ?? 0;
-            rowCount = p.Get<int?>("_RowCount") ?? 0;
-
-            return result;
-        }
-
-        public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
-        {
-            var p = new DynamicParameters(new { _ActiveDate = activeDate, _SiteId = siteId, _CategoryId = categoryId, _UserName = userName, _ExtraPoint = extraPoint, _LastUpdateUser = lastUpdateUser });
-            p.Add("RTN", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            _mainDbClient.Execute("Admin_LeaderboardExtraPoint_Set", p);
-            var rtn = p.Get<int?>("RTN") ?? -1;
-
-            return rtn;
-        }
-
+        
         #region Public Method
 
         /// <summary>
