@@ -601,6 +601,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
+        
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<LocalPaySetting>>> GetLocalPaySettingAsync()
+        {
+            var result = await _bankDetailBll.GetLocalPaySettingAsync();
+
+            return new ApiResult<IEnumerable<LocalPaySetting>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
         #endregion
 
     }

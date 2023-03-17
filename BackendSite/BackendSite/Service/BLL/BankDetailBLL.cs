@@ -66,6 +66,11 @@ namespace BackendSite.Service.BLL
             return result > 0;
         }
 
+        public async Task<IEnumerable<LocalPaySetting>> GetLocalPaySettingAsync()
+        {
+            return await bankDetailService.GetLocalPaySettingAsync();
+        }
+
         public int SetBankCard(ParamsWithLog<SetBankCard> input)
         {
             return bankDetailService.SetBankCard(input);

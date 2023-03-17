@@ -293,6 +293,9 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
         public int CurrencyId { get; set; }
+        public bool IsLocalPay { get; set; }
+        public int GroupId { get; set; }
+        public string Code { get; set; }
     }
     public class DepositComments
     {
