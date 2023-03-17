@@ -146,41 +146,51 @@ namespace BackendSite.Service.BLL
             });
             return personMsg;
         }
+        public async Task<DataWithPage<PersonalMsg>> GetPersonalMsg(int custId, int pageNumber, int pageSize)
+        {
+            var personMsg = await messageService.GetPersonalMsg(custId, (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), Math.Abs(pageSize));
+            personMsg.Data.ToList().ForEach(x =>
+            {
+                x.ContentRemoveTag = StripHTML(x.Content);
+            });
+            return personMsg;
+        }
 
         public CustLang GetCustLang(int CustId)
         {
             return messageService.GetCustLang(CustId);
         }
 
-        public async Task<bool> DeletePersonalMsg(int id, bool isBatch, string @operator)
+        public async Task<bool> DeletePersonalMsg(int id, string @operator)
         {
-            var msgBeforeInfo = await GetMessageById(id, isBatch);
-            if (!msgBeforeInfo.Any()) return false;
-            var custSimpleInfo = await custInfoBLL.GetCustId(msgBeforeInfo.First().CustId, null, null);
-            await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            var personalMsg = await messageService.GetMessageById(id);
+            if (personalMsg == null) return false;
+
+            var custSimpleInfo = await custInfoBLL.GetCustId(personalMsg.CustId, null, null);
+            using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
-
-            if (!messageService.DeletePersonalMsg(id, isBatch))
+            try
             {
-                _logger.LogError($"DeleteSMSInfo: Delete SMSInfo Fail. SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
+                await messageService.DeletePersonalMessage(id, trans);
+                await _custInfoService.InsertLogAsync(
+                    custSimpleInfo.SiteId, 
+                    custSimpleInfo.CustId, 
+                    custSimpleInfo.CurrencyId,
+                    personalMsg, null, 
+                    AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
+                    ActionType.Delete, 
+                    @operator, trans);
+                trans.Commit();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"DeleteSMSInfo Fail.  SMSId:{id} Operator:{@operator}.");
                 trans.Rollback();
                 return false;
             }
-
-            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, msgBeforeInfo.First(), null,
-                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, trans))
-            {
-                _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
-                trans.Rollback();
-                return false;
-            }
-
-            trans.Commit();
-            return true;
         }
-
-        public async Task<IEnumerable<PersonalMsg>> GetMessageById(int id, bool isBatch) => await messageService.GetMessageById(id, isBatch);
 
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {

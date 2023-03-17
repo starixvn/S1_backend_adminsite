@@ -137,16 +137,34 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        public async Task<DataWithPage<PersonalMsg>> GetPersonalMsg(int custId, int startIndex, int PageSize)
+        {
+            var props = new DynamicParameters();
+            props.Add("_CustId", custId, dbType: DbType.Int32);
+            props.Add("_StartIndex", startIndex, dbType: DbType.Int32);
+            props.Add("_PageSize", PageSize, dbType: DbType.Int32);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var result = await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_Get_V4", props);
+            return new DataWithPage<PersonalMsg>() 
+            {
+                Data = result,
+                PageNumber = startIndex,
+                TotalPages = props.Get<int?>("_TotalPages") ?? 0,
+                RowCount = props.Get<int?>("_RowCount") ?? 0
+            };
+        }
+        internal async Task<PersonalMsg> GetMessageById(int id) =>
+            await _reportDbClient.QueryFirstAsync<PersonalMsg>("Admin_PersonalMessageById_Get", new { _Id = id });
+
+        public async Task<int> DeletePersonalMessage(int id, MySqlTransaction transaction) =>
+             await _mainDbClient.ExecuteAsync("Admin_PersonalMsg_Del_V3", transaction, new { _Id = id });
 
         public CustLang GetCustLang(int CustId)
         {
             return _reportDbClient.Query<CustLang>("Admin_CustLang_Get", new { CustId }).FirstOrDefault();
         }
 
-        public bool DeletePersonalMsg(int id, bool isBatch)
-        {
-            return _mainDbClient.Execute("Admin_PersonalMsg_Del_V2", new { id, isBatch }) > 0;
-        }
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
             try
