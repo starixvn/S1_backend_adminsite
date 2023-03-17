@@ -1,6 +1,4 @@
-﻿using System.Drawing.Drawing2D;
-using System.Text.RegularExpressions;
-using Amazon.Runtime.Internal.Util;
+﻿using System.Text.RegularExpressions;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -38,7 +36,11 @@ namespace BackendSite.Service.BLL
             var customer = custInfoBLL.GetCustInfoWithCache(custId);
             return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang);
         }
-
+        public int SendMessageToPlayer(int custId, string title, string content) 
+        {
+            var customer = custInfoBLL.GetCustInfoWithCache(custId);
+            return messageService.SendMessageToPlayer(custId, customer.UserLang, title, content);
+        }
         public int SendMessageToPlayer(string sender, string title, string content, int custId, int SenderCustId)
         {
             var customer = custInfoBLL.GetCustInfoWithCache(custId);
@@ -177,7 +179,7 @@ namespace BackendSite.Service.BLL
             }
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, msgBeforeInfo.First(), null,
-                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, trans))
             {
                 _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
                 trans.Rollback();
@@ -205,6 +207,10 @@ namespace BackendSite.Service.BLL
         public bool NewBatchMessage(int siteId, string author, bool isPopup, string personalMsg, ref int batchId)
         {
             return messageService.NewBatchMessage(siteId, author, personalMsg, isPopup, ref batchId);
+        }
+        public async Task<int> NewBatchMessage(int siteId, int currencyId, string author, bool isPopup, string personalMsg)
+        {
+            return await messageService.NewBatchMessage(siteId, currencyId, author, isPopup, personalMsg);
         }
         public bool DeleteBatchMessage(int batchId)
         {
@@ -277,17 +283,29 @@ namespace BackendSite.Service.BLL
             return ("", custInfosDetail);
         }
 
-        public async Task<int> BatchMessageByFile(int siteId, string personalMsg, bool isPopup, string adminName, List<ExcelData> excelList)
+        public async Task<int> BatchMessageByFile(int siteId, int batchId, bool isPopup, string adminName, List<ExcelData> excelList)
         {
-            var batchId = await messageService.NewBatchMessage(siteId, adminName, personalMsg);
-            foreach (var data in excelList)
+            try
             {
-                await DoInsertRecipient(batchId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
+                await messageService.BeginTransaction();
+                var rowId = 1;
+                foreach (var data in excelList)
+                {
+                    await DoInsertRecipient(batchId, rowId, isPopup, siteId, data.CustId, data.CustUserName, data.SabaId, adminName);
+                    rowId++;
+                }
+                await messageService.UpdateBatchMessage((int)SendBatchMessageStatus.Finished, batchId);
+                await messageService.Commit();
+                return 1;
             }
-            messageService.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
-            return batchId;
+            catch (Exception ex)
+            {
+                await messageService.RollBack();
+                _logger.LogError(ex, ex.Message);
+                return 0;
+            }
         }
-        private async Task DoInsertRecipient(int batchId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
+        private async Task DoInsertRecipient(int batchId, int rawId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
         {
             var dataMessage = $"Username={userName}. SabaId={sabaId}.";
             var (resultMessage, customer) = await IsValidMember(siteId, custId, userName, dataMessage);
@@ -295,10 +313,10 @@ namespace BackendSite.Service.BLL
             if (string.IsNullOrEmpty(resultMessage))
             {
                 tmpCustId = customer.CustId;
-                await messageService.AddCustBatchMessage(customer.CustId, batchId, isPopup);
+                await messageService.AddCustBatchMessage(customer.CustId, batchId, customer.UserLang, isPopup, "", "");
                 resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
             }
-            messageService.InsertBatchMessageSendLog(batchId, 0, tmpCustId, userName, sabaId, resultMessage, adminName, 0);
+            await messageService.InsertBatchMessageSendLog(batchId, rawId, tmpCustId, userName, sabaId, resultMessage, adminName);
         }
 
         public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)

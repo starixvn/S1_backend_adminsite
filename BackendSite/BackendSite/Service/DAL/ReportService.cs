@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -185,8 +184,7 @@ namespace BackendSite.Service.DAL
             parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var spName = "Admin_TpBetFailureRecord_Get_V3";
-            var result = _reportDbClient.Query<TpFailRecordReport>(spName, parameters);
-
+            var result = _reportDbClient.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
             rowCount = parameters.Get<int>("_RowCount");
             totalPages = parameters.Get<int>("_TotalPages");
 
@@ -208,7 +206,7 @@ namespace BackendSite.Service.DAL
                 });
 
             var spName = "Admin_TpBetFailureRecordForExport_Get_V3";
-            var result = _reportDbClient.Query<TpFailRecordReport>(spName, parameters);
+            var result = _reportDbClient.Query<TpFailRecordReport>(spName, parameters, commandType: CommandType.StoredProcedure);
 
             return result;
         }

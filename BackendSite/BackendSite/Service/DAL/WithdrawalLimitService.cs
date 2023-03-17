@@ -11,21 +11,19 @@ namespace BackendSite.Service.DAL
 {
     public class WithdrawalLimitService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
         public WithdrawalLimitService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        public int SetWithdrawalLimit(int custId, string userName, int siteId, decimal withdrawalLimit, int reasonId ,string memo, string refTransId, int createFrom, string creator, out decimal afterWithdrawalLimit, MySqlConnection conn, MySqlTransaction trans)
+        public int SetWithdrawalLimit(int custId, string userName, int siteId, decimal withdrawalLimit, int reasonId ,string memo, string refTransId, int createFrom, string creator, out decimal afterWithdrawalLimit, MySqlTransaction trans)
         {
             var p = new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId, WithdrawalLimit = withdrawalLimit, ReasonId = reasonId, Memo = memo, RefTransId = refTransId, CreateFrom = createFrom, Creator = creator });
             p.Add("AfterWithdrawalLimit", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = _mainDbClient.Execute("Common_WithdrawalLimit_Set_V2", p, conn, trans);
+            var result = _mainDbClient.Execute("Common_WithdrawalLimit_Set_V2", trans, p);
             afterWithdrawalLimit = p.Get<decimal?>("AfterWithdrawalLimit") ?? 0;
             return result;
         }
@@ -61,7 +59,7 @@ namespace BackendSite.Service.DAL
 
         public bool AddWithdrawalLimitInfo(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -86,14 +84,14 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
                 tran.Rollback();
                 return false;
             }
             
-            var result = conn.Execute("Admin_WithdrawalLimitInfo_Ins_V2", param, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_WithdrawalLimitInfo_Ins_V2", tran, param) > 0;
             if (!result)
             {
                 tran.Rollback();
@@ -107,7 +105,7 @@ namespace BackendSite.Service.DAL
 
         public bool EditWithdrawalLimitInfo(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -131,14 +129,14 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
                 tran.Rollback();
                 return false;
             }
             
-            var result = conn.Execute("Admin_WithdrawalLimitInfo_Set_V2", param, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_WithdrawalLimitInfo_Set_V2", tran, param) > 0;
             if (!result)
             {
                 tran.Rollback();
@@ -152,7 +150,7 @@ namespace BackendSite.Service.DAL
 
         public bool EditWithdrawalLimitInfo(ParamsWithLog<IEnumerable<SetWithdrawalLimitInfo>> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             
@@ -174,14 +172,14 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
                 tran.Rollback();
                 return false;
             }
             
-            var result = conn.Execute("Admin_WithdrawalLimitInfoReNew_Set", param, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_WithdrawalLimitInfoReNew_Set", tran, param) > 0;
             if (!result)
             {
                 tran.Rollback();
@@ -195,18 +193,12 @@ namespace BackendSite.Service.DAL
 
         public WithdrawalLimitInfoManage GetWithdrawalLimitInfo(int siteId, int currencyId, int viplevel)
         {
-            var props = new DynamicParameters(new
-            {
-                SiteId = siteId,
-                CurrencyId = currencyId,
-                VipLevel = viplevel,
-            });
-            return _mainDbClient.QueryFirst<WithdrawalLimitInfoManage>("Admin_WithdrawalLimitInfoDetail_Get",props);
+            return _reportDbClient.QueryFirst<WithdrawalLimitInfoManage>("Admin_WithdrawalLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel });
         }
 
         public bool DeleteWithdrawalLimitInfo(ParamsWithLog<SetWithdrawalLimitInfo> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -226,14 +218,14 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
                 tran.Rollback();
                 return false;
             }
             
-            var result = conn.Execute("Admin_WithdrawalLimitInfo_Del", param, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_WithdrawalLimitInfo_Del", tran, param) > 0;
             if (!result)
             {
                 tran.Rollback();
@@ -270,7 +262,7 @@ namespace BackendSite.Service.DAL
         public bool AddUSDTWithdrawalLimitInfo(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string UpdateOperator)
         {
             var result = false;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -283,9 +275,9 @@ namespace BackendSite.Service.DAL
                 UpdateOperator,
                 Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType)
             };
-            conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "USDTWithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator }, tran, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", tran, new { Menu = "USDTWithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator });
 
-            result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Ins", param, commandType: CommandType.StoredProcedure) > 0;
+            result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Ins", tran, param) > 0;
             tran.Commit();
 
             return result;
@@ -293,20 +285,13 @@ namespace BackendSite.Service.DAL
 
         public USDTWithdrawalLimitInfoManage GetUSDTWithdrawalLimitInfo(int siteId, int currencyId, int viplevel, int Network)
         {
-            var props = new DynamicParameters(new
-            {
-                SiteId = siteId,
-                CurrencyId = currencyId,
-                VipLevel = viplevel,
-                Network = Network
-            });
-            return _reportDbClient.QueryFirst<USDTWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get", props);
+            return _reportDbClient.QueryFirst<USDTWithdrawalLimitInfoManage>("Admin_USDTWithdrawalLimitInfoDetail_Get", new { SiteId = siteId, CurrencyId = currencyId, VipLevel = viplevel, Network  = Network });
         }
 
         public int DeleteUSDTWithdrawalLimitInfo(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string Operator)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -316,9 +301,9 @@ namespace BackendSite.Service.DAL
                 USDTwithdrawalLimitInfoManage.VipLevel,
                 Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType)
             };
-            conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "USDTWithdrawalLimitManagement", ActionType = 2, DetailInfo = JsonConvert.SerializeObject(param), Operator = Operator }, tran, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", tran, new { Menu = "USDTWithdrawalLimitManagement", ActionType = 2, DetailInfo = JsonConvert.SerializeObject(param), Operator = Operator });
 
-            result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Del", new { SiteId = USDTwithdrawalLimitInfoManage.SiteId, CurrencyId = USDTwithdrawalLimitInfoManage.CurrencyId, VipLevel = USDTwithdrawalLimitInfoManage.VipLevel , Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType) }, commandType: CommandType.StoredProcedure);
+            result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Del", tran, new { SiteId = USDTwithdrawalLimitInfoManage.SiteId, CurrencyId = USDTwithdrawalLimitInfoManage.CurrencyId, VipLevel = USDTwithdrawalLimitInfoManage.VipLevel , Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType) });
             tran.Commit();
 
             return result;
@@ -327,7 +312,7 @@ namespace BackendSite.Service.DAL
         public bool EditUSDTWithdrawalLimitInfo(USDTWithdrawalLimitInfoManage USDTwithdrawalLimitInfoManage, string UpdateOperator)
         {
             var result = false;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -341,9 +326,9 @@ namespace BackendSite.Service.DAL
                 Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType)
             };
 
-            conn.Execute("Admin_AdjustmentInfoLog_Set", new { Menu = "USDTWithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator }, tran, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", tran, new { Menu = "USDTWithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator });
 
-            result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Set", param, commandType: CommandType.StoredProcedure) > 0;
+            result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Set", tran, param) > 0;
             tran.Commit();
 
             return result;
@@ -391,7 +376,7 @@ namespace BackendSite.Service.DAL
         
         public bool AddCryptoWithdrawalLimitInfo(ParamsWithLog<CreateCryptoWithdrawalLimitInfo> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
@@ -417,7 +402,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             
             if (!logResult)
             {
@@ -425,7 +410,7 @@ namespace BackendSite.Service.DAL
                 return false;
             }
 
-            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Ins_V4", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Ins_V4", tran, insParam) > 0;
 
             if (!result)
             {
@@ -454,7 +439,7 @@ namespace BackendSite.Service.DAL
 
         public bool DeleteCryptoWithdrawalLimitInfo(ParamsWithLog<DeleteCryptoWithdrawalLimitInfo> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
@@ -477,7 +462,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             
             if (!logResult)
             {
@@ -485,7 +470,7 @@ namespace BackendSite.Service.DAL
                 return false;
             }
 
-            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Del_V2", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Del_V2", tran, insParam) > 0;
             
             if (!result)
             {
@@ -500,7 +485,7 @@ namespace BackendSite.Service.DAL
 
         public bool EditCryptoWithdrawalLimitInfo(ParamsWithLog<UpdateCryptoWithdrawalLimitInfo> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
@@ -529,7 +514,7 @@ namespace BackendSite.Service.DAL
                 _Operator = input.Operator
             };
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
 
             if (!logResult)
             {
@@ -537,7 +522,7 @@ namespace BackendSite.Service.DAL
                 return false;
             }
 
-            var result = conn.Execute("Admin_USDTWithdrawalLimitInfo_Set_V3", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Set_V3", tran, insParam) > 0;
 
             if (!result)
             {
@@ -552,7 +537,7 @@ namespace BackendSite.Service.DAL
         
         public bool EditCryptoWithdrawalLimitInfo(ParamsWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
@@ -576,7 +561,7 @@ namespace BackendSite.Service.DAL
                 _Operator = input.Operator
             };
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
 
             if (!logResult)
             {
@@ -584,7 +569,7 @@ namespace BackendSite.Service.DAL
                 return false;
             }
 
-            var result = conn.Execute("Admin_USDTWithdrawalLimitInfoReNew_Set", insParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfoReNew_Set", tran, insParam) > 0;
 
             if (!result)
             {
@@ -599,12 +584,12 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<EWalletWithdrawalLimitInfoManage> GetEWalletWithdrawalLimitInfo(int siteId)
         {
-            return _mainDbClient.Query<EWalletWithdrawalLimitInfoManage>("Admin_EWalletWithdrawalLimitInfoDetail_Get", new { SiteId = siteId});
+            return _reportDbClient.Query<EWalletWithdrawalLimitInfoManage>("Admin_EWalletWithdrawalLimitInfoDetail_Get", new { SiteId = siteId}, commandType: CommandType.StoredProcedure);
         }
 
         public bool EditEWalletWithdrawalLimitInfo(ParamsWithLog<EWalletUpdateRequest> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -628,8 +613,8 @@ namespace BackendSite.Service.DAL
                 _Operator = input.Operator
             };
 
-            var result = conn.Execute("Admin_EWalletWithdrawalLimitInfo_Set", param, tran, commandType: CommandType.StoredProcedure) > 0;
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_EWalletWithdrawalLimitInfo_Set", tran, param) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
 
             if(result & logResult)
             {
@@ -645,7 +630,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdateEWalletWithdrawalLimitInfoStatus(ParamsWithLog<EWalletSwitchStatusRequest> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var param = new
@@ -667,8 +652,8 @@ namespace BackendSite.Service.DAL
                 _Operator = input.Operator
             };
 
-            var result = conn.Execute("Admin_EWalletWithdrawalLimitInfoStatus_Set", param, tran, commandType: CommandType.StoredProcedure) > 0;
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_EWalletWithdrawalLimitInfoStatus_Set", tran, param) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
 
             if (result & logResult)
             {

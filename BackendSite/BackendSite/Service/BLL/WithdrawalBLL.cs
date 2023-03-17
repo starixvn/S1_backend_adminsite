@@ -347,7 +347,9 @@ namespace BackendSite.Service.BLL
             int pageNumber,
             out int totalPages,
             out int rowCount,
-            ref List<string> currencyAmount)
+            out decimal totalAmount,
+            out decimal totalApproveAmount,
+            out int totalApproveRow)
         {
             return _withdrawalService.GetWithdrawalListByCust(custId,
                 transId,
@@ -355,10 +357,12 @@ namespace BackendSite.Service.BLL
                 startDate,
                 endDate,
                 Math.Abs(pageSize),
-                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                 out totalPages,
-                 out rowCount,
-                 ref currencyAmount);
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount,
+                out totalAmount,
+                out totalApproveAmount,
+                out totalApproveRow);
         }
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(
@@ -828,7 +832,7 @@ namespace BackendSite.Service.BLL
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!_withdrawalService.CreateWithdrawalInfo(custId, custInfo.UserName, custInfo.CurrencyId,
-            custInfo.SiteId, amount, memo, updater, convertData.WithdrawalInfo, _common.GetEnv(), conn, trans, out decimal afterAmount, out string transId))
+            custInfo.SiteId, amount, memo, updater, convertData.WithdrawalInfo, _common.GetEnv(), trans, out decimal afterAmount, out string transId))
             {
                 trans.Rollback();
                 return (false, string.Empty);

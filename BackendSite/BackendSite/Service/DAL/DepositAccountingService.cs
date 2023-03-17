@@ -5,7 +5,6 @@ using Dapper;
 using BackendSite.Controllers.ApiV2.Finance.Deposit;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
-using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
@@ -21,12 +20,10 @@ namespace BackendSite.Service.DAL
 
         #region Constructors
 
-        public DepositAccountingService(IServiceProvider provider)
+        public DepositAccountingService(IEnumerable<MySqlClient> sqlClients)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
-            var logger = provider.GetRequiredService<ILogger<MySqlClient>>();
-            _mainDbClient = new MySqlClient(_configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(_configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion
@@ -76,7 +73,7 @@ namespace BackendSite.Service.DAL
         
         public int EditDepositAccounting(ParamsWithLog<DepositAccountingController.EditRequest> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans =  conn.BeginTransaction();
             
@@ -85,7 +82,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_AccountNo", input.After.AccountNo);
             parameter.Add("_Memo", input.After.Memo);
             parameter.Add("_Operator", input.Operator);
-            var result = conn.Execute("Admin_DepositAccounting_Set", parameter, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.Execute("Admin_DepositAccounting_Set", trans, parameter);
 
             if (result > 0)
             {
@@ -99,7 +96,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans);
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam);
                 if (logSuccess > 0)
                 {
                     trans.Commit();

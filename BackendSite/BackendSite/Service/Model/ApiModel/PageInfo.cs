@@ -1,5 +1,3 @@
-using BackendSite.Extensions;
-
 namespace BackendSite.Service.Model.ApiModel
 {
     public class PageInfo : IPageInfo

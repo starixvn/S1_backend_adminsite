@@ -1,5 +1,4 @@
 ﻿using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL.Interface;
 

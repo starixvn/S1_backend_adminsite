@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -9,33 +8,23 @@ namespace BackendSite.Service.DAL
 {
     public class ServerInfoService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
         public ServerInfoService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
         public ServerInfo GetModel()
         {
             var siteId = 1;
-            var props = new DynamicParameters(new
-            {
-                SiteId = siteId
-            });
-            return _mainDbClient.QueryFirst<ServerInfo>("ServerInfo_Get", props);
+            return _reportDbClient.QueryFirst<ServerInfo>("ServerInfo_Get", new { SiteId = siteId });
         }
 
         public ServerInfo GetModelWithSiteId(int siteId)
         {
-            var props = new DynamicParameters(new
-            {
-                SiteId = siteId
-            });
-            return _mainDbClient.QueryFirst<ServerInfo>("ServerInfo_Get", props);
+            return _reportDbClient.QueryFirst<ServerInfo>("ServerInfo_Get", new { SiteId = siteId });
         }
 
         public IEnumerable<ServerInfo> GetSiteList()
@@ -67,7 +56,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var adminOperateLogList = _mainDbClient.Query<GetAdminOperateLog>("Log_LogAdminOperateInfo_Get_V3", p);
+            var adminOperateLogList = _reportDbClient.Query<GetAdminOperateLog>("Log_LogAdminOperateInfo_Get_V3", p, commandType: CommandType.StoredProcedure);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 

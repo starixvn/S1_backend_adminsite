@@ -10,14 +10,12 @@ namespace BackendSite.Service.DAL
 {
     public class DeepLinkService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        public DeepLinkService(IConfiguration configuration, ILogger<MySqlClient> logger)
+        public DeepLinkService(IEnumerable<MySqlClient> sqlClients)
         {
-            this._configuration = configuration;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
         public IEnumerable<DeepLink> GetDeepLinkList()
         {
@@ -46,12 +44,12 @@ namespace BackendSite.Service.DAL
         {
             var result = true;
 
-            using var conn = _mainDbClient.GetMySqlConnection();
+            await using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
-            using var trans = conn.BeginTransaction();
+            await using var trans = await conn.BeginTransactionAsync();
             var beforeData = GetDeepLinkTable(siteId, deepLinkId, 0, 100, out _, out _);
 
-            var asignBeforeData = beforeData.Where(x => x.SiteId == siteId && x.DeepLinkId == deepLinkId && x.Type == type).FirstOrDefault() ?? null;
+            var asignBeforeData = beforeData.FirstOrDefault(x => x.SiteId == siteId && x.DeepLinkId == deepLinkId && x.Type == type) ?? null;
             var afterData = new
             {
                 SiteId = siteId,
@@ -71,31 +69,30 @@ namespace BackendSite.Service.DAL
                 LastUpdateUser = lastUpdateUser
             };
 
-            if (conn.Execute("Admin_DeepLinkTable_Set", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
+            if (_mainDbClient.Execute("Admin_DeepLinkTable_Set", trans, new DynamicParameters(parameters)) == 0)
                 result = false;
 
             if (!await AddNewOprateLog(siteId, asignBeforeData, afterData, AdminAdjustmentLogMenuEnum.ProviderAppDownload,
-                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, conn, trans))
+                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, trans))
                 result = false;
 
             if (result)
             {
                 trans.Commit();
-                conn.Close();
+                await conn.CloseAsync();
                 return true;
             }
             else
             {
                 trans.Rollback();
-                conn.Close();
+                await conn.CloseAsync();
                 return false;
             }
 
         }
 
         private async Task<bool> AddNewOprateLog(int siteId, object beofreData, object afterData,
-            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater,
-            MySqlConnection conn, MySqlTransaction trans)
+            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlTransaction trans)
         {
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", siteId);
@@ -107,7 +104,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", afterData.ToLog());
             logParam.Add("_Operator", updater);
 
-            var logSuccess = await conn.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+            var logSuccess = await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
             if (logSuccess)
             {

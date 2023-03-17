@@ -1,7 +1,6 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Extensions;
@@ -11,16 +10,12 @@ namespace BackendSite.Service.DAL
 {
     public class PaymentManageService
     {
-        private readonly IConfiguration configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        private readonly string _connectionString;
-        public PaymentManageService(IConfiguration configuration, ILogger<MySqlClient> logger)
+        public PaymentManageService(IEnumerable<MySqlClient> sqlClients)
         {
-            this.configuration = configuration;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
-            _connectionString = configuration.GetConnectionString("ConnectionString");
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
         [Obsolete("請改用GetPayList(int siteId)")]
@@ -44,7 +39,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -68,10 +63,10 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            var result = _mainDbClient.Execute("Admin_PayList_Set", props, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_PayList_Set", trans, props) > 0;
             if (result)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (logResult)
                 {
                     trans.Commit();
@@ -85,7 +80,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdatePayChannel(ParamsWithLog<UpdatePayChannel> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -111,10 +106,10 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            var result = _mainDbClient.Execute("Admin_PayChannel_Set", props, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_PayChannel_Set", trans, props) > 0;
             if (result)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (logResult)
                 {
                     trans.Commit();
@@ -128,7 +123,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdatePayCurrency(ParamsWithLog<UpdatePayCurrency> input, string amountShow)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             
@@ -156,10 +151,10 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            var result = _mainDbClient.Execute("Admin_PayCurrency_Set", props, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_PayCurrency_Set", trans, props) > 0;
             if (result)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (logResult)
                 {
                     trans.Commit();
@@ -173,7 +168,7 @@ namespace BackendSite.Service.DAL
 
         public bool UpdatePayCurrencyAmount(ParamsWithLog<UpdatePayCurrency> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -199,10 +194,10 @@ namespace BackendSite.Service.DAL
 
             #endregion
 
-            var result = _mainDbClient.Execute("Admin_PayCurrency_SetAmount", props, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_PayCurrency_SetAmount", trans, props) > 0;
             if (result)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (logResult)
                 {
                     trans.Commit();
@@ -222,7 +217,7 @@ namespace BackendSite.Service.DAL
 
         public void UpdateBankInfo(int payId, int sysId, int status, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -247,8 +242,8 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", @operator);
             #endregion
 
-            _mainDbClient.Execute("Admin_BankInfoPay_Set", props, conn, trans);
-            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", propsLog, conn, trans);
+            _mainDbClient.Execute("Admin_BankInfoPay_Set", trans, props);
+            var result = _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", trans, propsLog);
             if (result > 0)
             {
                 trans.Commit();
@@ -269,7 +264,7 @@ namespace BackendSite.Service.DAL
         
         public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var pay = GetPayList(siteId)
@@ -306,9 +301,9 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", @operator);
             #endregion
 
-            if (_mainDbClient.Execute("Admin_SitePayList_Status_Set", props, conn, trans) > 0)
+            if (_mainDbClient.Execute("Admin_SitePayList_Status_Set", trans, props) > 0)
             {
-                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0)
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0)
                 {
                     trans.Commit();
                     return true;
@@ -321,7 +316,7 @@ namespace BackendSite.Service.DAL
         
         public bool SetPayListLoginInfo(SetPayListLoginInfoParams input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var pay = GetPayList(input.SiteId)
@@ -370,9 +365,9 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", input.Operator);
             #endregion
 
-            if (_mainDbClient.Execute("Admin_SitePayList_LoginInfo_Set", props, conn, trans) > 0)
+            if (_mainDbClient.Execute("Admin_SitePayList_LoginInfo_Set", trans, props) > 0)
             {
-                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0)
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0)
                 {
                     trans.Commit();
                     return true;
@@ -422,7 +417,7 @@ namespace BackendSite.Service.DAL
         
         public bool UpdatePaySetting(UpdatePaySettingParams input, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
@@ -472,9 +467,9 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", @operator);
             #endregion
 
-            if (_mainDbClient.Execute("Admin_PaySetting_Set", props, conn, trans) > 0)
+            if (_mainDbClient.Execute("Admin_PaySetting_Set", trans, props) > 0)
             {
-                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0)
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0)
                 {
                     trans.Commit();
                     return true;
@@ -487,7 +482,7 @@ namespace BackendSite.Service.DAL
         
         public bool UpdatePaySettingStatus(UpdatePaySettingStatusParams input, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
@@ -521,9 +516,9 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", @operator);
             #endregion
 
-            if (_mainDbClient.Execute("Admin_PaySetting_Status_Set", props, conn, trans) > 0)
+            if (_mainDbClient.Execute("Admin_PaySetting_Status_Set", trans, props) > 0)
             {
-                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0)
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0)
                 {
                     trans.Commit();
                     return true;
@@ -536,7 +531,7 @@ namespace BackendSite.Service.DAL
         
         public bool UpdatePaySettingChargeFee(UpdatePaySettingChargeFeeParams input, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var paySetting = GetPaySetting(input.SiteId, input.ChannelId)
@@ -572,9 +567,9 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", @operator);
             #endregion
 
-            if (_mainDbClient.Execute("Admin_PaySetting_ChargeFee_Set", props, conn, trans) > 0)
+            if (_mainDbClient.Execute("Admin_PaySetting_ChargeFee_Set", trans, props) > 0)
             {
-                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0)
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0)
                 {
                     trans.Commit();
                     return true;
@@ -606,7 +601,7 @@ namespace BackendSite.Service.DAL
         
         public bool UpdateBankInfo(int siteId, int payId, int sysId, BankInfoPayStatusEnum status, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var bankSysInfo = GetBankSysInfoList(siteId, payId)
@@ -640,10 +635,10 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", @operator);
             #endregion
 
-            var setResult = _mainDbClient.Execute("Admin_BankInfoPay_Set_V2", props, conn, trans);
+            var setResult = _mainDbClient.Execute("Admin_BankInfoPay_Set_V2", trans, props);
             if (setResult > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans);
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam);
                 if (logResult > 0)
                 {
                     trans.Commit();
@@ -661,7 +656,7 @@ namespace BackendSite.Service.DAL
         
         public bool SetCryptoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -695,10 +690,10 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Operator", @operator);
             #endregion
 
-            var setResult = _mainDbClient.Execute("Admin_CryptoNetwork_Set", props, conn, trans);
+            var setResult = _mainDbClient.Execute("Admin_CryptoNetwork_Set", trans, props);
             if (setResult > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans);
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam);
                 if (logResult > 0)
                 {
                     trans.Commit();

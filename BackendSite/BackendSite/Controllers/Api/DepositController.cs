@@ -135,10 +135,6 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetDepositListByCust(DepositListReq1 depositListReq)
         {
-            var totalPages = 0;
-            var rowCount = 0;
-            decimal totalAmount = 0;
-
             if (depositListReq.startDate > 2147483647)
             {
                 depositListReq.startDate = 2147483647;
@@ -159,9 +155,11 @@ namespace BackendSite.Controllers.Api
                                                        endTime,
                                                        depositListReq.PageSize,
                                                        depositListReq.PageNumber,
-                                                       out totalPages,
-                                                       out rowCount,
-                                                       out totalAmount);
+                                                       out var totalPages,
+                                                       out var rowCount,
+                                                       out _,
+                                                       out _,
+                                                       out _);
 
 
             return new ApiListResultTotalAmount<DepositRequest>
@@ -170,7 +168,6 @@ namespace BackendSite.Controllers.Api
                 TotalPages = totalPages,
                 PageNumber = depositListReq.PageNumber,
                 RowCount = rowCount,
-                TotalAmount = totalAmount,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 

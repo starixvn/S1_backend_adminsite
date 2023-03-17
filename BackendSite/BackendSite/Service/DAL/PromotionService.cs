@@ -2,38 +2,24 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 
 namespace BackendSite.Service.DAL
 {
     public class PromotionService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
-        public PromotionService(IServiceProvider provider)
+        public PromotionService(IEnumerable<MySqlClient> sqlClients)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
-            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
-            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
         public IEnumerable<Promotion> GetPromotionListByCustId(int custId)
         {
-            return _mainDbClient.Query<Promotion>("Admin_PromotionListByCustId_Get_V2", new { _CustId = custId });
+            return _reportDbClient.Query<Promotion>("Admin_PromotionListByCustId_Get_V2", new { _CustId = custId }, commandType: CommandType.StoredProcedure);
         }
-
-        //public int CancelBonusByBonusId(int bonusId)
-        //{
-        //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-        //    conn.Open();
-        //    using var trans = conn.BeginTransaction();
-        //    int result = 0;
-        //    result = conn.Execute("Common_CancelBonusByBonusId_Set", new { BonusId = bonusId }, transaction: trans, commandType: CommandType.StoredProcedure);
-        //    trans.Commit();
-        //    return result;
-        //}
 
         public PromotionListData GetPromotionListByCustIdAndDate(int CustId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
         {
@@ -46,7 +32,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", EndDate.DateTime, DbType.DateTime);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_PromotionTotalAmountByCustIdAndDate_Get_V3", props).ToList();
+            var CurrencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_PromotionTotalAmountByCustIdAndDate_Get_V3", props, commandType: CommandType.StoredProcedure).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -62,7 +48,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get_V4", props).ToList();
+            var result = _reportDbClient.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get_V4", props, commandType: CommandType.StoredProcedure).ToList();
 
             PromotionListData.PromotionList = result;
             PromotionListData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;

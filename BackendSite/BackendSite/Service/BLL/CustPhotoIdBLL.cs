@@ -1,5 +1,4 @@
 ﻿using Amazon.S3.Model;
-using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;

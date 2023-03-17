@@ -3,12 +3,6 @@ using BackendSite.Service.Model;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using System.Reflection;
-using Org.BouncyCastle.Asn1;
-using Amazon.Runtime.Internal.Transform;
-using System.Security.Policy;
-using System;
-using MySqlX.XDevAPI.Common;
 
 namespace BackendSite.Service.BLL
 {

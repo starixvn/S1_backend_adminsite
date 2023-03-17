@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -106,14 +105,14 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
-            return _reportDbClient.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props);
+            return _reportDbClient.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
         }
         public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para,int SiteId)
         {
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             props.Add("SiteId", SiteId);
-            return _mainDbClient.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId").ToList();
+            return _reportDbClient.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId", props, commandType: CommandType.StoredProcedure).ToList();
         }
     }
 }

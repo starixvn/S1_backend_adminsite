@@ -1,7 +1,6 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using MySql.Data.MySqlClient;
 using System.Data;
 using Dapper;
 

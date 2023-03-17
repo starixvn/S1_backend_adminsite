@@ -1,6 +1,5 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
-using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -116,17 +115,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult<int>> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
             var authData = _newAuthorizeBLL.GetAuthData();
-            var batchId = 0;
-            
+            var batchId =  await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
             if (req.excelUpload != null)
             {
                 if (!_excelBll.IsValidFile(req.excelUpload.ContentType))
-                    return new ApiResult<int>() { ErrorCode = -1, Message = "File Type Error" };
+                    return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "File Type Error" };
 
                 var excelList = _excelBll.Read(req.excelUpload);
-                batchId = await _messageBll.BatchMessageByFile(req.optSite, req.personalMsg, req.IsPopup, authData.UserName, excelList);
+                if(!excelList.Any())
+                    return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Empty File" };
+                
+                _ = Task.Run(async () => 
+                {
+                    await _messageBll.BatchMessageByFile(req.optSite, batchId, req.IsPopup, authData.UserName, excelList);
+                });
                 _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
             }
             else
@@ -144,9 +148,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 }
 
                 #endregion
-                
-                _messageBll.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
-                
+
                 _ = Task.Run(() =>
                 {
                     var userSiteList = _serverInfoService.GetSiteList();
