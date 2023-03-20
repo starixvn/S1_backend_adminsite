@@ -532,14 +532,13 @@ namespace BackendSite.Service.DAL
 
                 if (logSuccess)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                     return true;
                 }
 
             }
 
-            trans.Rollback();
-
+            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
 
@@ -593,13 +592,12 @@ namespace BackendSite.Service.DAL
 
                 if (logSuccess)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                     return true;
                 }
             }
 
-            trans.Rollback();
-
+            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
 

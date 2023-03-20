@@ -100,7 +100,7 @@ namespace BackendSite.Service.DAL
 
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
 
@@ -134,21 +134,21 @@ namespace BackendSite.Service.DAL
                         result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", trans, prop);
                         if (result == 0)
                         {
-                            trans.Rollback();
+                            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                             return result;
                         }
                     }
                     else
                     {
-                        trans.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                         return result;
                     }
                 }
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
 
             return result;
@@ -189,7 +189,7 @@ namespace BackendSite.Service.DAL
 
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
 
@@ -208,17 +208,17 @@ namespace BackendSite.Service.DAL
                     result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", trans, prop);
                     if (result == 0)
                     {
-                        trans.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                         return result;
                     }
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 

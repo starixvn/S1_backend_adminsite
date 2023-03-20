@@ -44,13 +44,18 @@ namespace BackendSite.Service.DAL
                 forStatus.Add((int)AdjustmentInfoStatusEnum.Pending);
                 if (SetAdjustmentInfo(transId, adjustmentInfo.SiteId, $"Payment Adjustment: {adjustmentInfo.Amount * (adjustmentInfo.AdjustType == 1 ? 1 : -1)}", Operator, forStatus, AdjustmentInfoStatusEnum.Approved, adjustmentInfo, trans) > 0)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                     transId = p.Get<string>("TransId");
                 }
                 else
                 {
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     result = 0;
                 }
+            }
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
 
             return result;
@@ -187,7 +192,8 @@ namespace BackendSite.Service.DAL
 
             if (resultCode != 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                return (resultCode, string.Empty);
             }
             
             var amount = input.AdjustType == WithdrawalLimitAdjustmentAdjustTypeEnum.Debit ? input.Amount * -1 : input.Amount;
@@ -196,7 +202,7 @@ namespace BackendSite.Service.DAL
 
             if (result < 1)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return (-2, string.Empty);
             }
             
@@ -221,11 +227,11 @@ namespace BackendSite.Service.DAL
             
             if (logResult < 1)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return (-3, string.Empty);
             }
             
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
 
             return (resultCode, transId);
         }
@@ -252,7 +258,7 @@ namespace BackendSite.Service.DAL
 
             if (withdrawalLimitInfo.AdjustType == 2 && deduction < withdrawalLimitInfo.Amount)
             {
-                trans.Commit();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return 21;
             }
             else
@@ -276,7 +282,7 @@ namespace BackendSite.Service.DAL
 
                 if (string.IsNullOrEmpty(transId))
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 22;
                 }
                 else
@@ -299,7 +305,7 @@ namespace BackendSite.Service.DAL
                     #endregion
 
                     _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", trans, propsLog);
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
@@ -420,11 +426,11 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                 }
                 else
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 }
 
             }
@@ -534,7 +540,7 @@ namespace BackendSite.Service.DAL
 
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -542,11 +548,11 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }

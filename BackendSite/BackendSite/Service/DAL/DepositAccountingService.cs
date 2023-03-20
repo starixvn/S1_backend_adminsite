@@ -99,11 +99,11 @@ namespace BackendSite.Service.DAL
                 var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam);
                 if (logSuccess > 0)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                     return result;
                 }
             }
-            trans.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return result;
         }
         

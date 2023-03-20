@@ -822,13 +822,13 @@ namespace BackendSite.Service.BLL
             var convertData = ConvertData(paymentId, sysId, accountNo, accountHolderName, IFSCCode, cryptoAccountNickName, cryptoCurrencyId, cryptoNetwork);
 
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!_withdrawalService.CreateWithdrawalInfo(custId, custInfo.UserName, custInfo.CurrencyId,
             custInfo.SiteId, amount, memo, updater, convertData.WithdrawalInfo, _common.GetEnv(), trans, out decimal afterAmount, out string transId))
             {
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return (false, string.Empty);
             }
 
@@ -855,10 +855,10 @@ namespace BackendSite.Service.BLL
 
             if (!logResult)
             {
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return (false, string.Empty);
             }
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return (true, transId);
         }
 

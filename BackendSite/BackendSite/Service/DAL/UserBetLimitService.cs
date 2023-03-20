@@ -34,7 +34,7 @@ namespace BackendSite.Service.DAL
         public async Task<int> InsertOrUpdate(ParamsWithLog<CustBetLimit> input)
         {
             await using var conn = MainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             
             var p = new DynamicParameters();
@@ -64,12 +64,12 @@ namespace BackendSite.Service.DAL
 
                 if (logSuccess)
                 {
-                    trans.Commit();
+                    await MainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                     return result;
                 }
             }
 
-            trans.Rollback();
+            await MainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
 
             return result;
         }
@@ -97,7 +97,7 @@ namespace BackendSite.Service.DAL
         public async Task<int> Delete(ParamsWithLog<DeleteCustBetLimit> input)
         {
             await using var conn = MainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             
             var p = new DynamicParameters();
@@ -124,12 +124,12 @@ namespace BackendSite.Service.DAL
 
                 if (logSuccess)
                 {
-                    trans.Commit();
+                    await MainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                     return result;
                 }
             }
 
-            trans.Rollback();
+            await MainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
 
             return result;
         }

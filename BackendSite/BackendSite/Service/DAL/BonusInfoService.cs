@@ -134,8 +134,8 @@ namespace BackendSite.Service.DAL
         public async Task<(int Result, int CustId)> CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, string @operator)
         {
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
-            await using var trans = conn.BeginTransaction();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
             var p = new DynamicParameters(new { _BonusId = bonusId, _StatusList = statusList });
             p.Add("_SiteId", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -191,12 +191,18 @@ namespace BackendSite.Service.DAL
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custId, custSimpleInfo.CurrencyId, new { BonusId = bonusId, Status = "Running" },
                new { BonusId = bonusId, Status = "Cancel" }, AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, ActionType.Update, @operator, trans))
             {
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return (0, custId);
             }
 
             if (result > 0)
-                trans.Commit();
+            {
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+            }
+            else
+            {
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
+            }
 
             return (result, custId);
         }
