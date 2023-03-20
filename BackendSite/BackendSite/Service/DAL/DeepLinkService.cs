@@ -45,7 +45,7 @@ namespace BackendSite.Service.DAL
             var result = true;
 
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             var beforeData = GetDeepLinkTable(siteId, deepLinkId, 0, 100, out _, out _);
 
@@ -78,14 +78,12 @@ namespace BackendSite.Service.DAL
 
             if (result)
             {
-                trans.Commit();
-                await conn.CloseAsync();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             else
             {
-                trans.Rollback();
-                await conn.CloseAsync();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 

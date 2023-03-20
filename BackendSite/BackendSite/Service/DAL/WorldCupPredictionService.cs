@@ -31,13 +31,17 @@ namespace BackendSite.Service.DAL
         public async Task Commit()
         {
             await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
             await _connection.CloseAsync();
+            await _connection.DisposeAsync();
         }
 
         public async Task RollBack()
         {
             await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
             await _connection.CloseAsync();
+            await _connection.DisposeAsync();
         }
 
         /// <summary>

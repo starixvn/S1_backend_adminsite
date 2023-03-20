@@ -74,11 +74,11 @@ public class PaymentChargeFeeService
 
         if (result == (int)ErrorCodeEnum.Success)
         {
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
         }
         else
         {
-            trans.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
         }
 
         return result;

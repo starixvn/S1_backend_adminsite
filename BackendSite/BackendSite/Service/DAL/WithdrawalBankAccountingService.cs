@@ -125,7 +125,7 @@ namespace BackendSite.Service.DAL
                 case ActionType.Create: //Insert
                     if (Insert(model, transaction) == 0)
                     {
-                        transaction.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                         return false;
                     }
 
@@ -133,7 +133,7 @@ namespace BackendSite.Service.DAL
                 case ActionType.Update: //Update
                     if (Update(model, transaction) == 0)
                     {
-                        transaction.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                         return false;
                     }
 
@@ -141,7 +141,7 @@ namespace BackendSite.Service.DAL
                 case ActionType.Delete: //Delete
                     if (Delete(model, transaction) == 0)
                     {
-                        transaction.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                         return false;
                     }
 
@@ -154,11 +154,11 @@ namespace BackendSite.Service.DAL
 
             if (InsertLog((int) action, model, transaction) == 0)
             {
-                transaction.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                 return false;
             }
 
-            transaction.Commit();
+            _mainDbClient.CommitAndDisposeConnection(connection, transaction);
             return true;
         }
 

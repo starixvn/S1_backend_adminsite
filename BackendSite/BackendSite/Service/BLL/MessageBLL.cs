@@ -164,13 +164,13 @@ namespace BackendSite.Service.BLL
             if (!msgBeforeInfo.Any()) return false;
             var custSimpleInfo = await custInfoBLL.GetCustId(msgBeforeInfo.First().CustId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!messageService.DeletePersonalMsg(id, isBatch))
             {
                 _logger.LogError($"DeleteSMSInfo: Delete SMSInfo Fail. SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
@@ -178,11 +178,11 @@ namespace BackendSite.Service.BLL
                 AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, trans))
             {
                 _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
 

@@ -444,5 +444,21 @@ namespace BackendSite.Service.Library
             conn.Close();
             conn.Dispose();
         }
+
+        public async Task CommitAndDisposeConnectionAsync(MySqlConnection conn, MySqlTransaction trans)
+        {
+            await trans.CommitAsync();
+            await trans.DisposeAsync();
+            await conn.CloseAsync();
+            await conn.DisposeAsync();
+        }
+        
+        public async Task RollbackAndDisposeConnectionAsync(MySqlConnection conn, MySqlTransaction trans)
+        {
+            await trans.RollbackAsync();
+            await trans.DisposeAsync();
+            await conn.CloseAsync();
+            await conn.DisposeAsync();
+        }
     }
 }

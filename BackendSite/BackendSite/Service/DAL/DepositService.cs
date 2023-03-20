@@ -177,12 +177,15 @@ namespace BackendSite.Service.DAL
 
 
             var result = _mainDbClient.Execute("Admin_DepositInfo_Ins", trans, p);
+            var transId = p.Get<string>("vTransId");
             if (result > 0)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
-
-            var transId = p.Get<string>("vTransId");
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            }
 
             return transId;
         }
@@ -299,8 +302,12 @@ namespace BackendSite.Service.DAL
 
                     if (result > 0)
                     {
-                        trans.Commit();
+                        _mainDbClient.CommitAndDisposeConnection(conn, trans);
                         result = p.Get<int?>("CustId") ?? result;
+                    }
+                    else
+                    {
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     }
                 }
             }

@@ -68,7 +68,7 @@ namespace BackendSite.Service.DAL
             
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -76,11 +76,11 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -109,7 +109,7 @@ namespace BackendSite.Service.DAL
             
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -117,11 +117,11 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
