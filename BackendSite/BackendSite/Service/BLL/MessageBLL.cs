@@ -167,7 +167,7 @@ namespace BackendSite.Service.BLL
             if (personalMsg == null) return false;
 
             var custSimpleInfo = await custInfoBLL.GetCustId(personalMsg.CustId, null, null);
-            using var conn = _mainDbClient.GetMySqlConnection();
+            await using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             try
@@ -181,13 +181,13 @@ namespace BackendSite.Service.BLL
                     AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
                     ActionType.Delete, 
                     @operator, trans);
-                trans.Commit();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"DeleteSMSInfo Fail.  SMSId:{id} Operator:{@operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
         }

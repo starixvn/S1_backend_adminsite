@@ -310,13 +310,13 @@ namespace BackendSite.Service.DAL
 
             if (setAffectCount == 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return false;
             }
 
             if (isAdd && setAffectCount != 1)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return false;
             }
             
@@ -327,7 +327,7 @@ namespace BackendSite.Service.DAL
             var insertCount = InsertAdjustmentInfoLog(promotion, trans, Operator);
             if (insertCount == 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return false;
             }
             #endregion
@@ -363,7 +363,7 @@ namespace BackendSite.Service.DAL
             //Step2-1:Set Promotion Specific
             if (!SetPromotionSpecific(promotion.BonusCode, promotion.SiteId, specificList, trans))
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return false;
             }
 
@@ -389,7 +389,7 @@ namespace BackendSite.Service.DAL
             {
                 if (!SetPromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList, trans))
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return false;
                 }
             }
@@ -476,19 +476,19 @@ namespace BackendSite.Service.DAL
 
                 if (isUpdate && !DeletePromotionCashBack(promotion.BonusCode, promotion.SiteId, trans))
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return false;
                 }
 
                 if (!InsertPromotionCashBack(promotion.BonusCode, promotion.SiteId, Operator, cashBackList,
                         trans))
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return false;
                 }
             }
 
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return true;
         }
 
@@ -516,13 +516,13 @@ namespace BackendSite.Service.DAL
 
             if (!promotionResult)
             {
-                transaction.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                 return false;
             }
             var promotionSpecificResult = DuplicatePromotionSpecific(bonusCode, siteId, newBonusCode, expectedSpecificRow, transaction);
             if (!promotionSpecificResult)
             {
-                transaction.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                 return false;
             }
 
@@ -531,7 +531,7 @@ namespace BackendSite.Service.DAL
                 var promotionConditionResult = DuplicatePromotionDisplayCondition(bonusCode, siteId, newBonusCode, expectedConditionRow, transaction);
                 if (!promotionConditionResult)
                 {
-                    transaction.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                     return false;
                 }
             }
@@ -541,12 +541,12 @@ namespace BackendSite.Service.DAL
                 var promotionCashBackResult = DuplicatePromotionCashBack(bonusCode, siteId, newBonusCode, expectedCashBackRow, transaction, Operator);
                 if (!promotionCashBackResult)
                 {
-                    transaction.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                     return false;
                 }
             }
 
-            transaction.Commit();
+            _mainDbClient.CommitAndDisposeConnection(connection, transaction);
             return true;
         }
 

@@ -145,11 +145,11 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog);
             if (result > 0)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return result;
         }
@@ -193,11 +193,11 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog);
             if (result > 0)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return result;
         }
@@ -229,11 +229,11 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog);
             if (result > 0)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return result;
         }

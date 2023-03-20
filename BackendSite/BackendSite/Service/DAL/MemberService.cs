@@ -205,7 +205,7 @@ public class MemberService : IMemberService
         }
 
         await using var conn = _mainSqlClient.GetMySqlConnection();
-        conn.Open();
+        await conn.OpenAsync();
         await using var trans = await conn.BeginTransactionAsync();
         
         var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", trans, p) > 0;
@@ -229,7 +229,7 @@ public class MemberService : IMemberService
             
             if (!custTags.Any())
             {
-                _mainSqlClient.CommitAndDisposeConnection(conn, trans);
+                await _mainSqlClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
 
@@ -241,12 +241,12 @@ public class MemberService : IMemberService
             success = await SetCustInfoTagList(custTags, trans);
             if (success)
             {
-                _mainSqlClient.CommitAndDisposeConnection(conn, trans);
+                await _mainSqlClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
         }
 
-        _mainSqlClient.RollbackAndDisposeConnection(conn, trans);
+        await _mainSqlClient.RollbackAndDisposeConnectionAsync(conn, trans);
         return false;
     }
 

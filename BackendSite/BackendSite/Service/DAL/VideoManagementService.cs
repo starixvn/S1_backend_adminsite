@@ -69,12 +69,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return logResult;
                 }
             }
             
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
         public void InsertLatestHighlightVideo(int siteId,string date, List<GetSiteLangData> siteLangDatas, string user)
@@ -88,7 +88,7 @@ namespace BackendSite.Service.DAL
                 _mainDbClient.Execute("Admin_LatestHighlightVideo_Int", tran,
                     new { SiteId = siteId, Date = date, Operator = user, data.Title, data.Link, data.LangId });
             }
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
             
         }
     }
