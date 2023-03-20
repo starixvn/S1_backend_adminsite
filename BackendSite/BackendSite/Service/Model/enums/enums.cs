@@ -418,7 +418,11 @@ namespace BackendSite.Service.Model.enums
         ERC20 = 1,
         TRC20 = 2,
         ETH = 3,
-        BTC = 4
+        BTC = 4,
+        BSC = 5,
+        BEP20 = 6,
+        XRP = 7,
+        ADA = 8
     }
 
     #endregion
@@ -1046,7 +1050,15 @@ namespace BackendSite.Service.Model.enums
         USDT = 96,
         USDC = 97,
         ETH = 98,
-        BTC = 99
+        BTC = 99,
+        BNB = 100,
+        BUSD = 101,
+        DAI = 102,
+        DOGE = 103,
+        XRP = 104,
+        EOS = 105,
+        SHIB = 106,
+        ADA = 107,
     }
 
     public enum SendMessageStatus
