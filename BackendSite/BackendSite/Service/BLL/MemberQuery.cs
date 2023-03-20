@@ -164,8 +164,8 @@ namespace BackendSite.Service.BLL
                     exportDatas.Add(exportData);
                 });
                 await Task.WhenAll(tasks);
-                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
-                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                //如果該名user的PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 return exportDatas;
             }
             return data;

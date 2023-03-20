@@ -114,9 +114,9 @@ namespace BackendSite.Service.BLL
                 if (financialLog.FinancialType == FinancialType.TpTransfer)
                 {
                     var tpId = financialLog.Type - 2000;
-                    var tpName = tpId == (int)TpEnum.Saba ? "Sportsbook" : _common.GetTpName(tpId);
-                    financialLog.Memo = financialLog.Direction == DirectionEnum.Add ?
-                        $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";
+                    var tpName = _common.GetTpName(tpId);
+                    financialLog.Memo = financialLog.Direction == DirectionEnum.Add ? 
+                        $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";            
                 }
             }
         }

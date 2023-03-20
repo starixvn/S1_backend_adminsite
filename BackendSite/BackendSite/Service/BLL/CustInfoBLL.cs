@@ -869,12 +869,7 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
-            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if (sabaWallet != null)
-            {
-                result.SabaWallet = sabaWallet.Balance;
-            }
             if (ptwallet != null)
             {
                 result.PTWallet = ptwallet.Balance;
@@ -885,12 +880,7 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
-            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if (sabaWallet != null)
-            {
-                result.SabaWallet = sabaWallet.Balance;
-            }
             if (ptwallet != null)
             {
                 result.PTWallet = ptwallet.Balance;

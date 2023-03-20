@@ -52,7 +52,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
-            _mainWalletType = configuration.GetValue<int>("MainWalletType");
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _fileNameBll = provider.GetRequiredService<FileNameBLL>();
@@ -341,26 +340,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 
                 if (depositConfirmResult > 0)
                 {
-                    var tmp = new ApiResult<TransferResult>();
-                    if (_mainWalletType == 2)
-                    {
-                        var pendingFund = new PendingFund
-                        {
-                            CustId = depositConfirmResult
-                        };
-                        tmp = await Process(pendingFund);
-                    }
-                    else
-                    {
-                        tmp.ErrorCode = (int)ErrorCodeEnum.Success;
-                    }
-
-                    if (tmp.ErrorCode != 0)
-                    {
-                        depositConfirmResult = -4;
-                    }
-                    else
-                    {
                         var userLang = _custInfoBll.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                         // Send message to player
                         var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
@@ -368,8 +347,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         title = string.Format(title, request.TransId);
                         var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, request.TransId);
-                        _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
-                    }
+                        _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId); 
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
@@ -782,11 +760,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
         
         #region Private function
-
-        private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
-        {
-            return await _pendingFundBll.ProcessAsync(pendingFund);
-        }
 
         private List<int> GetUsableActionButton(DepositRequest depositRequest)
         {
