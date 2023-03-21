@@ -347,7 +347,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         title = string.Format(title, request.TransId);
                         var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, request.TransId);
-                        _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId); 
+                        await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
@@ -364,7 +364,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     title = string.Format(title, request.TransId);
                     var content = _selLangBll.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, request.TransId);
-                    _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                     if (custInfo.SiteId == 1)
                     {
                         await _messageBll.SendSMSMessageToPlayer(depositRequest.CustId);
@@ -439,7 +439,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     title = string.Format(title, transId);
                     var content = _selLangBll.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, transId);
-                    _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    _messageBll.SendMessage(new Message(sender, depositRequest.CustId, userLang, title, content));
                 }
                 if (depositConfirmResult == -4)
                 {
