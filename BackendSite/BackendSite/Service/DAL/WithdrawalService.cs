@@ -69,18 +69,18 @@ namespace BackendSite.Service.DAL
                 int.TryParse(m.Value, out withdrawalId);
             }
             
-            var tempWithdrawalMethod = (int)withdrawalMethod;
-            if(withdrawalType.Count() > 1)
-            {
-                tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
-            }
-            else
-            {
-                if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
-                {
-                    tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
-                }
-            }
+            // var tempWithdrawalMethod = (int)withdrawalMethod;
+            // if(withdrawalType.Count() > 1)
+            // {
+            //     tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
+            // }
+            // else
+            // {
+            //     if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
+            //     {
+            //         tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
+            //     }
+            // }
             
             var p = new DynamicParameters(new
             {
@@ -102,7 +102,7 @@ namespace BackendSite.Service.DAL
                 _StartAmount = startAmount,
                 _EndAmount = endAmount,
                 _Agent = string.IsNullOrEmpty(agent) ? null : agent,
-                _WithdrawalMethod = tempWithdrawalMethod
+                _WithdrawalMethod = withdrawalMethod
             });
 
             #region GetCurrencyTotalAmount
@@ -205,18 +205,18 @@ namespace BackendSite.Service.DAL
                 int.TryParse(m.Value, out withdrawalId);
             }
            
-            var tempWithdrawalMethod = (int)withdrawalMethod;
-            if (withdrawalType.Count() > 1)
-            {
-                tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
-            }
-            else
-            {
-                if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
-                {
-                    tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
-                }
-            }
+            // var tempWithdrawalMethod = (int)withdrawalMethod;
+            // if (withdrawalType.Count() > 1)
+            // {
+            //     tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
+            // }
+            // else
+            // {
+            //     if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
+            //     {
+            //         tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
+            //     }
+            // }
             
             var p = new DynamicParameters(new
             {
@@ -236,7 +236,7 @@ namespace BackendSite.Service.DAL
                 _SelectBankCode = selectBankCode,
                 _SelectCalCode = selectCalCode,
                 _Agent = agent,
-                _WithdrawalMethod = tempWithdrawalMethod
+                _WithdrawalMethod = withdrawalMethod
             });
 
             var depositList = _reportDbClient.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V10", p,
