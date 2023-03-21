@@ -2044,18 +2044,9 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                                                     </div>
                                                     <button onClick={this.rotate.bind(this)}>rotate</button>
                                                 </td>
-                                                <td>
-                                                    <button className="btn btn-delete" disabled={data.isKyc} onClick={!data.isKyc ? this.onAskReupload.bind(this) : null}>Ask Re-Upload</button>
-                                                </td>
                                             </tr>
                                             :
                                             <tr>
-                                                <td>
-                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc} />
-                                                </td>
-                                                <td>
-                                                    <button className="btn btn-add" disabled={data.isKyc} onClick={!data.isKyc ? this.onNewUpload.bind(this) : null}>Upload</button>
-                                                </td>
                                             </tr>
                                         }
                                     </tbody>
