@@ -31,11 +31,6 @@ namespace BackendSite.Service.BLL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
-        public int SendMessageToPlayer(string sender, string title, string content, int custId)
-        {
-            var customer = custInfoBLL.GetCustInfoWithCache(custId);
-            return messageService.SendMessageToPlayer(sender, custId, customer.UserLang, title, content);
-        }
 
         public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> siteIds, DateTimeOffset startDate, DateTimeOffset endDate, IEnumerable<GeneralStatusEnum> statuses, int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
         {
@@ -167,7 +162,7 @@ namespace BackendSite.Service.BLL
             if (personalMsg == null) return false;
 
             var custSimpleInfo = await custInfoBLL.GetCustId(personalMsg.CustId, null, null);
-            await using var conn = _mainDbClient.GetMySqlConnection();
+            using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             try
@@ -369,6 +364,15 @@ namespace BackendSite.Service.BLL
                                  $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
             }
         }
+        public int SendMessageToPlayer(string sender, string title, string content, int custId)
+        {
+            var customer = custInfoBLL.GetCustInfoWithCache(custId);
+            return messageService.SendMessageToPlayer(sender, custId, customer.UserLang, title, content);
+        }
+        public int SendMessage(Message message) =>
+            messageService.SendMessage(message);
+        public Task<int> SendMessageAsync(Message message) =>
+            messageService.SendMessageAsync(message);
 
         public (bool, string) CheckBatchMessage(int currency, string personalMsg)
         {
