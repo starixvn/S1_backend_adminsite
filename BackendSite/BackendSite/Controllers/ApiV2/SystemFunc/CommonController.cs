@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
@@ -99,5 +100,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
+        
+        [HttpPost]
+        public async Task<ApiResult> CheckQrCodeImg(IFormFile file)
+        {
+            var result = await QrCodeExtension.DecodeFromImage(file);
+
+            return string.IsNullOrEmpty(result)
+                ? new ApiResult((int)ErrorCodeEnum.Fail, "Incorrect QR code image.")
+                : new ApiResult((int)ErrorCodeEnum.Success, string.Empty);
+        }
+        
     }
 }
