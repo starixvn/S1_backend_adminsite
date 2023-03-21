@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         #region API
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 144, 1 })]
         public ApiListResult<LeaderboardExtraPointList> GetExtraPointList(LeaderboardExtraPointReq request)
         {
             var apiResult = new ApiListResult<LeaderboardExtraPointList>();
@@ -67,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 2 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 144, 2 })]
         public IActionResult GetExtraPointListExport(LeaderboardExtraPointReq request)
         {
             var data = _leaderBoardBll.GetLeaderboardExtraPointListExport(
@@ -82,7 +82,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
         
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 5 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 144, 5 })]
         public ApiResult SetExtraPoint(SetLeaderboardExtraPointReq request)
         {
             var apiResult = new ApiResult();
@@ -117,7 +117,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 5 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 144, 5 })]
         public List<ApiResult> SetBatchExtraPoint([FromForm] SetBatchLeaderboardExtraPointReq request)
         {
             //var apiResult = new ApiResult();

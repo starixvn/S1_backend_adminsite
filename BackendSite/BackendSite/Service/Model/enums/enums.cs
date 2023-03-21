@@ -1098,6 +1098,14 @@ namespace BackendSite.Service.Model.enums
         VirtualSports = 7,
         Poker = 8
     }
+    
+    public enum LeaderBoardCategoryEnum
+    {
+        Sports = 1,
+        Casino = 2,
+        LiveCasino = 3
+    }
+    
     #region VerificationReward
 
     public enum VerificationTypeEnum
