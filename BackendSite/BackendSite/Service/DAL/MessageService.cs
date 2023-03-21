@@ -27,12 +27,7 @@ namespace BackendSite.Service.DAL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        public int SendMessageToPlayer(string sender, int custId, string lang, string title, string content)
-        {
-            return _mainDbClient.Execute(
-                "Admin_CustBatchMessage_Ins",
-                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = 0, _Title = title, _Content = content, _Sender = sender });
-        }
+
 
         public IEnumerable<Announcement> GetAnnouncements(string siteIds,
             DateTimeOffset startDate,
@@ -345,5 +340,16 @@ namespace BackendSite.Service.DAL
             props.Add("_BatchId", batchId);
             return _reportDbClient.Query<BatchMessageSendLogListModel>("Admin_BatchMessageSendLog_Get", props);
         }
+        public int SendMessageToPlayer(string sender, int custId, string lang, string title, string content)
+        {
+            return _mainDbClient.Execute(
+                "Admin_CustBatchMessage_Ins",
+                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = 0, _Title = title, _Content = content, _Sender = sender });
+        }
+        public int SendMessage(Message message) =>
+            _mainDbClient.Execute("Msg_Ins_V4", new DynamicParameters(message));
+
+        public async Task<int> SendMessageAsync(Message message) =>
+            await _mainDbClient.ExecuteAsync("Msg_Ins_V4", new DynamicParameters(message));
     }
 }

@@ -223,7 +223,7 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, withdrawalReq.TransId);
                     var content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                    await messageBLL.SendMessageAsync(new Message(sender, withdrawConfirmReuslt, userLang, title, content));
                     _logger.LogInformation($" SendMessageToPlayer use: {timer.ElapsedMilliseconds} ms");
 
                     #region Copy Picture
@@ -254,7 +254,7 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, withdrawalReq.TransId);
                     var content = selLangBLL.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                    await messageBLL.SendMessageAsync(new Message(sender, withdrawConfirmReuslt, userLang, title, content));
                 }
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Verify)
