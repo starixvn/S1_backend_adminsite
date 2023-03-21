@@ -4,10 +4,8 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.TpMaintain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Policy;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {

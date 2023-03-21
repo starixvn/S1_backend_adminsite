@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
-using System.Drawing.Drawing2D;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {

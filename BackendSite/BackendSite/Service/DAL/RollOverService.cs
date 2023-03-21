@@ -1,22 +1,20 @@
 ﻿using BackendSite.Service.Model;
-using Dapper;
-using MySql.Data.MySqlClient;
-using System.Data;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
     public class RollOverService
     {
-        private readonly IConfiguration configuration;
-        public RollOverService(IConfiguration configuration)
+        private readonly MySqlClient _mainDbClient;
+        public RollOverService(IEnumerable<MySqlClient> sqlClients)
         {
-            this.configuration = configuration;
+            _mainDbClient = sqlClients.FirstOrDefault(p => p.DataBase == DataBase.Main);
         }
 
         public CustRollOver GetCustRollOver(int custId, string bonusCode)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustRollOver>("Common_RollOver_Get", new { CustId = custId, BonusCode = bonusCode }, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.QueryFirst<CustRollOver>("Common_RollOver_Get", new { CustId = custId, BonusCode = bonusCode });
             return result;
         }
     }

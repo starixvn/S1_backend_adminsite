@@ -775,7 +775,9 @@ namespace BackendSite.Service.Model.enums
         SetWithdrawalMessage = 80,
         SetCustInfoNote = 81,
         DeleteSMSInfo = 82,
-        CancelBonusInCustInfo = 83
+        CancelBonusInCustInfo = 83,
+        SetBlockCryptoWallet = 84,
+        ReleaseCryptoWallet = 85,
     }
 
     #region BankFinancialTransferInfoLog
@@ -1405,7 +1407,10 @@ namespace BackendSite.Service.Model.enums
     public enum CryptoWalletLogStatusEnum
     {
         Create = 1,
-        Delete = 2
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
     }
 
     public enum EWalletinfoLogStatusEnum
@@ -1447,7 +1452,7 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
-    
+
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1521,6 +1526,7 @@ namespace BackendSite.Service.Model.enums
         TableAndCards = 3,
         BuyFeaturesGames = 4,
         Megaways = 5,
+        Mini = 6,
     }
 
     public enum SlotGameFilterStatusEnum
@@ -1534,7 +1540,7 @@ namespace BackendSite.Service.Model.enums
         Closed = 0,
         Open = 1
     }
-    
+
     public enum PaymentReportGroupByEnum
     {
         Date = 1,
@@ -1588,7 +1594,9 @@ namespace BackendSite.Service.Model.enums
         [Description("Wrong Amount submitted")]
         WrongAmountSubmitted = 4,
         [Description("Wrong Bank submitted")]
-        WrongBankSubmitted = 5
+        WrongBankSubmitted = 5,
+        [Description("Inactive Bank Account submission")]
+        InactiveBankAccountSubmission = 6
     }
 
     public enum WithdrawalMessageStatus
@@ -1641,12 +1649,46 @@ namespace BackendSite.Service.Model.enums
         SettledDate = 1,
         CreatedDate = 2
     }
-    
+
     public enum CustTagEnum
     {
         Duplicate = 6
     }
-    
+
+    public enum BatchCustInfoStatus
+    {
+        Pending = 0,
+        Finished = 1,
+        Failed = 2
+    }
+
+    public enum BlockCryptoWalletStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
+
+    public enum CustUSDTInfoLogStatus
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
+    }
+
+    public enum BlockCryptoStatus
+    {
+        SelectAll = 0,
+        Block = 1,
+        Unlock = 2
+    }
+    public enum CustCryptoWalletDetailSatatus
+    {
+        Delete = 0,
+        Open = 1,
+        BoDelete = 2
+    }
     public enum ExchangeTypeEnum
     {
         /// <summary>

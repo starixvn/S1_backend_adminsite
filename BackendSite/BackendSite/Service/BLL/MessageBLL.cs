@@ -1,15 +1,12 @@
 ﻿using System.Text.RegularExpressions;
-using Amazon.Runtime.Internal.Util;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL
 {
@@ -167,25 +164,25 @@ namespace BackendSite.Service.BLL
             if (!msgBeforeInfo.Any()) return false;
             var custSimpleInfo = await custInfoBLL.GetCustId(msgBeforeInfo.First().CustId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!messageService.DeletePersonalMsg(id, isBatch))
             {
                 _logger.LogError($"DeleteSMSInfo: Delete SMSInfo Fail. SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, msgBeforeInfo.First(), null,
-                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, trans))
             {
                 _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
 

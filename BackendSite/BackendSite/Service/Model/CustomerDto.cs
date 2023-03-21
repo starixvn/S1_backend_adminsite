@@ -197,6 +197,8 @@ public class MemberExportData
 public class GetCustomerBasicInfoRequest
 {
     public int CustId { get; set; }
+    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset EndTime { get; set; }
 }
 
 public class CustomerDto
@@ -625,4 +627,45 @@ public class CustRealNameChangeLog
     public string AfterName { get; set; }
     public DateTimeOffset UpdateTime { get; set; }
     public string Operator { get; set; }
+}
+
+public class GetListByFileRequest
+{
+    public int SiteId { get; set; }
+    public IFormFile File { get; set; }
+    public string Memo { get; set; }
+}
+public class GetCustinfoByImportDataRequest
+{
+    public int SiteId { get; set; }
+}
+public class CustPromotionWhiteList
+{
+    public int CustId { get; set; }
+    public int SiteId { get; set; } 
+    public string UserName { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }   
+    public string Operator { get; set; }
+}
+
+public class SetCustPromotionWhiteListRequest
+{
+    public int CustId { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }
+}
+
+public class PromotionReceiveFailLog
+{
+    public string BonusCode { get; set; }
+    public string PromotionTypeName { get; set; }
+    public DateTimeOffset CreateTime { get; set; }
+    public string ErrorCode { get; set; }
+    public string ErrorReason { get; set; }
+    public int SiteId { get; set; }
+    public int CustId { get; set; }
+    public int CurrencyId { get; set; }
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.ExceptionHandling;
 
@@ -1195,5 +1194,84 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = await _memberQuery.GetCustRealNameChangeLogAsync(request.CustId)
             };
         }
+
+        /// <summary>
+        /// Member/GetCustPromotionWhiteList 取得客戶Promotion限制白名單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<CustPromotionWhiteList>> GetCustPromotionWhiteList(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<CustPromotionWhiteList>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustPromotionWhiteListAsync(request.CustId)
+            };
+        }
+
+        /// <summary>
+        /// Member/EditCustPromotionWhiteList 修改用戶Promotion白名單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 80 })]
+        [HttpPost]
+        public async Task<ApiResult> EditCustPromotionWhiteList(SetCustPromotionWhiteListRequest request)
+        {
+            var result = await _memberCommand.SetCustPromotionWhiteListAsync(
+                request.CustId, 
+                request.IpEnable, 
+                request.DeviceEnable,
+                request.RealNameEnable,
+                User.Identity.Name);
+
+            if (result)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
+        /// Member/GetPromotionReceiveFailLog 取得客戶Promotion領取失敗紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<PromotionReceiveFailLog>>> GetPromotionReceiveFailLog(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<IEnumerable<PromotionReceiveFailLog>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetPromotionReceiveFailLogAsync(
+                    request.CustId, 
+                    request.StartTime.ToUniversalTime().DateTime,
+                    request.EndTime.ToUniversalTime().DateTime)
+            };
+        }
+
     }
 }
