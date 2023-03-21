@@ -46,7 +46,7 @@ namespace BackendSite.Service.DAL
         public async Task<bool> UpdateStatus(ParamsWithLog<DisableDisableUser> input)
         {
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             
             var p = new DynamicParameters();
@@ -74,12 +74,12 @@ namespace BackendSite.Service.DAL
 
                 if (logSuccess)
                 {
-                    trans.Commit();
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                     return true;
                 }
             }
 
-            trans.Rollback();
+            await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
 
             return false;
         }
@@ -113,7 +113,7 @@ namespace BackendSite.Service.DAL
         public async Task<bool> DeleteTpDisableUser(ParamsWithLog<DeleteDisableUser> input)
         {
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             
             var p = new DynamicParameters();
@@ -139,12 +139,12 @@ namespace BackendSite.Service.DAL
 
                 if (logSuccess)
                 {
-                    trans.Commit();
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                     return true;
                 }
             }
 
-            trans.Rollback();
+            await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
 
             return false;
         }

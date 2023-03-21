@@ -174,10 +174,10 @@ namespace BackendSite.Service.DAL
 
                 if (result == 1)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(connection, trans);
                     return true;
                 }
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(connection, trans);
                 return false;
             }
             catch (Exception e)
@@ -229,7 +229,7 @@ namespace BackendSite.Service.DAL
                 var affectCount = _mainDbClient.QueryFirst<int>("Admin_BatchMessageV2_Del", trans, p);
                 if (affectCount != batchMessageCount)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Batch Message Count={batchMessageCount},Actual Delete Batch Message Count={affectCount}.Transaction rollback.");
                     return false;
                 }
@@ -243,7 +243,7 @@ namespace BackendSite.Service.DAL
                 var affectCount = _mainDbClient.QueryFirst<int>("Admin_MessageByBatchId_Del", trans, p);
                 if (affectCount != messageCount)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Message Count={messageCount},Actual Delete Message Count={affectCount}.Transaction rollback.");
                     return false;
                 }
@@ -257,13 +257,13 @@ namespace BackendSite.Service.DAL
                 var affectCount = _mainDbClient.QueryFirst<int>("Admin_CustBatchMessageByBatchId_Del", trans, p);
                 if (affectCount != custMessageCount)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Message Count={custMessageCount},Actual Delete Message Count={affectCount}.Transaction rollback.");
                     return false;
                 }
             }
 
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             _logger.LogInformation($@"MessageService-DeleteBatchMessage End.");
             return true;
         }

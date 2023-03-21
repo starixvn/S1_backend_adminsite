@@ -71,16 +71,16 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit(); 
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
             
@@ -174,16 +174,16 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit(); 
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
         
@@ -219,16 +219,16 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit(); 
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
         

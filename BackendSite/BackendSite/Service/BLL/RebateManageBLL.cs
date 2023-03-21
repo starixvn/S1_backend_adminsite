@@ -102,7 +102,7 @@ namespace BackendSite.Service.BLL
         public async Task<bool> BatchSetRebateGameTypeAsync(int siteId, int currencyId, IEnumerable<RebateGameTypeDetail> details, string lastUpdateUser)
         {
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             foreach (var item in details)
@@ -110,12 +110,12 @@ namespace BackendSite.Service.BLL
                 if (!await _rebateManageService.SetRebateGameTypeAsync(siteId, currencyId, item.GameType, item.Level, (decimal)item.Percentage, lastUpdateUser, trans))
                 {
                     _logger.LogError($"SetRebateGameType Fail.SiteId={siteId}. CurrencyId={currencyId}. GameType={item.GameType}. Level={item.Level}. Percentage={item.Percentage}. lastUpdateUser={lastUpdateUser}");
-                    trans.Rollback();
+                    await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                     return false;
                 }
             }
 
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
 

@@ -68,7 +68,7 @@ namespace BackendSite.Service.DAL
                 }
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
         }
 
         public void AssignGroup(int UserId, int? GroupSEQ)
@@ -90,7 +90,7 @@ namespace BackendSite.Service.DAL
                 _mainDbClient.Execute(SpName, tran, para);
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
         }
 
         public void SetUserPassword(int UserId, string MD5Pwd)
@@ -151,7 +151,7 @@ namespace BackendSite.Service.DAL
                 userList = _reportDbClient.Query<AdminUser>("Admin_User_GetAll");
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return userList;
         }
