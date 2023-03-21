@@ -60,7 +60,7 @@ namespace BackendSite.Service.DAL
             var result = true;
 
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             var beforeData = GetRebatePeriod(siteId);
             foreach (var currencyId in currencyList)
@@ -81,14 +81,12 @@ namespace BackendSite.Service.DAL
 
             if (result)
             {
-                trans.Commit();
-                await conn.CloseAsync();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             else
             {
-                trans.Rollback();
-                await conn.CloseAsync();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
         }
@@ -115,7 +113,7 @@ namespace BackendSite.Service.DAL
             var result = true;
 
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             var categoryData = GetTPCategoryList().FirstOrDefault(x => x.CategoryId == categoryId) ?? null;
             var asignBeforeData = GetRebatePayoutLimit(siteId, currencyId, categoryId).FirstOrDefault() ?? null;
@@ -133,14 +131,12 @@ namespace BackendSite.Service.DAL
                 result = false;
             if (result)
             {
-                trans.Commit();
-                await conn.CloseAsync();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             else
             {
-                trans.Rollback();
-                await conn.CloseAsync();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
         }
@@ -157,7 +153,7 @@ namespace BackendSite.Service.DAL
             if (asignBeforeData?.Percentage == percentage) return true;
 
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             var parameters = new { SiteId = siteId, CurrencyId = currencyId, CategoryId = categoryId, Level = level, Percentage = percentage, LastUpdateUser = lastUpdateUser };
@@ -170,14 +166,12 @@ namespace BackendSite.Service.DAL
 
             if (result)
             {
-                trans.Commit();
-                await conn.CloseAsync();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             else
             {
-                trans.Rollback();
-                await conn.CloseAsync();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
         }

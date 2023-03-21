@@ -81,7 +81,7 @@ namespace BackendSite.Service.DAL
                 }
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
         }
 
         public void DeleteGroup(int GroupSEQ)
@@ -97,7 +97,7 @@ namespace BackendSite.Service.DAL
             SpName = "Admin_Group_Del";
             _mainDbClient.Execute(SpName, tran, para);
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
         }
 
         public void UpdateGroup(GroupWithPermission GroupInfo)
@@ -132,7 +132,7 @@ namespace BackendSite.Service.DAL
                 }
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
         }
     }
 }

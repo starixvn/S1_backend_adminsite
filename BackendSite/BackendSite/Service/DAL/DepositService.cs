@@ -90,7 +90,9 @@ namespace BackendSite.Service.DAL
             int startIndex,
             out int totalPages,
             out int rowCount,
-            out decimal totalAmount)
+            out decimal totalAmount,
+            out decimal totalApproveAmount,
+            out int totalApproveRow)
         {
             var p = new DynamicParameters();
             p.Add("_CustId", CustId, dbType: DbType.Int32);
@@ -103,11 +105,16 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_TotalApproveAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_TotalApproveRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositInfoListByCust_Get_V5", p);
+            var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositInfoListByCust_Get_V6", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             totalAmount = p.Get<decimal?>("_TotalAmount") ?? 0;
+            totalApproveAmount = p.Get<decimal?>("_TotalApproveAmount") ?? 0;
+            totalApproveRow = p.Get<int?>("_TotalApproveRow") ?? 0;
+            
             return depositList;
         }
 
@@ -170,12 +177,15 @@ namespace BackendSite.Service.DAL
 
 
             var result = _mainDbClient.Execute("Admin_DepositInfo_Ins", trans, p);
+            var transId = p.Get<string>("vTransId");
             if (result > 0)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
-
-            var transId = p.Get<string>("vTransId");
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            }
 
             return transId;
         }
@@ -292,8 +302,12 @@ namespace BackendSite.Service.DAL
 
                     if (result > 0)
                     {
-                        trans.Commit();
+                        _mainDbClient.CommitAndDisposeConnection(conn, trans);
                         result = p.Get<int?>("CustId") ?? result;
+                    }
+                    else
+                    {
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     }
                 }
             }
