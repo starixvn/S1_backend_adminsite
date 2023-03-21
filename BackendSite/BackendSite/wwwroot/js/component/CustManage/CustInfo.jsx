@@ -2027,39 +2027,6 @@ import {EWalletLog} from './CustInfo_EWalletLog.jsx';
                             {data.BonusWallet != null ? <BonusWallet BonusWallet={data.BonusWallet} /> : null}
                             {promotions}
                             <div className="table-responsive-md table">
-                                <span class="label">Photo</span>
-                                <table className="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Cust Photo</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {data.hasPhotoId ?
-                                            <tr>
-                                                <td>
-                                                    <div className="id-image" style={{margin:"0 auto"}}>
-                                                        <img src={"/api/CustManage/GetCustPhotoId?CustId=" + data.custId} alt="Identity Card" style={{ transform: `rotate(${this.state.direction}deg)` }} />
-                                                    </div>
-                                                    <button onClick={this.rotate.bind(this)}>rotate</button>
-                                                </td>
-                                                <td>
-                                                    <button className="btn btn-delete" disabled={data.isKyc} onClick={!data.isKyc ? this.onAskReupload.bind(this) : null}>Ask Re-Upload</button>
-                                                </td>
-                                            </tr>
-                                            :
-                                            <tr>
-                                                <td>
-                                                    <input id="uploadfile" className="form-control" type="file" accept=".png, .jpg, .jpeg" onChange={(e) => { this.EditFiled(e.target.value, 'file') }} disabled={data.isKyc} />
-                                                </td>
-                                                <td>
-                                                    <button className="btn btn-add" disabled={data.isKyc} onClick={!data.isKyc ? this.onNewUpload.bind(this) : null}>Upload</button>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
                             </div>
                             {
 				this.state.isOpen ?
