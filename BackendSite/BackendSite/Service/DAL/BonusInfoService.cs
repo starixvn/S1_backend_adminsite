@@ -175,7 +175,7 @@ namespace BackendSite.Service.DAL
                     result = _walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, trans);
 
                     if (result > 0)
-                        result = _withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, trans);
+                        result = _withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, (int)WithdrawalLimitAdjustmentReasonEnum.None ,$"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), (int)WithdrawalLimitLogCreateFromEnum.Bonus , @operator, out var afterWithdrawalLimit, trans);
                 }
 
                 //回收bonus紀錄

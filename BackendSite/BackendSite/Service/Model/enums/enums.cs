@@ -166,6 +166,18 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum WithdrawalLimitLogCreateFromEnum 
+    {
+        Default = 0,
+        Deposit = 1,
+        LimitAdjustment = 2,
+        BalanceAdjustment = 3,
+        Bonus = 4 ,
+        ReferralReward = 5,
+        VerificationReward = 6,
+        DrawPrize = 7
+    }
+    
     #endregion
 
     #region CustProfile

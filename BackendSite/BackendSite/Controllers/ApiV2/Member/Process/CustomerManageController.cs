@@ -3016,6 +3016,49 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return result;
         }
+        
+        /// <summary>
+        /// CustomerManage/GetAdjustmentWithdrawalLimitLog 取得手動調整提款額度限額的log
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        [HttpPost]
+        public AdjustmentWithdrawalLimitLogData GetAdjustmentWithdrawalLimitLog(CustIdWithDateRangeRequest request)
+        {
+            var result = new AdjustmentWithdrawalLimitLogData
+            {
+                AdjustmentWithdrawalLimitLogList = new List<AdjustmentWithdrawalLimitLog>(),
+                TotalAmount = 0
+            };
+
+            var searchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, 1, 1000);
+            
+            foreach (var model in searchResult.WithdrawalLimitLogList)
+            {
+                if (model.CreateFrom == (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment)
+                {
+                    var modelResult = new AdjustmentWithdrawalLimitLog
+                    {
+                        MainType = model.MainType,
+                        Amount = model.ChangeWithdrawalLimit,
+                        Memo = model.Memo,
+                        ReasonId = model.ReasonId,
+                        RefTransId = model.RefTransId,
+                        Creator = model.Creator,
+                        CreateTime = model.CreateTime
+                    };
+                    result.AdjustmentWithdrawalLimitLogList.Add(modelResult);
+                }
+            }
+            
+            result.TotalAmount = result.AdjustmentWithdrawalLimitLogList.Sum(x => x.MainType == (int)DirectionEnum.Add ? x.Amount : x.Amount * -1);
+            
+            return result;
+        }
+        
         #endregion
 
         #region CSD > Customer Administration > CustInfo [Get TPWallet]
