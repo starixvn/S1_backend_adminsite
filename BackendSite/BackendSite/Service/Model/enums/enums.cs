@@ -283,6 +283,12 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
+    
+    public enum DepositDateTypeEnum
+    {
+        CreateTime = 1,
+        StatementTime = 2
+    }
 
     public enum DepositReceiptCreateFromEnum
     {
@@ -409,6 +415,12 @@ namespace BackendSite.Service.Model.enums
         Verified = 69,
         Process = 70,
         ToKyc = 71
+    }
+    
+    public enum WithdrawalDateTypeEnum
+    {
+        CreateTime = 1,
+        FlowEndTime = 2
     }
 
     #endregion

@@ -34,7 +34,26 @@ namespace BackendSite.Service.DAL
             _logger = provider.GetRequiredService<ILogger<DepositService>>();
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode, IEnumerable<int> selectCalCode, DateTime startDate, DateTime endDate, string DepositId, IEnumerable<string> userNames, string agent ,IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize,decimal startAmount, decimal endAmount, IEnumerable<int> payIds, int pageNumber, out int totalPages, out int rowCount , ref List<TotalAmount> currencyAmountRecord)
+        public IEnumerable<DepositRequest> GetDepositRequestList(
+            IEnumerable<int> selectSite,
+            IEnumerable<int> depositType,
+            IEnumerable<string> selectBankCode, 
+            IEnumerable<int> selectCalCode, 
+            DateTime startDate,
+            DateTime endDate, 
+            DepositDateTypeEnum dateType,
+            string DepositId, 
+            IEnumerable<string> userNames, 
+            string agent ,
+            IEnumerable<int> currencyId,
+            IEnumerable<int> status, 
+            IEnumerable<int> levelStatus,
+            int pageSize,
+            decimal startAmount,
+            decimal endAmount, 
+            IEnumerable<int> payIds,
+            int pageNumber, out int totalPages, out int rowCount ,
+            ref List<TotalAmount> currencyAmountRecord)
         {
             var depositId = 0;
 
@@ -52,6 +71,7 @@ namespace BackendSite.Service.DAL
                 SelectCalCode = selectCalCode.Any() ? JsonConvert.SerializeObject(selectCalCode) : null,
                 StartDate = startDate,
                 EndDate = endDate,
+                DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int)dateType,
                 DepositId = depositId,
                 TransId = string.IsNullOrEmpty(DepositId) ? null : DepositId ,
                 UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
@@ -66,7 +86,7 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            currencyAmountRecord = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V8", p).ToList();
+            currencyAmountRecord = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
             
             #endregion
 
@@ -208,7 +228,7 @@ namespace BackendSite.Service.DAL
                 props.Add("DepositPic", depositPic);
                 props.Add("Creator", creator);
                 props.Add("CreateFrom", 2);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set_V2", props ,conn, trans);
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set_V2", trans , props );
 
                 if (result > 0)
                 {
@@ -252,7 +272,7 @@ namespace BackendSite.Service.DAL
                 props.Add("CustId", custId);
                 props.Add("DepositId", depositId);
                 props.Add("ReceiptNo", receiptNo);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", props ,conn, trans);
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans ,props );
 
                 if (result > 0)
                 {
@@ -483,7 +503,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<DepositReceipt>("Admin_DepositReceiptByNo_Get", new DynamicParameters(new { DepositId = depositId, ReceiptNo = receiptNo, SiteId = siteId }));
         }
         
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
         {
             var depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -500,6 +520,7 @@ namespace BackendSite.Service.DAL
                 DepositType = depositType,
                 StartDate = startDate,
                 EndDate = endDate,
+                DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int) dateType,
                 DepositId = depositId,
                 TransId = DepositId,
                 UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
@@ -511,7 +532,7 @@ namespace BackendSite.Service.DAL
                 EndAmount = endAmount,
                 PayIds = payIds
             });
-            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V13", p);
+            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V14", p);
             return depositList;
         }
 
