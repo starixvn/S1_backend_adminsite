@@ -41,22 +41,29 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         public class GetDataRequest : IOrderBy
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+            public string TimeZone
+            {
+                get
+                {
+                    var timezone = StartDate.Offset.ToString("hh\\:mm");
+                    if (StartDate.Offset >= TimeSpan.Zero)
+                    {
+                        timezone = "+" + timezone;
+                        return timezone;
+                    }
+                    else
+                    {
+                        timezone = "-" + timezone;
+                        return timezone;
+                    }
+                }
+            }
             public int SiteId { get; set; }
             public string BonusCode { get; set; }
             public IEnumerable<int> BonusTypes { get; set; }
             public IEnumerable<int> BonusStatus { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
             public IEnumerable<int> ClaimStatuses { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
@@ -112,20 +119,27 @@ namespace BackendSite.Controllers.ApiV2.Report
         
         public class GetDetailRequest : IOrderBy
         {
-            private DateTimeOffset _startDate { get; set; }
-            private DateTimeOffset _endDate { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+            public string TimeZone
+            {
+                get
+                {
+                    var timezone = StartDate.Offset.ToString("hh\\:mm");
+                    if (StartDate.Offset >= TimeSpan.Zero)
+                    {
+                        timezone = "+" + timezone;
+                        return timezone;
+                    }
+                    else
+                    {
+                        timezone = "-" + timezone;
+                        return timezone;
+                    }
+                }
+            }
             public int SiteId { get; set; }
             public string BonusCode { get; set; }
-            public DateTimeOffset StartDate
-            {
-                get => _startDate;
-                set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
-            public DateTimeOffset EndDate
-            {
-                get => _endDate;
-                set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            }
             public IEnumerable<int> ClaimStatuses { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
