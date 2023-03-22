@@ -44,6 +44,11 @@ namespace BackendSite.Service.BLL
             return serverInfo;
         }
 
+        public ServerInfo GetServerInfo(int siteId)
+        {
+            return serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
+        }
+
         public IEnumerable<ServerInfo> GetSiteList()
         {
             var sServerInfoListKey = $"ServerInfoList";
@@ -214,7 +219,7 @@ namespace BackendSite.Service.BLL
                     else
                     {
                         assignSites = newAdminUserService.GetAssignSiteListV2(authData.UserId);
-                        if (assignSites !=  null)
+                        if (assignSites != null)
                         {
                             List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();
                             assignSites.ToList().ForEach(z =>
@@ -249,6 +254,5 @@ namespace BackendSite.Service.BLL
                 return null;
             }
         }
-
     }
 }

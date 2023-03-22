@@ -27,6 +27,7 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public int IovationLevel { get; set; }
     public string DeviceId { get; set; }
     public int UserType { get; set; }
+    public bool ExcludeTag { get; set; }
 }
 
 public class MemberListDto
@@ -125,6 +126,7 @@ public class ExportMemberRequest
     public string DeviceId { get; set; }
     public int UserType { get; set; }
     public bool ExportTransferWallet { get; set; } = false;
+    public bool ExcludeTag { get; set; }
 }
 
 
@@ -156,6 +158,7 @@ public class MemberExportDataDto
     public DateTime RegTime { get; set; }
     public decimal SeamlessWallet { get; set; }
     public decimal BonusWallet { get; set; }
+    public string TagList { get; set; }
 }
 
 public class MemberExportData
@@ -181,18 +184,21 @@ public class MemberExportData
     public string Currency { get; set; }
     public string LevelName { get; set; }
     public string Agent { get; set; }
-    public int Status { get; set; }
+    public string Status { get; set; }
     public DateTimeOffset RegTime { get; set; }
     public string SabaId { get; set; }
     public string SignupUrl { get; set; }
     public string AffiliateId { get; set; }
     public string AffiliateCode { get; set; }
     public string LastActivityIp { get; set; }
+    public string Tag { get; set; }
 }
 
 public class GetCustomerBasicInfoRequest
 {
     public int CustId { get; set; }
+    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset EndTime { get; set; }
 }
 
 public class CustomerDto
@@ -203,6 +209,7 @@ public class CustomerDto
     public int VipLevel { get; set; }
     public string LevelName { get; set; }
     public string UserName { get; set; }
+    public string UserLang { get; set; }
     public string AccountName { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
@@ -250,6 +257,8 @@ public class CustomerDto
     public string AddressCity { get; set; }
     public string AddressLineFirst { get; set; }
     public string AddressLineSecond { get; set; }
+    public DateTimeOffset? PhoneRewardTime { get; set; }
+    public DateTimeOffset? EmailRewardTime { get; set; }
 }
 
 public class CustomerTag
@@ -268,6 +277,7 @@ public class CustomerBasicInfo
     public string VipLogo { get; set; }
     public bool IsOnline { get; set; }
     public string UserName { get; set; }
+    public string UserLang { get; set; }
     public string AccountName { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
@@ -297,6 +307,8 @@ public class CustomerBasicInfo
     public bool IsTest { get; set; }
     public IEnumerable<CustomerTag> TagList { get; set; }
     public AffInfo AffInfo { get; set; }
+    public DateTimeOffset? PhoneRewardTime { get; set; }
+    public DateTimeOffset? EmailRewardTime { get; set; }
 }
 
 public class AffInfo
@@ -589,4 +601,71 @@ public class LoginLogPageData
     public int PageNumber { get; set; }
     public int TotalPages { get; set; }
     public int RowCount { get; set; }
+}
+
+public class SimilarAccountInfo
+{
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string AccountName { get; set; }
+    public string TagList { get; set; }
+}
+
+public class CustTagList
+{
+    public int CustId { get; set; }
+        
+    public string StrTagList { get; set; }
+
+    public IEnumerable<int> TagList { get; set; }
+}
+
+public class CustRealNameChangeLog
+{
+    public string BeforeName { get; set; }
+    public string AfterName { get; set; }
+    public DateTimeOffset UpdateTime { get; set; }
+    public string Operator { get; set; }
+}
+
+public class GetListByFileRequest
+{
+    public int SiteId { get; set; }
+    public IFormFile File { get; set; }
+    public string Memo { get; set; }
+}
+public class GetCustinfoByImportDataRequest
+{
+    public int SiteId { get; set; }
+}
+public class CustPromotionWhiteList
+{
+    public int CustId { get; set; }
+    public int SiteId { get; set; } 
+    public string UserName { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }   
+    public string Operator { get; set; }
+}
+
+public class SetCustPromotionWhiteListRequest
+{
+    public int CustId { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }
+}
+
+public class PromotionReceiveFailLog
+{
+    public string BonusCode { get; set; }
+    public string PromotionTypeName { get; set; }
+    public DateTimeOffset CreateTime { get; set; }
+    public string ErrorCode { get; set; }
+    public string ErrorReason { get; set; }
+    public int SiteId { get; set; }
+    public int CustId { get; set; }
+    public int CurrencyId { get; set; }
 }

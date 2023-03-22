@@ -105,6 +105,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> ActionTypes { get; set; }
         public string UserName { get; set; }
         public string TransId { get; set; }
+        public int CustId { get; set; } = 0;
     }
     
     public class AdminAdjustmentLogReportResult

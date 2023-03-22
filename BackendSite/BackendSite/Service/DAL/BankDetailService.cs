@@ -77,11 +77,17 @@ namespace BackendSite.Service.DAL
             para.Add("_Status", (int)input.Status);
             para.Add("_Sort", input.Sort);
             para.Add("_SupportChannel", JsonConvert.SerializeObject(input.SupportChannels));
+            para.Add("_GroupId", input.GroupId);
             para.Add("_QRCodeUrl", input.QrCodeUrl);
             para.Add("_Operator", input.Operator);
 
             
-            return _mainDbClient.ExecuteAsync("Admin_OfflineBankingSetting_Set", para);
+            return _mainDbClient.ExecuteAsync("Admin_OfflineBankingSetting_Set_V2", para);
+        }
+        
+        public async Task<IEnumerable<LocalPaySetting>> GetLocalPaySettingAsync()
+        {
+            return await _mainDbClient.QueryAsync<LocalPaySetting>("Admin_LocalPaySetting_Get");
         }
         
         public IEnumerable<BankDetail> GetLoaclBankList(string siteIds,

@@ -223,6 +223,7 @@ namespace BackendSite.Service.Model
     public class PaySetting
     {
         public CurrencyEnum CurrencyId { get; set; }
+        public string IsoCode => CurrencyId.ToString();
         public int PayId { get; set; }
         public string PayName { get; set; }
         public int ChannelId { get; set; }
@@ -283,5 +284,18 @@ namespace BackendSite.Service.Model
         {
             return t.ToString().GetHashCode();
         }
+    }
+    
+    public class LocalPaySetting
+    {
+        public int CurrencyId { get; set; }
+        
+        public int SysId { get; set; }
+        
+        public int GroupId { get; set; }
+        
+        public string GroupName { get; set; }
+        
+        public DepositTypeEnum Type { get; set; }
     }
 }

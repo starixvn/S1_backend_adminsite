@@ -1,5 +1,4 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -29,7 +28,7 @@ namespace BackendSite.Service.Model
         public string AffCode { get; set; }
         public string Token { get; set; }
     }
-    
+
     public class CustInfoDetail
     {
         public string SiteName { get; set; }
@@ -201,27 +200,27 @@ namespace BackendSite.Service.Model
             set => TotalBonus = value;
         }
     }
-    
+
     public class CustRebateCategory
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public decimal RebateAmountSum { get; set; }
     }
-    
+
     public class CustRebateSum
     {
         public IEnumerable<CustRebateCategory> CustRebateCategory { get; set; }
         public decimal CustRebateTotalSum { get; set; }
     }
-    
+
     public class CustRewardType
     {
         public int TypeId { get; set; }
         public string TypeName { get; set; }
         public decimal RewardAmountSum { get; set; }
     }
-    
+
     public class CustRewardSum
     {
         public IEnumerable<CustRewardType> CustRewardType { get; set; }
@@ -229,7 +228,7 @@ namespace BackendSite.Service.Model
     }
 
     #endregion
-    
+
     public class CustInfoDetailForExport
     {
         public string SiteName { get; set; }
@@ -261,7 +260,7 @@ namespace BackendSite.Service.Model
         public string AffiliateCode { get; set; }
         public string LastActivityIP { get; set; }
     }
-    
+
     public class CustInfoDetailForExportV2
     {
         public string SiteName { get; set; }
@@ -330,8 +329,9 @@ namespace BackendSite.Service.Model
             }
         }
         public string Operator { get; set; }
+        public bool CanEdit { get; set; }
     }
-    
+
     public class CustRollOver
     {
         public decimal RollOver { get; set; }
@@ -347,8 +347,9 @@ namespace BackendSite.Service.Model
         public decimal Stake { get; set; }
         public decimal WinlostAmount { get; set; }
         public int SettlementType { get; set; }
+        public string TpUserName { get; set; }
     }
-    
+
     public class CustTurnoverRes
     {
         public string UserName { get; set; }
@@ -357,8 +358,9 @@ namespace BackendSite.Service.Model
         public decimal StakeSettled { get; set; }
         public decimal StakeNotRollover { get; set; }
         public decimal WinlostAmount { get; set; }
+        public string TpUserName { get; set; }
     }
-    
+
     public class CustBankInfoLog
     {
         public string AccountName { set; get; }
@@ -369,7 +371,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class CustCryptoWalletLog
     {
         public int CurrencyId { set; get; }
@@ -377,8 +379,9 @@ namespace BackendSite.Service.Model
         public string NetWork { set; get; }
         public string UsdtAddress { set; get; }
         public DateTimeOffset CreateTime { set; get; }
+        public int Status { set; get; }
     }
-    
+
     public class CustBonus
     {
         public string PromotionCategory { set; get; }
@@ -387,113 +390,7 @@ namespace BackendSite.Service.Model
         public decimal Bonus { get; set; }
         public decimal RemainingTurnover { get; set; }
     }
-    
-    public class CustTele
-    {
-        public string UserName { get; set; }
-        public int ActStatus { get; set; }
-        public DateTimeOffset RegTime { get; set; }
-        public int CallOutStatus { get; set; }
-        public string AccountName { get; set; }
-        public string PhoneNo { get; set; }
-        public int CustId { get; set; }
-        public int SiteId { get; set; }
-        public bool CanUpdate { get; set; }
-        public string UpdateAt { get; set; }
-        public string Operator { get; set; }
-        public List<string> UpdateRemark { get; set; }
-        public CustTele()
-        {
-            CanUpdate = true;
-        }
 
-    }
-    
-    public class TeleCSDData
-    {
-        public List<CustTele> CustTeleList { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
-    }
-
-    public class CustTeleExport
-    {
-        public string UserName { get; set; }
-        public string FullName { get; set; }
-        public string DepositStatus { get; set; }
-        public DateTimeOffset RegDate { get; set; }
-        public string PhoneNumber { get; set; }
-        public string FirstTimeCall { get; set; }
-        public string SecondTimeCall { get; set; }
-        public string ThirdTimeCall { get; set; }
-    }
-    
-    public class CustTeleExportTemp
-    {
-        public string UserName { get; set; }
-        public string FullName { get; set; }
-        public string DepositStatus { get; set; }
-        public DateTimeOffset RegDate { get; set; }
-        public string PhoneNumber { get; set; }
-        public int Remark { get; set; }
-        public string UpdateAt { get; set; }
-        public string Operator { get; set; }
-    }
-    
-    //public class VipUpgradeList
-    //{
-    //    public int SiteId { get; set; }
-    //    public string SiteName { get; set; }
-    //    public int CustId { get; set; }
-    //    public string UserName { get; set; }
-    //    public int CurrentVipLevel { get; set; }
-    //    public int UpgradeVipLevel { get; set; }
-    //    public string CurrentVipName { get; set; }
-    //    public string UpgradeVipName { get; set; }
-    //    public string Currency { get; set; }
-    //    public decimal DepositAmount { get; set; }
-    //    public decimal UpgradeBonus { get; set; }
-    //    public string CalculateTime { get; set; }
-    //    public int Status { get; set; }
-    //    public string StatusName { get; set; }
-    //    public int CurrencyId { get; set; }
-    //    public decimal ThresholdAmount { get; set; }
-    //    public string LastUpdateUser { get; set; }
-    //    public string SettleTime { get; set; }
-    //}
-    //public class VipUpgradeReviewData
-    //{
-    //    public List<VipUpgradeList> VipUpgradeList { get; set; }
-    //    public int PageNumber { get; set; }
-    //    public int TotalPages { get; set; }
-    //    public int RowCount { get; set; }
-    //}
-    //public class VipUpgradeExport
-    //{
-    //    public string SiteName { get; set; }
-    //    public string UserName { get; set; }
-    //    public string CurrentVipLevel { get; set; }
-    //    public string UpgradeVipLevel { get; set; }
-    //    public string Currency { get; set; }
-    //    public decimal DepositAmount { get; set; }
-    //    public decimal ThresholdAmount { get; set; }
-    //    public decimal UpgradeBonus { get; set; }
-    //    public string CalculateTime { get; set; }
-    //    public string SettleTime { get; set; }
-    //    public int Status { get; set; }
-    //    public string StatusName => Enum.GetName(typeof(VipStatus), Status) ;
-    //}
-    
-    public class LastDepositAndWithdrawalTime
-    {
-        public DateTime? LastDepositTime { get; set; }
-        public DateTime? LastWithdrawlTime { get; set; }
-        public decimal TotalAdjustment { get; set; }
-        public DateTime? LastBettingTime { get; set; }
-        public decimal TotalBonusClaimed { get; set; }
-    }
-    
     public class TagData
     {
         public int Id { get; set; }
@@ -505,122 +402,13 @@ namespace BackendSite.Service.Model
         public DateTimeOffset UpdateTime { get; set; }
         public string Updator { get; set; }
     }
-    
+
     public class GetTagDataResult
     {
         public List<TagData> TagDatas { get; set; }
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
-    }
-    
-    public class RegLiveStatus
-    {
-        private DateTimeOffset _regTime { get; set; }
-        public string UserName { get; set; }
-        public int ActStatus { get; set; }
-        public DateTimeOffset RegTime
-        {
-            get => _regTime;
-            set => _regTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-        }
-        public string AccountName { get; set; }
-        public int CustId { get; set; }
-        public int SiteId { get; set; }
-        public int PhoneVerified { get; set; }
-        public string PhoneNo { get; set; }
-        public int Status { get; set; }
-        public string Currency { get; set; }
-        public int CurrencyId { get; set; }
-        public string SiteName { get; set; }
-        public string AffCode { get; set; }
-        public string Agent { get; set; }
-        public string ReferralUrl { get; set; }
-    }
-    
-    public class RegLiveStatusResult
-    {
-        public List<RegLiveStatus> RegLiveStatusDatas { get; set; }
-        public int PageNumber { get; set; }
-        public int TotalPages { get; set; }
-        public int RowCount { get; set; }
-    }
-
-    public class SetRegLiveStatus
-    {
-        [LogIgnore]
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        [LogIgnore]
-        public CustomerRegLiveStatusStatusEnum Status { get; set; }
-
-        public string StatusName => Status.ToString();
-    }
-
-    public class AddRegLiveStatusNote
-    {
-        [LogIgnore]
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string Note { get; set; }
-    }
-
-    public class EditRegLiveStatusNote
-    {
-        [LogIgnore]
-        public int CustId { get; set; }
-        [LogIgnore]
-        public int Id { get; set; }
-        public string UserName { get; set; }
-        public string Note { get; set; }
-    }
-
-    public class DeleteRegLiveStatusNote
-    {
-        [LogIgnore]
-        public int CustId { get; set; }
-        [LogIgnore]
-        public int Id { get; set; }
-        public string UserName { get; set; }
-        public string Note { get; set; }
-    }
-
-    public class RegLiveStatusNotes
-    {
-        public int Id { get; set; }
-        public int CustId { get; set; }
-        public string Note { get; set; }
-        public DateTimeOffset CreateTime { get; set; }
-        public DateTimeOffset UpdateTime { get; set; }
-        public string Operator { get; set; }
-    }
-    
-    public class RegLiveStatusExport
-    {
-        public string Site { get; set; }
-        public string Currency { get; set; }
-        public string UserName { get; set; }
-        public string FullName { get; set; }
-        public string PhoneNo { get; set; }
-        public string Verify { get; set; }
-        public DateTimeOffset RegTime { get; set; }
-        public string DepositStatus { get; set; }
-        public string Status { get; set; }
-        public string AffCode { get; set; }
-        public string Agent { get; set; }
-    }
-
-    public class RegLiveStatusForMarketingExport
-    {
-        public string Site { get; set; }
-        public string Currency { get; set; }
-        public string AffCode { get; set; }
-        public string Agent { get; set; }
-        public string UserName { get; set; }
-        public string ReferralUrl { get; set; }
-        public string Verify { get; set; }
-        public DateTimeOffset RegTime { get; set; }
-        public string DepositStatus { get; set; }
     }
 
     public class CustomerForRisk
@@ -630,7 +418,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string UserName { get; set; }
     }
-    
+
     public class CustomerInfo
     {
         public string UserName { get; set; }
@@ -639,7 +427,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int Status { get; set; }
     }
-    
+
     public class CustomerSwitchStatus
     {
         public int IsKyc { get; set; }
@@ -647,7 +435,7 @@ namespace BackendSite.Service.Model
         public int PhoneVerified { get; set; }
         public int EmailVerified { get; set; }
     }
-    
+
     public class CustProfileReq
     {
         public int UserLevel { get; set; }
@@ -663,7 +451,7 @@ namespace BackendSite.Service.Model
         public string USDTInfo { get; set; }
         public string Address { get; set; }
     }
-    
+
     public class BankInfoDetail
     {
         [LogIgnore]
@@ -671,7 +459,7 @@ namespace BackendSite.Service.Model
         public string AccountNo { set; get; }
         public string IFSCCode { set; get; }
     }
-    
+
     public class USDTDetail
     {
         public string Network { set; get; }
@@ -703,7 +491,7 @@ namespace BackendSite.Service.Model
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
-    
+
     public class WithdrawalLimitLogData
     {
         public List<WithdrawalLimitLog> WithdrawalLimitLogList { get; set; }
@@ -734,7 +522,7 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
     }
 
-    public class CustLoginLog 
+    public class CustLoginLog
     {
         private DateTimeOffset _loginTime { get; set; }
         public string LoginIp { set; get; }
@@ -779,6 +567,7 @@ namespace BackendSite.Service.Model
         public int GameType { set; get; }
         public string GameName { get; set; }
         public int SettlementType { set; get; }
+        public string TpUserName { get; set; }
     }
     public class WinLoseSummaryDetailResult
     {
@@ -787,6 +576,7 @@ namespace BackendSite.Service.Model
         public decimal StakeNotRollover { set; get; }
         public int GameType { set; get; }
         public string GameName { get; set; }
+        public string TpUserName { get; set; }
     }
 
     public class CustDashBoardTodayModel
@@ -795,5 +585,34 @@ namespace BackendSite.Service.Model
         public decimal TodayWithdrawal { get; set; }
         public decimal TodayWinLoss { get; set; }
         public decimal TodayBetting { get; set; }
+    }
+
+    public class ImportDataByExcelModel
+    {
+        public string UserNameList { get; set; }
+        public string CustIdList { get; set; }
+        public int SiteId { get; set; }
+    }
+
+    public class BatchCustInfo
+    {
+        public int BatchId { get; set; }
+        public string Author { get; set; }
+        public int Status { get; set; }
+        public DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset _updateTime { get; set; }
+        public DateTimeOffset UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string StatusName { get; set; }
+        public string Url { get; set; }
+        public string Memo { get; set; }
     }
 }

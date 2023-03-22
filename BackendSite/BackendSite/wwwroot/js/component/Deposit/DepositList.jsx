@@ -552,6 +552,10 @@ import DateTimePicker from 'react-datetime';
                                 }
                             </tr>
                             <tr>
+                                <th scope="row">Deposit Bonus</th>
+                                <td>{data.bonusDescription}</td>
+                            </tr>
+                            <tr>
                                 <th scope="row">Deposit Type</th>
                                 <td>{i18n["lbl_DepositType" + data.depositType]}</td>
                             </tr>

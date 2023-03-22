@@ -5,6 +5,7 @@ using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.DAL
 {
@@ -13,6 +14,7 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration _configuration;
         private readonly WalletService _walletService;
         private readonly WithdrawalLimitService _withdrawalLimitService;
+        private readonly CustInfoService _custInfoService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
@@ -23,6 +25,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _walletService = provider.GetRequiredService<WalletService>();
             _withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
 
         public IEnumerable<BonusInfo> GetBonusInfoReport(string siteIds,
@@ -110,30 +113,12 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<BonusInfo>("Admin_BonusInfoExport_Get_V8", props);
         }
 
-        public IEnumerable<PendingBonus> GetPendingBonusList(string siteIds,
-            string currencyIds,
-            string promotionType,
-            string bonusCode,
-            string userName,
-            int startIndex, int pageSize, out int totalPages, out int rowCount)
+        public IEnumerable<PendingBonus> GetPendingBonusList(string siteIds)
         {
             var props = new DynamicParameters();
             props.Add("_SiteIds", siteIds);
-            props.Add("_CurrencyIds", currencyIds);
-            props.Add("_PromotionTypes", promotionType);
-            props.Add("_BonusCode", bonusCode);
-            props.Add("_UserName", userName);
-            props.Add("_PageSize", pageSize);
-            props.Add("_StartIndex", startIndex);
-            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V4", props);
-
-            totalPages = props.Get<int?>("_TotalPages") ?? 0;
-            rowCount = props.Get<int?>("_RowCount") ?? 0;
-
-            return result;
+            return _mainDbClient.Query<PendingBonus>("Admin_PendingBonusList_Get_V5", props);
         }
 
         public CancelBonus GetTransferBonusCancel(int bonusId)
@@ -150,7 +135,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<decimal>("Service_BonusWinLoss_Get", props);
         }
 
-        public int CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, out int custId)
+        public async Task<(int Result, int CustId)> CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, string @operator)
         {
             using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             conn.Open();
@@ -165,7 +150,7 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Common_CancelBonusByBonusId_SetV3", p, conn, trans);
 
             var siteId = p.Get<int?>("_SiteId") ?? 0;
-            custId = p.Get<int?>("_CustId") ?? 0;
+            var custId = p.Get<int?>("_CustId") ?? 0;
             var userName = p.Get<string>("_UserName");
             var lockedAmount = p.Get<decimal?>("_LockedAmount") ?? 0;
             var bonusAmount = p.Get<decimal?>("_BonusAmount") ?? 0;
@@ -206,18 +191,26 @@ namespace BackendSite.Service.DAL
                 }
             }
 
+            var custSimpleInfo = await _custInfoService.GetCustId(custId, null, null);
+            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custId, custSimpleInfo.CurrencyId, new { BonusId = bonusId, Status = "Running" },
+               new { BonusId = bonusId, Status = "Cancel" }, AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, ActionType.Update, @operator, conn, trans))
+            {
+                trans.Rollback();
+                return (0, custId);
+            }
+
             if (result > 0)
                 trans.Commit();
 
-            return result;
+            return (result, custId);
         }
 
         public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
         {
             return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
         }
-        
-        public CustBonusSum GetCustBonusSum(int siteId,int custId)
+
+        public CustBonusSum GetCustBonusSum(int siteId, int custId)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -225,8 +218,8 @@ namespace BackendSite.Service.DAL
             var result = _reportDbClient.QueryFirst<CustBonusSum>("Admin_CustBonusSum_Get", props);
             return result;
         }
-        
-        public CustRebateSum GetCustRebateSum(int siteId,int custId)
+
+        public CustRebateSum GetCustRebateSum(int siteId, int custId)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -244,11 +237,11 @@ namespace BackendSite.Service.DAL
                 CustRebateCategory = custRebateCategory,
                 CustRebateTotalSum = custRebateTotalSum
             };
-            
+
             return result;
         }
-        
-        public CustRewardSum GetCustRewardSum(int siteId,int custId)
+
+        public CustRewardSum GetCustRewardSum(int siteId, int custId)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -266,7 +259,7 @@ namespace BackendSite.Service.DAL
                 CustRewardType = custRewardType,
                 CustRewardTotalSum = custRebateTotalSum
             };
-            
+
             return result;
         }
     }

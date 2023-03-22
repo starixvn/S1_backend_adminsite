@@ -33,5 +33,6 @@ namespace BackendSite.Service.Model.BankCardManagement
         public BankCardManagementStatusEnum Status { get; set; }
         public IEnumerable<BankCardManagementSupportChannelEnum> SupportChannels { get; set; }
         public string QrCodeUrl { get; set; }
+        public int GroupId { get; set; }
     }
 }

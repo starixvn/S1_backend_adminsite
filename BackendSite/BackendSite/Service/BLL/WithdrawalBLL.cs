@@ -7,6 +7,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
 
 namespace BackendSite.Service.BLL
 {
@@ -225,14 +226,16 @@ namespace BackendSite.Service.BLL
             }
 
             var accountingModelString = string.Empty;
+            var chargeFee = 0m;
             if (withdrawalType is (int) WithdrawalTypeEnum.CryptoWallet or (int) WithdrawalTypeEnum.LocalBank)
             {
                 accountingModelString = SetAccountingString(accountingModels);
+                chargeFee = accountingModels.Sum(x => x.ChargeFee);
             }
             
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
-                WithdrawalStatusEnum.Process, withdrawalInfo, withdrawalType, accountingModelString , out custId, out amount ,userId);
+                WithdrawalStatusEnum.Process, withdrawalInfo, withdrawalType, accountingModelString , out custId, out amount ,userId, chargeFee:chargeFee);
         }
 
         public int WithdrawalOnHold(string transId, string comment, string updater)
@@ -517,9 +520,18 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.GetWithdrawalPicCount(transId);
         }
 
-        public WithdrawalTimeData WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
+        public WithdrawalTimeData WithdrawalTimeReportGet(string selectSite,
+            string withdrawalId,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            string selectStatus,
+            string currencyIds,
+            int custId,
+            int pageNumber,
+            int pageSize,
+            out List<TotalAmount> currencyTotalAmount)
         {
-            var result = _withdrawalService.WithdrawalTimeReportGet(para);
+            var result = _withdrawalService.WithdrawalTimeReportGet(selectSite,withdrawalId, startDate, endDate, selectStatus, currencyIds, custId, pageNumber, pageSize, out currencyTotalAmount);
 
             result?.WithdrawalTimeList.ForEach(x =>
             {
@@ -544,14 +556,23 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<WithdrawalTimeExportData> WithdrawalTimeExportGet(string selectSite, string withdrawalId,
-            DateTime startDate, DateTime endDate, int status, int currencyId)
+        public async Task<IEnumerable<WithdrawalTimeExportData>> WithdrawalTimeExportGet(string selectSite, string withdrawalId,
+            DateTime startDate, DateTime endDate, string status, string currencyId, string memberId)
         {
             var exportDataToExcel = new List<WithdrawalTimeExportData>();
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(selectSite);
+
+            int custId = 0;
+            if (!string.IsNullOrWhiteSpace(memberId))
+            {
+                var custSimpleInfo = await _custInfoBLL.GetCustId(null, memberId, JsonConvert.DeserializeObject<List<int>>(selectSite).FirstOrDefault());
+                if (custSimpleInfo != null)
+                    custId = custSimpleInfo.CustId;
+                else
+                    return exportDataToExcel;
+            }
 
             var result =
-                _withdrawalService.GetExportData(siteList, withdrawalId, startDate, endDate, status, currencyId);
+                _withdrawalService.GetExportData(selectSite, withdrawalId, startDate, endDate, status, currencyId, custId);
 
             if (result != null)
             {
@@ -1185,6 +1206,33 @@ namespace BackendSite.Service.BLL
             var url = $"{payApiUrl}WithdrawalManualReject";
             var response = await _courierAdapter.MyPostAsync<WithdrawalManualResponse, WithdrawalManualRequest>(url, withdrawalManualRequest);
             return response;
+        }
+
+        public int SetWithdrawalMessage(ParamsWithLog<WithdrawalMessageRequest> input)
+        {
+            var result = 1;
+
+            if (!_withdrawalService.SetWithdrawalMessage(input))
+            {
+                return 0;
+            }
+
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = input.Operator,
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                RefTransId = input.TransId,
+                ActionType = ActionType.Create,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SetWithdrawalMessage,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = JsonConvert.SerializeObject(input.After)
+            };
+
+            _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam);
+            _withdrawalService.SetWithdrawalLog(input.After.WithdrawalId, input.SiteId, $"SendMessage:{input.After.StatusName}", (int)input.After.Action, input.Operator);
+
+            return result;
         }
         #endregion
 
