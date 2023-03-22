@@ -41,6 +41,7 @@ namespace BackendSite.Service.DAL
             IEnumerable<int> withdrawalType,
             DateTime startDate,
             DateTime endDate,
+            WithdrawalDateTypeEnum dateType,
             string WithdrawalId,
             IEnumerable<string> userNames,
             IEnumerable<int> currencyId,
@@ -84,6 +85,7 @@ namespace BackendSite.Service.DAL
                 _WithdrawalTypes = JsonConvert.SerializeObject(withdrawalType),
                 _StartDate = startDate,
                 _EndDate = endDate,
+                _DateType = (int)dateType == 0 ? (int)WithdrawalDateTypeEnum.CreateTime : (int)dateType,
                 _WithdrawalId = withdrawalId,
                 _TransId = WithdrawalId,
                 _UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
@@ -102,14 +104,14 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            currencyAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V6", p).ToList();
+            currencyAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p, commandType: CommandType.StoredProcedure).ToList();
             
             #endregion
 
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V10", p);
+            var result = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V11", p, commandType: CommandType.StoredProcedure);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
@@ -180,6 +182,7 @@ namespace BackendSite.Service.DAL
             string withdrawalType,
             DateTime startDate, 
             DateTime endDate,
+            WithdrawalDateTypeEnum dateType,
             string WithdrawalId, 
             string userName, 
             string currencyId,
@@ -218,6 +221,7 @@ namespace BackendSite.Service.DAL
                 _WithdrawalTypes = withdrawalType,
                 _StartDate = startDate,
                 _EndDate = endDate,
+                _DateType = (int)dateType == 0 ? (int)WithdrawalDateTypeEnum.CreateTime : (int)dateType,
                 _WithdrawalId = withdrawalId,
                 _TransId = WithdrawalId,
                 _UserNames = userName,
@@ -231,8 +235,8 @@ namespace BackendSite.Service.DAL
                 _Agent = agent,
                 _WithdrawalMethod = tempWithdrawalMethod
             });
-
-            var depositList = _reportDbClient.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V9", p,
+            
+            var depositList = _reportDbClient.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V10", p,
                 commandType: CommandType.StoredProcedure);
             return depositList;
         }

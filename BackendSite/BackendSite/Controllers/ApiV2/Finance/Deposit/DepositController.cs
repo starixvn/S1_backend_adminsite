@@ -90,6 +90,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            public DepositDateTypeEnum DateType { get; set; }
             public IEnumerable<int> Statuses { get; set; }
             public IEnumerable<int> LevelStatuses { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
@@ -119,6 +120,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            public DepositDateTypeEnum DateType { get; set; }
             public IEnumerable<int> Statuses { get; set; }
             public IEnumerable<int> LevelStatuses { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
@@ -188,6 +190,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.SelectCalCode,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.DateType,
                 request.DepositId,
                 userNames,
                 request.Agent,
@@ -238,6 +241,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 JsonConvert.SerializeObject(request.DepositTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.DateType,
                 request.DepositId,
                 userNames,
                 string.IsNullOrEmpty(request.Agent) ? null : request.Agent,
