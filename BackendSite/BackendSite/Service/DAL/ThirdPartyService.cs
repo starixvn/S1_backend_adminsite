@@ -167,7 +167,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoListByCustId(int custId)
         {
-            return await _reportDbClient.QueryAsync<TpCustInfo>("Admin_TpCustInfo_GetListByCustId", new DynamicParameters(new { _CustId = custId }));
+            return await _reportDbClient.QueryAsync<TpCustInfo>("Admin_TpCustInfo_GetListByCustId_V2", new DynamicParameters(new { _CustId = custId }));
         }
 
         public async Task<IEnumerable<CommonTpInfo>> GetCommonTpList()
