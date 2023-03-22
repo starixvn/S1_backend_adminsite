@@ -2059,7 +2059,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var redisKey =
-                $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
+                $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
 
             if (_redisHelper.KeyExists(redisKey))
                 return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
@@ -2078,7 +2078,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var redisKey =
-                $"MapTransaction:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
+                $"MapTransaction:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
 
             var originTransaction = Enumerable.Empty<TransactionRelayDto>();
             if (_redisHelper.KeyExists(redisKey))
@@ -2131,7 +2131,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var redisKey =
-                $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
+                $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
 
             var originBonus = Enumerable.Empty<MpaWinLossBonusDto>();
             if (_redisHelper.KeyExists(redisKey))
