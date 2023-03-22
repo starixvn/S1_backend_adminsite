@@ -7,6 +7,8 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.Mpa.WinLoss;
 using StackExchange.Redis;
+using System;
+using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -270,6 +272,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var betRecordResult = await GetTpBetRecord(request, groupByType);
+            BetRecordSetDateToOffSet(request, betRecordResult, groupByType);
             var originTpBetRecordResult = GetGroupResult(betRecordResult.OriginBetRecord);
             var alreadyMultiplyRateTpBetRecordResult = GetGroupResult(betRecordResult.AlreadyMultiplyRateBetRecord);
 
@@ -307,6 +310,25 @@ namespace BackendSite.Service.BLL.Mpa
             };
 
             return wrapperResult;
+        }
+
+        private static void BetRecordSetDateToOffSet(MpaWinLossRequest request, MpaTpBetRecordWrapper betRecordResult,
+            MpaWinLossGroupByTypeEnum groupByType)
+        {
+            if (betRecordResult == null) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date) return;
+
+            var offset = request.StarTime.Offset;
+
+            foreach (var item in betRecordResult.OriginBetRecord)
+            {
+                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+            }
+
+            foreach (var item in betRecordResult.AlreadyMultiplyRateBetRecord)
+            {
+                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+            }
         }
 
         private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetCurrencyDetailByDate(List<MpaWinLossByDateDto> dateSummary)
@@ -1699,6 +1721,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var transactionResult = await GetMapTransactionByDate(request, groupByType);
+            TransactionSetDateToOffSet(request, transactionResult, groupByType);
             var originTransactionResult = GetGroupResult(transactionResult.OriginTransaction);
             var alreadyMultiplyRateTransactionResult = GetGroupResult(transactionResult.AlreadyMultiplyRateTransaction);
 
@@ -1791,6 +1814,24 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
+        private static void TransactionSetDateToOffSet(MpaWinLossRequest request, TransactionRelayWrapper transaction,
+            MpaWinLossGroupByTypeEnum groupByType)
+        {
+            if (transaction == null) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date) return;
+            var offset = request.StarTime.Offset;
+
+            foreach (var item in transaction.OriginTransaction)
+            {
+                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+            }
+
+            foreach (var item in transaction.AlreadyMultiplyRateTransaction)
+            {
+                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+            }
+        }
+
         /// <summary>
         /// 取得 (充值單/提款單) 結果 By Currency
         /// </summary>
@@ -1852,7 +1893,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var bonus = await GetMapWinLossBonusByDate(request, groupByType);
-
+            BonusSetDateToOffSet(request, bonus, groupByType);
             var originBonusResult = GetGroupResult(bonus.OriginBonus);
             var alreadyMultiplyRateBonusResult = GetGroupResult(bonus.AlreadyMultiplyRateBonus);
 
@@ -1879,6 +1920,24 @@ namespace BackendSite.Service.BLL.Mpa
             };
 
             return wrapperResult;
+        }
+
+        private static void BonusSetDateToOffSet(MpaWinLossRequest request, MpaWinLossBonusWrapper bonus,
+            MpaWinLossGroupByTypeEnum groupByType)
+        {
+            if (bonus == null) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date) return;
+            var offset = request.StarTime.Offset;
+
+            foreach (var item in bonus.OriginBonus)
+            {
+                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+            }
+
+            foreach (var item in bonus.AlreadyMultiplyRateBonus)
+            {
+                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+            }
         }
 
         /// <summary>
@@ -2133,7 +2192,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var format = groupByType switch
             {
-                MpaWinLossGroupByTypeEnum.Date => "%Y-%m-%d",
+                MpaWinLossGroupByTypeEnum.Date => "%m/%d/%Y %H:%i",
                 MpaWinLossGroupByTypeEnum.GameType => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.TpCategory => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.Player => "%Y-%m-%d",
