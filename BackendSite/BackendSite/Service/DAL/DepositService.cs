@@ -216,8 +216,8 @@ namespace BackendSite.Service.DAL
             
             try
             {
-                await using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-                conn.Open();
+                await using var conn = _mainDbClient.GetMySqlConnection();
+                await conn.OpenAsync();
                 await using var trans = await conn.BeginTransactionAsync();
             
                 var props = new DynamicParameters();
@@ -237,15 +237,12 @@ namespace BackendSite.Service.DAL
                 
                 if (result > 0)
                 {
-                    trans.Commit();
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 }
                 else
                 {
-                    trans.Rollback();
+                    await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 }
-                
-                await conn.CloseAsync();
-                await conn.DisposeAsync();
                 
                 return result;
             }
@@ -264,8 +261,8 @@ namespace BackendSite.Service.DAL
             
             try
             {
-                await using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-                conn.Open();
+                await using var conn = _mainDbClient.GetMySqlConnection();
+                await conn.OpenAsync();
                 await using var trans = await conn.BeginTransactionAsync();
                 
                 var props = new DynamicParameters();
@@ -281,16 +278,12 @@ namespace BackendSite.Service.DAL
                 
                 if (result > 0)
                 {
-                    trans.Commit();
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 }
                 else
                 {
-                    trans.Rollback();
+                    await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 }
-                
-                await conn.CloseAsync();
-                await conn.DisposeAsync();
-                
             }
             catch (Exception ex)
             {
@@ -307,7 +300,7 @@ namespace BackendSite.Service.DAL
             
             try
             {
-                using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+                using var conn = _mainDbClient.GetMySqlConnection();
                 conn.Open();
                 using var trans = conn.BeginTransaction();
                 
@@ -323,16 +316,12 @@ namespace BackendSite.Service.DAL
                 
                 if (result > 0)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                 }
                 else
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 }
-
-                conn.Close();
-                conn.Dispose();
-                
             }
             catch (Exception ex)
             {
@@ -603,12 +592,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -641,12 +630,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -681,12 +670,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -718,12 +707,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -760,12 +749,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -797,12 +786,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
