@@ -66,15 +66,21 @@ namespace BackendSite.Controllers
             return View(pendingFund.ToList());
         }
         [HttpGet]
-        public IActionResult GetDepositReceiptPic(string transId)
+        public List<IActionResult> GetDepositReceiptPic(string transId)
         {
             var depositReceipt = depositBLL.GetDepositReceipt(transId);
             if (depositReceipt == null)
             {
-                return StatusCode(404);
+                return null;
             }
-            var image = depositReceipt.DepositPic;
-            return File(image, "image/jpeg");
+            var result = new List<IActionResult>();
+            foreach (var receipt in depositReceipt)
+            {
+                var image = receipt.DepositPic;
+                result.Add(File(image, "image/jpeg"));
+            }
+           
+            return result;
         }
 
         public class DepositListReq
