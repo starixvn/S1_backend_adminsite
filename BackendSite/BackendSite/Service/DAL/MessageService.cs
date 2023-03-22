@@ -347,12 +347,12 @@ namespace BackendSite.Service.DAL
             var batchId = p.Get<int?>("BatchId") ?? 0;
             return batchId;
         }
-        public async Task<int> AddCustBatchMessage(int custId, int batchId, string langId, bool isPopup, string title, string content)
+        public async Task<int> AddCustBatchMessage(int custId, int batchId, string langId, bool isPopup, string title, string content, string sender)
         {
             return await _mainDbClient.ExecuteAsync(
                 "Admin_CustBatchMessage_Ins",
                 _transaction,
-                new { _CustId = custId, _BatchId = batchId, _LangId = langId, _IsPopup = isPopup, _Title = title, _Content = content });
+                new { _CustId = custId, _BatchId = batchId, _LangId = langId, _IsPopup = isPopup, _Title = title, _Content = content, _Sender = sender });
         }
         public async Task<int> InsertBatchMessageSendLog(int batchId, int rowId, int custId, string userName, string sabaId, string resultMessage, string updator)
         {

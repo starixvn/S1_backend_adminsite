@@ -127,11 +127,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 var excelList = _excelBll.Read(req.excelUpload);
                 if(!excelList.Any())
                     return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Empty File" };
-                
-                _ = Task.Run(async () => 
-                {
-                    await _messageBll.BatchMessageByFile(req.optSite, batchId, req.IsPopup, authData.UserName, excelList);
-                });
+
+                await _messageBll.BatchMessageByFile(req.optSite, batchId, req.IsPopup, authData.UserName, excelList);
                 _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
             }
             else

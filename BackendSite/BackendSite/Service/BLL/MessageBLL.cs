@@ -309,7 +309,7 @@ namespace BackendSite.Service.BLL
             if (string.IsNullOrEmpty(resultMessage))
             {
                 tmpCustId = customer.CustId;
-                await messageService.AddCustBatchMessage(customer.CustId, batchId, customer.UserLang, isPopup, "", "");
+                await messageService.AddCustBatchMessage(customer.CustId, batchId, customer.UserLang, isPopup, "", "", "");
                 resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
             }
             await messageService.InsertBatchMessageSendLog(batchId, rawId, tmpCustId, userName, sabaId, resultMessage, adminName);
