@@ -399,7 +399,7 @@ namespace BackendSite.Service.DAL
 
                         if (result >= 0)
                         {
-                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, $"WithdrawalLimit: {actualDeposit}", transId, out _, trans);
+                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, (int)WithdrawalLimitAdjustmentReasonEnum.Deposit,$"WithdrawalLimit: {actualDeposit}", transId, (int)WithdrawalLimitLogCreateFromEnum.Deposit , Operator, out _, trans);
                         }
 
                         if (is1stDepoist == 1 && result > 0)

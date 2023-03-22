@@ -324,6 +324,11 @@ namespace BackendSite.Service.BLL
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
+        
+        public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+        {
+            return await _memberService.GetCustomerAssociateBankUserAsync(custId);
+        }
 
         public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)
         {

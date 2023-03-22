@@ -1195,6 +1195,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = await _memberQuery.GetCustRealNameChangeLogAsync(request.CustId)
             };
         }
+        
+        /// <summary>
+        /// Member/GetCustomerAssociateBankUser 取得客戶相同銀行卡號的其他用戶資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        public async Task<ApiResult<IEnumerable<CustomerAssociateBankInfo>>> GetCustomerAssociateBankUser(GetCustomerAssociateBankUserRequest request)
+        {
+            return new ApiResult<IEnumerable<CustomerAssociateBankInfo>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustomerAssociateBankUserAsync(request.CustId)
+            };
+        }
 
         /// <summary>
         /// Member/GetCustPromotionWhiteList 取得客戶Promotion限制白名單
