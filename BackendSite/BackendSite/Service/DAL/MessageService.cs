@@ -6,7 +6,6 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using NPOI.OpenXmlFormats.Dml.Chart;
 
 namespace BackendSite.Service.DAL
 {
