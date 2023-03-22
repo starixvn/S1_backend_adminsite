@@ -671,7 +671,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                messageBLL.DeleteBatchMessage(batchId);
+                var siteId = SelectSite.First();
+                var result = messageBLL.DeleteBatchMessage(siteId, batchId, User.Identity.Name).Result;
                 var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
                 var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
                 apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize,

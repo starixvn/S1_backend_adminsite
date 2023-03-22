@@ -199,61 +199,26 @@ namespace BackendSite.Service.DAL
             batchId = p.Get<int>("BatchId");
             return result > 0;
         }
-        public bool DeleteBatchMessage(int batchId)
+        public async Task<bool> DeleteBatchMessage(int batchId)
         {
-            _logger.LogInformation($@"MessageService-DeleteBatchMessage Start.");
-
             using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
-            using var trans = conn.BeginTransaction();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
 
-            var p = new DynamicParameters();
-            p.Add("_BatchId", batchId);
-            var batchMessageCount = _reportDbClient.QueryFirst<int>("Admin_BatchMessageForDelete_Get", p);
-            _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={batchMessageCount}.");
-
-            if (batchMessageCount > 0)
+            try
             {
-                var affectCount = _mainDbClient.QueryFirst<int>("Admin_BatchMessageV2_Del", trans, p);
-                if (affectCount != batchMessageCount)
-                {
-                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-                    _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Batch Message Count={batchMessageCount},Actual Delete Batch Message Count={affectCount}.Transaction rollback.");
-                    return false;
-                }
+                var p = new { _BatchId = batchId };
+                await _mainDbClient.ExecuteAsync("Admin_BatchMessageV2_Del", trans, p);
+                await _mainDbClient.ExecuteAsync("Admin_CustBatchMessageByBatchId_Del", trans, p);
+                await trans.CommitAsync();
+                return true;
             }
-
-            var messageCount = _mainDbClient.QueryFirst<int>("Admin_MessageForDelete_Get", trans, p);
-            _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={messageCount}.");
-
-            if (messageCount > 0)
+            catch (Exception ex)
             {
-                var affectCount = _mainDbClient.QueryFirst<int>("Admin_MessageByBatchId_Del", trans, p);
-                if (affectCount != messageCount)
-                {
-                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-                    _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Message Count={messageCount},Actual Delete Message Count={affectCount}.Transaction rollback.");
-                    return false;
-                }
+                _logger.LogError(ex, "delete batch message failed");
+                await trans.RollbackAsync();
+                return false;
             }
-
-            var custMessageCount = _mainDbClient.QueryFirst<int>("Admin_CustBatchMessageForDelete_Get", trans, p);
-            _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={custMessageCount}.");
-
-            if (custMessageCount > 0)
-            {
-                var affectCount = _mainDbClient.QueryFirst<int>("Admin_CustBatchMessageByBatchId_Del", trans, p);
-                if (affectCount != custMessageCount)
-                {
-                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-                    _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Message Count={custMessageCount},Actual Delete Message Count={affectCount}.Transaction rollback.");
-                    return false;
-                }
-            }
-
-            _mainDbClient.CommitAndDisposeConnection(conn, trans);
-            _logger.LogInformation($@"MessageService-DeleteBatchMessage End.");
-            return true;
         }
         public bool UpdateBatchMessage(int batchId, bool isPopup, string message, string Operator)
         {

@@ -223,10 +223,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 4 })]
         [HttpPost]
-        public ApiResult DeleteBatchMessage(DeleteBatchMessageReq req)
+        public async Task<ApiResult> DeleteBatchMessage(DeleteBatchMessageReq req)
         {
             var authData = _newAuthorizeBLL.GetAuthData();
-            if (!_messageBll.DeleteBatchMessage(req.BatchId))
+            if (!await _messageBll.DeleteBatchMessage(authData.SiteId, req.BatchId, authData.UserName))
             {
                 return new ApiResult
                 {
@@ -234,19 +234,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Message = "Delete fail."
                 };
             }
-
-            var siteId = _newAuthorizeBLL.CheckBrand();
-            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
-            {
-                Operator = authData.UserName,
-                SiteId = siteId,
-                CurrencyId = 0,
-                ActionType = ActionType.Delete,
-                MenuEnum = AdminAdjustmentLogMenuEnum.SMSGenerator,
-                BeforeDetailInfo = null,
-                AfterDetailInfo = JsonConvert.SerializeObject(req),
-                RefTransId = string.Empty
-            });
 
             return new ApiResult
             {

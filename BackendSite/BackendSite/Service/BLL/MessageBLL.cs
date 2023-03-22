@@ -208,9 +208,27 @@ namespace BackendSite.Service.BLL
         {
             return await messageService.NewBatchMessage(siteId, currencyId, author, isPopup, personalMsg);
         }
-        public bool DeleteBatchMessage(int batchId)
+        public async Task<bool> DeleteBatchMessage(int siteId, int batchId, string @operator)
         {
-            return messageService.DeleteBatchMessage(batchId);
+            var batcjMsg = messageService.GetBatchMessage(batchId);
+            if (batcjMsg == null) return false;
+
+            var isSuccess = await messageService.DeleteBatchMessage(batchId);
+            if (isSuccess)
+            {
+                _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = @operator,
+                    SiteId = siteId,
+                    CurrencyId = 0,
+                    ActionType = ActionType.Delete,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SMSGenerator,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(batcjMsg),
+                    AfterDetailInfo = null,
+                    RefTransId = batchId.ToString()
+                });
+            }
+            return isSuccess;
         }
         public bool UpdateBatchMessage(int batchId, bool isPopup, string message, string Operator)
         {
