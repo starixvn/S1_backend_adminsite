@@ -275,7 +275,9 @@ namespace BackendSite.Service.DAL
             DateTime endDate,
             string claimStatuses,
             int baseCurrencyId,
-            bool isGroupByDate)
+            bool isGroupByDate,
+            string timeZone
+            )
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -288,6 +290,7 @@ namespace BackendSite.Service.DAL
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_IsGroupByDate", isGroupByDate);
+            props.Add("_TimeZone", timeZone);
 
             var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get", props);
 
@@ -301,7 +304,8 @@ namespace BackendSite.Service.DAL
             DateTime startDate,
             DateTime endDate,
             string claimStatuses,
-            int baseCurrencyId)
+            int baseCurrencyId,
+            string timeZone)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
@@ -311,6 +315,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_TimeZone", timeZone);
 
             var result = _reportDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
             return result.ToList();

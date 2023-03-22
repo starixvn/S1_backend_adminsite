@@ -69,11 +69,12 @@ namespace BackendSite.Service.BLL
                 JsonConvert.SerializeObject(input.BonusStatus),
                 JsonConvert.SerializeObject(input.BonusTypes),
                 input.BonusCode,
-                input.StartDate.DateTime,
-                input.EndDate.DateTime,
+                input.StartDate.ToUniversalTime().DateTime,
+                input.EndDate.ToUniversalTime().DateTime,
                 JsonConvert.SerializeObject(input.ClaimStatuses),
                 input.BaseCurrencyId,
-                input.IsGroupByDate);
+                input.IsGroupByDate,
+                input.TimeZone);
             
             //Sort
             var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.BonusCode).AsQueryable();
@@ -134,10 +135,11 @@ namespace BackendSite.Service.BLL
                 input.SiteId,
                 JsonConvert.SerializeObject(input.CurrencyIds),
                 input.BonusCode,
-                input.StartDate.DateTime,
-                input.EndDate.DateTime,
+                input.StartDate.ToUniversalTime().DateTime,
+                input.EndDate.ToUniversalTime().DateTime,
                 JsonConvert.SerializeObject(input.ClaimStatuses),
-                input.BaseCurrencyId);
+                input.BaseCurrencyId,
+                input.TimeZone);
             
             //Sort
             var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.BonusCode).AsQueryable();
