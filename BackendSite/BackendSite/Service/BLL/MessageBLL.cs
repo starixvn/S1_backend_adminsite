@@ -389,61 +389,10 @@ namespace BackendSite.Service.BLL
             var result = true;
             var errorMsg = "";
 
-            switch (currency)
+            if(JObject.Parse(personalMsg)["en"] == null)
             {
-                case (int)CurrencyEnum.MYR:
-                    if (JObject.Parse(personalMsg)["cs"] == null ||
-                        JObject.Parse(personalMsg)["my"] == null)
-                    {
-                        result = false;
-                        errorMsg = "Missing 'cs' or 'my' Msg";
-                    }
-                    break;
-
-                case (int)CurrencyEnum.USD:
-                case (int)CurrencyEnum.CNY:
-                    if (JObject.Parse(personalMsg)["cs"] == null)
-                    {
-                        result = false;
-                        errorMsg = "Missing 'cs' Msg";
-                    }
-                    break;
-
-                case (int)CurrencyEnum.THB:
-                    if (JObject.Parse(personalMsg)["th"] == null ||
-                        JObject.Parse(personalMsg)["en"] == null)
-                    {
-                        errorMsg = "Missing 'th' or 'en' Msg";
-                        result = false;
-                    }
-                    break;
-
-
-                case (int)CurrencyEnum.IDR:
-                    if (JObject.Parse(personalMsg)["id"] == null ||
-                        JObject.Parse(personalMsg)["en"] == null)
-                    {
-                        errorMsg = "Missing 'id' or 'en' Msg";
-                        result = false;
-                    }
-                    break;
-
-                case (int)CurrencyEnum.INR:
-                    if (JObject.Parse(personalMsg)["hi"] == null ||
-                        JObject.Parse(personalMsg)["en"] == null)
-                    {
-                        errorMsg = "Missing 'hi' or 'en' Msg";
-                        result = false;
-                    }
-                    break;
-
-                case (int)CurrencyEnum.BDT:
-                    if (JObject.Parse(personalMsg)["bd"] == null)
-                    {
-                        errorMsg = "Missing 'bd' Msg";
-                        result = false;
-                    }
-                    break;
+                errorMsg = "Missing 'en' Msg";
+                return (false, errorMsg);
             }
 
             return (result, errorMsg);
