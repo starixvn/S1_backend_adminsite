@@ -83,16 +83,30 @@ public class SetLeaderboardExtraPointModel
 
 public class LeaderboardExtraPointList
 {
-    public DateTimeOffset ActiveDate { get; set; }
+    private DateTimeOffset _activeDate;
+    private DateTimeOffset _createTime;
+    private DateTimeOffset _updateTime;
+    public DateTimeOffset ActiveDate
+    {
+        get => _activeDate;
+        set => _activeDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+    }
     public int CustId { get; set; }
     public string UserName { get; set; }
     public string Currency { get; set; }
     public string CategoryName { get; set; }
     public decimal ExtraPoint { get; set; }
-    public DateTime CreateTime { set; get; }
-    public DateTime UpdateTime { set; get; }
+    public DateTimeOffset CreateTime
+    {
+        get => _createTime;
+        set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+    }
+    public DateTimeOffset UpdateTime
+    {
+        get => _updateTime;
+        set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+    }
     public string LastUpdateUser { get; set; }
-
 }
 
 public class ExcelData
