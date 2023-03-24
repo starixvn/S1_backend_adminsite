@@ -646,34 +646,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// BaseData/GetTpCustInfoList 取得指定客戶第三方資訊清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpCustInfo>>> GetTpCustInfoList(GetBySiteIdAndUserNameRequest request)
-        {
-            var custInfo = _custInfoBll.GetCustInfoDetails(null, request.UserName, request.SiteId);
-
-            if (custInfo == null)
-                throw new AdminException(ErrorCodeEnum.CustNotFound);
-
-            var datas = await _tpBll.GetTpCustInfoList(custInfo.CustId);
-
-            if (!datas.Any())
-                throw new AdminException(ErrorCodeEnum.NoData);
-
-            return new ApiResult<IEnumerable<TpCustInfo>>()
-            {
-                Data = datas,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        /// <summary>
         /// BaseData/GetTagByStatus 取得指定狀態標籤資料
         /// </summary>
         /// <remarks>
