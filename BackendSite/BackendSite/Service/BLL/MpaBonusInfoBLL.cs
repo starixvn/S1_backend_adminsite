@@ -25,14 +25,13 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<MpaBonusInfo> GetMpaBonusInfoList(
             MpaBonusInfoReportController.GetDataRequest input,
-            out IPageInfo pageInfo , out MpaBonusInfoSummary summary)
+            out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusInfoList:{input.GetRedisKey()}";
             var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
             var cacheTime = TimeSpan.FromMinutes(15);
 
-            summary = new MpaBonusInfoSummary();
             if (_cacheHelper.KeyExists(masterKey))
             {
                 //Sort
@@ -46,8 +45,8 @@ namespace BackendSite.Service.BLL
                         AddCache(sortData, masterKey, sortKey, cacheTime, input.OrderBy);
                     }
 
-                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), input.PageNumber, input.PageSize);
-                    summary = GetAllDataSummary(sortData);
+                    var (sortIndex, sortCount) =
+                        pageInfo.ListPagination(sortData.Count(), input.PageNumber, input.PageSize);
                     return sortData.GetRange(sortIndex, sortCount);
                 }
 
@@ -60,11 +59,7 @@ namespace BackendSite.Service.BLL
                 //Redis Pagination
                 var total = (int) _cacheHelper.GetListLength(masterKey);
                 var (startIndex, endIndex) = pageInfo.RedisPagination(total, input.PageNumber, input.PageSize);
-
-                var allData = _cacheHelper.GetListByRange<MpaBonusInfo>(masterKey, 0, -1);
-                summary = GetAllDataSummary(allData);
-                
-                return  _cacheHelper.GetListByRange<MpaBonusInfo>(masterKey, startIndex, endIndex);
+                return _cacheHelper.GetListByRange<MpaBonusInfo>(masterKey, startIndex, endIndex);
             }
             
             //Search range table
@@ -93,10 +88,9 @@ namespace BackendSite.Service.BLL
             }
 
             var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
-            summary = GetAllDataSummary(data);
             return list.GetRange(index, count);
         }
-        
+
         public IEnumerable<MpaBonusDetail> GetMpaBonusDetailList(
             MpaBonusInfoReportController.GetDetailRequest input,
             out IPageInfo pageInfo)
@@ -331,23 +325,6 @@ namespace BackendSite.Service.BLL
        
         #region private function
 
-        private MpaBonusInfoSummary GetAllDataSummary( IEnumerable<MpaBonusInfo> input)
-        {
-            var result = new MpaBonusInfoSummary
-            {
-                GGR = input.Sum(x => x.GGR),
-                RunningCount = input.Sum(x => x.RunningCount),
-                CancelCount = input.Sum(x => x.CancelCount),
-                FulFillCount = input.Sum(x => x.FulFillCount),
-                OtherPlatformCount = input.Sum(x => x.OtherPlatformCount),
-                TotalClaimants = input.Sum(x => x.TotalClaimants),
-                TotalClaimedAmount =input.Sum(x => x.TotalClaimedAmount),
-                TotalDeposit = input.Sum(x => x.TotalDeposit),
-                TotalWithdrawal = input.Sum(x => x.TotalWithdrawal),
-            };
-            return result;
-        }
-        
         private void AddCache(IEnumerable<object> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
