@@ -520,7 +520,6 @@ namespace BackendSite.Service.BLL
             if (!depositService.SetDepositRequestAmount(input))
             {
                 scope.Dispose();
-
                 return 0;
             }
 
@@ -539,14 +538,24 @@ namespace BackendSite.Service.BLL
             if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
                 scope.Dispose();
-
                 return 0;
             }
 
-            if (!custInfoService.AddCustNote(custId, $"SetDepositRequestAmount:{input.After.Amount}", input.Operator))
+            var comment = $"Set Deposit Amount ,Change {input.Before.Amount} to {input.After.Amount}";
+            
+            var m = Regex.Match(input.TransId, @"\d+");
+            int.TryParse(m.Value, out var depositId);
+            var logResult = depositService.SetDepositLog(depositId, input.SiteId, comment, (int)DepositStatusEnum.SetDepositAmount, input.After.Amount, input.Operator);
+            
+            if (logResult < 1)
             {
                 scope.Dispose();
-
+                return 0;
+            }
+            
+            if (!custInfoService.AddCustNote(custId, comment, input.Operator))
+            {
+                scope.Dispose();
                 return 0;
             }
 
