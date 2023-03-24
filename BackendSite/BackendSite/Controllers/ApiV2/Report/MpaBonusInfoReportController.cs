@@ -297,11 +297,16 @@ namespace BackendSite.Controllers.ApiV2.Report
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 1 })]
-        public ApiListResult<MpaBonusInfo> GetInfoData(GetDataRequest request)
+        public MpaBonusInfoData GetInfoData(GetDataRequest request)
         {
-            var result = _mpaBonusInfoBll.GetMpaBonusInfoList(request, out var pageInfo);
-            
-            return new ApiListResult<MpaBonusInfo>(ErrorCodeEnum.Success, pageInfo, result);
+            var data = _mpaBonusInfoBll.GetMpaBonusInfoList(request, out var pageInfo ,out var summary);
+  
+            var result = new MpaBonusInfoData
+            {
+                MpaBonusInfo = new ApiListResult<MpaBonusInfo>(ErrorCodeEnum.Success, pageInfo, data),
+                MpaBonusInfoSummary = summary
+            };
+            return result;
         }
         
         [HttpPost]
@@ -309,7 +314,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public IActionResult ExportInfoData(GetDataRequest request)
         {
             request.PageNumber = -1; //export all
-            var data = _mpaBonusInfoBll.GetMpaBonusInfoList(request, out _);
+            var data = _mpaBonusInfoBll.GetMpaBonusInfoList(request, out _ , out _);
 
             var stream = _excelBll.Export(data);
             return _excelBll.ExcelFile(stream, "MpaBonusInfoListReport");

@@ -1,17 +1,15 @@
 ﻿namespace BackendSite.Service.Model
 {
     #region MpaBonus
-    
-    public class MpaBonusInfo
+
+    public class MpaBonusInfoData
     {
-        public DateTime? RecordDate { get; set; }
-        public string BonusName { get; set; }
-        public string BonusCode { get; set; }
-        public int BonusType { get; set; }
-        public string TypeName { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public string BonusStatus { get; set; }
+        public ApiListResult<MpaBonusInfo> MpaBonusInfo { get; set; }
+        public MpaBonusInfoSummary MpaBonusInfoSummary { get; set; }
+    }
+
+    public class MpaBonusInfoSummary
+    {
         public decimal GGR { get; set; }
         public int RunningCount { get; set; }
         public int CancelCount { get; set; }
@@ -21,6 +19,18 @@
         public decimal TotalClaimedAmount { get; set; }
         public decimal TotalDeposit { get; set; }
         public decimal TotalWithdrawal { get; set; }
+    }
+
+    public class MpaBonusInfo : MpaBonusInfoSummary
+    {
+        public DateTime? RecordDate { get; set; }
+        public string BonusName { get; set; }
+        public string BonusCode { get; set; }
+        public int BonusType { get; set; }
+        public string TypeName { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public string BonusStatus { get; set; }
     }
 
     public class MpaBonusDetail
