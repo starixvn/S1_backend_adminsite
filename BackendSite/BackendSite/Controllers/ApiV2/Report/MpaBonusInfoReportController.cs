@@ -305,6 +305,15 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
         
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 1 })]
+        public MpaBonusInfoSummary GetInfoDataSummary(GetDataRequest request)
+        {
+            var result = _mpaBonusInfoBll.GetMpaBonusInfoListSummary(request);
+            
+            return result;
+        }
+        
+        [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 2 })]
         public IActionResult ExportInfoData(GetDataRequest request)
         {
