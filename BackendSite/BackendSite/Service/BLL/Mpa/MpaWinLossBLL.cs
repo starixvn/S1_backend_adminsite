@@ -136,18 +136,14 @@ namespace BackendSite.Service.BLL.Mpa
             var keyName = "MickeyTest";
             sw.Start();
 
-            // 注單資料
-            var betRecord = await GetTpBetRecordGroupByDateResult(request, groupByType);
-            var originTpBetRecord = betRecord.OriginTpBetRecordResult;
-            var alreadyMultiplyRateTpBetRecord = betRecord.AlreadyMultiplyRateTpBetRecordResult;
-
-            // 存提款 
-            var transaction = await GetTransactionByDateResult(request, groupByType);
-            var originTransaction = transaction.OriginTransactionResult;
-            var alreadyMultiplyRateTpTransaction = transaction.AlreadyMultiplyRateTransactionResult;
-
-            // Bonus
-            var bonus = await GetBonusByDateResult(request, groupByType);
+            // 注單資料 & 存提款 & Bonus
+            var betRecordTask = GetTpBetRecordGroupByDateResult(request, groupByType);
+            var transactionTask = GetTransactionByDateResult(request, groupByType);
+            var bonusTask = GetBonusByDateResult(request, groupByType);
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
 
             sw.Stop();
             _logger.LogInformation($"{keyName} FromDB Get Mpa data {sw.ElapsedMilliseconds}ms");
@@ -156,8 +152,8 @@ namespace BackendSite.Service.BLL.Mpa
             sw.Restart();
 
             // 組合結果
-            var originCombineResult = ByDateCombineResult(request, originTpBetRecord, originTransaction, bonus.OriginBonusResult).ToList();
-            var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, alreadyMultiplyRateTpBetRecord, alreadyMultiplyRateTpTransaction, bonus.AlreadyMultiplyRateBonusResult).ToList();
+            var originCombineResult = ByDateCombineResult(request, betRecord.OriginTpBetRecordResult, transaction.OriginTransactionResult, bonus.OriginBonusResult).ToList();
+            var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, betRecord.AlreadyMultiplyRateTpBetRecordResult, transaction.AlreadyMultiplyRateTransactionResult, bonus.AlreadyMultiplyRateBonusResult).ToList();
 
             sw.Stop();
             _logger.LogInformation($"{keyName} Combine betRecord transaction bonus{sw.ElapsedMilliseconds}ms");
