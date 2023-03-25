@@ -132,10 +132,6 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByDateResponseToFrontEnd>> GetMapWinLossByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            var sw = new Stopwatch();
-            var keyName = "MickeyTest";
-            sw.Start();
-
             // 注單資料 & 存提款 & Bonus
             var bonusTask = GetBonusByDateResult(request, groupByType);
             var betRecordTask = GetTpBetRecordGroupByDateResult(request, groupByType);
@@ -145,22 +141,10 @@ namespace BackendSite.Service.BLL.Mpa
             var transaction = transactionTask.Result;
             var bonus = bonusTask.Result;
 
-            sw.Stop();
-            _logger.LogInformation($"{keyName} FromDB Get Mpa data {sw.ElapsedMilliseconds}ms");
-
-
-            sw.Restart();
 
             // 組合結果
             var originCombineResult = ByDateCombineResult(request, betRecord.OriginTpBetRecordResult, transaction.OriginTransactionResult, bonus.OriginBonusResult).ToList();
             var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, betRecord.AlreadyMultiplyRateTpBetRecordResult, transaction.AlreadyMultiplyRateTransactionResult, bonus.AlreadyMultiplyRateBonusResult).ToList();
-
-            sw.Stop();
-            _logger.LogInformation($"{keyName} Combine betRecord transaction bonus{sw.ElapsedMilliseconds}ms");
-
-
-
-            sw.Restart();
 
             var exportData = new Dictionary<string, MpaWinLossByDateResponse>();
             var keys = originCombineResult.Select(x => x.Date).Distinct();
@@ -225,18 +209,7 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
             });
 
-            sw.Stop();
-            _logger.LogInformation($"{keyName} exportData + total {sw.ElapsedMilliseconds}ms");
-
-            sw.Restart();
-
-            var exportDataResult = exportData.ToApiFormat();
-
-            sw.Stop();
-
-            _logger.LogInformation($"{keyName} ToApiFormat {sw.ElapsedMilliseconds}ms");
-
-            return exportDataResult;
+            return exportData.ToApiFormat();
         }
 
         /// <summary>
@@ -1747,12 +1720,7 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<TransactionByDateWrapper> GetTransactionByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
-            var sw = new Stopwatch();
-            const string keyName = "MickeyTest";
-            sw.Start();
             var transactionResult = await GetMapTransactionByDate(request, groupByType);
-            sw.Stop();
-            _logger.LogInformation($"{keyName} await GetMapTransactionByDate {sw.ElapsedMilliseconds}ms");
             TransactionSetDateToOffSet(request, transactionResult, groupByType);
             var originTransactionResult = GetGroupResult(transactionResult.OriginTransaction);
             var alreadyMultiplyRateTransactionResult = GetGroupResult(transactionResult.AlreadyMultiplyRateTransaction);
@@ -1924,14 +1892,7 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<BonusByDateWrapper> GetBonusByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
-
-            var sw = new Stopwatch();
-            const string keyName = "MickeyTest";
-            sw.Start();
             var bonus = await GetMapWinLossBonusByDate(request, groupByType);
-            sw.Stop();
-            _logger.LogInformation($"{keyName} await GetMapWinLossBonusByDate {sw.ElapsedMilliseconds}ms");
-
             BonusSetDateToOffSet(request, bonus, groupByType);
             var originBonusResult = GetGroupResult(bonus.OriginBonus);
             var alreadyMultiplyRateBonusResult = GetGroupResult(bonus.AlreadyMultiplyRateBonus);
@@ -2242,17 +2203,8 @@ namespace BackendSite.Service.BLL.Mpa
             var wrapperResult = new MpaTpBetRecordWrapper();
 
             // 注單過濾
-
-            var sw = new Stopwatch();
-            var keyName = "MickeyTest";
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
-
-            sw.Start();
             var data = await GetMapTpBetRecordByDate(request, groupByType);
-            sw.Stop();
-            _logger.LogInformation($"{keyName} await GetMapTpBetRecordByDate {sw.ElapsedMilliseconds}ms");
-
-            sw.Reset();
             var tpBetRecordRelayResult = data.Filter(request)
                 .SetGgRByOneGamingPoker()
                 .SetGgRByV8Poker()
