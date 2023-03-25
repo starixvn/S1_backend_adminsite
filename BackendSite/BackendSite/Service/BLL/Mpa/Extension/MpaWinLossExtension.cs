@@ -458,6 +458,10 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return result;
         }
 
+        public static DateTime ToOffSetReturnDate(this DateTime dateTime, TimeSpan offset)
+        {
+            return new DateTimeOffset(dateTime, new TimeSpan(0, 0, 0)).ToOffset(offset).Date;
+        }
     }
 }
 

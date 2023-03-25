@@ -319,12 +319,12 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var item in betRecordResult.OriginBetRecord)
             {
-                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+                item.Date = item.Date.ToOffSetReturnDate(offset);
             }
 
             foreach (var item in betRecordResult.AlreadyMultiplyRateBetRecord)
             {
-                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+                item.Date = item.Date.ToOffSetReturnDate(offset);
             }
         }
 
@@ -1820,12 +1820,12 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var item in transaction.OriginTransaction)
             {
-                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+                item.Date.ToOffSetReturnDate(offset);
             }
 
             foreach (var item in transaction.AlreadyMultiplyRateTransaction)
             {
-                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+                item.Date.ToOffSetReturnDate(offset);
             }
         }
 
@@ -1928,12 +1928,12 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var item in bonus.OriginBonus)
             {
-                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+                item.Date.ToOffSetReturnDate(offset);
             }
 
             foreach (var item in bonus.AlreadyMultiplyRateBonus)
             {
-                item.Date = new DateTimeOffset(item.Date, new TimeSpan(0, 0, 0)).ToOffset(offset).DateTime;
+                item.Date.ToOffSetReturnDate(offset);
             }
         }
 
