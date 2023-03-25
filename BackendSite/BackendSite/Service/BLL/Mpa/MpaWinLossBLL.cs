@@ -6,10 +6,7 @@ using BackendSite.Service.BLL.Mpa.Extension;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.Mpa.WinLoss;
-using StackExchange.Redis;
-using System;
 using System.Diagnostics;
-using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.BLL.Mpa
 {
