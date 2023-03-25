@@ -2087,38 +2087,17 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         private async Task<IEnumerable<MpaTpBetRecordDto>> GetMapTpBetRecordByDate(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            var sw = new Stopwatch();
-            var keyName = "MickeyTest";
-
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var redisKey = $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
 
             if (await _redisHelper.KeyExistsAsync(redisKey))
             {
-                sw.Start();
-                var dataFromRedis = await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
-                sw.Stop();
-                _logger.LogInformation($"{keyName} GetMapTpBetRecordByDate FromRedis {sw.ElapsedMilliseconds}ms");
-                return dataFromRedis;
+                return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
             }
 
-            sw.Reset();
-
-            var data = await _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, request.StarTime,
-                request.EndTime, format, request.DateType);
-
+            var data = await _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, request.StarTime, request.EndTime, format, request.DateType);
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName));
-
-            sw.Stop();
-            _logger.LogInformation($"{keyName} GetMapTpBetRecordByDate FromDB {sw.ElapsedMilliseconds}ms");
-
-            sw.Reset();
-
             var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
-
-            sw.Stop();
-            _logger.LogInformation($"{keyName} GetMapTpBetRecordByDate InsertList To redis {sw.ElapsedMilliseconds}ms");
-
             return data;
         }
 
@@ -2129,30 +2108,15 @@ namespace BackendSite.Service.BLL.Mpa
             var redisKey = $"MapTransaction:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
             IEnumerable<TransactionRelayDto> originTransaction;
 
-            var sw = new Stopwatch();
-            var keyName = "MickeyTest";
-
             if (await _redisHelper.KeyExistsAsync(redisKey))
             {
-                sw.Start();
                 originTransaction = await _redisHelper.GetListByRangeAsync<TransactionRelayDto>(redisKey, 0, -1);
-                sw.Stop();
-                _logger.LogInformation($"{keyName} GetMapTransactionByDate redis {sw.ElapsedMilliseconds}ms");
             }
             else
             {
-                sw.Start();
                 originTransaction = await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format);
-                sw.Stop();
-                _logger.LogInformation($"{keyName} GetMapTransactionByDate fromDB {sw.ElapsedMilliseconds}ms");
-
-                sw.Reset();
                 var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originTransaction);
-                sw.Stop();
-                _logger.LogInformation($"{keyName} GetMapTransactionByDate InsertList To redis {sw.ElapsedMilliseconds}ms");
             }
-
-            sw.Reset();
 
             originTransaction = originTransaction.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
             if (!string.IsNullOrEmpty(request.UserName))
@@ -2177,15 +2141,12 @@ namespace BackendSite.Service.BLL.Mpa
                                                       RowCount = item.RowCount
                                                   }).ToList();
 
-
             var wrapperResult = new TransactionRelayWrapper()
             {
                 OriginTransaction = originTransaction.ToList(),
                 AlreadyMultiplyRateTransaction = alreadyMultiplyRateTransaction
             };
 
-            sw.Stop();
-            _logger.LogInformation($"{keyName} GetMapTransactionByDate filterData {sw.ElapsedMilliseconds}ms");
             return wrapperResult;
         }
 
@@ -2268,14 +2229,25 @@ namespace BackendSite.Service.BLL.Mpa
             var wrapperResult = new MpaTpBetRecordWrapper();
 
             // 注單過濾
+            var sw = new Stopwatch();
+            var keyName = "MickeyTest";
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
+
+            sw.Start();
             var data = await GetMapTpBetRecordByDate(request, groupByType);
+            sw.Stop();
+            _logger.LogInformation($"{keyName} await GetMapTpBetRecordByDate {sw.ElapsedMilliseconds}ms");
+
+            sw.Reset();
             var tpBetRecordRelayResult = data.Filter(request)
                 .SetGgRByOneGamingPoker()
                 .SetGgRByV8Poker()
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
+            sw.Stop();
+            _logger.LogInformation($"{keyName} TpBetRecordByDate filter {sw.ElapsedMilliseconds}ms");
 
+            sw.Reset();
             var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult
                                                           let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
@@ -2303,6 +2275,9 @@ namespace BackendSite.Service.BLL.Mpa
                                                               ClosingBalance = item.ClosingBalance * rate,
                                                               RowCount = item.RowCount,
                                                           }).ToList();
+
+            sw.Stop();
+            _logger.LogInformation($"{keyName} AlreadyMultiplyRateBetRecord rate {sw.ElapsedMilliseconds}ms");
 
             wrapperResult.OriginBetRecord = tpBetRecordRelayResult;
             return wrapperResult;
