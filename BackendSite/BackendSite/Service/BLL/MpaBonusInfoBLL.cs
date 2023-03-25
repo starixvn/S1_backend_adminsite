@@ -91,6 +91,58 @@ namespace BackendSite.Service.BLL
             return list.GetRange(index, count);
         }
 
+        public MpaBonusInfoSummary GetMpaBonusInfoListSummary(MpaBonusInfoReportController.GetDataRequest input)
+        {
+            MpaBonusInfoSummary result;
+            
+            var masterKey = $"MpaBonusInfoList:{input.GetRedisKey()}";
+            if (_cacheHelper.KeyExists(masterKey))
+            {
+                var sortData = _cacheHelper.GetListByRange<MpaBonusInfo>(masterKey, 0, -1).ToList();
+                result = new MpaBonusInfoSummary
+                {
+                    GGR = sortData.Sum( x => x.GGR),
+                    RunningCount = sortData.Sum( x => x.RunningCount),
+                    CancelCount = sortData.Sum( x => x.CancelCount),
+                    FulFillCount =sortData.Sum( x => x.FulFillCount),
+                    OtherPlatformCount = sortData.Sum( x => x.OtherPlatformCount),
+                    TotalClaimants =sortData.Sum( x => x.TotalClaimants),
+                    TotalClaimedAmount =sortData.Sum( x => x.TotalClaimedAmount),
+                    TotalDeposit = sortData.Sum( x => x.TotalDeposit),
+                    TotalWithdrawal = sortData.Sum( x => x.TotalWithdrawal)
+                };
+                return result;
+            }
+            
+            var data =_bonusInfoService.GetMpaBonusInfoList(
+                input.SiteId,
+                JsonConvert.SerializeObject(input.CurrencyIds),
+                JsonConvert.SerializeObject(input.BonusStatus),
+                JsonConvert.SerializeObject(input.BonusTypes),
+                input.BonusCode,
+                input.StartDate.ToUniversalTime().DateTime,
+                input.EndDate.ToUniversalTime().DateTime,
+                JsonConvert.SerializeObject(input.ClaimStatuses),
+                input.BaseCurrencyId,
+                input.IsGroupByDate,
+                input.TimeZone);
+            
+            result = new MpaBonusInfoSummary
+            {
+                GGR = data.Sum( x => x.GGR),
+                RunningCount = data.Sum( x => x.RunningCount),
+                CancelCount = data.Sum( x => x.CancelCount),
+                FulFillCount = data.Sum( x => x.FulFillCount),
+                OtherPlatformCount = data.Sum( x => x.OtherPlatformCount),
+                TotalClaimants = data.Sum( x => x.TotalClaimants),
+                TotalClaimedAmount = data.Sum( x => x.TotalClaimedAmount),
+                TotalDeposit = data.Sum( x => x.TotalDeposit),
+                TotalWithdrawal = data.Sum( x => x.TotalWithdrawal)
+            };
+            
+            return result;
+        }
+        
         public IEnumerable<MpaBonusDetail> GetMpaBonusDetailList(
             MpaBonusInfoReportController.GetDetailRequest input,
             out IPageInfo pageInfo)
