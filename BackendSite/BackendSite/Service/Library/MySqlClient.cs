@@ -204,7 +204,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
 
@@ -226,7 +226,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
 
@@ -246,7 +246,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug(name);
+            _logger.LogInformation(name);
             return result;
         }
         
@@ -266,7 +266,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            _logger.LogInformation($"{name} {sw.Elapsed:c}");
             return result;
         }
 
@@ -289,7 +289,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            _logger.LogInformation($"{name} {sw.Elapsed:c}");
             return result;
         }
         public int Execute(string name, object parameters)
