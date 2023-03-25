@@ -1919,7 +1919,14 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<BonusByDateWrapper> GetBonusByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
+
+            var sw = new Stopwatch();
+            const string keyName = "MickeyTest";
+            sw.Start();
             var bonus = await GetMapWinLossBonusByDate(request, groupByType);
+            sw.Stop();
+            _logger.LogInformation($"{keyName} await GetMapWinLossBonusByDate {sw.ElapsedMilliseconds}ms");
+
             BonusSetDateToOffSet(request, bonus, groupByType);
             var originBonusResult = GetGroupResult(bonus.OriginBonus);
             var alreadyMultiplyRateBonusResult = GetGroupResult(bonus.AlreadyMultiplyRateBonus);
@@ -2154,11 +2161,10 @@ namespace BackendSite.Service.BLL.Mpa
             MpaWinLossGroupByTypeEnum groupByType)
         {
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
-            var redisKey =
-                $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
-
+            var redisKey = $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
             var originBonus = Enumerable.Empty<MpaWinLossBonusDto>();
-            if (_redisHelper.KeyExists(redisKey))
+
+            if (await _redisHelper.KeyExistsAsync(redisKey))
             {
                 originBonus = await _redisHelper.GetListByRangeAsync<MpaWinLossBonusDto>(redisKey, 0, -1);
             }
@@ -2229,6 +2235,7 @@ namespace BackendSite.Service.BLL.Mpa
             var wrapperResult = new MpaTpBetRecordWrapper();
 
             // 注單過濾
+
             var sw = new Stopwatch();
             var keyName = "MickeyTest";
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
