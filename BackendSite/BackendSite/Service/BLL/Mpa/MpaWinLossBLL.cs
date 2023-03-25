@@ -6,9 +6,7 @@ using BackendSite.Service.BLL.Mpa.Extension;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.Mpa.WinLoss;
-using StackExchange.Redis;
-using System;
-using NPOI.SS.Formula.Functions;
+using System.Diagnostics;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -17,12 +15,14 @@ namespace BackendSite.Service.BLL.Mpa
         private readonly IMpaWinLossService _mpaWinLossService;
         private readonly IMpaCommonService _mpaCommonService;
         private readonly ICacheHelper _redisHelper;
+        private readonly ILogger<MpaWinLossBLL> _logger;
 
-        public MpaWinLossBLL(IMpaWinLossService mpaWinLossService, ICacheHelper redisHelper, IMpaCommonService mpaCommonService)
+        public MpaWinLossBLL(IMpaWinLossService mpaWinLossService, ICacheHelper redisHelper, IMpaCommonService mpaCommonService, ILogger<MpaWinLossBLL> logger)
         {
             _mpaWinLossService = mpaWinLossService;
             _mpaCommonService = mpaCommonService;
             _redisHelper = redisHelper;
+            _logger = logger;
         }
 
         #region GropuByDate、Month
@@ -132,6 +132,10 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByDateResponseToFrontEnd>> GetMapWinLossByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
+            var sw = new Stopwatch();
+            var keyName = "MickeyTest";
+            sw.Start();
+
             // 注單資料
             var betRecord = await GetTpBetRecordGroupByDateResult(request, groupByType);
             var originTpBetRecord = betRecord.OriginTpBetRecordResult;
@@ -145,9 +149,22 @@ namespace BackendSite.Service.BLL.Mpa
             // Bonus
             var bonus = await GetBonusByDateResult(request, groupByType);
 
+            sw.Stop();
+            _logger.LogInformation($"{keyName} FromDB Get Mpa data {sw.ElapsedMilliseconds}ms");
+
+
+            sw.Restart();
+
             // 組合結果
             var originCombineResult = ByDateCombineResult(request, originTpBetRecord, originTransaction, bonus.OriginBonusResult).ToList();
             var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, alreadyMultiplyRateTpBetRecord, alreadyMultiplyRateTpTransaction, bonus.AlreadyMultiplyRateBonusResult).ToList();
+
+            sw.Stop();
+            _logger.LogInformation($"{keyName} Combine betRecord transaction bonus{sw.ElapsedMilliseconds}ms");
+
+
+
+            sw.Restart();
 
             var exportData = new Dictionary<string, MpaWinLossByDateResponse>();
             var keys = originCombineResult.Select(x => x.Date).Distinct();
@@ -212,7 +229,18 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
             });
 
-            return exportData.ToApiFormat();
+            sw.Stop();
+            _logger.LogInformation($"{keyName} exportData + total {sw.ElapsedMilliseconds}ms");
+
+            sw.Restart();
+
+            var exportDataResult = exportData.ToApiFormat();
+
+            sw.Stop();
+
+            _logger.LogInformation($"{keyName} ToApiFormat {sw.ElapsedMilliseconds}ms");
+
+            return exportDataResult;
         }
 
         /// <summary>
