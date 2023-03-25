@@ -1820,12 +1820,12 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var item in transaction.OriginTransaction)
             {
-                item.Date.ToOffSetReturnDate(offset);
+                item.Date = item.Date.ToOffSetReturnDate(offset);
             }
 
             foreach (var item in transaction.AlreadyMultiplyRateTransaction)
             {
-                item.Date.ToOffSetReturnDate(offset);
+                item.Date = item.Date.ToOffSetReturnDate(offset);
             }
         }
 
@@ -1928,12 +1928,12 @@ namespace BackendSite.Service.BLL.Mpa
 
             foreach (var item in bonus.OriginBonus)
             {
-                item.Date.ToOffSetReturnDate(offset);
+                item.Date = item.Date.ToOffSetReturnDate(offset);
             }
 
             foreach (var item in bonus.AlreadyMultiplyRateBonus)
             {
-                item.Date.ToOffSetReturnDate(offset);
+                item.Date = item.Date.ToOffSetReturnDate(offset);
             }
         }
 
