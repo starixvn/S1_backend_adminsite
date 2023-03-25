@@ -2097,14 +2097,14 @@ namespace BackendSite.Service.BLL.Mpa
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var redisKey = $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
 
-            if (await _redisHelper.KeyExistsAsync(redisKey))
-            {
-                return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
-            }
+            //if (await _redisHelper.KeyExistsAsync(redisKey))
+            //{
+            //    return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
+            //}
 
             var data = await _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, request.StarTime, request.EndTime, format, request.DateType);
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName));
-            var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
+            //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
             return data;
         }
 
@@ -2115,14 +2115,15 @@ namespace BackendSite.Service.BLL.Mpa
             var redisKey = $"MapTransaction:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
             IEnumerable<TransactionRelayDto> originTransaction;
 
-            if (await _redisHelper.KeyExistsAsync(redisKey))
+            //if (await _redisHelper.KeyExistsAsync(redisKey))
+            if (false)
             {
                 originTransaction = await _redisHelper.GetListByRangeAsync<TransactionRelayDto>(redisKey, 0, -1);
             }
             else
             {
                 originTransaction = await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format);
-                var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originTransaction);
+                //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originTransaction);
             }
 
             originTransaction = originTransaction.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
@@ -2164,14 +2165,15 @@ namespace BackendSite.Service.BLL.Mpa
             var redisKey = $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
             var originBonus = Enumerable.Empty<MpaWinLossBonusDto>();
 
-            if (await _redisHelper.KeyExistsAsync(redisKey))
+            //if (await _redisHelper.KeyExistsAsync(redisKey))
+            if (false)
             {
                 originBonus = await _redisHelper.GetListByRangeAsync<MpaWinLossBonusDto>(redisKey, 0, -1);
             }
             else
             {
                 originBonus = (await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
-                var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originBonus);
+                //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originBonus);
             }
 
             originBonus = originBonus.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
