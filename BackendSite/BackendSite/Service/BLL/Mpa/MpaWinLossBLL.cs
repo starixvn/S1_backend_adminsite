@@ -137,9 +137,9 @@ namespace BackendSite.Service.BLL.Mpa
             sw.Start();
 
             // 注單資料 & 存提款 & Bonus
+            var bonusTask = GetBonusByDateResult(request, groupByType);
             var betRecordTask = GetTpBetRecordGroupByDateResult(request, groupByType);
             var transactionTask = GetTransactionByDateResult(request, groupByType);
-            var bonusTask = GetBonusByDateResult(request, groupByType);
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
             var betRecord = betRecordTask.Result;
             var transaction = transactionTask.Result;
@@ -1747,7 +1747,12 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<TransactionByDateWrapper> GetTransactionByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
+            var sw = new Stopwatch();
+            const string keyName = "MickeyTest";
+            sw.Start();
             var transactionResult = await GetMapTransactionByDate(request, groupByType);
+            sw.Stop();
+            _logger.LogInformation($"{keyName} await GetMapTransactionByDate {sw.ElapsedMilliseconds}ms");
             TransactionSetDateToOffSet(request, transactionResult, groupByType);
             var originTransactionResult = GetGroupResult(transactionResult.OriginTransaction);
             var alreadyMultiplyRateTransactionResult = GetGroupResult(transactionResult.AlreadyMultiplyRateTransaction);
@@ -2253,10 +2258,7 @@ namespace BackendSite.Service.BLL.Mpa
                 .SetGgRByV8Poker()
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
-            sw.Stop();
-            _logger.LogInformation($"{keyName} TpBetRecordByDate filter {sw.ElapsedMilliseconds}ms");
 
-            sw.Reset();
             var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult
                                                           let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
@@ -2284,9 +2286,6 @@ namespace BackendSite.Service.BLL.Mpa
                                                               ClosingBalance = item.ClosingBalance * rate,
                                                               RowCount = item.RowCount,
                                                           }).ToList();
-
-            sw.Stop();
-            _logger.LogInformation($"{keyName} AlreadyMultiplyRateBetRecord rate {sw.ElapsedMilliseconds}ms");
 
             wrapperResult.OriginBetRecord = tpBetRecordRelayResult;
             return wrapperResult;
