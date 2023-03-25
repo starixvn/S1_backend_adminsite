@@ -937,18 +937,19 @@ namespace BackendSite.Service.BLL.Mpa
             var cacheTime = TimeSpan.FromMinutes(15);
             var apiData = new List<MpaWinLossByPlayerResponse>();
             var rowCount = 0;
+            var excludeUserName = new List<string>();
             apiData.Clear();
 
-            if (_redisHelper.KeyExists(masterKey))
+            if (await _redisHelper.KeyExistsAsync(masterKey))
             {
-                if (request.OrderBy && !_redisHelper.KeyExists(sortKey))
+                if (request.OrderBy && !await _redisHelper.KeyExistsAsync(sortKey))
                 {
                     // 取出全部資料重新排序
                     var sortData = (await _redisHelper.GetListByRangeAsync<MpaWinLossByPlayerResponse>(masterKey, 0, -1)).OrderBy(request);
                     rowCount = sortData.Count();
 
                     // 刪除舊資料重設cache
-                    if (_redisHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
+                    if (await _redisHelper.KeyDeleteByPatternAsync($"{masterKey}*") > 0)
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, request.OrderBy);
                     }
@@ -980,6 +981,9 @@ namespace BackendSite.Service.BLL.Mpa
                 foreach (var userName in userNames)
                 {
                     var dateSummary = result.AlreadyMultiplyRateData.Where(x => x.UserName == userName).ToList();
+                    var betCount = dateSummary.Sum(x => x.BetCount);
+                    if (betCount == 0) { excludeUserName.Add(userName); }
+
                     var responseItem = new MpaWinLossByPlayerResponse
                     {
                         SabaId = dateSummary.Select(r => r.TpUserName).FirstOrDefault(),
@@ -991,15 +995,15 @@ namespace BackendSite.Service.BLL.Mpa
                         ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                         ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                         Commission = dateSummary.Sum(x => x.Commission),
-                        BetCount = dateSummary.Sum(x => x.BetCount),
+                        BetCount = betCount,
                         UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                         ClosingBalance = dateSummary.Sum(x => x.ClosingBalance),
                         DepositCount = dateSummary.Sum(x => x.DepositCount),
                         TotalDepositAmount = dateSummary.Sum(x => x.TotalDepositAmount),
                         WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
                         TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
-                        AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                            ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        AvgBetAmount = betCount != 0
+                            ? dateSummary.Sum(x => x.ValidTurnOver) / betCount
                             : 0.00m,
 
                         Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
@@ -1038,7 +1042,7 @@ namespace BackendSite.Service.BLL.Mpa
                 Commission = response.Sum(x => x.Value.Commission),
                 BetCount = response.Sum(x => x.Value.BetCount),
                 ClosingBalance = response.Sum(x => x.Value.ClosingBalance),
-                UniquePlayers = response.DistinctBy(x => x.Value.UserName).Count(),
+                UniquePlayers = response.Where(x => !excludeUserName.Contains(x.Key)).DistinctBy(x => x.Value.UserName).Count(),
                 DepositCount = response.Sum(x => x.Value.DepositCount),
                 TotalDepositAmount = response.Sum(x => x.Value.TotalDepositAmount),
                 WithDrawCount = response.Sum(x => x.Value.WithDrawCount),
@@ -1078,7 +1082,6 @@ namespace BackendSite.Service.BLL.Mpa
             var bonus = await GetBonusByPlayerResult(request, groupByType);
             var originBonus = bonus.OriginBonusResult;
             var alreadyMultiplyBonus = bonus.AlreadyMultiplyRateBonusResult;
-
 
             // 注單 + 存提款 + bonus 資料合併
             var originCombineData = originBetRecord.Concat(originTransaction).Concat(originBonus).ToList();
