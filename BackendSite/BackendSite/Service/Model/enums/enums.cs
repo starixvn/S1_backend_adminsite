@@ -225,7 +225,8 @@ namespace BackendSite.Service.Model.enums
         CryptoPay = 4,
         LoadCard = 5,
         QRPay = 6,
-        BankAutoChannel = 7
+        BankAutoChannel = 7,
+        CryptoWallet = 8
     }
 
     public enum DepositStatusEnum

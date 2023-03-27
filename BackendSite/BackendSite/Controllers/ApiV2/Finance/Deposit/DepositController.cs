@@ -26,7 +26,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
         private readonly PermissionBLL _permissionBll;
-        private readonly Dictionary<int, List<int>> _usableActionType;
+        private readonly Dictionary<DepositStatusEnum, List<DepositActionEnum>> _usableActionType;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         
         private readonly int _mainWalletType;
@@ -46,13 +46,37 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _mainWalletType = configuration.GetValue<int>("MainWalletType");
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
-            _usableActionType = new Dictionary<int, List<int>>
+            _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
-                { 1, new List<int> {66,65,67,6,63} }, //Draft -> Draft,Approved,ManualApproved,Reject,OnHold
-                { 3, new List<int> {66} },//Approved -> Draft
-                { 4, new List<int> {66,67} },//Reject -> Draft,ManualApproved
-                { 5, new List<int> {66} },//Cancel -> Draft
-                { 7, new List<int> {66,64,67} }//On-Hold -> Draft,Pending,ManualApproved
+                { DepositStatusEnum.Pending,
+                    new List<DepositActionEnum>
+                    {
+                        DepositActionEnum.Draft,
+                        DepositActionEnum.Approved,
+                        DepositActionEnum.ManualApproved,
+                        DepositActionEnum.Rejected,
+                        DepositActionEnum.OnHold
+                    } },
+                { DepositStatusEnum.Approved, 
+                    new List<DepositActionEnum>
+                    {
+                        DepositActionEnum.Draft
+                    } },
+                { DepositStatusEnum.Rejected, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft,
+                    DepositActionEnum.ManualApproved
+                } },
+                { DepositStatusEnum.Canceled, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft
+                } },
+                { DepositStatusEnum.OnHold, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft,
+                    DepositActionEnum.Pending,
+                    DepositActionEnum.ManualApproved
+                } }
             };
         }
 
@@ -319,7 +343,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             
             if (request.Action == (int)DepositStatusEnum.Approved)
             {
-                if (depositRequest.DepositType == (int) DepositTypeEnum.LocalBanking)
+                if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
                 {
                     if (request.ActualDeposit > 0)
                         depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
@@ -579,19 +603,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             return await _pendingFundBll.ProcessAsync(pendingFund);
         }
 
-        private List<int> GetUsableActionButton(DepositRequest depositRequest)
-        {
+        private List<DepositActionEnum> GetUsableActionButton(DepositRequest depositRequest)
+        { 
             var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
             var usableList = _usableActionType[depositRequest.Status];
-            var usableActionButton = usableList.Where(item => permissionList.Contains(item)).ToList();
+            var usableActionButton = usableList
+                .Where(item => permissionList.Contains((int)item)).ToList();
                     
-            if (depositRequest.DepositType == (int) DepositTypeEnum.LocalBanking)
+            if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
             {
-                usableActionButton.Remove((int) DepositActionEnum.ManualApproved);
+                usableActionButton.Remove(DepositActionEnum.ManualApproved);
             }
-            else if (depositRequest.DepositType != (int) DepositTypeEnum.LocalBanking)
+            else if (depositRequest.DepositType is not DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
             {
-                usableActionButton.Remove((int) DepositActionEnum.Approved);
+                usableActionButton.Remove(DepositActionEnum.Approved);
             }
 
             return usableActionButton;
