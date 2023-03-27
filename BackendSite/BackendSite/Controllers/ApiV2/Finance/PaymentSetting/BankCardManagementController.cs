@@ -3,7 +3,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Amazon.S3.Model;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.BankCardManagement;
 using Newtonsoft.Json;
