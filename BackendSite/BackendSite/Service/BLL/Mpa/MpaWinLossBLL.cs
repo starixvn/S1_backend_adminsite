@@ -269,7 +269,6 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var betRecordResult = await GetTpBetRecord(request, groupByType);
-            BetRecordSetDateToOffSet(request, betRecordResult, groupByType);
             var originTpBetRecordResult = GetGroupResult(betRecordResult.OriginBetRecord);
             var alreadyMultiplyRateTpBetRecordResult = GetGroupResult(betRecordResult.AlreadyMultiplyRateBetRecord);
 
@@ -309,7 +308,7 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
-        private static void BetRecordSetDateToOffSet(MpaWinLossRequest request, MpaTpBetRecordWrapper betRecordResult,
+        private static void BetRecordSetDateToOffSet(MpaWinLossRequest request, List<MpaTpBetRecordDto> betRecordResult,
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (betRecordResult == null) return;
@@ -317,15 +316,15 @@ namespace BackendSite.Service.BLL.Mpa
 
             var offset = request.StarTime.Offset;
 
-            foreach (var item in betRecordResult.OriginBetRecord)
+            foreach (var item in betRecordResult)
             {
                 item.Date = item.Date.ToOffSetReturnDate(offset);
             }
 
-            foreach (var item in betRecordResult.AlreadyMultiplyRateBetRecord)
-            {
-                item.Date = item.Date.ToOffSetReturnDate(offset);
-            }
+            //foreach (var item in betRecordResult.AlreadyMultiplyRateBetRecord)
+            //{
+            //    item.Date = item.Date.ToOffSetReturnDate(offset);
+            //}
         }
 
         private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetCurrencyDetailByDate(List<MpaWinLossByDateDto> dateSummary)
@@ -2203,6 +2202,8 @@ namespace BackendSite.Service.BLL.Mpa
             var wrapperResult = new MpaTpBetRecordWrapper();
 
             // 注單過濾
+            var sw = new Stopwatch();
+            sw.Start();
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var data = await GetMapTpBetRecordByDate(request, groupByType);
             var tpBetRecordRelayResult = data.Filter(request)
@@ -2210,10 +2211,33 @@ namespace BackendSite.Service.BLL.Mpa
                 .SetGgRByV8Poker()
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
+            BetRecordSetDateToOffSet(request, tpBetRecordRelayResult, groupByType);
+
+            sw.Stop();
+
+            _logger.LogInformation($"GetTpBetRecord GetData And filter data ms:{sw.Elapsed.TotalMilliseconds}");
+
+            sw.Restart();
 
             var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
+            var groupByRateDate = tpBetRecordRelayResult.GroupBy(x => new { x.Date, x.CurrencyId, request.BaseCurrencyId });
+            var dictRate = new Dictionary<string, decimal>();
+
+            foreach (var dateItem in groupByRateDate)
+            {
+                var currencyId = dateItem.Key.CurrencyId;
+                var baseCurrencyId = request.BaseCurrencyId;
+                var dateKey = dateItem.Key.Date.ToString("yyyy-MM-dd");
+                var rate = _mpaCommonService.MapperExchangeRate(mapRate, dateItem.Key.Date, dateItem.Key.CurrencyId, request.BaseCurrencyId);
+                dictRate.Add($"{dateKey}{currencyId}{baseCurrencyId}", rate);
+            }
+
+            sw.Stop();
+            _logger.LogInformation($"Get mapRate data ms:{sw.Elapsed.TotalMilliseconds}");
+
+            sw.Restart();
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult
-                                                          let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+                                                          let rate = dictRate[$"{item.Date.ToString("yyyy-MM-dd")}{item.CurrencyId}{request.BaseCurrencyId}"] // = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
                                                           select new MpaTpBetRecordDto()
                                                           {
                                                               Date = item.Date,
@@ -2239,7 +2263,13 @@ namespace BackendSite.Service.BLL.Mpa
                                                               RowCount = item.RowCount,
                                                           }).ToList();
 
+
+
+
             wrapperResult.OriginBetRecord = tpBetRecordRelayResult;
+            sw.Stop();
+            _logger.LogInformation($"AlreadyMultiplyRateBetRecord ms:{sw.Elapsed.TotalMilliseconds}");
+
             return wrapperResult;
         }
 

@@ -31,6 +31,8 @@ namespace BackendSite.Service.DAL
 
         public decimal MapperExchangeRate(IEnumerable<MpaRateDto> source, DateTime date, int currencyId, int baseCurrencyId)
         {
+
+
             //是否是當天
             if (date == DateTime.Today)
             {
