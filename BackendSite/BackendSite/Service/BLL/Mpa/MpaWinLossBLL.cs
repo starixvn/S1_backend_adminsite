@@ -2035,17 +2035,40 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         private async Task<IEnumerable<MpaTpBetRecordDto>> GetMapTpBetRecordByDate(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
+            #region cache code
             var redisKey = $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
 
             //if (await _redisHelper.KeyExistsAsync(redisKey))
             //{
             //    return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
             //}
-
-            var data = await _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, request.StarTime, request.EndTime, format, request.DateType);
-            data = data.Where(x => !string.IsNullOrEmpty(x.UserName));
             //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
+            #endregion
+
+            var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
+            var startDate = request.StarTime;
+            var endDate = request.EndTime;
+            var interval = TimeSpan.FromDays(30);
+            var segmentCount = (int)Math.Ceiling((endDate - startDate).TotalDays / interval.TotalDays);
+            var data = new List<MpaTpBetRecordDto>();
+            var tasks = new List<Task<IEnumerable<MpaTpBetRecordDto>>>();
+            for (var i = 0; i < segmentCount; i++)
+            {
+                var segmentStart = startDate.AddDays(i * interval.TotalDays);
+                var segmentEnd = segmentStart.AddDays(interval.TotalDays - 1);
+                if (segmentEnd > endDate) segmentEnd = endDate;
+
+                tasks.Add(_mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, segmentStart, segmentEnd, format, request.DateType));
+            }
+
+            await Task.WhenAll(tasks);
+            foreach (var task in tasks)
+            {
+                data.AddRange(task.Result);
+            }
+
+            data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
+       
             return data;
         }
 
@@ -2071,7 +2094,7 @@ namespace BackendSite.Service.BLL.Mpa
             #endregion
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
-            originTransaction = FilterMapWinLossTransction(request, originTransaction);
+            originTransaction = FilterMapWinLossTransaction(request, originTransaction);
             TransactionSetDateToOffSet(request, originTransaction, groupByType);
             
             var mapRate = await GetMapRate(request);
@@ -2100,7 +2123,7 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
-        private static List<TransactionRelayDto> FilterMapWinLossTransction(MpaWinLossRequest request, List<TransactionRelayDto> originTransaction)
+        private static List<TransactionRelayDto> FilterMapWinLossTransaction(MpaWinLossRequest request, List<TransactionRelayDto> originTransaction)
         {
             originTransaction = originTransaction.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
             if (!string.IsNullOrEmpty(request.UserName))
