@@ -6,7 +6,6 @@ using BackendSite.Service.BLL.Mpa.Extension;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.Mpa.WinLoss;
-using System.Diagnostics;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -35,22 +34,18 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByDateDto>> GetMpaWinLossByDateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            // 注單資料
-            var betRecord = await GetTpBetRecordGroupByDateResult(request, groupByType);
-            var originTpBetRecord = betRecord.OriginTpBetRecordResult;
-            var alreadyMultiplyRateTpBetRecord = betRecord.AlreadyMultiplyRateTpBetRecordResult;
-
-            // 存提款 
-            var transaction = await GetTransactionByDateResult(request, groupByType);
-            var originTransaction = transaction.OriginTransactionResult;
-            var alreadyMultiplyRateTpTransaction = transaction.AlreadyMultiplyRateTransactionResult;
-
-            // Bonus
-            var bonus = await GetBonusByDateResult(request, groupByType);
+            // 注單資料 & 存提款 & Bonus
+            var bonusTask = GetBonusByDateResult(request, groupByType);
+            var betRecordTask = GetTpBetRecordGroupByDateResult(request, groupByType);
+            var transactionTask = GetTransactionByDateResult(request, groupByType);
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
 
             // 組合結果
-            var originCombineResult = ByDateCombineResult(request, originTpBetRecord, originTransaction, bonus.OriginBonusResult).ToList();
-            var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, alreadyMultiplyRateTpBetRecord, alreadyMultiplyRateTpTransaction, bonus.AlreadyMultiplyRateBonusResult).ToList();
+            var originCombineResult = ByDateCombineResult(request, betRecord.OriginTpBetRecordResult, transaction.OriginTransactionResult, bonus.OriginBonusResult).ToList();
+            var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, betRecord.AlreadyMultiplyRateTpBetRecordResult, transaction.AlreadyMultiplyRateTransactionResult, bonus.AlreadyMultiplyRateBonusResult).ToList();
 
             var exportData = new List<MpaWinLossByDateDto>();
             exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
@@ -319,11 +314,6 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 item.Date = item.Date.ToOffSetReturnDate(offset);
             }
-
-            //foreach (var item in betRecordResult.AlreadyMultiplyRateBetRecord)
-            //{
-            //    item.Date = item.Date.ToOffSetReturnDate(offset);
-            //}
         }
 
         private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetCurrencyDetailByDate(List<MpaWinLossByDateDto> dateSummary)
@@ -1066,25 +1056,18 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         private async Task<MpaWinLossByPlayerWrapper> GetWinLossByPlayer(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            // 注單資料
-            var betRecord = await GetTpBetRecordGroupByPlayerResult(request, groupByType);
-            var originBetRecord = betRecord.OriginTpBetRecordResult;
-            var alreadyMultiplyBetRecord = betRecord.AlreadyMultiplyRateTpBetRecordResult;
-
-            // 存提款 
-            var transaction = await GetTransactionByPlayerResult(request, groupByType);
-            var originTransaction = transaction.OriginTransactionResult;
-            var alreadyMultiplyTransaction = transaction.AlreadyMultiplyRateTransactionResult;
-
-            // bonus
-            var bonus = await GetBonusByPlayerResult(request, groupByType);
-            var originBonus = bonus.OriginBonusResult;
-            var alreadyMultiplyBonus = bonus.AlreadyMultiplyRateBonusResult;
+            // 注單資料 & 存提款 & bonus
+            var betRecordTask = GetTpBetRecordGroupByPlayerResult(request, groupByType);
+            var transactionTask = GetTransactionByPlayerResult(request, groupByType);
+            var bonusTask = GetBonusByPlayerResult(request, groupByType);
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord =  betRecordTask.Result;
+            var transaction =  transactionTask.Result;
+            var bonus =  bonusTask.Result;
 
             // 注單 + 存提款 + bonus 資料合併
-            var originCombineData = originBetRecord.Concat(originTransaction).Concat(originBonus).ToList();
-            var alreadyMultiplyCombineData = alreadyMultiplyBetRecord.Concat(alreadyMultiplyTransaction)
-                .Concat(alreadyMultiplyBonus).ToList();
+            var originCombineData = betRecord.OriginTpBetRecordResult.Concat(transaction.OriginTransactionResult).Concat(bonus.OriginBonusResult).ToList();
+            var alreadyMultiplyCombineData = betRecord.AlreadyMultiplyRateTpBetRecordResult.Concat(transaction.AlreadyMultiplyRateTransactionResult).Concat(bonus.AlreadyMultiplyRateBonusResult).ToList();
 
             var originData = GetGroupResult(originCombineData);
             var alreadyMultiplyRateData = GetGroupResult(alreadyMultiplyCombineData);
@@ -1332,20 +1315,24 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<IEnumerable<MpaWinLossByCurrencyDto>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料
-            var betRecord = await GetTpBetRecordGroupByCurrencyResult(request, groupByType);
+            var betRecordTask = GetTpBetRecordGroupByCurrencyResult(request, groupByType);
+            var transactionTask = GetTransactionByCurrencyResult(request, groupByType);
+            var bonusTask = GetBonusByCurrencyResult(request, groupByType);
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
+
             var originBetRecord = betRecord.OriginBetRecord;
             var alreadyMultiplyRateBetRecord = betRecord.AlreadyMultiplyRateBetRecord;
 
             // 存提款 
-            var transaction = await GetTransactionByCurrencyResult(request, groupByType);
             var originTransaction = transaction.OriginTransaction;
             var alreadyMultiplyRateTransaction = transaction.AlreadyMultiplyRateTransaction;
 
             // bonus
-            var bonus = await GetBonusByCurrencyResult(request, groupByType);
             var originBonus = bonus.OriginBonus;
             var alreadyMultiplyRateBonus = bonus.AlreadyMultiplyRateBonus;
-
 
             // 注單 + 存提款資料合併
             var originCombineData = request.OrderBy
