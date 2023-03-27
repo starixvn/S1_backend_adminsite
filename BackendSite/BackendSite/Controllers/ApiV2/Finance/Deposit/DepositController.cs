@@ -718,7 +718,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     apiResult.Message = "depositId already checked";
                 }
 
-                if (depositInfo.DepositType == DepositTypeEnum.LocalBanking &&
+                if ((depositInfo.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet) &&
                     depositInfo.Status == DepositStatusEnum.Pending || 
                     depositInfo.Status == DepositStatusEnum.OnHold)
                 {
