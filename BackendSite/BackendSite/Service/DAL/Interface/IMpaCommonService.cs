@@ -9,8 +9,9 @@ namespace BackendSite.Service.DAL.Interface
         /// </summary>
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
+        /// <param name="baseCurrencyId"></param>
         /// <returns></returns>
-        Task<IEnumerable<MpaRateDto>> GetMpaExchangeRate(DateTimeOffset starTime, DateTimeOffset endTime);
+        Task<IEnumerable<MpaRateDto>> GetMpaExchangeRate(DateTimeOffset starTime, DateTimeOffset endTime, int baseCurrencyId = 0);
 
 
         /// <summary>
