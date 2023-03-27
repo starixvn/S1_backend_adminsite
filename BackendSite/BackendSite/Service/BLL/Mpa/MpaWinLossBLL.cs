@@ -1470,21 +1470,23 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByCurrencyResponseFrontEnd>> GetMapWinLossByCurrencyResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            // 注單資料
-            var betRecord = await GetTpBetRecordGroupByCurrencyResult(request, groupByType);
+            // 注單資料 & 存提款 & bonus
+            var betRecordTask = GetTpBetRecordGroupByCurrencyResult(request, groupByType);
+            var transactionTask =  GetTransactionByCurrencyResult(request, groupByType);
+            var bonusTask = GetBonusByCurrencyResult(request, groupByType);
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
+
             var originBetRecord = betRecord.OriginBetRecord;
             var alreadyMultiplyRateBetRecord = betRecord.AlreadyMultiplyRateBetRecord;
 
-            // 存提款 
-            var transaction = await GetTransactionByCurrencyResult(request, groupByType);
             var originTransaction = transaction.OriginTransaction;
             var alreadyMultiplyRateTransaction = transaction.AlreadyMultiplyRateTransaction;
 
-            // bonus
-            var bonus = await GetBonusByCurrencyResult(request, groupByType);
             var originBonus = bonus.OriginBonus;
             var alreadyMultiplyRateBonus = bonus.AlreadyMultiplyRateBonus;
-
 
             // 注單 + 存提款資料合併
             var originCombineData = request.OrderBy
