@@ -1,5 +1,4 @@
-﻿using System.Text;
-using BackendSite.Service.BLL.Interface;
+﻿using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -324,6 +323,11 @@ namespace BackendSite.Service.BLL
         public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
+        }
+        
+        public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+        {
+            return await _memberService.GetCustomerAssociateBankUserAsync(custId);
         }
 
         public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)

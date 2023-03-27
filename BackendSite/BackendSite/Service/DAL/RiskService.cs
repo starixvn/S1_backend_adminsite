@@ -4,7 +4,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -46,8 +45,8 @@ namespace BackendSite.Service.DAL
 
         public async Task<bool> UpdateStatus(ParamsWithLog<DisableDisableUser> input)
         {
-            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             
             var p = new DynamicParameters();
@@ -75,12 +74,12 @@ namespace BackendSite.Service.DAL
 
                 if (logSuccess)
                 {
-                    trans.Commit();
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                     return true;
                 }
             }
 
-            trans.Rollback();
+            await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
 
             return false;
         }
@@ -113,8 +112,8 @@ namespace BackendSite.Service.DAL
 
         public async Task<bool> DeleteTpDisableUser(ParamsWithLog<DeleteDisableUser> input)
         {
-            await using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             
             var p = new DynamicParameters();
@@ -140,12 +139,12 @@ namespace BackendSite.Service.DAL
 
                 if (logSuccess)
                 {
-                    trans.Commit();
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                     return true;
                 }
             }
 
-            trans.Rollback();
+            await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
 
             return false;
         }

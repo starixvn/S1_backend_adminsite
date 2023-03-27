@@ -166,6 +166,18 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum WithdrawalLimitLogCreateFromEnum 
+    {
+        Default = 0,
+        Deposit = 1,
+        LimitAdjustment = 2,
+        BalanceAdjustment = 3,
+        Bonus = 4 ,
+        ReferralReward = 5,
+        VerificationReward = 6,
+        DrawPrize = 7
+    }
+    
     #endregion
 
     #region CustProfile
@@ -239,6 +251,9 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        CheckDepositReceipt = 95,
+        DeleteReceipt = 96,
+        UploadReceipt = 97,
         Adjustment = 98,
         Error = 99 //No Use
     }
@@ -269,7 +284,19 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
+    
+    public enum DepositDateTypeEnum
+    {
+        CreateTime = 1,
+        StatementTime = 2
+    }
 
+    public enum DepositReceiptCreateFromEnum
+    {
+        User = 1 , 
+        BackendUser = 2
+    }
+    
     #endregion
 
     #region PayList
@@ -389,6 +416,12 @@ namespace BackendSite.Service.Model.enums
         Verified = 69,
         Process = 70,
         ToKyc = 71
+    }
+    
+    public enum WithdrawalDateTypeEnum
+    {
+        CreateTime = 1,
+        FlowEndTime = 2
     }
 
     #endregion
@@ -776,7 +809,9 @@ namespace BackendSite.Service.Model.enums
         SetWithdrawalMessage = 80,
         SetCustInfoNote = 81,
         DeleteSMSInfo = 82,
-        CancelBonusInCustInfo = 83
+        CancelBonusInCustInfo = 83,
+        SetBlockCryptoWallet = 84,
+        ReleaseCryptoWallet = 85,
     }
 
     #region BankFinancialTransferInfoLog
@@ -1407,7 +1442,10 @@ namespace BackendSite.Service.Model.enums
     public enum CryptoWalletLogStatusEnum
     {
         Create = 1,
-        Delete = 2
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
     }
 
     public enum EWalletinfoLogStatusEnum
@@ -1537,7 +1575,7 @@ namespace BackendSite.Service.Model.enums
         Closed = 0,
         Open = 1
     }
-    
+
     public enum PaymentReportGroupByEnum
     {
         Date = 1,
@@ -1591,7 +1629,9 @@ namespace BackendSite.Service.Model.enums
         [Description("Wrong Amount submitted")]
         WrongAmountSubmitted = 4,
         [Description("Wrong Bank submitted")]
-        WrongBankSubmitted = 5
+        WrongBankSubmitted = 5,
+        [Description("Inactive Bank Account submission")]
+        InactiveBankAccountSubmission = 6
     }
 
     public enum WithdrawalMessageStatus
@@ -1644,7 +1684,7 @@ namespace BackendSite.Service.Model.enums
         SettledDate = 1,
         CreatedDate = 2
     }
-    
+
     public enum CustTagEnum
     {
         Duplicate = 6
@@ -1655,5 +1695,44 @@ namespace BackendSite.Service.Model.enums
         Pending = 0,
         Finished = 1,
         Failed = 2
+    }
+
+    public enum BlockCryptoWalletStatus
+    {
+        Lock = 1,
+        UnLock = 2,
+    }
+
+    public enum CustUSDTInfoLogStatus
+    {
+        Create = 1,
+        Delete = 2,
+        Lock = 3,
+        Unlock = 4,
+        Release = 5
+    }
+
+    public enum BlockCryptoStatus
+    {
+        SelectAll = 0,
+        Block = 1,
+        Unlock = 2
+    }
+    public enum CustCryptoWalletDetailSatatus
+    {
+        Delete = 0,
+        Open = 1,
+        BoDelete = 2
+    }
+    public enum ExchangeTypeEnum
+    {
+        /// <summary>
+        /// 我方賣出(玩家提款)
+        /// </summary>
+        Sell = 0,
+        /// <summary>
+        /// 我方買入(玩家存款)
+        /// </summary>
+        Buy = 1
     }
 }

@@ -1,8 +1,6 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
 using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Extensions;
@@ -11,7 +9,6 @@ namespace BackendSite.Service.DAL
 {
     public class RebateManageService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly WinLostReportService _winLostReportService;
@@ -19,24 +16,14 @@ namespace BackendSite.Service.DAL
 
         public RebateManageService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _winLostReportService = provider.GetRequiredService<WinLostReportService>();
             _custInfoService = provider.GetRequiredService<CustInfoService>();
         }
-        //public IEnumerable<VipLevel> GetVipLevel(int siteId)
-        //{
-        //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-        //    return conn.Query<VipLevel>("Admin_VipLevel_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
-        //}
-        private void SetRebateSettingHistory(AdjustmentInfoLogParam adjustmentInfoLogParam)
-        {
-            _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", new DynamicParameters(adjustmentInfoLogParam));
-        }
 
         private async Task<bool> AddNewOprateLog(int siteId, int currencyId, object beofreData, object afterData,
-            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlConnection conn, MySqlTransaction trans)
+            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlTransaction trans)
         {
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", siteId);
@@ -48,7 +35,7 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", afterData.ToLog());
             logParam.Add("_Operator", updater);
 
-            var logSuccess = await conn.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+            var logSuccess = await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
             if (logSuccess)
             {
@@ -72,53 +59,38 @@ namespace BackendSite.Service.DAL
         {
             var result = true;
 
-            using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
-            using var trans = conn.BeginTransaction();
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
             var beforeData = GetRebatePeriod(siteId);
             foreach (var currencyId in currencyList)
             {
-                var asignBeforeData = beforeData.Where(x => x.CurrencyId == currencyId).FirstOrDefault() ?? null;
+                var asignBeforeData = beforeData.FirstOrDefault(x => x.CurrencyId == currencyId);
                 var afterData = new { SiteId = siteId, CurrencyId = currencyId, PeriodType = periodType, PeriodDay = periodDay, RedeemHours = redeemHours };
                 if ((asignBeforeData?.PeriodType == periodType) && (asignBeforeData?.PeriodDay == periodDay) && (asignBeforeData?.RedeemHours == redeemHours)) continue;
 
                 var parameters = new { SiteId = siteId, CurrencyId = currencyId, PeriodType = periodType, PeriodDay = periodDay, RedeemHours = redeemHours, LastUpdateUser = lastUpdateUser };
 
-                if (conn.Execute("Admin_RebatePeriod_Set_V2", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
+                if (_mainDbClient.Execute("Admin_RebatePeriod_Set_V2", trans, new DynamicParameters(parameters)) == 0)
                     result = false;
 
                 if (!await AddNewOprateLog(siteId, currencyId, asignBeforeData, afterData, AdminAdjustmentLogMenuEnum.VipRebatePeriod,
-                    (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, conn, trans))
+                    (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, trans))
                     result = false;
             }
 
             if (result)
             {
-                trans.Commit();
-                conn.Close();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             else
             {
-                trans.Rollback();
-                conn.Close();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
         }
-        public bool DelRebatePeriod(int siteId, string lastUpdateUser)
-        {
-            var parameters = new { SiteId = siteId };
-            var logParam = new AdjustmentInfoLogParam
-            {
-                Menu = "DelRebatePeriod",
-                ActionType = 2,
-                DetailInfo = JsonConvert.SerializeObject(parameters),
-                Operator = lastUpdateUser
-            };
-            SetRebateSettingHistory(logParam);
-            return _mainDbClient.Execute("Admin_RebatePeriod_Del", new DynamicParameters(parameters)) > 0;
 
-        }
         public IEnumerable<RebateLevelData> GetRebateDataByCategory(int siteId, int categoryId, int currencyId)
         {
             return _reportDbClient.Query<RebateLevelData>("Admin_RebateCategory_Get", new DynamicParameters(new { SiteId = siteId, CategoryId = categoryId, CurrencyId = currencyId }));
@@ -140,9 +112,9 @@ namespace BackendSite.Service.DAL
         {
             var result = true;
 
-            using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
-            using var trans = conn.BeginTransaction();
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
             var categoryData = GetTPCategoryList().FirstOrDefault(x => x.CategoryId == categoryId) ?? null;
             var asignBeforeData = GetRebatePayoutLimit(siteId, currencyId, categoryId).FirstOrDefault() ?? null;
 
@@ -151,22 +123,20 @@ namespace BackendSite.Service.DAL
             if ((asignBeforeData?.MaxPayout == maxPayout) && (asignBeforeData?.MinPayout == minPayout)) return true;
 
             var parameters = new { SiteId = siteId, CurrencyId = currencyId, CategoryId = categoryId, MaxPayout = maxPayout, MinPayout = minPayout, LastUpdateUser = lastUpdateUser };
-            if (conn.Execute("Admin_RebatePayoutLimit_Set", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
+            if (_mainDbClient.Execute("Admin_RebatePayoutLimit_Set", trans, new DynamicParameters(parameters)) == 0)
                 result = false;
 
             if (!await AddNewOprateLog(siteId, currencyId, beforeData, afterData, AdminAdjustmentLogMenuEnum.VipRebatePayoutLimit,
-                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, conn, trans))
+                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, trans))
                 result = false;
             if (result)
             {
-                trans.Commit();
-                conn.Close();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             else
             {
-                trans.Rollback();
-                conn.Close();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
         }
@@ -182,33 +152,31 @@ namespace BackendSite.Service.DAL
             var afterData = new { CategoryId = categoryId, CategoryName = categoryData?.CategoryName, LevelName = vipLevelData?.LevelName, Percentage = percentage };
             if (asignBeforeData?.Percentage == percentage) return true;
 
-            using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
-            using var trans = conn.BeginTransaction();
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
 
             var parameters = new { SiteId = siteId, CurrencyId = currencyId, CategoryId = categoryId, Level = level, Percentage = percentage, LastUpdateUser = lastUpdateUser };
-            if (conn.Execute("Admin_RebateCategory_Set", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
+            if (_mainDbClient.Execute("Admin_RebateCategory_Set", trans, new DynamicParameters(parameters)) == 0)
                 result = false;
 
             if (!await AddNewOprateLog(siteId, currencyId, beforeData, afterData, AdminAdjustmentLogMenuEnum.VipRebateCategory,
-                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, conn, trans))
+                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, trans))
                 result = false;
 
             if (result)
             {
-                trans.Commit();
-                conn.Close();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             else
             {
-                trans.Rollback();
-                conn.Close();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
         }
 
-        public async Task<bool> SetRebateGameTypeAsync(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser, MySqlConnection conn, MySqlTransaction trans)
+        public async Task<bool> SetRebateGameTypeAsync(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser, MySqlTransaction trans)
         {
             var result = true;
 
@@ -220,11 +188,11 @@ namespace BackendSite.Service.DAL
             var afterData = new { GameType = gameType, GameTypeName = gameTypeData?.TypeName, LevelName = vipLevelData?.LevelName, Percentage = percentage };
             if (asignBeforeData?.Percentage == percentage) return true;
             var parameters = new { SiteId = siteId, CurrencyId = currencyId, GameType = gameType, Level = level, Percentage = percentage, LastUpdateUser = lastUpdateUser };
-            if (conn.Execute("Admin_RebateGameType_Set", new DynamicParameters(parameters), commandType: CommandType.StoredProcedure) == 0)
+            if (_mainDbClient.Execute("Admin_RebateGameType_Set", trans, new DynamicParameters(parameters)) == 0)
                 result = false;
 
             if (!await AddNewOprateLog(siteId, currencyId, beforeData, afterData, AdminAdjustmentLogMenuEnum.VipRebateGameType,
-                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, conn, trans))
+                (asignBeforeData == null ? ActionType.Create : ActionType.Update), lastUpdateUser, trans))
                 result = false;
 
             if (result)

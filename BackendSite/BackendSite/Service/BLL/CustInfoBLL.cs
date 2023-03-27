@@ -6,10 +6,6 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 using System.Transactions;
-using System.Linq;
-using BarcodeReader.ImageSharp;
-using NPOI.SS.Formula.Functions;
-using NuGet.Protocol;
 using OfficeOpenXml;
 using System.Text.RegularExpressions;
 using Amazon.S3.Model;
@@ -444,13 +440,13 @@ namespace BackendSite.Service.BLL
         {
             var custSimpleInfo = await GetCustId(custId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!_custInfoService.AddCustNote(custId, note, @operator, canEdit: canEdit))
             {
                 _logger.LogError($"SetNote: Add Note Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
@@ -458,15 +454,15 @@ namespace BackendSite.Service.BLL
             {
                 var afterData = new { Note = note, CanEdit = false };
                 if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, null, afterData,
-                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, conn, trans))
+                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, trans))
                 {
                     _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
-                    trans.Rollback();
+                    await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                     return false;
                 }
             }
 
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
         public IEnumerable<CustNote> GetCustNotes(int custId,
@@ -486,13 +482,13 @@ namespace BackendSite.Service.BLL
             var noteBeforeInfo = await GetNoteById(noteId);
             var custSimpleInfo = await GetCustId(noteBeforeInfo.First().CustId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!_custInfoService.SetCustNotes(noteId, note, type, Operator))
             {
                 _logger.LogError($"SetNote: Set Note Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
             var actionType = type == (int)SetCustNoteTypeEnum.Delete ? ActionType.Delete : ActionType.Update;
@@ -501,14 +497,14 @@ namespace BackendSite.Service.BLL
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData,
                 actionType == ActionType.Delete ? null : afterData,
-                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, trans))
             {
                 _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}..");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
-
-            trans.Commit();
+            
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
 
@@ -748,33 +744,33 @@ namespace BackendSite.Service.BLL
         {
             var custSimpleInfo = await GetCustId(custId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
-            if (!await _custInfoService.SetEnableRebateAsync(custId, (int)status, conn, trans))
+            if (!await _custInfoService.SetEnableRebateAsync(custId, (int)status, trans))
             {
                 _logger.LogError($"SetEnableRebate: Update EnableRebate Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
-            if (!_custInfoService.AddCustNote(custId, status == EnableRebateEnum.Disable ? "Disable Rebate Payout" : "Enable Rebate Payout", Operator, conn, trans))
+            if (!_custInfoService.AddCustNote(custId, status == EnableRebateEnum.Disable ? "Disable Rebate Payout" : "Enable Rebate Payout", Operator, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert CustNote Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
             var beforeData = new { UserName = custSimpleInfo.UserName, EnableRebate = status == EnableRebateEnum.Disable ? EnableRebateEnum.Enable : EnableRebateEnum.Disable };
             var afterData = new { UserName = custSimpleInfo.UserName, EnableRebate = status };
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData, afterData,
-                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert Operate Log Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
 
@@ -920,11 +916,7 @@ namespace BackendSite.Service.BLL
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
         {
-            var custProfile = GetCustProfile(custId);
-            if (string.IsNullOrWhiteSpace(custProfile.USDTInfo))
-                return Task.FromResult(Enumerable.Empty<USDTDetail>());
-            else
-                return Task.FromResult(JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo));
+            return _custInfoService.GetCustCryptoWalletDetailAsync(custId);
         }
 
         private bool IsWithdrawalInfoTransId(string transId)
@@ -1265,6 +1257,11 @@ namespace BackendSite.Service.BLL
             });
 
             return string.Join(",", temp);
+        }
+
+        public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
+        {
+            return _custInfoService.GetCryptoList(custId);
         }
     }
 }

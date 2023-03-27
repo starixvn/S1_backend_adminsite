@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -49,13 +48,13 @@ namespace BackendSite.Service.DAL
 
         public void AssignSiteList(int UserId, IEnumerable<int> SiteIds)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var para = new DynamicParameters();
             para.Add("UserId", UserId);
             var SpName = "Admin_AuthorSite_Del";
-            _mainDbClient.Execute(SpName, para, conn, tran);
+            _mainDbClient.Execute(SpName, tran, para);
 
             if (SiteIds != null && SiteIds.Any())
             {
@@ -65,16 +64,16 @@ namespace BackendSite.Service.DAL
                     var para2 = new DynamicParameters();
                     para2.Add("UserId", UserId);
                     para2.Add("SiteId", id);
-                    _mainDbClient.Execute(SpName, para2, conn, tran);
+                    _mainDbClient.Execute(SpName, tran, para2);
                 }
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
         }
 
         public void AssignGroup(int UserId, int? GroupSEQ)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var para = new DynamicParameters();
@@ -82,16 +81,16 @@ namespace BackendSite.Service.DAL
             if (GroupSEQ == null)
             {
                 var SpName = "Admin_AuthorGroup_Del";
-                _mainDbClient.Execute(SpName, para, conn, tran);
+                _mainDbClient.Execute(SpName, tran, para);
             }
             else
             {
                 para.Add("GroupSEQ", GroupSEQ);
                 var SpName = "Admin_AuthorGroup_Set";
-                _mainDbClient.Execute(SpName, para, conn, tran);
+                _mainDbClient.Execute(SpName, tran, para);
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
         }
 
         public void SetUserPassword(int UserId, string MD5Pwd)
@@ -113,7 +112,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<AdminUser> AddUser(string UserName, string MD5Pwd, IEnumerable<int> SiteList, int? GroupSEQ)
         {
             IEnumerable<AdminUser> userList = null;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             var UserInfo = new DynamicParameters();
@@ -123,7 +122,7 @@ namespace BackendSite.Service.DAL
             UserInfo.Add("@IsSuper", 0);
             UserInfo.Add("@Status", 1);
 
-            _mainDbClient.Execute("Admin_User_Ins", UserInfo, conn, tran);
+            _mainDbClient.Execute("Admin_User_Ins", tran, UserInfo);
 
             var UserId = UserInfo.Get<int?>("@UserId");
 
@@ -135,7 +134,7 @@ namespace BackendSite.Service.DAL
                     para.Add("UserId", UserId);
                     para.Add("GroupSEQ", GroupSEQ);
                     var SpName = "Admin_AuthorGroup_Set";
-                    _mainDbClient.Execute(SpName, para, conn, tran);
+                    _mainDbClient.Execute(SpName, tran, para);
                 }
 
                 if (SiteList != null)
@@ -145,14 +144,14 @@ namespace BackendSite.Service.DAL
                         var para2 = new DynamicParameters();
                         para2.Add("UserId", UserId);
                         para2.Add("SiteId", SiteId);
-                        _mainDbClient.Execute("Admin_AuthorSite_Ins", para2, conn, tran);
+                        _mainDbClient.Execute("Admin_AuthorSite_Ins", tran, para2);
                     }
                 }
 
                 userList = _reportDbClient.Query<AdminUser>("Admin_User_GetAll");
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return userList;
         }

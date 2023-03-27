@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.Mpa.Marketing;
 
 namespace BackendSite.Service.BLL.Interface

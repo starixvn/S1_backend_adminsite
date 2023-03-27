@@ -1,0 +1,30 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+# AdminSite RLS
+# @url=https://backofficerelease.nova88asia.com/
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得加密貨幣匯率
+POST {{url}}/apiV2/Withdrawal/GetExchangeInfo HTTP/1.1
+Content-Type: application/json
+
+{
+    "cryptoCurrencyName": "USDT",
+    "network": "ERC20",
+    "amount": 1000,
+    "currencyId": 2
+}
