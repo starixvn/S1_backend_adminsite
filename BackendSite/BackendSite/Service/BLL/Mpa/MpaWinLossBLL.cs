@@ -141,7 +141,6 @@ namespace BackendSite.Service.BLL.Mpa
             var transaction = transactionTask.Result;
             var bonus = bonusTask.Result;
 
-
             // 組合結果
             var originCombineResult = ByDateCombineResult(request, betRecord.OriginTpBetRecordResult, transaction.OriginTransactionResult, bonus.OriginBonusResult).ToList();
             var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, betRecord.AlreadyMultiplyRateTpBetRecordResult, transaction.AlreadyMultiplyRateTransactionResult, bonus.AlreadyMultiplyRateBonusResult).ToList();
@@ -208,7 +207,7 @@ namespace BackendSite.Service.BLL.Mpa
                     ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
                     : 0.00m,
             });
-
+            
             return exportData.ToApiFormat();
         }
 
@@ -1720,7 +1719,6 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var transactionResult = await GetMapTransactionByDate(request, groupByType);
-            TransactionSetDateToOffSet(request, transactionResult, groupByType);
             var originTransactionResult = GetGroupResult(transactionResult.OriginTransaction);
             var alreadyMultiplyRateTransactionResult = GetGroupResult(transactionResult.AlreadyMultiplyRateTransaction);
 
@@ -1813,19 +1811,14 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
-        private static void TransactionSetDateToOffSet(MpaWinLossRequest request, TransactionRelayWrapper transaction,
+        private static void TransactionSetDateToOffSet(MpaWinLossRequest request, List<TransactionRelayDto> transaction,
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (transaction == null) return;
             if (groupByType != MpaWinLossGroupByTypeEnum.Date) return;
             var offset = request.StarTime.Offset;
 
-            foreach (var item in transaction.OriginTransaction)
-            {
-                item.Date = item.Date.ToOffSetReturnDate(offset);
-            }
-
-            foreach (var item in transaction.AlreadyMultiplyRateTransaction)
+            foreach (var item in transaction)
             {
                 item.Date = item.Date.ToOffSetReturnDate(offset);
             }
@@ -1892,7 +1885,6 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var bonus = await GetMapWinLossBonusByDate(request, groupByType);
-            BonusSetDateToOffSet(request, bonus, groupByType);
             var originBonusResult = GetGroupResult(bonus.OriginBonus);
             var alreadyMultiplyRateBonusResult = GetGroupResult(bonus.AlreadyMultiplyRateBonus);
 
@@ -1921,19 +1913,14 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
-        private static void BonusSetDateToOffSet(MpaWinLossRequest request, MpaWinLossBonusWrapper bonus,
+        private static void BonusSetDateToOffSet(MpaWinLossRequest request, List<MpaWinLossBonusDto> bonus,
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (bonus == null) return;
             if (groupByType != MpaWinLossGroupByTypeEnum.Date) return;
             var offset = request.StarTime.Offset;
 
-            foreach (var item in bonus.OriginBonus)
-            {
-                item.Date = item.Date.ToOffSetReturnDate(offset);
-            }
-
-            foreach (var item in bonus.AlreadyMultiplyRateBonus)
+            foreach (var item in bonus)
             {
                 item.Date = item.Date.ToOffSetReturnDate(offset);
             }
@@ -2076,30 +2063,31 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<TransactionRelayWrapper> GetMapTransactionByDate(MpaWinLossRequest request,
             MpaWinLossGroupByTypeEnum groupByType)
         {
-            var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
-            var redisKey = $"MapTransaction:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
-            IEnumerable<TransactionRelayDto> originTransaction;
+            #region cache code
+
+            //var redisKey = $"MapTransaction:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
+            //List<TransactionRelayDto> originTransaction;
 
             //if (await _redisHelper.KeyExistsAsync(redisKey))
-            if (false)
-            {
-                originTransaction = await _redisHelper.GetListByRangeAsync<TransactionRelayDto>(redisKey, 0, -1);
-            }
-            else
-            {
-                originTransaction = await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format);
-                //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originTransaction);
-            }
+            //if (false)
+            //{
+            //    //originTransaction = await _redisHelper.GetListByRangeAsync<TransactionRelayDto>(redisKey, 0, -1);
+            //}
+            //else
+            //{
+            //    //originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
+            //    //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originTransaction);
+            //}
 
-            originTransaction = originTransaction.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
-            if (!string.IsNullOrEmpty(request.UserName))
-            {
-                originTransaction = originTransaction.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName).ToList();
-            }
-
-            var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
+            #endregion
+            var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
+            var originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
+            originTransaction = FilterMapWinLossTransction(request, originTransaction);
+            TransactionSetDateToOffSet(request, originTransaction, groupByType);
+            
+            var mapRate = await GetMapRate(request);
             var alreadyMultiplyRateTransaction = (from item in originTransaction
-                                                  let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+                                                  let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                                   select new TransactionRelayDto()
                                                   {
                                                       Date = item.Date,
@@ -2119,37 +2107,50 @@ namespace BackendSite.Service.BLL.Mpa
                 OriginTransaction = originTransaction.ToList(),
                 AlreadyMultiplyRateTransaction = alreadyMultiplyRateTransaction
             };
-
+            
             return wrapperResult;
+        }
+
+        private static List<TransactionRelayDto> FilterMapWinLossTransction(MpaWinLossRequest request, List<TransactionRelayDto> originTransaction)
+        {
+            originTransaction = originTransaction.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                originTransaction = originTransaction
+                    .Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName).ToList();
+            }
+
+            return originTransaction;
         }
 
         private async Task<MpaWinLossBonusWrapper> GetMapWinLossBonusByDate(MpaWinLossRequest request,
             MpaWinLossGroupByTypeEnum groupByType)
         {
-            var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
-            var redisKey = $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
-            var originBonus = Enumerable.Empty<MpaWinLossBonusDto>();
+            #region cache code
+
+            //var redisKey = $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
+            //var originBonus = new List<MpaWinLossBonusDto>();
 
             //if (await _redisHelper.KeyExistsAsync(redisKey))
-            if (false)
-            {
-                originBonus = await _redisHelper.GetListByRangeAsync<MpaWinLossBonusDto>(redisKey, 0, -1);
-            }
-            else
-            {
-                originBonus = (await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
-                //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originBonus);
-            }
+            //if (false)
+            //{
+            //    //originBonus = await _redisHelper.GetListByRangeAsync<MpaWinLossBonusDto>(redisKey, 0, -1);
+            //}
+            //else
+            //{
+            //    //originBonus = (await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
+            //    //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originBonus);
+            //}
 
-            originBonus = originBonus.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
-            if (!string.IsNullOrEmpty(request.UserName))
-            {
-                originBonus = originBonus.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName).ToList();
-            }
-
-            var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
+            #endregion
+            var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
+            var originBonus = (await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
+            originBonus = FilterMpaWinLossBonus(request, originBonus);
+            BonusSetDateToOffSet(request, originBonus, groupByType);
+            
+            var mapRate = await GetMapRate(request);
             var alreadyMultiplyRateBonus = (from item in originBonus
-                                            let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+                                            let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                             select new MpaWinLossBonusDto()
                                             {
                                                 Date = item.Date,
@@ -2165,8 +2166,20 @@ namespace BackendSite.Service.BLL.Mpa
                 OriginBonus = originBonus.ToList(),
                 AlreadyMultiplyRateBonus = alreadyMultiplyRateBonus
             };
-
+            
             return wrapperResult;
+        }
+
+        private static List<MpaWinLossBonusDto> FilterMpaWinLossBonus(MpaWinLossRequest request, List<MpaWinLossBonusDto> originBonus)
+        {
+            originBonus = originBonus.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                originBonus = originBonus.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName)
+                    .ToList();
+            }
+
+            return originBonus;
         }
 
         private void AddCache(IEnumerable<MpaWinLossByPlayerResponse> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
@@ -2202,8 +2215,6 @@ namespace BackendSite.Service.BLL.Mpa
             var wrapperResult = new MpaTpBetRecordWrapper();
 
             // 注單過濾
-            var sw = new Stopwatch();
-            sw.Start();
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var data = await GetMapTpBetRecordByDate(request, groupByType);
             var tpBetRecordRelayResult = data.Filter(request)
@@ -2213,31 +2224,9 @@ namespace BackendSite.Service.BLL.Mpa
                 .ToList();
             BetRecordSetDateToOffSet(request, tpBetRecordRelayResult, groupByType);
 
-            sw.Stop();
-
-            _logger.LogInformation($"GetTpBetRecord GetData And filter data ms:{sw.Elapsed.TotalMilliseconds}");
-
-            sw.Restart();
-
-            var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
-            var groupByRateDate = tpBetRecordRelayResult.GroupBy(x => new { x.Date, x.CurrencyId, request.BaseCurrencyId });
-            var dictRate = new Dictionary<string, decimal>();
-
-            foreach (var dateItem in groupByRateDate)
-            {
-                var currencyId = dateItem.Key.CurrencyId;
-                var baseCurrencyId = request.BaseCurrencyId;
-                var dateKey = dateItem.Key.Date.ToString("yyyy-MM-dd");
-                var rate = _mpaCommonService.MapperExchangeRate(mapRate, dateItem.Key.Date, dateItem.Key.CurrencyId, request.BaseCurrencyId);
-                dictRate.Add($"{dateKey}{currencyId}{baseCurrencyId}", rate);
-            }
-
-            sw.Stop();
-            _logger.LogInformation($"Get mapRate data ms:{sw.Elapsed.TotalMilliseconds}");
-
-            sw.Restart();
+            var mapRate = await GetMapRate(request);
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult
-                                                          let rate = dictRate[$"{item.Date.ToString("yyyy-MM-dd")}{item.CurrencyId}{request.BaseCurrencyId}"] // = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+                                                          let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                                           select new MpaTpBetRecordDto()
                                                           {
                                                               Date = item.Date,
@@ -2263,14 +2252,15 @@ namespace BackendSite.Service.BLL.Mpa
                                                               RowCount = item.RowCount,
                                                           }).ToList();
 
-
-
-
             wrapperResult.OriginBetRecord = tpBetRecordRelayResult;
-            sw.Stop();
-            _logger.LogInformation($"AlreadyMultiplyRateBetRecord ms:{sw.Elapsed.TotalMilliseconds}");
-
             return wrapperResult;
+        }
+
+        private async Task<Dictionary<string, decimal>> GetMapRate(MpaWinLossRequest request)
+        {
+            return (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime, request.BaseCurrencyId))
+                .Where(x => x.TargetCurrencyId == request.BaseCurrencyId)
+                .ToDictionary(k => $"{k.RateDate.ToString("yyyy-MM-dd")}{k.CurrencyId}{k.TargetCurrencyId}", v => v.Rate);
         }
 
         #endregion
