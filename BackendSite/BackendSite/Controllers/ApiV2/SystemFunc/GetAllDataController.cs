@@ -292,29 +292,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
         }
 
-        /// GetAllData/GetTransferAccountList 取得轉帳戶口清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult GetTransferAccountList()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
-
-            apiResult.Data = _bankFinancialBll.GetTransferAccountList();
-            foreach (var data in apiResult.Data.ToArray())
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return apiResult;
-        }
-
         //==============================================================================================================================================
         // TP 相關
         //==============================================================================================================================================
