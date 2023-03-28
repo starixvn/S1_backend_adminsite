@@ -2075,17 +2075,16 @@ namespace BackendSite.Service.BLL.Mpa
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var startDate = request.StarTime;
             var endDate = request.EndTime;
-            var interval = TimeSpan.FromDays(30);
+            var interval = TimeSpan.FromDays(16);
             var segmentCount = (int)Math.Ceiling((endDate - startDate).TotalDays / interval.TotalDays);
             var data = new List<MpaTpBetRecordDto>();
             var tasks = new List<Task<IEnumerable<MpaTpBetRecordDto>>>();
             for (var i = 0; i < segmentCount; i++)
             {
                 var segmentStart = startDate.AddDays(i * interval.TotalDays);
-                var segmentEnd = segmentStart.AddDays(interval.TotalDays - 1);
+                var segmentEnd = segmentStart.AddDays(interval.TotalDays);
                 if (segmentEnd > endDate) segmentEnd = endDate;
-
-                tasks.Add(Task.Run(() => _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, segmentStart, segmentEnd, format, request.DateType)));
+                tasks.Add(Task.Run(() => _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, segmentStart, segmentEnd.AddSeconds(-1), format, request.DateType)));
             }
 
             await Task.WhenAll(tasks);
