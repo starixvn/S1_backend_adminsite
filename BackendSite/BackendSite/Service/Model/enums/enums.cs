@@ -1449,11 +1449,10 @@ namespace BackendSite.Service.Model.enums
     }
     public enum WithdrawalMethodEnum
     {
-        Lock = 1,
-        UnLock = 2,
         All = 0,
         EWallet = 1,
-        BankCard = 2
+        BankCard = 2,
+        Crypto = 3
     }
 
     public enum CustBankInfoLogStatus
