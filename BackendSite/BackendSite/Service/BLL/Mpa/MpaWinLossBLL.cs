@@ -36,9 +36,9 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<IEnumerable<MpaWinLossByDateDto>> GetMpaWinLossByDateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料 & 存提款 & Bonus
-            var bonusTask = GetBonusByDateResult(request, groupByType);
-            var betRecordTask = GetTpBetRecordGroupByDateResult(request, groupByType);
-            var transactionTask = GetTransactionByDateResult(request, groupByType);
+            var bonusTask = Task.Run(() => GetBonusByDateResult(request, groupByType));
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByDateResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByDateResult(request, groupByType));
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
             var betRecord = betRecordTask.Result;
             var transaction = transactionTask.Result;
@@ -1076,9 +1076,9 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<MpaWinLossByPlayerWrapper> GetWinLossByPlayer(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料 & 存提款 & bonus
-            var betRecordTask = GetTpBetRecordGroupByPlayerResult(request, groupByType);
-            var transactionTask = GetTransactionByPlayerResult(request, groupByType);
-            var bonusTask = GetBonusByPlayerResult(request, groupByType);
+            var betRecordTask = Task.Run(()=> GetTpBetRecordGroupByPlayerResult(request, groupByType));
+            var transactionTask = Task.Run(()=> GetTransactionByPlayerResult(request, groupByType));
+            var bonusTask = Task.Run(()=> GetBonusByPlayerResult(request, groupByType));
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
             var betRecord = betRecordTask.Result;
             var transaction = transactionTask.Result;
@@ -1334,9 +1334,9 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<IEnumerable<MpaWinLossByCurrencyDto>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料
-            var betRecordTask = GetTpBetRecordGroupByCurrencyResult(request, groupByType);
-            var transactionTask = GetTransactionByCurrencyResult(request, groupByType);
-            var bonusTask = GetBonusByCurrencyResult(request, groupByType);
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByCurrencyResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByCurrencyResult(request, groupByType));
+            var bonusTask = Task.Run(() => GetBonusByCurrencyResult(request, groupByType));
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
             var betRecord = betRecordTask.Result;
             var transaction = transactionTask.Result;
@@ -1490,9 +1490,9 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<IEnumerable<MpaWinLossByCurrencyResponseFrontEnd>> GetMapWinLossByCurrencyResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料 & 存提款 & bonus
-            var betRecordTask = GetTpBetRecordGroupByCurrencyResult(request, groupByType);
-            var transactionTask = GetTransactionByCurrencyResult(request, groupByType);
-            var bonusTask = GetBonusByCurrencyResult(request, groupByType);
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByCurrencyResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByCurrencyResult(request, groupByType));
+            var bonusTask = Task.Run(() => GetBonusByCurrencyResult(request, groupByType));
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
             var betRecord = betRecordTask.Result;
             var transaction = transactionTask.Result;
@@ -2055,9 +2055,7 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<IEnumerable<MpaTpBetRecordDto>> GetMapTpBetRecordByDate(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             #region cache code
-
             //var redisKey = $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
-
             //if (await _redisHelper.KeyExistsAsync(redisKey))
             //{
 
@@ -2069,9 +2067,7 @@ namespace BackendSite.Service.BLL.Mpa
             //    return redisData;
             //    var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
             //}
-
             #endregion
-
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var startDate = request.StarTime;
             var endDate = request.EndTime;
@@ -2118,7 +2114,6 @@ namespace BackendSite.Service.BLL.Mpa
             //}
 
             #endregion
-
             var sw = new Stopwatch();
             sw.Start();
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
