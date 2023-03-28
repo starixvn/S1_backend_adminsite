@@ -11,8 +11,10 @@ namespace BackendSite.Service.Model.Mpa.Marketing
 
         public DateTimeOffset EndDate { get; set; }
 
+        [JsonProperty("ComparedStartDate")]
         public DateTimeOffset CompareFromDate { get; set; }
 
+        [JsonProperty("ComparedEndDate")]
         public DateTimeOffset CompareToDate { get; set; }
 
         public IEnumerable<int> CurrencyIds { get; set; }
