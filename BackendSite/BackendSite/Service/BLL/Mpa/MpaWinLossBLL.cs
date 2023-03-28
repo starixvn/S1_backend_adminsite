@@ -2055,13 +2055,20 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<IEnumerable<MpaTpBetRecordDto>> GetMapTpBetRecordByDate(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             #region cache code
+
             var redisKey = $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
 
-            //if (await _redisHelper.KeyExistsAsync(redisKey))
-            //{
-            //    return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
-            //}
-            //var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
+            if (await _redisHelper.KeyExistsAsync(redisKey))
+            {
+                
+                var sw = new Stopwatch();
+                sw.Start();
+                var redisData = await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
+                sw.Stop();
+                _logger.LogInformation($"MickeyTest UseRedis Get TpBetRecord ms:{sw.Elapsed.TotalMilliseconds}");
+                return redisData;
+            }
+
             #endregion
 
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
@@ -2085,9 +2092,9 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 data.AddRange(task.Result);
             }
-
+            var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
-       
+
             return data;
         }
 
@@ -2195,12 +2202,12 @@ namespace BackendSite.Service.BLL.Mpa
             originBonus = FilterMpaWinLossBonus(request, originBonus);
             BonusSetDateToOffSet(request, originBonus, groupByType);
             sw.Stop();
-            _logger.LogInformation($"MickeyTestGet MapWinLossBonus GetData And filter Data  ms:{sw.Elapsed.TotalMilliseconds}");
+            _logger.LogInformation($"MickeyTest Get MapWinLossBonus GetData And filter Data  ms:{sw.Elapsed.TotalMilliseconds}");
 
             sw.Restart();
             var mapRate = await GetMapRate(request);
             sw.Stop();
-            _logger.LogInformation($"MickeyTestGet WinLossBonus Get mapRate data ms:{sw.Elapsed.TotalMilliseconds}");
+            _logger.LogInformation($"MickeyTest Get WinLossBonus Get mapRate data ms:{sw.Elapsed.TotalMilliseconds}");
 
 
             sw.Restart();
@@ -2216,7 +2223,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                 BonusAmountClaim = item.BonusAmountClaim * rate
                                             }).ToList();
             sw.Stop();
-            _logger.LogInformation($"MickeyTestGet alreadyMultiplyRateBonus ms:{sw.Elapsed.TotalMilliseconds}");
+            _logger.LogInformation($"MickeyTest Get alreadyMultiplyRateBonus ms:{sw.Elapsed.TotalMilliseconds}");
 
             var wrapperResult = new MpaWinLossBonusWrapper()
             {
