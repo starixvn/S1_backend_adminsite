@@ -2056,18 +2056,19 @@ namespace BackendSite.Service.BLL.Mpa
         {
             #region cache code
 
-            var redisKey = $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
+            //var redisKey = $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss.fffzzz}:{request.EndTime:yyyy-MM-dd HH:mm:ss.fffzzz}";
 
-            if (await _redisHelper.KeyExistsAsync(redisKey))
-            {
-                
-                var sw = new Stopwatch();
-                sw.Start();
-                var redisData = await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
-                sw.Stop();
-                _logger.LogInformation($"MickeyTest UseRedis Get TpBetRecord ms:{sw.Elapsed.TotalMilliseconds}");
-                return redisData;
-            }
+            //if (await _redisHelper.KeyExistsAsync(redisKey))
+            //{
+
+            //    var sw = new Stopwatch();
+            //    sw.Start();
+            //    var redisData = await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
+            //    sw.Stop();
+            //    _logger.LogInformation($"MickeyTest UseRedis Get TpBetRecord ms:{sw.Elapsed.TotalMilliseconds}");
+            //    return redisData;
+            //    var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
+            //}
 
             #endregion
 
@@ -2092,7 +2093,7 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 data.AddRange(task.Result);
             }
-            var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
+            
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
 
             return data;
