@@ -43,13 +43,11 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             private DateTimeOffset _comparedStartDate { get; set; }
             private DateTimeOffset _comparedendDate { get; set; }
-            [JsonProperty("CompareFromDate")]
             public DateTimeOffset ComparedStartDate
             {
                 get => _comparedStartDate;
                 set => _comparedStartDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            [JsonProperty("CompareToDate")]
             public DateTimeOffset ComparedEndDate
             {
                 get => _comparedendDate;

@@ -208,13 +208,11 @@ namespace BackendSite.Controllers.ApiV2.Report
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            [JsonProperty("CompareFromDate")]
             public DateTimeOffset ComparedStartDate
             {
                 get => _comparedStartDate;
                 set => _comparedStartDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
-            [JsonProperty("CompareToDate")]
             public DateTimeOffset ComparedEndDate
             {
                 get => _comparedendDate;
