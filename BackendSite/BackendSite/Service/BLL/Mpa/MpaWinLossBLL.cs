@@ -6,6 +6,7 @@ using BackendSite.Service.BLL.Mpa.Extension;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.Mpa.WinLoss;
+using System.Diagnostics;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -128,10 +129,19 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<IEnumerable<MpaWinLossByDateResponseToFrontEnd>> GetMapWinLossByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料 & 存提款 & Bonus
+            var sw = new Stopwatch();
+            sw.Start();
+
             var bonusTask = GetBonusByDateResult(request, groupByType);
             var betRecordTask = GetTpBetRecordGroupByDateResult(request, groupByType);
             var transactionTask = GetTransactionByDateResult(request, groupByType);
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest Task.WhenAll ms:{sw.Elapsed.TotalMilliseconds}");
+
+            sw.Restart();
+
             var betRecord = betRecordTask.Result;
             var transaction = transactionTask.Result;
             var bonus = bonusTask.Result;
@@ -139,6 +149,11 @@ namespace BackendSite.Service.BLL.Mpa
             // 組合結果
             var originCombineResult = ByDateCombineResult(request, betRecord.OriginTpBetRecordResult, transaction.OriginTransactionResult, bonus.OriginBonusResult).ToList();
             var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, betRecord.AlreadyMultiplyRateTpBetRecordResult, transaction.AlreadyMultiplyRateTransactionResult, bonus.AlreadyMultiplyRateBonusResult).ToList();
+
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest CombineResult ms:{sw.Elapsed.TotalMilliseconds}");
+
+            sw.Restart();
 
             var exportData = new Dictionary<string, MpaWinLossByDateResponse>();
             var keys = originCombineResult.Select(x => x.Date).Distinct();
@@ -202,8 +217,12 @@ namespace BackendSite.Service.BLL.Mpa
                     ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
                     : 0.00m,
             });
-            
-            return exportData.ToApiFormat();
+            var rs = exportData.ToApiFormat();
+
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest exportData&ToApiFormat ms:{sw.Elapsed.TotalMilliseconds}");
+
+            return rs;
         }
 
         /// <summary>
@@ -2092,12 +2111,23 @@ namespace BackendSite.Service.BLL.Mpa
             //}
 
             #endregion
+
+            var sw = new Stopwatch();
+            sw.Start();
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
             originTransaction = FilterMapWinLossTransaction(request, originTransaction);
             TransactionSetDateToOffSet(request, originTransaction, groupByType);
-            
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest GetMapTransaction GetData And filter data ms:{sw.Elapsed.TotalMilliseconds}");
+
+
+            sw.Restart();
             var mapRate = await GetMapRate(request);
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest GetMapTransaction Get mapRate data ms:{sw.Elapsed.TotalMilliseconds}");
+
+            sw.Restart();
             var alreadyMultiplyRateTransaction = (from item in originTransaction
                                                   let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                                   select new TransactionRelayDto()
@@ -2113,6 +2143,8 @@ namespace BackendSite.Service.BLL.Mpa
                                                       Amount = item.Amount * rate,
                                                       RowCount = item.RowCount
                                                   }).ToList();
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest alreadyMultiplyRateTransaction ms:{sw.Elapsed.TotalMilliseconds}");
 
             var wrapperResult = new TransactionRelayWrapper()
             {
@@ -2155,12 +2187,23 @@ namespace BackendSite.Service.BLL.Mpa
             //}
 
             #endregion
+
+            var sw = new Stopwatch();
+            sw.Start();
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var originBonus = (await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
             originBonus = FilterMpaWinLossBonus(request, originBonus);
             BonusSetDateToOffSet(request, originBonus, groupByType);
-            
+            sw.Stop();
+            _logger.LogInformation($"MickeyTestGet MapWinLossBonus GetData And filter Data  ms:{sw.Elapsed.TotalMilliseconds}");
+
+            sw.Restart();
             var mapRate = await GetMapRate(request);
+            sw.Stop();
+            _logger.LogInformation($"MickeyTestGet WinLossBonus Get mapRate data ms:{sw.Elapsed.TotalMilliseconds}");
+
+
+            sw.Restart();
             var alreadyMultiplyRateBonus = (from item in originBonus
                                             let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                             select new MpaWinLossBonusDto()
@@ -2172,6 +2215,8 @@ namespace BackendSite.Service.BLL.Mpa
                                                 CurrencyId = item.CurrencyId,
                                                 BonusAmountClaim = item.BonusAmountClaim * rate
                                             }).ToList();
+            sw.Stop();
+            _logger.LogInformation($"MickeyTestGet alreadyMultiplyRateBonus ms:{sw.Elapsed.TotalMilliseconds}");
 
             var wrapperResult = new MpaWinLossBonusWrapper()
             {
@@ -2227,6 +2272,9 @@ namespace BackendSite.Service.BLL.Mpa
             var wrapperResult = new MpaTpBetRecordWrapper();
 
             // 注單過濾
+            var sw = new Stopwatch();
+            sw.Start();
+
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var data = await GetMapTpBetRecordByDate(request, groupByType);
             var tpBetRecordRelayResult = data.Filter(request)
@@ -2235,8 +2283,16 @@ namespace BackendSite.Service.BLL.Mpa
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
             BetRecordSetDateToOffSet(request, tpBetRecordRelayResult, groupByType);
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest GetTpBetRecord GetData And filter data ms:{sw.Elapsed.TotalMilliseconds}");
 
+
+            sw.Restart();
             var mapRate = await GetMapRate(request);
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest TpBetRecord Get mapRate data ms:{sw.Elapsed.TotalMilliseconds}");
+
+            sw.Restart();
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult
                                                           let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                                           select new MpaTpBetRecordDto()
@@ -2263,6 +2319,8 @@ namespace BackendSite.Service.BLL.Mpa
                                                               ClosingBalance = item.ClosingBalance * rate,
                                                               RowCount = item.RowCount,
                                                           }).ToList();
+            sw.Stop();
+            _logger.LogInformation($"MickeyTest AlreadyMultiplyRateBetRecord data ms:{sw.Elapsed.TotalMilliseconds}");
 
             wrapperResult.OriginBetRecord = tpBetRecordRelayResult;
             return wrapperResult;
