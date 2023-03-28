@@ -132,9 +132,9 @@ namespace BackendSite.Service.BLL.Mpa
             var sw = new Stopwatch();
             sw.Start();
 
-            var bonusTask = GetBonusByDateResult(request, groupByType);
-            var betRecordTask = GetTpBetRecordGroupByDateResult(request, groupByType);
-            var transactionTask = GetTransactionByDateResult(request, groupByType);
+            var bonusTask = Task.Run(() => GetBonusByDateResult(request, groupByType));
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByDateResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByDateResult(request, groupByType));
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
 
             sw.Stop();
@@ -1080,9 +1080,9 @@ namespace BackendSite.Service.BLL.Mpa
             var transactionTask = GetTransactionByPlayerResult(request, groupByType);
             var bonusTask = GetBonusByPlayerResult(request, groupByType);
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
-            var betRecord =  betRecordTask.Result;
-            var transaction =  transactionTask.Result;
-            var bonus =  bonusTask.Result;
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
 
             // 注單 + 存提款 + bonus 資料合併
             var originCombineData = betRecord.OriginTpBetRecordResult.Concat(transaction.OriginTransactionResult).Concat(bonus.OriginBonusResult).ToList();
@@ -1491,7 +1491,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             // 注單資料 & 存提款 & bonus
             var betRecordTask = GetTpBetRecordGroupByCurrencyResult(request, groupByType);
-            var transactionTask =  GetTransactionByCurrencyResult(request, groupByType);
+            var transactionTask = GetTransactionByCurrencyResult(request, groupByType);
             var bonusTask = GetBonusByCurrencyResult(request, groupByType);
             await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
             var betRecord = betRecordTask.Result;
@@ -2085,7 +2085,7 @@ namespace BackendSite.Service.BLL.Mpa
                 var segmentEnd = segmentStart.AddDays(interval.TotalDays - 1);
                 if (segmentEnd > endDate) segmentEnd = endDate;
 
-                tasks.Add(_mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, segmentStart, segmentEnd, format, request.DateType));
+                tasks.Add(Task.Run(() => _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, segmentStart, segmentEnd, format, request.DateType)));
             }
 
             await Task.WhenAll(tasks);
@@ -2093,7 +2093,7 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 data.AddRange(task.Result);
             }
-            
+
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
 
             return data;
@@ -2159,7 +2159,7 @@ namespace BackendSite.Service.BLL.Mpa
                 OriginTransaction = originTransaction.ToList(),
                 AlreadyMultiplyRateTransaction = alreadyMultiplyRateTransaction
             };
-            
+
             return wrapperResult;
         }
 
@@ -2231,7 +2231,7 @@ namespace BackendSite.Service.BLL.Mpa
                 OriginBonus = originBonus.ToList(),
                 AlreadyMultiplyRateBonus = alreadyMultiplyRateBonus
             };
-            
+
             return wrapperResult;
         }
 
