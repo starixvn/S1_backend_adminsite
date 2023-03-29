@@ -93,7 +93,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             var title = $"Withdrawal Amount, {request.StartDate.ToString("yyyy-dd-MM")} - {request.EndDate.ToString("yyyy-dd-MM")}, View in {currencyIdMapper[request.BaseCurrencyId]}";
 
             var stream = _marketingWithdrawalAmountBll.ExportMpaWithdrawal(summaryData, detailData,
-                isCompare: request.IsCompare,
+                isCompare: request.IsCompared,
                 summaryTitle: title,
                 detailTitle: title);
 
