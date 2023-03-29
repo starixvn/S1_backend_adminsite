@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model.Mpa.Marketing
+﻿using Newtonsoft.Json;
+
+namespace BackendSite.Service.Model.Mpa.Marketing
 {
     public class DashboardBase
     {
@@ -22,11 +24,14 @@
     {
         private DateTimeOffset _startDateCompared { get; set; }
         private DateTimeOffset _endDateCompared { get; set; }
+         
+        [JsonProperty("ComparedStartDate")]
         public DateTimeOffset StartDateCompared
         {
             get => _startDateCompared;
             set => _startDateCompared = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
+        [JsonProperty("ComparedEndDate")]
         public DateTimeOffset EndDateCompared
         {
             get => _endDateCompared;
@@ -76,38 +81,38 @@
         
         public int DepositUsers { get; set; }
         public int FirstDepositCount { get; set; }
-        public decimal DepositUsersComparedRate { get; set; }
+        public decimal? DepositUsersComparedRate { get; set; }
         
         public decimal DepositAmount { get; set; }
         public decimal FirstDepositAmount { get; set; }
-        public decimal DepositAmountComparedRate { get; set; }
+        public decimal? DepositAmountComparedRate { get; set; }
         
         public int ActiveUsers { get; set; }
-        public decimal ActiveUsersComparedRate { get; set; }
+        public decimal? ActiveUsersComparedRate { get; set; }
         
         public int NRU { get; set; }
-        public decimal NRUComparedRate { get; set; }
+        public decimal? NRUComparedRate { get; set; }
         
         public int ActiveNRU { get; set; }
-        public decimal ActiveNRUComparedRate { get; set; }
+        public decimal? ActiveNRUComparedRate { get; set; }
         
         
         public decimal WithdrawalUsers { get; set; }
         public decimal WithdrawalAmount { get; set; }
-        public decimal WithdrawalAmountComparedRate { get; set; }
+        public decimal? WithdrawalAmountComparedRate { get; set; }
         
         public decimal NetCashAmount { get; set; }
-        public decimal NetCashAmountComparedRate { get; set; }
+        public decimal? NetCashAmountComparedRate { get; set; }
         
         public decimal BonusAmountClaimed { get; set; }
         public int TotalBonusClaimants { get; set; }
-        public decimal BonusAmountClaimedComparedRate { get; set; }
+        public decimal? BonusAmountClaimedComparedRate { get; set; }
         
         public decimal ChurnRate { get; set; }
-        public decimal ChurnComparedRate { get; set; }
+        public decimal? ChurnComparedRate { get; set; }
         
         public decimal RetentionRate { get; set; }
-        public decimal RetentionComparedRate { get; set; }
+        public decimal? RetentionComparedRate { get; set; }
         
         public int NoBetUsers { get; set; }
         public int HasBetUsers { get; set; }
