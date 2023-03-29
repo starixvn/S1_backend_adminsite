@@ -119,6 +119,7 @@ namespace BackendSite.Service.Model
         public string BonusDescription { set; get; }
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
+        public string Network { set; get; }
     }
 
     public class DepositInfoForExport
@@ -214,6 +215,7 @@ namespace BackendSite.Service.Model
         public string AffiliateCode { get; set; }
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
+        public string Network { set; get; }
     }
 
     public class DepositDetailSubmission
