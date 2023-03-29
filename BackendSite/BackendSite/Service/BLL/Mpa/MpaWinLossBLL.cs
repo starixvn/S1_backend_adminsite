@@ -947,12 +947,11 @@ namespace BackendSite.Service.BLL.Mpa
             var key = request.GetWinLossByPlayerRedisKey();
             var masterKey = $"MpaWinLossByPlayer:{key}";
             var cacheTime = TimeSpan.FromMinutes(15);
-            var apiData = new List<MpaWinLossByPlayerResponse>();
+            var apiData = new List<MpaWinLossByPlayerResponse>(); 
+            apiData.Clear();
             var rowCount = 0;
             var excludeUserName = new List<string>();
             MpaWinLossByPlayerResponse totalItem;
-
-            apiData.Clear();
 
             if (await _redisHelper.KeyExistsAsync(masterKey))
             {
@@ -960,6 +959,7 @@ namespace BackendSite.Service.BLL.Mpa
                 apiData.AddRange(data);
                 rowCount = apiData.Count;
                 apiData = request.OrderBy ? apiData.OrderBy(request).ToList() : apiData;
+                excludeUserName.AddRange(apiData.Where(x => x.BetCount == 0).Select(x => x.UserName).ToList());
                 totalItem = GetMpaWinLossByPlayerTotal(apiData.ToDictionary(k => k.UserName, v => v), excludeUserName);
                 if (request.PageNumber != -1)
                 {
