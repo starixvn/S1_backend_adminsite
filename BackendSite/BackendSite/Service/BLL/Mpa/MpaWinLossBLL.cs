@@ -321,7 +321,7 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
-        private static void BetRecordSetDateToOffSet(MpaWinLossRequest request, List<MpaTpBetRecordDto> betRecordResult,
+        private static void BetRecordSetDateToOffSet(MpaWinLossRequest request, MpaTpBetRecordWrapper betRecordResult,
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (betRecordResult == null) return;
@@ -329,11 +329,19 @@ namespace BackendSite.Service.BLL.Mpa
 
             var offset = request.StarTime.Offset;
 
-            foreach (var item in betRecordResult)
+            foreach (var item in betRecordResult.OriginBetRecord)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
+
+            foreach (var item in betRecordResult.AlreadyMultiplyRateBetRecord)
             {
                 item.Date = item.Date.ToOffSetReturnDate(offset);
             }
         }
+
+
+
 
         private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetCurrencyDetailByDate(List<MpaWinLossByDateDto> dateSummary)
         {
@@ -1814,14 +1822,19 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
-        private static void TransactionSetDateToOffSet(MpaWinLossRequest request, List<TransactionRelayDto> transaction,
+        private static void TransactionSetDateToOffSet(MpaWinLossRequest request, TransactionRelayWrapper transaction,
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (transaction == null) return;
             if (groupByType != MpaWinLossGroupByTypeEnum.Date && groupByType != MpaWinLossGroupByTypeEnum.Month) return;
             var offset = request.StarTime.Offset;
 
-            foreach (var item in transaction)
+            foreach (var item in transaction.OriginTransaction)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
+
+            foreach (var item in transaction.AlreadyMultiplyRateTransaction)
             {
                 item.Date = item.Date.ToOffSetReturnDate(offset);
             }
@@ -1916,14 +1929,19 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
-        private static void BonusSetDateToOffSet(MpaWinLossRequest request, List<MpaWinLossBonusDto> bonus,
+        private static void BonusSetDateToOffSet(MpaWinLossRequest request, MpaWinLossBonusWrapper bonus,
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (bonus == null) return;
             if (groupByType != MpaWinLossGroupByTypeEnum.Date && groupByType != MpaWinLossGroupByTypeEnum.Month) return;
             var offset = request.StarTime.Offset;
 
-            foreach (var item in bonus)
+            foreach (var item in bonus.OriginBonus)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
+
+            foreach (var item in bonus.AlreadyMultiplyRateBonus)
             {
                 item.Date = item.Date.ToOffSetReturnDate(offset);
             }
@@ -2114,7 +2132,6 @@ namespace BackendSite.Service.BLL.Mpa
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
             originTransaction = FilterMapWinLossTransaction(request, originTransaction);
-            TransactionSetDateToOffSet(request, originTransaction, groupByType);
             sw.Stop();
             _logger.LogInformation($"MickeyTest GetMapTransaction GetData And filter data ms:{sw.Elapsed.TotalMilliseconds}");
 
@@ -2148,6 +2165,7 @@ namespace BackendSite.Service.BLL.Mpa
                 OriginTransaction = originTransaction.ToList(),
                 AlreadyMultiplyRateTransaction = alreadyMultiplyRateTransaction
             };
+            TransactionSetDateToOffSet(request, wrapperResult, groupByType);
 
             return wrapperResult;
         }
@@ -2190,7 +2208,6 @@ namespace BackendSite.Service.BLL.Mpa
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var originBonus = (await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
             originBonus = FilterMpaWinLossBonus(request, originBonus);
-            BonusSetDateToOffSet(request, originBonus, groupByType);
             sw.Stop();
             _logger.LogInformation($"MickeyTest Get MapWinLossBonus GetData And filter Data  ms:{sw.Elapsed.TotalMilliseconds}");
 
@@ -2220,6 +2237,8 @@ namespace BackendSite.Service.BLL.Mpa
                 OriginBonus = originBonus.ToList(),
                 AlreadyMultiplyRateBonus = alreadyMultiplyRateBonus
             };
+            BonusSetDateToOffSet(request, wrapperResult, groupByType);
+
 
             return wrapperResult;
         }
@@ -2275,7 +2294,6 @@ namespace BackendSite.Service.BLL.Mpa
                 .SetGgRByV8Poker()
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
-            BetRecordSetDateToOffSet(request, tpBetRecordRelayResult, groupByType);
             sw.Stop();
             _logger.LogInformation($"MickeyTest GetTpBetRecord GetData And filter data ms:{sw.Elapsed.TotalMilliseconds}");
 
@@ -2314,8 +2332,8 @@ namespace BackendSite.Service.BLL.Mpa
                                                           }).ToList();
             sw.Stop();
             _logger.LogInformation($"MickeyTest AlreadyMultiplyRateBetRecord data ms:{sw.Elapsed.TotalMilliseconds}");
-
             wrapperResult.OriginBetRecord = tpBetRecordRelayResult;
+            BetRecordSetDateToOffSet(request, wrapperResult, groupByType);
             return wrapperResult;
         }
 
