@@ -325,7 +325,7 @@ namespace BackendSite.Service.BLL.Mpa
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (betRecordResult == null) return;
-            if (groupByType != MpaWinLossGroupByTypeEnum.Date) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date && groupByType != MpaWinLossGroupByTypeEnum.Month) return;
 
             var offset = request.StarTime.Offset;
 
@@ -1818,7 +1818,7 @@ namespace BackendSite.Service.BLL.Mpa
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (transaction == null) return;
-            if (groupByType != MpaWinLossGroupByTypeEnum.Date) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date && groupByType != MpaWinLossGroupByTypeEnum.Month) return;
             var offset = request.StarTime.Offset;
 
             foreach (var item in transaction)
@@ -1920,7 +1920,7 @@ namespace BackendSite.Service.BLL.Mpa
             MpaWinLossGroupByTypeEnum groupByType)
         {
             if (bonus == null) return;
-            if (groupByType != MpaWinLossGroupByTypeEnum.Date) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date && groupByType != MpaWinLossGroupByTypeEnum.Month) return;
             var offset = request.StarTime.Offset;
 
             foreach (var item in bonus)
@@ -2250,11 +2250,11 @@ namespace BackendSite.Service.BLL.Mpa
             var format = groupByType switch
             {
                 MpaWinLossGroupByTypeEnum.Date => "%m/%d/%Y %H:%i",
+                MpaWinLossGroupByTypeEnum.Month => "%m/%d/%Y %H:%i",
                 MpaWinLossGroupByTypeEnum.GameType => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.TpCategory => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.Player => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.Currency => "%Y-%m-%d",
-                MpaWinLossGroupByTypeEnum.Month => "%Y-%m",
                 _ => string.Empty
             };
             return format;
