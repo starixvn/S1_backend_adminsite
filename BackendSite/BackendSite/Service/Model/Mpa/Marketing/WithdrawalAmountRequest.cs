@@ -29,7 +29,7 @@ namespace BackendSite.Service.Model.Mpa.Marketing
 
         public OrderByDirection OrderByDirection { get; set; }
 
-        public bool IsCompare { get; set; }
+        public bool IsCompared { get; set; }
 
         public string GetRedisKey()
         {
