@@ -589,7 +589,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     putRequest.Key = key;
                     await _s3Helper.PutObjectAsync(putRequest);
                     
-                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.SiteId, depositReceipt.CustId, depositReceipt.TransId, receiptNo , depositReceipt.ReceiptName, User.Identity.Name);
+                    var fileName = $"{depositReceipt.TransId}_{receiptNo}";
+                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.SiteId, depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, User.Identity.Name);
                     
                     if (result > 0)
                     {

@@ -496,7 +496,6 @@ namespace BackendSite.Service.Model
         public int ReceiptNo { get; set; }
         public string TransId { get; set; }
         public string Receipt { get; set; }
-        public string ReceiptName { get; set; }
     }
     
     public class CheckDepositReceiptRequest
