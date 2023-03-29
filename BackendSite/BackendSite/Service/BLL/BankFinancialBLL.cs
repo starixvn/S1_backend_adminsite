@@ -65,7 +65,13 @@ namespace BackendSite.Service.BLL
         {
             return _paymentManageService.GetPayList();
         }
-        
+
+        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
+        {
+            return _bankFinancialService.GetTransferAccountList();
+        }
+
+
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
         {
             return _bankFinancialService.GetTransferAccountList(siteId, new []
