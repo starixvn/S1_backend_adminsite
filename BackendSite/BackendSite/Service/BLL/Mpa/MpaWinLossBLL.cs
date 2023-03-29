@@ -7,7 +7,6 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.Mpa.WinLoss;
 using System.Diagnostics;
-using Ubiety.Dns.Core;
 
 namespace BackendSite.Service.BLL.Mpa
 {
