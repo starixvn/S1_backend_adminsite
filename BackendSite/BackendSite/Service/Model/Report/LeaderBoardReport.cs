@@ -83,14 +83,9 @@ public class SetLeaderboardExtraPointModel
 
 public class LeaderboardExtraPointList
 {
-    private DateTimeOffset _activeDate;
     private DateTimeOffset _createTime;
     private DateTimeOffset _updateTime;
-    public DateTimeOffset ActiveDate
-    {
-        get => _activeDate;
-        set => _activeDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
-    }
+    public DateTime ActiveDate { get; set; }
     public int CustId { get; set; }
     public string UserName { get; set; }
     public string Currency { get; set; }
