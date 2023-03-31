@@ -92,10 +92,8 @@ namespace BackendSite.Service.BLL
                 }
                 return userSiteList;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public IEnumerable<int> GetCurrencyList()
