@@ -1,7 +1,6 @@
-﻿using BackendSite.Service.Model.enums;
-
+﻿using System.Collections;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-
 using StackExchange.Redis;
 
 namespace BackendSite.Service.Library
@@ -28,7 +27,7 @@ namespace BackendSite.Service.Library
                 if (!db.KeyExists(key))
                 {
                     var result = factory();
-                    if (result != null)
+                    if (HasData(result))
                     {
                         db.StringSet(key, JsonConvert.SerializeObject(result), timeSpan);
                     }
@@ -44,7 +43,7 @@ namespace BackendSite.Service.Library
                 return factory();
             }
         }
-
+        
         public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan? timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
@@ -55,7 +54,7 @@ namespace BackendSite.Service.Library
                 if (!db.KeyExists(key))
                 {
                     var result = await factory();
-                    if (result != null)
+                    if (HasData(result))
                     {
                         await db.StringSetAsync(key, JsonConvert.SerializeObject(result), timeSpan);
                     }
@@ -379,6 +378,21 @@ namespace BackendSite.Service.Library
             }
 
             return key;
+        }
+        
+        private bool HasData<T>(T obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            return obj switch
+            {
+                ICollection collection => collection.Count > 0,
+                string str => !string.IsNullOrEmpty(str),
+                _ => true
+            };
         }
     }
 }
