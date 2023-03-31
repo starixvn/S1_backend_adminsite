@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using static BackendSite.Extensions.MethodExtension;
 
 namespace BackendSite.Controllers.Api
 {
@@ -29,15 +30,14 @@ namespace BackendSite.Controllers.Api
         private readonly PermissionBLL _permissionBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly Common _common;
-        private readonly PaymentBLL _paymentBll;
         private readonly ExcelBLL _excelBll;
         private readonly ImageEditorBLL _imageEditorBll;
         private readonly BonusInfoBLL _bonusInfoBll;
         private readonly SelLangBLL _selLangBll;
         private readonly MessageBLL _messageBll;
         private readonly AuthorizeBLL _authorizeBll;
-        private readonly BonusInfoService _bonusInfoService;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly ILogger<CustManageController> _logger;
 
         #endregion
 
@@ -50,15 +50,14 @@ namespace BackendSite.Controllers.Api
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _common = provider.GetRequiredService<Common>();
-            _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _bonusInfoBll = provider.GetRequiredService<BonusInfoBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _logger = provider.GetRequiredService<ILogger<CustManageController>>();
         }
 
         #endregion
@@ -437,31 +436,36 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<CustInfoDetail> GetCustInfoDetail(CustInfoReq custInfoReq)
         {
-
-            var custInfoDetail = _custInfoBll.GetCustInfoDetail(custInfoReq.CustId, custInfoReq.UserName);
-            if (custInfoDetail != null)
+            var result = new ApiResult<CustInfoDetail>
             {
-                if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
+                Data = new CustInfoDetail(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            
+            try
+            {
+                var custInfoDetail = _custInfoBll.GetCustInfoDetail(custInfoReq.CustId, custInfoReq.UserName);
+                if (custInfoDetail != null)
                 {
-                    custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
-                    custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
-                    if (custInfoDetail.CustLineProfile != null)
+                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
                     {
-                        custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                        custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
+                        custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
+                        if (custInfoDetail.CustLineProfile != null)
+                        {
+                            custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                        }
                     }
+
+                    result.Data = custInfoDetail;
                 }
-
-                return new ApiResult<CustInfoDetail>
-                {
-                    Data = custInfoDetail,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-
             }
-            else
+            catch (Exception e)
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
+                _logger.LogError(e, GetCurrentMethod());
             }
+
+            return result;
         }
 
         /// <summary>

@@ -175,8 +175,8 @@ namespace BackendSite.Service.BLL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
-            return GetCustInfoDetail(custId, userName, siteList);
+            var siteList = _serverInfoBll.GetSiteListByLoginUser()?.SelectMany(x => new int[] { x.SiteId });
+            return siteList is null ? null : GetCustInfoDetail(custId, userName, siteList);
         }
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, int siteId)
@@ -196,7 +196,7 @@ namespace BackendSite.Service.BLL
                 {
                     foreach (var promotion in custInfoDetail.promotions)
                     {
-                        if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.Running || promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
+                        if (promotion.BonusInfoStatus is (int)BonusInfoStatusEnum.Running or (int)BonusInfoStatusEnum.TrasferOut)
                         {
                             promotion.custRollOver = _rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
                             if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
@@ -215,12 +215,12 @@ namespace BackendSite.Service.BLL
                     custInfoDetail.VerificationReward = GetRewardMessage(custInfoDetail);
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
+                custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
+                custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
+                custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
+                custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             }
 
-            custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
-            custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
-            custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
-            custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             return custInfoDetail;
         }
 
