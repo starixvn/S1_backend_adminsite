@@ -204,7 +204,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<IActionResult> Export(ExportMemberRequest request)
         {
             var exportData = await _memberQuery.GetExportDataAsync(request);
-            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 
