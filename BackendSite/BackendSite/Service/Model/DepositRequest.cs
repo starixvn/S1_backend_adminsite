@@ -119,6 +119,7 @@ namespace BackendSite.Service.Model
         public string FromBankName { set; get; }
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
+        public string Network { set; get; }
     }
 
     public class DepositInfoForExport
@@ -132,7 +133,7 @@ namespace BackendSite.Service.Model
         public string Currency { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
-        public string NetWork { set; get; }
+        public string Network { set; get; }
         public decimal CryptoAmount { set; get; }
         public string Agent { set; get; }
         public string BankAgent { set; get; }
