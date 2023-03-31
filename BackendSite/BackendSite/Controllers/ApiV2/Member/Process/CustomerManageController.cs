@@ -429,6 +429,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
         }
+
+        public class GetFinancialLogExportRequest
+        {
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+            public string RefTransId { get; set; }
+            public int FinancialType { get; set; }
+        }
+
         public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
             public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
@@ -1680,9 +1690,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 2 })]
-        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
+        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogExportRequest request)
         {
-            request.PageNumber = -1; //export all
+
             var offset = request.StartDate.Offset;
             var startDate = request.StartDate.ToUniversalTime().DateTime;
             var endDate = request.EndDate.ToUniversalTime().DateTime;
@@ -1693,8 +1703,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 endDate,
                 request.RefTransId,
                 request.FinancialType,
-                request.PageSize,
-                request.PageNumber,
+                0,
+                -1,
                 out var _);
 
             foreach (var item in data)
