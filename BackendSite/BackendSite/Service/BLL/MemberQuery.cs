@@ -148,7 +148,7 @@ namespace BackendSite.Service.BLL
                 PhoneNo = a.PhoneNo,
                 LevelName = a.LevelName,
                 Agent = a.Agent,
-                RegTime = new DateTimeOffset(a.RegTime, timespan),
+                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero).ToOffset(timespan),
                 Status = ((CustomerStatusEnum)a.Status).ToString(),
                 SabaId = a.SabaId,
                 SignupUrl = a.SignupUrl,
