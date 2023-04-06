@@ -403,7 +403,8 @@ namespace BackendSite.Controllers.Api
                 ref PageNumber,
                 ref TotalPages,
                 ref RowCount,
-                new TimeSpan(8,0,0));
+                new TimeSpan(8,0,0),
+                false);
             //
             // foreach (var data in result)
             // {

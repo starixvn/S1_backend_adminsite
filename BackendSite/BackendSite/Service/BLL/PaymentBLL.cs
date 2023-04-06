@@ -225,7 +225,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset)
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset, bool isExport)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate)
                             .Where(i => i.GameType == gameTypeId);
@@ -251,6 +251,12 @@ namespace BackendSite.Service.BLL
                               }).ToList();
 
             IPageInfo pageInfo = new PageInfo();
+            if (isExport)
+            {
+                pageNumber = 1;
+                pageSize = result.Count;
+            }
+            
             var (index, count) = pageInfo.ListPagination(result.Count, pageNumber, pageSize);
             pageNumber = pageInfo.PageNumber;
             totalPages = pageInfo.TotalPages;
