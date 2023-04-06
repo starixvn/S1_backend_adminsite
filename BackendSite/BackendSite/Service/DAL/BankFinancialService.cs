@@ -61,20 +61,6 @@ namespace BackendSite.Service.DAL
         #endregion
 
         #region Transfer Account
-
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(bool isSetting, int siteId, int id)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _IsSetting = isSetting,
-                    _SiteId = siteId,
-                    _Id = id
-                });
-
-            var SpName = "Admin_BankFinancialTransferAccount_Get";
-            return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName, parameters);
-        }
         
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoListParams input)
         {
@@ -303,36 +289,6 @@ namespace BackendSite.Service.DAL
         #endregion
 
         #region Transfer Info
-
-        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetTransferInfoList(bool isSetting,
-                                                                                     TransferTypeEnum? transferType,
-                                                                                     DateTime? fromDate,
-                                                                                     DateTime? toDate,
-                                                                                     string fromAccountNo,
-                                                                                     string fromAccountDisplayName,
-                                                                                     string toAccountNo,
-                                                                                     string toAccountDisplayName,
-                                                                                     int? reason,
-                                                                                     string transferId)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _IsSetting = isSetting,
-                    _TransferType = transferType,
-                    _TransFromDate = fromDate,
-                    _TransToDate = toDate,
-                    _FromAccountNo = fromAccountNo,
-                    _FromAccountDisplayName = fromAccountDisplayName,
-                    _ToAccountNo = toAccountNo,
-                    _ToAccountDisplayName = toAccountDisplayName,
-                    _Reason = reason,
-                    _TransferId = transferId
-                });
-
-            var SpName = "Admin_BankFinancialTransferInfo_Get_V2";
-            return _reportDbClient.Query<BankFinancialTransferInfoTransDetailModel>(SpName, parameters);
-        }
         
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoList(GetTransferInfoListParams input,
             int startIndex,
