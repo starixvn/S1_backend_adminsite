@@ -630,7 +630,8 @@ namespace BackendSite.Service.Model.enums
         PTSlotsGame = 7,
         PTLiveCasino = 8,
         SBSW = 9,
-        Mega888SlotRNGAndFishing = 10
+        Mega888SlotRNGAndFishing = 10,
+        ESports = 11
     }
 
     public enum FullFillTypeEnum
@@ -1190,7 +1191,8 @@ namespace BackendSite.Service.Model.enums
         Cockfighting = 5,
         Lottery = 6,
         VirtualSports = 7,
-        Poker = 8
+        Poker = 8,
+        ESports = 11
     }
     
     public enum LeaderBoardCategoryEnum
