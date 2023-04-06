@@ -102,6 +102,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<MemberExportData>> GetExportDataAsync(ExportMemberRequest request)
         {
+            var timespan = request.StartDate.Offset;
+
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
@@ -146,7 +148,7 @@ namespace BackendSite.Service.BLL
                 PhoneNo = a.PhoneNo,
                 LevelName = a.LevelName,
                 Agent = a.Agent,
-                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero).ToOffset(timespan),
                 Status = ((CustomerStatusEnum)a.Status).ToString(),
                 SabaId = a.SabaId,
                 SignupUrl = a.SignupUrl,
