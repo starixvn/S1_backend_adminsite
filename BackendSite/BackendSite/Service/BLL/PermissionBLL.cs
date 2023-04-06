@@ -74,32 +74,6 @@ namespace BackendSite.Service.BLL
             return permission;
         }
 
-        public IEnumerable<FuncPermissionModel> GetGroupPermissionModel(int GroupSEQ)
-        {
-            var result = GetPermissionJSONData();
-            var permissions = _adminGroupService.GetGroupPermissions(GroupSEQ);
-            if (permissions.Any())
-            {
-                foreach (var item in result)
-                {
-                    item.Settings = SetPermissions(item.Settings, permissions, null);
-                }
-            }
-
-            return result;
-        }
-
-        private List<FuncPermissionSettings> SetPermissions(IEnumerable<FuncPermissionSettings> Settings, IEnumerable<GroupPermisison> GroupPermissions, IEnumerable<UserPermission> UserPermissions)
-        {
-            var result = new List<FuncPermissionSettings>();
-            foreach (var setting in Settings)
-            {
-                result.Add(SetPermissions(setting, GroupPermissions, UserPermissions));
-            }
-
-            return result;
-        }
-
         private FuncPermissionSettings SetPermissions(FuncPermissionSettings Setting, IEnumerable<GroupPermisison> GroupPermissions, IEnumerable<UserPermission> UserPermissions)
         {
             if (Setting.FuncKeys != null && Setting.FuncKeys.Any())
