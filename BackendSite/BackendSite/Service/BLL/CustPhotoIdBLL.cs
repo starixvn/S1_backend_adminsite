@@ -56,7 +56,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
             return 0;
         }
 
-        if (await _custPhotoIdService.GetCount(custId) >= 5)
+        if (await _custPhotoIdService.GetCount(custId) >= 10)
         {
             _logger.LogError("reach the upload photo limit");
             return 0;
