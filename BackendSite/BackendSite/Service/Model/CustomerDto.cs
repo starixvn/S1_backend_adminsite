@@ -242,10 +242,10 @@ public class CustomerDto
     /// 會員本身的代理推薦碼
     /// </summary>
     public string AffiliateCode { get; set; }
-    public DateTimeOffset RegTime { get; set; }
-    public DateTimeOffset? FirstDepositTime { get; set; }
-    public DateTimeOffset LastLoginTime { get; set; }
-    public DateTimeOffset? LastDepositTime { get; set; }
+    public DateTime RegTime { get; set; }
+    public DateTime? FirstDepositTime { get; set; }
+    public DateTime LastLoginTime { get; set; }
+    public DateTime? LastDepositTime { get; set; }
     public string BirthDay { get; set; }
     public string BirthMonth { get; set; }
     public string BirthYear { get; set; }
@@ -262,10 +262,10 @@ public class CustomerDto
     public string AddressCity { get; set; }
     public string AddressLineFirst { get; set; }
     public string AddressLineSecond { get; set; }
-    public DateTimeOffset? PhoneRewardTime { get; set; }
-    public DateTimeOffset? EmailRewardTime { get; set; }
-    public DateTimeOffset? PhoneVerifyTime { get; set; }
-    public DateTimeOffset? EmailVerifyTime { get; set; }
+    public DateTime? PhoneRewardTime { get; set; }
+    public DateTime? EmailRewardTime { get; set; }
+    public DateTime? PhoneVerifyTime { get; set; }
+    public DateTime? EmailVerifyTime { get; set; }
 }
 
 public class CustomerTag
