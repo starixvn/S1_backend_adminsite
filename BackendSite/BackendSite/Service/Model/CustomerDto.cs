@@ -263,6 +263,8 @@ public class CustomerDto
     public string AddressLineSecond { get; set; }
     public DateTimeOffset? PhoneRewardTime { get; set; }
     public DateTimeOffset? EmailRewardTime { get; set; }
+    public DateTimeOffset? PhoneVerifyTime { get; set; }
+    public DateTimeOffset? EmailVerifyTime { get; set; }
 }
 
 public class CustomerTag
@@ -313,6 +315,8 @@ public class CustomerBasicInfo
     public AffInfo AffInfo { get; set; }
     public DateTimeOffset? PhoneRewardTime { get; set; }
     public DateTimeOffset? EmailRewardTime { get; set; }
+    public DateTimeOffset? PhoneVerifyTime { get; set; }
+    public DateTimeOffset? EmailVerifyTime { get; set; }
 }
 
 public class AffInfo
