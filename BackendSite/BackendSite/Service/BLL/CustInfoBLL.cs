@@ -33,7 +33,6 @@ namespace BackendSite.Service.BLL
         private readonly BetListService _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
         private readonly ICacheHelper _redisHelper;
-
         private readonly WinLostReportService _winLostReportService;
         private readonly RebateManageService _rebateManageService;
         private readonly ExcelBLL _excelBll;
@@ -176,8 +175,8 @@ namespace BackendSite.Service.BLL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
-            return GetCustInfoDetail(custId, userName, siteList);
+            var siteList = _serverInfoBll.GetSiteListByLoginUser()?.SelectMany(x => new int[] { x.SiteId });
+            return siteList is null ? null : GetCustInfoDetail(custId, userName, siteList);
         }
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, int siteId)
@@ -197,7 +196,7 @@ namespace BackendSite.Service.BLL
                 {
                     foreach (var promotion in custInfoDetail.promotions)
                     {
-                        if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.Running || promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
+                        if (promotion.BonusInfoStatus is (int)BonusInfoStatusEnum.Running or (int)BonusInfoStatusEnum.TrasferOut)
                         {
                             promotion.custRollOver = _rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
                             if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
@@ -216,12 +215,12 @@ namespace BackendSite.Service.BLL
                     custInfoDetail.VerificationReward = GetRewardMessage(custInfoDetail);
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
+                custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
+                custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
+                custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
+                custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             }
 
-            custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
-            custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
-            custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
-            custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             return custInfoDetail;
         }
 
@@ -870,12 +869,7 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
-            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if (sabaWallet != null)
-            {
-                result.SabaWallet = sabaWallet.Balance;
-            }
             if (ptwallet != null)
             {
                 result.PTWallet = ptwallet.Balance;
@@ -886,12 +880,7 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
-            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if (sabaWallet != null)
-            {
-                result.SabaWallet = sabaWallet.Balance;
-            }
             if (ptwallet != null)
             {
                 result.PTWallet = ptwallet.Balance;
@@ -968,21 +957,6 @@ namespace BackendSite.Service.BLL
                 out rowCount); ;
         }
 
-        public async Task<IEnumerable<ThirdPartyAccountResponse>> GetThirdPartyAccountAsync(ThirdPartyAccountRequest request)
-        {
-            var key = $"TpAccountName_{request.CustId}";
-
-            var thirdPartyAccount = await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
-                async () => await _thirdPartyService.GetTpCustInfoListByCustId(request.CustId));
-
-            return thirdPartyAccount
-                .Select(r => new ThirdPartyAccountResponse()
-                {
-                    TpName = r.TpName,
-                    TpUserName = r.TpUserName
-                });
-        }
-
 
         public async Task<TpAdjustmentLogWrapper> GetCustAdjustmentTpLogV2(GetCustTpAdjustmentLogRequestV2 request, int siteId)
         {
@@ -1008,11 +982,6 @@ namespace BackendSite.Service.BLL
             return queryResult;
         }
 
-        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
-        {
-            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
-        }
-
         public IEnumerable<BlockBankAcc> GetBankList(int custId)
         {
             return _custInfoService.GetBankList(custId);
@@ -1021,6 +990,21 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BlockEWalletAcc> GetEWalletList(int custId)
         {
             return _custInfoService.GetEWalletList(custId);
+        }
+
+        public async Task<IEnumerable<ThirdPartyAccountResponse>> GetThirdPartyAccountAsync(ThirdPartyAccountRequest request)
+        {
+            var key = $"TpAccountName_{request.CustId}";
+
+            var thirdPartyAccount = await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
+                async () => await _thirdPartyService.GetTpCustInfoListByCustId(request.CustId));
+
+            return thirdPartyAccount
+                .Select(r => new ThirdPartyAccountResponse()
+                {
+                    TpName = r.TpName,
+                    TpUserName = r.TpUserName
+                });
         }
 
         public IEnumerable<CustLoginLog> GetIPLog(int custId, DateTime startDate,
@@ -1035,6 +1019,11 @@ namespace BackendSite.Service.BLL
                 });
             }
             return result;
+        }
+        
+        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        {
+            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
         }
 
         public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)

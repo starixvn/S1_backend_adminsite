@@ -32,6 +32,7 @@ namespace BackendSite.Service.BLL
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -248,7 +249,18 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest,null, CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+            var result = depositService.SetDepositInfo(transId,
+                depositRequest.SiteId,
+                depositRequest.Amount,
+                comment,
+                Operator,
+                forStatus,
+                DepositStatusEnum.Approved,
+                depositRequest,
+                null,
+                CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+
+            return result;
         }
 
         public int DepositReject(string transId, decimal actualDeposit, string comment, string Operator)
@@ -303,8 +315,7 @@ namespace BackendSite.Service.BLL
             var depositRequest = GetDepositRequest(transId);
             return depositService.GetDepositReceiptByNo(depositId, receiptNo ,depositRequest.SiteId);
         }
-
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType , string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
         {
             return depositService.GetDepositExportList(selectSite, selectBankCode, selectCalCode, depositType, startDate, endDate, dateType ,depositId, userNames, agent, currencyId, status, levelStatus, startAmount, endAmount, payIds);
         }
@@ -512,7 +523,6 @@ namespace BackendSite.Service.BLL
             if (!depositService.SetDepositRequestAmount(input))
             {
                 scope.Dispose();
-
                 return 0;
             }
 
@@ -531,14 +541,24 @@ namespace BackendSite.Service.BLL
             if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
                 scope.Dispose();
-
                 return 0;
             }
 
-            if (!custInfoService.AddCustNote(custId, $"SetDepositRequestAmount:{input.After.Amount}", input.Operator))
+            var comment = $"Set Deposit Amount ,Change {input.Before.Amount} to {input.After.Amount}";
+            
+            var m = Regex.Match(input.TransId, @"\d+");
+            int.TryParse(m.Value, out var depositId);
+            var logResult = depositService.SetDepositLog(depositId, input.SiteId, comment, (int)DepositStatusEnum.SetDepositAmount, input.After.Amount, input.Operator);
+            
+            if (logResult < 1)
             {
                 scope.Dispose();
-
+                return 0;
+            }
+            
+            if (!custInfoService.AddCustNote(custId, comment, input.Operator))
+            {
+                scope.Dispose();
                 return 0;
             }
 

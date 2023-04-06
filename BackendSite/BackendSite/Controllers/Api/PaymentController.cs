@@ -30,8 +30,6 @@ namespace BackendSite.Controllers.Api
         private readonly SelLangBLL _selLangBLL;
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly ReportBLL _reportBLL;
-
-        private readonly int _mainWalletType;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter courierAdapter;
         #endregion
@@ -59,8 +57,6 @@ namespace BackendSite.Controllers.Api
             _selLangBLL = selLangBLL;
             _serverInfoBLL = serverInfoBLL;
             _reportBLL = reportBLL;
-
-            _mainWalletType = configuration.GetValue<int>("MainWalletType"); //1=主錢包
             _bonusApiUrl = configuration.GetValue<string>("BonusService");
             this.courierAdapter = courierAdapter;
         }
@@ -173,35 +169,6 @@ namespace BackendSite.Controllers.Api
                     var balance = _custInfoBLL.GetBalance(custInfo.CustId);
                     if (balance < adjustmentInfo.Amount)
                     {
-                        if (_mainWalletType == 2)
-                        {
-                            var deAmount = adjustmentInfo.Amount - balance;
-                            var inTpTransfer = new TpTransfer()
-                            { TpId = 1, Amount = deAmount, CustId = custInfo.CustId, direction = TpDirection.ToMain };
-
-                            var acc = await _tpBLL.TransferAsync(inTpTransfer);
-                            if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
-                            {
-                                apiResult.ErrorCode = 1001;
-                                apiResult.Message =
-                                    $"{balance.ToString("#,##0.##")}<{adjustmentInfo.Amount.ToString("#,##0.##")}";
-                                return apiResult;
-                            }
-
-                            //balance = custInfoBLL.GetBalance(custInfo.CustId);
-                            //if (balance < adjustmentInfo.Amount)
-                            //{
-                            //    apiResult.ErrorCode = 1001;
-                            //    apiResult.Message = $"{balance.ToString("#,##0")}<{adjustmentInfo.Amount.ToString("#,##0")}";
-                            //    return apiResult;
-                            //}
-                        }
-                    }
-
-                    balance = _custInfoBLL.GetBalance(custInfo.CustId);
-
-                    if (balance < adjustmentInfo.Amount)
-                    {
                         apiResult.ErrorCode = 1002;
                         apiResult.Message =
                             $"{balance.ToString("#,##0.##")} < {adjustmentInfo.Amount.ToString("#,##0.##")}";
@@ -211,24 +178,8 @@ namespace BackendSite.Controllers.Api
 
                 if (_paymentBLL.PaymentAdjustment(adjustmentInfo, User.Identity.Name, out transId) > 0)
                 {
-                    if (_mainWalletType == 2 && adjustmentInfo.AdjustType == 1)
-                    {
-                        var balance = _custInfoBLL.GetBalance(custInfo.CustId);
-                        var inTpTransfer = new TpTransfer()
-                        { TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp };
-
-                        var acc = await _tpBLL.TransferAsync(inTpTransfer);
-                        if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
-                        {
-                            apiResult.ErrorCode = 0;
-                            apiResult.Message = $"Success. ID is {transId}";
-                        }
-                    }
-                    else
-                    {
                         apiResult.ErrorCode = 0;
-                        apiResult.Message = $"Success. ID is {transId}";
-                    }
+                        apiResult.Message = $"Success. ID is {transId}";            
                 }
             }
 
@@ -452,7 +403,8 @@ namespace BackendSite.Controllers.Api
                 ref PageNumber,
                 ref TotalPages,
                 ref RowCount,
-                new TimeSpan(8,0,0));
+                new TimeSpan(8,0,0),
+                false);
             //
             // foreach (var data in result)
             // {
@@ -509,38 +461,13 @@ namespace BackendSite.Controllers.Api
                             {
                                 if (balance < adjustmentAndWithdrawalLimit.Amount)
                                 {
-                                    if (_mainWalletType == 2)
-                                    {
-                                        var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                        var inTpTransfer = new TpTransfer()
-                                        {
-                                            TpId = 1,
-                                            Amount = deAmount,
-                                            CustId = custInfo.CustId,
-                                            direction = TpDirection.ToMain
-                                        };
-
-                                        var acc = await _tpBLL.TransferAsync(inTpTransfer);
-                                        if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
-                                        {
-                                            apiResult.ErrorCode = (int)ErrorCodeEnum.TransferError;
-                                            apiResult.Message =
-                                                $"{balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
-                                            return apiResult;
-                                        }
-                                    }
-                                }
-
-
-                                if (balance < adjustmentAndWithdrawalLimit.Amount)
-                                {
                                     apiResult.ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError;
                                     apiResult.Message =
                                         $"{balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}";
                                     return apiResult;
                                 }
 
-                                if (_mainWalletType == 1 && (balance - adjustmentAndWithdrawalLimit.Amount) < 0)
+                                if (balance - adjustmentAndWithdrawalLimit.Amount < 0)
                                 {
                                     apiResult.ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError;
                                     apiResult.Message = $"{balance.ToString("#,##0.##")} + {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")} < 0. Reject";
@@ -551,7 +478,7 @@ namespace BackendSite.Controllers.Api
                         case (int)AdjustmentInfoAdjustTypeEnum.BalancePlus:  //Balance(+)
                         case (int)AdjustmentInfoAdjustTypeEnum.BonusPlus:  //Bonus(+)
                             {
-                                if (_mainWalletType == 1 && (balance + adjustmentAndWithdrawalLimit.Amount) < 0)
+                                if (balance + adjustmentAndWithdrawalLimit.Amount < 0)
                                 {
                                     apiResult.ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError;
                                     apiResult.Message = $"{balance.ToString("#,##0.##")} + {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")} < 0. Reject";
@@ -561,7 +488,7 @@ namespace BackendSite.Controllers.Api
                             break;
                         case (int)AdjustmentInfoAdjustTypeEnum.BonusMinus:  //Bonus(-)
                             {
-                                if (_mainWalletType == 1 && (balance - adjustmentAndWithdrawalLimit.Amount) < 0)
+                                if (balance - adjustmentAndWithdrawalLimit.Amount < 0)
                                 {
                                     apiResult.ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError;
                                     apiResult.Message = $"{balance.ToString("#,##0.##")} - {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")} < 0. Reject";
@@ -575,49 +502,10 @@ namespace BackendSite.Controllers.Api
                     if (_paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
                         out transId) > 0)
                     {
-                        if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalancePlus)
-                        {
-                            var inTpTransfer = new TpTransfer()
-                            { TpId = 1, Amount = balance, CustId = custInfo.CustId, direction = TpDirection.ToTp };
-
-                            var acc = await _tpBLL.TransferAsync(inTpTransfer);
-                            if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
-                            {
-                                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                                apiResult.Message = $"Success. ID is {transId}";
-                            }
-                        }
-                        else
-                        {
                             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                             apiResult.Message = $"Success. ID is {transId}";
-                        }
-                    }
-                    /*}
-                    else
-                    {
-                        var setAdjustBonusReq = new SetAdjustBonusReq()
-                        {
-                            CustId = custInfo.CustId,
-                            BonusCode = adjustmentAndWithdrawalLimitReq.BounsCode,
-                            Memo = adjustmentAndWithdrawalLimitReq.Memo,
-                            Operator = authData.UserName,
-                            Amount = adjustmentAndWithdrawalLimitReq.Amount,
-                            PromotionType = adjustmentAndWithdrawalLimitReq.Option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus ?  9 : 8
-                        };
-                        var apiOnlineResult =
-                            await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
-                        if (apiOnlineResult.ErrorCode == 0)
-                        {
-                            apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                            apiResult.Message = $"Success.";
-                        }
-                        else
-                        {
-                            apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                            apiResult.Message = apiOnlineResult.Message;
-                        }
-                    }*/
+                        
+                    }         
                 }
             }
             catch (Exception ex)
@@ -705,36 +593,6 @@ namespace BackendSite.Controllers.Api
                                             var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
                                             if (balance < adjustmentAndWithdrawalLimit.Amount)
                                             {
-                                                if (_mainWalletType == 2)
-                                                {
-                                                    var deAmount = adjustmentAndWithdrawalLimit.Amount - balance;
-                                                    var inTpTransfer = new TpTransfer()
-                                                    {
-                                                        TpId = 1,
-                                                        Amount = deAmount,
-                                                        CustId = custInfoDetail.CustId,
-                                                        direction = TpDirection.ToMain
-                                                    };
-
-                                                    var acc = await _tpBLL.TransferAsync(inTpTransfer);
-                                                    if (acc.ErrorCode != 0 || acc.Data.Status != TransferStatus.Success)
-                                                    {
-                                                        apiResult.Add(new ApiResult()
-                                                        {
-                                                            ErrorCode = (int)ErrorCodeEnum.TransferError,
-                                                            Message =
-                                                                $"Fail. Username: {custUsername}. SabaId: {sabaId}. {balance.ToString("#,##0.##")} < {adjustmentAndWithdrawalLimit.Amount.ToString("#,##0.##")}"
-                                                        });
-                                                        RowId += 1;
-                                                        continue;
-                                                    }
-                                                }
-                                            }
-
-                                            balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
-
-                                            if (balance < adjustmentAndWithdrawalLimit.Amount)
-                                            {
                                                 apiResult.Add(new ApiResult()
                                                 {
                                                     ErrorCode = (int)ErrorCodeEnum.BalanceAdjustmentError,
@@ -749,70 +607,14 @@ namespace BackendSite.Controllers.Api
                                         if (_paymentBLL.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit,
                                             authData.UserName, out transId) > 0)
                                         {
-                                            if (_mainWalletType == 2 && adjustmentAndWithdrawalLimit.AdjustType == (int)AdjustmentInfoAdjustTypeEnum.BalancePlus)
-                                            {
-                                                var balance = _custInfoBLL.GetBalance(custInfoDetail.CustId);
-                                                var inTpTransfer = new TpTransfer()
-                                                {
-                                                    TpId = 1,
-                                                    Amount = balance,
-                                                    CustId = custInfoDetail.CustId,
-                                                    direction = TpDirection.ToTp
-                                                };
-
-                                                var acc = await _tpBLL.TransferAsync(inTpTransfer);
-                                                if (acc.ErrorCode == 0 && acc.Data.Status == TransferStatus.Success)
-                                                {
-                                                    apiResult.Add(new ApiResult()
-                                                    {
-                                                        ErrorCode = (int)ErrorCodeEnum.Success,
-                                                        Message =
-                                                            $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {transId}."
-                                                    });
-                                                }
-                                            }
-                                            else
-                                            {
                                                 apiResult.Add(new ApiResult()
                                                 {
                                                     ErrorCode = (int)ErrorCodeEnum.Success,
                                                     Message =
                                                         $"Success. Username: {custUsername}. SabaId: {sabaId}. ID is {transId}."
                                                 });
-                                            }
                                         }
-                                    }
-                                    /*else
-                                    {
-                                        var setAdjustBonusReq = new SetAdjustBonusReq()
-                                        {
-                                            CustId = custInfoDetail.CustId,
-                                            BonusCode = bonuscode,
-                                            Memo = memo,
-                                            Operator = authData.UserName,
-                                            Amount = amount,
-                                            PromotionType = option == (int)AdjustmentInfoAdjustTypeEnum.RetentionBonus ? 9 : 8
-                                        };
-                                        var apiOnlineResult =
-                                             await courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
-                                        if (apiOnlineResult.ErrorCode == 0)
-                                        {
-                                            apiResult.Add(new ApiResult()
-                                            {
-                                                ErrorCode = apiOnlineResult.ErrorCode,
-                                                Message = $"Success. Username: {custUsername}. SabaId: {sabaId}."
-                                            });
-                                        }
-                                        else
-                                        {
-                                            apiResult.Add(new ApiResult()
-                                            {
-                                                ErrorCode = apiOnlineResult.ErrorCode,
-                                                Message = $"Fail. Username: {custUsername}. SabaId: {sabaId}. {apiOnlineResult.Message}"
-                                            });
-                                        }
-                                    }*/
-
+                                    }                                    
                                 }
                                 catch (Exception ex)
                                 {
@@ -995,9 +797,8 @@ namespace BackendSite.Controllers.Api
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-
+            
             var stream = _excelBLL.ExportV2(searchResult.VipRebateInfoList);
-
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

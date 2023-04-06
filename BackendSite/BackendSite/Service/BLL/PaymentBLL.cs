@@ -81,6 +81,7 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
+
             if (financialType != 0)
             {
                 data = data.Where(i => i.FinancialType == (FinancialType)financialType);
@@ -113,13 +114,12 @@ namespace BackendSite.Service.BLL
                 if (financialLog.FinancialType == FinancialType.TpTransfer)
                 {
                     var tpId = financialLog.Type - 2000;
-                    var tpName = tpId == (int)TpEnum.Saba ? "Sportsbook" : _common.GetTpName(tpId);
+                    var tpName = _common.GetTpName(tpId);
                     financialLog.Memo = financialLog.Direction == DirectionEnum.Add ? 
                         $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";            
                 }
             }
         }
-
         public IEnumerable<BonusLog> GetBonusLog(int custId, IEnumerable<int> promoCategoryIds, DateTime? startDate, DateTime? endDate,
             string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -225,7 +225,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset)
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset, bool isExport)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate)
                             .Where(i => i.GameType == gameTypeId);
@@ -251,6 +251,12 @@ namespace BackendSite.Service.BLL
                               }).ToList();
 
             IPageInfo pageInfo = new PageInfo();
+            if (isExport)
+            {
+                pageNumber = 1;
+                pageSize = result.Count;
+            }
+            
             var (index, count) = pageInfo.ListPagination(result.Count, pageNumber, pageSize);
             pageNumber = pageInfo.PageNumber;
             totalPages = pageInfo.TotalPages;

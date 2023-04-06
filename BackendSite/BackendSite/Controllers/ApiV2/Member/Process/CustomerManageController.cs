@@ -429,6 +429,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
         }
+
+        public class GetFinancialLogExportRequest
+        {
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+            public string RefTransId { get; set; }
+            public int FinancialType { get; set; }
+        }
+
         public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
             public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
@@ -467,6 +477,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
         }
 
+        public class CustTpBetRecordDetailListbyGameTypeExportReq 
+        {
+            public DateTime SelDate { get; set; }
+            public int GameTypeId { get; set; }
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+        }
         public class GetCustInfoWithBalanceRequest
         {
             public int SiteId { get; set; }
@@ -614,8 +632,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     exportDatas.Add(exprotdata);
                 });
                 await Task.WhenAll(tasks);
-                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
-                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                //如果該名user的PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 var stream = _excelBll.ExportV2(exportDatas);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
@@ -1680,9 +1698,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 2 })]
-        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
+        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogExportRequest request)
         {
-            request.PageNumber = -1; //export all
+
             var offset = request.StartDate.Offset;
             var startDate = request.StartDate.ToUniversalTime().DateTime;
             var endDate = request.EndDate.ToUniversalTime().DateTime;
@@ -1693,8 +1711,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 endDate,
                 request.RefTransId,
                 request.FinancialType,
-                request.PageSize,
-                request.PageNumber,
+                0,
+                -1,
                 out var _);
 
             foreach (var item in data)
@@ -1797,6 +1815,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
+        
+        public IActionResult GetCustTpBetRecordExport(CustIdWithDateRangeRequest request)
+        {
+            var apiResult = _paymentBll.GetCustTpBetRecordList(
+                request.CustId,
+                request.StartDate.ToUniversalTime().DateTime,
+                request.EndDate.ToUniversalTime().DateTime,
+                request.StartDate.Offset);
+            
+            var stream = _excelBll.ExportV2(apiResult);
+            return _excelBll.ExcelFile(stream, "CustTpBetRecord");
+        }
 
         /// <summary>
         /// CustomerManage/GetCustTpBetRecordByDay 取得指定客戶指定日期第三方下注紀錄
@@ -1826,6 +1856,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
+        [HttpPost]
+        public IActionResult GetCustTpBetRecordByDayExport(CustTpBetRecordListOneDayReq req)
+        {
+            var apiResult = _paymentBll.GetCustTpBetRecordListOneDay(
+                req.CustId,
+                req.SelDate.Date,
+                req.StartDate.ToUniversalTime().DateTime,
+                req.EndDate.ToUniversalTime().DateTime);
+            
+            var stream = _excelBll.ExportV2(apiResult);
+            return _excelBll.ExcelFile(stream, "CustTpBetRecordByDay");
+        }
+        
         /// <summary>
         /// CustomerManage/GetCustTpBetRecordByCategoryId 取得指定客戶指定第三方分類下注紀錄
         /// </summary>
@@ -1853,6 +1897,21 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     req.EndDate.ToUniversalTime().DateTime)
             };
             return apiResult;
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
+        [HttpPost]
+        public IActionResult GetCustTpBetRecordByCategoryIdExport(CustTpBetRecordListbyCategoryIdReq req)
+        {
+            var apiResult = _paymentBll.GetCustTpBetRecordListbyCategoryId(
+                req.CustId,
+                req.SelDate.Date,
+                req.CategoryId,
+                req.StartDate.ToUniversalTime().DateTime,
+                req.EndDate.ToUniversalTime().DateTime);
+            
+            var stream = _excelBll.ExportV2(apiResult);
+            return _excelBll.ExcelFile(stream, "CustTpBetRecordListByCategoryId");
         }
 
         /// <summary>
@@ -1884,7 +1943,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ref pageNumber,
                 ref totalPages,
                 ref rowCount,
-                req.StartDate.Offset);
+                req.StartDate.Offset,
+                false);
 
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             apiResult.Data = result;
@@ -1892,6 +1952,31 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             apiResult.RowCount = rowCount;
             apiResult.TotalPages = totalPages;
             return apiResult;
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
+        [HttpPost]
+        public IActionResult GetCustTpBetRecordDetailByGameTypeExport(CustTpBetRecordDetailListbyGameTypeExportReq req)
+        {
+            var pageSize = 0;
+            var totalPages = 0;
+            var rowCount = 0;
+            var pageNumber = 0;
+            
+            var apiResult = _paymentBll.GetCustTpBetRecordDetailListbyGameType(
+                req.CustId,
+                req.GameTypeId,
+                req.StartDate.ToUniversalTime().DateTime,
+                req.EndDate.ToUniversalTime().DateTime,
+                pageSize,
+                ref pageNumber,
+                ref totalPages,
+                ref rowCount,
+                req.StartDate.Offset,
+                true);
+            
+            var stream = _excelBll.ExportV2(apiResult);
+            return _excelBll.ExcelFile(stream, "CustTpBetRecordDetailByGameType");
         }
 
         /// <summary>
@@ -2285,21 +2370,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> GetPersonalMsg(CustIdWithPageRequest request)
+        public async Task<ApiListResult<PersonalMsg>> GetPersonalMsg(CustIdWithPageRequest request)
         {
-            var pageNumber = request.PageNumber;
-            var TotalPages = 0;
-            var RowCount = 0;
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                apiResult.Data = _messageBll.GetPersonalMsg(request.CustId, request.PageNumber, request.PageSize,
-                    ref TotalPages, ref RowCount);
-
+                var personMsg = await _messageBll.GetPersonalMsg(request.CustId, request.PageNumber, request.PageSize);
+                apiResult.Data = personMsg.Data;
+                apiResult.PageNumber = personMsg.PageNumber;
+                apiResult.RowCount = personMsg.RowCount;
+                apiResult.TotalPages = personMsg.TotalPages;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.PageNumber = pageNumber;
-                apiResult.RowCount = RowCount;
-                apiResult.TotalPages = TotalPages;
             }
             catch (Exception ex)
             {
@@ -2324,17 +2405,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> SendPersonalMsg(SendCustMessageRequest request)
+        public ApiResult SendPersonalMsg(SendCustMessageRequest request)
         {
-            var apiResult = new ApiListResult<PersonalMsg>();
+            var apiResult = new ApiResult();
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                if (_messageBll.SendMessageToPlayer(authData.UserName,
-                    request.Title,
-                    request.Content,
-                    request.CustId,
-                    authData.UserId) == 0)
+                if (_messageBll.SendMessageToPlayer(authData.UserName, request.Title, request.Content, request.CustId) == 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Send Fail.";
@@ -2369,7 +2446,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             try
             {
-                if (!await _messageBll.DeletePersonalMsg(request.Id, request.IsBatch, User.Identity.Name))
+                if (!await _messageBll.DeletePersonalMsg(request.Id, User.Identity.Name))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Delete Fail.";
@@ -2409,6 +2486,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                                                    request.GameTypes,
                                                    request.StartDate.ToUniversalTime().DateTime,
                                                    request.EndDate.ToUniversalTime().DateTime);
+
             return new ApiResult<dynamic>
             {
                 Data = data.Select(x => new { x.GameName, x.StakeSettled, x.UserName, x.WinlostAmount, x.StakeNotRollover, x.TpUserName }),

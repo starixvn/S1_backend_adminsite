@@ -52,6 +52,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             SupportChannels = req.SupportChannels.Select(x => (int) x);
             QrCodeUrl = string.IsNullOrWhiteSpace(req.QrCodeUrl) ? null : req.QrCodeUrl;
             Operator = updater;
+            GroupId = req.GroupId;
         }
         public int FinancialAccountId { get; set; }
         public decimal MinAmount { get; set; }
@@ -65,5 +66,6 @@ namespace BackendSite.Service.Model.BankCardManagement
         public string Operator { get; set; }
         public IEnumerable<int> SupportChannels { get; set; }
         public string QrCodeUrl { get; set; }
+        public int GroupId { get; set; }
     }
 }

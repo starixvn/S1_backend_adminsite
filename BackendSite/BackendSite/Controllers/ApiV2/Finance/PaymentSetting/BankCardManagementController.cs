@@ -3,7 +3,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.Extensions;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model.BankCardManagement;
 using Newtonsoft.Json;
 
@@ -22,6 +22,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly ILogger<BankCardManagementController> _logger;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly AWSS3Helper _s3Helper;
+        private readonly string _folder;
+        private readonly string _bucketName;
 
         #endregion
 
@@ -34,6 +38,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
+            _bucketName = configuration.GetValue<string>("AwsPaymentBucketName");
         }
 
         #endregion
@@ -113,7 +123,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public async Task<ApiResult> SetAsync(SetOfflineBankingSettingRequest request)
         {
-            var updater = User.Identity.Name;
+            var updater = _newAuthorizeBll.GetAuthData().UserName;
             var oldData = await _bankDetailBll.GetOfflineBankingSettingByIdAsync(request.FinancialAccountId);
             var success = await _bankDetailBll.SetOfflineBankingSettingAsync(
                 new SetOfflineBankingSettingParams(request, updater));
@@ -121,6 +131,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             if (success)
             {
                 var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
+                var localPaySettings = await _bankDetailBll.GetLocalPaySettingAsync();
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
                     SiteId = request.SiteId,
@@ -143,7 +154,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                         oldData.Sort,
                         Status = oldData.Status.ToString(),
                         SupportChannels = string.Join(", ", oldData.SupportChannels.Select(x => x.ToString())),
-                        oldData.QrCodeUrl
+                        oldData.QrCodeUrl,
+                        oldData.GroupName
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
@@ -158,7 +170,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                         Status = request.Status.ToString(),
                         request.Memo,
                         SupportChannels = string.Join(", ", request.SupportChannels.Select(x => x.ToString())),
-                        request.QrCodeUrl
+                        request.QrCodeUrl,
+                        localPaySettings.FirstOrDefault(x => x.GroupId == request.GroupId)?.GroupName
                     }),
                     Operator = updater
                 });
@@ -172,7 +185,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public async Task<ApiResult<GetQrCodeUrlResult>> GetQrCodeUrl([FromForm] GetQrCodeUrlRequest request)
         {
-            var result = await QrCodeExtension.DecodeFromImage(request.File);
+            var result = await UploadToS3(request.File);
+
 
             return new ApiResult<GetQrCodeUrlResult>
             {
@@ -182,6 +196,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                 },
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+        private async Task<string> UploadToS3(IFormFile file)
+        {
+            var ext = Path.GetExtension(file.FileName);
+            var path = $"/pay-qrcode/{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}{ext}";
+            var key = _folder + path;
+            var success = await _s3Helper.UploadFileAsync(file, _bucketName, key);
+
+            return success ? path : string.Empty;
         }
         
         #endregion

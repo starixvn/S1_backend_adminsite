@@ -26,7 +26,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
         private readonly PermissionBLL _permissionBll;
-        private readonly Dictionary<int, List<int>> _usableActionType;
+        private readonly Dictionary<DepositStatusEnum, List<DepositActionEnum>> _usableActionType;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly ImageEditorBLL _imageEditorBll;
         private readonly FileNameBLL _fileNameBll;
@@ -52,17 +52,40 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
-            _mainWalletType = configuration.GetValue<int>("MainWalletType");
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _fileNameBll = provider.GetRequiredService<FileNameBLL>();
-            _usableActionType = new Dictionary<int, List<int>>
+            _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
-                { 1, new List<int> {66,65,67,6,63} }, //Draft -> Draft,Approved,ManualApproved,Reject,OnHold
-                { 3, new List<int> {66} },//Approved -> Draft
-                { 4, new List<int> {66,67} },//Reject -> Draft,ManualApproved
-                { 5, new List<int> {66} },//Cancel -> Draft
-                { 7, new List<int> {66,64,67} }//On-Hold -> Draft,Pending,ManualApproved
+                { DepositStatusEnum.Pending,
+                    new List<DepositActionEnum>
+                    {
+                        DepositActionEnum.Draft,
+                        DepositActionEnum.Approved,
+                        DepositActionEnum.ManualApproved,
+                        DepositActionEnum.Rejected,
+                        DepositActionEnum.OnHold
+                    } },
+                { DepositStatusEnum.Approved, 
+                    new List<DepositActionEnum>
+                    {
+                        DepositActionEnum.Draft
+                    } },
+                { DepositStatusEnum.Rejected, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft,
+                    DepositActionEnum.ManualApproved
+                } },
+                { DepositStatusEnum.Canceled, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft
+                } },
+                { DepositStatusEnum.OnHold, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft,
+                    DepositActionEnum.Pending,
+                    DepositActionEnum.ManualApproved
+                } }
             };
         }
 
@@ -333,7 +356,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             
             if (request.Action == (int)DepositStatusEnum.Approved)
             {
-                if (depositRequest.DepositType == (int) DepositTypeEnum.LocalBanking)
+                if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
                 {
                     if (request.ActualDeposit > 0)
                         depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
@@ -341,26 +364,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 
                 if (depositConfirmResult > 0)
                 {
-                    var tmp = new ApiResult<TransferResult>();
-                    if (_mainWalletType == 2)
-                    {
-                        var pendingFund = new PendingFund
-                        {
-                            CustId = depositConfirmResult
-                        };
-                        tmp = await Process(pendingFund);
-                    }
-                    else
-                    {
-                        tmp.ErrorCode = (int)ErrorCodeEnum.Success;
-                    }
-
-                    if (tmp.ErrorCode != 0)
-                    {
-                        depositConfirmResult = -4;
-                    }
-                    else
-                    {
                         var userLang = _custInfoBll.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                         // Send message to player
                         var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
@@ -368,8 +371,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         title = string.Format(title, request.TransId);
                         var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, request.TransId);
-                        _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
-                    }
+                        await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
@@ -386,7 +388,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     title = string.Format(title, request.TransId);
                     var content = _selLangBll.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, request.TransId);
-                    _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                     if (custInfo.SiteId == 1)
                     {
                         await _messageBll.SendSMSMessageToPlayer(depositRequest.CustId);
@@ -461,7 +463,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     title = string.Format(title, transId);
                     var content = _selLangBll.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, transId);
-                    _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    _messageBll.SendMessage(new Message(sender, depositRequest.CustId, userLang, title, content));
                 }
                 if (depositConfirmResult == -4)
                 {
@@ -488,7 +490,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// Func Path：Finance > [Submit] > Click [Trxn.ID] > Deposit Info [Request Amount] > [Edit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 81 })]
         [HttpPost]
         public ApiResult SetAmountByTransId(ApiRequestWithLog<SetAmountRequest> request)
         {
@@ -560,7 +562,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 var depositRequest = _depositBll.GetDepositRequest(depositReceipt.TransId);
 
-                if (depositRequest.Status is not ((int)DepositStatusEnum.Pending or (int)DepositStatusEnum.OnHold))
+                if (depositRequest.Status is not (DepositStatusEnum.Pending or DepositStatusEnum.OnHold))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Wrong status ,Can't upload receipt";
@@ -631,7 +633,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
                 
                 bool permission;
-                if (depositRequest.Status is (int)DepositStatusEnum.Approved or (int)DepositStatusEnum.Rejected or (int)DepositStatusEnum.Canceled)
+                if (depositRequest.Status is DepositStatusEnum.Approved or DepositStatusEnum.Rejected or DepositStatusEnum.Canceled)
                 {
                     permission = permissionList.Contains(78); //刪除權限
                 }
@@ -694,9 +696,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     apiResult.Message = "depositId already checked";
                 }
 
-                if (depositInfo.DepositType == (int)DepositTypeEnum.LocalBanking &&
-                    depositInfo.Status == (int)DepositStatusEnum.Pending || 
-                    depositInfo.Status == (int)DepositStatusEnum.OnHold)
+                if ((depositInfo.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet) &&
+                    depositInfo.Status == DepositStatusEnum.Pending || 
+                    depositInfo.Status == DepositStatusEnum.OnHold)
                 {
                     var result = _depositBll.CheckDepositReceipt(depositInfo.SiteId ,request.TransId, User.Identity.Name);
                     if (result > 0)
@@ -783,24 +785,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         
         #region Private function
 
-        private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
-        {
-            return await _pendingFundBll.ProcessAsync(pendingFund);
-        }
-
-        private List<int> GetUsableActionButton(DepositRequest depositRequest)
-        {
+        private List<DepositActionEnum> GetUsableActionButton(DepositRequest depositRequest)
+        { 
             var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
             var usableList = _usableActionType[depositRequest.Status];
-            var usableActionButton = usableList.Where(item => permissionList.Contains(item)).ToList();
+            var usableActionButton = usableList
+                .Where(item => permissionList.Contains((int)item)).ToList();
                     
-            if (depositRequest.DepositType == (int) DepositTypeEnum.LocalBanking)
+            if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
             {
-                usableActionButton.Remove((int) DepositActionEnum.ManualApproved);
+                usableActionButton.Remove(DepositActionEnum.ManualApproved);
             }
-            else if (depositRequest.DepositType != (int) DepositTypeEnum.LocalBanking)
+            else if (depositRequest.DepositType is not DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
             {
-                usableActionButton.Remove((int) DepositActionEnum.Approved);
+                usableActionButton.Remove(DepositActionEnum.Approved);
             }
 
             return usableActionButton;

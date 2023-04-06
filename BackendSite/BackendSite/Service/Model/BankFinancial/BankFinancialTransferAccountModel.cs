@@ -81,6 +81,8 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶顯示名稱
         /// </summary>
         public string DisplayName { get; set; }
+        
+        public string FrontendDisplayName { get; set; }
 
         /// <summary>
         /// 讀寫 初始金額

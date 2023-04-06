@@ -1,13 +1,13 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using BackendSite.Service.Library;
-using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -204,7 +204,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<IActionResult> Export(ExportMemberRequest request)
         {
             var exportData = await _memberQuery.GetExportDataAsync(request);
-            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 
@@ -499,6 +499,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// 取得玩家在第三方遊戲帳號
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
+            try
+            {
+                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
         /// Member/EditFullName 修改用戶真實姓名
         /// </summary>
         /// <remarks>
@@ -1105,29 +1127,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// 取得玩家在第三方遊戲帳號
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
-        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
-            try
-            {
-                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
         /// Member/GetCustomerBalanceInfo 取得客戶餘額資料
         /// </summary>
         /// <remarks>
@@ -1156,6 +1155,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Http Method：POST
         /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
         public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
@@ -1192,25 +1197,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = await _memberQuery.GetCustRealNameChangeLogAsync(request.CustId)
-            };
-        }
-        
-        /// <summary>
-        /// Member/GetCustomerAssociateBankUser 取得客戶相同銀行卡號的其他用戶資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<CustomerAssociateBankInfo>>> GetCustomerAssociateBankUser(GetCustomerAssociateBankUserRequest request)
-        {
-            return new ApiResult<IEnumerable<CustomerAssociateBankInfo>>()
-            {
-                ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _memberQuery.GetCustomerAssociateBankUserAsync(request.CustId)
             };
         }
 
@@ -1291,6 +1277,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     request.EndTime.ToUniversalTime().DateTime)
             };
         }
+        
+        /// <summary>
+        /// Member/GetCustomerAssociateBankUser 取得客戶相同銀行卡號的其他用戶資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<CustomerAssociateBankInfo>>> GetCustomerAssociateBankUser(GetCustomerAssociateBankUserRequest request)
+        {
+            return new ApiResult<IEnumerable<CustomerAssociateBankInfo>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustomerAssociateBankUserAsync(request.CustId)
+            };
+        }
+        
 
     }
 }

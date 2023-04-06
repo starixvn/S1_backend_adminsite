@@ -20,39 +20,27 @@ namespace BackendSite.Controllers.Api
     {
         #region Fields
 
-        private readonly SelLangBLL _selLangBLL;
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly Tools _tools;
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly AdminBLL _adminBLL;
-        private readonly HomeBLL _homeBLL;
-        private readonly DashBoardBLL _dashBoardBLL;
         private readonly MenuBLL _menuBLL;
-        private readonly ResponseSettingBLL _responseSettingBLL;
 
         #endregion
 
         #region Constructors
 
-        public HomeController(SelLangBLL selLangBLL,
-                              AuthorizeBLL authorizeBLL,
+        public HomeController(AuthorizeBLL authorizeBLL,
                               Tools tools,
                               ServerInfoBLL serverInfoBLL,
                               AdminBLL adminBLL,
-                              HomeBLL homeBLL,
-                              DashBoardBLL dashBoardBLL,
-                              MenuBLL menuBLL,
-                              ResponseSettingBLL responseSettingBLL)
+                              MenuBLL menuBLL)
         {
-            _selLangBLL = selLangBLL;
             _authorizeBLL = authorizeBLL;
             _tools = tools;
             _serverInfoBLL = serverInfoBLL;
             _adminBLL = adminBLL;
-            _homeBLL = homeBLL;
-            _dashBoardBLL = dashBoardBLL;
             _menuBLL = menuBLL;
-            _responseSettingBLL = responseSettingBLL;
         }
 
         #endregion
@@ -72,6 +60,7 @@ namespace BackendSite.Controllers.Api
             /// </summary>
             [Required]
             public string txtPW { set; get; }
+            public string redirectUrl { set; get; }
         }
 
         public class DashBoardPara
@@ -140,10 +129,13 @@ namespace BackendSite.Controllers.Api
             await HttpContext.SignInAsync("backend",
                                  new ClaimsPrincipal(claimsIdentity));
 
+            if (string.IsNullOrWhiteSpace(loginModel.redirectUrl))
+                loginModel.redirectUrl = Url.Action("Index", "Home");
+
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = Url.Action("Index", "Home")
+                Message = loginModel.redirectUrl
             };
         }
 
@@ -256,75 +248,6 @@ namespace BackendSite.Controllers.Api
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Message = "Update Success."
-            };
-        }
-
-        #region Temp，沒再使用
-
-        [HttpPost]
-        public ApiResult<int> RegisteredCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
-        {
-            var result = _homeBLL.GetRegisteredCustomers(SiteId, StartDate, EndDate);
-            var apiResult = new ApiResult<int>();
-
-            if (result >= 0)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Data = result;
-            }
-            else
-            {
-                apiResult.ErrorCode = 999;
-            }
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult<int> DepositCustomers([FromForm] int SiteId, [FromForm] long StartDate, [FromForm] long EndDate)
-        {
-            var result = _homeBLL.GetepositCustomers(SiteId, StartDate, EndDate);
-            var apiResult = new ApiResult<int>();
-
-            if (result >= 0)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Data = result;
-            }
-            else
-            {
-                apiResult.ErrorCode = 999;
-            }
-
-            return apiResult;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Home/GetDashBoardData 取得首頁儀錶板資訊資料
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：Home > Dash Board > [Refresh]
-        /// 
-        /// </remarks>
-        /// <param name="para">參數</param>
-        /// <returns>結果</returns>
-        [HttpPost]
-        public ApiResult GetDashBoardData(DashBoardPara para)
-        {
-            var CanSearchSite = new List<int>();
-
-            _serverInfoBLL.GetSiteListByLoginUser().ToList().ForEach(x => CanSearchSite.Add(x.SiteId));
-            var result = _dashBoardBLL.GetDashBoardData(para.SiteId, para.CurrencyId, para.BaseCurrencyId, CanSearchSite,8);
-
-            return new ApiResult<DashBoardData>
-            {
-                Data = result,
-                ErrorCode = (int)ErrorCodeEnum.Success,
             };
         }
 

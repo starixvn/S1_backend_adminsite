@@ -236,7 +236,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, string siteList)
         {
-            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V11", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
+            var result = _reportDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfoDetailSearch_Get_V12", new DynamicParameters(new { CustId = custId, UserName = userName, SiteList = siteList }));
             return result;
         }
 
@@ -247,6 +247,7 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
+
             return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3",
                 new DynamicParameters(new
                 {
@@ -732,7 +733,6 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
-
         public async Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beofreData, object afterData,
            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater, MySqlTransaction trans)
         {
@@ -755,7 +755,6 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
-
         public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
             var p = new DynamicParameters();
@@ -780,11 +779,11 @@ namespace BackendSite.Service.DAL
         }
         public DashboardWinLossGroup GetDashboardWinLossGroup(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
+            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
         }
         public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
+            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
         }
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)

@@ -320,12 +320,6 @@ namespace BackendSite.Service.Model
         public string TpGameTypeName { get; set; }
     }
 
-    public class PromotionType
-    {
-        public int Type { get; set; }
-        public string PromotionTypeName { get; set; }
-    }
-
     public class PromotionCashBack
     {
         public int GameType { get; set; }
@@ -398,21 +392,7 @@ namespace BackendSite.Service.Model
         public bool IsForVipLevel  { get; set; }
         public IEnumerable<int> SelectedVipLevel { get; set; }
     }
-    public class LeaderboardExtraPointList
-    {
-        public DateTimeOffset ActiveDate { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string Currency { get; set; }
-        public string CategoryName { get; set; }
-        public decimal ExtraPoint { get; set; }
-        public DateTimeOffset CreateTime { set; get; }
-        public DateTimeOffset UpdateTime { set; get; }
-        public string LastUpdateUser { get; set; }
-
-    }
-
+    
     public class PromotionCashBackSetting
     {
         public int CurrencyId { get; set; }
@@ -437,6 +417,12 @@ namespace BackendSite.Service.Model
         public int Key { get; set; }
     }
 
+    public class PromotionType
+    {
+        public int Type { get; set; }
+        public string PromotionTypeName { get; set; }
+    }
+
     public class TierAmount
     {
         public decimal Bonus { get; set; }
@@ -445,4 +431,6 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public int WinOver { get; set; }
     }
+
+
 }

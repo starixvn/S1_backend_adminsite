@@ -1,0 +1,57 @@
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Report;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BackendSite.Controllers.ApiV2.Report
+{
+    [Authorize(AuthenticationSchemes = "backendV2")]
+    [Route("apiV2/[controller]/[action]")]
+    [ApiController]
+    public class LeaderBoardReportController : ControllerBase
+    {
+        private readonly LeaderBoardBLL _leaderBoardBll;
+        private readonly ExcelBLL _excelBll;
+
+        public LeaderBoardReportController(IServiceProvider provider)
+        {
+            _leaderBoardBll = provider.GetRequiredService<LeaderBoardBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
+        public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
+        {
+            var apiResult = new ApiListResult<GetLeaderboardReportResponse>();
+
+            try
+            {
+                var data = _leaderBoardBll.GetLeaderboardReport(request);
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 2 })]
+        public IActionResult GetLeaderboardReportExport(GetLeaderboardReportRequest request)
+        {
+            var data = _leaderBoardBll.GetLeaderboardReport(request);
+            
+            var stream = _excelBll.ExportV2(data);
+            return _excelBll.ExcelFile(stream, "LeaderboardReport");
+        }
+        
+    }
+}

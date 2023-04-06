@@ -104,12 +104,19 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int PageNumber { get; set; }
         public int RowCount { get; set; }
-
-        public List<TotalAmount> CurrencyAmountRecord { get; set; }
         public List<string> CurrencyAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TotalApproveAmount { get; set; }
         public int TotalApproveRow { get; set; }
+        public List<TotalAmount> CurrencyAmountRecord { get; set; }
         public string PageRange { get; set; }
+    }
+
+    public class DataWithPage<T>
+    {
+        public IEnumerable<T> Data { get; set; }
+        public int PageNumber { get; set; }
+        public int TotalPages { get; set; }
+        public int RowCount { get; set; }
     }
 }

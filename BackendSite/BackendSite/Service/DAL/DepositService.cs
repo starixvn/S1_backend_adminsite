@@ -228,7 +228,7 @@ namespace BackendSite.Service.DAL
                 props.Add("DepositPic", depositPic);
                 props.Add("Creator", creator);
                 props.Add("CreateFrom", 2);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set_V2", trans , props );
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set_V2", trans, props);
 
                 if (result > 0)
                 {
@@ -269,7 +269,7 @@ namespace BackendSite.Service.DAL
                 props.Add("CustId", custId);
                 props.Add("DepositId", depositId);
                 props.Add("ReceiptNo", receiptNo);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans ,props );
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans, props);
 
                 if (result > 0)
                 {
@@ -376,7 +376,7 @@ namespace BackendSite.Service.DAL
 
                     if (status == DepositStatusEnum.Approved)
                     {
-                        if (depositRequest.DepositType != 3)
+                        if (depositRequest.DepositType is not DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
                         {
                             var pay = (IPay)depositRequest.oDepositInfo;
                             type = payTypePosition + pay.PayId;
@@ -398,7 +398,7 @@ namespace BackendSite.Service.DAL
 
                         if (result > 0)
                         {
-                            if (depositRequest.DepositType == 3)
+                            if (depositRequest.DepositType == DepositTypeEnum.LocalBanking)
                             {
                                 var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
                                 result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, trans);
