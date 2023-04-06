@@ -251,7 +251,9 @@ namespace BackendSite.Service.BLL
                     ? new List<CustomerTag>()
                     : await _memberService.GetCustomerTagsAsync(customer.TagList),
                 PhoneRewardTime = customer.PhoneRewardTime,
-                EmailRewardTime = customer.EmailRewardTime
+                EmailRewardTime = customer.EmailRewardTime,
+                PhoneVerifyTime = customer.PhoneVerifyTime,
+                EmailVerifyTime = customer.EmailVerifyTime
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
