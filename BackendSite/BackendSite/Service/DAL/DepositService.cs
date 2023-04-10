@@ -34,7 +34,26 @@ namespace BackendSite.Service.DAL
             _logger = provider.GetRequiredService<ILogger<DepositService>>();
         }
 
-        public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode, IEnumerable<int> selectCalCode, DateTime startDate, DateTime endDate, string DepositId, IEnumerable<string> userNames, string agent ,IEnumerable<int> currencyId, IEnumerable<int> status, IEnumerable<int> levelStatus, int pageSize,decimal startAmount, decimal endAmount, IEnumerable<int> payIds, int pageNumber, out int totalPages, out int rowCount , ref List<TotalAmount> currencyAmountRecord)
+        public IEnumerable<DepositRequest> GetDepositRequestList(
+            IEnumerable<int> selectSite,
+            IEnumerable<int> depositType,
+            IEnumerable<string> selectBankCode, 
+            IEnumerable<int> selectCalCode, 
+            DateTime startDate,
+            DateTime endDate, 
+            DepositDateTypeEnum dateType,
+            string DepositId, 
+            IEnumerable<string> userNames, 
+            string agent ,
+            IEnumerable<int> currencyId,
+            IEnumerable<int> status, 
+            IEnumerable<int> levelStatus,
+            int pageSize,
+            decimal startAmount,
+            decimal endAmount, 
+            IEnumerable<int> payIds,
+            int pageNumber, out int totalPages, out int rowCount ,
+            ref List<TotalAmount> currencyAmountRecord)
         {
             var depositId = 0;
 
@@ -52,6 +71,7 @@ namespace BackendSite.Service.DAL
                 SelectCalCode = selectCalCode.Any() ? JsonConvert.SerializeObject(selectCalCode) : null,
                 StartDate = startDate,
                 EndDate = endDate,
+                DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int)dateType,
                 DepositId = depositId,
                 TransId = string.IsNullOrEmpty(DepositId) ? null : DepositId ,
                 UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
@@ -66,7 +86,7 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            currencyAmountRecord = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V8", p).ToList();
+            currencyAmountRecord = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
             
             #endregion
 
@@ -75,7 +95,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V12", p);
+            var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V13", p);
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
@@ -189,12 +209,129 @@ namespace BackendSite.Service.DAL
 
             return transId;
         }
-
-        public int SetDepositReceiptPic(int custId, int depositId, string picFileName, byte[] depositPic)
+        
+        public async Task<int> SetDepositReceiptPic(int siteId ,int custId, int depositId, int receiptNo ,string picFileName, byte[] depositPic ,string creator)
         {
-            return _mainDbClient.Execute("Admin_DepositReceiptPic_Set", new { CustId = custId, DepositId = depositId, PicFileName = picFileName, DepositPic = depositPic });
+            var result = 0;
+            
+            try
+            {
+                await using var conn = _mainDbClient.GetMySqlConnection();
+                await conn.OpenAsync();
+                await using var trans = await conn.BeginTransactionAsync();
+            
+                var props = new DynamicParameters();
+                props.Add("CustId", custId);
+                props.Add("DepositId", depositId);
+                props.Add("ReceiptNo", receiptNo);
+                props.Add("PicFileName", picFileName);
+                props.Add("DepositPic", depositPic);
+                props.Add("Creator", creator);
+                props.Add("CreateFrom", 2);
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set_V2", trans , props );
+
+                if (result > 0)
+                {
+                    result = SetDepositLog(depositId, siteId, $"Upload Receipt , picFileName:{picFileName}  ", (int)DepositStatusEnum.UploadReceipt, 0, creator);
+                }
+                
+                if (result > 0)
+                {
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+                }
+                else
+                {
+                    await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
+                }
+                
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, creator);
+            }
+            
+            return result;
         }
 
+        public async Task<int> DelDepositReceiptPic(int siteId ,int custId, int depositId, string picFileName , int receiptNo ,string Operator)
+        {
+            var result = 0;
+            
+            try
+            {
+                await using var conn = _mainDbClient.GetMySqlConnection();
+                await conn.OpenAsync();
+                await using var trans = await conn.BeginTransactionAsync();
+                
+                var props = new DynamicParameters();
+                props.Add("CustId", custId);
+                props.Add("DepositId", depositId);
+                props.Add("ReceiptNo", receiptNo);
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans ,props );
+
+                if (result > 0)
+                {
+                    result = SetDepositLog(depositId, siteId, $"Delete Receipt, picFileName:{picFileName}", (int)DepositStatusEnum.DeleteReceipt, 0, Operator);
+                }
+                
+                if (result > 0)
+                {
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+                }
+                else
+                {
+                    await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, Operator);
+            }
+            
+            return result;
+        }
+
+        public int CheckDepositReceipt(int siteId ,int depositId , string Operator)
+        {
+            var result = 0;
+            
+            try
+            {
+                using var conn = _mainDbClient.GetMySqlConnection();
+                conn.Open();
+                using var trans = conn.BeginTransaction();
+                
+                var props = new DynamicParameters();
+                props.Add("_DepositId", depositId);
+                props.Add("_Operator", Operator);
+                result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set", props);
+
+                if (result > 0)
+                {
+                    result = SetDepositLog(depositId, siteId, "Check DepositReceipt", (int)DepositStatusEnum.CheckDepositReceipt, 0, Operator);
+                }
+                
+                if (result > 0)
+                {
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
+                }
+                else
+                {
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, Operator);
+            }
+            
+            return result;
+        }
+        
         public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)
         {
             var type = 1;
@@ -251,7 +388,7 @@ namespace BackendSite.Service.DAL
 
                         if (result >= 0)
                         {
-                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, $"WithdrawalLimit: {actualDeposit}", transId, out _, trans);
+                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, (int)WithdrawalLimitAdjustmentReasonEnum.Deposit,$"WithdrawalLimit: {actualDeposit}", transId, (int)WithdrawalLimitLogCreateFromEnum.Deposit , Operator, out _, trans);
                         }
 
                         if (is1stDepoist == 1 && result > 0)
@@ -345,12 +482,17 @@ namespace BackendSite.Service.DAL
                 }));
         }
 
-        public DepositReceipt GetDepositReceipt(int depositId, int siteId)
+        public IEnumerable<DepositReceipt> GetDepositReceipt(int depositId, int siteId)
         {
-            return _reportDbClient.QueryFirst<DepositReceipt>("DepositReceipt_Get", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
+            return _reportDbClient.Query<DepositReceipt>("DepositReceipt_Get", new DynamicParameters(new { DepositId = depositId, SiteId = siteId }));
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
+        public DepositReceipt GetDepositReceiptByNo(int depositId, int receiptNo, int siteId)
+        {
+            return _reportDbClient.QueryFirst<DepositReceipt>("Admin_DepositReceiptByNo_Get", new DynamicParameters(new { DepositId = depositId, ReceiptNo = receiptNo, SiteId = siteId }));
+        }
+        
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
         {
             var depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -367,6 +509,7 @@ namespace BackendSite.Service.DAL
                 DepositType = depositType,
                 StartDate = startDate,
                 EndDate = endDate,
+                DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int) dateType,
                 DepositId = depositId,
                 TransId = DepositId,
                 UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
@@ -378,7 +521,7 @@ namespace BackendSite.Service.DAL
                 EndAmount = endAmount,
                 PayIds = payIds
             });
-            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V13", p);
+            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V14", p);
             return depositList;
         }
 
@@ -449,12 +592,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -487,12 +630,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -527,12 +670,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -564,12 +707,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -606,12 +749,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 
@@ -643,12 +786,12 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return true;
                 }
             }
 
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
 

@@ -198,7 +198,7 @@ namespace BackendSite.Service.DAL
             
             var amount = input.AdjustType == WithdrawalLimitAdjustmentAdjustTypeEnum.Debit ? input.Amount * -1 : input.Amount;
             var result = withdrawalLimitService.SetWithdrawalLimit(input.CustId, input.UserName, input.SiteId,
-                amount, input.Memo, transId, out var afterAmount, trans);
+                amount, (int)input.ReasonId, input.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment , input.Operator, out var afterAmount, trans);
 
             if (result < 1)
             {
@@ -288,7 +288,7 @@ namespace BackendSite.Service.DAL
                 else
                 {
                     var amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
-                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, out var AfterAmount, trans);
+                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, (int)WithdrawalLimitAdjustmentReasonEnum.None ,withdrawalLimitInfo.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment , Operator ,out var AfterAmount, trans);
 
                     #region propsLog
                     var propsLog = new DynamicParameters();
@@ -413,7 +413,7 @@ namespace BackendSite.Service.DAL
                             else
                             {
                                 var amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 ? adjustmentAndWithdrawalLimit.WithdrawalLimitAmount * -1 : adjustmentAndWithdrawalLimit.WithdrawalLimitAmount;
-                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Memo, transId, out _, trans);
+                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Category ,adjustmentAndWithdrawalLimit.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.BalanceAdjustment , Operator ,out _, trans);
                                 //return 0;
                             }
                         }
@@ -528,14 +528,14 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", input.Operator);
 
             var logParam = new DynamicParameters();
-            props.Add("_SiteId", input.SiteId);
-            props.Add("_CurrencyId", input.CurrencyId);
-            props.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.AdjustmentLimitation);
-            props.Add("_ActionType", (int)ActionType.Update);
-            props.Add("_RefTransId", string.Empty);
-            props.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
-            props.Add("_Operator", input.Operator);
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.AdjustmentLimitation);
+            logParam.Add("_ActionType", (int)ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_Operator", input.Operator);
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
 
             if (!logResult)

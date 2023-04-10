@@ -484,7 +484,10 @@ namespace BackendSite.Service.Model
         public decimal BeforeWithdrawalLimit { get; set; }
         public decimal AfterWithdrawalLimit { get; set; }
         public string Memo { get; set; }
+        public int ReasonId { get; set; }
         public string RefTransId { get; set; }
+        public int CreateFrom { get; set; }
+        public string Creator { get; set; }
         public DateTimeOffset CreateTime
         {
             get => _createTime;
@@ -498,6 +501,23 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
+    }
+    
+    public class AdjustmentWithdrawalLimitLog
+    {
+        public int MainType { get; set; }
+        public decimal Amount { get; set; }
+        public string Memo { get; set; }
+        public int ReasonId { get; set; }
+        public string RefTransId { get; set; }
+        public string Creator { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+    }
+    
+    public class AdjustmentWithdrawalLimitLogData
+    {
+        public List<AdjustmentWithdrawalLimitLog> AdjustmentWithdrawalLimitLogList { get; set; }
+        public decimal TotalAmount { get; set; }
     }
 
     public class CustLineProfileModel

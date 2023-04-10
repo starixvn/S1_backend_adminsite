@@ -71,6 +71,7 @@ namespace BackendSite.Service.BLL
             IEnumerable<int> withdrawalType,
             DateTime startDate,
             DateTime endDate,
+            WithdrawalDateTypeEnum dateType,
             string withdrawalId,
             IEnumerable<string> userNames,
             IEnumerable<int> currencyId,
@@ -92,6 +93,7 @@ namespace BackendSite.Service.BLL
                 withdrawalType,
                 startDate,
                 endDate,
+                dateType,
                 withdrawalId,
                 userNames,
                 currencyId,
@@ -229,13 +231,12 @@ namespace BackendSite.Service.BLL
             var chargeFee = 0m;
             if (withdrawalType is (int) WithdrawalTypeEnum.CryptoWallet or (int) WithdrawalTypeEnum.LocalBank)
             {
-                accountingModelString = SetAccountingString(accountingModels);
                 chargeFee = accountingModels.Sum(x => x.ChargeFee);
             }
             
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus), updater,
-                WithdrawalStatusEnum.Process, withdrawalInfo, withdrawalType, accountingModelString , out custId, out amount ,userId, chargeFee:chargeFee);
+                WithdrawalStatusEnum.Process, withdrawalInfo, withdrawalType, accountingModels , out custId, out amount ,userId, chargeFee:chargeFee);
         }
 
         public int WithdrawalOnHold(string transId, string comment, string updater)
@@ -280,12 +281,11 @@ namespace BackendSite.Service.BLL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
             var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-            var accountingModelString = SetAccountingString(accountingModels);
             
             return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
                 JsonConvert.SerializeObject(forStatus),
                 updater,
-                WithdrawalStatusEnum.Draft, null, null, accountingModelString, out _, out _);
+                WithdrawalStatusEnum.Draft, null, null, accountingModels, out _, out _);
         }
 
         public int WithdrawalPending(string transId, string comment, string updater)
@@ -370,6 +370,7 @@ namespace BackendSite.Service.BLL
             string withdrawalType,
             DateTime startDate, 
             DateTime endDate, 
+            WithdrawalDateTypeEnum dateType,
             string withdrawalId, 
             string userName, 
             string currencyId,
@@ -387,6 +388,7 @@ namespace BackendSite.Service.BLL
                 withdrawalType,
                 startDate, 
                 endDate,
+                dateType,
                 withdrawalId, 
                 userName, 
                 currencyId,
@@ -1359,24 +1361,6 @@ namespace BackendSite.Service.BLL
         private bool DeleteWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
         {
             return _withdrawalBankAccountingService.SetFlow(ActionType.Delete, model);
-        }
-
-        private string SetAccountingString(IEnumerable<WithdrawalAccountingModel> accountingModels)
-        {
-            string accountingModelString = null;
-            if (accountingModels != null && accountingModels.Any() )
-            {
-                var bankAccountList = _bankDetailBll.GetOfflineBankAccount();
-                var seq = 1;
-                foreach (var model in accountingModels)
-                {
-                    model.Seq = seq;
-                    model.BankAccountNo = bankAccountList.FirstOrDefault(x => x.BankId == model.BankId)?.DisplayName;
-                    seq += 1;
-                }
-                accountingModelString = JsonConvert.SerializeObject(accountingModels);
-            }
-            return accountingModelString;
         }
 
         #region Withdrawal Submission

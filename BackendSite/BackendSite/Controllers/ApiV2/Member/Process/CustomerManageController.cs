@@ -429,6 +429,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
         }
+
+        public class GetFinancialLogExportRequest
+        {
+            public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+            public string RefTransId { get; set; }
+            public int FinancialType { get; set; }
+        }
+
         public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
         {
             public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
@@ -1680,9 +1690,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 2 })]
-        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogRequest request)
+        public IActionResult GetFinancialLogByCustIdExport(GetFinancialLogExportRequest request)
         {
-            request.PageNumber = -1; //export all
+
             var offset = request.StartDate.Offset;
             var startDate = request.StartDate.ToUniversalTime().DateTime;
             var endDate = request.EndDate.ToUniversalTime().DateTime;
@@ -1693,8 +1703,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 endDate,
                 request.RefTransId,
                 request.FinancialType,
-                request.PageSize,
-                request.PageNumber,
+                0,
+                -1,
                 out var _);
 
             foreach (var item in data)
@@ -3008,6 +3018,49 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return result;
         }
+        
+        /// <summary>
+        /// CustomerManage/GetAdjustmentWithdrawalLimitLog 取得手動調整提款額度限額的log
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        [HttpPost]
+        public AdjustmentWithdrawalLimitLogData GetAdjustmentWithdrawalLimitLog(CustIdWithDateRangeRequest request)
+        {
+            var result = new AdjustmentWithdrawalLimitLogData
+            {
+                AdjustmentWithdrawalLimitLogList = new List<AdjustmentWithdrawalLimitLog>(),
+                TotalAmount = 0
+            };
+
+            var searchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, 1, 1000);
+            
+            foreach (var model in searchResult.WithdrawalLimitLogList)
+            {
+                if (model.CreateFrom == (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment)
+                {
+                    var modelResult = new AdjustmentWithdrawalLimitLog
+                    {
+                        MainType = model.MainType,
+                        Amount = model.ChangeWithdrawalLimit,
+                        Memo = model.Memo,
+                        ReasonId = model.ReasonId,
+                        RefTransId = model.RefTransId,
+                        Creator = model.Creator,
+                        CreateTime = model.CreateTime
+                    };
+                    result.AdjustmentWithdrawalLimitLogList.Add(modelResult);
+                }
+            }
+            
+            result.TotalAmount = result.AdjustmentWithdrawalLimitLogList.Sum(x => x.MainType == (int)DirectionEnum.Add ? x.Amount : x.Amount * -1);
+            
+            return result;
+        }
+        
         #endregion
 
         #region CSD > Customer Administration > CustInfo [Get TPWallet]

@@ -136,6 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> WithdrawalTypes { get; set; }
+            public WithdrawalDateTypeEnum DateType { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate
             {
@@ -163,6 +164,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             private DateTimeOffset _startDate;
             private DateTimeOffset _endDate;
             public int SiteId { get; set; }
+            public WithdrawalDateTypeEnum DateType { get; set; }
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> WithdrawalTypes { get; set; }
@@ -268,6 +270,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.WithdrawalTypes, 
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.DateType,
                 request.WithdrawalId, 
                 userNames,
                 request.CurrencyIds,
@@ -329,6 +332,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 JsonConvert.SerializeObject(request.WithdrawalTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.DateType,
                 request.WithdrawalId,
                 userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
                 request.CurrencyIds.Any() ? JsonConvert.SerializeObject(request.CurrencyIds) : null,
@@ -819,13 +823,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 77 })]
         [HttpPost]
         public async Task<ApiResult> UploadPicture(UploadPictureRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
+                var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                
+                if (withdrawalRequest.Status is not (WithdrawalStatusEnum.Process or WithdrawalStatusEnum.Approved))
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Wrong status ,Can't upload receipt";
+                    return apiResult;
+                }
+                
                 var requestCount = request.Pic.Count();
                 var result = _withdrawalBll.UpdateWithdrawalPicCount(request.TransId , requestCount);
                 if (result)
@@ -879,13 +892,32 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
         [HttpPost]
         public async Task<ApiResult> DeletePicture(DeletePictureRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
+                var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
+                
+                bool permission;
+                if (withdrawalRequest.Status is WithdrawalStatusEnum.Approved or WithdrawalStatusEnum.Rejected or WithdrawalStatusEnum.Cancelled)
+                {
+                    permission = permissionList.Contains(78); //刪除權限
+                }
+                else
+                {
+                    permission = permissionList.Contains(77); //新增權限
+                }
+                
+                if (!permission)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.PermissionDenied;
+                    apiResult.Message = "Permission Denied";
+                    return apiResult;
+                }
+                
                 var deleteRequest = new DeleteObjectRequest();
                 var key = $"{_awsWithdrawalFolder}/{request.TransId}_{request.Number}.png";
                 deleteRequest.BucketName = _awsWithdrawalBucketName;
@@ -1055,11 +1087,23 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 usableActionButton.Remove(WithdrawalActionEnum.ManualRejected);
             }
 
+            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank 
+                && withdrawalRequest.Status is  WithdrawalStatusEnum.Approved)
+            {
+                usableActionButton.Add(WithdrawalActionEnum.ManualRejected);
+            }
+            
             if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
                 withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
             {
                 usableActionButton.Remove(WithdrawalActionEnum.Verified);
                 usableActionButton.Remove(WithdrawalActionEnum.Approved);
+            }
+            
+            if (withdrawalRequest.Status == WithdrawalStatusEnum.Rejected &&
+                withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
+            {
+                usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
             }
             
             return usableActionButton;
