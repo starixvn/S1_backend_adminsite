@@ -80,6 +80,11 @@ namespace BackendSite.Service.BLL
             });
         }
 
+        public IEnumerable<BankFinancialTransferAccount> GetFinancialAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
+        {
+            return _bankFinancialService.GetTransferAccountList(siteId, purposes);
+        }
+        
         #endregion
 
         #region Transfer Account Management
