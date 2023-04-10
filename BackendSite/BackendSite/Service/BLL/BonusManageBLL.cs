@@ -214,26 +214,6 @@ namespace BackendSite.Service.BLL
 
             return scratchCardList;
         }
-        public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(IEnumerable<int> selectSite,
-            IEnumerable<int> categoryType,
-            IEnumerable<int> currencyId,
-            DateTime startDate,
-            DateTime endDate,
-            int pageNumber,
-            int pageSize, out int totalPages, out int rowCount)
-        {
-            return _bonusManageService.GetLeaderboardExtraPointList(JsonConvert.SerializeObject(selectSite),
-                JsonConvert.SerializeObject(categoryType),
-                JsonConvert.SerializeObject(currencyId),
-                startDate,
-                endDate,
-                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                Math.Abs(pageSize), out totalPages, out rowCount);
-        }
-        public int SetLeaderboardExtraPoint(long activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
-        {
-            return _bonusManageService.SetLeaderboardExtraPoint(activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
-        }
 
         public bool CheckPromotionExists(string bonusCode, string specialCode)
         {
