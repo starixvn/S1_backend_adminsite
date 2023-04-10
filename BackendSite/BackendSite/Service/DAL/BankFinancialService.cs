@@ -117,7 +117,7 @@ namespace BackendSite.Service.DAL
                     _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = bankFinancialTransferAccount.Purpose,
+                    _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
