@@ -185,7 +185,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V7";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V8";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
