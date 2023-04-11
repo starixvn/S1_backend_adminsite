@@ -19,11 +19,11 @@ namespace BackendSite.Service.DAL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        public int SetWithdrawalLimit(int custId, string userName, int siteId, decimal withdrawalLimit, string memo, string refTransId, out decimal afterWithdrawalLimit, MySqlTransaction trans)
+        public int SetWithdrawalLimit(int custId, string userName, int siteId, decimal withdrawalLimit, int reasonId ,string memo, string refTransId, int createFrom, string creator, out decimal afterWithdrawalLimit, MySqlTransaction trans)
         {
-            var p = new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId, WithdrawalLimit = withdrawalLimit, Memo = memo, RefTransId = refTransId });
+            var p = new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId, WithdrawalLimit = withdrawalLimit, ReasonId = reasonId, Memo = memo, RefTransId = refTransId, CreateFrom = createFrom, Creator = creator });
             p.Add("AfterWithdrawalLimit", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = _mainDbClient.Execute("Common_WithdrawalLimit_Set", trans, p);
+            var result = _mainDbClient.Execute("Common_WithdrawalLimit_Set_V2", trans ,p );
             afterWithdrawalLimit = p.Get<decimal?>("AfterWithdrawalLimit") ?? 0;
             return result;
         }
@@ -87,18 +87,18 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
             var result = _mainDbClient.Execute("Admin_WithdrawalLimitInfo_Ins_V2", tran, param) > 0;
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -132,18 +132,18 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
             var result = _mainDbClient.Execute("Admin_WithdrawalLimitInfo_Set_V2", tran, param) > 0;
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -175,18 +175,18 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
             var result = _mainDbClient.Execute("Admin_WithdrawalLimitInfoReNew_Set", tran, param) > 0;
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -221,18 +221,18 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
             var result = _mainDbClient.Execute("Admin_WithdrawalLimitInfo_Del", tran, param) > 0;
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -278,7 +278,7 @@ namespace BackendSite.Service.DAL
             _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", tran, new { Menu = "USDTWithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator });
 
             result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Ins", tran, param) > 0;
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return result;
         }
@@ -304,7 +304,7 @@ namespace BackendSite.Service.DAL
             _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", tran, new { Menu = "USDTWithdrawalLimitManagement", ActionType = 2, DetailInfo = JsonConvert.SerializeObject(param), Operator = Operator });
 
             result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Del", tran, new { SiteId = USDTwithdrawalLimitInfoManage.SiteId, CurrencyId = USDTwithdrawalLimitInfoManage.CurrencyId, VipLevel = USDTwithdrawalLimitInfoManage.VipLevel , Network = Enum.GetName(typeof(NetworkTypeEnum), USDTwithdrawalLimitInfoManage.NetworkType) });
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return result;
         }
@@ -329,7 +329,7 @@ namespace BackendSite.Service.DAL
             _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", tran, new { Menu = "USDTWithdrawalLimitManagement", ActionType = 1, DetailInfo = JsonConvert.SerializeObject(param), Operator = UpdateOperator });
 
             result = _mainDbClient.Execute("Admin_USDTWithdrawalLimitInfo_Set", tran, param) > 0;
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return result;
         }
@@ -406,7 +406,7 @@ namespace BackendSite.Service.DAL
             
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -414,11 +414,11 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -466,7 +466,7 @@ namespace BackendSite.Service.DAL
             
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -474,11 +474,11 @@ namespace BackendSite.Service.DAL
             
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -518,7 +518,7 @@ namespace BackendSite.Service.DAL
 
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -526,11 +526,11 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -565,7 +565,7 @@ namespace BackendSite.Service.DAL
 
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -573,11 +573,11 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
@@ -618,11 +618,11 @@ namespace BackendSite.Service.DAL
 
             if(result & logResult)
             {
-                tran.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, tran);
             }
             else
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             }
 
             return result & logResult;
@@ -657,11 +657,11 @@ namespace BackendSite.Service.DAL
 
             if (result & logResult)
             {
-                tran.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, tran);
             }
             else
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             }
 
             return result & logResult;

@@ -10,7 +10,7 @@ namespace BackendSite.Extensions
         }
 
         ///// <summary>
-        ///// decimal ¤p¼Æ¨â¦ì
+        ///// decimal ï¿½pï¿½Æ¨ï¿½ï¿½
         ///// </summary>
         ///// <param name="source"></param>
         ///// <returns></returns>
@@ -18,5 +18,12 @@ namespace BackendSite.Extensions
         //{
         //    return Math.Round(source, 2, MidpointRounding.AwayFromZero);
         //}
+        
+        public static string GetChannelName(this string currencyName, string network)
+        {
+            return currencyName.Equals(network, StringComparison.OrdinalIgnoreCase)
+                ? currencyName
+                : $"{currencyName}-{network}";
+        }
     }
 }

@@ -79,18 +79,18 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
             var result = _mainDbClient.Execute("Admin_BettingMonitorSetting_Set", tran, param) > 0;
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
             
@@ -123,18 +123,18 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
             var result = _mainDbClient.Execute("Admin_BettingMonitorSetting_Del", tran, param) > 0;
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
             
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
             

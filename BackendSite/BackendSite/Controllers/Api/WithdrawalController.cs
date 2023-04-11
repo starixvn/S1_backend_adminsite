@@ -101,9 +101,10 @@ namespace BackendSite.Controllers.Api
 
             var withdrawalRequestList = withdrawalBLL.GetWithdrawalRequestList(
                 withdrawalListReq.SelectSite,
-                withdrawalListReq.withdrawalType, 
+                withdrawalListReq.withdrawalType,
                 startTime, 
                 endTime,
+                WithdrawalDateTypeEnum.CreateTime,
                 withdrawalListReq.WithdrawalId,
                 userNames , 
                 withdrawalListReq.CurrencyId,

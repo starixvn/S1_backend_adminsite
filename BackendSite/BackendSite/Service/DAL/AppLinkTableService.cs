@@ -26,7 +26,7 @@ namespace BackendSite.Service.DAL
             var result = true;
 
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
             var beforeData = GetAppLinkTable(siteId);
 
@@ -52,14 +52,12 @@ namespace BackendSite.Service.DAL
 
             if (result)
             {
-                trans.Commit();
-                await conn.CloseAsync();
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
             else
             {
-                trans.Rollback();
-                await conn.CloseAsync();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
         }

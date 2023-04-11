@@ -44,13 +44,18 @@ namespace BackendSite.Service.DAL
                 forStatus.Add((int)AdjustmentInfoStatusEnum.Pending);
                 if (SetAdjustmentInfo(transId, adjustmentInfo.SiteId, $"Payment Adjustment: {adjustmentInfo.Amount * (adjustmentInfo.AdjustType == 1 ? 1 : -1)}", Operator, forStatus, AdjustmentInfoStatusEnum.Approved, adjustmentInfo, trans) > 0)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                     transId = p.Get<string>("TransId");
                 }
                 else
                 {
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     result = 0;
                 }
+            }
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
 
             return result;
@@ -187,16 +192,17 @@ namespace BackendSite.Service.DAL
 
             if (resultCode != 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                return (resultCode, string.Empty);
             }
             
             var amount = input.AdjustType == WithdrawalLimitAdjustmentAdjustTypeEnum.Debit ? input.Amount * -1 : input.Amount;
             var result = withdrawalLimitService.SetWithdrawalLimit(input.CustId, input.UserName, input.SiteId,
-                amount, input.Memo, transId, out var afterAmount, trans);
+                amount, (int)input.ReasonId, input.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment , input.Operator, out var afterAmount, trans);
 
             if (result < 1)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return (-2, string.Empty);
             }
             
@@ -221,11 +227,11 @@ namespace BackendSite.Service.DAL
             
             if (logResult < 1)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return (-3, string.Empty);
             }
             
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
 
             return (resultCode, transId);
         }
@@ -252,7 +258,7 @@ namespace BackendSite.Service.DAL
 
             if (withdrawalLimitInfo.AdjustType == 2 && deduction < withdrawalLimitInfo.Amount)
             {
-                trans.Commit();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return 21;
             }
             else
@@ -276,13 +282,13 @@ namespace BackendSite.Service.DAL
 
                 if (string.IsNullOrEmpty(transId))
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 22;
                 }
                 else
                 {
                     var amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
-                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, withdrawalLimitInfo.Memo, transId, out var AfterAmount, trans);
+                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, (int)WithdrawalLimitAdjustmentReasonEnum.None ,withdrawalLimitInfo.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment , Operator ,out var AfterAmount, trans);
 
                     #region propsLog
                     var propsLog = new DynamicParameters();
@@ -299,7 +305,7 @@ namespace BackendSite.Service.DAL
                     #endregion
 
                     _mainDbClient.Execute("Admin_AdjustmentInfoLog_Set", trans, propsLog);
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
@@ -407,7 +413,7 @@ namespace BackendSite.Service.DAL
                             else
                             {
                                 var amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 ? adjustmentAndWithdrawalLimit.WithdrawalLimitAmount * -1 : adjustmentAndWithdrawalLimit.WithdrawalLimitAmount;
-                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Memo, transId, out _, trans);
+                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Category ,adjustmentAndWithdrawalLimit.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.BalanceAdjustment , Operator ,out _, trans);
                                 //return 0;
                             }
                         }
@@ -420,11 +426,11 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
                 }
                 else
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 }
 
             }
@@ -522,19 +528,19 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", input.Operator);
 
             var logParam = new DynamicParameters();
-            props.Add("_SiteId", input.SiteId);
-            props.Add("_CurrencyId", input.CurrencyId);
-            props.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.AdjustmentLimitation);
-            props.Add("_ActionType", (int)ActionType.Update);
-            props.Add("_RefTransId", string.Empty);
-            props.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
-            props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
-            props.Add("_Operator", input.Operator);
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.AdjustmentLimitation);
+            logParam.Add("_ActionType", (int)ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(input.Before));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(input.After));
+            logParam.Add("_Operator", input.Operator);
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
 
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -542,11 +548,11 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }

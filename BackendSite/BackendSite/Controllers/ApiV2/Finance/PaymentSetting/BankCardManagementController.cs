@@ -21,6 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly VipLevelBLL _vipLevelBll;
+        private readonly ILogger<BankCardManagementController> _logger;
 
         #endregion
 
@@ -32,6 +33,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
+            _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
         }
 
         #endregion
@@ -67,17 +69,33 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public async Task<ApiListResult<OfflineBankingSetting>> GetList(GetOfflineBankingSettingRequest request)
         {
-            var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
-                new GetOfflineBankingSettingParams(request));
-
-            return new ApiListResult<OfflineBankingSetting>
+            try
             {
-                Data = datas,
-                PageNumber = request.PageNumber,
-                TotalPages = totalPages,
-                RowCount = rowCount,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
+                var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
+                    new GetOfflineBankingSettingParams(request));
+                
+                return new ApiListResult<OfflineBankingSetting>
+                {
+                    Data = datas,
+                    PageNumber = request.PageNumber,
+                    TotalPages = totalPages,
+                    RowCount = rowCount,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "BankCardManagement/GetList");
+                return new ApiListResult<OfflineBankingSetting>
+                {
+                    Data = new List<OfflineBankingSetting>(),
+                    PageNumber = request.PageNumber,
+                    TotalPages = 0,
+                    RowCount = 0,
+                    ErrorCode = (int)ErrorCodeEnum.Fail
+                };
+            }
+            
         }
 
         /// <summary>

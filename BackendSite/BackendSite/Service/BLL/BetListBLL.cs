@@ -100,7 +100,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpBetRecord> GetTpBetRecord(int CustId, DateTime StartTime, DateTime EndTime)
         {
-            return _cacheHelper.TryGetOrCreate(
+            return _cacheHelper.TryGetOrCreate<IEnumerable<TpBetRecord>>(
                 key: $"TpBetRecord:{CustId}:{StartTime:yyyyMMddHHmmssfff}:{EndTime:yyyyMMddHHmmssfff}",
                 timeSpan: TimeSpan.FromMinutes(1),
                 factory: () =>

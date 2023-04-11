@@ -100,13 +100,13 @@ namespace BackendSite.Service.DAL
                     var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                     if (!logResult)
                     {
-                        trans.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                         return 0;
                     }
                 }
                 else
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return result;
                 }
             }
@@ -114,7 +114,7 @@ namespace BackendSite.Service.DAL
             {
                 return result;
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
@@ -151,16 +151,16 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
@@ -266,7 +266,7 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
 
@@ -302,21 +302,21 @@ namespace BackendSite.Service.DAL
                         result = _mainDbClient.Execute("Service_CustBankInfoLog_Set_V3", trans, prop);
                         if (result == 0)
                         {
-                            trans.Rollback();
+                            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                             return result;
                         }
                     }
                     else
                     {
-                        trans.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                         return result;
                     }
                 }
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
 
             return result;
@@ -357,7 +357,7 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
 
@@ -381,20 +381,20 @@ namespace BackendSite.Service.DAL
 
                     if (result <= 0)
                     {
-                        trans.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     }
                 }
                 else
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 }
 
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
@@ -540,7 +540,7 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
 
@@ -575,21 +575,21 @@ namespace BackendSite.Service.DAL
                         result = _mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", trans, prop);
                         if (result == 0)
                         {
-                            trans.Rollback();
+                            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                             return result;
                         }
                     }
                     else
                     {
-                        trans.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                         return result;
                     }
                 }
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
 
             return result;
@@ -631,7 +631,7 @@ namespace BackendSite.Service.DAL
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
 
@@ -656,22 +656,24 @@ namespace BackendSite.Service.DAL
 
                         if (_mainDbClient.Execute("Service_CustUSDTInfoLog_Set_V3", trans, logProp) <= 0)
                         {
-                            trans.Rollback();
+                            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                             return 0;
                         }
                     }
                 }
                 else
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                    return 0;
                 }
 
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                return 0;
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
     }

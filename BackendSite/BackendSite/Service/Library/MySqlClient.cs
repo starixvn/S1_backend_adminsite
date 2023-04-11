@@ -45,7 +45,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -220,7 +224,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -247,7 +255,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -311,7 +323,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -355,7 +371,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -418,7 +438,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -443,6 +467,22 @@ namespace BackendSite.Service.Library
             trans.Dispose();
             conn.Close();
             conn.Dispose();
+        }
+
+        public async Task CommitAndDisposeConnectionAsync(MySqlConnection conn, MySqlTransaction trans)
+        {
+            await trans.CommitAsync();
+            await trans.DisposeAsync();
+            await conn.CloseAsync();
+            await conn.DisposeAsync();
+        }
+        
+        public async Task RollbackAndDisposeConnectionAsync(MySqlConnection conn, MySqlTransaction trans)
+        {
+            await trans.RollbackAsync();
+            await trans.DisposeAsync();
+            await conn.CloseAsync();
+            await conn.DisposeAsync();
         }
     }
 }

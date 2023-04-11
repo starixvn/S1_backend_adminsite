@@ -79,6 +79,7 @@ namespace BackendSite.Controllers.Api
                 depositListReq.SelectCalCode, 
                 startTime, 
                 endTime, 
+                DepositDateTypeEnum.CreateTime,
                 depositListReq.DepositId,
                 userNames, 
                 "",

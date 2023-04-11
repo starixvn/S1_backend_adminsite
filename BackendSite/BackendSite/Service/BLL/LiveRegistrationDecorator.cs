@@ -24,9 +24,9 @@ namespace BackendSite.Service.BLL
         {
             return await _liveRegistration.GetRegLiveStatusData(request);
         }
-        public async Task<IEnumerable<ExportLiveRegistration>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
+        public Task<IEnumerable<Dictionary<string, object>>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
         {
-            return await _liveRegistration.GetExportRegLiveStatus(request);
+            return _liveRegistration.GetExportRegLiveStatus(request);
         }
         public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
         {

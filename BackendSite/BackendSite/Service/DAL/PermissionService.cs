@@ -64,14 +64,14 @@ namespace BackendSite.Service.DAL
 
             if(result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
             var SEQ = props.Get<int?>("@SEQ");
 
             if (SEQ == null)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 result = 0;
                 return result;
             }
@@ -79,7 +79,7 @@ namespace BackendSite.Service.DAL
             {
                 _mainDbClient.Execute("Admin_RolePermission_Ins", trans, new DynamicParameters(new { Role= SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList)}));
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
@@ -100,7 +100,7 @@ namespace BackendSite.Service.DAL
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
 
@@ -110,7 +110,7 @@ namespace BackendSite.Service.DAL
             {
                 _mainDbClient.Execute("Admin_RolePermission_Ins", trans, new DynamicParameters(new { Role = role, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
@@ -121,7 +121,7 @@ namespace BackendSite.Service.DAL
             using var trans = conn.BeginTransaction();
             _mainDbClient.Execute("Admin_AdminRole_Del", trans, new DynamicParameters(new { Id = role }));
             _mainDbClient.Execute("Admin_RolePermission_Del", trans, new DynamicParameters(new { Role = role }));
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
         }
 
         public IEnumerable<RoleList> GetRoleList(string roleName, int siteId)
@@ -153,14 +153,14 @@ namespace BackendSite.Service.DAL
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
             var SEQ = props.Get<int?>("@SEQ");
 
             if (SEQ == null)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 result = 0;
                 return result;
             }
@@ -170,7 +170,7 @@ namespace BackendSite.Service.DAL
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
 
@@ -178,7 +178,7 @@ namespace BackendSite.Service.DAL
             {
                 _mainDbClient.Execute("Admin_UserPermission_Ins", trans, new DynamicParameters(new { UserId = SEQ, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
@@ -196,7 +196,7 @@ namespace BackendSite.Service.DAL
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
 
@@ -204,7 +204,7 @@ namespace BackendSite.Service.DAL
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
 
@@ -214,7 +214,7 @@ namespace BackendSite.Service.DAL
             {
                 _mainDbClient.Execute("Admin_UserPermission_Ins", trans, new DynamicParameters(new { UserId = userId, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
         public bool SetAdminUserPassword(ParamsWithLog<SetAdminUserPasswordReq> input)
@@ -244,11 +244,11 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog) > 0;
             if (logResult & result)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return logResult & result;
         }
@@ -281,11 +281,11 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog) > 0;
             if (r & result)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return r & result;
         }
@@ -333,11 +333,11 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentBrandLog_Ins", trans, propsLog) > 0;
             if (logResult & result)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return logResult & result;
         }

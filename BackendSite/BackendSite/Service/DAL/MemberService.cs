@@ -159,6 +159,13 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
     }
+    
+    public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+    {
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _sqlClienct.QueryAsync<CustomerAssociateBankInfo>("Admin_AssociateBankAccountNo_Get", p);
+    }
+    
     public async Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo)
     {
         return await _sqlClienct.ExecuteScalarAsync<int>("Admin_ExistsPhoneNo_Get",
@@ -203,7 +210,7 @@ public class MemberService : IMemberService
         }
 
         await using var conn = _mainSqlClient.GetMySqlConnection();
-        conn.Open();
+        await conn.OpenAsync();
         await using var trans = await conn.BeginTransactionAsync();
         
         var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", trans, p) > 0;
@@ -227,7 +234,7 @@ public class MemberService : IMemberService
             
             if (!custTags.Any())
             {
-                _mainSqlClient.CommitAndDisposeConnection(conn, trans);
+                await _mainSqlClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
 
@@ -239,12 +246,12 @@ public class MemberService : IMemberService
             success = await SetCustInfoTagList(custTags, trans);
             if (success)
             {
-                _mainSqlClient.CommitAndDisposeConnection(conn, trans);
+                await _mainSqlClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
         }
 
-        _mainSqlClient.RollbackAndDisposeConnection(conn, trans);
+        await _mainSqlClient.RollbackAndDisposeConnectionAsync(conn, trans);
         return false;
     }
 
