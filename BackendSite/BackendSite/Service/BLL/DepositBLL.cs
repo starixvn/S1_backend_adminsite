@@ -132,7 +132,8 @@ namespace BackendSite.Service.BLL
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                await InsertDepositReceipt(deposit.SiteId, deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
+                //搬移至AWS
+                // await InsertDepositReceipt(deposit.SiteId, deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
             }
 
             if (!string.IsNullOrEmpty(transId))
@@ -148,10 +149,10 @@ namespace BackendSite.Service.BLL
             return await depositService.DelDepositReceiptPic(siteId ,custId, depositId , picFileName ,receiptNo ,Operator);
         }
         
-        public async Task<int> InsertDepositReceipt(int siteId, int custId, string transId, int receiptNo , string fileName, byte[] fileBytes , string creator)
+        public async Task<int> InsertDepositReceipt(int siteId, int custId, string transId, int receiptNo , string fileName, string creator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-            return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName, fileBytes ,creator);
+            return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName ,creator);
         }
 
         public int CheckDepositReceipt(int siteId ,string transId,  string Operator)

@@ -329,7 +329,7 @@ namespace BackendSite.Service.Model
     
     public class DepositReceiptModel
     {
-        public IActionResult Receipt { get; set; }
+        public string Receipt { get; set; }
         public int ReceiptNo { get; set; }
         public int CreateFrom { get; set; }
         public string Creator { get; set; }
@@ -499,7 +499,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int ReceiptNo { get; set; }
         public string TransId { get; set; }
-        public IFormFile Receipt { get; set; }
+        public string Receipt { get; set; }
     }
     
     public class CheckDepositReceiptRequest
