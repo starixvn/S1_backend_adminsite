@@ -45,7 +45,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -220,7 +224,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -247,7 +255,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -311,7 +323,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -355,7 +371,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
@@ -418,7 +438,11 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, name);
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
                 throw;
             }
 
