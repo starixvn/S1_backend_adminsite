@@ -2,7 +2,6 @@
 using BackendSite.Service.DAL.BetLimit;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.TpMaintain;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL

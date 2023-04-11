@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.TpMaintain;
-using BackendSite.Service.Model.BankFinancial;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -23,17 +22,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly PaymentBLL _paymentBll;
         private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
-        private readonly AdminGroupBLL _adminGroupBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly PrizeBLL _prizeBll;
         private readonly PaymentManageBLL _paymentManageBll;
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
-        private readonly BankFinancialBLL _bankFinancialBll;
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly BonusManageBLL _bonusManageBll;
         private readonly DeepLinkBLL _deepLinkBll;
         private readonly NewAuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -47,17 +45,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
-            _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
-            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -94,40 +91,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-        }
-
-
-        /// <summary>
-        ///  GetAllData/GetGroupList 取得所有群組權限清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Administration > User Setting > Permission > Group > [Edit]
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<AdminGroupModel>> GetGroupList()
-        {
-            var result = new List<AdminGroupModel>();
-            var data = _adminGroupBll.GetGroupList(1, 1000, out _, out _);
-
-            foreach (var item in data)
-            {
-                result.Add(new AdminGroupModel()
-                {
-                    GroupId = (int)item.GroupSEQ,
-                    GroupName = item.GroupName,
-                    Remark = item.Remark
-                });
-            }
-
-            var apiResult = new ApiResult<IEnumerable<AdminGroupModel>>
-            {
-                Data = result,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-            return apiResult;
         }
 
         /// <summary>
@@ -541,6 +504,37 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 新後台Bonus Manage使用，排除Rebate
             /// </summary>
             public bool isNew { get; set; } = true;
+        }
+
+        public class GetServerInfoReq
+        {
+            public int SiteId { get; set; }
+        }
+        /// <summary>
+        /// GetAllData/GetServerInfo  取得ServerInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<ServerInfo> GetServerInfo(GetServerInfoReq req)
+        {
+            var apiResult = new ApiResult<ServerInfo>();
+            try
+            {
+                apiResult.Data = _serverInfoBll.GetServerInfo(req.SiteId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
         }
 
         #endregion

@@ -62,7 +62,7 @@ namespace BackendSite.Service.Model
                 Id = Id,
                 Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
                 EName = nameObj.en,
-                CName = nameObj.ch,
+                CName = nameObj.cs,
                 CurrencyStatusList = currencyStatusList
             };
         }
@@ -117,6 +117,7 @@ namespace BackendSite.Service.Model
         /// TableAndCards = 3,
         /// BuyFeaturesGames = 4,
         /// Megaways = 5,
+        /// Mini = 6,
         /// </summary>
         public SlotGameCategoryEnum Category { get; set; }
         public GetSlotGameCategoryListReq()
@@ -145,6 +146,7 @@ namespace BackendSite.Service.Model
         /// TableAndCards = 3,
         /// BuyFeaturesGames = 4,
         /// Megaways = 5,
+        /// Mini = 6,
         /// </summary>
         public SlotGameCategoryEnum CategoryId { get; set; }
         /// <summary>
@@ -153,5 +155,11 @@ namespace BackendSite.Service.Model
         ///  Open = 1
         /// </summary>
         public SlotGameStatusEnum Status { get; set; }
+    }
+
+    public class SlotCategoryInfo
+    {
+        public int Id { set; get; }
+        public string Name { set; get; }
     }
 }

@@ -81,6 +81,7 @@ namespace BackendSite.Controllers.Api
                 depositListReq.SelectCalCode, 
                 startTime, 
                 endTime, 
+                DepositDateTypeEnum.CreateTime,
                 depositListReq.DepositId,
                 userNames, 
                 "",
@@ -134,10 +135,6 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetDepositListByCust(DepositListReq1 depositListReq)
         {
-            var totalPages = 0;
-            var rowCount = 0;
-            decimal totalAmount = 0;
-
             if (depositListReq.startDate > 2147483647)
             {
                 depositListReq.startDate = 2147483647;
@@ -158,18 +155,12 @@ namespace BackendSite.Controllers.Api
                                                        endTime,
                                                        depositListReq.PageSize,
                                                        depositListReq.PageNumber,
-                                                       out totalPages,
-                                                       out rowCount,
-                                                       out totalAmount);
+                                                       out var totalPages,
+                                                       out var rowCount,
+                                                       out _,
+                                                       out _,
+                                                       out _);
 
-            foreach (var item in data)
-            {
-                item.CreateTime = new DateTimeOffset(item.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (item.UpdateTime != null)
-                    item.UpdateTime = new DateTimeOffset(item.UpdateTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                if (item.DepositTime != null)
-                    item.DepositTime = new DateTimeOffset(item.DepositTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-            }
 
             return new ApiListResultTotalAmount<DepositRequest>
             {
@@ -177,7 +168,6 @@ namespace BackendSite.Controllers.Api
                 TotalPages = totalPages,
                 PageNumber = depositListReq.PageNumber,
                 RowCount = rowCount,
-                TotalAmount = totalAmount,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 

@@ -2,67 +2,21 @@
 using BackendSite.Service.Model;
 using Dapper;
 using System.Data;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
     public class AdminService
     {
-        private IConfiguration configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
-        public AdminService(IConfiguration configuration, ILogger<MySqlClient> logger)
+        public AdminService(IEnumerable<MySqlClient> sqlClients)
         {
-            this.configuration = configuration;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = sqlClients.FirstOrDefault(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.FirstOrDefault(p => p.DataBase == DataBase.Report);
         }
-
-        //暫無使用
-        //public bool AddAccount(int siteId, AdminUser adminUser)
-        //{
-        //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-        //    var p = new DynamicParameters(new { 
-        //        SiteId = siteId, 
-        //        adminUser.UserName, 
-        //        adminUser.Userpwd
-        //    });
-        //    p.Add("UserId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-        //    return conn.Execute("AdminAccount_Ins", p, commandType: CommandType.StoredProcedure) >0;
-        //}
-
-        //暫無使用
-        //public IEnumerable<AdminUser> AccountList(int siteId)
-        //{
-        //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-        //    return conn.Query<AdminUser>("AdminAccount_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
-        //}
-
-        //暫無使用
-        //public AdminUser GetAccount(int siteId, int userId)
-        //{
-        //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-        //    return conn.QueryFirst<AdminUser>("AdminAccountId_Get", new { SiteId = siteId, UserId = userId }, commandType: CommandType.StoredProcedure);
-        //}
-
-        //暫無使用
-        //public bool EditAccount(int siteId, AdminUser adminUser)
-        //{
-        //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-        //    return conn.Execute("AdminAccountId_Set", new { 
-        //        SiteId = siteId, 
-        //        UserId = adminUser.UserId,
-        //        Status = adminUser.Status 
-        //    }, commandType: CommandType.StoredProcedure)>0;
-        //}
-
-        //暫無使用
-        //public bool ChangePwdAccount(int siteId, AdminUser adminUser)
-        //{
-        //    using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-        //    return conn.Execute("AdminAccountChangePwd_Set", new { SiteId = siteId, UserId = adminUser.UserId, UserPWD = adminUser.Userpwd }, commandType: CommandType.StoredProcedure) > 0;
-        //}
-
+        
         public bool ChangePwd(int siteId, int userId, ChangePwd changePwd, out string Md5Userpwd)
         {
             Md5Userpwd = null;

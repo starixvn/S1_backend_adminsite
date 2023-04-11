@@ -1,5 +1,6 @@
-﻿using BackendSite.Attributes;
+﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -57,18 +58,21 @@ namespace BackendSite.Service.Model
 
     public class ShieldTaggingReportExport
     {
+        [EpplusIgnore]
         public int SiteId { get; set; }
         public string SiteName { get; set; }
+        [EpplusIgnore]
         public int CurrencyId { get; set; }
+        public string Currency { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public string ShieldId { get; set; }
-        [ExportIgnore]
+        [EpplusIgnore]
         public int TriggeredPoint { get; set; }
-        public string TriggeredPointName { get; set; }
-        [ExportIgnore]
+        public string TriggeredPointName => Enum.GetName(typeof(TriggeredPoints), TriggeredPoint);
+        [EpplusIgnore]
         public int TaggedIssue { get; set; }
-        public string TaggedIssueName { get; set; }
+        public string TaggedIssueName => Enum.GetName(typeof(TaggedIssue), TaggedIssue);
         public int DeviceScore { get; set; }
         public string Version { get; set; }
         public string SessionId { get; set; }

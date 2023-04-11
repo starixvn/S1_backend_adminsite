@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.ExceptionHandling;
 
@@ -70,7 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         public ApiResult<IEnumerable<GetPromotionCashbackResponse>> GetPromotionCashback(GetPromotionCashbackRequest request)
         {
@@ -99,14 +98,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
-        
+
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
         public ApiResult<GetPromotionDetailResponse> GetPromotionDetail(GetPromotionDetailRequest request)
         {
-                
+
             var apiResult = new ApiResult<GetPromotionDetailResponse>();
             try
             {
@@ -133,16 +132,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
-        
+
             return apiResult;
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 49 })]
         [HttpPost]
-        public ApiResult CancelBonusByBonusId(CancelBonusRequest request)
+        public async Task<ApiResult> CancelBonusByBonusId(CancelBonusRequest request)
         {
             var apiResult = new ApiResult();
-            _custInfoBll.CancelBonusByBonusId(request.BonusId);
+            var result = await _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
+            if (result.Result == 0)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Cancel Bonus Fail";
+                return apiResult;
+            }
             const string menu = "CustManage/CustInfoList";
             var info = new Dictionary<string, dynamic>
             {
@@ -194,12 +199,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 2 })]
         [HttpPost]
         public async Task<IActionResult> Export(ExportMemberRequest request)
         {
             var exportData = await _memberQuery.GetExportDataAsync(request);
-            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 
@@ -227,7 +232,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// Member/GetCustPhotoId 取得客戶證件照列表
         /// </summary>
@@ -244,7 +249,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var custPhotoId = await _custPhotoIdBll.GetPhotoIdAsync(request.CustId);
             if (custPhotoId == null) throw new AdminException(ErrorCodeEnum.NoData);
-            
+
             var apiResult = new ApiResult<IEnumerable<GetCustPhotoIdResponse>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -253,7 +258,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
 
         }
-        
+
         /// <summary>
         /// Member/UploadCustPhotoId 上傳用戶證件照
         /// </summary>
@@ -266,7 +271,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 75 })]
         [HttpPost]
-        public async Task<ApiResult> UploadCustPhotoId([FromForm]UploadCustPhotoIdRequest request)
+        public async Task<ApiResult> UploadCustPhotoId([FromForm] UploadCustPhotoIdRequest request)
         {
             var result = await _custPhotoIdBll.UploadPhotoIdAsync(request.CustId, request.Photo);
 
@@ -282,7 +287,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             throw new AdminException(ErrorCodeEnum.Fail, "Upload Fail.");
 
         }
-        
+
         /// <summary>
         /// Member/DeleteCustPhotoId 刪除用戶證件照
         /// </summary>
@@ -507,9 +512,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditFullName(SetFullNameRequest request)
         {
-            var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName, User.Identity.Name);
+            var result = await _memberCommand.EditFullNameAsync(request.CustId, request.FullName.Trim(), User.Identity.Name);
 
-            if (result > 0)
+            if (result)
             {
                 return new ApiResult
                 {
@@ -519,6 +524,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> CheckDuplicateName(SetFullNameRequest request)
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var result =
+                await _memberCommand.GetDuplicateAccountInfoAsync(authData.SiteId, request.CustId, request.FullName);
+
+            return new ApiResult<IEnumerable<SimilarAccountInfo>>
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = result.Where(x => x.CustId != request.CustId)
+            };
         }
 
         /// <summary>
@@ -548,7 +567,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/EditPhoneNo 修改用戶電話
         /// </summary>
@@ -576,7 +595,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/EditBirthday 修改用戶生日
         /// </summary>
@@ -602,7 +621,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/EditAddress 修改會員地址
         /// </summary>
@@ -630,7 +649,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchKyc 修改會員Kyc狀態
         /// </summary>
@@ -658,7 +677,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchRisk 切換會員Risk狀態
         /// </summary>
@@ -686,7 +705,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchEmailVerified 切換會員Email驗證狀態
         /// </summary>
@@ -714,7 +733,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchPhoneVerified 切換會員電話驗證狀態
         /// </summary>
@@ -742,7 +761,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/ResetPassword 重置會員密碼
         /// </summary>
@@ -771,7 +790,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/LockAccount 鎖/解鎖會員帳號
         /// </summary>
@@ -797,7 +816,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/KickOut 強制讓客戶登出
         /// </summary>
@@ -821,7 +840,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Kick out fail.Customer is not online now.");
         }
-        
+
         /// <summary>
         /// Member/Close 關閉會員帳號
         /// </summary>
@@ -847,7 +866,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/SwitchRebatePayout 起停用派發Rebate
         /// </summary>
@@ -873,7 +892,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/ResetBankInfo 重置BankInfo
         /// </summary>
@@ -951,7 +970,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         /// <summary>
         /// Member/PayoutVerificationReward 派發客戶驗證獎勵金
         /// </summary>
@@ -992,7 +1011,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// Member/GetIpList 取得會員登入過的Ip
         /// </summary>
@@ -1141,7 +1160,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
-            
+
             var loginLog = await _memberQuery.GetLoginLogAsync(request.CustId, startTime, endTime, request.PageSize, request.PageNumber);
             var apiResult = new ApiListResult<MemberLoginLog>
             {
@@ -1154,5 +1173,124 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
+
+        /// <summary>
+        /// Member/GetCustRealNameChangeLog 取得客戶改名歷史紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<CustRealNameChangeLog>>> GetCustRealNameChangeLog(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<IEnumerable<CustRealNameChangeLog>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustRealNameChangeLogAsync(request.CustId)
+            };
+        }
+        
+        /// <summary>
+        /// Member/GetCustomerAssociateBankUser 取得客戶相同銀行卡號的其他用戶資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<CustomerAssociateBankInfo>>> GetCustomerAssociateBankUser(GetCustomerAssociateBankUserRequest request)
+        {
+            return new ApiResult<IEnumerable<CustomerAssociateBankInfo>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustomerAssociateBankUserAsync(request.CustId)
+            };
+        }
+
+        /// <summary>
+        /// Member/GetCustPromotionWhiteList 取得客戶Promotion限制白名單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<CustPromotionWhiteList>> GetCustPromotionWhiteList(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<CustPromotionWhiteList>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustPromotionWhiteListAsync(request.CustId)
+            };
+        }
+
+        /// <summary>
+        /// Member/EditCustPromotionWhiteList 修改用戶Promotion白名單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 80 })]
+        [HttpPost]
+        public async Task<ApiResult> EditCustPromotionWhiteList(SetCustPromotionWhiteListRequest request)
+        {
+            var result = await _memberCommand.SetCustPromotionWhiteListAsync(
+                request.CustId, 
+                request.IpEnable, 
+                request.DeviceEnable,
+                request.RealNameEnable,
+                User.Identity.Name);
+
+            if (result)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
+        /// Member/GetPromotionReceiveFailLog 取得客戶Promotion領取失敗紀錄
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<PromotionReceiveFailLog>>> GetPromotionReceiveFailLog(GetCustomerBasicInfoRequest request)
+        {
+            return new ApiResult<IEnumerable<PromotionReceiveFailLog>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetPromotionReceiveFailLogAsync(
+                    request.CustId, 
+                    request.StartTime.ToUniversalTime().DateTime,
+                    request.EndTime.ToUniversalTime().DateTime)
+            };
+        }
+
     }
 }

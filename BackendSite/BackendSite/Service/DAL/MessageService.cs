@@ -4,7 +4,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -38,28 +37,28 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Msg_Ins", new { Type = 99, siteId = siteId, LangId = lang, RecipientCustId = custId, Recipient = CustUserName, SenderCustId = SenderCustId, Sender = sender, Title = title, Content = content, MainId = 0 });
         }
 
-        public IEnumerable<Announcement> GetAnnouncements(string selectSite,
+        public IEnumerable<Announcement> GetAnnouncements(string siteIds,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
-            int status,
+            string statuses,
             int startIndex,
             int pageSize,
             ref int totalPages,
             ref int rowCount)
         {
             var props = new DynamicParameters();
-            props.Add("SelectSite", selectSite);
-            props.Add("StartDate", startDate.DateTime, DbType.DateTime);
-            props.Add("EndDate", endDate.DateTime, DbType.DateTime);
-            props.Add("Status", status, DbType.Int32);
-            props.Add("StartIndex", startIndex, DbType.Int32);
-            props.Add("PageSize", pageSize);
-            props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_SiteIds", siteIds);
+            props.Add("_StartDate", startDate.DateTime, DbType.DateTime);
+            props.Add("_EndDate", endDate.DateTime, DbType.DateTime);
+            props.Add("_Statuses", statuses);
+            props.Add("_StartIndex", startIndex, DbType.Int32);
+            props.Add("_PageSize", pageSize);
+            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<Announcement>("Admin_Announcement_Get_V2", props);
-            totalPages = props.Get<int?>("TotalPages") ?? 0;
-            rowCount = props.Get<int?>("RowCount") ?? 0;
+            var result = _reportDbClient.Query<Announcement>("Admin_Announcement_Get_V3", props);
+            totalPages = props.Get<int?>("_TotalPages") ?? 0;
+            rowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return result;
         }
@@ -145,25 +144,25 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<CustLang>("Admin_CustLang_Get", new { CustId }).FirstOrDefault();
         }
 
-        public void DeletePersonalMsg(int id ,bool isBatch)
+        public bool DeletePersonalMsg(int id, bool isBatch)
         {
-            _mainDbClient.Execute("Admin_PersonalMsg_Del_V2", new { id , isBatch});
+            return _mainDbClient.Execute("Admin_PersonalMsg_Del_V2", new { id, isBatch }) > 0;
         }
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
             try
             {
-                using var connection = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+                using var connection = _mainDbClient.GetMySqlConnection();
                 connection.Open();
                 using var trans = connection.BeginTransaction();
-                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins", new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }), connection, trans);
+                var result = _mainDbClient.Execute("Admin_Msg_BatchV2_Ins", trans, new DynamicParameters(new { Sender = sender, CustId = custId, SiteId = siteId, PersonalMsg = personalMsg, BatchId = batchId }));
 
                 if (result == 1)
                 {
-                    trans.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(connection, trans);
                     return true;
                 }
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(connection, trans);
                 return false;
             }
             catch (Exception e)
@@ -191,7 +190,7 @@ namespace BackendSite.Service.DAL
         }
         public bool NewBatchMessage(int siteId, string author, string personalMsg, bool isPopup, ref int batchId)
         {
-            var p = new DynamicParameters(new {_SiteId = siteId, _Author = author, _IsPopup = isPopup, _Message = personalMsg});
+            var p = new DynamicParameters(new { _SiteId = siteId, _Author = author, _IsPopup = isPopup, _Message = personalMsg });
             p.Add("BatchId", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var result = _mainDbClient.Execute("Admin_BatchMessage_Ins_V2", p);
             batchId = p.Get<int>("BatchId");
@@ -201,76 +200,76 @@ namespace BackendSite.Service.DAL
         {
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Start.");
 
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
             var p = new DynamicParameters();
             p.Add("_BatchId", batchId);
-            var batchMessageCount = conn.QueryFirst<int>("Admin_BatchMessageForDelete_Get", p, trans, commandType: CommandType.StoredProcedure);
+            var batchMessageCount = _reportDbClient.QueryFirst<int>("Admin_BatchMessageForDelete_Get", p);
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={batchMessageCount}.");
 
             if (batchMessageCount > 0)
             {
-                var affectCount = conn.QueryFirstOrDefault<int>("Admin_BatchMessageV2_Del", p, trans, commandType: CommandType.StoredProcedure);
+                var affectCount = _mainDbClient.QueryFirst<int>("Admin_BatchMessageV2_Del", trans, p);
                 if (affectCount != batchMessageCount)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Batch Message Count={batchMessageCount},Actual Delete Batch Message Count={affectCount}.Transaction rollback.");
                     return false;
                 }
             }
-            
-            var messageCount = conn.QueryFirstOrDefault<int>("Admin_MessageForDelete_Get", p, trans, commandType: CommandType.StoredProcedure);
+
+            var messageCount = _mainDbClient.QueryFirst<int>("Admin_MessageForDelete_Get", trans, p);
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={messageCount}.");
 
             if (messageCount > 0)
             {
-                var affectCount = conn.QueryFirstOrDefault<int>("Admin_MessageByBatchId_Del", p, trans, commandType: CommandType.StoredProcedure);
+                var affectCount = _mainDbClient.QueryFirst<int>("Admin_MessageByBatchId_Del", trans, p);
                 if (affectCount != messageCount)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Message Count={messageCount},Actual Delete Message Count={affectCount}.Transaction rollback.");
                     return false;
                 }
             }
-            
-            var custMessageCount = conn.QueryFirstOrDefault<int>("Admin_CustBatchMessageForDelete_Get", p, trans, commandType: CommandType.StoredProcedure);
+
+            var custMessageCount = _mainDbClient.QueryFirst<int>("Admin_CustBatchMessageForDelete_Get", trans, p);
             _logger.LogInformation($@"MessageService-DeleteBatchMessage Expect Delete Message Count={custMessageCount}.");
 
             if (custMessageCount > 0)
             {
-                var affectCount = conn.QueryFirstOrDefault<int>("Admin_CustBatchMessageByBatchId_Del", p, trans, commandType: CommandType.StoredProcedure);
+                var affectCount = _mainDbClient.QueryFirst<int>("Admin_CustBatchMessageByBatchId_Del", trans, p);
                 if (affectCount != custMessageCount)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     _logger.LogError($@"MessageService-DeleteBatchMessage Expect Delete Message Count={custMessageCount},Actual Delete Message Count={affectCount}.Transaction rollback.");
                     return false;
                 }
             }
-            
-            trans.Commit();
+
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             _logger.LogInformation($@"MessageService-DeleteBatchMessage End.");
             return true;
         }
-        public bool UpdateBatchMessage(int batchId, bool isPopup, string message ,string Operator)
+        public bool UpdateBatchMessage(int batchId, bool isPopup, string message, string Operator)
         {
             var props = new DynamicParameters();
             props.Add("_BatchId", batchId);
             props.Add("_IsPopup", isPopup);
             props.Add("_Message", message);
             props.Add("_Operator", Operator);
-            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set_V3", props) > 0;
+            return _mainDbClient.Execute("Admin_BatchMessageUpdate_Set_V3", props) >= 0;
         }
-        
-        public bool UpdateBatchMessageStatus(int status , int batchId)
+
+        public bool UpdateBatchMessageStatus(int status, int batchId)
         {
             var props = new DynamicParameters();
             props.Add("_Status", status);
             props.Add("_BatchId", batchId);
             return _mainDbClient.Execute("Admin_BatchMessageUpdateStatus_Set", props) > 0;
         }
-        
+
         public BatchMsg GetBatchMessage(int batchId)
         {
             var p = new DynamicParameters(new { BatchId = batchId });
@@ -330,6 +329,11 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_BatchId", batchId);
             return _reportDbClient.Query<BatchMessageSendLogListModel>("Admin_BatchMessageSendLog_Get", props);
+        }
+
+        internal async Task<IEnumerable<PersonalMsg>> GetMessageById(int id, bool isBatch)
+        {
+            return await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_GetById", new DynamicParameters(new { _Id = id, _IsBatch = isBatch }));
         }
     }
 }

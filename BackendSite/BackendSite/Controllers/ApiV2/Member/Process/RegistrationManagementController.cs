@@ -13,10 +13,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     [ApiController]
     public class RegistrationManagementController : ControllerBase
     {
-        private readonly LiveReigstrationExcelBLL _excelBll;
+        private readonly ExcelBLL _excelBll;
         private readonly LiveRegistrationDecorator _registrationBll;
 
-        public RegistrationManagementController(LiveReigstrationExcelBLL excelBll, LiveRegistrationDecorator registrationBll)
+        public RegistrationManagementController(ExcelBLL excelBll, LiveRegistrationDecorator registrationBll)
         {
             _excelBll = excelBll;
             _registrationBll = registrationBll;
@@ -62,8 +62,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<IActionResult> Export(ExportRegLiveStatusRequest request)
         {
             var exportData = await _registrationBll.GetExportRegLiveStatus(request);
-            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
-            return _excelBll.ExcelFile(stream, "Registration");
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "LiveRegistrationStatistics");
         }
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using LazZiya.ImageResize;
-using Org.BouncyCastle.Pkix;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
 

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Net;
-using System.Reflection;
 using BackendSite.Service.Model;
 
 namespace BackendSite.Extensions
@@ -32,15 +28,21 @@ namespace BackendSite.Extensions
         public static IEnumerable<SelectListItem> EnumToSelectListItem<T>(IEnumerable<T> except = null)
             where T : Enum
         {
-            var type = typeof(T);
-            return Enum.GetValues(type)
-                .Cast<T>()
-                .Where(x => except == null || !except.Contains(x))
+            return EnumToIEnumerable(except)
                 .Select(x => new SelectListItem
                 {
                     Value = Convert.ToInt32(x),
                     Name = x.GetDescription()
                 });
+        }
+        
+        public static IEnumerable<T> EnumToIEnumerable<T>(IEnumerable<T> except = null)
+            where T : Enum
+        {
+            var type = typeof(T);
+            return Enum.GetValues(type)
+                .Cast<T>()
+                .Where(x => except == null || !except.Contains(x));
         }
     }
 }

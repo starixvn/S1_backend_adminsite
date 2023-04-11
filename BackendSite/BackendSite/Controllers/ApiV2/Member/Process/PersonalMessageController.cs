@@ -15,7 +15,7 @@ using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class PersonalMessageController : ControllerBase
@@ -24,11 +24,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         private readonly MessageBLL _messageBll;
         private readonly ServerInfoService _serverInfoService;
-        private readonly AuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly Common _common;
         private readonly ILogger<PersonalMessageController> _logger;
         private readonly ExcelBLL _excelBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
 
         #endregion
 
@@ -38,11 +39,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _serverInfoService = provider.GetRequiredService<ServerInfoService>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _common = provider.GetRequiredService<Common>();
             _logger = provider.GetRequiredService<ILogger<PersonalMessageController>>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -86,7 +88,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteIds { get; set; }
             public DateTimeOffset StartDate
             {
                 get => _startDate;
@@ -97,6 +99,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+        }
+
+        public class GetServerInfoReq
+        {
+            public int SiteId { get; set; }
         }
         #endregion
 
@@ -118,11 +125,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <param name="personalMsg"></param>
         /// <param name="accountStatus"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 3 })]
         [HttpPost]
         public async Task<ApiResult<int>> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
-            var authData = _authorizeBll.GetAuthData();
+            var authData = _newAuthorizeBLL.GetAuthData();
             var batchId = 0;
             var excelList = new List<ExcelData>();
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
@@ -248,7 +255,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > [Export Excel]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 2 })]
         [HttpPost]
         public IActionResult ExportSendMessageBatchResultReport(ExportMessageBatchReq req)
         {
@@ -268,10 +275,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 4 })]
         [HttpPost]
         public ApiResult DeleteBatchMessage(DeleteBatchMessageReq req)
         {
+            var authData = _newAuthorizeBLL.GetAuthData();
             if (!_messageBll.DeleteBatchMessage(req.BatchId))
             {
                 return new ApiResult
@@ -280,6 +288,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     Message = "Delete fail."
                 };
             }
+
+            var siteId = _newAuthorizeBLL.CheckBrand();
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = authData.UserName,
+                SiteId = siteId,
+                CurrencyId = 0,
+                ActionType = ActionType.Delete,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SMSGenerator,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = JsonConvert.SerializeObject(req),
+                RefTransId = string.Empty
+            });
 
             return new ApiResult
             {
@@ -296,11 +317,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > Edit > [Update]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 3 })]
         [HttpPost]
         public ApiResult UpdateBatchMessage(UpdateBatchMessageReq req)
         {
-            var authData = _authorizeBll.GetAuthData();
+            var authData = _newAuthorizeBLL.GetAuthData();
             var message = new Dictionary<string, MessageModel>();
 
             foreach (var item in req.LanguageDatas)
@@ -326,6 +347,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 };
             }
 
+            var siteId = _newAuthorizeBLL.CheckBrand();
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    Operator = authData.UserName,
+                    SiteId = siteId,
+                    CurrencyId = 0,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.SMSGenerator,
+                    BeforeDetailInfo = null,
+                    AfterDetailInfo = JsonConvert.SerializeObject(req),
+                    RefTransId = string.Empty
+                });
+
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -341,7 +375,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Personal Message Batch > Submit(Query) > [Edit]
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 1 })]
         [HttpPost]
         public ApiResult<BatchMsg> GetBatchMessage(GetBatchMessageReq req)
         {
@@ -368,17 +402,19 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Func Path：CSD > Personal Message Batch > [Submit](Query)
         /// </remarks>
         /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/PersonalMsgBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 25, 1 })]
         [HttpPost]
         public ApiListResult<BatchMsg> GetBatchMessageList(GetBatchMessageListReq req)
         {
             var totalPages = 0;
             var rowCount = 0;
             var apiResult = new ApiListResult<BatchMsg>();
+            List<int> SiteIdList = new List<int>();
+            SiteIdList.Add(req.SiteIds);
             try
             {
                 var pageNumber = req.PageNumber;
-                apiResult.Data = _messageBll.GetBatchMessageList(req.SiteIds, req.StartDate, req.EndDate, req.PageSize, ref pageNumber, ref totalPages, ref rowCount);
+                apiResult.Data = _messageBll.GetBatchMessageList(SiteIdList, req.StartDate, req.EndDate, req.PageSize, ref pageNumber, ref totalPages, ref rowCount);
                 apiResult.PageNumber = pageNumber;
                 apiResult.RowCount = rowCount;
                 apiResult.TotalPages = totalPages;
@@ -392,7 +428,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return apiResult;
         }
-
         #endregion
 
         #region Private Methods

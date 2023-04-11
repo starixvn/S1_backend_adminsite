@@ -1,9 +1,8 @@
-﻿using System.Data;
-using System.Net;
-using System.Xml.Linq;
+﻿using System.Net;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
@@ -13,6 +12,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
@@ -35,6 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly PermissionBLL _permissionBll;
         private readonly Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>> _usableActionType;
         private readonly Cryptor _cryptor;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
         
         private readonly string _payApiUrl;
         private readonly string _awsWithdrawalFolder;
@@ -59,6 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _cryptor = provider.GetRequiredService<Cryptor>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             
             var configuration = provider.GetRequiredService<IConfiguration>();
             _payApiUrl = configuration.GetValue<string>("PayService");
@@ -88,7 +90,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     WithdrawalActionEnum.Draft,
                     WithdrawalActionEnum.Process,
                     WithdrawalActionEnum.Pending,
-                    WithdrawalActionEnum.Rejected
+                    WithdrawalActionEnum.Rejected,
+                    WithdrawalActionEnum.ManualApproved,
                 }},
                 {WithdrawalStatusEnum.Process, new List<WithdrawalActionEnum>
                 {
@@ -133,6 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> WithdrawalTypes { get; set; }
+            public WithdrawalDateTypeEnum DateType { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate
             {
@@ -160,6 +164,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             private DateTimeOffset _startDate;
             private DateTimeOffset _endDate;
             public int SiteId { get; set; }
+            public WithdrawalDateTypeEnum DateType { get; set; }
             public string WithdrawalId { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> WithdrawalTypes { get; set; }
@@ -224,6 +229,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public int Number { get; set; }
         }
         
+        public class GetExchangeInfoRequest
+        {
+            public string CryptoCurrencyName { get; set; }
+            public string Network { get; set; }
+            public int CurrencyId { get; set; }
+            public decimal Amount { get; set; }
+        }
+
         #endregion
 
         #region Actions
@@ -245,12 +258,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
             var currencyAmount = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
+            var selectSites = new List<int> {request.SiteId};
+            
+            if (request.SiteId == 0)
+            {
+                selectSites = GetSelectSites();
+            }
             
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(
-                new List<int> {request.SiteId},
+                selectSites,
                 request.WithdrawalTypes, 
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.DateType,
                 request.WithdrawalId, 
                 userNames,
                 request.CurrencyIds,
@@ -300,17 +320,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             var exportData = new List<WithdrawalInfoForExportData>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
+            var selectSites = new List<int> {request.SiteId};
+            
+            if (request.SiteId == 0)
+            {
+                selectSites = GetSelectSites();
+            }
             
             var exportWithdrawal = _withdrawalBll.GetWithdrawalExportList(
-                JsonConvert.SerializeObject(new List<int>{request.SiteId}),
+                JsonConvert.SerializeObject(selectSites),
                 JsonConvert.SerializeObject(request.WithdrawalTypes),
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
+                request.DateType,
                 request.WithdrawalId,
                 userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
-                JsonConvert.SerializeObject(request.CurrencyIds),
+                request.CurrencyIds.Any() ? JsonConvert.SerializeObject(request.CurrencyIds) : null,
                 JsonConvert.SerializeObject(request.Statuses),
-                JsonConvert.SerializeObject(request.LevelStatuses),
+                request.LevelStatuses.Any() ? JsonConvert.SerializeObject(request.LevelStatuses) : null,
                 request.StartAmount, 
                 request.EndAmount,
                 request.SelectBankCode.Any() ? JsonConvert.SerializeObject(request.SelectBankCode) : null,
@@ -501,7 +528,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     break;
                 case WithdrawalStatusEnum.Process:
                     {
-                        if (request.WithdrawalType is null or (int)WithdrawalTypeEnum.Undefine)
+                        if (request.WithdrawalType is null or (int)WithdrawalTypeEnum.Undefined)
                         {
                             apiResult.ErrorCode = 1101;
                             apiResult.Message = "Select 1 Type of Withdrawal Please.";
@@ -796,13 +823,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 77 })]
         [HttpPost]
         public async Task<ApiResult> UploadPicture(UploadPictureRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
+                var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                
+                if (withdrawalRequest.Status is not (WithdrawalStatusEnum.Process or WithdrawalStatusEnum.Approved))
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Wrong status ,Can't upload receipt";
+                    return apiResult;
+                }
+                
                 var requestCount = request.Pic.Count();
                 var result = _withdrawalBll.UpdateWithdrawalPicCount(request.TransId , requestCount);
                 if (result)
@@ -856,13 +892,32 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 3 })]
         [HttpPost]
         public async Task<ApiResult> DeletePicture(DeletePictureRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
+                var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
+                
+                bool permission;
+                if (withdrawalRequest.Status is WithdrawalStatusEnum.Approved or WithdrawalStatusEnum.Rejected or WithdrawalStatusEnum.Cancelled)
+                {
+                    permission = permissionList.Contains(78); //刪除權限
+                }
+                else
+                {
+                    permission = permissionList.Contains(77); //新增權限
+                }
+                
+                if (!permission)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.PermissionDenied;
+                    apiResult.Message = "Permission Denied";
+                    return apiResult;
+                }
+                
                 var deleteRequest = new DeleteObjectRequest();
                 var key = $"{_awsWithdrawalFolder}/{request.TransId}_{request.Number}.png";
                 deleteRequest.BucketName = _awsWithdrawalBucketName;
@@ -877,6 +932,79 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
 
             return apiResult;
+        }
+
+        /// <summary>
+        /// Withdrawal/WithdrawalMessageStatusList  get withdrawal cannot be successful	status list
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 73 })]
+        [HttpPost]
+        public ApiResult WithdrawalMessageStatusList()
+        {
+            var apiResult = new ApiResult<List<EnumTypeModel>>();
+            var result = new List<EnumTypeModel>();
+
+            foreach (WithdrawalMessageStatus status in Enum.GetValues(typeof(WithdrawalMessageStatus)))
+            {
+                result.Add(new EnumTypeModel
+                {
+                    Name = status.GetDescription(),
+                    Value = (int)status
+                });
+            }
+
+            apiResult.Data = result;
+            apiResult.ErrorCode = 0;
+            return apiResult;
+        }
+
+        public class WithdrawalMessageRequest
+        {
+            public WithdrawalMessageStatus Status { get; set; }
+            public string StatusName { get; set; }
+            public int WithdrawalId { get; set; }
+            public WithdrawalStatusEnum Action { get; set; }
+            public string ActionName { get; set; }
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 73 })]
+        [HttpPost]
+        public ApiResult SetWithdrawalMessage(ApiRequestWithLog<WithdrawalMessageRequest> request)
+        {
+            request.After.StatusName = request.After.Status.ToString();
+            request.After.ActionName = request.After.Action.ToString();
+            if (_withdrawalBll.SetWithdrawalMessage(
+                    new ParamsWithLog<WithdrawalMessageRequest>(request, User.Identity.Name)) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Edit Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult<CryptoExchangeInfo>> GetExchangeInfoAsync(GetExchangeInfoRequest req)
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var exchangeReq = new CryptoExchangeReq
+            {
+                SiteId = authData.SiteId,
+                CurrencyId = req.CurrencyId,
+                Amount = req.Amount,
+                ChannelName = req.CryptoCurrencyName.GetChannelName(req.Network),
+                Type = ExchangeTypeEnum.Sell
+            };
+            var myUrl = $"{_payApiUrl}CryptoExchange";
+            return await _courierAdapter.MyPostAsync<CryptoExchangeInfo, CryptoExchangeReq>(myUrl, exchangeReq);
         }
 
         #endregion
@@ -908,8 +1036,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 return false;
             }
         }
-
-
+        
         /// <summary>
         /// 複製提款單圖片檔
         /// </summary>
@@ -947,7 +1074,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 return false;
             }
         }
-
         
         private List<WithdrawalActionEnum> GetUsableActionButton(WithdrawalRequest withdrawalRequest)
         {
@@ -961,6 +1087,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 usableActionButton.Remove(WithdrawalActionEnum.ManualRejected);
             }
 
+            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank 
+                && withdrawalRequest.Status is  WithdrawalStatusEnum.Approved)
+            {
+                usableActionButton.Add(WithdrawalActionEnum.ManualRejected);
+            }
+            
             if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
                 withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
             {
@@ -968,8 +1100,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 usableActionButton.Remove(WithdrawalActionEnum.Approved);
             }
             
+            if (withdrawalRequest.Status == WithdrawalStatusEnum.Rejected &&
+                withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
+            {
+                usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
+            }
+            
             return usableActionButton;
         }
+        
+        private List<int> GetSelectSites()
+        {
+            var authInfo = _newAuthorizeBll.GetAuthData();
+            var result = _permissionBll.GetUserBrand(authInfo.UserId).ToList();
+            var selectSites = result.Select(x => x.SiteId).ToList();
+            
+            return selectSites;
+        }
+        
         #endregion
 
     }
