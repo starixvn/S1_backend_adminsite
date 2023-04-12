@@ -380,7 +380,7 @@ namespace BackendSite.Service.Library
             if (redisValue.HasValue && redisValue.ToString() != value)
             {
                 result.Success = false;
-                result.Value = redisValue.ToString();
+                result.Value = redisValue.ToString(); // redis origin value
             }
 
             return result;

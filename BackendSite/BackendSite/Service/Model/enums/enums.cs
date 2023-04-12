@@ -1753,4 +1753,22 @@ namespace BackendSite.Service.Model.enums
         /// </summary>
         Buy = 1
     }
+
+    public enum WithdrawalInfoProcessWayEnum
+    {
+        /// <summary>
+        /// 手動出款
+        /// </summary>
+        Manual = 0,
+
+        /// <summary>
+        /// 自動出款
+        /// </summary>
+        Auto = 1,
+
+        /// <summary>
+        /// 自動出款失敗後轉回手動出款
+        /// </summary>
+        AutoFailBackManual = 2
+    }
 }
