@@ -31,17 +31,6 @@ namespace BackendSite.Service.BLL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
-        public int SendMessageToPlayer(string sender, string title, string content, int custId)
-        {
-            var customer = custInfoBLL.GetCustInfoWithCache(custId);
-            return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang);
-        }
-
-        public int SendMessageToPlayer(string sender, string title, string content, int custId, int SenderCustId)
-        {
-            var customer = custInfoBLL.GetCustInfoWithCache(custId);
-            return messageService.SendMessageToPlayer(customer.SiteId, sender, title, content, custId, customer.UserName, customer.UserLang, SenderCustId);
-        }
 
         public IEnumerable<Announcement> GetAnnouncements(IEnumerable<int> siteIds, DateTimeOffset startDate, DateTimeOffset endDate, IEnumerable<GeneralStatusEnum> statuses, int PageNumber, int PageSize, ref int TotalPages, ref int RowCount)
         {
@@ -152,41 +141,61 @@ namespace BackendSite.Service.BLL
             });
             return personMsg;
         }
+        public async Task<DataWithPage<PersonalMsg>> GetPersonalMsg(int custId, int pageNumber, int pageSize)
+        {
+            var personMsg = await messageService.GetPersonalMsg(custId, (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), Math.Abs(pageSize));
+            personMsg.Data.ToList().ForEach(x =>
+            {
+                x.ContentRemoveTag = StripHTML(x.Content);
+            });
+            return personMsg;
+        }
 
         public CustLang GetCustLang(int CustId)
         {
             return messageService.GetCustLang(CustId);
         }
 
-        public async Task<bool> DeletePersonalMsg(int id, bool isBatch, string @operator)
+        public async Task<bool> DeletePersonalMsg(int id, string @operator)
         {
-            var msgBeforeInfo = await GetMessageById(id, isBatch);
-            if (!msgBeforeInfo.Any()) return false;
-            var custSimpleInfo = await custInfoBLL.GetCustId(msgBeforeInfo.First().CustId, null, null);
-            await using var conn = _mainDbClient.GetMySqlConnection();
+            var personalMsg = await messageService.GetMessageById(id);
+            if (personalMsg == null) 
+            {
+                _logger.LogError("message not found");
+                return false;
+            }
+
+            var customer = custInfoBLL.GetCustInfoWithCache(personalMsg.CustId);
+            if (customer == null) 
+            {
+                _logger.LogError("customer not found");
+                return false;
+            }
+
+            using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
-
-            if (!messageService.DeletePersonalMsg(id, isBatch))
+            try
             {
-                _logger.LogError($"DeleteSMSInfo: Delete SMSInfo Fail. SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
+                await messageService.DeletePersonalMessage(id, trans);
+                await _custInfoService.InsertLogAsync(
+                    customer.SiteId,
+                    customer.CustId,
+                    customer.CurrencyId,
+                    personalMsg, null,
+                    AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
+                    ActionType.Delete,
+                    @operator, trans);
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"DeleteSMSInfo Fail.  SMSId:{id} Operator:{@operator}.");
                 await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
-
-            if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, msgBeforeInfo.First(), null,
-                AdminAdjustmentLogMenuEnum.DeleteSMSInfo, ActionType.Delete, @operator, trans))
-            {
-                _logger.LogError($"DeleteSMSInfo: Insert Operate Log Fail.  SMSId:{id} IsBatch:{isBatch} Operator:{@operator}.");
-                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
-                return false;
-            }
-
-            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
-            return true;
         }
-
-        public async Task<IEnumerable<PersonalMsg>> GetMessageById(int id, bool isBatch) => await messageService.GetMessageById(id, isBatch);
 
         public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
         {
@@ -383,6 +392,15 @@ namespace BackendSite.Service.BLL
                                  $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
             }
         }
+        public int SendMessageToPlayer(string sender, string title, string content, int custId)
+        {
+            var customer = custInfoBLL.GetCustInfoWithCache(custId);
+            return messageService.SendMessageToPlayer(sender, custId, customer.UserLang, title, content);
+        }
+        public int SendMessage(Message message) =>
+            messageService.SendMessage(message);
+        public Task<int> SendMessageAsync(Message message) =>
+            messageService.SendMessageAsync(message);
 
         public (bool, string) CheckBatchMessage(int currency, string personalMsg)
         {
