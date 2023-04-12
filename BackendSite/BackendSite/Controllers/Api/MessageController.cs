@@ -417,7 +417,7 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var authData = authorizeBLL.GetAuthData();
-                messageBLL.SendMessageToPlayer(authData.UserName, Title, Content, CustId, authData.UserId);
+                messageBLL.SendMessageToPlayer(authData.UserName, Title, Content, CustId);
                 apiResult.Data =
                     messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
@@ -461,7 +461,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                await messageBLL.DeletePersonalMsg(Id, IsBatch, User.Identity.Name);
+                await messageBLL.DeletePersonalMsg(Id, User.Identity.Name);
                 apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
