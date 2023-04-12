@@ -120,9 +120,9 @@ namespace BackendSite.Service.Model
     }
     public class BatchMsg
     {
-        public string SiteName { get; set; }
         public int SiteId { get; set; }
         public int BatchId { get; set; }
+        public int CurrencyId { get; set; }
         public string Author { get; set; }
         public string LastUpdateUser { get; set; }
         public bool IsPopup { get; set; }
@@ -148,7 +148,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int SiteId { get; set; }
         public string UserLang { get; set; }
-        public int Status { get; set; }
+        public CustomerStatusEnum Status { get; set; }
     }
     
     public class SendMessageBatchRequest
