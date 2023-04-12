@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL.Interface;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +22,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 82 })]
         public async Task<ApiResult<IEnumerable<AutoWithdrawalRuleDataListResponse>>> GetDataListAsync(AutoWithdrawalRuleDataListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<AutoWithdrawalRuleDataListResponse>>();
@@ -40,6 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 82 })]
         public async Task<ApiResult> CreateAsync(AutoWithdrawalRuleCreateRequest request)
         {
             var apiResult = new ApiResult() { ErrorCode = (int)ErrorCodeEnum.SystemException };
@@ -61,6 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 82 })]
         public async Task<ApiResult> SetAsync(AutoWithdrawalRuleSetRequest request)
         {
             var apiResult = new ApiResult();
@@ -80,6 +84,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 82 })]
         public async Task<ApiResult> DeleteAsync(AutoWithdrawalRuleDeleteRequest request)
         {
             var apiResult = new ApiResult();
@@ -99,6 +104,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 82 })]
         public ApiResult<IEnumerable<WithdrawalOptionDto>> WithdrawalTypeAsync()
         {
             return new ApiResult<IEnumerable<WithdrawalOptionDto>>

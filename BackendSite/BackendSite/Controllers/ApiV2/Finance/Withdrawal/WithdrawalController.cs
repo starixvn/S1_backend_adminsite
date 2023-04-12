@@ -5,11 +5,13 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
@@ -24,19 +26,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         #region Fields
 
         private readonly WithdrawalBLL _withdrawalBll;
+        private readonly IWithdrawalStateTransferBLL _withdrawalStateTransferBll;
         private readonly SelLangBLL _selLangBll;
         private readonly ExcelBLL _excelBll;
         private readonly MessageBLL _messageBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly BankDetailBLL _bankDetailBll;
-        private readonly AuthorizeBLL _authorizeBll;   
+        private readonly AuthorizeBLL _authorizeBll;
         private readonly CourierAdapter _courierAdapter;
         private readonly AWSS3Helper _s3Helper;
         private readonly PermissionBLL _permissionBll;
         private readonly Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>> _usableActionType;
         private readonly Cryptor _cryptor;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
-        
+
         private readonly string _payApiUrl;
         private readonly string _awsWithdrawalFolder;
         private readonly string _awsWithdrawalAccountingFolder;
@@ -50,6 +53,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public WithdrawalController(IServiceProvider provider)
         {
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
+            _withdrawalStateTransferBll = provider.GetRequiredService<IWithdrawalStateTransferBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
@@ -61,7 +65,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _cryptor = provider.GetRequiredService<Cryptor>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
-            
+
             var configuration = provider.GetRequiredService<IConfiguration>();
             _payApiUrl = configuration.GetValue<string>("PayService");
             _awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
@@ -189,7 +193,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public decimal EndAmount { get; set; }
 
         }
-        
+
         public class GetByTransIdRequest
         {
             public string TransId { get; set; }
@@ -228,7 +232,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             public int Number { get; set; }
         }
-        
+
         public class GetExchangeInfoRequest
         {
             public string CryptoCurrencyName { get; set; }
@@ -258,33 +262,33 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
             var currencyAmount = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
-            var selectSites = new List<int> {request.SiteId};
-            
+            var selectSites = new List<int> { request.SiteId };
+
             if (request.SiteId == 0)
             {
                 selectSites = GetSelectSites();
             }
-            
+
             var withdrawalRequestList = _withdrawalBll.GetWithdrawalRequestList(
                 selectSites,
-                request.WithdrawalTypes, 
+                request.WithdrawalTypes,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime,
                 request.DateType,
-                request.WithdrawalId, 
+                request.WithdrawalId,
                 userNames,
                 request.CurrencyIds,
                 request.Statuses,
-                request.LevelStatuses, 
-                request.PageSize, 
-                request.StartAmount, 
+                request.LevelStatuses,
+                request.PageSize,
+                request.StartAmount,
                 request.EndAmount,
                 request.PageNumber,
                 request.WithdrawalMethod,
                 request.SelectBankCode,
                 request.SelectCalCode,
                 request.Agent,
-                out var totalPages,out var rowCount, ref currencyAmount);
+                out var totalPages, out var rowCount, ref currencyAmount);
 
             foreach (var data in withdrawalRequestList)
             {
@@ -293,7 +297,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 data.MobilePin = _cryptor.Decrypt(data.MobilePin);
                 data.CorporateID = _cryptor.Decrypt(data.CorporateID);
             }
-            
+
             apiListResult.Data = withdrawalRequestList;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
             apiListResult.PageNumber = request.PageNumber;
@@ -320,13 +324,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             var exportData = new List<WithdrawalInfoForExportData>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
-            var selectSites = new List<int> {request.SiteId};
-            
+            var selectSites = new List<int> { request.SiteId };
+
             if (request.SiteId == 0)
             {
                 selectSites = GetSelectSites();
             }
-            
+
             var exportWithdrawal = _withdrawalBll.GetWithdrawalExportList(
                 JsonConvert.SerializeObject(selectSites),
                 JsonConvert.SerializeObject(request.WithdrawalTypes),
@@ -334,17 +338,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.EndDate.DateTime,
                 request.DateType,
                 request.WithdrawalId,
-                userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
+                userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
                 request.CurrencyIds.Any() ? JsonConvert.SerializeObject(request.CurrencyIds) : null,
                 JsonConvert.SerializeObject(request.Statuses),
                 request.LevelStatuses.Any() ? JsonConvert.SerializeObject(request.LevelStatuses) : null,
-                request.StartAmount, 
+                request.StartAmount,
                 request.EndAmount,
                 request.SelectBankCode.Any() ? JsonConvert.SerializeObject(request.SelectBankCode) : null,
                 request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null,
                 string.IsNullOrEmpty(request.Agent) ? null : request.Agent,
                 request.WithdrawalMethod);
-            
+
             foreach (var data in exportWithdrawal)
             {
                 if (!string.IsNullOrWhiteSpace(data.EWalletName))
@@ -412,13 +416,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             var apiResult = new ApiResult<WithdrawalRequest>();
             var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-            
+
             if (withdrawalRequest != null)
             {
                 withdrawalRequest.WithdrawalAccountingModels = _withdrawalBll.GetWithdrawalAccountingByTransId(request.TransId);
                 withdrawalRequest.UsableActionButton = GetUsableActionButton(withdrawalRequest);
             }
-            
+
             if (withdrawalRequest.Operator == User.Identity.Name)
             {
                 withdrawalRequest.SameOperator = true;
@@ -488,102 +492,44 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var apiResult = new ApiResult(_selLangBll);
             var withdrawConfirmResult = -1;
             var authData = _authorizeBll.GetAuthData();
+            var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+            var originStatus = withdrawalData.Status;
+            var changeStatus = request.Action;
 
             switch (request.Action)
             {
                 case WithdrawalStatusEnum.Draft:
-                    
-                    var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                    if (request.WithdrawalAccountingModels != null &&
-                        (withdrawalData.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
-                    {
-                        var sumAmountData = request.WithdrawalAccountingModels.Sum(model => model.Amount);
-                        
-                        if ( withdrawalData.Amount != sumAmountData )
-                        {
-                            apiResult.ErrorCode = 1101;
-                            apiResult.Message = "Accounting sum is Not EQUAL withdrawal num.";
-                            return apiResult;
-                        }
-                    }
-                    withdrawConfirmResult = _withdrawalBll.WithdrawalDraft(request.TransId,
+
+                    var checkWithdrawalDraftFailResult = CheckWithdrawalDraft(request, withdrawalData, apiResult);
+                    if (checkWithdrawalDraftFailResult != null) return checkWithdrawalDraftFailResult;
+
+                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalDraft(request.TransId,
                         request.Comment,
                         request.WithdrawalAccountingModels,
                         authData.UserName);
                     break;
                 case WithdrawalStatusEnum.Pending:
-                    withdrawConfirmResult = _withdrawalBll.WithdrawalPending(request.TransId,
+                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalPending(request.TransId,
                         request.Comment,
                         authData.UserName);
                     break;
                 case WithdrawalStatusEnum.OnHold:
-                    withdrawConfirmResult = _withdrawalBll.WithdrawalOnHold(request.TransId,
+                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalOnHold(request.TransId,
                         request.Comment,
                         authData.UserName);
                     break;
                 case WithdrawalStatusEnum.Verify:
-                    withdrawConfirmResult = _withdrawalBll.WithdrawalVerify(request.TransId,
+                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
                         request.Comment,
                         authData.UserName);
                     break;
                 case WithdrawalStatusEnum.Process:
                     {
-                        if (request.WithdrawalType is null or (int)WithdrawalTypeEnum.Undefined)
-                        {
-                            apiResult.ErrorCode = 1101;
-                            apiResult.Message = "Select 1 Type of Withdrawal Please.";
-                            return apiResult;
-                        }
-
                         var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(request.WithdrawalInfo);
+                        var checkWithdrawalTypeFailResult = CheckWithdrawalTypeAndSetObject(request, apiResult, withdrawalInfo);
+                        if (checkWithdrawalTypeFailResult != null) return checkWithdrawalTypeFailResult;
 
-                        switch (request.WithdrawalType)
-                        {
-                            case WithdrawalTypeEnum.OnlinePayment:
-                                withdrawalInfo.PayId = request.SelId;
-                                break;
-                            
-                            case WithdrawalTypeEnum.LocalBank:
-                            case WithdrawalTypeEnum.CryptoWallet:
-                                {
-                                    var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                                    var bankInfoOff = _bankDetailBll
-                                        .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
-                                        .FirstOrDefault(x => x.BankId == request.SelId);
-
-                                    if (request.WithdrawalAccountingModels == null)
-                                    {
-                                        apiResult.ErrorCode = 1101;
-                                        apiResult.Message = "Required Withdrawal Accounting data";
-                                        return apiResult;
-                                    }
-
-                                    var sumAmount = request.WithdrawalAccountingModels.Sum(model => model.Amount);
-                                    if ( withdrawalRequest.Amount != sumAmount )
-                                    {
-                                        apiResult.ErrorCode = 1101;
-                                        apiResult.Message = "Accounting sum is Not EQUAL withdrawal num.";
-                                        return apiResult;
-                                    }
-
-                                    if (bankInfoOff != null)
-                                    {
-                                        withdrawalInfo.PayId = null;
-                                        withdrawalInfo.FromAccountNo = bankInfoOff.AccountNo;
-                                        withdrawalInfo.FromAccountName = bankInfoOff.AccountName;
-                                        withdrawalInfo.FromSysId = bankInfoOff.SysId;
-                                        withdrawalInfo.BankId = bankInfoOff.BankId;
-                                    }
-                                    break;
-                                }
-                            
-                            case WithdrawalTypeEnum.CryptoPay:
-                                withdrawalInfo.PayId = request.SelId;
-                                withdrawalInfo.ChannelId = request.ChannelId;
-                                break;
-                        }
-
-                        withdrawConfirmResult = _withdrawalBll.WithdrawalProcess(
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalProcess(
                             request.TransId,
                             request.Comment,
                             authData.UserName,
@@ -591,44 +537,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             JsonConvert.SerializeObject(withdrawalInfo),
                             (int)request.WithdrawalType,
                             request.WithdrawalAccountingModels,
-                            out var custId, out var amount );
+                            out var custId, out var amount);
 
-                        if (withdrawConfirmResult > 0 &&
-                            request.WithdrawalType is WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.CryptoPay)
+                        if (withdrawConfirmResult > 0 && request.WithdrawalType is WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.CryptoPay)
                         {
-                            var reqWithdrawalOnline = new ReqWithdrawalOnline
-                            {
-                                SysId = withdrawalInfo.SysId,
-                                TransId = request.TransId,
-                                CustId = custId,
-                                Amount = amount,
-                                PayId = withdrawalInfo.PayId ?? 0,
-                                ChannelId = withdrawalInfo.ChannelId ?? 0,
-                                AccountName = withdrawalInfo.AccountName,
-                                AccountNo = withdrawalInfo.AccountNo,
-                                IFSCCode = withdrawalInfo.IFSCCode
-                                //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
-                            };
-
-                            var myUrl = request.WithdrawalType == WithdrawalTypeEnum.CryptoPay ? 
-                                $"{_payApiUrl}CryptoWithdrawal" : $"{_payApiUrl}Withdrawal";
-
-                            var apiOnlineResult =
-                                await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
-                            if (apiOnlineResult == null)
-                            {
-                                _withdrawalBll.WithdrawalVerify(request.TransId,
-                                    apiResult.Message, User.Identity.Name);
-                                apiResult.ErrorCode = 1101;
-                                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-                                return apiResult;
-                            }
-                            if (apiOnlineResult.ErrorCode != 0)
-                            {
-                                _withdrawalBll.WithdrawalVerify(request.TransId,
-                                    apiOnlineResult.Message, authData.UserName);
-                                return apiOnlineResult;
-                            }
+                            var createFailResult = await PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData);
+                            if (createFailResult != null) return createFailResult;
                         }
                         break;
                     }
@@ -637,8 +551,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         //Check has pic or not
                         var hasPic = await CheckWithdrawalPictureAsync(request.TransId);
 
-                        withdrawConfirmResult = _withdrawalBll.WithdrawalApproved(request.TransId, request.Comment,
-                            authData.UserName, authData.UserId , hasPic);
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalApproved(request.TransId, request.Comment,
+                            authData.UserName, authData.UserId, hasPic);
 
                         if (withdrawConfirmResult > 0)
                         {
@@ -667,7 +581,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 case WithdrawalStatusEnum.Rejected:
                     {
                         withdrawConfirmResult =
-                            _withdrawalBll.WithdrawalRejected(request.TransId, request.Comment, authData.UserName);
+                            _withdrawalStateTransferBll.WithdrawalRejected(request.TransId, request.Comment, authData.UserName);
 
                         if (withdrawConfirmResult > 0)
                         {
@@ -684,7 +598,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         break;
                     }
                 case WithdrawalStatusEnum.ToKyc:
-                    withdrawConfirmResult = _withdrawalBll.WithdrawalToKyc(request.TransId,
+                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalToKyc(request.TransId,
                         request.Comment,
                         authData.UserName);
                     break;
@@ -704,6 +618,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             return apiResult;
         }
+
+     
 
         /// <summary>
         /// Withdrawal/ManualApproval
@@ -735,7 +651,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 };
             }
         }
-        
+
         /// <summary>
         /// Withdrawal/ManualReject
         /// </summary>
@@ -766,7 +682,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 };
             }
         }
-        
+
         /// <summary>
         /// Withdrawal/GetPicture 取得提款圖擋
         /// </summary>
@@ -784,7 +700,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public List<string> GetPicture(string transId, int number)
         {
             using var client = new HttpClient();
-            
+
             var result = new List<string>();
             if (number == -1)
             {
@@ -831,20 +747,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             try
             {
                 var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                
+
                 if (withdrawalRequest.Status is not (WithdrawalStatusEnum.Process or WithdrawalStatusEnum.Approved))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Wrong status ,Can't upload receipt";
                     return apiResult;
                 }
-                
+
                 var requestCount = request.Pic.Count();
-                var result = _withdrawalBll.UpdateWithdrawalPicCount(request.TransId , requestCount);
+                var result = _withdrawalBll.UpdateWithdrawalPicCount(request.TransId, requestCount);
                 if (result)
                 {
                     var withdrawalPic = _withdrawalBll.GetWithdrawalPicCount(request.TransId);
-                    
+
                     var count = 1;
                     foreach (var pic in request.Pic)
                     {
@@ -863,7 +779,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                         count += 1;
                     }
-                    
+
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
                 else
@@ -900,7 +816,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             {
                 var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
                 var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
-                
+
                 bool permission;
                 if (withdrawalRequest.Status is WithdrawalStatusEnum.Approved or WithdrawalStatusEnum.Rejected or WithdrawalStatusEnum.Cancelled)
                 {
@@ -910,14 +826,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 {
                     permission = permissionList.Contains(77); //新增權限
                 }
-                
+
                 if (!permission)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.PermissionDenied;
                     apiResult.Message = "Permission Denied";
                     return apiResult;
                 }
-                
+
                 var deleteRequest = new DeleteObjectRequest();
                 var key = $"{_awsWithdrawalFolder}/{request.TransId}_{request.Number}.png";
                 deleteRequest.BucketName = _awsWithdrawalBucketName;
@@ -990,7 +906,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             throw new AdminException(ErrorCodeEnum.Fail, "Edit Fail.");
         }
-        
+
         [HttpPost]
         public async Task<ApiResult<CryptoExchangeInfo>> GetExchangeInfoAsync(GetExchangeInfoRequest req)
         {
@@ -1036,7 +952,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 return false;
             }
         }
-        
+
         /// <summary>
         /// 複製提款單圖片檔
         /// </summary>
@@ -1074,50 +990,176 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 return false;
             }
         }
-        
+
         private List<WithdrawalActionEnum> GetUsableActionButton(WithdrawalRequest withdrawalRequest)
         {
             var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
             var usableList = _usableActionType[withdrawalRequest.Status];
             var usableActionButton = usableList.Where(item => permissionList.Contains((int)item)).ToList();
-                    
+
             if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
             {
                 usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
                 usableActionButton.Remove(WithdrawalActionEnum.ManualRejected);
             }
 
-            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank 
-                && withdrawalRequest.Status is  WithdrawalStatusEnum.Approved)
+            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank
+                && withdrawalRequest.Status is WithdrawalStatusEnum.Approved)
             {
                 usableActionButton.Add(WithdrawalActionEnum.ManualRejected);
             }
-            
+
             if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
                 withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
             {
                 usableActionButton.Remove(WithdrawalActionEnum.Verified);
                 usableActionButton.Remove(WithdrawalActionEnum.Approved);
             }
-            
+
             if (withdrawalRequest.Status == WithdrawalStatusEnum.Rejected &&
                 withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
             {
                 usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
             }
-            
+
             return usableActionButton;
         }
-        
+
         private List<int> GetSelectSites()
         {
             var authInfo = _newAuthorizeBll.GetAuthData();
             var result = _permissionBll.GetUserBrand(authInfo.UserId).ToList();
             var selectSites = result.Select(x => x.SiteId).ToList();
-            
+
             return selectSites;
         }
-        
+
+        #region Withdrawal to Draft
+
+        private ApiResult CheckWithdrawalDraft(SendToNextRequest request, WithdrawalRequest withdrawalData,
+            ApiResult apiResult)
+        {
+            if (request.WithdrawalAccountingModels != null &&
+                withdrawalData.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
+            {
+                var sumAmountData = request.WithdrawalAccountingModels.Sum(model => model.Amount);
+                if (withdrawalData.Amount != sumAmountData)
+                {
+                    apiResult.ErrorCode = 1101;
+                    apiResult.Message = "Accounting sum is Not EQUAL withdrawal num.";
+                    return apiResult;
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region Withdrawal to Process
+
+        private async Task<ApiResult> PaymentOnlineCreate(SendToNextRequest request, WithdrawalInfo withdrawalInfo, int custId,
+        decimal amount, ApiResult apiResult, AuthData authData)
+        {
+            var myUrl = request.WithdrawalType == WithdrawalTypeEnum.CryptoPay
+                ? $"{_payApiUrl}CryptoWithdrawal"
+                : $"{_payApiUrl}Withdrawal";
+
+            var reqWithdrawalOnline = new ReqWithdrawalOnline
+            {
+                SysId = withdrawalInfo.SysId,
+                TransId = request.TransId,
+                CustId = custId,
+                Amount = amount,
+                PayId = withdrawalInfo.PayId ?? 0,
+                ChannelId = withdrawalInfo.ChannelId ?? 0,
+                AccountName = withdrawalInfo.AccountName,
+                AccountNo = withdrawalInfo.AccountNo,
+                IFSCCode = withdrawalInfo.IFSCCode
+            };
+
+            var apiOnlineResult = await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
+            if (apiOnlineResult == null)
+            {
+                _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
+                    apiResult.Message, User.Identity.Name);
+                apiResult.ErrorCode = 1101;
+                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
+                return apiResult;
+            }
+
+            if (apiOnlineResult.ErrorCode != 0)
+            {
+                _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
+                    apiOnlineResult.Message, authData.UserName);
+                return apiOnlineResult;
+            }
+
+            return null;
+        }
+
+        private ApiResult CheckWithdrawalTypeAndSetObject(SendToNextRequest request, ApiResult apiResult, WithdrawalInfo withdrawalInfo)
+        {
+            switch (request.WithdrawalType)
+            {
+                case null:
+                case WithdrawalTypeEnum.Undefined:
+                    apiResult.ErrorCode = 1101;
+                    apiResult.Message = "Select 1 Type of Withdrawal Please.";
+                    return apiResult;
+
+                case WithdrawalTypeEnum.OnlinePayment:
+                    withdrawalInfo.PayId = request.SelId;
+                    break;
+
+                case WithdrawalTypeEnum.LocalBank:
+                case WithdrawalTypeEnum.CryptoWallet:
+                    {
+                        var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                        if (request.WithdrawalAccountingModels == null)
+                        {
+                            apiResult.ErrorCode = 1101;
+                            apiResult.Message = "Required Withdrawal Accounting data";
+                            return apiResult;
+                        }
+
+                        var sumAmount = request.WithdrawalAccountingModels.Sum(model => model.Amount);
+                        if (withdrawalRequest.Amount != sumAmount)
+                        {
+                            apiResult.ErrorCode = 1101;
+                            apiResult.Message = "Accounting sum is Not EQUAL withdrawal num.";
+                            return apiResult;
+                        }
+
+                        var bankInfoOff = _bankDetailBll
+                            .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
+                            .FirstOrDefault(x => x.BankId == request.SelId);
+
+                        if (bankInfoOff != null)
+                        {
+                            withdrawalInfo.PayId = null;
+                            withdrawalInfo.FromAccountNo = bankInfoOff.AccountNo;
+                            withdrawalInfo.FromAccountName = bankInfoOff.AccountName;
+                            withdrawalInfo.FromSysId = bankInfoOff.SysId;
+                            withdrawalInfo.BankId = bankInfoOff.BankId;
+                        }
+
+                        break;
+                    }
+
+                case WithdrawalTypeEnum.CryptoPay:
+                    withdrawalInfo.PayId = request.SelId;
+                    withdrawalInfo.ChannelId = request.ChannelId;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return null;
+        }
+
+        #endregion
+
         #endregion
 
     }
