@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using StackExchange.Redis;
 
 namespace BackendSite.Service.Library
@@ -21,5 +22,6 @@ namespace BackendSite.Service.Library
         bool KeyDelete(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
         Task<long> KeyDeleteByPatternAsync(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        Task<RedisSetAndGetResult> StringSetAndGetAsync(string key, string value, TimeSpan expiry, RedisDataBase redisDataBase = RedisDataBase.Admin);
     }
 }
