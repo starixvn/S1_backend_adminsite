@@ -63,7 +63,7 @@ namespace BackendSite.Service.BLL
                 //Export
                 if (pageNumber == -1)
                 {
-                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber);
+                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber, RedisDataBase.Shared);
                 }
 
                 //Redis Pagination
