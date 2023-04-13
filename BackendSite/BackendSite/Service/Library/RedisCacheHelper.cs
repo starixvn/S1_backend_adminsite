@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -43,7 +44,7 @@ namespace BackendSite.Service.Library
                 return factory();
             }
         }
-        
+
         public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan? timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
@@ -370,6 +371,21 @@ namespace BackendSite.Service.Library
             }
         }
 
+        public async Task<RedisSetAndGetResult> StringSetAndGetAsync(string key, string value, TimeSpan expiry, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            var result = new RedisSetAndGetResult() { Success = true, Value = value };
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            var redisValue = await db.StringSetAndGetAsync(key: key, value: value, expiry: expiry, When.NotExists, CommandFlags.None);
+
+            if (redisValue.HasValue && redisValue.ToString() != value)
+            {
+                result.Success = false;
+                result.Value = redisValue.ToString(); // redis origin value
+            }
+
+            return result;
+        }
+
         private string RemoveSpecialChars(string key)
         {
             foreach (var c in _charsToRemove)
@@ -379,7 +395,7 @@ namespace BackendSite.Service.Library
 
             return key;
         }
-        
+
         private bool HasData<T>(T obj)
         {
             if (obj == null)

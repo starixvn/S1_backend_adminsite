@@ -112,6 +112,14 @@ namespace BackendSite.Service.Model
         public string MobilePin { get; set; }
         public string CorporateID { get; set; }
         public IEnumerable<WithdrawalAccountingModel> WithdrawalAccountingModels { set; get; }
+
+        [JsonIgnore]
+        public WithdrawalInfoProcessWayEnum ProcessWay { get; set; }
+
+        public string ProcessWayName => ProcessWay.ToString();
+
+        public string OnUser { get; set; }
+
     }
     public class WithdrawalInfo
     {

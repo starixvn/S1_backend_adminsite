@@ -92,6 +92,8 @@ namespace BackendSite
             services.AddTransient<IMpaMarketingWithdrawalAmountBLL, MpaMarketingWithdrawalAmountBLL>();
             services.AddTransient<IMpaMarketingDepositAmountBLL, MpaMarketingDepositAmountBLL>();
             services.AddTransient<IAutoWithdrawalRuleBLL, AutoWithdrawalRuleBLL>();
+            services.AddTransient<IWithdrawalStateTransferBLL, WithdrawalStateTransferBLL>();
+
 
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
