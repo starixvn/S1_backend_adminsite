@@ -48,7 +48,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public string Purpose { get; set; }
 
         public IEnumerable<TransferAccountPurposeEnum> Purposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(Purpose ?? string.Empty);
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(Purpose ?? "[]");
 
         /// <summary>
         /// 讀寫 付款方式
