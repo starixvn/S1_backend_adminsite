@@ -401,6 +401,8 @@ namespace BackendSite.Service.Model.enums
         Approved = 6,
         Rejected = 7,
         ToKyc = 8,
+        Receive = 9, //No Use
+        UnReceive = 10, //No Use
         Error = 99 //No Use
     }
 

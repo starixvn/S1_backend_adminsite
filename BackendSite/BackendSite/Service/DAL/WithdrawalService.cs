@@ -8,7 +8,9 @@ using System.Text.RegularExpressions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
+using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Service.DAL
 {
@@ -68,7 +70,7 @@ namespace BackendSite.Service.DAL
                 var m = Regex.Match(WithdrawalId, @"\d+");
                 int.TryParse(m.Value, out withdrawalId);
             }
-            
+
             // var tempWithdrawalMethod = (int)withdrawalMethod;
             // if(withdrawalType.Count() > 1)
             // {
@@ -81,7 +83,7 @@ namespace BackendSite.Service.DAL
             //         tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
             //     }
             // }
-            
+
             var p = new DynamicParameters(new
             {
                 _SiteIds = JsonConvert.SerializeObject(selectSite),
@@ -91,7 +93,7 @@ namespace BackendSite.Service.DAL
                 _DateType = (int)dateType == 0 ? (int)WithdrawalDateTypeEnum.CreateTime : (int)dateType,
                 _WithdrawalId = withdrawalId,
                 _TransId = WithdrawalId,
-                _UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
+                _UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
                 _CurrencyIds = currencyId.Any() ? JsonConvert.SerializeObject(currencyId) : null,
                 _Statuses = JsonConvert.SerializeObject(status),
                 _VipStatuses = levelStatus.Any() ? JsonConvert.SerializeObject(levelStatus) : null,
@@ -108,7 +110,7 @@ namespace BackendSite.Service.DAL
             #region GetCurrencyTotalAmount
 
             currencyAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p).ToList();
-            
+
             #endregion
 
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -137,7 +139,7 @@ namespace BackendSite.Service.DAL
         {
             const string spName = "WithdrawalLog_Ins";
             var parameter = new { WithdrawalId = withdrawalId, SiteId = siteId, Comment = comment, Action = status, Operator };
-            
+
             return trans != null
                 ? _mainDbClient.Execute(spName, trans, parameter)
                 : _mainDbClient.Execute(spName, parameter);
@@ -169,25 +171,25 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_TotalApproveAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_TotalApproveRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var depositList = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get_V4", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             totalAmount = p.Get<decimal?>("_TotalAmount") ?? 0;
             totalApproveAmount = p.Get<decimal?>("_TotalApproveAmount") ?? 0;
             totalApproveRow = p.Get<int?>("_TotalApproveRow") ?? 0;
-            
+
             return depositList;
         }
 
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(
-            string selectSite, 
+            string selectSite,
             string withdrawalType,
-            DateTime startDate, 
+            DateTime startDate,
             DateTime endDate,
             WithdrawalDateTypeEnum dateType,
-            string WithdrawalId, 
-            string userName, 
+            string WithdrawalId,
+            string userName,
             string currencyId,
             string status,
             string levelStatus,
@@ -204,7 +206,7 @@ namespace BackendSite.Service.DAL
                 var m = Regex.Match(WithdrawalId, @"\d+");
                 int.TryParse(m.Value, out withdrawalId);
             }
-           
+
             // var tempWithdrawalMethod = (int)withdrawalMethod;
             // if (withdrawalType.Count() > 1)
             // {
@@ -217,7 +219,7 @@ namespace BackendSite.Service.DAL
             //         tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
             //     }
             // }
-            
+
             var p = new DynamicParameters(new
             {
                 _SiteIds = selectSite,
@@ -313,13 +315,13 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_WithdrawalMinInfo_Del", new { SiteId, CurrencyId }) > 0;
         }
 
-        public bool UpdateWithdrawalPicCount(string transId , int count)
+        public bool UpdateWithdrawalPicCount(string transId, int count)
         {
             return _mainDbClient.Execute("Admin_BankSlipPic_Ins_V2", new
-                {
-                    TransId = transId,
-                    Count = count
-                }) > 0;
+            {
+                TransId = transId,
+                Count = count
+            }) > 0;
         }
 
         public BankSlipPic GetWithdrawalPicCount(string transId)
@@ -386,7 +388,7 @@ namespace BackendSite.Service.DAL
             DateTime endDate, string selectStatus, string currencyIds, int custId)
         {
             int.TryParse(withdrawalId, out var tempWithdrawalId);
-            
+
             var props = new DynamicParameters();
             props.Add("StartDate", startDate);
             props.Add("EndDate", endDate);
@@ -399,7 +401,7 @@ namespace BackendSite.Service.DAL
                 commandType: CommandType.StoredProcedure).ToList();
         }
 
-        public int  SetWithdrawalInfoFlow(string transId,
+        public int SetWithdrawalInfoFlow(string transId,
             int siteId,
             string comment,
             string forStatus,
@@ -431,14 +433,14 @@ namespace BackendSite.Service.DAL
                 result = SetWithdrawalInfo(withdrawalId, siteId, comment,
                     forStatus, updater, status,
                     /*Approved don't to Set WithdrawalInfo*/
-                    (status == WithdrawalStatusEnum.Approved && withdrawalType != (int)WithdrawalTypeEnum.CryptoWallet 
+                    (status == WithdrawalStatusEnum.Approved && withdrawalType != (int)WithdrawalTypeEnum.CryptoWallet
                         ? null : withdrawalInfo),
                     withdrawalType, chargeFee,
                     out custId, out var userName, out amount, out paraLog, trans);
 
                 var accountingModelString = SetAccountingString(accountingModels);
                 var beforeAccountingModels = _withdrawalBankAccountingService.GetByTransId(transId);
-                
+
                 if (result > 0)
                 {
                     //step2: Set WithdrawalLog
@@ -449,14 +451,14 @@ namespace BackendSite.Service.DAL
                             comment = $"Comment : {comment}, ";
                         }
 
-                        var compare = accountingModels.Except(beforeAccountingModels , new WithdrawalAccountingModelComparer()); 
-                        
+                        var compare = accountingModels.Except(beforeAccountingModels, new WithdrawalAccountingModelComparer());
+
                         if (compare.Any())
                         {
                             comment += $"AccountingModel :{accountingModelString}";
                         }
                     }
-                    
+
                     var logResult = SetWithdrawalLog(withdrawalId, siteId, comment, (int)status, updater, trans);
                     var specialResult = 0;
 
@@ -476,30 +478,30 @@ namespace BackendSite.Service.DAL
 
                                 specialResult = (updateFlowEndResult == 0 || balanceResult == 0) ? 0 : 1;
                                 break;
-                            
+
                             case WithdrawalStatusEnum.Draft:
                             case WithdrawalStatusEnum.Process:
-                                
+
                                 if (!string.IsNullOrEmpty(accountingModelString))
                                 {
                                     var delResult = 1;
                                     if (beforeAccountingModels.Any())
                                     {
-                                        delResult = DelWithdrawalAccounting(transId,trans) >= 0 ? 1 : 0;
+                                        delResult = DelWithdrawalAccounting(transId, trans) >= 0 ? 1 : 0;
                                     }
 
                                     if (delResult == 1)
                                     {
-                                        specialResult = SetWithdrawalAccounting(transId,accountingModelString,userId,trans) > 0 ? 1 : 0;
+                                        specialResult = SetWithdrawalAccounting(transId, accountingModelString, userId, trans) > 0 ? 1 : 0;
                                     }
                                 }
                                 else
                                 {
                                     specialResult = 1;
                                 }
-                                
+
                                 break;
-                            
+
                             case WithdrawalStatusEnum.Approved:
                                 var dummyResult = 0;
                                 // var accountingResult = 0;
@@ -528,11 +530,11 @@ namespace BackendSite.Service.DAL
                                         dummyResult = 1;
                                         break;
                                 }
-                                
+
                                 specialResult = updateFlowEndResult == 0 || dummyResult == 0 ? 0 : 1;
 
                                 break;
-                            
+
                             default:
                                 specialResult = 1; //No special Flow status,Result is always success.
                                 break;
@@ -640,7 +642,7 @@ namespace BackendSite.Service.DAL
                 : _mainDbClient.Execute(spName, p);
         }
 
-        private int SetWithdrawalAccounting(string transId , string accountingModels, int userId, MySqlTransaction trans = null)
+        private int SetWithdrawalAccounting(string transId, string accountingModels, int userId, MySqlTransaction trans = null)
         {
             var p = new DynamicParameters(new
             {
@@ -653,7 +655,7 @@ namespace BackendSite.Service.DAL
                 ? _mainDbClient.Execute(spName, trans, p)
                 : _mainDbClient.Execute(spName, p);
         }
-        
+
         private int DelWithdrawalAccounting(string transId, MySqlTransaction trans = null)
         {
             var p = new DynamicParameters();
@@ -663,7 +665,7 @@ namespace BackendSite.Service.DAL
                 ? _mainDbClient.Execute(spName, trans, p)
                 : _mainDbClient.Execute(spName, p);
         }
-        
+
         public bool IsExistRunningWithdrawalInfo(int custId)
         {
             return _mainDbClient.QueryFirst<bool>("Member_WithdrawalInfoCheck_Get",
@@ -726,13 +728,26 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
             return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
-        
+
+        public async Task<bool> SetWithdrawalInfoOnUserAndLog(string transId, string onUser, int siteId, WithdrawalStatusEnum withdrawalStatusEnum, string @operator)
+        {
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
+
+            var _ = SetWithdrawalLog(withdrawalId, siteId, "", (int)withdrawalStatusEnum, @operator);
+
+            var p = new DynamicParameters();
+            p.Add("_WithdrawalId", withdrawalId);
+            p.Add("_OnUser", onUser);
+            return await _mainDbClient.ExecuteAsync("Admin_WithdrawalInfoOnUser_Set", p) > 0;
+        }
+
         #region private
 
         private string SetAccountingString(IEnumerable<WithdrawalAccountingModel> accountingModels)
         {
             string accountingModelString = null;
-            if (accountingModels != null && accountingModels.Any() )
+            if (accountingModels != null && accountingModels.Any())
             {
                 var bankAccountList = _bankDetailBll.GetOfflineBankAccount();
                 var seq = 1;
@@ -748,12 +763,12 @@ namespace BackendSite.Service.DAL
             }
             return accountingModelString;
         }
-        
+
         private class WithdrawalAccountingModelComparer : IEqualityComparer<WithdrawalAccountingModel>
         {
             public bool Equals(WithdrawalAccountingModel t1, WithdrawalAccountingModel t2)
             {
-                var isSame = t1.Seq == t2.Seq && 
+                var isSame = t1.Seq == t2.Seq &&
                              t1.BankId == t2.BankId &&
                              t1.Amount == t2.Amount &&
                              t1.ChargeFee == t2.ChargeFee;
@@ -765,8 +780,8 @@ namespace BackendSite.Service.DAL
                 return t.ToString().GetHashCode();
             }
         }
-        
+
         #endregion
-        
+
     }
 }
