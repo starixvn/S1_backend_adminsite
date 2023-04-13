@@ -159,9 +159,19 @@ namespace BackendSite.Service.BLL
         public async Task<bool> DeletePersonalMsg(int id, string @operator)
         {
             var personalMsg = await messageService.GetMessageById(id);
-            if (personalMsg == null) return false;
+            if (personalMsg == null) 
+            {
+                _logger.LogError("message not found");
+                return false;
+            }
 
-            var custSimpleInfo = await custInfoBLL.GetCustId(personalMsg.CustId, null, null);
+            var customer = custInfoBLL.GetCustInfoWithCache(personalMsg.CustId);
+            if (customer == null) 
+            {
+                _logger.LogError("customer not found");
+                return false;
+            }
+
             using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
@@ -169,12 +179,12 @@ namespace BackendSite.Service.BLL
             {
                 await messageService.DeletePersonalMessage(id, trans);
                 await _custInfoService.InsertLogAsync(
-                    custSimpleInfo.SiteId, 
-                    custSimpleInfo.CustId, 
-                    custSimpleInfo.CurrencyId,
-                    personalMsg, null, 
+                    customer.SiteId,
+                    customer.CustId,
+                    customer.CurrencyId,
+                    personalMsg, null,
                     AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
-                    ActionType.Delete, 
+                    ActionType.Delete,
                     @operator, trans);
                 await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
