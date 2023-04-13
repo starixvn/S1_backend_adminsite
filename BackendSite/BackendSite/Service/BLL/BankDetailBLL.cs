@@ -106,10 +106,11 @@ namespace BackendSite.Service.BLL
         /// </summary>
         public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
         {
-            var key = $"OfflineBankAccount:{siteId}:{currencyId}";
-            
-            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
-                () => localBankService.GetOfflineBankAccount(siteId, currencyId));
+            return localBankService.GetOfflineBankAccount(siteId, currencyId);
+            // var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
+            //
+            // return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
+            //     () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
         public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
