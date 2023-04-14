@@ -306,11 +306,11 @@ namespace BackendSite.Service.DAL
             props.Add("_BatchId", batchId);
             return _reportDbClient.Query<BatchMessageSendLogListModel>("Admin_BatchMessageSendLog_Get", props);
         }
-        public int SendMessageToPlayer(string sender, int custId, string lang, string title, string content)
+        public Task<int> SendMessageToPlayer(string sender, int custId, string lang, string title, string content, bool isPopup, string popupMessage)
         {
-            return _mainDbClient.Execute(
-                "Admin_CustBatchMessage_Ins",
-                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = 0, _Title = title, _Content = content, _Sender = sender });
+            return _mainDbClient.ExecuteAsync(
+                "Admin_CustBatchMessage_Ins_V2",
+                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = isPopup, _Title = title, _Content = content, _PopupMessage = popupMessage, _Sender = sender });
         }
         public int SendMessage(Message message) =>
             _mainDbClient.Execute("Msg_Ins_V4", new DynamicParameters(message));

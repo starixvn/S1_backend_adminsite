@@ -392,10 +392,10 @@ namespace BackendSite.Service.BLL
                                  $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
             }
         }
-        public int SendMessageToPlayer(string sender, string title, string content, int custId)
+        public Task<int> SendMessageToPlayer(string sender, string title, string content, bool isPopup, string popupMessage, int custId)
         {
             var customer = custInfoBLL.GetCustInfoWithCache(custId);
-            return messageService.SendMessageToPlayer(sender, custId, customer.UserLang, title, content);
+            return messageService.SendMessageToPlayer(sender, custId, customer.UserLang, title, content, isPopup, popupMessage);
         }
         public int SendMessage(Message message) =>
             messageService.SendMessage(message);
