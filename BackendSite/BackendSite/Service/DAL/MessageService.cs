@@ -140,7 +140,7 @@ namespace BackendSite.Service.DAL
             props.Add("_PageSize", PageSize, dbType: DbType.Int32);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_Get_V4", props);
+            var result = await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_Get_V5", props);
             return new DataWithPage<PersonalMsg>() 
             {
                 Data = result,
