@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
@@ -39,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>> _usableActionType;
         private readonly Cryptor _cryptor;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly ICacheHelper _redisHelper;
 
         private readonly string _payApiUrl;
         private readonly string _awsWithdrawalFolder;
@@ -65,6 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _cryptor = provider.GetRequiredService<Cryptor>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
 
             var configuration = provider.GetRequiredService<IConfiguration>();
             _payApiUrl = configuration.GetValue<string>("PayService");
@@ -420,7 +423,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             if (withdrawalRequest != null)
             {
                 withdrawalRequest.WithdrawalAccountingModels = _withdrawalBll.GetWithdrawalAccountingByTransId(request.TransId);
-                withdrawalRequest.UsableActionButton = GetUsableActionButton(withdrawalRequest);
+                withdrawalRequest.UsableActionButton = await GetUsableActionButton(withdrawalRequest);
             }
 
             if (withdrawalRequest.Operator == User.Identity.Name)
@@ -619,7 +622,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             return apiResult;
         }
 
-     
+
 
         /// <summary>
         /// Withdrawal/ManualApproval
@@ -991,38 +994,60 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
         }
 
-        private List<WithdrawalActionEnum> GetUsableActionButton(WithdrawalRequest withdrawalRequest)
+        private async Task<List<WithdrawalActionEnum>> GetUsableActionButton(WithdrawalRequest withdrawalRequest)
         {
-            var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
-            var usableList = _usableActionType[withdrawalRequest.Status];
-            var usableActionButton = usableList.Where(item => permissionList.Contains((int)item)).ToList();
+            var key = $"lock:withdrawalTransId:{withdrawalRequest.TransId}";
+            var lockExists = await _redisHelper.KeyExistsAsync(key);
 
-            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
+            if (lockExists) // 如果有人 Lock
             {
-                usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
-                usableActionButton.Remove(WithdrawalActionEnum.ManualRejected);
+                var authData = _authorizeBll.GetAuthData();
+                var lockUser = await _redisHelper.StringGetAsync(key);
+                var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
+                
+                if (lockUser == authData.UserName) // 是不自己 Lock
+                {
+                    var usableList = _usableActionType[withdrawalRequest.Status];
+                    var usableActionButton = usableList.Where(item => permissionList.Contains((int)item)).ToList();
+
+                    if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
+                    {
+                        usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
+                        usableActionButton.Remove(WithdrawalActionEnum.ManualRejected);
+                    }
+
+                    if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank
+                        && withdrawalRequest.Status is WithdrawalStatusEnum.Approved)
+                    {
+                        usableActionButton.Add(WithdrawalActionEnum.ManualRejected);
+                        usableActionButton.Remove(WithdrawalActionEnum.Receive);
+                    }
+
+                    if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
+                        withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
+                    {
+                        usableActionButton.Remove(WithdrawalActionEnum.Verified);
+                        usableActionButton.Remove(WithdrawalActionEnum.Approved);
+                    }
+
+                    if (withdrawalRequest.Status == WithdrawalStatusEnum.Rejected &&
+                        withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
+                    {
+                        usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
+                    }
+
+                    usableActionButton.Remove(WithdrawalActionEnum.Receive);
+                    return usableActionButton;
+                }
+
+                // 如果有人Lock 但不是自己，就判斷權限是否是主管，主管可以有 Receive 按鈕
+                var forceProceedPermission = permissionList.Any(x => x == 83);
+                return forceProceedPermission 
+                    ? new List<WithdrawalActionEnum>() { WithdrawalActionEnum.Draft, WithdrawalActionEnum.Receive } 
+                    : new List<WithdrawalActionEnum>() { WithdrawalActionEnum.Draft };
             }
 
-            if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank
-                && withdrawalRequest.Status is WithdrawalStatusEnum.Approved)
-            {
-                usableActionButton.Add(WithdrawalActionEnum.ManualRejected);
-            }
-
-            if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
-                withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
-            {
-                usableActionButton.Remove(WithdrawalActionEnum.Verified);
-                usableActionButton.Remove(WithdrawalActionEnum.Approved);
-            }
-
-            if (withdrawalRequest.Status == WithdrawalStatusEnum.Rejected &&
-                withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
-            {
-                usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
-            }
-
-            return usableActionButton;
+            return new List<WithdrawalActionEnum>() { WithdrawalActionEnum.Draft, WithdrawalActionEnum.Receive };
         }
 
         private List<int> GetSelectSites()
