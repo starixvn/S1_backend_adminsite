@@ -306,12 +306,6 @@ namespace BackendSite.Service.DAL
             props.Add("_BatchId", batchId);
             return _reportDbClient.Query<BatchMessageSendLogListModel>("Admin_BatchMessageSendLog_Get", props);
         }
-        public Task<int> SendMessageToPlayer(string sender, int custId, string lang, string title, string content, bool isPopup, string popupMessage)
-        {
-            return _mainDbClient.ExecuteAsync(
-                "Admin_CustBatchMessage_Ins_V2",
-                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = isPopup, _Title = title, _Content = content, _PopupMessage = popupMessage, _Sender = sender });
-        }
         public int SendMessage(Message message) =>
             _mainDbClient.Execute("Msg_Ins_V4", new DynamicParameters(message));
 
@@ -326,12 +320,11 @@ namespace BackendSite.Service.DAL
             var batchId = p.Get<int?>("BatchId") ?? 0;
             return batchId;
         }
-        public async Task<int> AddCustBatchMessage(int custId, int batchId, string langId, bool isPopup, string title, string content, string sender)
+        public Task<int> AddCustBatchMessage(int custId, int batchId, string langId, bool isPopup, string title, string content, string popupMessage, string sender)
         {
-            return await _mainDbClient.ExecuteAsync(
-                "Admin_CustBatchMessage_Ins",
-                _transaction,
-                new { _CustId = custId, _BatchId = batchId, _LangId = langId, _IsPopup = isPopup, _Title = title, _Content = content, _Sender = sender });
+            return _mainDbClient.ExecuteAsync(
+                "Admin_CustBatchMessage_Ins_V2",
+                new { _CustId = custId, _BatchId = batchId, _LangId = langId, _IsPopup = isPopup, _Title = title, _Content = content, _PopupMessage = popupMessage, _Sender = sender });
         }
         public async Task<int> InsertBatchMessageSendLog(int batchId, int rowId, int custId, string userName, string sabaId, string resultMessage, string updator)
         {
