@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
-using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Service.BLL
 {

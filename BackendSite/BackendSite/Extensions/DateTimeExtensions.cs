@@ -75,6 +75,17 @@
             return DateTimeOffset.Parse(time.ToString() + timeZone);
         }
 
+        public static DateTimeOffset? ToOffset(this DateTime? time, TimeSpan timeZone)
+        {
+            if (time.HasValue)
+                return new DateTimeOffset(time.Value, timeZone);
+            return null;
+        }
+        public static DateTimeOffset ToOffset(this DateTime time, TimeSpan timeZone)
+        {
+            return new DateTimeOffset(time, timeZone);
+        }
+
         public static bool EarlierThan(this DateTime startMonth, DateTime endMonth)
         {
             var start = int.Parse(startMonth.ToString("yyyyMM"));

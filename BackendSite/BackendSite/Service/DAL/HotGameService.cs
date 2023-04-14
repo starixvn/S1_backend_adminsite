@@ -65,7 +65,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_Id", id);
             p.Add("_Sort", sort);
-            return await _mainDbClient.ExecuteAsync("Admin_HotGamesSort_Set", p, _connection, _transaction);
+            return await _mainDbClient.ExecuteAsync("Admin_HotGamesSort_Set", _transaction, p);
         }
 
         public async Task BeginTransaction()
@@ -78,13 +78,17 @@ namespace BackendSite.Service.DAL
         public async Task Commit()
         {
             await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
             await _connection.CloseAsync();
+            await _connection.DisposeAsync();
         }
 
         public async Task RollBack()
         {
             await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
             await _connection.CloseAsync();
+            await _connection.DisposeAsync();
         }
 
         #region ApiV2
@@ -152,7 +156,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Id", id);
             p.Add("_Sort", sort);
             p.Add("_SiteId", siteId);
-            return await _mainDbClient.ExecuteAsync("Admin_HotGamesSort_Set_V2", p, _connection, _transaction);
+            return await _mainDbClient.ExecuteAsync("Admin_HotGamesSort_Set_V2", _transaction, p);
         }
 
         #endregion

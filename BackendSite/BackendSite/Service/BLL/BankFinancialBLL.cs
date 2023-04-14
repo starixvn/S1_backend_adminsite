@@ -9,10 +9,6 @@ using BackendSite.Service.Model.enums;
 using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.ApiModel;
-using System.Drawing;
-using System.Transactions;
-using BackendSite.Service.Library;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {
@@ -72,7 +68,8 @@ namespace BackendSite.Service.BLL
         {
             return _bankFinancialService.GetTransferAccountList();
         }
-        
+
+
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
         {
             return _bankFinancialService.GetTransferAccountList(siteId, new []
@@ -81,28 +78,13 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public IEnumerable<BankFinancialTransferAccount> GetFinancialAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
-        {
-            return _bankFinancialService.GetTransferAccountList(siteId, purposes);
-        }
-        
         #endregion
 
         #region Transfer Account Management
 
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListForDisplay(bool isSetting, int siteId, int id)
-        {
-            return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
-        }
-        
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(GetTransferAccountInfoListParams input)
         {
             return _bankFinancialService.GetTransferAccountInfoListV2(input);
-        }
-
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListForExport(bool isSetting, int siteId, int id)
-        {
-            return _bankFinancialService.GetTransferAccountInfoList(isSetting, siteId, id);
         }
         
         public IEnumerable<string> GetTransferAccountAgentList(int siteId)
@@ -137,7 +119,7 @@ namespace BackendSite.Service.BLL
                 SiteName = input.SiteName,
                 CurrencyId = input.CurrencyId,
                 SysId = input.SysId,
-                Purpose = SortPurpose(input.Purpose),
+                Purpose = input.Purpose,
                 Channel = input.Channel,
                 Agent = input.Agent == "" ? null : input.Agent,
                 PayId = input.PayId == 0 ? null : input.PayId,
@@ -174,7 +156,7 @@ namespace BackendSite.Service.BLL
                 BeforeDetailInfo = isCreate ? null : JsonConvert.SerializeObject(new
                 {
                     Id = oldData.Id,
-                    Purpose = GetPurpose(oldData.Purpose),
+                    Purpose = GetPurpose(oldData.Purposes.Select(p => (int)p).OrderBy(p => p)),
                     Channel = oldData.Channel.ToString(),
                     Agent = oldData.Agent,
                     AccountNo = oldData.AccountNo,
@@ -358,13 +340,6 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(input.Purpose))
-            {
-                message = "Data-[Purpose] invalid.";
-
-                return false;
-            }
-
             if (input.Channel == null || input.Channel == 0)
             {
                 message = "Data-[Channel] invalid.";
@@ -464,74 +439,10 @@ namespace BackendSite.Service.BLL
             return true;
         }
 
-        private bool CheckKeyValueForSetTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount, BankFinancialTransferAccountDetailModel oldData)
-        {
-
-            #region Key Values Check
-
-
-            if (bankFinancialTransferAccount.CurrencyId != oldData.CurrencyId)
-            {
-                return true;
-            }
-
-            if (bankFinancialTransferAccount.SysId != oldData.SysId)
-            {
-                return true;
-            }
-
-            if (bankFinancialTransferAccount.Channel != oldData.Channel)
-            {
-                return true;
-            }
-
-            if (bankFinancialTransferAccount.PayId != oldData.PayId)
-            {
-                return true;
-            }
-
-            if (bankFinancialTransferAccount.Agent != oldData.Agent)
-            {
-                return true;
-            }
-
-            if (bankFinancialTransferAccount.AccountNo != oldData.AccountNo)
-            {
-                return true;
-            }
-
-            if (bankFinancialTransferAccount.AccountName != oldData.AccountName)
-            {
-                return true;
-            }
-
-            if (bankFinancialTransferAccount.DisplayName != oldData.DisplayName)
-            {
-                return true;
-            }
-
-            #endregion
-
-            return false;
-        }
-
-        private string SortPurpose(string purpose)
-        {
-
-            IEnumerable<int> sortPurpose = purpose.Split(',').Select(int.Parse).ToList();
-            sortPurpose = sortPurpose.OrderBy(p => p);
-            var result = string.Join(",", sortPurpose);
-
-            return result;
-        }
-        
-        private string GetPurpose(string purpose)
+        private string GetPurpose(IEnumerable<int> purpose)
         {
             var result = string.Empty;
-
-            IEnumerable<int> purposeList = purpose.Split(',').Select(int.Parse).ToList();
-
-            foreach (var i in purposeList)
+            foreach (var i in purpose)
             {
                 switch (i)
                 {
@@ -549,29 +460,6 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region Transfer Info Management
-
-        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetTransferInfoList(bool isSetting,
-                                                                                     TransferTypeEnum? transferType,
-                                                                                     DateTime? transFromDate,
-                                                                                     DateTime? transToDate,
-                                                                                     string fromAccountNo,
-                                                                                     string fromAccountDisplayName,
-                                                                                     string toAccountNo,
-                                                                                     string toAccountDisplayName,
-                                                                                     int? reason,
-                                                                                     string transferId)
-        {
-            return _bankFinancialService.GetTransferInfoList(isSetting,
-                                                             transferType,
-                                                             transFromDate,
-                                                             transToDate,
-                                                             fromAccountNo,
-                                                             fromAccountDisplayName,
-                                                             toAccountNo,
-                                                             toAccountDisplayName,
-                                                             reason,
-                                                             transferId);
-        }
 
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoList(
             GetTransferInfoListParams input, int pageNumber, int pageSize, out IPageInfo pageInfo)
@@ -1512,53 +1400,6 @@ namespace BackendSite.Service.BLL
             }
 
             return false;
-        }
-
-        public ProcessedImage ProcessImage(IFormFile image)
-        {
-            var processedImage = new ProcessedImage();
-
-            if (_contentTypesCheck.ContainsKey(image.ContentType))
-            {
-                var xSize = 500m;
-                var apiResult = new ApiResult();
-                decimal xCell = 1;
-
-                using var fileStream = image.OpenReadStream();
-                using var uploadedImage = Image.FromStream(fileStream);
-                using var ms = new System.IO.MemoryStream();
-
-                if (uploadedImage.Width > xSize || uploadedImage.Height > xSize)
-                {
-                    if (uploadedImage.Width > uploadedImage.Height)
-                    {
-                        xCell = xSize / uploadedImage.Width;
-                    }
-                    else
-                    {
-                        xCell = xSize / uploadedImage.Height;
-                    }
-                }
-
-                var graphicOptions = new GraphicOptions
-                {
-                    CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed,
-                    SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed
-                };
-                var img = ImageResize.Scale(uploadedImage, Convert.ToInt32(uploadedImage.Width * xCell), Convert.ToInt32(uploadedImage.Height * xCell), graphicOptions);
-                img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                var fileName = image.FileName;
-                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
-                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
-
-                var fileBytes = ms.ToArray();
-
-                processedImage.FileName = fileName;
-                processedImage.FileBytes = fileBytes;
-            }
-
-            return processedImage;
         }
 
         public class ProcessedImage

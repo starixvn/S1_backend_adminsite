@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
@@ -85,10 +85,10 @@ namespace BackendSite.Service.BLL
                     IsTest = a.IsTest,
                     IP = a.IP,
                     LevelName = a.LevelName,
-                    RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
-                    LastActiveTime = Convert(a.ReloadTime, TimeSpan.Zero),
-                    LastTagUpdateTime = Convert(a.LastTagUpdateTime, TimeSpan.Zero),
-                    LastStatusUpdateTime = Convert(a.LastStatusUpdateTime, TimeSpan.Zero),
+                    RegTime = a.RegTime.ToOffset(TimeSpan.Zero),
+                    LastActiveTime = a.ReloadTime.ToOffset(TimeSpan.Zero),
+                    LastTagUpdateTime = a.LastTagUpdateTime.ToOffset(TimeSpan.Zero),
+                    LastStatusUpdateTime = a.LastStatusUpdateTime.ToOffset(TimeSpan.Zero),
                     Balance = a.Balance,
                     Bonus = a.Bonus,
                     DeviceScore = a.DeviceScore,
@@ -103,6 +103,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<MemberExportData>> GetExportDataAsync(ExportMemberRequest request)
         {
+            var timespan = request.StartDate.Offset;
+
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
@@ -147,7 +149,7 @@ namespace BackendSite.Service.BLL
                 PhoneNo = a.PhoneNo,
                 LevelName = a.LevelName,
                 Agent = a.Agent,
-                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero).ToOffset(timespan),
                 Status = ((CustomerStatusEnum)a.Status).ToString(),
                 SabaId = a.SabaId,
                 SignupUrl = a.SignupUrl,
@@ -232,10 +234,10 @@ namespace BackendSite.Service.BLL
                 AgentName = customer.Agent,
                 SuperiorAffiliateId = customer.AffId,
                 SuperiorAffiliateCode = customer.AffCode,
-                RegisteredTime = customer.RegTime,
-                FirstDepositTime = customer.FirstDepositTime,
-                LastLoginTime = customer.LastLoginTime,
-                LastActiveTime = customer.LastDepositTime,
+                RegisteredTime = customer.RegTime.ToOffset(TimeSpan.Zero),
+                FirstDepositTime = customer.FirstDepositTime.ToOffset(TimeSpan.Zero),
+                LastLoginTime = customer.LastLoginTime.ToOffset(TimeSpan.Zero),
+                LastActiveTime = customer.LastDepositTime.ToOffset(TimeSpan.Zero),
                 BirthDay = customer.BirthDay,
                 BirthMonth = customer.BirthMonth,
                 BirthYear = customer.BirthYear,
@@ -249,8 +251,10 @@ namespace BackendSite.Service.BLL
                 TagList = customer.TagList == null
                     ? new List<CustomerTag>()
                     : await _memberService.GetCustomerTagsAsync(customer.TagList),
-                PhoneRewardTime = customer.PhoneRewardTime,
-                EmailRewardTime = customer.EmailRewardTime
+                PhoneRewardTime = customer.PhoneRewardTime.ToOffset(TimeSpan.Zero),
+                EmailRewardTime = customer.EmailRewardTime.ToOffset(TimeSpan.Zero),
+                PhoneVerifyTime = customer.PhoneVerifyTime.ToOffset(TimeSpan.Zero),
+                EmailVerifyTime = customer.EmailVerifyTime.ToOffset(TimeSpan.Zero)
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
@@ -324,6 +328,11 @@ namespace BackendSite.Service.BLL
         public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
+        }
+        
+        public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+        {
+            return await _memberService.GetCustomerAssociateBankUserAsync(custId);
         }
 
         public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)

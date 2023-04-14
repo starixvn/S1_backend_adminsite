@@ -5,7 +5,7 @@ namespace BackendSite.Service.BLL.Interface
     public interface ILiveRegistrationBLL
     {
         Task<LiveRegistrationResponse> GetRegLiveStatusData(GetRegLiveStatusRequest request);
-        Task<IEnumerable<ExportLiveRegistration>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request);
+        Task<IEnumerable<Dictionary<string, object>>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request);
         Task<CustRegLiveStatus> GetRegLiveStatus(int custId);
         Task<int> SetRegLiveStatus(SetRegLiveStatusRequest input, string @operator);
         Task<int> AddCallingRecord(int siteId, int custId, string @operator);

@@ -3,7 +3,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 
@@ -68,7 +67,7 @@ namespace BackendSite.Service.DAL
         public int BlockEWalletSet(ParamsWithLog<BlockEWalletSetRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -93,15 +92,15 @@ namespace BackendSite.Service.DAL
                 _Operator = input.Operator
             };
 
-            result = _mainDbClient.Execute("Admin_BlockEWallet_Set", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_BlockEWallet_Set", trans, p);
 
             if (result > 0)
             {
-                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
 
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
 
@@ -117,7 +116,7 @@ namespace BackendSite.Service.DAL
                         Status = input.After.Status == BlockAccountStatus.Lock ? (int)CustBankDetailStatus.Disable : (int)CustBankDetailStatus.BODelete
                     });
 
-                    result = _mainDbClient.Execute("Member_CustEWalletDetail_Set", parameter, conn, trans);
+                    result = _mainDbClient.Execute("Member_CustEWalletDetail_Set", trans, parameter);
 
                     if (result > 0)
                     {
@@ -132,24 +131,24 @@ namespace BackendSite.Service.DAL
                             Operator = input.Operator
                         });
 
-                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", prop, conn, trans);
+                        result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", trans, prop);
                         if (result == 0)
                         {
-                            trans.Rollback();
+                            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                             return result;
                         }
                     }
                     else
                     {
-                        trans.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                         return result;
                     }
                 }
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
 
             return result;
@@ -158,7 +157,7 @@ namespace BackendSite.Service.DAL
         public int ReleaseAccount(ParamsWithLog<ReleaseEWalletAccountRequest> input)
         {
             var result = 0;
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
 
@@ -182,15 +181,15 @@ namespace BackendSite.Service.DAL
             #endregion
 
             var releaseEWalletList = GetBlockEWalletList(input.Before.SysId, input.Before.AccountNum).ToList();
-            result = _mainDbClient.Execute("Admin_CustEWalletDetail_Del", p, conn, trans);
+            result = _mainDbClient.Execute("Admin_CustEWalletDetail_Del", trans, p);
 
             if (result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog) > 0;
 
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
 
@@ -206,20 +205,20 @@ namespace BackendSite.Service.DAL
                         Status = (int)EWalletinfoLogStatusEnum.Release,
                         Operator = input.Operator
                     });
-                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", prop, conn, trans);
+                    result = _mainDbClient.Execute("Admin_EWalletinfoLog_Set_V2", trans, prop);
                     if (result == 0)
                     {
-                        trans.Rollback();
+                        _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                         return result;
                     }
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 

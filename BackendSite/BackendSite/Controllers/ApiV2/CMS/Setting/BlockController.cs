@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -15,6 +16,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
         private readonly BlockBLL _blockBLL;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
         #endregion
 
         #region Constructors
@@ -22,6 +24,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             _blockBLL = provider.GetRequiredService<BlockBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
         #endregion
 
@@ -57,6 +60,39 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             public int SysId { get; set; }
             public string AccountNum { get; set; }
+        }
+
+        public class GetBlockCryptoWalletRequest
+        {
+            private DateTimeOffset _startDate;
+            private DateTimeOffset _endDate;
+            public string Address { get; set; }
+            public string UserName { get; set; }
+            public int Status { get; set; }
+            public DateTimeOffset StartDate
+            {
+                get => _startDate;
+                set
+                {
+                    _startDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+                }
+            }
+            public DateTimeOffset EndDate
+            {
+                get => _endDate;
+                set
+                {
+                    _endDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+                }
+            }
+            public IEnumerable<int> CurrencyId { get; set; }
+            public IEnumerable<int> CryptoType { get; set; }
+            public IEnumerable<string> NetWork { get; set; }
+        }
+
+        public class BlockCryptoWalletRequest
+        {
+            public string Address { get; set; }
         }
         #endregion
 
@@ -232,7 +268,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// Block/GetDeviceUserList 取得相同DeviceId關聯帳號
         /// </summary>
@@ -245,7 +281,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public async Task<ApiResult<IEnumerable<DeviceUser>>> GetDeviceUserList(GetDeviceUserListRequest request)
         {
             var customer = _custInfoBll.GetCustInfoWithCache(request.CustId);
-            
+
             var deviceUserList = await _blockBLL.GetDeviceUserList(customer.SiteId, request.DeviceId);
             return new ApiResult<IEnumerable<DeviceUser>>
             {
@@ -266,6 +302,84 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public ApiResult ReleaseAccount(ApiRequestWithLog<ReleaseAccountRequest> request)
         {
             var result = _blockBLL.ReleaseAccount(new ParamsWithLog<ReleaseAccountRequest>(request, User.Identity.Name));
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Release Success."
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Release Fail."
+                };
+            }
+        }
+
+        /// <summary>
+        /// Block/GetBlockBankAcc 取得BlockBankAccount List
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 142, 1 })]
+        public ApiListResult<BlockCryptoWallet> GetBlockCryptoWallet(GetBlockCryptoWalletRequest request)
+        {
+            var siteId = _newAuthorizeBLL.CheckBrand();
+            var custBlockCryptoWallet = _blockBLL.GetBlockCryptoWallet(request.StartDate.DateTime, request.EndDate.DateTime, request.Status, request.Address, request.CurrencyId, request.UserName, request.CryptoType, request.NetWork, siteId);
+            return new ApiListResult<BlockCryptoWallet>
+            {
+                Data = custBlockCryptoWallet,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        [HttpPost]
+        public ApiListResult<BlockCryptoWalletList> CryptoWalletGetByAddress(BlockCryptoWalletRequest request)
+        {
+            var siteId = _newAuthorizeBLL.CheckBrand();
+            var blockCryptoWalletList = _blockBLL.GetBlockCryptoWalletList(request.Address).ToList();
+            blockCryptoWalletList.RemoveAll(x => x.SiteId != siteId);
+            return new ApiListResult<BlockCryptoWalletList>
+            {
+                Data = blockCryptoWalletList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        [HttpPost]
+        public ApiResult BlockCryptoWalletSet(ApiRequestWithLog<BlockCryptoWalletSetRequest> request)
+        {
+            var result = _blockBLL.BlockCryptoWalletSet(new ParamsWithLog<BlockCryptoWalletSetRequest>(request, User.Identity.Name));
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+            else
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Update Fail."
+                };
+            }
+        }
+
+        [HttpPost]
+        public ApiResult ReleaseCryptoWallet(ApiRequestWithLog<ReleaseCryptoWalletRequest> request)
+        {
+            var result = _blockBLL.ReleaseCryptoWallet(new ParamsWithLog<ReleaseCryptoWalletRequest>(request, User.Identity.Name));
             if (result > 0)
             {
                 return new ApiResult

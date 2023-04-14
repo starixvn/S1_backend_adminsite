@@ -341,13 +341,13 @@ public class MemberCommand : IMemberCommand
 
     public async Task<int> ResetCryptoInfoAsync(int custId, string @operator)
     {
-        var custProfile = _custInfoBll.GetCustProfile(custId);
+        var cryptoInfo = await _custInfoBll.GetCustCryptoInfoListAsync(custId);
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
         var result = await _memberService.ResetCryptoInfoAsync(custId);
         if (result <= 0) return 0;
 
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
-            JsonConvert.SerializeObject(new { customer.UserName, CryptoInfo = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo) }),
+            JsonConvert.SerializeObject(new { customer.UserName, CryptoInfo = cryptoInfo }),
             JsonConvert.SerializeObject(new { customer.UserName, CryptoInfo = "" }), ActionType.Update,
             custId, $"Reset CryptoInfo");
         return result;

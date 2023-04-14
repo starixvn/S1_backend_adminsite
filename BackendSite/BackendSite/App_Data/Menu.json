@@ -19,16 +19,16 @@
   },
   {
     "Key": "",
-    "Title": "CSD",
+    "Title": "CMS",
     "Icon": "icon-csd",
     "Roles": null,
     "Childs": [
       {
-        "Key": "lbl_CustomerAdministration",
-        "Title": "Customer Administration",
-        "FuncKey": "CustManage/CustInfoList",
-        "Controller": "CustManage",
-        "Action": "CustInfoList",
+        "Key": "LeaderBoardExtraPoint",
+        "Title": "LeaderBoard ExtraPoint",
+        "FuncKey": "CMS/LeaderBoardExtraPoint",
+        "Controller": "Marketing",
+        "Action": "LeaderBoardExtraPoint",
         "Icon": "",
         "Roles": null,
         "Childs": null

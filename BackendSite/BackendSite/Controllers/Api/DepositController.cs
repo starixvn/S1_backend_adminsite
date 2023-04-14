@@ -81,6 +81,7 @@ namespace BackendSite.Controllers.Api
                 depositListReq.SelectCalCode, 
                 startTime, 
                 endTime, 
+                DepositDateTypeEnum.CreateTime,
                 depositListReq.DepositId,
                 userNames, 
                 "",
@@ -134,10 +135,6 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult GetDepositListByCust(DepositListReq1 depositListReq)
         {
-            var totalPages = 0;
-            var rowCount = 0;
-            decimal totalAmount = 0;
-
             if (depositListReq.startDate > 2147483647)
             {
                 depositListReq.startDate = 2147483647;
@@ -158,9 +155,11 @@ namespace BackendSite.Controllers.Api
                                                        endTime,
                                                        depositListReq.PageSize,
                                                        depositListReq.PageNumber,
-                                                       out totalPages,
-                                                       out rowCount,
-                                                       out totalAmount);
+                                                       out var totalPages,
+                                                       out var rowCount,
+                                                       out _,
+                                                       out _,
+                                                       out _);
 
 
             return new ApiListResultTotalAmount<DepositRequest>
@@ -169,7 +168,6 @@ namespace BackendSite.Controllers.Api
                 TotalPages = totalPages,
                 PageNumber = depositListReq.PageNumber,
                 RowCount = rowCount,
-                TotalAmount = totalAmount,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -269,7 +267,7 @@ namespace BackendSite.Controllers.Api
                         title = string.Format(title, depositReq.TransId);
                         var content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, depositReq.TransId);
-                        messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                        await messageBLL.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                     }
                 }
             }
@@ -288,7 +286,7 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, depositReq.TransId);
                     var content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, depositReq.TransId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    await messageBLL.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                     if (custInfo.SiteId == 1)
                     {
                         messageBLL.SendSMSMessageToPlayer(depositRequest.CustId);
@@ -481,7 +479,7 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, _transId);
                     var content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, _transId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    messageBLL.SendMessage(new Message(sender, depositRequest.CustId, userLang, title, content));
                 }
                 if (depositConfirmReuslt == -4)
                 {

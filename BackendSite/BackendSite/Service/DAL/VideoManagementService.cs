@@ -1,7 +1,6 @@
 ﻿using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Service.Library;
@@ -10,12 +9,12 @@ namespace BackendSite.Service.DAL
 {
     public class VideoManagementService
     {
-        private readonly IConfiguration _configuration;
+        private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         
         public VideoManagementService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
@@ -43,7 +42,7 @@ namespace BackendSite.Service.DAL
         }
         public bool SetVideoInfo(ParamsWithLog<SetVideoPara> para)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             
@@ -54,7 +53,7 @@ namespace BackendSite.Service.DAL
             props.Add("_Title", para.After.Title);
             props.Add("_Link", para.After.Link);
             props.Add("_Operator", para.Operator);
-            var result = conn.Execute("Admin_VideoInfo_Set", props, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_VideoInfo_Set", tran, props) > 0;
             
             if (result)
             {
@@ -67,29 +66,29 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(para.Before));
                 logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(para.After));
                 logParam.Add("_Operator", para.Operator);
-                var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
                 if (logResult)
                 {
-                    tran.Commit();
+                    _mainDbClient.CommitAndDisposeConnection(conn, tran);
                     return logResult;
                 }
             }
             
-            tran.Rollback();
+            _mainDbClient.RollbackAndDisposeConnection(conn, tran);
             return false;
         }
         public void InsertLatestHighlightVideo(int siteId,string date, List<GetSiteLangData> siteLangDatas, string user)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var tran = conn.BeginTransaction();
             
             foreach (var data in siteLangDatas)
             {
-                conn.Execute("Admin_LatestHighlightVideo_Int",
-                    new { SiteId = siteId, Date = date, Operator = user, Title = data.Title, Link = data.Link, LangId = data.LangId }, tran,commandType: CommandType.StoredProcedure);
+                _mainDbClient.Execute("Admin_LatestHighlightVideo_Int", tran,
+                    new { SiteId = siteId, Date = date, Operator = user, data.Title, data.Link, data.LangId });
             }
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
             
         }
     }

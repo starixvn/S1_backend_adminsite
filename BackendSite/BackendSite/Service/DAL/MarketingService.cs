@@ -1,10 +1,8 @@
-﻿using System.Data;
-using BackendSite.Service.DAL.Interface;
+﻿using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {

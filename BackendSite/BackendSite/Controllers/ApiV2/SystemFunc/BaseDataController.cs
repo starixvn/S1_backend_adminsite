@@ -271,6 +271,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         /// <summary>
         /// BaseData/GetBankInfoOffList 取得指定銀行戶口資料清單
+        /// Withdrawal Operator > Search > 點選單號 > Withdrawal Request > Withdrawal Type
+        /// Deposit Operator > Search > 點選單號 > Bank 相關資料
         /// </summary>
         /// <remarks>
         /// 
@@ -645,34 +647,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
-        /// BaseData/GetTpCustInfoList 取得指定客戶第三方資訊清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpCustInfo>>> GetTpCustInfoList(GetBySiteIdAndUserNameRequest request)
-        {
-            var custInfo = _custInfoBll.GetCustInfoDetails(null, request.UserName, request.SiteId);
-
-            if (custInfo == null)
-                throw new AdminException(ErrorCodeEnum.CustNotFound);
-
-            var datas = await _tpBll.GetTpCustInfoList(custInfo.CustId);
-
-            if (!datas.Any())
-                throw new AdminException(ErrorCodeEnum.NoData);
-
-            return new ApiResult<IEnumerable<TpCustInfo>>()
-            {
-                Data = datas,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        /// <summary>
         /// BaseData/GetTagByStatus 取得指定狀態標籤資料
         /// </summary>
         /// <remarks>
@@ -998,6 +972,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
         
+        /// <summary>
+        /// Transfer Info Management > Filter > Acc. No.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult GetTransferAccountList(GetAccountListRequest request)
         {
