@@ -417,7 +417,8 @@ namespace BackendSite.Service.Model.enums
         OnHold = 63,
         Verified = 69,
         Process = 70,
-        ToKyc = 71
+        ToKyc = 71,
+        Receive = 72
     }
     
     public enum WithdrawalDateTypeEnum
