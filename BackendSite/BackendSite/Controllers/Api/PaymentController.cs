@@ -208,7 +208,8 @@ namespace BackendSite.Controllers.Api
                 0,
                 10, 
                 request.PageNumber, 
-                out var pageInfo);
+                out var pageInfo,
+                new List<int>());
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }

@@ -428,6 +428,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
+            public List<int> FinancialTypeList { get; set; } = new ();
         }
 
         public class GetFinancialLogExportRequest
@@ -437,6 +438,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
+            public List<int> FinancialTypeList { get; set; } = new ();
         }
 
         public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -1680,7 +1682,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.FinancialType,
                 request.PageSize,
                 request.PageNumber,
-                out var pageInfo);
+                out var pageInfo,
+                request.FinancialTypeList);
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
@@ -1713,7 +1716,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.FinancialType,
                 0,
                 -1,
-                out var _);
+                out var _,
+                request.FinancialTypeList);
 
             foreach (var item in data)
             {
