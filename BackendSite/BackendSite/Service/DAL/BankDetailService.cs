@@ -45,7 +45,7 @@ namespace BackendSite.Service.DAL
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get", para);
+            var result = await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para);
 
             var totalPages = para.Get<int?>("_TotalPages") ?? 0;
             var rowCount = para.Get<int?>("_RowCount") ?? 0;
@@ -59,7 +59,7 @@ namespace BackendSite.Service.DAL
             para.Add("_FinancialAccountId", id);
 
             var result = await _reportDbClient
-                .QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_GetById", para);
+                .QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_GetById_V2", para);
 
             return result.FirstOrDefault();
         }
@@ -77,7 +77,7 @@ namespace BackendSite.Service.DAL
             para.Add("_Status", (int)input.Status);
             para.Add("_Sort", input.Sort);
             para.Add("_SupportChannel", JsonConvert.SerializeObject(input.SupportChannels));
-            para.Add("_GroupId", input.GroupId);
+            para.Add("_GroupIds", JsonConvert.SerializeObject(input.GroupIds));
             para.Add("_QRCodeUrl", input.QrCodeUrl);
             para.Add("_Operator", input.Operator);
 
