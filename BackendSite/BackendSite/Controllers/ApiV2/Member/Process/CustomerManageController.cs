@@ -394,6 +394,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public string Title { get; set; }
             public string Content { get; set; }
+            public bool IsPopup { get; set; }
+            public string PopupMessage { get; set; }
         }
 
         public class CancelBonusRequest : CustIdRequest
@@ -2409,13 +2411,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
-        public ApiResult SendPersonalMsg(SendCustMessageRequest request)
+        public async Task<ApiResult> SendPersonalMsg(SendCustMessageRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                if (_messageBll.SendMessageToPlayer(authData.UserName, request.Title, request.Content, request.CustId) == 0)
+                if (await _messageBll.SendMessageToPlayer(authData.UserName, request.Title, request.Content, request.IsPopup, request.PopupMessage, request.CustId) == 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Send Fail.";
