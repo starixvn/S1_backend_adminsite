@@ -22,13 +22,6 @@ namespace BackendSite.Service.DAL
             var tasks = new List<Task<IEnumerable<TResult>>>();
             foreach (var partitionDate in StartDate.GetDailyPartitionRange(endDate))
             {
-                //減少全站維護時間，由程式判斷日期決定走哪支SP
-                var newDate = new DateTime(2023, 3, 9);
-                if (spName == "Admin_TpBetRecordExtend_Get_V2" && partitionDate.Date >= newDate)
-                {
-                    spName = "Admin_TpBetRecordExtend_Get_V3";
-                }
-
                 var p = new DynamicParameters(parameters);
                 p.Add("YYYYMMDD", partitionDate.GetDailyPartitionKey());
                 var task = dataBase switch
