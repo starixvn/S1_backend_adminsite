@@ -327,7 +327,7 @@ namespace BackendSite.Service.BLL
             if (string.IsNullOrEmpty(resultMessage))
             {
                 tmpCustId = customer.CustId;
-                await messageService.AddCustBatchMessage(customer.CustId, batchId, customer.UserLang, isPopup, "", "", "", sender);
+                await messageService.AddCustBatchMessage(customer.CustId, batchId, customer.UserLang, isPopup, sender);
                 resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
             }
             await messageService.InsertBatchMessageSendLog(batchId, rawId, tmpCustId, userName, sabaId, resultMessage, sender);
@@ -386,7 +386,7 @@ namespace BackendSite.Service.BLL
         public Task<int> SendMessageToPlayer(string sender, string title, string content, bool isPopup, string popupMessage, int custId)
         {
             var customer = custInfoBLL.GetCustInfoWithCache(custId);
-            return messageService.AddCustBatchMessage(custId, 0, customer.UserLang, isPopup, title, content, popupMessage, sender);
+            return messageService.SendMessageToPlayer(custId, customer.UserLang, isPopup, title, content, popupMessage, sender);
         }
         public int SendMessage(Message message) =>
             messageService.SendMessage(message);
