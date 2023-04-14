@@ -54,7 +54,7 @@ Content-Type: application/json
     "status": 1,
     "supportChannels": [0, 1],
     "qrCodeUrl": "/pay-qrcode/1678965098.jpg",
-    "groupId": 31
+    "groupIds": [31,17,26]
 }
 
 

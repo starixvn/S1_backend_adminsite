@@ -71,7 +71,7 @@ namespace BackendSite.Service.DAL
             para.Add("_Status", (int)input.Status);
             para.Add("_Sort", input.Sort);
             para.Add("_SupportChannel", JsonConvert.SerializeObject(input.SupportChannels));
-            para.Add("_GroupId", input.GroupId);
+            para.Add("_GroupIds", JsonConvert.SerializeObject(input.GroupIds));
             para.Add("_QRCodeUrl", input.QrCodeUrl);
             para.Add("_Operator", input.Operator);
 

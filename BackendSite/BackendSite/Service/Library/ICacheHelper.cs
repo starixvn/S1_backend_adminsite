@@ -22,6 +22,7 @@ namespace BackendSite.Service.Library
         bool KeyDelete(string key, RedisDataBase redisDataBase = RedisDataBase.Admin);
         long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
         Task<long> KeyDeleteByPatternAsync(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin);
-        Task<RedisSetAndGetResult> StringSetAndGetAsync(string key, string value, TimeSpan expiry, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        Task<RedisSetAndGetResult> StringSetAndGetAsync(string key, string value, RedisDataBase redisDataBase = RedisDataBase.Admin);
+        Task<bool> ExecuteLuaScriptAsync(string script, string key, string value, RedisDataBase redisDataBase = RedisDataBase.Admin);
     }
 }

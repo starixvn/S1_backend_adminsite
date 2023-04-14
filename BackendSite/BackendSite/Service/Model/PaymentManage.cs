@@ -298,4 +298,11 @@ namespace BackendSite.Service.Model
         
         public DepositTypeEnum Type { get; set; }
     }
+    
+    public class PayGroup
+    {
+        public int GroupId { get; set; }
+        public string GroupName { get; set; }
+        public DepositTypeEnum Type { get; set; }
+    }
 }

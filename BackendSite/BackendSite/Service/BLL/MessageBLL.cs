@@ -196,15 +196,6 @@ namespace BackendSite.Service.BLL
                 return false;
             }
         }
-
-        public bool SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId)
-        {
-            return messageService.SendMessageBatch(personalMsg, custId, siteId, sender, batchId);
-        }
-        public async Task<int> SendMessageBatch(string personalMsg, int custId, int siteId, string sender, int batchId, bool isPopup)
-        {
-            return await messageService.SendMessageBatch(personalMsg, custId, siteId, sender, batchId, isPopup);
-        }
         public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
         {
             return messageService.ChangeVipLevelBatch(siteId, custId, userName, vipLevel, memo, Operator);
@@ -328,7 +319,7 @@ namespace BackendSite.Service.BLL
                 return 0;
             }
         }
-        private async Task DoInsertRecipient(int batchId, int rawId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string adminName)
+        private async Task DoInsertRecipient(int batchId, int rawId, bool isPopup, int siteId, int? custId, string userName, string sabaId, string sender)
         {
             var dataMessage = $"Username={userName}. SabaId={sabaId}.";
             var (resultMessage, customer) = await IsValidMember(siteId, custId, userName, dataMessage);
@@ -336,10 +327,10 @@ namespace BackendSite.Service.BLL
             if (string.IsNullOrEmpty(resultMessage))
             {
                 tmpCustId = customer.CustId;
-                await messageService.AddCustBatchMessage(customer.CustId, batchId, customer.UserLang, isPopup, "", "", "");
+                await messageService.AddCustBatchMessage(customer.CustId, batchId, customer.UserLang, isPopup, "", "", "", sender);
                 resultMessage = $"Success. {dataMessage} Status: {customer.Status.GetDescription()}.";
             }
-            await messageService.InsertBatchMessageSendLog(batchId, rawId, tmpCustId, userName, sabaId, resultMessage, adminName);
+            await messageService.InsertBatchMessageSendLog(batchId, rawId, tmpCustId, userName, sabaId, resultMessage, sender);
         }
 
         public async Task PreSendBatchMessage(ExcelData data, CustomerWhoWaitToSend customer, string personalMsg, AuthData authData, int optSite, int batchId, bool isPopup)
@@ -392,10 +383,10 @@ namespace BackendSite.Service.BLL
                                  $@" SabaId: {data.SabaId}. Result: {resultMessage}. Status:{status}");
             }
         }
-        public int SendMessageToPlayer(string sender, string title, string content, int custId)
+        public Task<int> SendMessageToPlayer(string sender, string title, string content, bool isPopup, string popupMessage, int custId)
         {
             var customer = custInfoBLL.GetCustInfoWithCache(custId);
-            return messageService.SendMessageToPlayer(sender, custId, customer.UserLang, title, content);
+            return messageService.AddCustBatchMessage(custId, 0, customer.UserLang, isPopup, title, content, popupMessage, sender);
         }
         public int SendMessage(Message message) =>
             messageService.SendMessage(message);
