@@ -937,7 +937,8 @@ namespace BackendSite.Service.Model.enums
         vn = 5,
         hi = 6,
         my = 7,
-        bd = 8
+        bd = 8,
+        kh = 9
     }
 
     public enum PromotionDisplayConditionType
