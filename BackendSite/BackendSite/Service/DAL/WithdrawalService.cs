@@ -749,6 +749,17 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public async Task<bool> SetWithdrawalAccountCounter(int custId, string accountNo, WithdrawalAccountTypeEnum accountType, int counter)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_AccountNo", accountNo);
+            p.Add("_AccountType", (int)accountType);
+            p.Add("_Counter", counter);
+            return await _mainDbClient.ExecuteAsync("Admin_WithdrawalAccountCounter_Set", p) > 0;
+        }
+
+
         #region private
 
         private string SetAccountingString(IEnumerable<WithdrawalAccountingModel> accountingModels)
