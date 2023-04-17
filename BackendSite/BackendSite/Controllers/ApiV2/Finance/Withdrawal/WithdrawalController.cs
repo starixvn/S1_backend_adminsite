@@ -28,6 +28,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly IWithdrawalStateTransferBLL _withdrawalStateTransferBll;
+        private readonly IWithdrawalAccountBLL _withdrawalAccountBll;
         private readonly SelLangBLL _selLangBll;
         private readonly ExcelBLL _excelBll;
         private readonly MessageBLL _messageBll;
@@ -56,6 +57,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _withdrawalStateTransferBll = provider.GetRequiredService<IWithdrawalStateTransferBLL>();
+            _withdrawalAccountBll = provider.GetRequiredService<IWithdrawalAccountBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
@@ -496,9 +498,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var withdrawConfirmResult = -1;
             var authData = _authorizeBll.GetAuthData();
             var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-            var originStatus = withdrawalData.Status;
-            var changeStatus = request.Action;
-
+            
             switch (request.Action)
             {
                 case WithdrawalStatusEnum.Draft:
@@ -608,6 +608,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             }
 
+            var changeStatus = request.Action;
+            await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, changeStatus);
+
             if (withdrawConfirmResult <= 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
@@ -640,9 +643,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             try
             {
+                var withdrawalData = _withdrawalBll.GetWithdrawalRequest(para.TransId);
                 para.Operator = User.Identity.Name;
                 para.ThirdId = string.Empty;
                 var response = await _withdrawalBll.WithdrawalManualApproval(para);
+
+                if (response.ErrorCode == 0)
+                {
+                    // Api 成功更新提款成功次數
+                    await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, WithdrawalStatusEnum.Approved);
+                }
+
                 return response;
             }
             catch (Exception ex)
@@ -671,9 +682,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             try
             {
+                var withdrawalData = _withdrawalBll.GetWithdrawalRequest(para.TransId);
                 para.Operator = User.Identity.Name;
                 para.ThirdId = string.Empty;
                 var response = await _withdrawalBll.WithdrawalManualReject(para);
+
+                if (response.ErrorCode == 0)
+                {
+                    // Api 成功更新提款成功次數
+                    await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, WithdrawalStatusEnum.Rejected);
+                }
+
                 return response;
             }
             catch (Exception ex)

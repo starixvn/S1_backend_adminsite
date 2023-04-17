@@ -1766,4 +1766,13 @@ namespace BackendSite.Service.Model.enums
         /// </summary>
         AutoFailBackManual = 2
     }
+
+    public enum WithdrawalAccountTypeEnum
+    {
+        EWallet = 1,
+
+        BankCard = 2,
+
+        Crypto = 3
+    }
 }
