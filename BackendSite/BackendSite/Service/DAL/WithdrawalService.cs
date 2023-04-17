@@ -734,13 +734,31 @@ namespace BackendSite.Service.DAL
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
 
-            var _ = SetWithdrawalLog(withdrawalId, siteId, "", (int)withdrawalStatusEnum, @operator);
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            var _ = SetWithdrawalLog(withdrawalId, siteId, "", (int)withdrawalStatusEnum, @operator, trans);
 
             var p = new DynamicParameters();
             p.Add("_WithdrawalId", withdrawalId);
             p.Add("_OnUser", onUser);
-            return await _mainDbClient.ExecuteAsync("Admin_WithdrawalInfoOnUser_Set", p) > 0;
+            var result = await _mainDbClient.ExecuteAsync("Admin_WithdrawalInfoOnUser_Set", trans, p) > 0;
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn,trans);
+
+            return result;
         }
+
+        public async Task<bool> SetWithdrawalAccountCounter(int custId, string accountNo, WithdrawalAccountTypeEnum accountType, int counter)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_AccountNo", accountNo);
+            p.Add("_AccountType", (int)accountType);
+            p.Add("_Counter", counter);
+            return await _mainDbClient.ExecuteAsync("Admin_WithdrawalAccountCounter_Set", p) > 0;
+        }
+
 
         #region private
 

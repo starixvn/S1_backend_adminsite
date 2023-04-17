@@ -94,6 +94,7 @@ namespace BackendSite
             services.AddTransient<IAutoWithdrawalRuleBLL, AutoWithdrawalRuleBLL>();
             services.AddTransient<IWithdrawalStateTransferBLL, WithdrawalStateTransferBLL>();
             services.AddTransient<IWithdrawalReceiveBLL, WithdrawalReceiveBLL>();
+            services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
 
 
             services.AddTransient<ReferralManagementDecorator>();

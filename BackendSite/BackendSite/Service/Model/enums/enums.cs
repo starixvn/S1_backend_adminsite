@@ -424,7 +424,8 @@ namespace BackendSite.Service.Model.enums
         OnHold = 63,
         Verified = 69,
         Process = 70,
-        ToKyc = 71
+        ToKyc = 71,
+        Receive = 72
     }
     
     public enum WithdrawalDateTypeEnum
@@ -1845,5 +1846,14 @@ namespace BackendSite.Service.Model.enums
         /// 自動出款失敗後轉回手動出款
         /// </summary>
         AutoFailBackManual = 2
+    }
+
+    public enum WithdrawalAccountTypeEnum
+    {
+        EWallet = 1,
+
+        BankCard = 2,
+
+        Crypto = 3
     }
 }

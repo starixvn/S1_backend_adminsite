@@ -12,11 +12,10 @@ namespace BackendSite.Service.BLL
     {
         private readonly WithdrawalService _withdrawalService;
 
-        public WithdrawalStateTransferBLL(IServiceProvider provider)
+        public WithdrawalStateTransferBLL(WithdrawalService withdrawalService)
         {
-            _withdrawalService = provider.GetRequiredService<WithdrawalService>();
+            _withdrawalService = withdrawalService;
         }
-
 
         public int WithdrawalToKyc(string transId, string comment, string updater)
         {
