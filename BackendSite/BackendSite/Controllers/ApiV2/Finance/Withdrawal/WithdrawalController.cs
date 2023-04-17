@@ -1018,7 +1018,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var key = $"lock:withdrawalTransId:{withdrawalRequest.TransId}";
             var lockExists = await _redisHelper.KeyExistsAsync(key);
 
-            if (lockExists) // 如果有人 Lock
+            if (!lockExists) // 如果沒有人 Lock
             {
                 var authData = _authorizeBll.GetAuthData();
                 var lockUser = await _redisHelper.StringGetAsync(key);
