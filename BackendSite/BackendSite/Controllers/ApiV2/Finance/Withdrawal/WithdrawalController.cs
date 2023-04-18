@@ -598,7 +598,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         {
                             var reqWithdrawalOnline = new ReqWithdrawalOnline
                             {
-                                SysId = withdrawalInfo.SysId,
+                                SysId = withdrawalInfo.AccountType == "ewallet" ? (int)withdrawalInfo.EWalletSysId : withdrawalInfo.SysId,
                                 TransId = request.TransId,
                                 CustId = custId,
                                 Amount = amount,
@@ -612,7 +612,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                             var myUrl = request.WithdrawalType == WithdrawalTypeEnum.CryptoPay ? 
                                 $"{_payApiUrl}CryptoWithdrawal" : $"{_payApiUrl}Withdrawal";
-
+                            myUrl = withdrawalInfo.AccountType == "ewallet" ? $"{_payApiUrl}EWalletWithdrawal" : myUrl;
+                            
                             var apiOnlineResult =
                                 await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
                             if (apiOnlineResult == null)
