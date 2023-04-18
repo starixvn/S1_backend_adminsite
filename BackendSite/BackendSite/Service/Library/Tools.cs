@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.AspNetCore.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -138,7 +139,7 @@ namespace BackendSite.Service.Library
             return (userIp >= begin) && (userIp <= end);
         }
         #endregion
-        public string GetFromUrl(Microsoft.AspNetCore.Http.HttpContext context)
+        public string GetFromUrl(HttpContext context)
         {
             var fromUrl = "";
             if (context.Request.Headers.ContainsKey("Referer"))
@@ -146,8 +147,12 @@ namespace BackendSite.Service.Library
                 fromUrl = context.Request.Headers["Referer"].ToString();
             }
 
+            if (string.IsNullOrWhiteSpace(fromUrl))
+                fromUrl = context.Request.Host.ToString();
+
             return fromUrl;
         }
+
         /// <summary>
         /// 保留两位小数的金额
         /// </summary>
@@ -201,7 +206,7 @@ namespace BackendSite.Service.Library
                 return false;
             }
         }
-        
+
         /// <summary>
         /// 電話遮罩
         /// </summary>
@@ -242,6 +247,27 @@ namespace BackendSite.Service.Library
 
             var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1})";
             return Regex.Replace(data, pattern, m => new string('*', m.Length));
+        }
+
+        public bool CheckSpecialCode(string specialCode)
+        {
+            if (string.IsNullOrEmpty(specialCode) || specialCode.Length > 20)
+                return false;
+            var regex = new Regex("^[- !@#$%^&*a-zA-Z0-9]{1,20}$", RegexOptions.Singleline);
+            var mPwd = regex.Match(specialCode);
+
+            return mPwd.Success;
+        }
+
+        public bool CheckScratchCardCode(string specialCode)
+        {
+            if (string.IsNullOrEmpty(specialCode) || specialCode.Length != 12)
+                return false;
+
+            var regex = new Regex("^[a-zA-Z]{5}-[a-zA-Z0-9]{6}$", RegexOptions.Singleline);
+            var mPwd = regex.Match(specialCode);
+
+            return mPwd.Success;
         }
 
     }

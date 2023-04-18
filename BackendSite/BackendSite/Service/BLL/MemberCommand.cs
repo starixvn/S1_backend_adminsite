@@ -18,8 +18,16 @@ public class MemberCommand : IMemberCommand
     private readonly IAdminLogService _adminLogService;
     private readonly IBonusApiService _bonusApi;
     private readonly ILogger<MemberCommand> _logger;
+    private readonly ServerInfoBLL _ServerInfoBll;
 
-    public MemberCommand(IMemberService memberService, CodeGenerator codeGenerator, Tools tools, IAdminLogService adminLogService, ILogger<MemberCommand> logger, IBonusApiService bonusApi, CustInfoBLL custInfoBll, VerificationRewardService verificationRewardService)
+    public MemberCommand(IMemberService memberService,
+        CodeGenerator codeGenerator,
+        Tools tools,
+        IAdminLogService adminLogService,
+        ILogger<MemberCommand> logger,
+        IBonusApiService bonusApi,
+        CustInfoBLL custInfoBll,
+        VerificationRewardService verificationRewardService, ServerInfoBLL serverInfoBll)
     {
         _memberService = memberService;
         _codeGenerator = codeGenerator;
@@ -29,6 +37,7 @@ public class MemberCommand : IMemberCommand
         _bonusApi = bonusApi;
         _custInfoBll = custInfoBll;
         _verificationRewardService = verificationRewardService;
+        _ServerInfoBll = serverInfoBll;
     }
 
     public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
@@ -414,29 +423,29 @@ public class MemberCommand : IMemberCommand
         var beforeWhiteList = await _memberService.GetCustPromotionWhiteListAsync(custId);
         var result = await _memberService.SetCustPromotionWhiteListAsync(new CustPromotionWhiteList()
         {
-           CustId = custId,
-           IpEnable = ipEnable,
-           DeviceEnable = deviceEnable,
-           RealNameEnable = realNameEnable,
-           SiteId = customer.SiteId,
-           UserName = customer.UserName,
-           Operator = @operator
+            CustId = custId,
+            IpEnable = ipEnable,
+            DeviceEnable = deviceEnable,
+            RealNameEnable = realNameEnable,
+            SiteId = customer.SiteId,
+            UserName = customer.UserName,
+            Operator = @operator
         });
-        
+
         if (result < 1)
         {
             return false;
-        }         
+        }
 
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
-            JsonConvert.SerializeObject(new 
-            { 
+            JsonConvert.SerializeObject(new
+            {
                 customer.UserName,
                 IpEnable = beforeWhiteList?.IpEnable ?? false,
                 DeviceEnable = beforeWhiteList?.DeviceEnable ?? false,
                 RealNameEnable = beforeWhiteList?.RealNameEnable ?? false,
             }),
-            JsonConvert.SerializeObject(new 
+            JsonConvert.SerializeObject(new
             {
                 customer.UserName,
                 IpEnable = ipEnable,
@@ -476,5 +485,33 @@ public class MemberCommand : IMemberCommand
         {
             _logger.LogError(e, "InsertAdminLog failed. params: " + JsonConvert.SerializeObject(adminLog));
         }
+    }
+
+    public async Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
+        MemberTypeEnum memberType, string areaCode, string phoneNo, string promoCode, string affCode,
+         string signupUrl, bool hasPromo, bool isScratch, string @operator)
+    {
+        var result = await _memberService.RegisterMemberAsync(siteId,
+                userName,
+                userPwd,
+                email,
+                currencyId,
+                _ServerInfoBll.GetServerInfoWithSiteId(siteId).DefLang,
+                memberType,
+                areaCode,
+                phoneNo,
+                promoCode,
+                affCode,
+                signupUrl,
+                hasPromo,
+                isScratch);
+
+        if (result.IsSuccess > 0) //Success
+        {
+            await CreateAdminLog(@operator, siteId, currencyId, null,
+                JsonConvert.SerializeObject(new { UserName = userName }), ActionType.Create,
+                result.CustId, "Member Create.");
+        }
+        return result.IsSuccess;
     }
 }

@@ -166,18 +166,25 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
-    public enum WithdrawalLimitLogCreateFromEnum 
+    public enum WithdrawalLimitLogCreateFromEnum
     {
         Default = 0,
         Deposit = 1,
         LimitAdjustment = 2,
         BalanceAdjustment = 3,
-        Bonus = 4 ,
+        Bonus = 4,
         ReferralReward = 5,
         VerificationReward = 6,
         DrawPrize = 7
     }
-    
+
+    public enum MemberTypeEnum
+    {
+        Normal = 1,
+        Affiliate = 2,
+        LiveStreaming = 3
+    }
+
     #endregion
 
     #region CustProfile
@@ -283,7 +290,7 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
-    
+
     public enum DepositDateTypeEnum
     {
         CreateTime = 1,
@@ -292,10 +299,10 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositReceiptCreateFromEnum
     {
-        User = 1 , 
+        User = 1,
         BackendUser = 2
     }
-    
+
     #endregion
 
     #region PayList
@@ -416,7 +423,7 @@ namespace BackendSite.Service.Model.enums
         Process = 70,
         ToKyc = 71
     }
-    
+
     public enum WithdrawalDateTypeEnum
     {
         CreateTime = 1,

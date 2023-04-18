@@ -27,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ExcelBLL _excelBll;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly Tools _tools;
         private readonly ILogger<MemberController> _logger;
 
         public MemberController(IServiceProvider provider)
@@ -42,6 +43,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _memberQuery = provider.GetRequiredService<IMemberQuery>();
             _vipLevelBll = provider.GetRequiredService<IVipLevelBLL>();
+            _tools = provider.GetRequiredService<Tools>();
             _logger = provider.GetRequiredService<ILogger<MemberController>>();
         }
 
@@ -525,7 +527,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         [HttpPost]
         public async Task<ApiResult> CheckDuplicateName(SetFullNameRequest request)
         {
@@ -1194,7 +1196,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = await _memberQuery.GetCustRealNameChangeLogAsync(request.CustId)
             };
         }
-        
+
         /// <summary>
         /// Member/GetCustomerAssociateBankUser 取得客戶相同銀行卡號的其他用戶資料
         /// </summary>
@@ -1250,8 +1252,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> EditCustPromotionWhiteList(SetCustPromotionWhiteListRequest request)
         {
             var result = await _memberCommand.SetCustPromotionWhiteListAsync(
-                request.CustId, 
-                request.IpEnable, 
+                request.CustId,
+                request.IpEnable,
                 request.DeviceEnable,
                 request.RealNameEnable,
                 User.Identity.Name);
@@ -1286,11 +1288,78 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = await _memberQuery.GetPromotionReceiveFailLogAsync(
-                    request.CustId, 
+                    request.CustId,
                     request.StartTime.ToUniversalTime().DateTime,
                     request.EndTime.ToUniversalTime().DateTime)
             };
         }
 
+        /// <summary>
+        /// Member/RegisterMember 會員註冊
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[Add] > [Submit]
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult> RegisterMember(RegisterCustomerRequest request)
+        {
+            var hasPromo = false;
+            var isScratch = false;
+            if (!string.IsNullOrWhiteSpace(request.PromoCode) && _tools.CheckSpecialCode(request.PromoCode))
+            {
+                hasPromo = true;
+                if (_tools.CheckScratchCardCode(request.PromoCode))
+                    isScratch = true;
+            }
+
+            var result = await _memberCommand.RegisterMemberAsync(request.SiteId,
+                request.UserName,
+                _tools.MD5Encrypt(request.Userpwd),
+                request.Email,
+                request.CurrencyId,
+                request.MemberType,
+                request.AreaCode,
+                request.PhoneNo,
+                request.PromoCode,
+                request.AffCode,
+                _tools.GetFromUrl(HttpContext),
+                hasPromo,
+                isScratch,
+                User.Identity.Name);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            switch (result)
+            {
+                case -1:
+                    throw new AdminException(ErrorCodeEnum.Fail, "This Currency not Support.");
+                case -2:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Username Validate.");
+                case -3:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Password Validate.");
+                case -4:
+                    throw new AdminException(ErrorCodeEnum.Fail, "");
+                case -5:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Username Not Available.");
+                case -7:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Promo Code Incorrect.");
+                case -19:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Affiliate Not Exist.");
+                default:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Username Not Available.");
+            }
+        }
     }
 }

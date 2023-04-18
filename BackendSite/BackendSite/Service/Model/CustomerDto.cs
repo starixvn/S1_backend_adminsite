@@ -84,7 +84,7 @@ public class MemberList
     public int PointLevel { get; set; }
     public int UserType { get; set; }
     public int Identity { get; set; }
-    public string  AffiliateName { get; set; }
+    public string AffiliateName { get; set; }
     public string Agent { get; set; }
     public int Status { get; set; }
     public bool IsTest { get; set; }
@@ -628,7 +628,7 @@ public class SimilarAccountInfo
 public class CustTagList
 {
     public int CustId { get; set; }
-        
+
     public string StrTagList { get; set; }
 
     public IEnumerable<int> TagList { get; set; }
@@ -655,11 +655,11 @@ public class GetCustinfoByImportDataRequest
 public class CustPromotionWhiteList
 {
     public int CustId { get; set; }
-    public int SiteId { get; set; } 
+    public int SiteId { get; set; }
     public string UserName { get; set; }
     public bool IpEnable { get; set; }
     public bool DeviceEnable { get; set; }
-    public bool RealNameEnable { get; set; }   
+    public bool RealNameEnable { get; set; }
     public string Operator { get; set; }
 }
 
@@ -681,4 +681,19 @@ public class PromotionReceiveFailLog
     public int SiteId { get; set; }
     public int CustId { get; set; }
     public int CurrencyId { get; set; }
+}
+
+public class RegisterCustomerRequest
+{
+    public int SiteId { get; set; }
+    public string UserName { get; set; }
+    public string Userpwd { get; set; }
+    public MemberTypeEnum MemberType { get; set; }
+    public string Email { get; set; }
+    public int CurrencyId { get; set; }
+    public string PhoneNo { get; set; }
+    public string AreaCode { get; set; }
+    public string PromoCode { get; set; }
+    public string AffCode { get; set; }
+
 }

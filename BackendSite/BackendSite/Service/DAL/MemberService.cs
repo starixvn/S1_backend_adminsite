@@ -16,7 +16,7 @@ public class MemberService : IMemberService
 
     public MemberService(IEnumerable<MySqlClient> sqlCliencts)
     {
-        _sqlClienct = sqlCliencts.FirstOrDefault(a=>a.DataBase == DataBase.Report);
+        _sqlClienct = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Report);
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
     }
 
@@ -120,7 +120,7 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId });
         return await _sqlClienct.QueryFirstAsync<string>("Admin_CustomerTagList_Get", p);
     }
-    
+
     public async Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId)
     {
         var p = new DynamicParameters();
@@ -133,7 +133,7 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId, _userId = lineUserId });
         return await _sqlClienct.QueryFirstAsync<CustLineProfileModel>("Member_CustLineProfile_Get", p);
     }
-    
+
     public async Task<LoginLogPageData> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber)
     {
         var p = new DynamicParameters();
@@ -159,13 +159,13 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
     }
-    
+
     public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
     {
         var p = new DynamicParameters(new { _CustId = custId });
         return await _sqlClienct.QueryAsync<CustomerAssociateBankInfo>("Admin_AssociateBankAccountNo_Get", p);
     }
-    
+
     public async Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo)
     {
         return await _sqlClienct.ExecuteScalarAsync<int>("Admin_ExistsPhoneNo_Get",
@@ -185,7 +185,7 @@ public class MemberService : IMemberService
         p.Add("TagList", JsonConvert.SerializeObject(tagList));
         return await _mainSqlClient.ExecuteAsync("Admin_CustInofoTagList_Set", p);
     }
-    
+
     public async Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames)
     {
         var p = new DynamicParameters(new
@@ -193,11 +193,11 @@ public class MemberService : IMemberService
             _SiteId = siteId,
             _AccountNames = JsonConvert.SerializeObject(accountNames)
         });
-        
+
         return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
     }
 
-    public async Task<bool> EditFullNameAsync(int custId,int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
+    public async Task<bool> EditFullNameAsync(int custId, int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
@@ -212,7 +212,7 @@ public class MemberService : IMemberService
         await using var conn = _mainSqlClient.GetMySqlConnection();
         await conn.OpenAsync();
         await using var trans = await conn.BeginTransactionAsync();
-        
+
         var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", trans, p) > 0;
 
         if (success)
@@ -221,17 +221,17 @@ public class MemberService : IMemberService
             var tags = string.IsNullOrEmpty(strTags)
                 ? new List<int>()
                 : JsonConvert.DeserializeObject<List<int>>(strTags);
-        
+
             var custTags = duplicateAccounts
-                .Select(x => new CustTagList {CustId = x.CustId, TagList = JsonConvert.DeserializeObject<IEnumerable<int>>(x.TagList ?? "[]")})
-                .Where(x => !x.TagList.Contains((int) CustTagEnum.Duplicate))
+                .Select(x => new CustTagList { CustId = x.CustId, TagList = JsonConvert.DeserializeObject<IEnumerable<int>>(x.TagList ?? "[]") })
+                .Where(x => !x.TagList.Contains((int)CustTagEnum.Duplicate))
                 .ToList();
-        
-            if (!tags.Contains((int) CustTagEnum.Duplicate))
+
+            if (!tags.Contains((int)CustTagEnum.Duplicate))
             {
-                custTags.Add(new CustTagList {CustId = custId, TagList = tags});
+                custTags.Add(new CustTagList { CustId = custId, TagList = tags });
             }
-            
+
             if (!custTags.Any())
             {
                 await _mainSqlClient.CommitAndDisposeConnectionAsync(conn, trans);
@@ -240,9 +240,9 @@ public class MemberService : IMemberService
 
             foreach (var item in custTags)
             {
-                item.TagList = item.TagList.Append((int) CustTagEnum.Duplicate);
+                item.TagList = item.TagList.Append((int)CustTagEnum.Duplicate);
             }
-            
+
             success = await SetCustInfoTagList(custTags, trans);
             if (success)
             {
@@ -349,7 +349,7 @@ public class MemberService : IMemberService
         p.Add("_CustId", custId);
         return await _mainSqlClient.ExecuteAsync("Admin_OnUser_Del", p);
     }
-    
+
     public async Task<int> SwitchRebatePayoutAsync(int custId, int status)
     {
         var p = new DynamicParameters(new { _CustId = custId, _EnableRebate = status });
@@ -372,20 +372,20 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_ResetCustEWallet_Set", p);
     }
-    
+
     public async Task<int> DeleteLineProfileAsync(int custId)
     {
         var p = new DynamicParameters(new { _CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_CustLineProfile_Del", p);
     }
-    
+
     public async Task<bool> SetCustInfoTagList(IEnumerable<CustTagList> tagList, MySqlTransaction trans)
     {
         var parameter = new DynamicParameters(new
         {
             _Infos = JsonConvert.SerializeObject(tagList)
         });
-            
+
         return await _mainSqlClient.ExecuteAsync("Service_CustInfoTagList_Set", trans, parameter) > 0;
     }
 
@@ -409,8 +409,137 @@ public class MemberService : IMemberService
 
     public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime)
     {
-        var p = new DynamicParameters(new { CustId = custId , StartTime = startTime , EndTime = endTime });
+        var p = new DynamicParameters(new { CustId = custId, StartTime = startTime, EndTime = endTime });
         return await _sqlClienct.QueryAsync<PromotionReceiveFailLog>("Admin_PromotionReceiveFailLog_Get", p);
     }
 
+    public async Task<(int IsSuccess, int CustId)> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
+        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string promoCode,
+        string affCode, string signupUrl, bool hasPromo, bool isScratch)
+    {
+        string nullValue = null;
+        var custId = 0;
+        var isSuccess = -1;
+        using var conn = _mainSqlClient.GetMySqlConnection();
+        await conn.OpenAsync();
+        await using var trans = await conn.BeginTransactionAsync();
+
+        try
+        {
+            var p = new DynamicParameters(new
+            {
+                SiteId = siteId,
+                UserName = userName,
+                Userpwd = userPwd,
+                CurrencyId = currencyId,
+                UserLang = userLang,
+                AgentId = 0,
+                AllAgentId = nullValue,
+                UserLevel = 1,
+                MemberType = (int)memberType
+            });
+            p.Add("CustId", dbType: DbType.String, direction: ParameterDirection.Output);
+
+            isSuccess = _mainSqlClient.Execute("CustInfo_Ins_V2", trans, p);
+
+            if (isSuccess > 0)
+            {
+                var strCustId = p.Get<string>("CustId") ?? "";
+                custId = int.Parse(strCustId);
+
+                if (custId == 0)
+                {
+                    trans.Rollback();
+                    conn.Close();
+                    conn.Dispose();
+                    return (IsSuccess: -5, CustId: custId);
+                }
+            }
+            else
+            {
+                trans.Rollback();
+                conn.Close();
+                conn.Dispose();
+                return (IsSuccess: -5, CustId: custId);
+            }
+
+            if (!string.IsNullOrEmpty(email) ||
+                 (!string.IsNullOrEmpty(phoneNo) && !string.IsNullOrEmpty(areaCode)))
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    email = null;
+                }
+                else if (string.IsNullOrEmpty(phoneNo) || string.IsNullOrEmpty(areaCode))
+                {
+                    phoneNo = null;
+                    areaCode = null;
+                }
+
+                isSuccess = _mainSqlClient.Execute("Member_CustProfile_Ins", trans, new DynamicParameters(new
+                {
+                    CustId = custId,
+                    SiteId = siteId,
+                    Email = email,
+                    Profile = nullValue,
+                    PhoneNo = phoneNo,
+                    AreaCode = areaCode
+                }));
+            }
+
+            if (isSuccess > 0 && !string.IsNullOrEmpty(signupUrl))
+            {
+                isSuccess = _mainSqlClient.Execute("Member_CustRegInfo_Ins_V2", trans,
+                    new DynamicParameters(new { CustId = custId, siteId, SignupUrl = signupUrl, ReferralUrl = signupUrl }));
+            }
+
+            //Double Check：這邊有用到agentId，上面亂塞可能會有問題
+            if (isSuccess > 0 && hasPromo)
+            {
+                if (isScratch)
+                {
+                    var parameters = new DynamicParameters(new { CustId = custId, ScratchCardCode = promoCode, DeviceType = 1 });
+                    parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                    _mainSqlClient.Execute("Member_CustScratchCardCodeV3_Ins", trans, parameters);
+                    isSuccess = parameters.Get<int>("Result") == 0 ? 1 : 0;
+                }
+                else
+                {
+                    isSuccess = _mainSqlClient.Execute("Member_CustPromoCode_Ins", trans,
+                        new DynamicParameters(new { CustId = custId, PromoCode = promoCode.Trim() }));
+                }
+
+                if (isSuccess == 0)
+                    isSuccess = -7;
+            }
+
+            if (isSuccess > 0 && !string.IsNullOrEmpty(affCode))
+            {
+                isSuccess = _mainSqlClient.Execute("Member_VNAffiliate_Ins", trans,
+                    new DynamicParameters(new { CustId = custId, SiteId = siteId, AffId = 0, AffCode = affCode }));
+            }
+
+            if (isSuccess > 0)
+                await trans.CommitAsync();
+            else
+                await trans.RollbackAsync();
+
+            await conn.CloseAsync();
+            await conn.DisposeAsync();
+
+            //isSuccess = isSuccess switch
+            //{
+            //    > 0 => 0,
+            //    0 => -5,
+            //    _ => isSuccess
+            //};
+        }
+        catch (Exception ex)
+        {
+            conn.CloseAsync();
+            conn.DisposeAsync();
+            isSuccess = -1;
+        }
+        return (IsSuccess: isSuccess, CustId: custId);
+    }
 }

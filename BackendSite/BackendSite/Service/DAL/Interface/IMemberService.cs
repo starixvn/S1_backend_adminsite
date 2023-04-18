@@ -1,4 +1,6 @@
 ﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using System.Runtime.CompilerServices;
 
 namespace BackendSite.Service.DAL.Interface;
 
@@ -25,7 +27,7 @@ public interface IMemberService
     Task<bool> IsExistsEmail(int custId, string email, int siteId);
     Task<int> SetCustTag(int custid, List<int> tagList);
     Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames);
-    Task<bool> EditFullNameAsync(int custId,int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts);
+    Task<bool> EditFullNameAsync(int custId, int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts);
     Task<int> EditEmailAsync(int custId, string email);
     Task<int> SetPhoneNoAsync(int custId, string phoneNo);
     Task<int> EditBirthdayAsync(int custId, int year, int month, int date);
@@ -48,4 +50,7 @@ public interface IMemberService
     Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId);
     Task<int> SetCustPromotionWhiteListAsync(CustPromotionWhiteList input);
     Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime);
+    Task<(int IsSuccess, int CustId)> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
+        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string promoCode,
+        string affCode, string signupUrl, bool hasPromo, bool isScratch);
 }
