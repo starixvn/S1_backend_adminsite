@@ -233,6 +233,9 @@ namespace BackendSite.Service.Model
 
         [Description("用戶Tag封鎖清單")]
         public IEnumerable<int> BlockTagList { get; set; } = new List<int>();
+
+        [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
+        public bool LogoutIsHide { get; set; }
     }
     
     public class PromotionSpecific
