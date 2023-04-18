@@ -51,7 +51,7 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
-            if (financialType != 0)
+            if (financialType != 0  || financialTypeList.Any())
             {
                 financialTypeList.Add(financialType);
                 financialTypeList = financialTypeList.Distinct().ToList();
