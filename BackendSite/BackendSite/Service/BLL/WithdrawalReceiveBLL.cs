@@ -24,12 +24,12 @@ namespace BackendSite.Service.BLL
             _withdrawalService = withdrawalService;
         }
 
-        public async Task<RedisSetAndGetResult> LockWithdrawalTicketAsync(string transId, string userName, int siteId)
+        public async Task<RedisSetAndGetResult> LockWithdrawalTicketAsync(string transId, string userName, int siteId, bool writeLog = true)
         {
             var key = $"lock:withdrawalTransId:{transId}";
             var createResult = await _redisHelper.StringSetAndGetAsync(key, userName);
 
-            if (createResult.Success)
+            if (createResult.Success && writeLog)
             {
                 var _ = await _withdrawalService.SetWithdrawalInfoOnUserAndLog(transId, onUser: userName, siteId, WithdrawalStatusEnum.Receive, @operator: userName);
             }
