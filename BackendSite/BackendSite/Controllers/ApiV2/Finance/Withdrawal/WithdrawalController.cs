@@ -29,6 +29,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly IWithdrawalStateTransferBLL _withdrawalStateTransferBll;
         private readonly IWithdrawalAccountBLL _withdrawalAccountBll;
+        private readonly IWithdrawalReceiveBLL _withdrawalReceiveBll;
         private readonly SelLangBLL _selLangBll;
         private readonly ExcelBLL _excelBll;
         private readonly MessageBLL _messageBll;
@@ -58,6 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _withdrawalStateTransferBll = provider.GetRequiredService<IWithdrawalStateTransferBLL>();
             _withdrawalAccountBll = provider.GetRequiredService<IWithdrawalAccountBLL>();
+            _withdrawalReceiveBll = provider.GetRequiredService<IWithdrawalReceiveBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
@@ -495,10 +497,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
             var apiResult = new ApiResult(_selLangBll);
-            var withdrawConfirmResult = -1;
             var authData = _authorizeBll.GetAuthData();
+            var withdrawConfirmResult = -1;
+
+            var locker = await _withdrawalReceiveBll.LockWithdrawalTicketAsync(request.TransId, authData.UserName,
+                authData.SiteId,
+                writeLog: false);
+
+            if (!locker.Success) //判斷自己是否還是 OnUser
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                apiResult.Message = $"{request.TransId} Now OnUser is {locker.Value}";
+            }
+
             var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-            
             switch (request.Action)
             {
                 case WithdrawalStatusEnum.Draft:
@@ -1024,7 +1036,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var authData = _authorizeBll.GetAuthData();
             var lockUser = await _redisHelper.StringGetAsync(key);
             var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
-                
+
             if (lockUser == authData.UserName) // 是不自己 Lock
             {
                 var usableList = _usableActionType[withdrawalRequest.Status];
@@ -1062,8 +1074,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             // 如果有人Lock 但不是自己，就判斷權限是否是主管，主管可以有 Receive 按鈕
             var forceProceedPermission = permissionList.Any(x => x == 83);
-            return forceProceedPermission 
-                ? new List<WithdrawalActionEnum>() { WithdrawalActionEnum.Draft, WithdrawalActionEnum.Receive } 
+            return forceProceedPermission
+                ? new List<WithdrawalActionEnum>() { WithdrawalActionEnum.Draft, WithdrawalActionEnum.Receive }
                 : new List<WithdrawalActionEnum>() { WithdrawalActionEnum.Draft };
 
         }
