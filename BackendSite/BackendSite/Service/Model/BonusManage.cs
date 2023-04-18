@@ -123,6 +123,9 @@ namespace BackendSite.Service.Model
         [Description("用戶Tag封鎖清單")]
         public IEnumerable<int> BlockTagList => string.IsNullOrEmpty(BlockTagListJson) ? new List<int>() : JsonConvert.DeserializeObject<IEnumerable<int>>(BlockTagListJson);
         public string BlockTagListJson { get; set; }
+
+        [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
+        public bool HideForUnlogin { get; set; }
     }
 
     public class PromotionInfoReq 
