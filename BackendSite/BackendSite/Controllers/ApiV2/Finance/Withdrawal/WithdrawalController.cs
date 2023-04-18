@@ -1017,11 +1017,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             if (!lockExists) // 如果沒有人 Lock
             {
                 var authData = _authorizeBll.GetAuthData();
-                //var lockUser = await _redisHelper.StringGetAsync(key);
+                var lockUser = await _redisHelper.StringGetAsync(key);
                 var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
                 
-                //if (lockUser == authData.UserName) // 是不自己 Lock
-                //{
+                if (lockUser == authData.UserName) // 是不自己 Lock
+                {
                     var usableList = _usableActionType[withdrawalRequest.Status];
                     var usableActionButton = usableList.Where(item => permissionList.Contains((int)item)).ToList();
 
@@ -1053,7 +1053,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                     usableActionButton.Remove(WithdrawalActionEnum.Receive);
                     return usableActionButton;
-                //}
+                }
 
                 // 如果有人Lock 但不是自己，就判斷權限是否是主管，主管可以有 Receive 按鈕
                 var forceProceedPermission = permissionList.Any(x => x == 83);
