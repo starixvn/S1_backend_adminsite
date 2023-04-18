@@ -164,7 +164,7 @@ namespace BackendSite.Service.BLL
                 pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
             }
             
-            var eWalletPayList = _localBankService.GetEWalletPayList()
+            var eWalletPayList = _localBankService.GetEWalletPayList(siteId)
                 .Where(x =>  x.SysId == sysId
                              && x.CurrencyId == currencyId
                              && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
