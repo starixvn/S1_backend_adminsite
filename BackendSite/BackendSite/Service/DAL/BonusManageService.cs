@@ -610,7 +610,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SameRealNameRestrict", promotion.SameRealNameRestrict);
             p.Add("_SameRealNameRestrictAvailableCount", _sameRealNameRestrictAvailableCount);
             p.Add("_BlockTagList", JsonConvert.SerializeObject(promotion.BlockTagList));
-            p.Add("_LogoutIsHide", promotion.LogoutIsHide);
+            p.Add("_HideForUnlogin", promotion.HideForUnlogin);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             _mainDbClient.Execute("Admin_Promotion_Set_V7", transaction, p);
