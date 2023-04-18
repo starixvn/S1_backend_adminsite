@@ -449,24 +449,6 @@ namespace BackendSite.Controllers.Api
         }
         
         [HttpPost]
-        public ApiResult<IEnumerable<EWalletPay>> GetEWalletPayList(WithdrawalEWalletReq withdrawalReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<EWalletPay>>();
-            var eWalletPay = bankDetailBLL.GetEWalletPayList();
-            var _eWalletPayInfo = (from x in eWalletPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId
-                            select new EWalletPay
-                            {
-                                PayId = x.PayId,
-                                PayName = x.PayName,
-                                CurrencyId = x.CurrencyId
-                            });
-            apiResult.Data = _eWalletPayInfo;
-            apiResult.ErrorCode = 0;
-            return apiResult;
-        }
-        
-        [HttpPost]
         public ApiResult<IEnumerable<PayInfo>> GetCryptoPayList(GetPayListRequest req)
         {
             var result =
