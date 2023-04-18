@@ -428,6 +428,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
+            public List<int> FinancialTypeList { get; set; } = new ();
         }
 
         public class GetFinancialLogExportRequest
@@ -437,6 +438,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
+            public List<int> FinancialTypeList { get; set; } = new ();
         }
 
         public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -1672,7 +1674,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.FinancialType,
                 request.PageSize,
                 request.PageNumber,
-                out var pageInfo);
+                out var pageInfo,
+                request.FinancialTypeList);
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
@@ -1705,7 +1708,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.FinancialType,
                 0,
                 -1,
-                out var _);
+                out var _,
+                request.FinancialTypeList);
 
             foreach (var item in data)
             {
@@ -2295,21 +2299,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> GetPersonalMsg(CustIdWithPageRequest request)
+        public async Task<ApiListResult<PersonalMsg>> GetPersonalMsg(CustIdWithPageRequest request)
         {
-            var pageNumber = request.PageNumber;
-            var TotalPages = 0;
-            var RowCount = 0;
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                apiResult.Data = _messageBll.GetPersonalMsg(request.CustId, request.PageNumber, request.PageSize,
-                    ref TotalPages, ref RowCount);
-
+                var personMsg = await _messageBll.GetPersonalMsg(request.CustId, request.PageNumber, request.PageSize);
+                apiResult.Data = personMsg.Data;
+                apiResult.PageNumber = personMsg.PageNumber;
+                apiResult.RowCount = personMsg.RowCount;
+                apiResult.TotalPages = personMsg.TotalPages;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.PageNumber = pageNumber;
-                apiResult.RowCount = RowCount;
-                apiResult.TotalPages = TotalPages;
             }
             catch (Exception ex)
             {
@@ -2334,17 +2334,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> SendPersonalMsg(SendCustMessageRequest request)
+        public ApiResult SendPersonalMsg(SendCustMessageRequest request)
         {
-            var apiResult = new ApiListResult<PersonalMsg>();
+            var apiResult = new ApiResult();
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                if (_messageBll.SendMessageToPlayer(authData.UserName,
-                    request.Title,
-                    request.Content,
-                    request.CustId,
-                    authData.UserId) == 0)
+                if (_messageBll.SendMessageToPlayer(authData.UserName, request.Title, request.Content, request.CustId) == 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Send Fail.";
@@ -2379,7 +2375,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             try
             {
-                if (!await _messageBll.DeletePersonalMsg(request.Id, request.IsBatch, User.Identity.Name))
+                if (!await _messageBll.DeletePersonalMsg(request.Id, User.Identity.Name))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Delete Fail.";

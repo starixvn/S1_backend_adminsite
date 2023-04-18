@@ -42,7 +42,7 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId, int financialType,
-            int pageSize, int pageNumber, out IPageInfo pageInfo)
+            int pageSize, int pageNumber, out IPageInfo pageInfo, List<int> financialTypeList)
         {
             pageInfo = new PageInfo();
             var key = $"GetFinancialLog:{custId}:{startDate:yyyyMMddHHmmssfff}:{endDate:yyyyMMddHHmmssfff}";
@@ -51,9 +51,11 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
-            if (financialType != 0)
+            if (financialType != 0  || financialTypeList.Any())
             {
-                key += $":{financialType}";
+                financialTypeList.Add(financialType);
+                financialTypeList = financialTypeList.Distinct().ToList();
+                key += $":{string.Join(":", financialTypeList.Select(i => i.ToString()))}";
             }
 
             var cacheTime = TimeSpan.FromMinutes(1);
@@ -63,7 +65,7 @@ namespace BackendSite.Service.BLL
                 //Export
                 if (pageNumber == -1)
                 {
-                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber);
+                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber, RedisDataBase.Shared);
                 }
 
                 //Redis Pagination
@@ -81,9 +83,9 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
-            if (financialType != 0)
+            if (financialTypeList.Any())
             {
-                data = data.Where(i => i.FinancialType == (FinancialType)financialType);
+                data = data.Where(i => financialTypeList.Contains((int)i.FinancialType));
             }
 
             var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id);

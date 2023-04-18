@@ -271,6 +271,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         /// <summary>
         /// BaseData/GetBankInfoOffList 取得指定銀行戶口資料清單
+        /// Withdrawal Operator > Search > 點選單號 > Withdrawal Request > Withdrawal Type
+        /// Deposit Operator > Search > 點選單號 > Bank 相關資料
         /// </summary>
         /// <remarks>
         /// 
@@ -970,6 +972,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
         
+        /// <summary>
+        /// Transfer Info Management > Filter > Acc. No.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult GetTransferAccountList(GetAccountListRequest request)
         {
