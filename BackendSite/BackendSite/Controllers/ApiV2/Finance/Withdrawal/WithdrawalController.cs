@@ -504,6 +504,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
                 apiResult.Message = $"{request.TransId} Now OnUser is {lockUser}";
+                return apiResult;
             }
 
             var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
