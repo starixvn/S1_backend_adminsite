@@ -248,28 +248,6 @@ namespace BackendSite.Service.Library
             var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1})";
             return Regex.Replace(data, pattern, m => new string('*', m.Length));
         }
-
-        public bool CheckSpecialCode(string specialCode)
-        {
-            if (string.IsNullOrEmpty(specialCode) || specialCode.Length > 20)
-                return false;
-            var regex = new Regex("^[- !@#$%^&*a-zA-Z0-9]{1,20}$", RegexOptions.Singleline);
-            var mPwd = regex.Match(specialCode);
-
-            return mPwd.Success;
-        }
-
-        public bool CheckScratchCardCode(string specialCode)
-        {
-            if (string.IsNullOrEmpty(specialCode) || specialCode.Length != 12)
-                return false;
-
-            var regex = new Regex("^[a-zA-Z]{5}-[a-zA-Z0-9]{6}$", RegexOptions.Singleline);
-            var mPwd = regex.Match(specialCode);
-
-            return mPwd.Success;
-        }
-
     }
 
 }

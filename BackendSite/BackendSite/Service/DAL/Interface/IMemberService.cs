@@ -50,6 +50,5 @@ public interface IMemberService
     Task<int> SetCustPromotionWhiteListAsync(CustPromotionWhiteList input);
     Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime);
     Task<(int IsSuccess, int CustId)> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
-        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string promoCode,
-        string affCode, string signupUrl, bool hasPromo, bool isScratch);
+        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl);
 }

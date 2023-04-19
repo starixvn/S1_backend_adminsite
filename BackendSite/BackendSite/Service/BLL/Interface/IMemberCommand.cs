@@ -28,6 +28,6 @@ public interface IMemberCommand
     Task<int> DeleteOnUserAsync(int custId, string @operator);
     Task<bool> SetCustPromotionWhiteListAsync(int custId, bool ipEnable, bool deviceEnable, bool realNameEnable, string @operator);
     Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
-        MemberTypeEnum memberType, string areaCode, string phoneNo, string promoCode,
-        string affCode, string signupUrl, bool hasPromo, bool isScratch, string @operator);
+        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,
+        string @operator);
 }

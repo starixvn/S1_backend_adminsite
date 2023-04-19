@@ -693,7 +693,6 @@ public class RegisterCustomerRequest
     public int CurrencyId { get; set; }
     public string PhoneNo { get; set; }
     public string AreaCode { get; set; }
-    public string PromoCode { get; set; }
     public string AffCode { get; set; }
 
 }

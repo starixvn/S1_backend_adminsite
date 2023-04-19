@@ -1308,15 +1308,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> RegisterMember(RegisterCustomerRequest request)
         {
-            var hasPromo = false;
-            var isScratch = false;
-            if (!string.IsNullOrWhiteSpace(request.PromoCode) && _tools.CheckSpecialCode(request.PromoCode))
-            {
-                hasPromo = true;
-                if (_tools.CheckScratchCardCode(request.PromoCode))
-                    isScratch = true;
-            }
-
             var result = await _memberCommand.RegisterMemberAsync(request.SiteId,
                 request.UserName,
                 _tools.MD5Encrypt(request.Userpwd),
@@ -1325,11 +1316,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.MemberType,
                 request.AreaCode,
                 request.PhoneNo,
-                request.PromoCode,
                 request.AffCode,
                 _tools.GetFromUrl(HttpContext),
-                hasPromo,
-                isScratch,
                 User.Identity.Name);
 
             if (result > 0)

@@ -418,8 +418,7 @@ public class MemberService : IMemberService
     }
 
     public async Task<(int IsSuccess, int CustId)> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
-        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string promoCode,
-        string affCode, string signupUrl, bool hasPromo, bool isScratch)
+        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl)
     {
         string nullValue = null;
         var custId = 0;
@@ -497,26 +496,6 @@ public class MemberService : IMemberService
                     new DynamicParameters(new { CustId = custId, siteId, SignupUrl = signupUrl, ReferralUrl = signupUrl }));
             }
 
-            //Double Check：這邊有用到agentId，上面亂塞可能會有問題
-            if (isSuccess > 0 && hasPromo)
-            {
-                if (isScratch)
-                {
-                    var parameters = new DynamicParameters(new { CustId = custId, ScratchCardCode = promoCode, DeviceType = 1 });
-                    parameters.Add("Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                    _mainSqlClient.Execute("Member_CustScratchCardCodeV3_Ins", trans, parameters);
-                    isSuccess = parameters.Get<int>("Result") == 0 ? 1 : 0;
-                }
-                else
-                {
-                    isSuccess = _mainSqlClient.Execute("Member_CustPromoCode_Ins", trans,
-                        new DynamicParameters(new { CustId = custId, PromoCode = promoCode.Trim() }));
-                }
-
-                if (isSuccess == 0)
-                    isSuccess = -7;
-            }
-
             if (isSuccess > 0 && !string.IsNullOrEmpty(affCode))
             {
                 isSuccess = _mainSqlClient.Execute("Member_VNAffiliate_Ins", trans,
@@ -530,18 +509,11 @@ public class MemberService : IMemberService
 
             await conn.CloseAsync();
             await conn.DisposeAsync();
-
-            //isSuccess = isSuccess switch
-            //{
-            //    > 0 => 0,
-            //    0 => -5,
-            //    _ => isSuccess
-            //};
         }
         catch (Exception ex)
         {
-            conn.CloseAsync();
-            conn.DisposeAsync();
+            await conn.CloseAsync();
+            await conn.DisposeAsync();
             isSuccess = -1;
         }
         return (IsSuccess: isSuccess, CustId: custId);
