@@ -20,7 +20,11 @@ public class MemberService : IMemberService
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
     }
 
-    public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList, IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList, string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize, bool excludeTag)
+    public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList,
+        IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
+        string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
+        string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
+        string deviceId, IEnumerable<int> userTypes, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize, bool excludeTag)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
@@ -43,7 +47,7 @@ public class MemberService : IMemberService
         p.Add("_ShieldLevel", shieldLevel);
         p.Add("_IovationLevel", iovationLevel);
         p.Add("_DeviceId", deviceId);
-        p.Add("_UserType", userType);
+        p.Add("_UserTypes", JsonConvert.SerializeObject(userTypes));
         p.Add("_DateType", dateType);
         p.Add("_StartDate", startDate);
         p.Add("_EndDate", endDate);
@@ -53,7 +57,7 @@ public class MemberService : IMemberService
         p.Add("_PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
         p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
         p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-        var result = await _sqlClienct.QueryAsync<MemberListDto>("Admin_CustInfoSearch_Get_V15", p);
+        var result = await _sqlClienct.QueryAsync<MemberListDto>("Admin_CustInfoSearch_Get_V16", p);
         var searchData = new GetMemberListPageData<MemberListDto>()
         {
             Data = result,
@@ -69,7 +73,7 @@ public class MemberService : IMemberService
         IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
         string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
         string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
-        string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, bool excludeTag)
+        string deviceId, IEnumerable<int> userTypes, int dateType, DateTime startDate, DateTime endDate, bool excludeTag)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
@@ -92,12 +96,12 @@ public class MemberService : IMemberService
         p.Add("_ShieldLevel", shieldLevel);
         p.Add("_IovationLevel", iovationLevel);
         p.Add("_DeviceId", deviceId);
-        p.Add("_UserType", userType);
+        p.Add("_UserTypes", JsonConvert.SerializeObject(userTypes));
         p.Add("_DateType", dateType);
         p.Add("_StartDate", startDate);
         p.Add("_EndDate", endDate);
         p.Add("_ExcludeTag", excludeTag ? 1 : 0);
-        var result = await _sqlClienct.QueryAsync<MemberExportDataDto>("Admin_CustInfoSearchForExport_Get_V11", p);
+        var result = await _sqlClienct.QueryAsync<MemberExportDataDto>("Admin_CustInfoSearchForExport_Get_V12", p);
         return result;
     }
 

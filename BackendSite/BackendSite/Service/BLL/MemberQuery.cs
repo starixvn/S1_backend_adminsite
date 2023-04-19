@@ -56,10 +56,11 @@ namespace BackendSite.Service.BLL
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
+            var userTypes = request.UserTypes.Select(x=>(int)x);
 
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
                 userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
-                affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, request.UserType,
+                affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, userTypes,
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize, request.ExcludeTag);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
 
@@ -121,11 +122,12 @@ namespace BackendSite.Service.BLL
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
+            var userTypes = request.UserTypes.Select(x => (int)x);
 
             var memberList = await _memberService.GetExportData(request.SiteId, currencyList, statusList,
                 request.Identity, userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo,
                 bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel,
-                request.IovationLevel, deviceId, request.UserType,request.DateType, startTime, endTime, request.ExcludeTag);
+                request.IovationLevel, deviceId, userTypes, request.DateType, startTime, endTime, request.ExcludeTag);
             var allTagList = await _tagBll.GetAllTag();
             var data = memberList.Select(a => new MemberExportData()
             {
@@ -157,7 +159,7 @@ namespace BackendSite.Service.BLL
                 LastActivityIp = a.LastActivityIp,
                 Tag = GetTag(allTagList, a.TagList)
             });
-            if (request.ExportTransferWallet) 
+            if (request.ExportTransferWallet)
             {
                 var exportDatas = new List<MemberExportData>();
                 var tasks = data.Select(async x =>
@@ -326,7 +328,7 @@ namespace BackendSite.Service.BLL
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
-        
+
         public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
         {
             return await _memberService.GetCustomerAssociateBankUserAsync(custId);
@@ -339,7 +341,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId)
         {
-            var result  = await _memberService.GetCustPromotionWhiteListAsync(custId);
+            var result = await _memberService.GetCustPromotionWhiteListAsync(custId);
             if (result == null)
             {
                 var customer = _custInfoBll.GetCustInfoWithCache(custId);
@@ -354,7 +356,7 @@ namespace BackendSite.Service.BLL
                     Operator = string.Empty
                 };
             }
-            
+
             return result;
         }
 
@@ -367,8 +369,8 @@ namespace BackendSite.Service.BLL
 
         {
             var info = pointLevelInfos
-                .OrderByDescending(a=>a.PointLevel)
-                .FirstOrDefault(a => 
+                .OrderByDescending(a => a.PointLevel)
+                .FirstOrDefault(a =>
                     a.CurrencyId == currencyId && a.DepositCnt <= depositSum &&
                     a.WithdrawalCnt <= withdrawSum && a.IsKyc == isKyc);
             var pointLevel = info?.PointLevel ?? 1;

@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System.Runtime.CompilerServices;
 
 namespace BackendSite.Service.DAL.Interface;
 
@@ -10,13 +9,13 @@ public interface IMemberService
         IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
         string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
         string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
-        string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, int pageNumber,
+        string deviceId, IEnumerable<int> userTypes, int dateType, DateTime startDate, DateTime endDate, int pageNumber,
         int pageSize, bool excludeTag);
     Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, IEnumerable<int> currencyList,
         IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
         string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
         string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
-        string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, bool excludeTag);
+        string deviceId, IEnumerable<int> userTypes, int dateType, DateTime startDate, DateTime endDate, bool excludeTag);
     Task<CustomerDto> GetCustomerBasicInfoAsync(int custId);
     Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList);
     Task<string> GetCustomerTagsAsync(int custId);
