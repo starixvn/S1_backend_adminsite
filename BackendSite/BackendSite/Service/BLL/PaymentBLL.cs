@@ -165,7 +165,7 @@ namespace BackendSite.Service.BLL
                 })
                 .Select(x => new TpBetRecordListOneDayRes
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     CategoryName = x.Key.CategoryName,
                     CategoryId = x.Key.CategoryId,
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet),
@@ -209,7 +209,7 @@ namespace BackendSite.Service.BLL
                 })
                 .Select(x => new TpBetRecordbyCategoryIdRes
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     GameTypeName = x.Key.GameTypeName,
                     GameTypeID = x.Key.GameTypeID,
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.TurnOver),
@@ -344,7 +344,7 @@ namespace BackendSite.Service.BLL
                 .GroupBy(x => new { SettledDate = x.SettledTime.ToOffset(offset).Date })
                 .Select(x => new TpBetRecordByDate
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
                     ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet ?? y.Stake),
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.Stake),
