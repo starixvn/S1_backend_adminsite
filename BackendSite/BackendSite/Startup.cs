@@ -46,6 +46,7 @@ namespace BackendSite
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
             services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
+            services.AddSingleton<DateTimeHelper>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
