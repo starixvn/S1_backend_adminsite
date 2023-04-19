@@ -779,7 +779,7 @@ namespace BackendSite.Service.DAL
         }
         public DashboardWinLossGroup GetDashboardWinLossGroup(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
+            return _reportDbClient.Query<DashboardWinLossGroup>("Admin_DashboardWinLossGroup_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime })).FirstOrDefault();
         }
         public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId, DateTimeOffset dateTime)
         {
