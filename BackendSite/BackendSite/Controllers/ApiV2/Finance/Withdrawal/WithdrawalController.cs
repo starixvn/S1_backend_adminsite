@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using YamlDotNet.Core.Tokens;
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
@@ -500,14 +501,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var authData = _authorizeBll.GetAuthData();
             var withdrawConfirmResult = -1;
 
-            var locker = await _withdrawalReceiveBll.LockWithdrawalTicketAsync(request.TransId, authData.UserName,
-                authData.SiteId,
-                writeLog: false);
-
-            if (!locker.Success) //判斷自己是否還是 OnUser
+            var key = $"lock:withdrawalTransId:{request.TransId}";
+            var lockUser = await _redisHelper.StringGetAsync(key);
+            
+            if (lockUser != authData.UserName) //判斷自己是否還是 OnUser
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = $"{request.TransId} Now OnUser is {locker.Value}";
+                apiResult.Message = $"{request.TransId} Now OnUser is {lockUser}";
             }
 
             var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
@@ -630,6 +630,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
             else
             {
+                //解除鎖定
+                var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId, authData.UserName);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
