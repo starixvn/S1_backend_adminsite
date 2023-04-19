@@ -28,6 +28,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
         private readonly ILogger<MemberController> _logger;
+        private readonly ICacheHelper _redisHelper;
+        private readonly DateTimeHelper _dateTimeHelper;
 
         public MemberController(IServiceProvider provider)
         {
@@ -43,6 +45,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _memberQuery = provider.GetRequiredService<IMemberQuery>();
             _vipLevelBll = provider.GetRequiredService<IVipLevelBLL>();
             _logger = provider.GetRequiredService<ILogger<MemberController>>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -1291,6 +1295,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     request.EndTime.ToUniversalTime().DateTime)
             };
         }
-
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
+        {
+            var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, request.CurrencyId);
+            var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
+            
+            if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
+            {
+                var result = await _redisHelper.StringSetAsync(key, 0, TimeSpan.FromDays(1), RedisDataBase.Shared);
+                
+                return new ApiResult
+                {
+                    ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                };
+            }
+            
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
     }
 }
