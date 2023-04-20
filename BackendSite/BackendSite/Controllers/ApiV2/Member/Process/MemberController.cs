@@ -30,6 +30,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ILogger<MemberController> _logger;
         private readonly ICacheHelper _redisHelper;
         private readonly DateTimeHelper _dateTimeHelper;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         public MemberController(IServiceProvider provider)
         {
@@ -47,6 +48,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _logger = provider.GetRequiredService<ILogger<MemberController>>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -1306,7 +1308,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
         {
-            var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, request.CurrencyId);
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, custInfo.CurrencyId);
             var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
             
             if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
@@ -1318,6 +1321,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
                 };
             }
+            
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = User.Identity.Name,
+                SiteId = custInfo.SiteId,
+                CurrencyId = custInfo.CurrencyId,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = null
+            });
             
             return new ApiResult
             {
