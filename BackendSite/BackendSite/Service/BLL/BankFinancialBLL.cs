@@ -78,11 +78,6 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public IEnumerable<BankFinancialTransferAccount> GetFinancialAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
-        {
-            return _bankFinancialService.GetTransferAccountList(siteId, purposes);
-        }
-        
         #endregion
 
         #region Transfer Account Management
@@ -124,7 +119,7 @@ namespace BackendSite.Service.BLL
                 SiteName = input.SiteName,
                 CurrencyId = input.CurrencyId,
                 SysId = input.SysId,
-                Purpose = SortPurpose(input.Purpose),
+                Purpose = input.Purpose,
                 Channel = input.Channel,
                 Agent = input.Agent == "" ? null : input.Agent,
                 PayId = input.PayId == 0 ? null : input.PayId,
@@ -161,7 +156,7 @@ namespace BackendSite.Service.BLL
                 BeforeDetailInfo = isCreate ? null : JsonConvert.SerializeObject(new
                 {
                     Id = oldData.Id,
-                    Purpose = GetPurpose(oldData.Purpose),
+                    Purpose = GetPurpose(oldData.Purposes.Select(p => (int)p).OrderBy(p => p)),
                     Channel = oldData.Channel.ToString(),
                     Agent = oldData.Agent,
                     AccountNo = oldData.AccountNo,
@@ -345,13 +340,6 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(input.Purpose))
-            {
-                message = "Data-[Purpose] invalid.";
-
-                return false;
-            }
-
             if (input.Channel == null || input.Channel == 0)
             {
                 message = "Data-[Channel] invalid.";
@@ -450,23 +438,11 @@ namespace BackendSite.Service.BLL
 
             return true;
         }
-        private string SortPurpose(string purpose)
-        {
 
-            IEnumerable<int> sortPurpose = purpose.Split(',').Select(int.Parse).ToList();
-            sortPurpose = sortPurpose.OrderBy(p => p);
-            var result = string.Join(",", sortPurpose);
-
-            return result;
-        }
-        
-        private string GetPurpose(string purpose)
+        private string GetPurpose(IEnumerable<int> purpose)
         {
             var result = string.Empty;
-
-            IEnumerable<int> purposeList = purpose.Split(',').Select(int.Parse).ToList();
-
-            foreach (var i in purposeList)
+            foreach (var i in purpose)
             {
                 switch (i)
                 {

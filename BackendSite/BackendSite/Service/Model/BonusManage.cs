@@ -398,21 +398,7 @@ namespace BackendSite.Service.Model
         public bool IsForVipLevel  { get; set; }
         public IEnumerable<int> SelectedVipLevel { get; set; }
     }
-    public class LeaderboardExtraPointList
-    {
-        public DateTimeOffset ActiveDate { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string Currency { get; set; }
-        public string CategoryName { get; set; }
-        public decimal ExtraPoint { get; set; }
-        public DateTimeOffset CreateTime { set; get; }
-        public DateTimeOffset UpdateTime { set; get; }
-        public string LastUpdateUser { get; set; }
-
-    }
-
+    
     public class PromotionCashBackSetting
     {
         public int CurrencyId { get; set; }

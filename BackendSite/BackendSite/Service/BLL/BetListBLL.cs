@@ -76,7 +76,7 @@ namespace BackendSite.Service.BLL
                 EndDate,
             });
 
-            var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V2", parameters);
+            var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V3", parameters);
 
             //Sort
             var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.SettledTime).AsQueryable();

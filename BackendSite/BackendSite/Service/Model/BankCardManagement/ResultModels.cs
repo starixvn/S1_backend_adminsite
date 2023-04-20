@@ -20,7 +20,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         [JsonIgnore]
         public string FinancialAccountPurposes { set; get; }
         private IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>($"[{FinancialAccountPurposes}]");
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(FinancialAccountPurposes);
         
         [JsonIgnore]
         public TransferChannelEnum FinancialAccountChannel { set; get; }

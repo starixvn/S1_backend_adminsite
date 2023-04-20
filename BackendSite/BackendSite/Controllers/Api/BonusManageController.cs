@@ -1,7 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using Microsoft.AspNetCore.Authorization;
@@ -25,43 +24,32 @@ namespace BackendSite.Controllers.Api
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly ReferralManagementBLL _referralManagementBLL;
         private readonly ReportBLL _reportBLL;
-        private readonly PrizeBLL _prizeBLL;
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly ExcelBLL _excelBLL;
         private readonly CustInfoBLL _custInfoBLL;
-        private readonly RebateManageBLL _rebateManageBLL;
         private readonly ILogger<BonusManageController> _logger;
-        private readonly CourierAdapter courierAdapter;
-        private readonly string _bonusApiUrl;
         #endregion
 
         #region Constructors
 
-        public BonusManageController(BonusManageBLL bonusManageBLL,
+        public BonusManageController(
+            BonusManageBLL bonusManageBLL,
             ServerInfoBLL serverInfoBLL,
             ReferralManagementBLL referralManagementBLL,
             ReportBLL reportBLL,
-            PrizeBLL prizeBLL,
             AuthorizeBLL authorizeBLL,
             ExcelBLL excelBLL,
             CustInfoBLL custInfoBLL,
-            RebateManageBLL rebateManageBLL,
-            IServiceProvider provider,
-            CourierAdapter courierAdapter,
-            IConfiguration configuration)
+            IServiceProvider provider)
         {
             _bonusManageBLL = bonusManageBLL;
             _serverInfoBLL = serverInfoBLL;
             _referralManagementBLL = referralManagementBLL;
             _reportBLL = reportBLL;
-            _prizeBLL = prizeBLL;
             _authorizeBLL = authorizeBLL;
             _excelBLL = excelBLL;
             _custInfoBLL = custInfoBLL;
-            _rebateManageBLL = rebateManageBLL;
             _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
-            this.courierAdapter = courierAdapter;
-            _bonusApiUrl = configuration.GetValue<string>("BonusService");
         }
 
         #endregion
@@ -126,28 +114,7 @@ namespace BackendSite.Controllers.Api
             public string SpecialCode { get; set; }
             public int FilterType { get; set; }
         }
-
-
-        public class LeaderboardExtraPointReq
-        {
-            public IEnumerable<int> SelectSite { get; set; }
-            public int CategoryId { get; set; }
-            public int Currency { get; set; }
-            public long StartDate { get; set; }
-            public long EndDate { get; set; }
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
-        }
-
-        public class SetLeaderboardExtraPointReq
-        {
-            public long ActiveDate { get; set; }
-            public int SiteId { get; set; }
-            public int CategoryId { get; set; }
-            public string UserName { get; set; }
-            public decimal ExtraPoint { get; set; }
-        }
-
+        
         public class GetTpGameListReq
         {
             public int TpId { get; set; }
@@ -676,102 +643,6 @@ namespace BackendSite.Controllers.Api
             };
         }
 
-        #endregion
-        #region For Leaderboard ExtraPoint 
-        [HttpPost]
-        public ApiListResult<LeaderboardExtraPointList> GetLeaderboardExtraPointList(LeaderboardExtraPointReq leaderboardExtraPointReq)
-        {
-            var apiResult = new ApiListResult<LeaderboardExtraPointList>();
-            var startTime = DateTimeExtensions.UnixToDateTime(leaderboardExtraPointReq.StartDate);
-            var endTime = DateTimeExtensions.UnixToDateTime(leaderboardExtraPointReq.EndDate);
-            int totalPages = 0, rowCount = 0;
-
-            var categoryList = new List<int>();
-            var categoryAllList = _rebateManageBLL.GetTPCategoryList();
-            var currencyList = new List<int>();
-            var siteInfoList = _reportBLL.GetServer();
-
-            var pageNumber = leaderboardExtraPointReq.PageNumber;
-            var pageSize = 10;
-            if (leaderboardExtraPointReq.PageSize > 0)
-                pageSize = leaderboardExtraPointReq.PageSize;
-
-            if (leaderboardExtraPointReq.CategoryId == 0)
-            {
-                categoryList.AddRange(categoryAllList.Select(x => x.CategoryId));
-            }
-            else
-            {
-                categoryList.Add(leaderboardExtraPointReq.CategoryId);
-            }
-
-            if (leaderboardExtraPointReq.Currency == 0)
-            {
-                foreach (var a in siteInfoList)
-                {
-                    currencyList.AddRange(a.ICurrencyList);
-                }
-            }
-            else
-            {
-                currencyList.Add(leaderboardExtraPointReq.Currency);
-            }
-
-            apiResult.Data = _bonusManageBLL.GetLeaderboardExtraPointList(leaderboardExtraPointReq.SelectSite,
-                categoryList,
-                currencyList,
-                startTime,
-                endTime,
-                pageNumber, pageSize, out totalPages, out rowCount);
-
-            foreach (var data in apiResult.Data)
-            {
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
-            }
-
-            apiResult.TotalPages = totalPages;
-            apiResult.PageNumber = pageNumber;
-            apiResult.RowCount = rowCount;
-            apiResult.ErrorCode = 0;
-
-            return apiResult;
-        }
-
-        [HttpPost]
-        public ApiResult SetLeaderboardExtraPoint(SetLeaderboardExtraPointReq setLeaderboardExtraPointReq)
-        {
-            var apiResult = new ApiResult
-            {
-                Message = "Unknown Error"
-            };
-            var UserName = _authorizeBLL.GetAuthData().UserName;
-            var rtn = _bonusManageBLL.SetLeaderboardExtraPoint(
-                setLeaderboardExtraPointReq.ActiveDate, setLeaderboardExtraPointReq.SiteId, setLeaderboardExtraPointReq.CategoryId,
-                setLeaderboardExtraPointReq.UserName, setLeaderboardExtraPointReq.ExtraPoint, UserName
-                );
-            if (rtn == 0)
-            {
-                apiResult.ErrorCode = 0;
-                apiResult.Message = "";
-            }
-            else if (rtn == -2)
-            {
-                apiResult.ErrorCode = rtn;
-                apiResult.Message = "User Not Found";
-            }
-            else if (rtn == -3)
-            {
-                apiResult.ErrorCode = rtn;
-                apiResult.Message = "Can only select the ActiveDate today or after today";
-            }
-            else
-            {
-                apiResult.ErrorCode = rtn;
-                apiResult.Message = "Unknown Error";
-            }
-            return apiResult;
-        }
         #endregion
 
         #endregion
