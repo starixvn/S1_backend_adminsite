@@ -30,4 +30,5 @@ public interface IMemberCommand
     Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
         MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,
         string @operator);
+    Task<bool> SetCustTpGameTypeSettingAsync(int custId,IEnumerable<int> tpGameTypes, CustTpGameTypeSettingTypeEnum type, string @operator);
 }

@@ -518,4 +518,39 @@ public class MemberService : IMemberService
         }
         return (IsSuccess: isSuccess, CustId: custId);
     }
+
+    public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type)
+    {
+        await using var conn = _mainSqlClient.GetMySqlConnection();
+        await conn.OpenAsync();
+        await using var trans = await conn.BeginTransactionAsync();
+
+
+        _mainSqlClient.Execute("Admin_CustTpGameTypeSetting_Del", trans, new DynamicParameters(
+                new
+                {
+                    _CustId = custId,
+                    _Type = (int)type,
+                    _GameTypes = JsonConvert.SerializeObject(deleteTpGameTypes)
+                }));
+
+        _mainSqlClient.Execute("Admin_CustTpGameTypeSetting_Ins", trans, new DynamicParameters(
+                new
+                {
+                    _CustId = custId,
+                    _Type = (int)type,
+                    _GameTypes = JsonConvert.SerializeObject(addTpGameTypes)
+                }));
+
+        await trans.CommitAsync();
+        await conn.CloseAsync();
+        await conn.DisposeAsync();
+        return true;
+    }
+
+    public async Task<IEnumerable<CustTpGameTypeSetting>> GetCustTpGameTypeSettingAsync(int custId, IEnumerable<CustTpGameTypeSettingTypeEnum> types)
+    {
+        var p = new DynamicParameters(new { _CustId = custId, _Types = JsonConvert.SerializeObject(types.Select(x => (int)x)) });
+        return await _sqlClienct.QueryAsync<CustTpGameTypeSetting>("Admin_CustTpGameTypeSetting_Get", p);
+    }
 }

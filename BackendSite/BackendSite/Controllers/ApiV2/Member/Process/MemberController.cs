@@ -1297,11 +1297,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <summary>
         /// Member/RegisterMember 會員註冊
         /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[Add] > [Submit]
-        /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
@@ -1349,5 +1344,51 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     throw new AdminException(ErrorCodeEnum.Fail, "Username Not Available.");
             }
         }
+
+        /// <summary>
+        /// Member/GetCustTpGameTypeSetting 取得用戶TpGameType 設定
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<CustTpGameTypeSetting>>> GetCustTpGameTypeSetting(GetTpGameTypeSettingRequest request)
+        {
+            return new ApiResult<IEnumerable<CustTpGameTypeSetting>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustTpGameTypeSettingAsync(
+                    request.CustId,
+                    new List<CustTpGameTypeSettingTypeEnum>() { CustTpGameTypeSettingTypeEnum.NoPlay })
+            };
+        }
+
+        /// <summary>
+        /// Member/SetCustTpGameTypeList 修改用戶TpGameType 設定
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult> SetCustTpGameTypeSetting(SetTpGameTypeSettingRequest request)
+        {
+            var result = await _memberCommand.SetCustTpGameTypeSettingAsync(
+                request.CustId,
+                request.TpGameTypes,
+                CustTpGameTypeSettingTypeEnum.NoPlay,
+                User.Identity.Name);
+
+            if (result)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
     }
 }

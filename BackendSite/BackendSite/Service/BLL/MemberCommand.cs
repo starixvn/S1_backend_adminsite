@@ -5,6 +5,8 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using System.Reflection;
+using System.Security.Policy;
 
 namespace BackendSite.Service.BLL;
 
@@ -509,5 +511,22 @@ public class MemberCommand : IMemberCommand
                 result.CustId, "Member Create.");
         }
         return result.IsSuccess;
+    }
+
+    public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> tpGameTypes, CustTpGameTypeSettingTypeEnum type, string @operator)
+    {
+        var oldData = await _memberService.GetCustTpGameTypeSettingAsync(custId, new List<CustTpGameTypeSettingTypeEnum> { type });
+        var deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x));
+        var addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x));
+
+        var result = await _memberService.SetCustTpGameTypeSettingAsync(custId, deleteGameType, addGameType, type);
+        if (result) //Success
+        {
+            var customer = _custInfoBll.GetCustInfoWithCache(custId);
+            await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, JsonConvert.SerializeObject(oldData.Select(x => x.GameType)),
+                JsonConvert.SerializeObject(tpGameTypes), ActionType.Update,
+                custId, $"CustTpGameTypeSetting-{type} Set.");
+        }
+        return result;
     }
 }

@@ -696,3 +696,23 @@ public class RegisterCustomerRequest
     public string AffCode { get; set; }
 
 }
+
+public class GetTpGameTypeSettingRequest
+{
+    public int CustId { get; set; }
+}
+
+public class CustTpGameTypeSetting
+{
+    public int TpId { get; set; }
+    public string TpName { get; set; }
+    public int GameType { get; set; }
+    public string GameTypeName { get; set; }
+}
+
+
+public class SetTpGameTypeSettingRequest
+{
+    public int CustId { get; set; }
+    public IEnumerable<int> TpGameTypes { get; set; }
+}
