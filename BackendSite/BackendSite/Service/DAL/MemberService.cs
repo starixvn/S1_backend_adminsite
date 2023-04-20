@@ -16,11 +16,15 @@ public class MemberService : IMemberService
 
     public MemberService(IEnumerable<MySqlClient> sqlCliencts)
     {
-        _sqlClienct = sqlCliencts.FirstOrDefault(a=>a.DataBase == DataBase.Report);
+        _sqlClienct = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Report);
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
     }
 
-    public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList, IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList, string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo, string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel, string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize, bool excludeTag)
+    public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList,
+        IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
+        string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
+        string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
+        string deviceId, IEnumerable<int> userTypes, int dateType, DateTime startDate, DateTime endDate, int pageNumber, int pageSize, bool excludeTag)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
@@ -43,7 +47,7 @@ public class MemberService : IMemberService
         p.Add("_ShieldLevel", shieldLevel);
         p.Add("_IovationLevel", iovationLevel);
         p.Add("_DeviceId", deviceId);
-        p.Add("_UserType", userType);
+        p.Add("_UserTypes", JsonConvert.SerializeObject(userTypes));
         p.Add("_DateType", dateType);
         p.Add("_StartDate", startDate);
         p.Add("_EndDate", endDate);
@@ -53,7 +57,7 @@ public class MemberService : IMemberService
         p.Add("_PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
         p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
         p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-        var result = await _sqlClienct.QueryAsync<MemberListDto>("Admin_CustInfoSearch_Get_V15", p);
+        var result = await _sqlClienct.QueryAsync<MemberListDto>("Admin_CustInfoSearch_Get_V16", p);
         var searchData = new GetMemberListPageData<MemberListDto>()
         {
             Data = result,
@@ -69,7 +73,7 @@ public class MemberService : IMemberService
         IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
         string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
         string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
-        string deviceId, int userType, int dateType, DateTime startDate, DateTime endDate, bool excludeTag)
+        string deviceId, IEnumerable<int> userTypes, int dateType, DateTime startDate, DateTime endDate, bool excludeTag)
     {
         var p = new DynamicParameters();
         p.Add("_SiteId", siteId);
@@ -92,12 +96,12 @@ public class MemberService : IMemberService
         p.Add("_ShieldLevel", shieldLevel);
         p.Add("_IovationLevel", iovationLevel);
         p.Add("_DeviceId", deviceId);
-        p.Add("_UserType", userType);
+        p.Add("_UserTypes", JsonConvert.SerializeObject(userTypes));
         p.Add("_DateType", dateType);
         p.Add("_StartDate", startDate);
         p.Add("_EndDate", endDate);
         p.Add("_ExcludeTag", excludeTag ? 1 : 0);
-        var result = await _sqlClienct.QueryAsync<MemberExportDataDto>("Admin_CustInfoSearchForExport_Get_V11", p);
+        var result = await _sqlClienct.QueryAsync<MemberExportDataDto>("Admin_CustInfoSearchForExport_Get_V12", p);
         return result;
     }
 
@@ -120,7 +124,7 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId });
         return await _sqlClienct.QueryFirstAsync<string>("Admin_CustomerTagList_Get", p);
     }
-    
+
     public async Task<IEnumerable<CustomerLoginIp>> GetCustomerIpListByCustIdAsync(int custId)
     {
         var p = new DynamicParameters();
@@ -133,7 +137,7 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId, _userId = lineUserId });
         return await _sqlClienct.QueryFirstAsync<CustLineProfileModel>("Member_CustLineProfile_Get", p);
     }
-    
+
     public async Task<LoginLogPageData> GetLoginLogAsync(int custId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber)
     {
         var p = new DynamicParameters();
@@ -154,13 +158,18 @@ public class MemberService : IMemberService
         };
         return loginLogData;
     }
+    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
+    }
 
-     public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+    public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
     {
         var p = new DynamicParameters(new { _CustId = custId });
         return await _sqlClienct.QueryAsync<CustomerAssociateBankInfo>("Admin_AssociateBankAccountNo_Get", p);
     }
-    
+
     public async Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo)
     {
         return await _sqlClienct.ExecuteScalarAsync<int>("Admin_ExistsPhoneNo_Get",
@@ -180,7 +189,7 @@ public class MemberService : IMemberService
         p.Add("TagList", JsonConvert.SerializeObject(tagList));
         return await _mainSqlClient.ExecuteAsync("Admin_CustInofoTagList_Set", p);
     }
-    
+
     public async Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames)
     {
         var p = new DynamicParameters(new
@@ -188,11 +197,11 @@ public class MemberService : IMemberService
             _SiteId = siteId,
             _AccountNames = JsonConvert.SerializeObject(accountNames)
         });
-        
+
         return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
     }
 
-    public async Task<bool> EditFullNameAsync(int custId,int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
+    public async Task<bool> EditFullNameAsync(int custId, int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
@@ -207,7 +216,7 @@ public class MemberService : IMemberService
         await using var conn = _mainSqlClient.GetMySqlConnection();
         await conn.OpenAsync();
         await using var trans = await conn.BeginTransactionAsync();
-        
+
         var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", trans, p) > 0;
 
         if (success)
@@ -216,17 +225,17 @@ public class MemberService : IMemberService
             var tags = string.IsNullOrEmpty(strTags)
                 ? new List<int>()
                 : JsonConvert.DeserializeObject<List<int>>(strTags);
-        
+
             var custTags = duplicateAccounts
-                .Select(x => new CustTagList {CustId = x.CustId, TagList = JsonConvert.DeserializeObject<IEnumerable<int>>(x.TagList ?? "[]")})
-                .Where(x => !x.TagList.Contains((int) CustTagEnum.Duplicate))
+                .Select(x => new CustTagList { CustId = x.CustId, TagList = JsonConvert.DeserializeObject<IEnumerable<int>>(x.TagList ?? "[]") })
+                .Where(x => !x.TagList.Contains((int)CustTagEnum.Duplicate))
                 .ToList();
-        
-            if (!tags.Contains((int) CustTagEnum.Duplicate))
+
+            if (!tags.Contains((int)CustTagEnum.Duplicate))
             {
-                custTags.Add(new CustTagList {CustId = custId, TagList = tags});
+                custTags.Add(new CustTagList { CustId = custId, TagList = tags });
             }
-            
+
             if (!custTags.Any())
             {
                 await _mainSqlClient.CommitAndDisposeConnectionAsync(conn, trans);
@@ -235,9 +244,9 @@ public class MemberService : IMemberService
 
             foreach (var item in custTags)
             {
-                item.TagList = item.TagList.Append((int) CustTagEnum.Duplicate);
+                item.TagList = item.TagList.Append((int)CustTagEnum.Duplicate);
             }
-            
+
             success = await SetCustInfoTagList(custTags, trans);
             if (success)
             {
@@ -344,7 +353,7 @@ public class MemberService : IMemberService
         p.Add("_CustId", custId);
         return await _mainSqlClient.ExecuteAsync("Admin_OnUser_Del", p);
     }
-    
+
     public async Task<int> SwitchRebatePayoutAsync(int custId, int status)
     {
         var p = new DynamicParameters(new { _CustId = custId, _EnableRebate = status });
@@ -368,25 +377,19 @@ public class MemberService : IMemberService
         return await _mainSqlClient.ExecuteAsync("Admin_ResetCustEWallet_Set", p);
     }
 
-    public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
-    {
-        var p = new DynamicParameters(new { CustId = custId });
-        return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
-    }
-
     public async Task<int> DeleteLineProfileAsync(int custId)
     {
         var p = new DynamicParameters(new { _CustId = custId });
         return await _mainSqlClient.ExecuteAsync("Admin_CustLineProfile_Del", p);
     }
-    
+
     public async Task<bool> SetCustInfoTagList(IEnumerable<CustTagList> tagList, MySqlTransaction trans)
     {
         var parameter = new DynamicParameters(new
         {
             _Infos = JsonConvert.SerializeObject(tagList)
         });
-            
+
         return await _mainSqlClient.ExecuteAsync("Service_CustInfoTagList_Set", trans, parameter) > 0;
     }
 
@@ -410,8 +413,144 @@ public class MemberService : IMemberService
 
     public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime)
     {
-        var p = new DynamicParameters(new { CustId = custId , StartTime = startTime , EndTime = endTime });
+        var p = new DynamicParameters(new { CustId = custId, StartTime = startTime, EndTime = endTime });
         return await _sqlClienct.QueryAsync<PromotionReceiveFailLog>("Admin_PromotionReceiveFailLog_Get", p);
     }
 
+    public async Task<(int IsSuccess, int CustId)> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
+        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl)
+    {
+        string nullValue = null;
+        var custId = 0;
+        var isSuccess = -1;
+        using var conn = _mainSqlClient.GetMySqlConnection();
+        await conn.OpenAsync();
+        await using var trans = await conn.BeginTransactionAsync();
+
+        try
+        {
+            var p = new DynamicParameters(new
+            {
+                SiteId = siteId,
+                UserName = userName,
+                Userpwd = userPwd,
+                CurrencyId = currencyId,
+                UserLang = userLang,
+                AgentId = 0,
+                AllAgentId = nullValue,
+                UserLevel = 1,
+                MemberType = (int)memberType
+            });
+            p.Add("CustId", dbType: DbType.String, direction: ParameterDirection.Output);
+
+            isSuccess = _mainSqlClient.Execute("CustInfo_Ins_V2", trans, p);
+
+            if (isSuccess > 0)
+            {
+                var strCustId = p.Get<string>("CustId") ?? "";
+                custId = int.Parse(strCustId);
+
+                if (custId == 0)
+                {
+                    trans.Rollback();
+                    conn.Close();
+                    conn.Dispose();
+                    return (IsSuccess: -5, CustId: custId);
+                }
+            }
+            else
+            {
+                trans.Rollback();
+                conn.Close();
+                conn.Dispose();
+                return (IsSuccess: -5, CustId: custId);
+            }
+
+            if (!string.IsNullOrEmpty(email) ||
+                 (!string.IsNullOrEmpty(phoneNo) && !string.IsNullOrEmpty(areaCode)))
+            {
+                if (string.IsNullOrEmpty(email))
+                {
+                    email = null;
+                }
+                else if (string.IsNullOrEmpty(phoneNo) || string.IsNullOrEmpty(areaCode))
+                {
+                    phoneNo = null;
+                    areaCode = null;
+                }
+
+                isSuccess = _mainSqlClient.Execute("Member_CustProfile_Ins", trans, new DynamicParameters(new
+                {
+                    CustId = custId,
+                    SiteId = siteId,
+                    Email = email,
+                    Profile = nullValue,
+                    PhoneNo = phoneNo,
+                    AreaCode = areaCode
+                }));
+            }
+
+            if (isSuccess > 0 && !string.IsNullOrEmpty(signupUrl))
+            {
+                isSuccess = _mainSqlClient.Execute("Member_CustRegInfo_Ins_V2", trans,
+                    new DynamicParameters(new { CustId = custId, siteId, SignupUrl = signupUrl, ReferralUrl = signupUrl }));
+            }
+
+            if (isSuccess > 0 && !string.IsNullOrEmpty(affCode))
+            {
+                isSuccess = _mainSqlClient.Execute("Member_VNAffiliate_Ins", trans,
+                    new DynamicParameters(new { CustId = custId, SiteId = siteId, AffId = 0, AffCode = affCode }));
+            }
+
+            if (isSuccess > 0)
+                await trans.CommitAsync();
+            else
+                await trans.RollbackAsync();
+
+            await conn.CloseAsync();
+            await conn.DisposeAsync();
+        }
+        catch (Exception ex)
+        {
+            await conn.CloseAsync();
+            await conn.DisposeAsync();
+            isSuccess = -1;
+        }
+        return (IsSuccess: isSuccess, CustId: custId);
+    }
+
+    public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type)
+    {
+        await using var conn = _mainSqlClient.GetMySqlConnection();
+        await conn.OpenAsync();
+        await using var trans = await conn.BeginTransactionAsync();
+
+
+        _mainSqlClient.Execute("Admin_CustTpGameTypeSetting_Del", trans, new DynamicParameters(
+                new
+                {
+                    _CustId = custId,
+                    _Type = (int)type,
+                    _GameTypes = JsonConvert.SerializeObject(deleteTpGameTypes)
+                }));
+
+        _mainSqlClient.Execute("Admin_CustTpGameTypeSetting_Ins", trans, new DynamicParameters(
+                new
+                {
+                    _CustId = custId,
+                    _Type = (int)type,
+                    _GameTypes = JsonConvert.SerializeObject(addTpGameTypes)
+                }));
+
+        await trans.CommitAsync();
+        await conn.CloseAsync();
+        await conn.DisposeAsync();
+        return true;
+    }
+
+    public async Task<IEnumerable<CustTpGameTypeSetting>> GetCustTpGameTypeSettingAsync(int custId, IEnumerable<CustTpGameTypeSettingTypeEnum> types)
+    {
+        var p = new DynamicParameters(new { _CustId = custId, _Types = JsonConvert.SerializeObject(types.Select(x => (int)x)) });
+        return await _sqlClienct.QueryAsync<CustTpGameTypeSetting>("Admin_CustTpGameTypeSetting_Get", p);
+    }
 }
