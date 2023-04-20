@@ -172,18 +172,25 @@ namespace BackendSite.Service.Model.enums
         Deduct = 2
     }
 
-    public enum WithdrawalLimitLogCreateFromEnum 
+    public enum WithdrawalLimitLogCreateFromEnum
     {
         Default = 0,
         Deposit = 1,
         LimitAdjustment = 2,
         BalanceAdjustment = 3,
-        Bonus = 4 ,
+        Bonus = 4,
         ReferralReward = 5,
         VerificationReward = 6,
         DrawPrize = 7
     }
-    
+
+    public enum MemberTypeEnum
+    {
+        Normal = 1,
+        Affiliate = 2,
+        LiveStreaming = 3
+    }
+
     #endregion
 
     #region CustProfile
@@ -219,6 +226,16 @@ namespace BackendSite.Service.Model.enums
     {
         Disable = 0,
         Enable = 1
+    }
+
+    #endregion
+
+    #region CustTpGameTypeSetting
+
+    public enum CustTpGameTypeSettingTypeEnum
+    {
+        NoShow = 1,  //有資料表示不顯示
+        NoPlay = 2   //有資料表示不可玩
     }
 
     #endregion
@@ -291,7 +308,7 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
-    
+
     public enum DepositDateTypeEnum
     {
         CreateTime = 1,
@@ -300,10 +317,10 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositReceiptCreateFromEnum
     {
-        User = 1 , 
+        User = 1,
         BackendUser = 2
     }
-    
+
     #endregion
 
     #region PayList
@@ -427,7 +444,7 @@ namespace BackendSite.Service.Model.enums
         ToKyc = 71,
         Receive = 72
     }
-    
+
     public enum WithdrawalDateTypeEnum
     {
         CreateTime = 1,

@@ -5,6 +5,8 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using System.Reflection;
+using System.Security.Policy;
 
 namespace BackendSite.Service.BLL;
 
@@ -18,8 +20,16 @@ public class MemberCommand : IMemberCommand
     private readonly IAdminLogService _adminLogService;
     private readonly IBonusApiService _bonusApi;
     private readonly ILogger<MemberCommand> _logger;
+    private readonly ServerInfoBLL _ServerInfoBll;
 
-    public MemberCommand(IMemberService memberService, CodeGenerator codeGenerator, Tools tools, IAdminLogService adminLogService, ILogger<MemberCommand> logger, IBonusApiService bonusApi, CustInfoBLL custInfoBll, VerificationRewardService verificationRewardService)
+    public MemberCommand(IMemberService memberService,
+        CodeGenerator codeGenerator,
+        Tools tools,
+        IAdminLogService adminLogService,
+        ILogger<MemberCommand> logger,
+        IBonusApiService bonusApi,
+        CustInfoBLL custInfoBll,
+        VerificationRewardService verificationRewardService, ServerInfoBLL serverInfoBll)
     {
         _memberService = memberService;
         _codeGenerator = codeGenerator;
@@ -29,6 +39,7 @@ public class MemberCommand : IMemberCommand
         _bonusApi = bonusApi;
         _custInfoBll = custInfoBll;
         _verificationRewardService = verificationRewardService;
+        _ServerInfoBll = serverInfoBll;
     }
 
     public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
@@ -414,29 +425,29 @@ public class MemberCommand : IMemberCommand
         var beforeWhiteList = await _memberService.GetCustPromotionWhiteListAsync(custId);
         var result = await _memberService.SetCustPromotionWhiteListAsync(new CustPromotionWhiteList()
         {
-           CustId = custId,
-           IpEnable = ipEnable,
-           DeviceEnable = deviceEnable,
-           RealNameEnable = realNameEnable,
-           SiteId = customer.SiteId,
-           UserName = customer.UserName,
-           Operator = @operator
+            CustId = custId,
+            IpEnable = ipEnable,
+            DeviceEnable = deviceEnable,
+            RealNameEnable = realNameEnable,
+            SiteId = customer.SiteId,
+            UserName = customer.UserName,
+            Operator = @operator
         });
-        
+
         if (result < 1)
         {
             return false;
-        }         
+        }
 
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
-            JsonConvert.SerializeObject(new 
-            { 
+            JsonConvert.SerializeObject(new
+            {
                 customer.UserName,
                 IpEnable = beforeWhiteList?.IpEnable ?? false,
                 DeviceEnable = beforeWhiteList?.DeviceEnable ?? false,
                 RealNameEnable = beforeWhiteList?.RealNameEnable ?? false,
             }),
-            JsonConvert.SerializeObject(new 
+            JsonConvert.SerializeObject(new
             {
                 customer.UserName,
                 IpEnable = ipEnable,
@@ -476,5 +487,46 @@ public class MemberCommand : IMemberCommand
         {
             _logger.LogError(e, "InsertAdminLog failed. params: " + JsonConvert.SerializeObject(adminLog));
         }
+    }
+
+    public async Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
+        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl, string @operator)
+    {
+        var result = await _memberService.RegisterMemberAsync(siteId,
+                userName,
+                userPwd,
+                email,
+                currencyId,
+                _ServerInfoBll.GetServerInfoWithSiteId(siteId).DefLang,
+                memberType,
+                areaCode,
+                phoneNo,
+                affCode,
+                signupUrl);
+
+        if (result.IsSuccess > 0) //Success
+        {
+            await CreateAdminLog(@operator, siteId, currencyId, null,
+                JsonConvert.SerializeObject(new { UserName = userName }), ActionType.Create,
+                result.CustId, "Member Create.");
+        }
+        return result.IsSuccess;
+    }
+
+    public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> tpGameTypes, CustTpGameTypeSettingTypeEnum type, string @operator)
+    {
+        var oldData = await _memberService.GetCustTpGameTypeSettingAsync(custId, new List<CustTpGameTypeSettingTypeEnum> { type });
+        var deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x));
+        var addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x));
+
+        var result = await _memberService.SetCustTpGameTypeSettingAsync(custId, deleteGameType, addGameType, type);
+        if (result) //Success
+        {
+            var customer = _custInfoBll.GetCustInfoWithCache(custId);
+            await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, JsonConvert.SerializeObject(oldData.Select(x => x.GameType)),
+                JsonConvert.SerializeObject(tpGameTypes), ActionType.Update,
+                custId, $"CustTpGameTypeSetting-{type} Set.");
+        }
+        return result;
     }
 }
