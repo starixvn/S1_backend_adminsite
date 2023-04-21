@@ -729,23 +729,15 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
 
-        public async Task<bool> SetWithdrawalInfoOnUserAndLog(string transId, string onUser, int siteId, WithdrawalStatusEnum withdrawalStatusEnum, string @operator)
+        public async Task<bool> SetWithdrawalInfoOnUser(string transId, string onUser)
         {
             var m = Regex.Match(transId, @"\d+");
             int.TryParse(m.Value, out var withdrawalId);
-
-            await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
-            await using var trans = await conn.BeginTransactionAsync();
-
-            var _ = SetWithdrawalLog(withdrawalId, siteId, "", (int)withdrawalStatusEnum, @operator, trans);
-
             var p = new DynamicParameters();
             p.Add("_WithdrawalId", withdrawalId);
             p.Add("_OnUser", onUser);
-            var result = await _mainDbClient.ExecuteAsync("Admin_WithdrawalInfoOnUser_Set", trans, p) > 0;
-            await _mainDbClient.CommitAndDisposeConnectionAsync(conn,trans);
-
+            var result = await _mainDbClient.ExecuteAsync("Admin_WithdrawalInfoOnUser_Set", p) > 0;
+            
             return result;
         }
 
