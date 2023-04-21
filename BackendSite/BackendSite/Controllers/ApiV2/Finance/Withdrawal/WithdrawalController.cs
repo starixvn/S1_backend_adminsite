@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.Net;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -503,8 +504,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             var key = $"lock:withdrawalTransId:{request.TransId}";
             var lockUser = await _redisHelper.StringGetAsync(key);
-            
-            if (lockUser != authData.UserName) //判斷自己是否還是 OnUser
+
+            //非 Draft 才判斷自己是否還是 OnUser
+            if (request.Action != WithdrawalStatusEnum.Draft &&
+                lockUser != authData.UserName) 
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
                 apiResult.Message = $"{request.TransId} Now OnUser is {lockUser}";
@@ -631,8 +634,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             }
             else
             {
-                //解除鎖定
-                var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId, authData.UserName);
+                if (request.Action != WithdrawalStatusEnum.Draft)
+                {
+                    //解除鎖定
+                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId, authData.UserName);
+                }
+
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
             }
@@ -665,10 +672,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 if (response.ErrorCode == 0)
                 {
+                    var authData = _authorizeBll.GetAuthData();
+
+                    //解除鎖定
+                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(para.TransId, authData.SiteId, authData.UserName);
+
                     // Api 成功更新提款成功次數
                     await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, WithdrawalStatusEnum.Approved);
                 }
-
                 return response;
             }
             catch (Exception ex)
@@ -704,6 +715,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 if (response.ErrorCode == 0)
                 {
+                    var authData = _authorizeBll.GetAuthData();
+
+                    //解除鎖定
+                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(para.TransId, authData.SiteId, authData.UserName);
+
                     // Api 成功更新提款成功次數
                     await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, WithdrawalStatusEnum.Rejected);
                 }
