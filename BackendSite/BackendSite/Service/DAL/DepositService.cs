@@ -294,7 +294,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int CheckDepositReceipt(int siteId ,int depositId , string Operator)
+        public int CheckDepositReceipt(int siteId ,int depositId, bool status, string Operator)
         {
             var result = 0;
             
@@ -306,14 +306,24 @@ namespace BackendSite.Service.DAL
                 
                 var props = new DynamicParameters();
                 props.Add("_DepositId", depositId);
+                props.Add("_Status", status);
                 props.Add("_Operator", Operator);
-                result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set", props);
+                result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set_V2", props);
 
                 if (result > 0)
                 {
-                    result = SetDepositLog(depositId, siteId, "Check DepositReceipt", (int)DepositStatusEnum.CheckDepositReceipt, 0, Operator);
+                    if (status)
+                    {
+                        result = SetDepositLog(depositId, siteId, "Check DepositReceipt",
+                            (int) DepositStatusEnum.CheckDepositReceipt, 0, Operator);
+                    }
+                    else
+                    {
+                        result = SetDepositLog(depositId, siteId, "UnCheck DepositReceipt",
+                            (int) DepositStatusEnum.UnCheckDepositReceipt, 0, Operator);
+                    }
                 }
-                
+
                 if (result > 0)
                 {
                     _mainDbClient.CommitAndDisposeConnection(conn, trans);
