@@ -284,7 +284,7 @@ namespace BackendSite.Service.BLL
                 (int) BonusInfoStatusEnum.Running,
                 (int) BonusInfoStatusEnum.TrasferOut,
             };
-            return await _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), @operator);
+            return await _bonusInfoService.CancelBonusByBonusId(bonusId, JsonConvert.SerializeObject(statusList), @operator);
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
