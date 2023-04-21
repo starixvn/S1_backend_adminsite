@@ -630,7 +630,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             {
                 if (request.Action != WithdrawalStatusEnum.Draft)
                 {   
-                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId, authData.UserName); 
+                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId); 
                 }
 
                 var changeStatus = request.Action;
@@ -671,7 +671,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     var authData = _authorizeBll.GetAuthData();
 
                     //解除鎖定
-                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(para.TransId, authData.SiteId, authData.UserName);
+                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(para.TransId, authData.SiteId);
 
                     // Api 成功更新提款成功次數
                     await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, WithdrawalStatusEnum.Approved);
@@ -714,7 +714,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     var authData = _authorizeBll.GetAuthData();
 
                     //解除鎖定
-                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(para.TransId, authData.SiteId, authData.UserName);
+                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(para.TransId, authData.SiteId);
 
                     // Api 成功更新提款成功次數
                     await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, WithdrawalStatusEnum.Rejected);
