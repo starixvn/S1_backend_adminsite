@@ -1345,7 +1345,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 84 })]
         [HttpPost]
         public async Task<ApiResult> RegisterMember(RegisterCustomerRequest request)
         {
@@ -1396,7 +1396,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 85 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<CustTpGameTypeSetting>>> GetCustTpGameTypeSetting(GetTpGameTypeSettingRequest request)
         {
@@ -1414,7 +1414,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 85 })]
         [HttpPost]
         public async Task<ApiResult> SetCustTpGameTypeSetting(SetTpGameTypeSettingRequest request)
         {

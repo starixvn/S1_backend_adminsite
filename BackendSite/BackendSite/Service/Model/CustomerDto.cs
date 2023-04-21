@@ -706,6 +706,7 @@ public class RegisterCustomerRequest
 public class GetTpGameTypeSettingRequest
 {
     public int CustId { get; set; }
+    public CustTpGameTypeSettingGetType GetDataType { get; set; }
 }
 
 public class CustTpGameTypeSetting
@@ -720,5 +721,6 @@ public class CustTpGameTypeSetting
 public class SetTpGameTypeSettingRequest
 {
     public int CustId { get; set; }
+    public CustTpGameTypeSettingGetType SetDataType { get; set; }
     public IEnumerable<int> TpGameTypes { get; set; }
 }

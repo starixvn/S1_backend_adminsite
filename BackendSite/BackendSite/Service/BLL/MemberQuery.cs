@@ -57,7 +57,8 @@ namespace BackendSite.Service.BLL
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
-            var userTypes = request.UserTypes?.Select(x => (int)x) ?? new List<int>();
+            var userTypes = request.UserTypes.Any() ? request.UserTypes.Select(x => (int)x)
+                : ((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x);
 
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
                 userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
@@ -123,7 +124,8 @@ namespace BackendSite.Service.BLL
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
-            var userTypes = request.UserTypes.Select(x => (int)x);
+            var userTypes = request.UserTypes.Any() ? request.UserTypes.Select(x => (int)x)
+                : ((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x);
 
             var memberList = await _memberService.GetExportData(request.SiteId, currencyList, statusList,
                 request.Identity, userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo,
