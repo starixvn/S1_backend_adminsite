@@ -57,7 +57,7 @@ namespace BackendSite.Service.BLL
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
-            var userTypes = request.UserTypes.Select(x => (int)x);
+            var userTypes = request.UserTypes?.Select(x => (int)x) ?? new List<int>();
 
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
                 userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
