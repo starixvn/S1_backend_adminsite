@@ -57,7 +57,7 @@ namespace BackendSite.Service.BLL
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
-            var userTypes = request.UserTypes.Any() ? request.UserTypes.Select(x => (int)x)
+            var userTypes = request.UserTypes != null && request.UserTypes.Any() ? request.UserTypes.Select(x => (int)x)
                 : ((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x);
 
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
@@ -124,7 +124,7 @@ namespace BackendSite.Service.BLL
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
-            var userTypes = request.UserTypes.Any() ? request.UserTypes.Select(x => (int)x)
+            var userTypes = request.UserTypes != null && request.UserTypes.Any() ? request.UserTypes.Select(x => (int)x)
                 : ((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x);
 
             var memberList = await _memberService.GetExportData(request.SiteId, currencyList, statusList,
@@ -408,8 +408,31 @@ namespace BackendSite.Service.BLL
             return string.Join(",", temp);
         }
 
-        public async Task<IEnumerable<CustTpGameTypeSetting>> GetCustTpGameTypeSettingAsync(int custId, IEnumerable<CustTpGameTypeSettingTypeEnum> types)
-       => await _memberService.GetCustTpGameTypeSettingAsync(custId, types);
+        public async Task<IEnumerable<CustTpGameTypeSettingForFrontendUse>> GetCustTpGameTypeSettingAsync(int custId, IEnumerable<CustTpGameTypeSettingGetType> getDataTypes)
+        {
+            var types = getDataTypes.Select(x => _custInfoBll.ConvertCustTpGameTypeSettingType(x));
+            var settingResult = await _memberService.GetCustTpGameTypeSettingAsync(custId);
+
+            foreach (var type in getDataTypes)
+            {
+                switch (type)
+                {
+                    case CustTpGameTypeSettingGetType.IsPlay:
+                        settingResult = settingResult.Where(x => x.NoPlay == false);
+                        break;
+                    case CustTpGameTypeSettingGetType.NoPlay:
+                        settingResult = settingResult.Where(x => x.NoPlay == true);
+                        break;
+                    case CustTpGameTypeSettingGetType.IsShow:
+                        settingResult = settingResult.Where(x => x.NoShow == false);
+                        break;
+                    case CustTpGameTypeSettingGetType.NoShow:
+                        settingResult = settingResult.Where(x => x.NoShow == true);
+                        break;
+                }
+            }
+            return settingResult;
+        }
 
     }
 }

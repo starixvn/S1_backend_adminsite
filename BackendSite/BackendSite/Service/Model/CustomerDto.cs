@@ -706,15 +706,21 @@ public class RegisterCustomerRequest
 public class GetTpGameTypeSettingRequest
 {
     public int CustId { get; set; }
-    public CustTpGameTypeSettingGetType GetDataType { get; set; }
+    public IEnumerable<CustTpGameTypeSettingGetType> GetDataTypes { get; set; }
 }
 
-public class CustTpGameTypeSetting
+public class CustTpGameTypeSettingForFrontendUse
 {
     public int TpId { get; set; }
     public string TpName { get; set; }
     public int GameType { get; set; }
     public string GameTypeName { get; set; }
+}
+
+public class CustTpGameTypeSettingDto : CustTpGameTypeSettingForFrontendUse
+{
+    public bool NoShow { get; set; }
+    public bool NoPlay { get; set; }
 }
 
 

@@ -548,9 +548,9 @@ public class MemberService : IMemberService
         return true;
     }
 
-    public async Task<IEnumerable<CustTpGameTypeSetting>> GetCustTpGameTypeSettingAsync(int custId, IEnumerable<CustTpGameTypeSettingTypeEnum> types)
+    public async Task<IEnumerable<CustTpGameTypeSettingDto>> GetCustTpGameTypeSettingAsync(int custId)
     {
-        var p = new DynamicParameters(new { _CustId = custId, _Types = JsonConvert.SerializeObject(types.Select(x => (int)x)) });
-        return await _sqlClienct.QueryAsync<CustTpGameTypeSetting>("Admin_CustTpGameTypeSetting_Get", p);
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _sqlClienct.QueryAsync<CustTpGameTypeSettingDto>("Admin_CustTpGameTypeSetting_Get", p);
     }
 }

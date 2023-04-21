@@ -51,6 +51,6 @@ public interface IMemberService
     Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime);
     Task<(int IsSuccess, int CustId)> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
         string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl);
-    Task<IEnumerable<CustTpGameTypeSetting>> GetCustTpGameTypeSettingAsync(int custId, IEnumerable<CustTpGameTypeSettingTypeEnum> types);
+    Task<IEnumerable<CustTpGameTypeSettingDto>> GetCustTpGameTypeSettingAsync(int custId);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type);
 }
