@@ -96,6 +96,18 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region CustTpGameTypeSetting For Frontend Use
+
+    public enum CustTpGameTypeSettingGetType
+    {
+        NoShow = 1,  //表示不顯示
+        IsShow = 11,  //表示顯示
+        NoPlay = 2,   //表示不可玩
+        IsPlay = 21   //表示可玩
+    }
+
+    #endregion
+
     #region AdminModule
 
     public enum AdminModuleStatusEnum
@@ -1161,14 +1173,14 @@ namespace BackendSite.Service.Model.enums
         VirtualSports = 7,
         Poker = 8
     }
-    
+
     public enum LeaderBoardCategoryEnum
     {
         Sports = 1,
         Casino = 2,
         LiveCasino = 3
     }
-    
+
     #region VerificationReward
 
     public enum VerificationTypeEnum
