@@ -1352,14 +1352,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 85 })]
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<CustTpGameTypeSetting>>> GetCustTpGameTypeSetting(GetTpGameTypeSettingRequest request)
+        public async Task<ApiResult<IEnumerable<CustTpGameTypeSettingForFrontendUse>>> GetCustTpGameTypeSetting(GetTpGameTypeSettingRequest request)
         {
-            return new ApiResult<IEnumerable<CustTpGameTypeSetting>>()
+            return new ApiResult<IEnumerable<CustTpGameTypeSettingForFrontendUse>>()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = await _memberQuery.GetCustTpGameTypeSettingAsync(
                     request.CustId,
-                    new List<CustTpGameTypeSettingTypeEnum>() { CustTpGameTypeSettingTypeEnum.NoPlay })
+                    request.GetDataTypes)
             };
         }
 
@@ -1374,8 +1374,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             var result = await _memberCommand.SetCustTpGameTypeSettingAsync(
                 request.CustId,
+                request.SetDataType,
                 request.TpGameTypes,
-                CustTpGameTypeSettingTypeEnum.NoPlay,
                 User.Identity.Name);
 
             if (result)
@@ -1389,6 +1389,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
+
 
     }
 }

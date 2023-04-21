@@ -503,7 +503,7 @@ namespace BackendSite.Service.BLL
                 await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
-            
+
             await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
@@ -1262,6 +1262,20 @@ namespace BackendSite.Service.BLL
         public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
         {
             return _custInfoService.GetCryptoList(custId);
+        }
+
+        public CustTpGameTypeSettingTypeEnum ConvertCustTpGameTypeSettingType(CustTpGameTypeSettingGetType type)
+        {
+            switch (type)
+            {
+                case CustTpGameTypeSettingGetType.IsShow:
+                case CustTpGameTypeSettingGetType.NoShow:
+                default:
+                    return CustTpGameTypeSettingTypeEnum.NoShow;
+                case CustTpGameTypeSettingGetType.IsPlay:
+                case CustTpGameTypeSettingGetType.NoPlay:
+                    return CustTpGameTypeSettingTypeEnum.NoPlay;
+            }
         }
     }
 }
