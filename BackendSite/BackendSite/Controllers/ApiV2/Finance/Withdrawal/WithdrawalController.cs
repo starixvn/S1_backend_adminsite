@@ -621,9 +621,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             }
 
-            var changeStatus = request.Action;
-            await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, changeStatus);
-
             if (withdrawConfirmResult <= 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
@@ -632,10 +629,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             else
             {
                 if (request.Action != WithdrawalStatusEnum.Draft)
-                {
-                    //解除鎖定
-                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId, authData.UserName);
+                {   
+                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId, authData.UserName); 
                 }
+
+                var changeStatus = request.Action;
+                await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, changeStatus);
 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
