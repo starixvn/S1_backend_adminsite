@@ -5,8 +5,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using System.Reflection;
-using System.Security.Policy;
 
 namespace BackendSite.Service.BLL;
 
@@ -513,13 +511,38 @@ public class MemberCommand : IMemberCommand
         return result.IsSuccess;
     }
 
-    public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> tpGameTypes, CustTpGameTypeSettingTypeEnum type, string @operator)
+    public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, CustTpGameTypeSettingGetType setType, IEnumerable<int> tpGameTypes, string @operator)
     {
-        var oldData = await _memberService.GetCustTpGameTypeSettingAsync(custId, new List<CustTpGameTypeSettingTypeEnum> { type });
-        var deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x));
-        var addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x));
+        var oldData = await _memberService.GetCustTpGameTypeSettingAsync(custId);
+        var deleteGameType = Enumerable.Empty<int>();
+        var addGameType = Enumerable.Empty<int>();
+        switch (setType)
+        {
+            case CustTpGameTypeSettingGetType.IsPlay: //DB只記錄不可玩
+                oldData = oldData.Where(x => x.NoPlay == false); //ex.舊1,2,3可以玩，新2,3,4可以玩 => 1變成不可玩，4變成可玩
+                deleteGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //刪除 4
+                addGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //加入 1
+                break;
+            case CustTpGameTypeSettingGetType.NoPlay: //DB只記錄不可玩
+                oldData = oldData.Where(x => x.NoPlay == true); //ex.舊1,2,3不可玩，新2,3,4不可玩 => 1變成可玩，4變成不可玩
+                deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //刪除 1
+                addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //加入 4
+                break;
+            case CustTpGameTypeSettingGetType.IsShow: //DB只記錄不顯示
+                oldData = oldData.Where(x => x.NoShow == false); //ex.舊1,2,3可顯示，新2,3,4可顯示 => 1變成不顯示，4變成顯示
+                deleteGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //刪除 4
+                addGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //加入 1
+                break;
+            case CustTpGameTypeSettingGetType.NoShow: //DB只記錄不顯示
+                oldData = oldData.Where(x => x.NoShow == true); //ex.舊1,2,3不顯示，新2,3,4不顯示 => 1變成可顯示，4變成不顯示
+                deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //刪除 1
+                addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //加入 4
+                break;
+        }
 
+        var type = _custInfoBll.ConvertCustTpGameTypeSettingType(setType);
         var result = await _memberService.SetCustTpGameTypeSettingAsync(custId, deleteGameType, addGameType, type);
+
         if (result) //Success
         {
             var customer = _custInfoBll.GetCustInfoWithCache(custId);

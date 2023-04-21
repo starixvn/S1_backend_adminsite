@@ -16,5 +16,5 @@ public interface IMemberQuery
     Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId);
     Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId);
     Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime);
-    Task<IEnumerable<CustTpGameTypeSetting>> GetCustTpGameTypeSettingAsync(int custId,IEnumerable<CustTpGameTypeSettingTypeEnum> types);
+    Task<IEnumerable<CustTpGameTypeSettingForFrontendUse>> GetCustTpGameTypeSettingAsync(int custId,IEnumerable<CustTpGameTypeSettingGetType> getDataTypes);
 }
