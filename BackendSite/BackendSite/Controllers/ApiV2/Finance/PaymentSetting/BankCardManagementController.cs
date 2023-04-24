@@ -27,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         private readonly AWSS3Helper _s3Helper;
         private readonly string _folder;
         private readonly string _bucketName;
+        private readonly ICacheHelper _redisHelper;
 
         #endregion
 
@@ -42,6 +43,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
             
             var configuration = provider.GetRequiredService<IConfiguration>();
             _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
@@ -132,6 +134,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             if (success)
             {
+                _ = Task.Run(() => _redisHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member));
+                
                 var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
                 var localPaySettings = await _bankDetailBll.GetLocalPaySettingAsync();
                 var payGroups = await _paymentManageBll.GetPayGroupWithCache();

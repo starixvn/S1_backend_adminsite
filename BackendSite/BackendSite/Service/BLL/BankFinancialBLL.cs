@@ -272,6 +272,8 @@ namespace BackendSite.Service.BLL
                 count = 1;
                 message = "Update Transfer Account And Insert Log Success.";
             }
+            
+            _ = Task.Run(() => _cacheHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member));
 
             return (true, count, message);
         }
