@@ -255,7 +255,7 @@ namespace BackendSite.Service.BLL
                 EmailRewardTime = customer.EmailRewardTime.ToOffset(TimeSpan.Zero),
                 PhoneVerifyTime = customer.PhoneVerifyTime.ToOffset(TimeSpan.Zero),
                 EmailVerifyTime = customer.EmailVerifyTime.ToOffset(TimeSpan.Zero),
-                VipDowngradeExclusive = customer.Exclusive
+                Exclusive = customer.Exclusive
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
