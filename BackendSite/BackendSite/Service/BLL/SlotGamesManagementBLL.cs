@@ -15,23 +15,23 @@ namespace BackendSite.Service.BLL
             _slotGamesManagementService = slotGamesManagementService;
             _serverInfoService = serverInfoService;
         }
-        
+
         public IEnumerable<SlotGameData> GetSlotGameList(GetSlotGameListReq request, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var userSiteData = _serverInfoService.GetSiteList().First(x => x.SiteId == request.SiteId);
 
-            var result = _slotGamesManagementService.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.GameId, request.Status);    
+            var result = _slotGamesManagementService.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.GameId, request.Status);
             var slotGames = result.Select(i => i.GetSlotGameData(userSiteData));
             var data = SortSlotGamesList(slotGames).ToList();
 
             var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
-            return data.GetRange(index, count); 
+            return data.GetRange(index, count);
         }
 
         public int SetSlotGame(SetSlotGameReq req, string Operator)
         {
-            return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId,req.Status, Operator);
+            return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId, req.Status, Operator);
         }
 
         public IEnumerable<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request, out IPageInfo pageInfo)
@@ -44,7 +44,7 @@ namespace BackendSite.Service.BLL
                 _slotGamesManagementService.GetSlotGameCategoryList(request.SiteId, request.TpId, request.Name, request.GameId, request.Category);
             var slotGames = result.Select(i => i.GetSlotGameData(userSiteData));
             var data = SortSlotGamesList(slotGames).ToList();
-            
+
             var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
             return data.GetRange(index, count);
         }
@@ -56,7 +56,12 @@ namespace BackendSite.Service.BLL
 
         private IEnumerable<SlotGameData> SortSlotGamesList(IEnumerable<SlotGameData> list)
         {
-            return  list.OrderByDescending(i => i.CurrencyStatusList.Any(i => i.Status == (int)SlotGameStatusEnum.Open));
+            return list.OrderByDescending(i => i.CurrencyStatusList.Any(i => i.Status == (int)SlotGameStatusEnum.Open));
+        }
+
+        public int SetSlotGameAllCurrency(SetSlotGameReq req, string Operator)
+        {
+            return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId, req.Status, Operator);
         }
     }
 }
