@@ -26,7 +26,7 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public int ShieldLevel { get; set; }
     public int IovationLevel { get; set; }
     public string DeviceId { get; set; }
-    public int UserType { get; set; }
+    public IEnumerable<MemberTypeEnum> UserTypes { get; set; } = new List<MemberTypeEnum>() { MemberTypeEnum.Normal , MemberTypeEnum.Affiliate };
     public bool ExcludeTag { get; set; }
 }
 
@@ -84,7 +84,7 @@ public class MemberList
     public int PointLevel { get; set; }
     public int UserType { get; set; }
     public int Identity { get; set; }
-    public string  AffiliateName { get; set; }
+    public string AffiliateName { get; set; }
     public string Agent { get; set; }
     public int Status { get; set; }
     public bool IsTest { get; set; }
@@ -124,7 +124,7 @@ public class ExportMemberRequest
     public int ShieldLevel { get; set; }
     public int IovationLevel { get; set; }
     public string DeviceId { get; set; }
-    public int UserType { get; set; }
+    public IEnumerable<MemberTypeEnum> UserTypes { get; set; }
     public bool ExportTransferWallet { get; set; } = false;
     public bool ExcludeTag { get; set; }
 }
@@ -265,6 +265,7 @@ public class CustomerDto
     public DateTime? EmailRewardTime { get; set; }
     public DateTime? PhoneVerifyTime { get; set; }
     public DateTime? EmailVerifyTime { get; set; }
+    public int Exclusive { get; set; }
 }
 
 public class CustomerTag
@@ -317,6 +318,7 @@ public class CustomerBasicInfo
     public DateTimeOffset? EmailRewardTime { get; set; }
     public DateTimeOffset? PhoneVerifyTime { get; set; }
     public DateTimeOffset? EmailVerifyTime { get; set; }
+    public int VipDowngradeExclusive { get; set; }
 }
 
 public class AffInfo
@@ -383,6 +385,12 @@ public class SetVipLevelManuallyRequest
 {
     public int CustId { get; set; }
     public int Manually { get; set; }
+}
+
+public class AutoVipDowngradeExclusionRequest
+{
+    public int CustId { get; set; }
+    public bool Enable { get; set; }
 }
 
 public class AddTagRequest
@@ -630,7 +638,7 @@ public class SimilarAccountInfo
 public class CustTagList
 {
     public int CustId { get; set; }
-        
+
     public string StrTagList { get; set; }
 
     public IEnumerable<int> TagList { get; set; }
@@ -657,11 +665,11 @@ public class GetCustinfoByImportDataRequest
 public class CustPromotionWhiteList
 {
     public int CustId { get; set; }
-    public int SiteId { get; set; } 
+    public int SiteId { get; set; }
     public string UserName { get; set; }
     public bool IpEnable { get; set; }
     public bool DeviceEnable { get; set; }
-    public bool RealNameEnable { get; set; }   
+    public bool RealNameEnable { get; set; }
     public string Operator { get; set; }
 }
 
@@ -688,4 +696,45 @@ public class PromotionReceiveFailLog
 public class ResetOtpTimesRequest
 {
     public int CustId { get; set; }
+}
+public class RegisterCustomerRequest
+{
+    public int SiteId { get; set; }
+    public string UserName { get; set; }
+    public string Userpwd { get; set; }
+    public MemberTypeEnum MemberType { get; set; }
+    public string Email { get; set; }
+    public int CurrencyId { get; set; }
+    public string PhoneNo { get; set; }
+    public string AreaCode { get; set; }
+    public string AffCode { get; set; }
+
+}
+
+public class GetTpGameTypeSettingRequest
+{
+    public int CustId { get; set; }
+    public IEnumerable<CustTpGameTypeSettingGetType> GetDataTypes { get; set; }
+}
+
+public class CustTpGameTypeSettingForFrontendUse
+{
+    public int TpId { get; set; }
+    public string TpName { get; set; }
+    public int GameType { get; set; }
+    public string GameTypeName { get; set; }
+}
+
+public class CustTpGameTypeSettingDto : CustTpGameTypeSettingForFrontendUse
+{
+    public bool NoShow { get; set; }
+    public bool NoPlay { get; set; }
+}
+
+
+public class SetTpGameTypeSettingRequest
+{
+    public int CustId { get; set; }
+    public CustTpGameTypeSettingGetType SetDataType { get; set; }
+    public IEnumerable<int> TpGameTypes { get; set; }
 }

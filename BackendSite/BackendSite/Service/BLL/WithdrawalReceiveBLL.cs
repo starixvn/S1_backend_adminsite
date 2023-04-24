@@ -3,6 +3,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.BLL
 {
@@ -31,7 +32,8 @@ namespace BackendSite.Service.BLL
 
             if (createResult.Success && writeLog)
             {
-                var _ = await _withdrawalService.SetWithdrawalInfoOnUserAndLog(transId, onUser: userName, siteId, WithdrawalStatusEnum.Receive, @operator: userName);
+                var _ = await _withdrawalService.SetWithdrawalInfoOnUser(transId, onUser: userName);
+                _withdrawalService.SetWithdrawalLog(GetWithdrawalId(transId), siteId, "", (int)WithdrawalStatusEnum.Receive, Operator: userName);
             }
 
             return createResult;
@@ -47,12 +49,14 @@ namespace BackendSite.Service.BLL
                 unLockResult = await _redisHelper.ExecuteLuaScriptAsync(UnLockWithdrawalScript, key, userName);
                 if (unLockResult)
                 {
-                    var _ = await _withdrawalService.SetWithdrawalInfoOnUserAndLog(transId, onUser: "", siteId, WithdrawalStatusEnum.UnReceive, @operator: userName);
+                    var _ = await _withdrawalService.SetWithdrawalInfoOnUser(transId, onUser: "");
+                    _withdrawalService.SetWithdrawalLog(GetWithdrawalId(transId), siteId, "", (int)WithdrawalStatusEnum.UnReceive, Operator: userName);
                 }
             }
             else
             {
                 unLockResult = _redisHelper.KeyDelete(key);
+                var _ = await _withdrawalService.SetWithdrawalInfoOnUser(transId, onUser: "");
             }
             
             return unLockResult;
@@ -64,7 +68,8 @@ namespace BackendSite.Service.BLL
             var setSuccess = await _redisHelper.StringSetAsync(key, userName);
             if (setSuccess)
             {
-                var _ = await _withdrawalService.SetWithdrawalInfoOnUserAndLog(transId, onUser: userName, siteId, WithdrawalStatusEnum.Receive, @operator: userName);
+                var _ = await _withdrawalService.SetWithdrawalInfoOnUser(transId, onUser: userName);
+                _withdrawalService.SetWithdrawalLog(GetWithdrawalId(transId), siteId, "", (int)WithdrawalStatusEnum.Receive, Operator: userName);
             }
 
             return setSuccess;
@@ -74,6 +79,13 @@ namespace BackendSite.Service.BLL
         {
             var key = $"lock:withdrawalTransId:{transId}";
             return await _redisHelper.KeyExistsAsync(key);
+        }
+
+        private int GetWithdrawalId(string transId)
+        {
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
+            return withdrawalId;
         }
     }
 }

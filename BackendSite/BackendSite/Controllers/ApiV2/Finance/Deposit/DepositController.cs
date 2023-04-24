@@ -714,7 +714,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     depositInfo.Status == DepositStatusEnum.Pending || 
                     depositInfo.Status == DepositStatusEnum.OnHold)
                 {
-                    var result = _depositBll.CheckDepositReceipt(depositInfo.SiteId ,request.TransId, User.Identity.Name);
+                    var result = _depositBll.CheckDepositReceipt(depositInfo.SiteId ,request.TransId, true ,User.Identity.Name);
                     if (result > 0)
                     {
                         apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -735,6 +735,47 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             catch (Exception e)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, $"CheckDepositReceipt Fail. {e.Message}");
+            }
+           
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// Deposit/UnCheckDepositReceipt UnCheck存款單審核
+        /// </summary>
+        /// <remarks/>
+        /// Http Method：POST
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 79 })]
+        [HttpPost]
+        public ApiResult UnCheckDepositReceipt(CheckDepositReceiptRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var depositInfo = _depositBll.GetDepositRequest(request.TransId);
+
+                if (depositInfo.CheckReceipt == 0)
+                {
+                    apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                    apiResult.Message = "depositId hasn't be checked";
+                }
+
+                var result = _depositBll.CheckDepositReceipt(depositInfo.SiteId ,request.TransId,false, User.Identity.Name);
+                if (result > 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "UnCheckDepositReceipt fail.";
+                }
+                
+            }
+            catch (Exception e)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"UnCheckDepositReceipt Fail. {e.Message}");
             }
            
             return apiResult;
