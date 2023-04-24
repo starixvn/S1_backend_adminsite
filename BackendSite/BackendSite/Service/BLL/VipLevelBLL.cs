@@ -98,7 +98,7 @@ namespace BackendSite.Service.BLL
             return await _vipLevelService.SetVipLevelManuallyAsync(siteId, custId, userName, manually, $"{updator} Update Manually", updator);
         }
 
-        public async Task<int> AutoVipDowngradeExclusive(int custId, bool enable, string updator) 
+        public async Task<int> VipAutomationExclusion(int custId, bool enable, string updator) 
         {
             var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
             if (customer == null) return -1;
@@ -112,8 +112,8 @@ namespace BackendSite.Service.BLL
 
             var afterStatus = isExclusive;
             await CreateAdminLog(updator, customer.SiteId, customer.CurrencyId,
-                JsonConvert.SerializeObject(new { customer.UserName, AutoVipDowngradeExclusion = beforeStatus.ToString() }),
-                JsonConvert.SerializeObject(new { customer.UserName, AutoVipDowngradeExclusion = afterStatus.ToString() }), ActionType.Update,
+                JsonConvert.SerializeObject(new { customer.UserName, VipAutomationExclusion = beforeStatus.ToString() }),
+                JsonConvert.SerializeObject(new { customer.UserName, VipAutomationExclusion = afterStatus.ToString() }), ActionType.Update,
                 custId, $"Edit Exclusive \"{afterStatus}\"");
             return result;
         }
