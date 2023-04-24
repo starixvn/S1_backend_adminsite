@@ -265,6 +265,7 @@ public class CustomerDto
     public DateTime? EmailRewardTime { get; set; }
     public DateTime? PhoneVerifyTime { get; set; }
     public DateTime? EmailVerifyTime { get; set; }
+    public int Exclusive { get; set; }
 }
 
 public class CustomerTag
@@ -317,6 +318,7 @@ public class CustomerBasicInfo
     public DateTimeOffset? EmailRewardTime { get; set; }
     public DateTimeOffset? PhoneVerifyTime { get; set; }
     public DateTimeOffset? EmailVerifyTime { get; set; }
+    public int VipDowngradeExclusive { get; set; }
 }
 
 public class AffInfo
@@ -383,6 +385,12 @@ public class SetVipLevelManuallyRequest
 {
     public int CustId { get; set; }
     public int Manually { get; set; }
+}
+
+public class AutoVipDowngradeExclusionRequest
+{
+    public int CustId { get; set; }
+    public bool Enable { get; set; }
 }
 
 public class AddTagRequest
