@@ -225,6 +225,7 @@ namespace BackendSite.Service.BLL
                 UserName = customer.UserName,
                 UserLang = customer.UserLang,
                 AccountName = customer.AccountName,
+                SabaId = customer.SabaId,
                 PhoneVerified = customer.PhoneVerified,
                 EmailVerified = customer.EmailVerified,
                 ActStatus = customer.ActStatus,
