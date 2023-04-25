@@ -1340,6 +1340,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     throw new AdminException(ErrorCodeEnum.Fail, "Promo Code Incorrect.");
                 case -9:
                     throw new AdminException(ErrorCodeEnum.Fail, "Email Already Exist.");
+                case -10:
+                    throw new AdminException(ErrorCodeEnum.Fail, "PhoneNo Already Exist.");
                 case -19:
                     throw new AdminException(ErrorCodeEnum.Fail, "Affiliate Not Exist.");
                 default:

@@ -453,21 +453,18 @@ public class MemberService : IMemberService
                 if (custId == 0)
                 {
                     trans.Rollback();
-                    conn.Close();
-                    conn.Dispose();
+                    await conn.CloseAsync();
+                    await conn.DisposeAsync();
                     return (IsSuccess: -5, CustId: custId);
                 }
             }
             else
             {
                 trans.Rollback();
-                conn.Close();
-                conn.Dispose();
+                await conn.CloseAsync();
+                await conn.DisposeAsync();
                 return (IsSuccess: -5, CustId: custId);
             }
-
-            if (await IsExistsEmail(custId, email, siteId))
-                return (IsSuccess: -9, CustId: custId);
 
             if (!string.IsNullOrEmpty(email) ||
                  (!string.IsNullOrEmpty(phoneNo) && !string.IsNullOrEmpty(areaCode)))
@@ -480,6 +477,22 @@ public class MemberService : IMemberService
                 {
                     phoneNo = null;
                     areaCode = null;
+                }
+
+                if (await IsExistsEmail(custId, email, siteId))
+                {
+                    trans.Rollback();
+                    await conn.CloseAsync();
+                    await conn.DisposeAsync();
+                    return (IsSuccess: -9, CustId: custId);
+                }
+
+                if (await IsExistsPhoneNo(custId, siteId, areaCode, phoneNo))
+                {
+                    trans.Rollback();
+                    await conn.CloseAsync();
+                    await conn.DisposeAsync();
+                    return (IsSuccess: -10, CustId: custId);
                 }
 
                 isSuccess = _mainSqlClient.Execute("Member_CustProfile_Ins", trans, new DynamicParameters(new
@@ -515,6 +528,7 @@ public class MemberService : IMemberService
         }
         catch (Exception ex)
         {
+            trans.Rollback();
             await conn.CloseAsync();
             await conn.DisposeAsync();
             isSuccess = -1;
