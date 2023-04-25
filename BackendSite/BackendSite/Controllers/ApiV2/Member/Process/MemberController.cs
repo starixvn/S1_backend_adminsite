@@ -1384,6 +1384,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     throw new AdminException(ErrorCodeEnum.Fail, "Username Not Available.");
                 case -7:
                     throw new AdminException(ErrorCodeEnum.Fail, "Promo Code Incorrect.");
+                case -9:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Email Already Exist.");
                 case -19:
                     throw new AdminException(ErrorCodeEnum.Fail, "Affiliate Not Exist.");
                 default:

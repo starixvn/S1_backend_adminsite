@@ -177,8 +177,8 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-    
-    public enum WithdrawalLimitLogMainTypeEnum 
+
+    public enum WithdrawalLimitLogMainTypeEnum
     {
         Add = 1,
         Deduct = 2
@@ -712,7 +712,7 @@ namespace BackendSite.Service.Model.enums
         Deposit = 1
     }
 
-    
+
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -729,7 +729,7 @@ namespace BackendSite.Service.Model.enums
         VipUpgrade = 14,
         ReferralFreeCredit = 15
     }
-    
+
     public enum BonusSummaryTransactionType
     {
         IncreaseBonus = 1,
@@ -737,7 +737,7 @@ namespace BackendSite.Service.Model.enums
         Phone = 3,
         Email = 4
     }
-    
+
     #endregion
 
     #region PromotionCashBackSetting
@@ -899,6 +899,8 @@ namespace BackendSite.Service.Model.enums
         SetBlockCryptoWallet = 84,
         ReleaseCryptoWallet = 85,
         ResetSmsOtpTimes = 86,
+        RegisterMember = 87,
+        SetCustTpGameTypeSetting = 88
     }
 
     #region BankFinancialTransferInfoLog
@@ -1445,7 +1447,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
-    
+
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1584,7 +1586,7 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1,
     }
-    
+
     public enum DashboardOrderByPropertyEnum
     {
         Amount = 1,
@@ -1670,7 +1672,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #region SlotGamesManagement
-    
+
     public enum SlotGameCategoryEnum
     {
         AllAndSetStatus = 0,
@@ -1842,7 +1844,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         BoDelete = 2
     }
-    
+
     public enum ExchangeTypeEnum
     {
         /// <summary>
@@ -1854,7 +1856,7 @@ namespace BackendSite.Service.Model.enums
         /// </summary>
         Buy = 1
     }
-    
+
     public enum ViewTimeType
     {
         Daily = 1,
