@@ -29,6 +29,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly IWithdrawalStateTransferBLL _withdrawalStateTransferBll;
         private readonly IWithdrawalAccountBLL _withdrawalAccountBll;
         private readonly IWithdrawalReceiveBLL _withdrawalReceiveBll;
+        private readonly IAutoWithdrawalPaymentGateWayBLL _autoWithdrawalPaymentGateWayBll;
         private readonly SelLangBLL _selLangBll;
         private readonly ExcelBLL _excelBll;
         private readonly MessageBLL _messageBll;
@@ -59,6 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _withdrawalStateTransferBll = provider.GetRequiredService<IWithdrawalStateTransferBLL>();
             _withdrawalAccountBll = provider.GetRequiredService<IWithdrawalAccountBLL>();
             _withdrawalReceiveBll = provider.GetRequiredService<IWithdrawalReceiveBLL>();
+            _autoWithdrawalPaymentGateWayBll = provider.GetRequiredService<IAutoWithdrawalPaymentGateWayBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
@@ -504,7 +506,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             //非 Draft 才判斷自己是否還是 OnUser
             if (request.Action != WithdrawalStatusEnum.Draft &&
-                lockUser != authData.UserName) 
+                lockUser != authData.UserName)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
                 apiResult.Message = $"{request.TransId} Now OnUser is {lockUser}";
@@ -535,9 +537,53 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         authData.UserName);
                     break;
                 case WithdrawalStatusEnum.Verify:
-                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
-                        request.Comment,
-                        authData.UserName);
+
+                    if (withdrawalData.ProcessWay == WithdrawalInfoProcessWayEnum.Auto) // 自動出款要走 Verify + Process 流程
+                    {
+                        var paymentGateWay = _autoWithdrawalPaymentGateWayBll.GetPaymentGateWay(withdrawalData, authData.SiteId);
+                        if (paymentGateWay == null)
+                        {
+                            // 找不到 paymentGateWay 就單純只做 Verify，並且 comment 失敗原因
+                            withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId, "Not Found PaymentGateWay ProcessWay Set to AutoFailBackManual", authData.UserName);
+                            var _ = await _withdrawalBll.SetWithdrawalProcessWay(request.TransId, WithdrawalInfoProcessWayEnum.AutoFailBackManual);
+                            break;
+                        }
+
+                        var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalData.WithdrawalInfo);
+                        request.WithdrawalType = paymentGateWay.WithdrawalType;
+                        withdrawalInfo.PayId = paymentGateWay.PayId;
+                        withdrawalInfo.ChannelId = paymentGateWay.ChannelId;
+
+                        // 先 Verify 後 Process
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId, request.Comment, authData.UserName);
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalProcess(
+                            request.TransId,
+                            request.Comment,
+                            authData.UserName,
+                            authData.UserId,
+                            JsonConvert.SerializeObject(withdrawalInfo),
+                            (int)request.WithdrawalType,
+                            request.WithdrawalAccountingModels,
+                            out var custId, out var amount);
+
+                        if (withdrawConfirmResult > 0)
+                        {
+                            var createFailResult = await PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData, systemOperation: "system");
+                            if (createFailResult != null)
+                            {
+                                // 自動出款失敗，狀態改回 AutoFailBackManual
+                                var _ = await _withdrawalBll.SetWithdrawalProcessWay(request.TransId, WithdrawalInfoProcessWayEnum.AutoFailBackManual);
+                                return createFailResult;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
+                            request.Comment,
+                            authData.UserName);
+                    }
+
                     break;
                 case WithdrawalStatusEnum.Process:
                     {
@@ -629,8 +675,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             else
             {
                 if (request.Action != WithdrawalStatusEnum.Draft)
-                {   
-                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId); 
+                {
+                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId);
                 }
 
                 var changeStatus = request.Action;
@@ -1129,7 +1175,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         #region Withdrawal to Process
 
         private async Task<ApiResult> PaymentOnlineCreate(SendToNextRequest request, WithdrawalInfo withdrawalInfo, int custId,
-        decimal amount, ApiResult apiResult, AuthData authData)
+        decimal amount, ApiResult apiResult, AuthData authData, string systemOperation = "")
         {
             var myUrl = request.WithdrawalType == WithdrawalTypeEnum.CryptoPay
                 ? $"{_payApiUrl}CryptoWithdrawal"
@@ -1153,8 +1199,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var apiOnlineResult = await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
             if (apiOnlineResult == null)
             {
+                var updater = string.IsNullOrEmpty(systemOperation)
+                    ? User.Identity.Name
+                    : systemOperation;
+
                 _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
-                    apiResult.Message, User.Identity.Name);
+                    apiResult.Message, updater);
                 apiResult.ErrorCode = 1101;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
                 return apiResult;
@@ -1162,8 +1212,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             if (apiOnlineResult.ErrorCode != 0)
             {
+                var updater = string.IsNullOrEmpty(systemOperation)
+                    ? authData.UserName
+                    : systemOperation;
+
                 _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
-                    apiOnlineResult.Message, authData.UserName);
+                    apiOnlineResult.Message, updater);
                 return apiOnlineResult;
             }
 
