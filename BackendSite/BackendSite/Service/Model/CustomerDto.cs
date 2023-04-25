@@ -215,6 +215,7 @@ public class CustomerDto
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
@@ -265,6 +266,7 @@ public class CustomerDto
     public DateTime? EmailRewardTime { get; set; }
     public DateTime? PhoneVerifyTime { get; set; }
     public DateTime? EmailVerifyTime { get; set; }
+    public int Exclusive { get; set; }
 }
 
 public class CustomerTag
@@ -285,6 +287,7 @@ public class CustomerBasicInfo
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
@@ -317,6 +320,7 @@ public class CustomerBasicInfo
     public DateTimeOffset? EmailRewardTime { get; set; }
     public DateTimeOffset? PhoneVerifyTime { get; set; }
     public DateTimeOffset? EmailVerifyTime { get; set; }
+    public int Exclusive { get; set; }
 }
 
 public class AffInfo
@@ -383,6 +387,12 @@ public class SetVipLevelManuallyRequest
 {
     public int CustId { get; set; }
     public int Manually { get; set; }
+}
+
+public class AutoVipDowngradeExclusionRequest
+{
+    public int CustId { get; set; }
+    public bool Enable { get; set; }
 }
 
 public class AddTagRequest
