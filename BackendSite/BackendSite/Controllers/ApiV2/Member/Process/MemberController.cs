@@ -440,7 +440,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="custIdReq"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 86 })]
         [HttpPost]
         public async Task<ApiResult> VipAutomationExclusion(AutoVipDowngradeExclusionRequest custIdReq)
         {
