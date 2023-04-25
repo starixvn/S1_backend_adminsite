@@ -130,6 +130,7 @@ namespace BackendSite.Service.DAL
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
@@ -167,6 +168,7 @@ namespace BackendSite.Service.DAL
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
                     _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
@@ -554,7 +556,71 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialReport_Transfer_Get_V2";
             return _reportDbClient.Query<BankFinancialTransferSummaryModel>(SpName, parameters);
         }
+        
+        public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportDepositAsync(GetFinancialReportParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.CurrencyIds,
+                    _Agents = input.Agents,
+                    _Channel = input.Channel,
+                    _FinancialAccountIds = input.FinancialAccountIds,
+                    _StartTime = input.StartTime,
+                    _EndTime = input.EndTime
+                });
 
+            return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Deposit_Get_V3", parameters);
+        }
+        
+        public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportWithdrawalAsync(GetFinancialReportParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.CurrencyIds,
+                    _Agents = input.Agents,
+                    _Channel = input.Channel,
+                    _FinancialAccountIds = input.FinancialAccountIds,
+                    _StartTime = input.StartTime,
+                    _EndTime = input.EndTime
+                });
+
+            return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Withdrawal_Get_V3", parameters);
+        }
+        
+        public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportTransferAsync(GetFinancialReportParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _CurrencyIds = input.CurrencyIds,
+                    _Agents = input.Agents,
+                    _Channel = input.Channel,
+                    _FinancialAccountIds = input.FinancialAccountIds,
+                    _StartTime = input.StartTime,
+                    _EndTime = input.EndTime
+                });
+
+            return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Transfer_Get_V3", parameters);
+        }
+        
+        public async Task<IEnumerable<FinancialAccountOpenBalanceResult>> GetFinancialAccountOpenBalanceAsync(GetFinancialAccountOpenBalanceParams input)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = input.SiteId,
+                    _FinancialIds = input.FinancialIds,
+                    _StartTime = input.StartTime
+                });
+
+            return await _reportDbClient.QueryAsync<FinancialAccountOpenBalanceResult>("Admin_BankFinancialReport_OpenBalance_Get", parameters);
+        }
+        
         #endregion
 
     }

@@ -67,9 +67,10 @@ namespace BackendSite.Service.DAL
         {
             totalPages = 0;
             var p = new DynamicParameters(
+
                 new { CustId = custId, 
                     PromoCategoryIds = promoCategoryIds,
-                    StartDate = startDate, 
+                    StartDate = startDate,
                     EndDate = endDate,
                     RefTransId = refTransId,
                     PageSize = pageSize
@@ -78,13 +79,15 @@ namespace BackendSite.Service.DAL
             p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", Math.Abs(totalPages), DbType.Int32, ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var depositList = _mainDbClient.Query<BonusLog>("Admin_BonusLogList_Get_V4", p);
+
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
         }
+
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {
             var result = _reportDbClient.Query<PromotionCategory>("Common_PromotionCategory_Get");
@@ -131,7 +134,7 @@ namespace BackendSite.Service.DAL
             props.Add("_PageSize", pageSize);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V9", props).ToList();
 
             searchData.VipRebateInfoList = result;

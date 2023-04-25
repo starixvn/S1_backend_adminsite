@@ -140,9 +140,9 @@ namespace BackendSite.Service.BLL
             {
                 if (propertyInfo == null)
                 {
-                    propertyInfo = t.FirstOrDefault().GetType().GetProperties();
+                    propertyInfo = t.FirstOrDefault().GetType().GetProperties()
+                    	.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
                 }
-
                 propertyInfo = propertyInfo.Where(x => !Attribute.IsDefined(x, typeof(ExportIgnoreAttribute)));
 
                 ExportBody(ws, t, propertyInfo, offset);
@@ -316,6 +316,14 @@ namespace BackendSite.Service.BLL
             return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
                 FileDownloadName = $"{fileName}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx"
+            };
+        }
+        
+        public FileContentResult ExcelFileDateRange(byte[] data, DateTime from , DateTime to ,string fileName)
+        {
+            return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = $"{fileName}_{from:yyyyMMdd}_{to:yyyyMMdd}.xlsx"
             };
         }
     }

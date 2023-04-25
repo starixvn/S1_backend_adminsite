@@ -125,7 +125,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<CommonTpInfo>> GetCommonTpList()
         {
-            return await _thirdPartyService.GetCommonTpList();
+            var result = await _thirdPartyService.GetCommonTpList();
+            return result.Where(i => i.Status > 0);
         }
 
         public async Task<int> Sorting(IEnumerable<HotGameSortingRequest> request)
@@ -158,12 +159,12 @@ namespace BackendSite.Service.BLL
             var casinoGames = await _gameCasinoService.GetGameCasinoByTpId(tpId);
 
             return (from game in casinoGames
-                let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)
-                select new HotGameOfGameCasinoDto()
-                {
-                    GameId = game.GameId,
-                    Name = gameName.en,
-                }).ToList();
+                    let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)
+                    select new HotGameOfGameCasinoDto()
+                    {
+                        GameId = game.GameId,
+                        Name = gameName.en,
+                    }).ToList();
         }
 
         #endregion

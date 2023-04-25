@@ -1,11 +1,11 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
+using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -71,11 +71,17 @@ namespace BackendSite.Service.DAL
             para.Add("_Status", (int)input.Status);
             para.Add("_Sort", input.Sort);
             para.Add("_SupportChannel", JsonConvert.SerializeObject(input.SupportChannels));
+            para.Add("_GroupIds", JsonConvert.SerializeObject(input.GroupIds));
             para.Add("_QRCodeUrl", input.QrCodeUrl);
             para.Add("_Operator", input.Operator);
 
             
-            return _mainDbClient.ExecuteAsync("Admin_OfflineBankingSetting_Set", para);
+            return _mainDbClient.ExecuteAsync("Admin_OfflineBankingSetting_Set_V2", para);
+        }
+        
+        public async Task<IEnumerable<LocalPaySetting>> GetLocalPaySettingAsync()
+        {
+            return await _mainDbClient.QueryAsync<LocalPaySetting>("Admin_LocalPaySetting_Get");
         }
         
         public IEnumerable<BankDetail> GetLoaclBankList(string siteIds,

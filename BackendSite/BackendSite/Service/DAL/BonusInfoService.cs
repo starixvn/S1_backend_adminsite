@@ -131,7 +131,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<decimal>("Service_BonusWinLoss_Get", props);
         }
 
-        public async Task<(int Result, int CustId)> CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, string @operator)
+        public async Task<(int Result, int CustId)> CancelBonusByBonusId(int bonusId, string statusList, string @operator)
         {
             await using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
@@ -152,39 +152,36 @@ namespace BackendSite.Service.DAL
             var bonusAmount = p.Get<decimal?>("_BonusAmount") ?? 0;
             var bonus = p.Get<decimal?>("_Bonus") ?? 0;
 
-            if (isReturnAmount)
+            decimal backAmount = 0;
+            if (bonus >= lockedAmount + bonusAmount)
             {
-                decimal backAmount = 0;
-                if (bonus >= lockedAmount + bonusAmount)
-                {
-                    backAmount = lockedAmount;
-                }
-                else
-                {
-                    backAmount = bonus - bonusAmount;
-                }
+                backAmount = lockedAmount;
+            }
+            else
+            {
+                backAmount = bonus - bonusAmount;
+            }
 
-                //避免輸光 負負得正
-                if (backAmount < 0)
-                {
-                    backAmount = 0;
-                }
+            //避免輸光 負負得正
+            if (backAmount < 0)
+            {
+                backAmount = 0;
+            }
 
-                if (backAmount > 0)
-                {
-                    result = _walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, trans);
+            if (backAmount > 0)
+            {
+                result = _walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, trans);
 
-                    if (result > 0)
-                        result = _withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, (int)WithdrawalLimitAdjustmentReasonEnum.None ,$"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), (int)WithdrawalLimitLogCreateFromEnum.Bonus , @operator, out var afterWithdrawalLimit, trans);
-                }
+                if (result > 0)
+                    result = _withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, (int)WithdrawalLimitAdjustmentReasonEnum.None, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), (int)WithdrawalLimitLogCreateFromEnum.Bonus, @operator, out var afterWithdrawalLimit, trans);
+            }
 
-                //回收bonus紀錄
-                var cancelBonusAmount = bonus - backAmount;
-                if (cancelBonusAmount > 0 && result > 0)
-                {
-                    var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
-                    result = _mainDbClient.Execute("Service_CancelBonusAmount_Set", trans, cp);
-                }
+            //回收bonus紀錄
+            var cancelBonusAmount = bonus - backAmount;
+            if (cancelBonusAmount > 0 && result > 0)
+            {
+                var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
+                result = _mainDbClient.Execute("Service_CancelBonusAmount_Set", trans, cp);
             }
 
             var custSimpleInfo = await _custInfoService.GetCustId(custId, null, null);
@@ -205,11 +202,6 @@ namespace BackendSite.Service.DAL
             }
 
             return (result, custId);
-        }
-
-        public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
-        {
-            return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
         }
 
         public CustBonusSum GetCustBonusSum(int siteId, int custId)
@@ -263,6 +255,105 @@ namespace BackendSite.Service.DAL
             };
 
             return result;
+        }
+
+        public IEnumerable<BonusCodeInfo> GetBonusCodeList(IEnumerable<int> bonusIdList)
+        {
+            return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
+        }
+
+        public List<MpaBonusInfo> GetMpaBonusInfoList(
+            int siteId,
+            string currencyIds,
+            string bonusStatuses,
+            string bonusTypes,
+            string bonusCode,
+            DateTime startDate,
+            DateTime endDate,
+            string claimStatuses,
+            int baseCurrencyId,
+            bool isGroupByDate,
+            string timeZone
+            )
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_Statuses", bonusStatuses);
+            props.Add("_BonusTypes", bonusTypes);
+            props.Add("_BonusCode", bonusCode);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_ClaimStatuses", claimStatuses);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_IsGroupByDate", isGroupByDate);
+            props.Add("_TimeZone", timeZone);
+
+            var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get", props);
+
+            return result.ToList();
+        }
+
+        public List<MpaBonusDetail> GetMpaBonusDetailList(
+            int siteId,
+            string currencyIds,
+            string bonusCode,
+            DateTime startDate,
+            DateTime endDate,
+            string claimStatuses,
+            int baseCurrencyId,
+            string timeZone)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_BonusCode", bonusCode);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_ClaimStatuses", claimStatuses);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+            props.Add("_TimeZone", timeZone);
+
+            var result = _reportDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
+            return result.ToList();
+        }
+
+        public List<MpaMarketingBonus> GetMpaMarketingBonus(
+            int siteId,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            int baseCurrencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+
+            var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
+
+            return result.ToList();
+        }
+
+        public List<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(
+            int siteId,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            int baseCurrencyId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_BaseCurrencyId", baseCurrencyId);
+
+            var result = _reportDbClient.Query<MpaMarketingBonusDetail>("Admin_MarketingBonusSummaryDetail_Get", props);
+
+            return result.ToList();
         }
     }
 }

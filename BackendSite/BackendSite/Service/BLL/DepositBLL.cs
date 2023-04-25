@@ -32,6 +32,7 @@ namespace BackendSite.Service.BLL
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
+            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -154,10 +155,10 @@ namespace BackendSite.Service.BLL
             return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName ,creator);
         }
 
-        public int CheckDepositReceipt(int siteId ,string transId,  string Operator)
+        public int CheckDepositReceipt(int siteId ,string transId, bool status, string Operator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-            return depositService.CheckDepositReceipt(siteId ,depositId, Operator);
+            return depositService.CheckDepositReceipt(siteId ,depositId, status, Operator);
         }
         
         private int ValidateDepositReceiptPic(string transId)
@@ -249,7 +250,18 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest,null, CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+            var result = depositService.SetDepositInfo(transId,
+                depositRequest.SiteId,
+                depositRequest.Amount,
+                comment,
+                Operator,
+                forStatus,
+                DepositStatusEnum.Approved,
+                depositRequest,
+                null,
+                CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+
+            return result;
         }
 
         public int DepositReject(string transId, decimal actualDeposit, string comment, string Operator)
@@ -304,8 +316,7 @@ namespace BackendSite.Service.BLL
             var depositRequest = GetDepositRequest(transId);
             return depositService.GetDepositReceiptByNo(depositId, receiptNo ,depositRequest.SiteId);
         }
-
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType , string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
         {
             return depositService.GetDepositExportList(selectSite, selectBankCode, selectCalCode, depositType, startDate, endDate, dateType ,depositId, userNames, agent, currencyId, status, levelStatus, startAmount, endAmount, payIds);
         }

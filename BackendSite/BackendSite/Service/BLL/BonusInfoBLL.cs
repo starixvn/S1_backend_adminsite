@@ -99,7 +99,6 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-
         public IEnumerable<BonusInfoFrontEnd> GetBonusInfoExportReport(IEnumerable<int> siteIds,
             string bonusCode,
             string transId,
@@ -189,14 +188,14 @@ namespace BackendSite.Service.BLL
             return data;
         }
 
-        public async Task<(int Result,int CustId)> CancelBonusByBonusId(int bonusId, string @operator)
+        public async Task<(int Result, int CustId)> CancelBonusByBonusId(int bonusId, string @operator)
         {
             var statusList = new List<int>
             {
                 (int) BonusInfoStatusEnum.Running,
             };
 
-            var result = await _bonusInfoService.CancelBonusByBonusId(true, bonusId, JsonConvert.SerializeObject(statusList), @operator);
+            var result = await _bonusInfoService.CancelBonusByBonusId(bonusId, JsonConvert.SerializeObject(statusList), @operator);
             return result;
         }
 

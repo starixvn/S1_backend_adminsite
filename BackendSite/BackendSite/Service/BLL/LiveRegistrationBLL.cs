@@ -1,4 +1,4 @@
-﻿using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -84,7 +84,11 @@ namespace BackendSite.Service.BLL
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), item.ActStatus),
                     Note = item.Note,
                     CallRecord = ZipRemark(item.UpdateAt, item.Operator, item.DepositStatus, timezone),
-                    ReferralUrl = item.ReferralUrl
+                    ReferralUrl = item.ReferralUrl,
+                    BonusCode = item.BonusCode,
+                    PromotionCategory = item.PromotionCategory,
+                    FTDDate = new DateTimeOffset(item.FTDDate, TimeSpan.Zero).ToOffset(offset),
+                    Amount = item.Amount
                 };
                 if (liveReg.CallRecord?.Count > maxCol)
                     maxCol = liveReg.CallRecord.Count;
@@ -102,7 +106,11 @@ namespace BackendSite.Service.BLL
                     { "LastActiveTime", a.LastActiveTime },
                     { "DepositStatus", a.DepositStatus },
                     { "Note", a.Note },
-                    { "ReferralUrl", a.ReferralUrl }
+                    { "ReferralUrl", a.ReferralUrl },
+                    { "FTD Date", a.FTDDate.Equals(default) ? "" : a.FTDDate.ToString("yyyy-MM-dd") },
+                    { "BonusCode", a.BonusCode },
+                    { "Promotion Category", a.PromotionCategory },
+                    { "Locked Amount/FTD Amount", a.Amount }
                 };
                 for (int i = 0; i < maxCol; i++)
                 {

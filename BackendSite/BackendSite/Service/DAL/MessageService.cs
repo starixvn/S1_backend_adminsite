@@ -113,7 +113,12 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Execute("Admin_Announcement_Del", new DynamicParameters(new { Id = id }));
         }
-
+        public Task<int> SendMessageToPlayer(int custId, string langId, bool isPopup, string title, string content, string popupMessage, string sender)
+        {
+            return _mainDbClient.ExecuteAsync(
+                "Admin_CustBatchMessage_Ins_V2",
+                new { _CustId = custId, _BatchId = 0, _LangId = langId, _IsPopup = isPopup, _Title = title, _Content = content, _PopupMessage = popupMessage, _Sender = sender });
+        }
         public IEnumerable<PersonalMsg> GetPersonalMsg(int custId, int startIndex, int PageSize,
             ref int TotalPages, ref int RowCount)
         {
@@ -140,7 +145,7 @@ namespace BackendSite.Service.DAL
             props.Add("_PageSize", PageSize, dbType: DbType.Int32);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_Get_V4", props);
+            var result = await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_Get_V5", props);
             return new DataWithPage<PersonalMsg>() 
             {
                 Data = result,
@@ -306,17 +311,12 @@ namespace BackendSite.Service.DAL
             props.Add("_BatchId", batchId);
             return _reportDbClient.Query<BatchMessageSendLogListModel>("Admin_BatchMessageSendLog_Get", props);
         }
-        public int SendMessageToPlayer(string sender, int custId, string lang, string title, string content)
-        {
-            return _mainDbClient.Execute(
-                "Admin_CustBatchMessage_Ins",
-                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = 0, _Title = title, _Content = content, _Sender = sender });
-        }
-        public int SendMessage(Message message) =>
-            _mainDbClient.Execute("Msg_Ins_V4", new DynamicParameters(message));
 
-        public async Task<int> SendMessageAsync(Message message) =>
-            await _mainDbClient.ExecuteAsync("Msg_Ins_V4", new DynamicParameters(message));
+        internal async Task<IEnumerable<PersonalMsg>> GetMessageById(int id, bool isBatch)
+        {
+            return await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_GetById", new DynamicParameters(new { _Id = id, _IsBatch = isBatch }));
+        }
+
 
         public async Task<int> NewBatchMessage(int siteId, int currencyId, string author, bool isPopup, string personalMsg)
         {
@@ -326,12 +326,12 @@ namespace BackendSite.Service.DAL
             var batchId = p.Get<int?>("BatchId") ?? 0;
             return batchId;
         }
-        public async Task<int> AddCustBatchMessage(int custId, int batchId, string langId, bool isPopup, string title, string content, string sender)
+        public Task<int> AddCustBatchMessage(int custId, int batchId, string langId, bool isPopup, string sender)
         {
-            return await _mainDbClient.ExecuteAsync(
-                "Admin_CustBatchMessage_Ins",
+            return _mainDbClient.ExecuteAsync(
+                "Admin_CustBatchMessage_Ins_V2",
                 _transaction,
-                new { _CustId = custId, _BatchId = batchId, _LangId = langId, _IsPopup = isPopup, _Title = title, _Content = content, _Sender = sender });
+                new { _CustId = custId, _BatchId = batchId, _LangId = langId, _IsPopup = isPopup, _Title = "", _Content = "", _PopupMessage = "", _Sender = sender });
         }
         public async Task<int> InsertBatchMessageSendLog(int batchId, int rowId, int custId, string userName, string sabaId, string resultMessage, string updator)
         {
@@ -366,5 +366,16 @@ namespace BackendSite.Service.DAL
             await _transaction.RollbackAsync();
             await _connection.CloseAsync();
         }
+        public int SendMessageToPlayer(string sender, int custId, string lang, string title, string content)
+        {
+            return _mainDbClient.Execute(
+                "Admin_CustBatchMessage_Ins",
+                new { _CustId = custId, _BatchId = 0, _LangId = lang, _IsPopup = 0, _Title = title, _Content = content, _Sender = sender });
+        }
+        public int SendMessage(Message message) =>
+            _mainDbClient.Execute("Msg_Ins_V4", new DynamicParameters(message));
+
+        public async Task<int> SendMessageAsync(Message message) =>
+            await _mainDbClient.ExecuteAsync("Msg_Ins_V4", new DynamicParameters(message));
     }
 }

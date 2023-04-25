@@ -1,4 +1,4 @@
-﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
@@ -36,6 +36,10 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public string DepositStatus { get; set; }
         public string ReferralUrl { get; set; }
+        public string BonusCode { get; set; }
+        public string PromotionCategory { get; set; }
+        public DateTime FTDDate { get; set; }
+        public decimal Amount { get; set; }
     }
     public class GetRegLiveStatusRequest : ApiRequestPageModel, IOrderBy
     {
@@ -81,6 +85,10 @@ namespace BackendSite.Service.Model
         public string PhoneNo { get; set; }
         public string Note { get; set; }
         public string ReferralUrl { get; set; }
+        public string BonusCode { get; set; }
+        public string PromotionCategory { get; set; }
+        public DateTimeOffset FTDDate { get; set; }
+        public decimal Amount { get; set; }
         public List<string> CallRecord { get; set; }
     }
     public class RegLiveStatusPageResult

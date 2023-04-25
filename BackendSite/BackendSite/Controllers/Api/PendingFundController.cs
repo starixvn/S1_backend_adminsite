@@ -29,22 +29,6 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<ApiResult> ProcessAsync([FromBody] PendingFund pendingFund)
-        {
-            var apiResult = await pendingFundBLL.ProcessAsync(pendingFund);
-
-            if (apiResult.ErrorCode == 0)
-            {
-                apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
-
-        [HttpPost]
         public async Task<ApiResult> BonusTransferAsync([FromForm] int CustId, [FromForm] int TpId)
         {
             var apiResult = await pendingFundBLL.BonusTransferAsync(CustId, TpId);

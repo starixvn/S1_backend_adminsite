@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL.Interface;
 
@@ -15,4 +16,5 @@ public interface IMemberQuery
     Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId);
     Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId);
     Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime);
+    Task<IEnumerable<CustTpGameTypeSettingForFrontendUse>> GetCustTpGameTypeSettingAsync(int custId,IEnumerable<CustTpGameTypeSettingGetType> getDataTypes);
 }
