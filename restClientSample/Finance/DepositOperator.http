@@ -53,7 +53,21 @@ POST {{url}}/apiV2/Common/CryptoAmountCalculation HTTP/1.1
 Content-Type: application/json
 
 {
-    "currencyId": 2,
-    "exchangeRate": 0.225620814,
-    "cryptoAmount": 112.810407
+    "currencyId": 51,
+    "exchangeRate": 0.00004259219480519481,
+    "cryptoAmount": 3.5
+}
+
+
+###
+# CryptoWallet Approved，新增欄位 actualCryptoAmount
+POST {{url}}/apiV2/Deposit/SendToNext HTTP/1.1
+Content-Type: application/json
+
+{
+    "action": 3,
+    "actualDeposit": 82174.0,
+    "comment": "",
+    "transId": "DD1405333",
+    "actualCryptoAmount": 3.5
 }
