@@ -845,6 +845,8 @@ namespace BackendSite.Service.Model.enums
         CancelBonusInCustInfo = 83,
         SetBlockCryptoWallet = 84,
         ReleaseCryptoWallet = 85,
+        RegisterMember = 86,
+        SetCustTpGameTypeSetting = 87,
     }
 
     #region BankFinancialTransferInfoLog

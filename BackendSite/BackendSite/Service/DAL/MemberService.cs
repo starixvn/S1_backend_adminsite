@@ -466,6 +466,9 @@ public class MemberService : IMemberService
                 return (IsSuccess: -5, CustId: custId);
             }
 
+            if (await IsExistsEmail(custId, email, siteId))
+                return (IsSuccess: -9, CustId: custId);
+
             if (!string.IsNullOrEmpty(email) ||
                  (!string.IsNullOrEmpty(phoneNo) && !string.IsNullOrEmpty(areaCode)))
             {
