@@ -332,7 +332,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false, string depositInfo = null)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -410,6 +410,15 @@ namespace BackendSite.Service.DAL
                             }
                         }
 
+                        if (result > 0 && !string.IsNullOrEmpty(depositInfo))
+                        {
+                            result = UpdateDepositInfo(depositRequest.TransId, depositInfo, trans);
+                            if (result < 1)
+                            {
+                                _logger.LogError($"UpdateDepositInfo Failed. TransId: {transId}, depositInfo: {depositInfo}");
+                            }
+                        }
+
                         if (result > 0 && canReward)
                         {
                             var resultCode = InsertDepositRewardPointQueue(transId, trans);
@@ -456,8 +465,19 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        
+        private int UpdateDepositInfo(string transId, string depositInfo, IDbTransaction trans)
+        {
+            return _mainDbClient.Execute("Service_DepositInfoDepositInfo_Set",
+                trans,
+                new
+                {
+                    _TransId = transId,
+                    _DepositInfo = depositInfo
+                });
+        }
 
-        private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlTransaction trans)
+        private int SetDepositInfoFirstDeposit(int depositId, int siteId, IDbTransaction trans)
         {
             return _mainDbClient.Execute("DepositInfoFirstDeposit_Set",
                 trans,

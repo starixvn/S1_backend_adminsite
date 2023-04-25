@@ -46,3 +46,14 @@ Content-Type: application/json
     "currencyId": 2,
     "purpose": 1
 }
+
+###
+# CryptoAmount換算上分金額
+POST {{url}}/apiV2/Common/CryptoAmountCalculation HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 2,
+    "exchangeRate": 0.225620814,
+    "cryptoAmount": 112.810407
+}
