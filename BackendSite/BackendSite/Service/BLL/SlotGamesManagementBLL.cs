@@ -59,9 +59,11 @@ namespace BackendSite.Service.BLL
             return list.OrderByDescending(i => i.CurrencyStatusList.Any(i => i.Status == (int)SlotGameStatusEnum.Open));
         }
 
-        public int SetSlotGameAllCurrency(SetSlotGameReq req, string Operator)
+        public bool SetSlotGameAllCurrency(SetSlotGameReq req, string Operator)
         {
-            return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId, req.Status, Operator);
+            var userSiteData = _serverInfoService.GetSiteList().First(x => x.SiteId == req.SiteId);
+
+            return _slotGamesManagementService.SetSlotGameAllCurrency(req.SiteId, userSiteData.ICurrencyList, req.SlotGameId, req.Status, Operator);
         }
     }
 }

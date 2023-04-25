@@ -193,8 +193,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                var result = _slotGamesManagementBLL.SetSlotGame(request, User.Identity.Name);
-                if (result > 0)
+                var result = _slotGamesManagementBLL.SetSlotGameAllCurrency(request, User.Identity.Name);
+                if (result)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
