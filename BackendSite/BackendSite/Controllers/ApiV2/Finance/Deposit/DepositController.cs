@@ -11,6 +11,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
@@ -161,6 +162,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public class SendToNextRequest : GetByTransIdRequest
         {
             public decimal ActualDeposit { set; get; }
+            public decimal ActualCryptoAmount { set; get; }
             public string Comment { set; get; }
             public int Action { set; get; }
             private DateTimeOffset? _statementTime { get; set; }
@@ -358,8 +360,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
                 {
+                    string di = null;
+                    if (depositRequest.DepositType == DepositTypeEnum.CryptoWallet)
+                    {
+                        var jObj = JObject.Parse(depositRequest.DepositInfo);
+                        jObj.Add("ActualExchangeAmount", request.ActualCryptoAmount);
+                        di = jObj.ToString(Formatting.None);
+                    }
+                    
                     if (request.ActualDeposit > 0)
-                        depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
+                        depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name, di);
                 }
                 
                 if (depositConfirmResult > 0)
