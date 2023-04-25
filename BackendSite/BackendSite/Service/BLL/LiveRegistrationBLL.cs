@@ -107,7 +107,7 @@ namespace BackendSite.Service.BLL
                     { "DepositStatus", a.DepositStatus },
                     { "Note", a.Note },
                     { "ReferralUrl", a.ReferralUrl },
-                    { "FTD Date", a.FTDDate.Equals(default) ? "" : a.FTDDate.ToString("yyyy-MM-dd") },
+                    { "FTD Date", a.FTDDate.Equals(default) ? "" : a.FTDDate.ToString("yyyy-MM-dd HH:mm:ss") },
                     { "BonusCode", a.BonusCode },
                     { "Promotion Category", a.PromotionCategory },
                     { "Locked Amount/FTD Amount", a.Amount }
