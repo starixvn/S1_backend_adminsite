@@ -431,7 +431,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// Member/AutoVipDowngradeExclusion 設定VIP自動降級排除
+        /// Member/VipAutomationExclusion 設定VIP自動降級排除
         /// </summary>
         /// <remarks>
         /// 
@@ -442,9 +442,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
         [HttpPost]
-        public async Task<ApiResult> AutoVipDowngradeExclusion(AutoVipDowngradeExclusionRequest custIdReq)
+        public async Task<ApiResult> VipAutomationExclusion(AutoVipDowngradeExclusionRequest custIdReq)
         {
-            var result = await _vipLevelBll.AutoVipDowngradeExclusive(custIdReq.CustId, custIdReq.Enable, User.Identity.Name);
+            var result = await _vipLevelBll.VipAutomationExclusion(custIdReq.CustId, custIdReq.Enable, User.Identity.Name);
             if (result > 0)
             {
                 return new ApiResult
@@ -1410,6 +1410,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     throw new AdminException(ErrorCodeEnum.Fail, "Username Not Available.");
                 case -7:
                     throw new AdminException(ErrorCodeEnum.Fail, "Promo Code Incorrect.");
+                case -9:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Email Already Exist.");
+                case -10:
+                    throw new AdminException(ErrorCodeEnum.Fail, "PhoneNo Already Exist.");
                 case -19:
                     throw new AdminException(ErrorCodeEnum.Fail, "Affiliate Not Exist.");
                 default:

@@ -506,7 +506,7 @@ public class MemberCommand : IMemberCommand
         {
             await CreateAdminLog(@operator, siteId, currencyId, null,
                 JsonConvert.SerializeObject(new { UserName = userName }), ActionType.Create,
-                result.CustId, "Member Create.");
+                result.CustId, "Member Create.", AdminAdjustmentLogMenuEnum.RegisterMember);
         }
         return result.IsSuccess;
     }
@@ -548,7 +548,7 @@ public class MemberCommand : IMemberCommand
             var customer = _custInfoBll.GetCustInfoWithCache(custId);
             await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, JsonConvert.SerializeObject(oldData.Select(x => x.GameType)),
                 JsonConvert.SerializeObject(tpGameTypes), ActionType.Update,
-                custId, $"CustTpGameTypeSetting-{type} Set.");
+                custId, $"CustTpGameTypeSetting-{type} Set.", AdminAdjustmentLogMenuEnum.SetCustTpGameTypeSetting);
         }
         return result;
     }
