@@ -8,6 +8,7 @@
             SiteName = data.SiteName;
             CustId = data.CustId;
             UserName = data.UserName;
+            Exclusive = data.Exclusive;
             CurrencyId = data.CurrencyId;
             IsoCode = data.IsoCode;
             CurrentVipLevel = data.CurrentVipLevel;
