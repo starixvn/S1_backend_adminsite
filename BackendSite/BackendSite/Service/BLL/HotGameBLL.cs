@@ -28,6 +28,7 @@ namespace BackendSite.Service.BLL
             { 15, "id" },
             { 51, "vn" },
             { 61, "hi" },
+            { 72, "kh" },  
             { 74, "bn" },
         };
         private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
@@ -158,12 +159,12 @@ namespace BackendSite.Service.BLL
             var casinoGames = await _gameCasinoService.GetGameCasinoByTpId(tpId);
 
             return (from game in casinoGames
-                let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)
-                select new HotGameOfGameCasinoDto()
-                {
-                    GameId = game.GameId,
-                    Name = gameName.en,
-                }).ToList();
+                    let gameName = JsonConvert.DeserializeObject<GameCasinoTranslate>(game.Name)
+                    select new HotGameOfGameCasinoDto()
+                    {
+                        GameId = game.GameId,
+                        Name = gameName.en,
+                    }).ToList();
         }
 
         #endregion
@@ -174,7 +175,7 @@ namespace BackendSite.Service.BLL
         public async Task<GetHotGameListResponseV2Wrapper> GetDataListV2(GetHotGameDataListRequestV2 request)
         {
             var queryResult = await _hotGameService.GetDataListV2(request);
-            
+
             // not found data return
             if (!queryResult.Data.Any())
             {
@@ -207,7 +208,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<GetHotGameDetailResponseV2> GetDetailV2(int id,int siteId)
+        public async Task<GetHotGameDetailResponseV2> GetDetailV2(int id, int siteId)
         {
             var hotGame = await _hotGameService.GetDetailV2(id, siteId);
             if (hotGame == null) return null;
@@ -243,15 +244,15 @@ namespace BackendSite.Service.BLL
             };
 
             var result = await _hotGameService.CreateOrUpdateV2(request, updateOperator);
-            if(result == 1) await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.SiteId}*", RedisDataBase.Member);
+            if (result == 1) await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.SiteId}*", RedisDataBase.Member);
             return result;
         }
 
         public async Task<int> DeleteV2(DeleteHotGameRequestV2 request)
         {
-            var result =  await _hotGameService.DeleteV2(request.Id, request.SiteId);
-             if(result == 1) await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.SiteId}*", RedisDataBase.Member);
-             return result;
+            var result = await _hotGameService.DeleteV2(request.Id, request.SiteId);
+            if (result == 1) await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.SiteId}*", RedisDataBase.Member);
+            return result;
         }
 
         public async Task<int> SortingV2(IEnumerable<HotGameSortingRequestV2> request)
@@ -272,7 +273,7 @@ namespace BackendSite.Service.BLL
             }
 
             await _hotGameService.RollBack();
-            
+
             return 0;
         }
 
