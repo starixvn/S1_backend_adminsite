@@ -227,7 +227,8 @@ namespace BackendSite.Service.BLL
             {
                 details = details.Select(c =>
                 {
-                    c.CanUpdateStatus = true;
+                    // 排除名單才可以手動調整
+                    c.CanUpdateStatus = c.Exclusive;
                     return c;
                 }).ToList();
             }
@@ -273,7 +274,7 @@ namespace BackendSite.Service.BLL
         /// <returns></returns>
         private bool CheckCanUpdateStatus(string calculateYearMonth, int siteId, VipSettingStatusEnum vipType)
         {
-            var siteVipSetting = GetVipSettings(vipType).FirstOrDefault(x => x.SiteId == siteId);
+            var siteVipSetting = _vipLevelService.GetVipSetting((int)vipType, siteId);
             if (siteVipSetting == null)
                 return false;
 
@@ -300,16 +301,6 @@ namespace BackendSite.Service.BLL
                 default:
                     return false;
             }
-        }
-
-        /// <summary>
-        /// 取得VIP排程設定資料
-        /// </summary>
-        /// <param name="vipType"></param>
-        /// <returns></returns>
-        private IEnumerable<VipSettingModel> GetVipSettings(VipSettingStatusEnum vipType)
-        {
-            return _vipLevelService.GetVipSetting((int)vipType);
         }
 
         /// <summary>

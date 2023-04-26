@@ -246,7 +246,7 @@ namespace BackendSite.Service.BLL
             return depositService.GetDepositRequestComment(depositId, depositRequest.SiteId);
         }
 
-        public int DepositApproved(string transId, decimal actualDeposit, string comment, string Operator)
+        public int DepositApproved(string transId, decimal actualDeposit, string comment, string Operator, string depositInfo = null)
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
@@ -259,7 +259,8 @@ namespace BackendSite.Service.BLL
                 DepositStatusEnum.Approved,
                 depositRequest,
                 null,
-                CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+                CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId),
+                depositInfo);
 
             return result;
         }
