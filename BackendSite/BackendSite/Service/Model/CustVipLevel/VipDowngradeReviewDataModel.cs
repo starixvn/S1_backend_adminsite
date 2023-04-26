@@ -8,6 +8,7 @@ namespace BackendSite.Service.Model.CustVipLevel
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public bool Exclusive { get; set; }
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
         public int CurrentVipLevel { get; set; }
