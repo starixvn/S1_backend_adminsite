@@ -230,7 +230,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         
         public class WithdrawalEWalletReq
         {
+            /// <summary>
+            /// 幣別
+            /// </summary>
             public int CurrencyId { get; set; }
+            public int SysId { get; set; }
+            /// <summary>
+            /// 取提款金流商列表時必填
+            /// </summary>
+            public decimal? Amount { get; set; }
+            /// <summary>
+            /// 取提款金流商列表時必填
+            /// </summary>
+            public int? CustId { get; set; }
         }
         
         public class GetPointLevelListRequest
@@ -271,6 +283,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         /// <summary>
         /// BaseData/GetBankInfoOffList 取得指定銀行戶口資料清單
+        /// Withdrawal Operator > Search > 點選單號 > Withdrawal Request > Withdrawal Type
+        /// Deposit Operator > Search > 點選單號 > Bank 相關資料
         /// </summary>
         /// <remarks>
         /// 
@@ -444,19 +458,25 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<EWalletPay>> GetEWalletPayList(WithdrawalEWalletReq request)
+        public ApiResult<IEnumerable<PayInfo>> GetEWalletPayList(WithdrawalEWalletReq request)
         {
-            var apiResult = new ApiResult<IEnumerable<EWalletPay>>();
-            var eWalletPay = _bankDetailBll.GetEWalletPayList();
-            var _eWalletPayInfo = (from x in eWalletPay
-                where x.CurrencyId == request.CurrencyId
-                select new EWalletPay
+            var authData = _authorizeBll.GetAuthData();
+            var apiResult = new ApiResult<IEnumerable<PayInfo>>();
+            
+            var eWalletPay = _bankDetailBll.GetEWalletPayList(authData.SiteId, request.CurrencyId, request.SysId , request.Amount, request.CustId).ToList();
+            
+            if (_permissionBll.CheckPermission(28, new []{70})) // Withdrawal Operator => Process
+            {
+                eWalletPay.ForEach(d =>
                 {
-                    PayId = x.PayId,
-                    PayName = x.PayName,
-                    CurrencyId = x.CurrencyId
+                    d.LoginAccount = _cryptor.Decrypt(d.LoginAccount);
+                    d.LoginPassword = _cryptor.Decrypt(d.LoginPassword);
+                    d.TransferPin = _cryptor.Decrypt(d.TransferPin);
+                    d.LoginPin = _cryptor.Decrypt(d.LoginPin);
                 });
-            apiResult.Data = _eWalletPayInfo;
+            }
+            
+            apiResult.Data = eWalletPay;
             apiResult.ErrorCode = 0;
             return apiResult;
         }
@@ -970,6 +990,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return apiResult;
         }
         
+        /// <summary>
+        /// Transfer Info Management > Filter > Acc. No.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public ApiResult GetTransferAccountList(GetAccountListRequest request)
         {

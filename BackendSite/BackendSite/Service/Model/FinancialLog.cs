@@ -174,7 +174,7 @@ namespace BackendSite.Service.Model
 
     public class TpBetRecordByDate
     {
-        public DateTime SettledDate { get; set; }
+        public string SettledDate { get; set; }
         public decimal TotalTO { get; set; }
         public decimal ValidBet { get; set; }
         public decimal InvalidBet { get; set; }
@@ -198,7 +198,7 @@ namespace BackendSite.Service.Model
     }
     public class TpBetRecordListOneDayRes
     {
-        public DateTime SettledDate { get; set; }
+        public string SettledDate { get; set; }
         public string CategoryName { get; set; }
         public int CategoryId { get; set; }
         public decimal TotalTO { get; set; }
@@ -224,7 +224,7 @@ namespace BackendSite.Service.Model
     }
     public class TpBetRecordbyCategoryIdRes
     {
-        public DateTime SettledDate { get; set; }
+        public string SettledDate { get; set; }
         public string GameTypeName { get; set; }
         public int GameTypeID { get; set; }
         public decimal TotalTO { get; set; }

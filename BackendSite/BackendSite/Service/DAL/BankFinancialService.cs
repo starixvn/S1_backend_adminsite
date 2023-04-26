@@ -79,7 +79,7 @@ namespace BackendSite.Service.DAL
                     _Id = input.Id
                 });
 
-            var spName = "Admin_BankFinancialTransferAccount_Get_V2";
+            var spName = "Admin_BankFinancialTransferAccount_Get_V3";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(spName, parameters);
         }
 
@@ -117,7 +117,7 @@ namespace BackendSite.Service.DAL
                     _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = bankFinancialTransferAccount.Purpose,
+                    _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
@@ -144,7 +144,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V6", parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V8", parameters);
         }
 
         public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
@@ -157,7 +157,7 @@ namespace BackendSite.Service.DAL
                     _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = bankFinancialTransferAccount.Purpose,
+                    _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
@@ -183,37 +183,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V6";
-
-            return _mainDbClient.Execute(SpName, parameters);
-        }
-
-        public int InsertTransferAccountLog(ActionType action, BankFinancialTransferAccountModel bankFinancialTransferAccount)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _SiteId = bankFinancialTransferAccount.SiteId,
-                    _SiteName = bankFinancialTransferAccount.SiteName,
-                    _CurrencyId = bankFinancialTransferAccount.CurrencyId,
-                    _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = bankFinancialTransferAccount.Purpose,
-                    _Channel = bankFinancialTransferAccount.Channel,
-                    _Agent = bankFinancialTransferAccount.Agent,
-                    _PayId = bankFinancialTransferAccount.PayId,
-                    _AccountNo = bankFinancialTransferAccount.AccountNo,
-                    _AccountName = bankFinancialTransferAccount.AccountName,
-                    _DisplayName = bankFinancialTransferAccount.DisplayName,
-                    _InitialAmount = bankFinancialTransferAccount.InitialAmount,
-                    _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
-                    _Reason = bankFinancialTransferAccount.Reason,
-                    _Remark = bankFinancialTransferAccount.Remark,
-                    _Status = bankFinancialTransferAccount.Status,
-                    _Operator = bankFinancialTransferAccount.Updator,
-                    _Action = action
-                });
-
-            var SpName = "Admin_BankFinancialTransferAccountLog_Ins_V2";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V8";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
@@ -232,7 +202,7 @@ namespace BackendSite.Service.DAL
                 _Purposes = purposes == null ? null : JsonConvert.SerializeObject(purposes)
             });
             return _reportDbClient
-                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V3", parameters);
+                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V4", parameters);
         }
 
         public int GetTransferDataCount(string accountNo)

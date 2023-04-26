@@ -1,7 +1,10 @@
-﻿using BackendSite.Attributes;
+﻿using System.Net;
+using Amazon.S3.Model;
+using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -28,16 +31,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly PermissionBLL _permissionBll;
         private readonly Dictionary<int, List<int>> _usableActionType;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
-        private readonly ImageEditorBLL _imageEditorBll;
-        private readonly FileNameBLL _fileNameBll;
-        
+        private readonly AWSS3Helper _s3Helper;
+        private readonly string _awsDepositUrl;
+        private readonly string _awsDepositFolder;
+        private readonly string _awsDepositBucketName;
         private readonly int _mainWalletType;
-        private readonly Dictionary<string, System.Drawing.Imaging.ImageFormat> _contentTypesCheck = new(comparer: StringComparer.OrdinalIgnoreCase)
-        {
-            {"image/png",System.Drawing.Imaging.ImageFormat.Png},
-            {"image/jpeg",System.Drawing.Imaging.ImageFormat.Jpeg},
-            { "image/gif",System.Drawing.Imaging.ImageFormat.Gif}
-        };
 
         #endregion
 
@@ -53,8 +51,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
-            _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
-            _fileNameBll = provider.GetRequiredService<FileNameBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _awsDepositUrl = configuration.GetValue<string>("AwsDepositUrl");
+            _awsDepositFolder = configuration.GetValue<string>("AwsDepositFolder");
+            _awsDepositBucketName = configuration.GetValue<string>("AwsDepositBucketName");
             _usableActionType = new Dictionary<int, List<int>>
             {
                 { 1, new List<int> {66,65,67,6,63} }, //Draft -> Draft,Approved,ManualApproved,Reject,OnHold
@@ -347,7 +347,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         title = string.Format(title, request.TransId);
                         var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, request.TransId);
-                        _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId); 
+                        await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
+                    }
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
@@ -364,7 +365,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     title = string.Format(title, request.TransId);
                     var content = _selLangBll.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, request.TransId);
-                    _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                     if (custInfo.SiteId == 1)
                     {
                         await _messageBll.SendSMSMessageToPlayer(depositRequest.CustId);
@@ -439,7 +440,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     title = string.Format(title, transId);
                     var content = _selLangBll.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, transId);
-                    _messageBll.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    _messageBll.SendMessage(new Message(sender, depositRequest.CustId, userLang, title, content));
                 }
                 if (depositConfirmResult == -4)
                 {
@@ -499,6 +500,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public List<DepositReceiptModel> GetReceiptByTransId(string transId)
         {
             var result = new List<DepositReceiptModel>();
+            using var client = new HttpClient();
             
             var depositReceipt = _depositBll.GetDepositReceipt(transId);
             if (depositReceipt == null)
@@ -508,16 +510,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             
             foreach (var receipt in depositReceipt)
             {
-                var image = receipt.DepositPic;
-                var model = new DepositReceiptModel
+                var picUrl = Redirect($"{_awsDepositUrl}{_awsDepositFolder}/{transId}_{receipt.ReceiptNo}.png").Url;
+                var picRsp = client.GetAsync(picUrl).Result;
+                if (picRsp.StatusCode == HttpStatusCode.OK)
                 {
-                    ReceiptNo = receipt.ReceiptNo,
-                    Receipt = File(image, "image/jpeg"),
-                    Creator = receipt.Creator,
-                    CreateTime = receipt.CreateTime,
-                    CreateFrom = receipt.CreateFrom
-                };
-                result.Add(model);
+                    var model = new DepositReceiptModel
+                    {
+                        ReceiptNo = receipt.ReceiptNo,
+                        Receipt = picUrl,
+                        Creator = receipt.Creator,
+                        CreateTime = receipt.CreateTime,
+                        CreateFrom = receipt.CreateFrom
+                    };
+                    result.Add(model);
+                }
             }
            
             return result;
@@ -531,7 +537,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 77 })]
         [HttpPost]
-        public async Task<ApiResult> UploadReceipt([FromForm] DepositReceiptFile depositReceipt)
+        public async Task<ApiResult> UploadReceipt(DepositReceiptFile depositReceipt)
         {
             var apiResult = new ApiResult();
             try
@@ -545,21 +551,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     return apiResult;
                 }
                 
-                if (depositReceipt.Receipt != null && _contentTypesCheck.ContainsKey(depositReceipt.Receipt.ContentType))
+                if (depositReceipt.Receipt != null)
                 {
-                    await using var fileStream = depositReceipt.Receipt.OpenReadStream();
-                    using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
-                    var fileBytes = await _imageEditorBll.Resize(uploadedImage);
-
-                    var fileName = _fileNameBll
-                        .SetFileName(depositReceipt.Receipt.FileName)
-                        .ExcludePath()
-                        .SetFilenameExtension("jpg")
-                        .FileName;
-
                     var receipts = _depositBll.GetDepositReceipt(depositReceipt.TransId);
                     var receiptNo = receipts.Any() ? receipts.Max(x => x.ReceiptNo) + 1 : 1 ;
-                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.SiteId, depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, fileBytes, User.Identity.Name);
+                    
+                    var x = depositReceipt.Receipt.Replace("data:image/png;base64,", "");
+                    var bytes = Convert.FromBase64String(x);
+                    var stream = new MemoryStream(bytes);
+
+                    var putRequest = new PutObjectRequest();
+                    var key = $"{_awsDepositFolder}/{depositReceipt.TransId}_{receiptNo}.png";
+                    putRequest.BucketName = _awsDepositBucketName; // Your bucket name
+                    putRequest.ContentType = "image/png";
+                    putRequest.InputStream = stream;
+                    putRequest.Key = key;
+                    await _s3Helper.PutObjectAsync(putRequest);
+                    
+                    var fileName = $"{depositReceipt.TransId}_{receiptNo}";
+                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.SiteId, depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, User.Identity.Name);
                     
                     if (result > 0)
                     {
@@ -609,7 +619,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
                 
                 bool permission;
-                if (depositRequest.Status is (int)DepositStatusEnum.Approved or (int)DepositStatusEnum.Rejected or (int)DepositStatusEnum.Canceled)
+                if (depositRequest.Status is (int)DepositStatusEnum.Approved or (int)DepositStatusEnum.Rejected or (int)DepositStatusEnum.Canceled )
                 {
                     permission = permissionList.Contains(78); //刪除權限
                 }
@@ -635,6 +645,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
                 if (result > 0)
                 {
+                    var deleteRequest = new DeleteObjectRequest();
+                    var key = $"{_awsDepositFolder}/{request.TransId}_{request.ReceiptNo}.png";
+                    deleteRequest.BucketName = _awsDepositBucketName;
+                    deleteRequest.Key = key;
+                    await _s3Helper.DeleteObjectAsync(deleteRequest);
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
                 else
