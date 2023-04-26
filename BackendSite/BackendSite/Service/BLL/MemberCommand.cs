@@ -548,7 +548,7 @@ public class MemberCommand : IMemberCommand
             var customer = _custInfoBll.GetCustInfoWithCache(custId);
             await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, JsonConvert.SerializeObject(oldData.Select(x => x.GameType)),
                 JsonConvert.SerializeObject(tpGameTypes), ActionType.Update,
-                custId, $"CustTpGameTypeSetting-{type} Set.", AdminAdjustmentLogMenuEnum.SetCustTpGameTypeSetting);
+                custId, $"CustTpGameTypeSetting-{setType} Set.", AdminAdjustmentLogMenuEnum.SetCustTpGameTypeSetting);
         }
         return result;
     }
