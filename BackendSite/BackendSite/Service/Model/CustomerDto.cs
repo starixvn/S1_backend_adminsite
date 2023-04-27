@@ -216,6 +216,7 @@ public class CustomerDto
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
@@ -286,6 +287,7 @@ public class CustomerBasicInfo
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
