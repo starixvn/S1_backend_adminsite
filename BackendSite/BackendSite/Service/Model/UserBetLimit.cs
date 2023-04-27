@@ -2,6 +2,31 @@
 
 namespace BackendSite.Service.Model
 {
+    public class BetLimitSetting 
+    {
+        public bool Checked { get; set; }
+        [LogIgnore]
+        public int TpCategory { get; set; }
+        public string TpCategoryName { get; set; }
+        [LogIgnore]
+        public int GameTypeId { get; set; }
+        public string GameTypeName { get; set; }
+    }
+    public class LiveCasinoSetting : BetLimitSetting
+    {
+        [LogIgnore]
+        public string LimitGroup { get; set; }
+        public string LimitRange { get; set; }
+    }
+    public class SportsSetting : BetLimitSetting
+    {
+        [LogIgnore]
+        public int Min { get; set; }
+        public int Max { get; set; }
+        public int MaxPerMatch { get; set; }
+    }
+
+
     public class TpCategoryData
     {
         public int CategoryId { set; get; }
@@ -43,7 +68,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         [LogIgnore]
         public int CustId { get; set; }
-        public List<BetSetting> BetSetting { get; set; }
+        public List<BetLimitSetting> BetSetting { get; set; }
     }
 
     public class DeleteCustBetLimit

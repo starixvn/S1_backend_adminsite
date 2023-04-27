@@ -124,7 +124,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
         [HttpPost]
-        public async Task<ApiResult> Set(ApiRequestWithLog<CustBetLimitV2> req)
+        public async Task<ApiResult> Set(dynamic req)
         {
             var result = await _userBetLimitBll.SetUserBetLimit(req, User.Identity.Name);
             if (result == 1 || result == 2) 
