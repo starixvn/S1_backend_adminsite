@@ -51,7 +51,7 @@ namespace BackendSite.Service.BLL.Mpa
             return response;
         }
 
-        private async Task MultiplyExchangeRateAmountSummary<TEntity>(List<TEntity> source,
+        public async Task MultiplyExchangeRateAmountSummary<TEntity>(List<TEntity> source,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
             int baseCurrencyId)
@@ -314,7 +314,7 @@ namespace BackendSite.Service.BLL.Mpa
             return config;
         }
 
-        private async Task MultiplyExchangeRateSinUpSummary<TEntity>(List<TEntity> source,
+        public async Task MultiplyExchangeRateSinUpSummary<TEntity>(List<TEntity> source,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
             int baseCurrencyId)
@@ -447,7 +447,7 @@ namespace BackendSite.Service.BLL.Mpa
                 firstRow.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#FFCC99"));
 
                 // 第二列
-                var toCell = request.IsCompare ? 4 : 2;
+                var toCell = request.IsCompared ? 4 : 2;
                 var secondRow = ws.Cells[2, 1, 2, toCell];
                 secondRow.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 secondRow.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
@@ -465,7 +465,7 @@ namespace BackendSite.Service.BLL.Mpa
                 ws.Cells[3, 2].Value = depositAmountSummary.DepositAmount;
                 ws.Cells[3, 2].EntireColumn.Width = 30;
 
-                if (request.IsCompare)
+                if (request.IsCompared)
                 {
                     ws.Cells[2, 3].Value = "Compare Date";
                     ws.Cells[2, 3].EntireColumn.Width = 20;

@@ -1,8 +1,8 @@
-﻿using BackendSite.Service.Model;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using System.Data;
-using BackendSite.Service.Library;
-using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {

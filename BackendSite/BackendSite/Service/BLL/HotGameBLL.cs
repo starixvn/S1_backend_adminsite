@@ -126,7 +126,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<CommonTpInfo>> GetCommonTpList()
         {
-            return await _thirdPartyService.GetCommonTpList();
+            var result = await _thirdPartyService.GetCommonTpList();
+            return result.Where(i => i.Status > 0);
         }
 
         public async Task<int> Sorting(IEnumerable<HotGameSortingRequest> request)

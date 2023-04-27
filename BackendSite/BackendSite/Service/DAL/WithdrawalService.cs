@@ -401,7 +401,7 @@ namespace BackendSite.Service.DAL
                 commandType: CommandType.StoredProcedure).ToList();
         }
 
-        public int SetWithdrawalInfoFlow(string transId,
+        public int  SetWithdrawalInfoFlow(string transId,
             int siteId,
             string comment,
             string forStatus,
@@ -751,6 +751,13 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_WithdrawalAccountCounter_Set", p) > 0;
         }
 
+        public async Task<bool> SetWithdrawalProcessWay(int withdrawalId, WithdrawalInfoProcessWayEnum processWay)
+        {
+            var p = new DynamicParameters();
+            p.Add("_WithdrawalId", withdrawalId);
+            p.Add("_ProcessWay", (int)processWay);
+            return await _mainDbClient.ExecuteAsync("Admin_WithdrawalInfoProcessWay_Set", p) > 0;
+        }
 
         #region private
 

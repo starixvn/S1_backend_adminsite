@@ -11,6 +11,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
@@ -29,7 +30,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
         private readonly PermissionBLL _permissionBll;
-        private readonly Dictionary<int, List<int>> _usableActionType;
+        private readonly Dictionary<DepositStatusEnum, List<DepositActionEnum>> _usableActionType;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly AWSS3Helper _s3Helper;
         private readonly string _awsDepositUrl;
@@ -50,19 +51,42 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
-            _mainWalletType = configuration.GetValue<int>("MainWalletType");
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _awsDepositUrl = configuration.GetValue<string>("AwsDepositUrl");
             _awsDepositFolder = configuration.GetValue<string>("AwsDepositFolder");
             _awsDepositBucketName = configuration.GetValue<string>("AwsDepositBucketName");
-            _usableActionType = new Dictionary<int, List<int>>
+            _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
-                { 1, new List<int> {66,65,67,6,63} }, //Draft -> Draft,Approved,ManualApproved,Reject,OnHold
-                { 3, new List<int> {66} },//Approved -> Draft
-                { 4, new List<int> {66,67} },//Reject -> Draft,ManualApproved
-                { 5, new List<int> {66} },//Cancel -> Draft
-                { 7, new List<int> {66,64,67} }//On-Hold -> Draft,Pending,ManualApproved
+                { DepositStatusEnum.Pending,
+                    new List<DepositActionEnum>
+                    {
+                        DepositActionEnum.Draft,
+                        DepositActionEnum.Approved,
+                        DepositActionEnum.ManualApproved,
+                        DepositActionEnum.Rejected,
+                        DepositActionEnum.OnHold
+                    } },
+                { DepositStatusEnum.Approved, 
+                    new List<DepositActionEnum>
+                    {
+                        DepositActionEnum.Draft
+                    } },
+                { DepositStatusEnum.Rejected, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft,
+                    DepositActionEnum.ManualApproved
+                } },
+                { DepositStatusEnum.Canceled, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft
+                } },
+                { DepositStatusEnum.OnHold, new List<DepositActionEnum>
+                {
+                    DepositActionEnum.Draft,
+                    DepositActionEnum.Pending,
+                    DepositActionEnum.ManualApproved
+                } }
             };
         }
 
@@ -138,6 +162,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public class SendToNextRequest : GetByTransIdRequest
         {
             public decimal ActualDeposit { set; get; }
+            public decimal ActualCryptoAmount { set; get; }
             public string Comment { set; get; }
             public int Action { set; get; }
             private DateTimeOffset? _statementTime { get; set; }
@@ -333,34 +358,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             
             if (request.Action == (int)DepositStatusEnum.Approved)
             {
-                if (depositRequest.DepositType == (int) DepositTypeEnum.LocalBanking)
+                if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
                 {
+                    string di = null;
+                    if (depositRequest.DepositType == DepositTypeEnum.CryptoWallet)
+                    {
+                        var jObj = JObject.Parse(depositRequest.DepositInfo);
+                        jObj.Add("ActualExchangeAmount", request.ActualCryptoAmount);
+                        di = jObj.ToString(Formatting.None);
+                    }
+                    
                     if (request.ActualDeposit > 0)
-                        depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
+                        depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name, di);
                 }
                 
                 if (depositConfirmResult > 0)
                 {
-                    var tmp = new ApiResult<TransferResult>();
-                    if (_mainWalletType == 2)
-                    {
-                        var pendingFund = new PendingFund
-                        {
-                            CustId = depositConfirmResult
-                        };
-                        tmp = await Process(pendingFund);
-                    }
-                    else
-                    {
-                        tmp.ErrorCode = (int)ErrorCodeEnum.Success;
-                    }
-
-                    if (tmp.ErrorCode != 0)
-                    {
-                        depositConfirmResult = -4;
-                    }
-                    else
-                    {
                         var userLang = _custInfoBll.GetCustInfoWithCache(depositRequest.CustId).UserLang;
                         // Send message to player
                         var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
@@ -369,7 +382,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, request.TransId);
                         await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
-                    }
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
@@ -565,7 +577,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 var depositRequest = _depositBll.GetDepositRequest(depositReceipt.TransId);
 
-                if (depositRequest.Status is not ((int)DepositStatusEnum.Pending or (int)DepositStatusEnum.OnHold))
+                if (depositRequest.Status is not (DepositStatusEnum.Pending or DepositStatusEnum.OnHold))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Wrong status ,Can't upload receipt";
@@ -640,7 +652,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
                 
                 bool permission;
-                if (depositRequest.Status is (int)DepositStatusEnum.Approved or (int)DepositStatusEnum.Rejected or (int)DepositStatusEnum.Canceled )
+                if (depositRequest.Status is DepositStatusEnum.Approved or DepositStatusEnum.Rejected or DepositStatusEnum.Canceled )
                 {
                     permission = permissionList.Contains(78); //刪除權限
                 }
@@ -708,11 +720,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     apiResult.Message = "depositId already checked";
                 }
 
-                if (depositInfo.DepositType == (int)DepositTypeEnum.LocalBanking &&
-                    depositInfo.Status == (int)DepositStatusEnum.Pending || 
-                    depositInfo.Status == (int)DepositStatusEnum.OnHold)
+                if ((depositInfo.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet) &&
+                    depositInfo.Status == DepositStatusEnum.Pending || 
+                    depositInfo.Status == DepositStatusEnum.OnHold)
                 {
-                    var result = _depositBll.CheckDepositReceipt(depositInfo.SiteId ,request.TransId, User.Identity.Name);
+                    var result = _depositBll.CheckDepositReceipt(depositInfo.SiteId ,request.TransId, true ,User.Identity.Name);
                     if (result > 0)
                     {
                         apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -733,6 +745,47 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             catch (Exception e)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, $"CheckDepositReceipt Fail. {e.Message}");
+            }
+           
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// Deposit/UnCheckDepositReceipt UnCheck存款單審核
+        /// </summary>
+        /// <remarks/>
+        /// Http Method：POST
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 27, 79 })]
+        [HttpPost]
+        public ApiResult UnCheckDepositReceipt(CheckDepositReceiptRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var depositInfo = _depositBll.GetDepositRequest(request.TransId);
+
+                if (depositInfo.CheckReceipt == 0)
+                {
+                    apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                    apiResult.Message = "depositId hasn't be checked";
+                }
+
+                var result = _depositBll.CheckDepositReceipt(depositInfo.SiteId ,request.TransId,false, User.Identity.Name);
+                if (result > 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "UnCheckDepositReceipt fail.";
+                }
+                
+            }
+            catch (Exception e)
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, $"UnCheckDepositReceipt Fail. {e.Message}");
             }
            
             return apiResult;
@@ -797,24 +850,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         
         #region Private function
 
-        private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
-        {
-            return await _pendingFundBll.ProcessAsync(pendingFund);
-        }
-
-        private List<int> GetUsableActionButton(DepositRequest depositRequest)
-        {
+        private List<DepositActionEnum> GetUsableActionButton(DepositRequest depositRequest)
+        { 
             var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
             var usableList = _usableActionType[depositRequest.Status];
-            var usableActionButton = usableList.Where(item => permissionList.Contains(item)).ToList();
+            var usableActionButton = usableList
+                .Where(item => permissionList.Contains((int)item)).ToList();
                     
-            if (depositRequest.DepositType == (int) DepositTypeEnum.LocalBanking)
+            if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
             {
-                usableActionButton.Remove((int) DepositActionEnum.ManualApproved);
+                usableActionButton.Remove(DepositActionEnum.ManualApproved);
             }
-            else if (depositRequest.DepositType != (int) DepositTypeEnum.LocalBanking)
+            else if (depositRequest.DepositType is not DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
             {
-                usableActionButton.Remove((int) DepositActionEnum.Approved);
+                usableActionButton.Remove(DepositActionEnum.Approved);
             }
 
             return usableActionButton;

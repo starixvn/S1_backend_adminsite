@@ -11,8 +11,8 @@ namespace BackendSite.Service.Model
     {
         public string TransId { set; get; }
         public int DepositId { set; get; }
-        public int DepositType { set; get; }
-        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
+        public DepositTypeEnum DepositType { set; get; }
+        public string DepositTypeName => DepositType.ToString();
         public int CurrencyId { get; set; }
         public string IsoCode { set; get; }
         public int CustId { set; get; }
@@ -35,15 +35,15 @@ namespace BackendSite.Service.Model
         public IDepositInfo oDepositInfo =>
                 DepositType switch
                 {
-                    1 => JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo),
-                    2 => JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo),
-                    3 => JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo),
+                    DepositTypeEnum.OnlineBanking => JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo),
+                    DepositTypeEnum.MobilePay => JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo),
+                    DepositTypeEnum.LocalBanking => JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo),
                     _ => null
                 };
         public int FirstDeposit { set; get; }
-        public int Status { set; get; }
-        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
-        public List<int> UsableActionButton { set; get; }
+        public DepositStatusEnum Status { set; get; }
+        public string StatusName => Status.ToString();
+        public IEnumerable<DepositActionEnum> UsableActionButton { set; get; }
         public bool Receipt { set; get; }
         public string RefId { set; get; }
         private DateTimeOffset? _depositTime;
@@ -67,9 +67,9 @@ namespace BackendSite.Service.Model
         public string CalCode =>
             DepositType switch
             {
-                (int)DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
-                (int)DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
-                (int)DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
+                DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
+                DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
         public int IsKyc { set; get; }
@@ -110,13 +110,13 @@ namespace BackendSite.Service.Model
         public string ChannelName { set; get; }
         public int VipLevel { set; get; }
         public string Operator { set; get; }
-        public string BonusCode { set; get; }
-        public string BonusDescription { set; get; }
         public string Agent { set; get; }
         public string DepositFrom { set; get; }
         public string FromAccountNo { set; get; }
         public string FromBankCode { set; get; }
         public string FromBankName { set; get; }
+        public string BonusCode { set; get; }
+        public string BonusDescription { set; get; }
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
         public string Network { set; get; }
@@ -294,6 +294,9 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
         public int CurrencyId { get; set; }
+        public bool IsLocalPay { get; set; }
+        public int GroupId { get; set; }
+        public string Code { get; set; }
     }
     public class DepositComments
     {

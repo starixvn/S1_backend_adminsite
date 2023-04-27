@@ -1,13 +1,13 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using BackendSite.Service.Library;
-using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -27,7 +27,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ExcelBLL _excelBll;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly Tools _tools;
         private readonly ILogger<MemberController> _logger;
+        private readonly ICacheHelper _redisHelper;
+        private readonly DateTimeHelper _dateTimeHelper;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         public MemberController(IServiceProvider provider)
         {
@@ -42,7 +46,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _memberQuery = provider.GetRequiredService<IMemberQuery>();
             _vipLevelBll = provider.GetRequiredService<IVipLevelBLL>();
+            _tools = provider.GetRequiredService<Tools>();
             _logger = provider.GetRequiredService<ILogger<MemberController>>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -423,6 +431,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// Member/VipAutomationExclusion 設定VIP自動降級排除
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 86 })]
+        [HttpPost]
+        public async Task<ApiResult> VipAutomationExclusion(AutoVipDowngradeExclusionRequest custIdReq)
+        {
+            var result = await _vipLevelBll.VipAutomationExclusion(custIdReq.CustId, custIdReq.Enable, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success"
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set auto vip downgrade exclusion fail");
+        }
+
+        /// <summary>
         /// Member/SetCustTag 設定客戶標籤
         /// </summary>
         /// <remarks>
@@ -499,6 +533,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// 取得玩家在第三方遊戲帳號
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
+            try
+            {
+                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
         /// Member/EditFullName 修改用戶真實姓名
         /// </summary>
         /// <remarks>
@@ -525,7 +581,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-        
+
         [HttpPost]
         public async Task<ApiResult> CheckDuplicateName(SetFullNameRequest request)
         {
@@ -1105,29 +1161,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// 取得玩家在第三方遊戲帳號
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
-        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
-            try
-            {
-                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
         /// Member/GetCustomerBalanceInfo 取得客戶餘額資料
         /// </summary>
         /// <remarks>
@@ -1156,6 +1189,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Http Method：POST
         /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
         public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
@@ -1194,7 +1233,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = await _memberQuery.GetCustRealNameChangeLogAsync(request.CustId)
             };
         }
-        
+
         /// <summary>
         /// Member/GetCustomerAssociateBankUser 取得客戶相同銀行卡號的其他用戶資料
         /// </summary>
@@ -1250,8 +1289,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> EditCustPromotionWhiteList(SetCustPromotionWhiteListRequest request)
         {
             var result = await _memberCommand.SetCustPromotionWhiteListAsync(
-                request.CustId, 
-                request.IpEnable, 
+                request.CustId,
+                request.IpEnable,
                 request.DeviceEnable,
                 request.RealNameEnable,
                 User.Identity.Name);
@@ -1286,11 +1325,145 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = await _memberQuery.GetPromotionReceiveFailLogAsync(
-                    request.CustId, 
+                    request.CustId,
                     request.StartTime.ToUniversalTime().DateTime,
                     request.EndTime.ToUniversalTime().DateTime)
             };
         }
 
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, custInfo.CurrencyId);
+            var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
+
+            if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
+            {
+                var result = await _redisHelper.StringSetAsync(key, 0, TimeSpan.FromDays(1), RedisDataBase.Shared);
+
+                return new ApiResult
+                {
+                    ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                };
+            }
+
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = User.Identity.Name,
+                SiteId = custInfo.SiteId,
+                CurrencyId = custInfo.CurrencyId,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = null
+            });
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// Member/RegisterMember 會員註冊
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 84 })]
+        [HttpPost]
+        public async Task<ApiResult> RegisterMember(RegisterCustomerRequest request)
+        {
+            var result = await _memberCommand.RegisterMemberAsync(request.SiteId,
+                request.UserName,
+                _tools.MD5Encrypt(request.Userpwd),
+                request.Email,
+                request.CurrencyId,
+                request.MemberType,
+                request.AreaCode,
+                request.PhoneNo,
+                request.AffCode,
+                _tools.GetFromUrl(HttpContext),
+                User.Identity.Name);
+
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            switch (result)
+            {
+                case -1:
+                    throw new AdminException(ErrorCodeEnum.Fail, "This Currency not Support.");
+                case -2:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Username Validate.");
+                case -3:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Password Validate.");
+                case -4:
+                    throw new AdminException(ErrorCodeEnum.Fail, "");
+                case -5:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Username Not Available.");
+                case -7:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Promo Code Incorrect.");
+                case -9:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Email Already Exist.");
+                case -10:
+                    throw new AdminException(ErrorCodeEnum.Fail, "PhoneNo Already Exist.");
+                case -19:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Affiliate Not Exist.");
+                default:
+                    throw new AdminException(ErrorCodeEnum.Fail, "Username Not Available.");
+            }
+        }
+
+        /// <summary>
+        /// Member/GetCustTpGameTypeSetting 取得用戶TpGameType 設定
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 85 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<CustTpGameTypeSettingForFrontendUse>>> GetCustTpGameTypeSetting(GetTpGameTypeSettingRequest request)
+        {
+            return new ApiResult<IEnumerable<CustTpGameTypeSettingForFrontendUse>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = await _memberQuery.GetCustTpGameTypeSettingAsync(
+                    request.CustId,
+                    request.GetDataTypes)
+            };
+        }
+
+        /// <summary>
+        /// Member/SetCustTpGameTypeList 修改用戶TpGameType 設定
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 85 })]
+        [HttpPost]
+        public async Task<ApiResult> SetCustTpGameTypeSetting(SetTpGameTypeSettingRequest request)
+        {
+            var result = await _memberCommand.SetCustTpGameTypeSettingAsync(
+                request.CustId,
+                request.SetDataType,
+                request.TpGameTypes,
+                User.Identity.Name);
+
+            if (result)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Update Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
     }
 }

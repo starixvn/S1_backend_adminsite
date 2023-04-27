@@ -247,6 +247,7 @@ namespace BackendSite.Service.DAL
 
         public bool SendMessageBatch(BatchPersonalMsg req)
         {
+
             return _mainDbClient.Execute("Admin_SendMsgBatchByStatus_Ins_V3",
                 new DynamicParameters(new
                 {
@@ -754,7 +755,6 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryAsync<BankInfoDetail>("Admin_CustBankDetailByCustId_Get", new DynamicParameters(new { CustId = custId }));
         }
-
         public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
             var p = new DynamicParameters();

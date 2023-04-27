@@ -1,6 +1,5 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
-using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;

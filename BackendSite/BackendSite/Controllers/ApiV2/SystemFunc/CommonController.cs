@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
@@ -32,6 +33,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         #endregion
 
         #region API Model
+
+        public class CryptoAmountCalculationRequest
+        {
+            public decimal CryptoAmount { get; set; }
+            public decimal ExchangeRate { get; set; }
+            public CurrencyEnum CurrencyId { get; set; }
+        }
+        
+        public class CryptoAmountCalculationResponse
+        {
+            public decimal Amount { get; set; }
+        }
+        
         #endregion
 
         /// <summary>
@@ -49,6 +63,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<object>();
             var normalCurrencyList = Enumerable.Empty<int>();
             var vipCurrencyList = Enumerable.Empty<int>();
+            var allSiteEnableCurrencyList = Enumerable.Empty<int>();
+
             try
             {
                 if (User.Identity.IsAuthenticated)
@@ -71,7 +87,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                         if (brandData != null)
                             normalCurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(brandData.CurrencyList);
                     }
+
                     vipCurrencyList = _rebateManageBLL.GetRebatePeriodList(brand).Select(x => x.CurrencyId).Distinct();
+                    allSiteEnableCurrencyList = _serverInfoBLL.GetSiteList().ToList().SelectMany(r => r.ICurrencyList).Distinct();
                 }
                 else
                 {
@@ -81,7 +99,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 {
                     SiteCurrencyList = normalCurrencyList,
                     RewardsCurrencyList = normalCurrencyList.Intersect(_RewardCurrencyList),
-                    VipCurrencyList = normalCurrencyList.Intersect(vipCurrencyList)
+                    VipCurrencyList = normalCurrencyList.Intersect(vipCurrencyList),
+                    AllSiteEnableCurrencyList = allSiteEnableCurrencyList
                 };
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -93,6 +112,34 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
 
             return apiResult;
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult> CheckQrCodeImg(IFormFile file)
+        {
+            var result = await QrCodeExtension.DecodeFromImage(file);
+
+            return string.IsNullOrEmpty(result)
+                ? new ApiResult((int)ErrorCodeEnum.Fail, "Incorrect QR code image.")
+                : new ApiResult((int)ErrorCodeEnum.Success, string.Empty);
+        }
+        
+        [HttpPost]
+        public ApiResult<CryptoAmountCalculationResponse> CryptoAmountCalculation(CryptoAmountCalculationRequest request)
+        {
+            var tmpAmount = request.CryptoAmount / request.ExchangeRate;
+            var amount = request.CurrencyId is CurrencyEnum.VND or CurrencyEnum.INR
+                ? Math.Floor(tmpAmount)
+                : Math.Floor(tmpAmount * 100) / 100; // VND、INR以外保留小數兩位
+            
+            return new ApiResult<CryptoAmountCalculationResponse>
+            {
+                Data = new CryptoAmountCalculationResponse
+                {
+                    Amount = amount
+                },
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
     }
 }

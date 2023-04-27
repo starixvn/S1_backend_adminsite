@@ -705,6 +705,11 @@ namespace BackendSite.Service.DAL
             
             return false;
         }
+        
+        public async Task<IEnumerable<PayGroup>> GetPayGroup()
+        {
+            return await _reportDbClient.QueryAsync<PayGroup>("Service_PayGroup_Get");
+        }
 
         #endregion
     }

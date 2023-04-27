@@ -46,6 +46,7 @@ namespace BackendSite
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
             services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
+            services.AddSingleton<DateTimeHelper>();
 
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -85,9 +86,9 @@ namespace BackendSite
             services.AddTransient<IIovationReportBLL, IovationReportBLL>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
-            services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<IVipLevelBLL, VipLevelBLL>();
             services.AddTransient<ITagBLL, TagBLL>();
+            services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
             services.AddTransient<IMpaMarketingWithdrawalAmountBLL, MpaMarketingWithdrawalAmountBLL>();
             services.AddTransient<IMpaMarketingDepositAmountBLL, MpaMarketingDepositAmountBLL>();
@@ -95,33 +96,33 @@ namespace BackendSite
             services.AddTransient<IWithdrawalStateTransferBLL, WithdrawalStateTransferBLL>();
             services.AddTransient<IWithdrawalReceiveBLL, WithdrawalReceiveBLL>();
             services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
+            services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
+
 
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
             services.AddTransient<IVipLevelService, VipLevelService>();
             services.AddTransient<ITagService, TagService>();
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
-            services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
-            services.AddTransient<IIovationReportService, IovationReportService>();
             services.AddTransient<IDeviceService, DeviceService>();
             services.AddTransient<IAdminLogService, AdminLogService>();
             services.AddTransient<IMarketingService, MarketingService>();
             services.AddTransient<IAffiliateApiService, AffiliateApiService>();
             services.AddTransient<IBonusApiService, BonusApiService>();
+            services.AddTransient<IIovationReportService, IovationReportService>();
             services.AddTransient<BetListService>();
             services.AddTransient<IMpaWinLossService, MpaWinLossService>();
             services.AddTransient<IMpaCommonService, MpaCommonService>();
             services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
             services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
             services.AddTransient<IAutoWithdrawalRuleService, AutoWithdrawalRuleService>();
-
-
-
+            
+            
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
