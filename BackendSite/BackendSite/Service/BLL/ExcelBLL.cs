@@ -3,6 +3,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Reflection;
 using BackendSite.Attributes;
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL
 {
@@ -30,6 +31,41 @@ namespace BackendSite.Service.BLL
         public bool IsValidFile(string contentType)
         {
             return _excelContentType.Exists(a => a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public List<ExcelData> Read(IFormFile formFile) 
+        {
+            var excelList = new List<ExcelData>();
+            var excelPkg = new ExcelPackage(formFile.OpenReadStream());
+            var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+            var isLastRow = false;
+            var rowId = 2; // 因為有標題列，所以從第2列開始讀起
+
+            do // 讀取資料，直到讀到空白列為止
+            {
+                var custUsername = sheet.Cells[rowId, 1].Text.Trim();
+                var sabaId = sheet.Cells[rowId, 2].Text.Trim();
+                var tmp = sabaId.Split('_');
+                int? custId = (tmp.Length == 2 && int.TryParse(tmp[1], out var id)) ? id : null;
+
+                if (string.IsNullOrEmpty(custUsername) && custId == null)
+                {
+                    isLastRow = true;
+                }
+                else
+                {
+                    excelList.Add(new ExcelData
+                    {
+                        CustId = custId,
+                        CustUserName = string.IsNullOrEmpty(custUsername) ? null : custUsername,
+                        SabaId = sabaId,
+                        RowId = rowId,
+                    });
+                    rowId += 1;
+                }
+            } while (!isLastRow);
+
+            return excelList;
         }
 
         public byte[] ExportToMultiSheet(List<ExportDataToExcel> t)

@@ -210,7 +210,7 @@ namespace BackendSite.Service.DAL
             return transId;
         }
         
-        public async Task<int> SetDepositReceiptPic(int siteId ,int custId, int depositId, int receiptNo ,string picFileName, byte[] depositPic ,string creator)
+        public async Task<int> SetDepositReceiptPic(int siteId ,int custId, int depositId, int receiptNo ,string picFileName ,string creator)
         {
             var result = 0;
             
@@ -225,10 +225,10 @@ namespace BackendSite.Service.DAL
                 props.Add("DepositId", depositId);
                 props.Add("ReceiptNo", receiptNo);
                 props.Add("PicFileName", picFileName);
-                props.Add("DepositPic", depositPic);
+                //props.Add("DepositPic", depositPic);
                 props.Add("Creator", creator);
                 props.Add("CreateFrom", 2);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set_V2", trans , props );
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Set_V3", trans, props);
 
                 if (result > 0)
                 {

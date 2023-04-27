@@ -1828,7 +1828,7 @@ namespace BackendSite.Controllers.Api
                 var msg = new StringBuilder();
                 msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
                 var authData = _authorizeBll.GetAuthData();
-                _messageBll.SendMessageToPlayer("Bonus Service", title, msg.ToString(), data.CustId, authData.UserId);
+                await _messageBll.SendMessageAsync(new Message( "Bonus Service", data.CustId, data.UserLang, title, msg.ToString()));
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else

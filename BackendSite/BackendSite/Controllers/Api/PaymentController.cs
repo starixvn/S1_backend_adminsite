@@ -257,7 +257,8 @@ namespace BackendSite.Controllers.Api
                 0,
                 10, 
                 request.PageNumber, 
-                out var pageInfo);
+                out var pageInfo,
+                new List<int>());
 
             return new ApiListResult<FinancialLog>(ErrorCodeEnum.Success, pageInfo, data);
         }
@@ -452,7 +453,8 @@ namespace BackendSite.Controllers.Api
                 ref PageNumber,
                 ref TotalPages,
                 ref RowCount,
-                new TimeSpan(8,0,0));
+                new TimeSpan(8,0,0),
+                false);
             //
             // foreach (var data in result)
             // {

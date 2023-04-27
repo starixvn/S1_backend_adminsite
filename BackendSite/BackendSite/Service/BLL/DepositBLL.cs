@@ -131,7 +131,8 @@ namespace BackendSite.Service.BLL
                 fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
                 fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
 
-                await InsertDepositReceipt(deposit.SiteId, deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
+                //搬移至AWS
+                // await InsertDepositReceipt(deposit.SiteId, deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
             }
 
             if (!string.IsNullOrEmpty(transId))
@@ -147,10 +148,10 @@ namespace BackendSite.Service.BLL
             return await depositService.DelDepositReceiptPic(siteId ,custId, depositId , picFileName ,receiptNo ,Operator);
         }
         
-        public async Task<int> InsertDepositReceipt(int siteId, int custId, string transId, int receiptNo , string fileName, byte[] fileBytes , string creator)
+        public async Task<int> InsertDepositReceipt(int siteId, int custId, string transId, int receiptNo , string fileName, string creator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-            return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName, fileBytes ,creator);
+            return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName ,creator);
         }
 
         public int CheckDepositReceipt(int siteId ,string transId,  string Operator)
@@ -512,7 +513,6 @@ namespace BackendSite.Service.BLL
             if (!depositService.SetDepositRequestAmount(input))
             {
                 scope.Dispose();
-
                 return 0;
             }
 
@@ -531,14 +531,24 @@ namespace BackendSite.Service.BLL
             if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
                 scope.Dispose();
-
                 return 0;
             }
 
-            if (!custInfoService.AddCustNote(custId, $"SetDepositRequestAmount:{input.After.Amount}", input.Operator))
+            var comment = $"Set Deposit Amount ,Change {input.Before.Amount} to {input.After.Amount}";
+            
+            var m = Regex.Match(input.TransId, @"\d+");
+            int.TryParse(m.Value, out var depositId);
+            var logResult = depositService.SetDepositLog(depositId, input.SiteId, comment, (int)DepositStatusEnum.SetDepositAmount, input.After.Amount, input.Operator);
+            
+            if (logResult < 1)
             {
                 scope.Dispose();
-
+                return 0;
+            }
+            
+            if (!custInfoService.AddCustNote(custId, comment, input.Operator))
+            {
+                scope.Dispose();
                 return 0;
             }
 

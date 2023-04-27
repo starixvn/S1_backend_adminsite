@@ -390,53 +390,6 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Message/SendPersonalMsg 送出指定客戶個人訊息
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message >  Click [Add] > Click [Send]
-        /// 
-        /// </remarks>
-        /// <param name="CustId"></param>
-        /// <param name="Title"></param>
-        /// <param name="Content"></param>
-        /// <param name="PageNumber"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
-        [HttpPost]
-        public ApiListResult<PersonalMsg> SendPersonalMsg([FromForm] int CustId, [FromForm] string Title,
-            [FromForm] string Content, [FromForm] int PageNumber)
-        {
-            var PageSize = 10;
-            var TotalPages = 0;
-            var RowCount = 0;
-            var apiResult = new ApiListResult<PersonalMsg>();
-            try
-            {
-                var authData = authorizeBLL.GetAuthData();
-                messageBLL.SendMessageToPlayer(authData.UserName, Title, Content, CustId, authData.UserId);
-                apiResult.Data =
-                    messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
-                apiResult.ErrorCode = 0;
-
-                apiResult.PageNumber = PageNumber;
-                apiResult.RowCount = RowCount;
-                apiResult.TotalPages = TotalPages;
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = 999;
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
         /// Message/DeletePersonalMsg 刪除指定客戶個人訊息
         /// </summary>
         /// <remarks>
@@ -461,7 +414,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                await messageBLL.DeletePersonalMsg(Id, IsBatch, User.Identity.Name);
+                await messageBLL.DeletePersonalMsg(Id, User.Identity.Name);
                 apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
@@ -671,7 +624,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                messageBLL.DeleteBatchMessage(batchId);
+                var siteId = SelectSite.First();
+                var result = messageBLL.DeleteBatchMessage(siteId, batchId, User.Identity.Name).Result;
                 var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
                 var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
                 apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize,

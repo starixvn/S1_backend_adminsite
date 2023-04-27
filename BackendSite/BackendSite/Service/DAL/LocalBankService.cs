@@ -28,7 +28,7 @@ namespace BackendSite.Service.DAL
                 _CurrencyId = currencyId
             });
             
-            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get", p);
+            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get_V2", p);
 
             return a;
         }
@@ -50,9 +50,9 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V3", new { _SiteId = siteId });
         }
         
-        public IEnumerable<EWalletPay> GetEWalletPayList()
+        public IEnumerable<BankInfoPay> GetEWalletPayList(int siteId)
         {
-            return _reportDbClient.Query<EWalletPay>("Common_EWalletPayForPayout_Get");
+            return _reportDbClient.Query<BankInfoPay>("Common_EWalletPayForPayout_Get", new { _SiteId = siteId });
         }
 
         public IEnumerable<BankInfoPay> GetCryptoPayList(int siteId)
