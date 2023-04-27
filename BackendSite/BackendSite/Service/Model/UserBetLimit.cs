@@ -149,7 +149,6 @@ namespace BackendSite.Service.Model
     public class CustBetLimitV2
     {
         public string UserName { get; set; }
-        public int CustId { get; set; }
         public List<TpBetSettingV2> BetSetting { get; set; }
     }
     public class TpBetSettingV2 : TpBetSetting

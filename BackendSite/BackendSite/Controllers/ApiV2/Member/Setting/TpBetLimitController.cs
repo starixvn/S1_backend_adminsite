@@ -126,40 +126,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         [HttpPost]
         public async Task<ApiResult> Set(ApiRequestWithLog<CustBetLimitV2> req)
         {
-            var updateOperator = User.Identity.Name;
             var customer = await _custInfoBll.GetCustId(null, req.After.UserName, req.SiteId);
             if (customer == null)
             {
                 throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
             }
-            var betSetting = req.After.BetSetting.GroupBy(x => x.TpCategory).Select(x => new BetSetting
-            {
-                TpCategory = x.Key,
-                TpCategoryName = x.FirstOrDefault()?.TpCategoryName,
-                TpBetSetting = x.Where(z=> z.Checked).Select(y => new TpBetSetting
-                {
-                    LimitGroup = y.LimitGroup,
-                    LimitRange = y.LimitRange,
-                    GameTypeId = y.GameTypeId,
-                    GameTypeName = y.GameTypeName
-                }).ToList()
-            }).ToList();
 
-            var custBetLimit = new ApiRequestWithLog<CustBetLimit>()
-            {
-                SiteId = req.SiteId,
-                CurrencyId = req.CurrencyId,
-                TransId = req.TransId,
-                Before = null,
-                After = new CustBetLimit()
-                {
-                    UserName = req.After.UserName,
-                    BetSetting = betSetting,
-                    CustId = customer.CustId
-                }
-            };
-
-            var result = await _userBetLimitBll.SetUserBetLimit(new ParamsWithLog<CustBetLimit>(custBetLimit, updateOperator));
+            var result = await _userBetLimitBll.SetUserBetLimit(req, customer.CustId, User.Identity.Name);
             //result: 1 (新增成功),2 (修改成功)
             var success = result == 1 || result == 2;
 

@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.BetLimit;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
@@ -23,9 +24,36 @@ namespace BackendSite.Service.BLL
                 .Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
         }
 
-        public async Task<int> SetUserBetLimit(ParamsWithLog<CustBetLimit> input)
+        public async Task<int> SetUserBetLimit(ApiRequestWithLog<CustBetLimitV2> req, int custId, string updateOperator)
         {
-            return await _userBetLimitService.InsertOrUpdate(input);
+            var betSetting = req.After.BetSetting.GroupBy(x => x.TpCategory).Select(x => new BetSetting
+            {
+                TpCategory = x.Key,
+                TpCategoryName = x.FirstOrDefault()?.TpCategoryName,
+                TpBetSetting = x.Where(z => z.Checked).Select(y => new TpBetSetting
+                {
+                    LimitGroup = y.LimitGroup,
+                    LimitRange = y.LimitRange,
+                    GameTypeId = y.GameTypeId,
+                    GameTypeName = y.GameTypeName
+                }).ToList()
+            }).ToList();
+
+            var custBetLimit = new ApiRequestWithLog<CustBetLimit>()
+            {
+                SiteId = req.SiteId,
+                CurrencyId = req.CurrencyId,
+                TransId = req.TransId,
+                Before = null,
+                After = new CustBetLimit()
+                {
+                    UserName = req.After.UserName,
+                    BetSetting = betSetting,
+                    CustId = custId
+                }
+            };
+            var betLimit = new ParamsWithLog<CustBetLimit>(custBetLimit, updateOperator);
+            return await _userBetLimitService.InsertOrUpdate(betLimit);
         }
 
         public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, IEnumerable<int> currencyIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
