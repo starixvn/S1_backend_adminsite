@@ -284,7 +284,7 @@ namespace BackendSite.Service.BLL
                     DeviceType = a.DeviceType,
                     AssociateCount = a.AssociateCount,
                     LastUpdateTime = a.LastUpdateTime
-                });
+                }).OrderByDescending(x => x.LastUpdateTime);
             }
 
             var shield = await _deviceService.GetCustShieldRiskInfoList(custId);
@@ -297,7 +297,7 @@ namespace BackendSite.Service.BLL
                 DeviceType = a.Platform,
                 AssociateCount = a.AssociateCount,
                 LastUpdateTime = a.LastUpdateTime
-            });
+            }).OrderByDescending(x=> x.LastUpdateTime);
         }
 
         public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId)
