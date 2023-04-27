@@ -1,4 +1,5 @@
-﻿using BackendSite.Extensions;
+﻿using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.BetLimit;
 using BackendSite.Service.Library;
@@ -6,21 +7,22 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using NPOI.POIFS.Crypt.Dsig;
 
 namespace BackendSite.Service.BLL
 {
     public class UserBetLimitBLL
     {
+        private readonly CustInfoBLL _custInfoBll;
         private readonly UserBetLimitService _userBetLimitService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<UserBetLimitBLL> _logger;
 
-        public UserBetLimitBLL(UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, ILogger<UserBetLimitBLL> logger)
+        public UserBetLimitBLL(CustInfoBLL custInfoBll, UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, ILogger<UserBetLimitBLL> logger)
         {
             _userBetLimitService = userBetLimitService;
             _adjustmentLogReportService = adjustmentLogReportService;
             _logger = logger;
+            _custInfoBll = custInfoBll;
         }
 
         public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
@@ -31,45 +33,32 @@ namespace BackendSite.Service.BLL
                 .Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
         }
 
-        public async Task<int> SetUserBetLimit(ApiRequestWithLog<CustBetLimitV2> req, int custId, string updateOperator)
+        public async Task<int> SetUserBetLimit(ApiRequestWithLog<CustBetLimitV2> req, string updateOperator)
         {
-            var betSetting = req.After.BetSetting.GroupBy(x => x.TpCategory).Select(x => new BetSetting
+            var customer = await _custInfoBll.GetCustId(null, req.After.UserName, req.SiteId);
+            if (customer == null)
             {
-                TpCategory = x.Key,
-                TpCategoryName = x.FirstOrDefault()?.TpCategoryName,
-                TpBetSetting = x.Where(z => z.Checked).Select(y => new TpBetSetting
-                {
-                    LimitGroup = y.LimitGroup,
-                    LimitRange = y.LimitRange,
-                    GameTypeId = y.GameTypeId,
-                    GameTypeName = y.GameTypeName
-                }).ToList()
-            }).ToList();
+                throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
+            }
+            var custId = customer.CustId;
+            var siteId = customer.SiteId;
+            var currencyId = customer.CurrencyId;
 
-            var custBetLimit = new ApiRequestWithLog<CustBetLimit>()
-            {
-                SiteId = req.SiteId,
-                CurrencyId = req.CurrencyId,
-                TransId = req.TransId,
-                Before = null,
-                After = new CustBetLimit()
-                {
-                    UserName = req.After.UserName,
-                    BetSetting = betSetting,
-                    CustId = custId
-                }
-            };
-            var betLimit = new ParamsWithLog<CustBetLimit>(custBetLimit, updateOperator);
-            var result = await _userBetLimitService.SetBetLimit(req.SiteId, custId, JsonConvert.SerializeObject(betLimit.After.BetSetting), updateOperator);
+            var result = await _userBetLimitService.SetBetLimit(req.SiteId, custId, JsonConvert.SerializeObject(req.After.BetSetting), updateOperator);
             if (result > 0) 
             {
+                var after = new CustBetLimit()
+                {
+                    UserName = req.After.UserName,
+                    //BetSetting = betSetting
+                };
                 var logParam = new CreateAdminAdjustmentInfoLogInput
                 {
-                    SiteId = req.SiteId,
-                    CurrencyId = req.CurrencyId,
+                    SiteId = siteId,
+                    CurrencyId = currencyId,
                     MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
                     ActionType = result == 1 ? ActionType.Create : ActionType.Update,
-                    AfterDetailInfo = betLimit.After.ToLog(),
+                    AfterDetailInfo = after.ToLog(),
                     Operator = updateOperator
                 };
 

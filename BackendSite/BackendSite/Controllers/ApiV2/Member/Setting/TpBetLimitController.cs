@@ -126,20 +126,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         [HttpPost]
         public async Task<ApiResult> Set(ApiRequestWithLog<CustBetLimitV2> req)
         {
-            var customer = await _custInfoBll.GetCustId(null, req.After.UserName, req.SiteId);
-            if (customer == null)
+            var result = await _userBetLimitBll.SetUserBetLimit(req, User.Identity.Name);
+            if (result == 1 || result == 2) 
             {
-                throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
             }
-
-            var result = await _userBetLimitBll.SetUserBetLimit(req, customer.CustId, User.Identity.Name);
-            //result: 1 (新增成功),2 (修改成功)
-            var success = result == 1 || result == 2;
-
-            return new ApiResult
-            {
-                ErrorCode = success ? (int)ErrorCodeEnum.Success : result,
-            };
+            throw new AdminException("Set bet limit failed");
         }
 
         /// <summary>
