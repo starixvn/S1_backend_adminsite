@@ -1,19 +1,26 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.BetLimit;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using NPOI.POIFS.Crypt.Dsig;
 
 namespace BackendSite.Service.BLL
 {
     public class UserBetLimitBLL
     {
         private readonly UserBetLimitService _userBetLimitService;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly ILogger<UserBetLimitBLL> _logger;
 
-        public UserBetLimitBLL(UserBetLimitService userBetLimitService)
+        public UserBetLimitBLL(UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, ILogger<UserBetLimitBLL> logger)
         {
             _userBetLimitService = userBetLimitService;
+            _adjustmentLogReportService = adjustmentLogReportService;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
@@ -53,7 +60,25 @@ namespace BackendSite.Service.BLL
                 }
             };
             var betLimit = new ParamsWithLog<CustBetLimit>(custBetLimit, updateOperator);
-            return await _userBetLimitService.InsertOrUpdate(betLimit);
+            var result = await _userBetLimitService.SetBetLimit(req.SiteId, custId, JsonConvert.SerializeObject(betLimit.After.BetSetting), updateOperator);
+            if (result > 0) 
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = req.SiteId,
+                    CurrencyId = req.CurrencyId,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
+                    ActionType = result == 1 ? ActionType.Create : ActionType.Update,
+                    AfterDetailInfo = betLimit.After.ToLog(),
+                    Operator = updateOperator
+                };
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            }
+            return result;
         }
 
         public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, IEnumerable<int> currencyIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)

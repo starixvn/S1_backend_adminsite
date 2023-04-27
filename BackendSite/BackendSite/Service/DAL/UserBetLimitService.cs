@@ -10,26 +10,26 @@ namespace BackendSite.Service.DAL
 {
     public class UserBetLimitService
     {
-        #region Fields
-
-        private readonly IConfiguration _configuration;
         public MySqlClient MainDbClient { get; }
         public MySqlClient ReportDbClient { get; }
 
-        #endregion
-
-        #region Constructor
 
         public UserBetLimitService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             MainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             ReportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        #endregion
-
-        #region Methods
+        public Task<int> SetBetLimit(int siteId, int custId, string betSetting, string updateOperator)
+        {
+            return MainDbClient.ExecuteAsync("Admin_CustBetLimit_Set", new 
+            {
+                _CustId = custId,
+                _SiteId = siteId,
+                _BetSetting = betSetting,
+                _Operator = updateOperator
+            });
+        }
 
         public async Task<int> InsertOrUpdate(ParamsWithLog<CustBetLimit> input)
         {
@@ -168,7 +168,5 @@ namespace BackendSite.Service.DAL
         {
             return await ReportDbClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
         }
-
-        #endregion
     }
 }
