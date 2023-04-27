@@ -118,27 +118,27 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="lbl_DepositApprovedContent" xml:space="preserve">
-    <value>សូមអបអរសាទរ! ការដាក់ប្រាក់ {០} របស់អ្នក ត្រូវបានអនុម័ត! ឥឡូវនេះ ចំនួនទឹកប្រាក់ត្រូវបានបញ្ចូលទៅក្នុងគណនីរបស់អ្នក។ សូមជូនពរអ្នកជួបតែសំណាងល្អក្នុងការភ្នាល់!</value>
+    <value>សូមអបអរសាទរ! ការដាក់ប្រាក់ {0} របស់អ្នក ត្រូវបានអនុម័ត! ឥឡូវនេះ ចំនួនទឹកប្រាក់ត្រូវបានបញ្ចូលទៅក្នុងគណនីរបស់អ្នក។ សូមជូនពរអ្នកជួបតែសំណាងល្អក្នុងការភ្នាល់!</value>
   </data>
   <data name="lbl_DepositApprovedTitle" xml:space="preserve">
-    <value>ការដាក់ប្រាក់ {០} របស់អ្នក ត្រូវបានអនុម័ត!</value>
+    <value>ការដាក់ប្រាក់ {0} របស់អ្នក ត្រូវបានអនុម័ត!</value>
   </data>
   <data name="lbl_DepositRejectContent" xml:space="preserve">
     <value>សូមអភ័យទោសដែលជូនដំណឹងថាការដាក់ប្រាក់ {0} របស់អ្នក ត្រូវបានបដិសេធ។ ប្រសិនបើអ្នកមានសំណួរបន្ថែម សូមមេត្តាទាក់ទង CSD សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។</value>
   </data>
   <data name="lbl_DepositRejectTitle" xml:space="preserve">
-    <value>ការដាក់ប្រាក់ {០} របស់អ្នក ត្រូវបានបដិសេធ!</value>
+    <value>ការដាក់ប្រាក់ {0} របស់អ្នក ត្រូវបានបដិសេធ!</value>
   </data>
   <data name="lbl_WithdrawalApprovedContent" xml:space="preserve">
-    <value>សូមអរគុណសម្រាប់ការលេងជាមួយពួកយើង! ការដកប្រាក់ {០}របស់អ្នក ត្រូវបានអនុម័ត យើងសង្ឃឹមថានឹងជួបអ្នកម្តងទៀតនៅពេលក្រោយ!</value>
+    <value>សូមអរគុណសម្រាប់ការលេងជាមួយពួកយើង! ការដកប្រាក់ {0}របស់អ្នក ត្រូវបានអនុម័ត យើងសង្ឃឹមថានឹងជួបអ្នកម្តងទៀតនៅពេលក្រោយ!</value>
   </data>
   <data name="lbl_WithdrawalApprovedTitle" xml:space="preserve">
-    <value>ការដកប្រាក់ {០} របស់អ្នក ត្រូវបានអនុម័ត!</value>
+    <value>ការដកប្រាក់ {0} របស់អ្នក ត្រូវបានអនុម័ត!</value>
   </data>
   <data name="lbl_WithdrawalRejectContent" xml:space="preserve">
-    <value>សូមអភ័យទោសដែលជូនដំណឹងថា ការដកប្រាក់ {០} របស់អ្នក ត្រូវបានបដិសេធ។ ប្រសិនបើអ្នកមានសំណួរបន្ថែម សូមមេត្តាទាក់ទង CSD សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។</value>
+    <value>សូមអភ័យទោសដែលជូនដំណឹងថា ការដកប្រាក់ {0} របស់អ្នក ត្រូវបានបដិសេធ។ ប្រសិនបើអ្នកមានសំណួរបន្ថែម សូមមេត្តាទាក់ទង CSD សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។</value>
   </data>
   <data name="lbl_WithdrawalRejectTitle" xml:space="preserve">
-    <value>ការដកប្រាក់ {០} របស់អ្នក ត្រូវបានបដិសេធ!</value>
+    <value>ការដកប្រាក់ {0} របស់អ្នក ត្រូវបានបដិសេធ!</value>
   </data>
 </root>
