@@ -285,7 +285,7 @@ namespace BackendSite.Service.BLL
                 (int) BonusInfoStatusEnum.Running,
                 (int) BonusInfoStatusEnum.TrasferOut,
             };
-            return await _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), @operator);
+            return await _bonusInfoService.CancelBonusByBonusId(bonusId, JsonConvert.SerializeObject(statusList), @operator);
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
@@ -503,7 +503,7 @@ namespace BackendSite.Service.BLL
                 await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
-            
+
             await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
