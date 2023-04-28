@@ -74,24 +74,28 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
+        public async Task<DataWithPage<UserBetLimit>> GetUserBetLimit(int siteId, IEnumerable<int> currencyIds,string userName, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
+            p.Add("_SiteId", siteId);
             p.Add("_CurrencyIds", JsonConvert.SerializeObject(currencyIds));
             p.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
-            p.Add("_StartDate", startDate.DateTime);
-            p.Add("_EndDate", endDate.DateTime.AddDays(1).AddSeconds(-1));
+            p.Add("_StartDate", startTime);
+            p.Add("_EndDate", endTime);
             p.Add("_PageSize", Math.Abs(pageSize));
             p.Add("_PageNumber", Math.Abs(pageNumber));
             p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
          
-            var result = ReportDbClient.Query<UserBetLimit>("Admin_CustBetLimit_Get_V4", p);
-            totalPages = p.Get<int?>("_TotalPages") ?? 0;
-            rowCount = p.Get<int?>("_RowCount") ?? 0;
-            return result;
+            var result = await ReportDbClient.QueryAsync<UserBetLimit>("Admin_CustBetLimit_Get_V5", p);
+            return new DataWithPage<UserBetLimit>()
+            {
+                Data = result,
+                PageNumber = pageNumber,
+                TotalPages = p.Get<int?>("_TotalPages") ?? 0,
+                RowCount = p.Get<int?>("_RowCount") ?? 0
+            };
         }
 
         public async Task<int> Delete(ParamsWithLog<DeleteCustBetLimit> input)

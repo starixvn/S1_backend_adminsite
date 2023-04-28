@@ -120,12 +120,9 @@ namespace BackendSite.Service.Model
 
     public class UserBetLimit
     {
-        public string SiteName { get; set; }
-        public int SiteId { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public int CurrencyId { get; set; }
-        public int Status { get; set; }
         public string Creator { get; set; }
         public DateTimeOffset CreateTime { get; set; }
         public string UpdateOperator { get; set; }
