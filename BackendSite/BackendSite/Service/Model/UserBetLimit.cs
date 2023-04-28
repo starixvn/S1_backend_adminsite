@@ -18,14 +18,19 @@ namespace BackendSite.Service.Model
         public string LimitGroup { get; set; }
         public string LimitRange { get; set; }
     }
+
     public class SportsSetting : BetLimitSetting
     {
-        [LogIgnore]
         public int Min { get; set; }
         public int Max { get; set; }
         public int MaxPerMatch { get; set; }
     }
-
+    public class SetBetLimit
+    {
+        public int TpId { set; get; }
+        public int CustId { set; get; }
+        public string BetSetting { get; set; }
+    }
 
     public class TpCategoryData
     {

@@ -168,5 +168,10 @@ namespace BackendSite.Service.DAL
         {
             return await ReportDbClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
         }
+
+        public Task<int> GetTpIdByGameType(int gameType)
+        {
+            return ReportDbClient.QueryFirstAsync<int>("Admin_TpIdByGameType_Get", new { _GameType = gameType });
+        }
     }
 }
