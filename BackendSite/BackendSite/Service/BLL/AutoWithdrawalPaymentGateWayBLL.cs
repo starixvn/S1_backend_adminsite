@@ -6,7 +6,7 @@ namespace BackendSite.Service.BLL
 {
     public class AutoWithdrawalPaymentGateWayBLL : IAutoWithdrawalPaymentGateWayBLL
     {
-        public record AutoWithdrawalPaymentGateWayDto(int? PayId, int? ChannelId, WithdrawalTypeEnum WithdrawalType);
+        public record AutoWithdrawalPaymentGateWayDto(int? PayId, int? ChannelId, string PayName, WithdrawalTypeEnum WithdrawalType);
 
         private readonly IWithdrawalAccountBLL _withdrawalAccountBll;
         private readonly BankDetailBLL _bankDetailBll;
@@ -31,7 +31,7 @@ namespace BackendSite.Service.BLL
 
                     if (bankInfo != null)
                     {
-                        return new AutoWithdrawalPaymentGateWayDto(bankInfo.PayId, bankInfo.ChannelId, WithdrawalTypeEnum.OnlinePayment);
+                        return new AutoWithdrawalPaymentGateWayDto(bankInfo.PayId, bankInfo.ChannelId, bankInfo.PayName, WithdrawalTypeEnum.OnlinePayment);
                     }
 
                     break;
@@ -44,7 +44,7 @@ namespace BackendSite.Service.BLL
                     var cryptoInfo = cryptoOnline.FirstOrDefault();
                     if (cryptoInfo != null)
                     {
-                        return new AutoWithdrawalPaymentGateWayDto(cryptoInfo.PayId, cryptoInfo.ChannelId, WithdrawalTypeEnum.CryptoPay);
+                        return new AutoWithdrawalPaymentGateWayDto(cryptoInfo.PayId, cryptoInfo.ChannelId, cryptoInfo.PayName, WithdrawalTypeEnum.CryptoPay);
                     }
 
                     break;
@@ -57,7 +57,7 @@ namespace BackendSite.Service.BLL
                     var eWalletInfo = eWalletOnline.FirstOrDefault();
                     if (eWalletInfo != null)
                     {
-                        return new AutoWithdrawalPaymentGateWayDto(eWalletInfo.PayId, eWalletInfo.ChannelId, WithdrawalTypeEnum.OnlinePayment);
+                        return new AutoWithdrawalPaymentGateWayDto(eWalletInfo.PayId, eWalletInfo.ChannelId, eWalletInfo.PayName, WithdrawalTypeEnum.OnlinePayment);
                     }
 
                     break;
