@@ -546,16 +546,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         }
 
                         var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalData.WithdrawalInfo);
-                        request.WithdrawalType = paymentGateWay.WithdrawalType;
                         withdrawalInfo.PayId = paymentGateWay.PayId;
                         withdrawalInfo.ChannelId = paymentGateWay.ChannelId;
+                        request.WithdrawalType = paymentGateWay.WithdrawalType;
 
                         // 先 Verify 後 Process
                         withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId, request.Comment, authData.UserName);
                         withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalProcess(
                             request.TransId,
                             request.Comment,
-                            authData.UserName,
+                            updater:paymentGateWay.PayName,
                             authData.UserId,
                             JsonConvert.SerializeObject(withdrawalInfo),
                             (int)request.WithdrawalType,
