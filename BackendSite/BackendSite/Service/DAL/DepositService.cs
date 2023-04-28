@@ -386,7 +386,7 @@ namespace BackendSite.Service.DAL
 
                     if (status == DepositStatusEnum.Approved)
                     {
-                        if (depositRequest.DepositType is not DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
+                        if (depositRequest.DepositType is not (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet))
                         {
                             var pay = (IPay)depositRequest.oDepositInfo;
                             type = payTypePosition + pay.PayId;
