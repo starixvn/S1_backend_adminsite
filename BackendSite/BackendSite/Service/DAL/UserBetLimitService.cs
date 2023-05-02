@@ -177,5 +177,9 @@ namespace BackendSite.Service.DAL
         {
             return ReportDbClient.QueryFirstAsync<int>("Admin_TpIdByGameType_Get", new { _GameType = gameType });
         }
+        public Task<TpBetLimitData> GetLimitGroup(int gameType, int currencyId)
+        {
+            return ReportDbClient.QueryFirstAsync<TpBetLimitData>("Admin_TpBetLimit_Get", new { _GameTypeId = gameType, _CurrencyId = currencyId });
+        }
     }
 }

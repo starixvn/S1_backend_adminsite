@@ -25,6 +25,36 @@ namespace BackendSite.Service.Model
         public int Max { get; set; }
         public int MaxPerMatch { get; set; }
     }
+
+    public class CustBetLimitSetting
+    {
+        public bool Checked { get; set; }
+        public int TpCategory { get; set; }
+        public string TpCategoryName { get; set; }
+        public int GameTypeId { get; set; }
+        public string GameTypeName { get; set; }
+    }
+    public class CustLiveCasinoSetting : CustBetLimitSetting
+    {
+        public string LimitGroup { get; set; }
+        public string LimitRange { get; set; }
+        public List<LimitGroupList> LimitGroupList { get; set; }
+    }
+
+    public class CustSportsSetting : CustBetLimitSetting
+    {
+        public int Min { get; set; }
+        public int Max { get; set; }
+        public int MaxPerMatch { get; set; }
+    }
+
+    public class LimitGroupList
+    {
+        public string Group { get; set; }
+        public string Range { get; set; }
+    }
+
+
     public class SetBetLimit
     {
         public int TpId { set; get; }
@@ -137,8 +167,6 @@ namespace BackendSite.Service.Model
 
     public class CustBetLimitData
     {
-        public int SiteId { get; set; }
-        public string SiteName { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public int CurrencyId { get; set; }
@@ -161,12 +189,10 @@ namespace BackendSite.Service.Model
 
     public class CustBetLimitByCustIdV2
     {
-        public int SiteId { get; set; }
-        public string SiteName { get; set; }
         public int custId { get; set; }
         public string UserName { get; set; }
         public int CurrencyId { get; set; }
-        public List<TpBetLimitGroupV2> GameTypeBetLimit { get; set; }
+        public List<CustBetLimitSetting> BetSetting { get; set; }
     }
     public class TpBetLimitGroupV2 : TpBetLimitGroup
     {
