@@ -348,7 +348,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
                         content = string.Format(content, request.TransId);
                         await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
-                    }
+                    
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
