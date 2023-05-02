@@ -240,7 +240,6 @@ namespace BackendSite.Service.Model
         public int IsTest { get; set; }
         public int IsKyc { get; set; }
         public int IsRisk { get; set; }
-        public decimal SabaWallet { get; set; }
         public decimal PTWallet { get; set; }
         public decimal SeamlessWallet { get; set; }
         public decimal BonusWallet { get; set; }
