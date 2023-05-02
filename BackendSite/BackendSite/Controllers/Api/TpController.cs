@@ -86,20 +86,6 @@ namespace BackendSite.Controllers.Api
             public int CustId { get; set; }
         }
 
-
-        public async Task<ApiResult> FixNegativeAsync(FixNegativeReq fixNegativeReq)
-        {
-            var tpInfo = new TpInfo
-            {
-                CustId = fixNegativeReq.CustId,
-                TpId = 1
-            };
-
-            var apiResult = await tpBLL.FixNegativeAsync(tpInfo);
-            apiResult.Message = string.IsNullOrWhiteSpace(apiResult.Message) ? apiResult.RawMessage : apiResult.Message;
-
-            return apiResult;
-        }
         [HttpPost]
         public ApiResult<IEnumerable<SiteTpListIfo>> GetTpBySite([FromForm] int SiteId)
         {
