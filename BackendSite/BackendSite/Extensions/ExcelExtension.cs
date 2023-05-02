@@ -40,6 +40,22 @@ namespace BackendSite.Extensions
             if (freeze)
                 sheet.CreateFreezePane(0, 1);
         }
+        
+        public static void CreateHeaders(this ISheet sheet, IEnumerable<string> headers, bool freeze = false)
+        {
+            var headerRow = sheet.CreateRow(0);
+
+            var index = 0;
+            foreach (var header in headers)
+            {
+                headerRow.CreateCell(index).SetCellValue(header);
+                index++;
+            }
+
+            // 凍結窗格
+            if (freeze)
+                sheet.CreateFreezePane(0, 1);
+        }
 
          public static void SetDropDownList(this ISheet sheet, string[] datas,
             int firstRow, int lastRow, int firstCol, int lastCol)
@@ -84,7 +100,6 @@ namespace BackendSite.Extensions
         public static void WriteToSheet<T>(this ISheet sheet, IEnumerable<T> list, bool freeze = false, TimeSpan? offset = null)
             where T : class
         {
-            sheet.CreateHeaders<T>(freeze);
             var rowTitle = sheet.CreateRow(1);
 
             if (!list.Any())
@@ -93,8 +108,9 @@ namespace BackendSite.Extensions
             }
             else
             {
+                sheet.CreateHeaders<T>(freeze);
+                
                 var props = list.First().GetType().GetProperties();
-
                 var index = 1;
                 foreach (var item in list)
                 {
@@ -118,6 +134,36 @@ namespace BackendSite.Extensions
                         {
                             row.CreateCell(i).SetCellValue(val?.ToString() ?? string.Empty);
                         }
+                        
+                        i++;
+                    }
+                    index++;
+                }
+            }
+        }
+        
+        public static void WriteDictionaryListToSheet(this ISheet sheet, IEnumerable<IDictionary<string, string>> list, bool freeze = false)
+        {
+            var rowTitle = sheet.CreateRow(1);
+
+            if (!list.Any())
+            {
+                rowTitle.CreateCell(0).SetCellValue("No Data");
+            }
+            else
+            {
+                var headers = list.First().Keys;
+                sheet.CreateHeaders(headers, freeze);
+                
+                var index = 1;
+                foreach (var dic in list)
+                {
+                    var row = sheet.CreateRow(index);
+
+                    var i = 0;
+                    foreach (var item in dic)
+                    {
+                        row.CreateCell(i).SetCellValue(item.Value);
                         
                         i++;
                     }

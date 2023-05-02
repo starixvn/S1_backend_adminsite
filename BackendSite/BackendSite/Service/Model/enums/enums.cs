@@ -166,6 +166,12 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum WithdrawalLimitLogMainTypeEnum
+    {
+        Add = 1,
+        Deduct = 2
+    }
+
     public enum WithdrawalLimitLogCreateFromEnum 
     {
         Default = 0,
@@ -250,6 +256,7 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        UnCheckDepositReceipt = 93,
         SetDepositAmount = 94,
         CheckDepositReceipt = 95,
         DeleteReceipt = 96,
@@ -658,7 +665,32 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-
+    
+    public enum BonusSummaryType
+    {
+        WelcomeBonus = 1,
+        ReDeposit = 2,
+        FreeBet = 3,
+        Rebate = 6,
+        CashBack = 7,
+        ManualBonus = 8,
+        RetentionFreeBet = 9,
+        Referral = 10,
+        VerificationReward = 11,
+        PrizeDraw = 12,
+        Other = 13,
+        VipUpgrade = 14,
+        ReferralFreeCredit = 15
+    }
+    
+    public enum BonusSummaryTransactionType
+    {
+        IncreaseBonus = 1,
+        DecreaseBonus = 2,
+        Phone = 3,
+        Email = 4
+    }
+    
     #endregion
 
     #region PromotionCashBackSetting
@@ -1032,7 +1064,9 @@ namespace BackendSite.Service.Model.enums
         [Description("UNDER CREDIT")]
         UnderCredit = 20,
         [Description("REFUND")]
-        Refund = 21
+        Refund = 21,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
@@ -1247,8 +1281,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
-
+    
     #region Banner
 
     public enum BannerTypeEnum
@@ -1365,6 +1398,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1438,7 +1472,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         All = 0,
@@ -1510,6 +1543,7 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
+
 
     public enum ShieldRiskTagged
     {
@@ -1747,6 +1781,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         BoDelete = 2
     }
+    
     public enum ExchangeTypeEnum
     {
         /// <summary>

@@ -18,15 +18,26 @@ namespace BackendSite.Service.DAL
             _redisHelper = redisHelper;
         }
 
-        public async Task<IEnumerable<MpaRateDto>> GetMpaExchangeRate(DateTimeOffset starTime, DateTimeOffset endTime)
+        public async Task<IEnumerable<MpaRateDto>> GetMpaExchangeRate(DateTimeOffset starTime, DateTimeOffset endTime,int baseCurrencyId = 0)
         {
-            var redisKey = $"MpaExchangeRate:{starTime:yyyy-MM-dd HH:mm:ss}:{endTime:yyyy-MM-dd HH:mm:ss}";
+            var redisKey = $"MpaExchangeRate:{starTime:yyyy-MM-dd HH:mm:ss}:{endTime:yyyy-MM-dd HH:mm:ss}:{baseCurrencyId}";
 
-            var exchangeRate = await _redisHelper.TryGetOrCreateAsync(redisKey,
-                TimeSpan.FromMinutes(10),
-                () => GetRateFromDb(starTime,endTime));
+            if (baseCurrencyId == 0)
+            {
+                var exchangeRate = await _redisHelper.TryGetOrCreateAsync(redisKey,
+                    TimeSpan.FromMinutes(10),
+                    () => GetRateFromDb(starTime, endTime));
 
-            return exchangeRate;
+                return exchangeRate;
+            }
+            else
+            {
+                var exchangeRate = await _redisHelper.TryGetOrCreateAsync(redisKey,
+                    TimeSpan.FromMinutes(10),
+                    async () => (await GetRateFromDb(starTime, endTime)).Where(x=>x.TargetCurrencyId == baseCurrencyId));
+
+                return exchangeRate;
+            }
         }
 
         public decimal MapperExchangeRate(IEnumerable<MpaRateDto> source, DateTime date, int currencyId, int baseCurrencyId)
@@ -55,7 +66,6 @@ namespace BackendSite.Service.DAL
             return source.FirstOrDefault(r => r.RateDate.ToString("yyyy-MM-dd") == lastDay
                                               && r.CurrencyId == currencyId
                                               && r.TargetCurrencyId == baseCurrencyId)!.Rate;
-
         }
 
         public async Task<Dictionary<int, string>> GetCurrencyIsoCodeMapper()
@@ -116,7 +126,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_RateDateStart", starTime.Date.AddDays(-1), dbType: DbType.DateTime);
-            p.Add("_RateDateEnd", endTime.Date, dbType: DbType.DateTime);
+            p.Add("_RateDateEnd", endTime.Date.AddMonths(1), dbType: DbType.DateTime);
 
             return _reportDbClient.QueryAsync<MpaRateDto>("Admin_ExchangeRate_Get", p);
         }
