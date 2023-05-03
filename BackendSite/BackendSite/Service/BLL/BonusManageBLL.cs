@@ -128,7 +128,7 @@ namespace BackendSite.Service.BLL
 
             //tpId == 0,WalletType is Seamless
             //tpId != 0,WalletType is Transfer
-            if (tpId == 0)
+            if (tpId == 0 || tpId == 41)
             {
                 //WalletType is Seamless key by tpId
                 tempResult.ToList().ForEach(x =>
