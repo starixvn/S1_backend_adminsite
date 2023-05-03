@@ -424,6 +424,10 @@ namespace BackendSite.Service.DAL
                             {
                                 tpCategoryId = tpInfo.CategoryId;
                             }
+                            else if (promotion.TpId == (int)TpEnum.SBSW)
+                            {
+                                tpCategoryId = tpInfo.TpId;
+                            }
                             else
                             {
                                 tpCategoryId = tpInfo.CategoryId switch
@@ -442,7 +446,9 @@ namespace BackendSite.Service.DAL
                                 cashBackList.Add(new PromotionCashBackSetting
                                 {
                                     CurrencyId = specific.CurrencyId,
-                                    TpId = tpInfo.TpId,
+                                    TpId = (promotion.TpId == (int)TpEnum.SBSW)
+                                        ? promotion.TpId
+                                        : tpInfo.TpId,
                                     CategoryId = tpCategoryId,
                                     Level = vipLevel,
                                     Percentage = specific.CashBackSetting.Percentage,
