@@ -432,6 +432,7 @@ namespace BackendSite.Service.DAL
                                     (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
                                     (int)PromotionCategoryEnum.Fish => (int)TpCategoryEnum.Fishing,
                                     (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
+                                    (int)PromotionCategoryEnum.SBSW => tpInfo.TpId, // 沙巴獨立的 PromotionCategory 是 9，但沙巴又有多種 TpCategory，前端會依據產品的 TpCategoryId帶入到TpId這個欄位
                                     _ => 0
                                 };
                             }
