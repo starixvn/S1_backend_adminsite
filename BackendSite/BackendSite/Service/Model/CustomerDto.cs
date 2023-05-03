@@ -172,7 +172,6 @@ public class MemberExportData
     public bool IsTest { get; set; }
     public bool IsKyc { get; set; }
     public bool IsRisk { get; set; }
-    public decimal SabaWallet { get; set; }
     public decimal PTWallet { get; set; }
     public decimal SeamlessWallet { get; set; }
     public decimal BonusWallet { get; set; }
@@ -216,6 +215,7 @@ public class CustomerDto
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
@@ -242,10 +242,10 @@ public class CustomerDto
     /// 會員本身的代理推薦碼
     /// </summary>
     public string AffiliateCode { get; set; }
-    public DateTimeOffset RegTime { get; set; }
-    public DateTimeOffset? FirstDepositTime { get; set; }
-    public DateTimeOffset LastLoginTime { get; set; }
-    public DateTimeOffset? LastDepositTime { get; set; }
+    public DateTime RegTime { get; set; }
+    public DateTime? FirstDepositTime { get; set; }
+    public DateTime LastLoginTime { get; set; }
+    public DateTime? LastDepositTime { get; set; }
     public string BirthDay { get; set; }
     public string BirthMonth { get; set; }
     public string BirthYear { get; set; }
@@ -262,8 +262,10 @@ public class CustomerDto
     public string AddressCity { get; set; }
     public string AddressLineFirst { get; set; }
     public string AddressLineSecond { get; set; }
-    public DateTimeOffset? PhoneRewardTime { get; set; }
-    public DateTimeOffset? EmailRewardTime { get; set; }
+    public DateTime? PhoneRewardTime { get; set; }
+    public DateTime? EmailRewardTime { get; set; }
+    public DateTime? PhoneVerifyTime { get; set; }
+    public DateTime? EmailVerifyTime { get; set; }
 }
 
 public class CustomerTag
@@ -284,6 +286,7 @@ public class CustomerBasicInfo
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
@@ -314,6 +317,8 @@ public class CustomerBasicInfo
     public AffInfo AffInfo { get; set; }
     public DateTimeOffset? PhoneRewardTime { get; set; }
     public DateTimeOffset? EmailRewardTime { get; set; }
+    public DateTimeOffset? PhoneVerifyTime { get; set; }
+    public DateTimeOffset? EmailVerifyTime { get; set; }
 }
 
 public class AffInfo

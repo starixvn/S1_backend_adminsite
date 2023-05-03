@@ -113,10 +113,11 @@ namespace BackendSite.Service.BLL
         /// </summary>
         public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
         {
-            var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
-            
-            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
-                () => localBankService.GetOfflineBankAccount(siteId, currencyId));
+            return localBankService.GetOfflineBankAccount(siteId, currencyId);
+            // var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
+            //
+            // return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
+            //     () => localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
         
         public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
@@ -163,9 +164,36 @@ namespace BackendSite.Service.BLL
             return bankInfoPayList;
         }
         
-        public IEnumerable<EWalletPay> GetEWalletPayList()
+        public IEnumerable<PayInfo> GetEWalletPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
-            var eWalletPayList = localBankService.GetEWalletPayList();
+            var pointLevel = -1;
+            if (custId != null)
+            {
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+            }
+            
+            var eWalletPayList = localBankService.GetEWalletPayList(siteId)
+                .Where(x =>  x.SysId == sysId
+                             && x.CurrencyId == currencyId
+                             && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                             && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .GroupBy(x => x.PayId)
+                .Select(g =>
+                {
+                    var d = g.First();
+                    return new PayInfo
+                    {
+                        PayId = g.Key,
+                        PayName = d.PayName,
+                        ChannelId = d.ChannelId,
+                        LoginUrl = d.LoginUrl,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.TransferPin,
+                        TransferPin = d.TransferPin
+                    };
+                });
+            
             return eWalletPayList;
         }
         

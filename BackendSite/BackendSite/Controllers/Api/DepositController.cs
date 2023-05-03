@@ -24,7 +24,6 @@ namespace BackendSite.Controllers.Api
         private readonly CustInfoBLL custInfoBLL;
         private readonly BankDetailBLL bankDetailBLL;
         private readonly ExcelBLL excelBLL;
-        private readonly int mainWalletType;
         private readonly ServerInfoBLL serverInfoBLL;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
@@ -40,7 +39,6 @@ namespace BackendSite.Controllers.Api
             this.excelBLL = provider.GetRequiredService<ExcelBLL>();
             this.serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
             var configuration = provider.GetRequiredService<IConfiguration>();
-            mainWalletType = configuration.GetValue<int>("MainWalletType");
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
         public class DepositListReq
@@ -239,36 +237,15 @@ namespace BackendSite.Controllers.Api
 
                 if (depositConfirmReuslt > 0)
                 {
-                    var tmp = new ApiResult<TransferResult>();
-                    if (mainWalletType == 2)
-                    {
-                        var pendingFund = new PendingFund
-                        {
-                            CustId = depositConfirmReuslt
-                        };
-                        tmp = await Process(pendingFund);
-                    }
-                    else
-                    {
-                        tmp.ErrorCode = 0;
-                    }
-
-                    if (tmp.ErrorCode != 0)
-                    {
-                        depositConfirmReuslt = -4;
-                    }
-                    else
-                    {
-                        var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
-                        var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
-                        // Send message to player
-                        var sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                        var title = selLangBLL.GetResourceValue("lbl_DepositApprovedTitle", userLang);
-                        title = string.Format(title, depositReq.TransId);
-                        var content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent", userLang);
-                        content = string.Format(content, depositReq.TransId);
-                        messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
-                    }
+                    var depositRequest = depositBLL.GetDepositRequest(depositReq.TransId);
+                    var userLang = custInfoBLL.GetCustInfoWithCache(depositRequest.CustId).UserLang;
+                    // Send message to player
+                    var sender = selLangBLL.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                    var title = selLangBLL.GetResourceValue("lbl_DepositApprovedTitle", userLang);
+                    title = string.Format(title, depositReq.TransId);
+                    var content = selLangBLL.GetResourceValue("lbl_DepositApprovedContent", userLang);
+                    content = string.Format(content, depositReq.TransId);
+                    await messageBLL.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                 }
             }
             else if (depositReq.Action == (int)DepositStatusEnum.Rejected)
@@ -286,7 +263,7 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, depositReq.TransId);
                     var content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, depositReq.TransId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    await messageBLL.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
                     if (custInfo.SiteId == 1)
                     {
                         messageBLL.SendSMSMessageToPlayer(depositRequest.CustId);
@@ -323,10 +300,6 @@ namespace BackendSite.Controllers.Api
             }
 
             return apiResult;
-        }
-        private async Task<ApiResult<TransferResult>> Process(PendingFund pendingFund)
-        {
-            return await pendingFundBLL.ProcessAsync(pendingFund);
         }
 
         [HttpPost]
@@ -479,7 +452,7 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, _transId);
                     var content = selLangBLL.GetResourceValue("lbl_DepositRejectContent", userLang);
                     content = string.Format(content, _transId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, depositRequest.CustId);
+                    messageBLL.SendMessage(new Message(sender, depositRequest.CustId, userLang, title, content));
                 }
                 if (depositConfirmReuslt == -4)
                 {
