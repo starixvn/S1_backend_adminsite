@@ -208,7 +208,15 @@ namespace BackendSite.Service.DAL
                                 specific.CashBackSetting = new CashBackSetting
                                 {
                                     CashBackTpInfos = specific.CashBackList.Select(i => new CashBackTpInfo
-                                        { TpId = i.TpId, CategoryId = i.GameType }),
+                                    {
+                                        TpId = (i.TpId == 41)
+                                            ? i.GameType
+                                            : i.TpId,
+
+                                        CategoryId = (i.TpId == 41)
+                                            ? 9
+                                            : i.GameType
+                                    }),
                                     Percentage = cashBack.Percentage,
                                     LossAmount = cashBack.LossAmount
                                 };
