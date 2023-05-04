@@ -623,9 +623,10 @@ namespace BackendSite.Service.DAL
             p.Add("_SameRealNameRestrict", promotion.SameRealNameRestrict);
             p.Add("_SameRealNameRestrictAvailableCount", _sameRealNameRestrictAvailableCount);
             p.Add("_BlockTagList", JsonConvert.SerializeObject(promotion.BlockTagList));
+            p.Add("_HideForUnlogin", promotion.HideForUnlogin);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_Promotion_Set_V6", transaction, p);
+            _mainDbClient.Execute("Admin_Promotion_Set_V7", transaction, p);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
