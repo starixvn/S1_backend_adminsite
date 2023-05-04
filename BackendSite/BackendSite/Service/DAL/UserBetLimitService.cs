@@ -31,6 +31,11 @@ namespace BackendSite.Service.DAL
             });
         }
 
+        public async Task<int> Delete(ParamsWithLog<DeleteCustBetLimit> input)
+        {
+            return await MainDbClient.ExecuteAsync("Admin_CustBetLimit_Del", new { _CustId = input.Before.CustId });
+        }
+
         public async Task<int> InsertOrUpdate(ParamsWithLog<CustBetLimit> input)
         {
             await using var conn = MainDbClient.GetMySqlConnection();
@@ -96,46 +101,6 @@ namespace BackendSite.Service.DAL
                 TotalPages = p.Get<int?>("_TotalPages") ?? 0,
                 RowCount = p.Get<int?>("_RowCount") ?? 0
             };
-        }
-
-        public async Task<int> Delete(ParamsWithLog<DeleteCustBetLimit> input)
-        {
-            await using var conn = MainDbClient.GetMySqlConnection();
-            await conn.OpenAsync();
-            await using var trans = await conn.BeginTransactionAsync();
-            
-            var p = new DynamicParameters();
-            p.Add("_CustId", input.Before.CustId);
-
-            var result = await conn
-                .ExecuteAsync("Admin_CustBetLimit_Del", p, commandType: CommandType.StoredProcedure);
-
-            if (result > 0)
-            {
-                var isCreate = result == 1;
-                var logParam = new DynamicParameters();
-                logParam.Add("_SiteId", input.SiteId);
-                logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BetLimit);
-                logParam.Add("_ActionType", (int) ActionType.Delete);
-                logParam.Add("_RefTransId", string.Empty);
-                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
-                logParam.Add("_AfterDetailInfo", null, DbType.String);
-                logParam.Add("_Operator", input.Operator);
-
-                var logSuccess = await conn
-                    .ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", logParam, trans, commandType: CommandType.StoredProcedure) > 0;
-
-                if (logSuccess)
-                {
-                    await MainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
-                    return result;
-                }
-            }
-
-            await MainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
-
-            return result;
         }
 
         public async Task<CustBetLimitData> UserBetLimitGetByCustId(int custId)

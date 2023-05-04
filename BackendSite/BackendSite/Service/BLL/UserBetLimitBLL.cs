@@ -6,7 +6,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace BackendSite.Service.BLL
 {
@@ -103,7 +102,34 @@ namespace BackendSite.Service.BLL
 
         public async Task<int> Delete(ParamsWithLog<DeleteCustBetLimit> input)
         {
-            return await _userBetLimitService.Delete(input);
+            var betLimit = await _userBetLimitService.UserBetLimitGetByCustId(input.Before.CustId);
+            if (betLimit == null)
+                return -1;
+
+            var betSettings = await ParseSetting(betLimit.BetSetting, betLimit.CurrencyId);
+            var sbo = betSettings.FirstOrDefault(a => a.GameTypeId == (int)TpGameTypeEnum.SBO_Sports);
+            if(sbo != null)
+                await ResetBetLimit(betLimit.CustId, sbo.GameTypeId, betLimit.CurrencyId);
+
+            var result = await _userBetLimitService.Delete(input);
+            if (result > 0)
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = input.SiteId,
+                    CurrencyId = input.CurrencyId,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
+                    ActionType = ActionType.Delete,
+                    BeforeDetailInfo = input.Before.ToLog(),
+                    Operator = input.Operator
+                };
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            }
+            return result;
         }
 
         public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
@@ -123,6 +149,23 @@ namespace BackendSite.Service.BLL
             var tpGameType = await _userBetLimitService.GetTpListByCategoryAsync(categoryId);
 
             return tpGameType;
+        }
+
+        private async Task ResetBetLimit(int custId, int gameType, int currencyId) 
+        {
+            var defaultBetLimit = await _userBetLimitService.GetLimitGroup(gameType, currencyId);
+
+            var tpId = await _userBetLimitService.GetTpIdByGameType(gameType);
+            var betLimitApi = $"{_apiUrl}SetBetLimit";
+            var betLimit = new SetBetLimit
+            {
+                TpId = tpId,
+                CustId = custId,
+                BetSetting = defaultBetLimit.LimitGroup
+            };
+            var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>(betLimitApi, betLimit);
+            if (apiResult.ErrorCode != 0)
+                throw new AdminException("failed");
         }
 
         public async Task<IEnumerable<TpBetLimitGroup>> GetTpBetLimitGroupAsync(int categoryId, int currencyId)
@@ -244,7 +287,7 @@ namespace BackendSite.Service.BLL
                 var tpCategory = (int)item["TpCategory"];
                 if (tpCategory == (int)TpCategoryEnum.Sports)
                 {
-                    var sports = new CustSportsSetting
+                    var sports = new CustBetLimitSetting
                     {
                         Checked = item["Checked"],
                         TpCategory = item["TpCategory"],
@@ -263,7 +306,7 @@ namespace BackendSite.Service.BLL
                 {
                     var gameType = (int)item["GameTypeId"];
                     var liveCasisnoGroup = await _userBetLimitService.GetLimitGroup(gameType, currencyId);
-                    var liveCasino = new CustLiveCasinoSetting
+                    var liveCasino = new CustBetLimitSetting
                     {
                         Checked = (bool)item["Checked"],
                         TpCategory = item["TpCategory"],

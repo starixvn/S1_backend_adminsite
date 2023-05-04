@@ -33,16 +33,9 @@ namespace BackendSite.Service.Model
         public string TpCategoryName { get; set; }
         public int GameTypeId { get; set; }
         public string GameTypeName { get; set; }
-    }
-    public class CustLiveCasinoSetting : CustBetLimitSetting
-    {
         public string LimitGroup { get; set; }
         public string LimitRange { get; set; }
         public List<LimitGroupList> LimitGroupList { get; set; }
-    }
-
-    public class CustSportsSetting : CustBetLimitSetting
-    {
         public int Min { get; set; }
         public int Max { get; set; }
         public int MaxPerMatch { get; set; }
@@ -53,7 +46,13 @@ namespace BackendSite.Service.Model
         public string Group { get; set; }
         public string Range { get; set; }
     }
-
+    public class SportBetLimit
+    {
+        public int MinBet { get; set; }
+        public int MaxBet { get; set; }
+        public int MaxPerMatch { get; set; }
+        public int TableLimit { get; set; }
+    }
 
     public class SetBetLimit
     {
