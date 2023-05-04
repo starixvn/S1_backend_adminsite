@@ -164,9 +164,36 @@ namespace BackendSite.Service.BLL
             return bankInfoPayList;
         }
         
-        public IEnumerable<EWalletPay> GetEWalletPayList()
+        public IEnumerable<PayInfo> GetEWalletPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
-            var eWalletPayList = localBankService.GetEWalletPayList();
+            var pointLevel = -1;
+            if (custId != null)
+            {
+                pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+            }
+            
+            var eWalletPayList = localBankService.GetEWalletPayList(siteId)
+                .Where(x =>  x.SysId == sysId
+                             && x.CurrencyId == currencyId
+                             && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
+                             && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .GroupBy(x => x.PayId)
+                .Select(g =>
+                {
+                    var d = g.First();
+                    return new PayInfo
+                    {
+                        PayId = g.Key,
+                        PayName = d.PayName,
+                        ChannelId = d.ChannelId,
+                        LoginUrl = d.LoginUrl,
+                        LoginAccount = d.LoginAccount,
+                        LoginPassword = d.LoginPassword,
+                        LoginPin = d.TransferPin,
+                        TransferPin = d.TransferPin
+                    };
+                });
+            
             return eWalletPayList;
         }
         
