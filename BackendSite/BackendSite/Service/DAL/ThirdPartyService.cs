@@ -143,6 +143,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+   
         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
         {
             return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = currency, SiteId = siteId }, commandType: CommandType.StoredProcedure);
