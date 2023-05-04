@@ -49,6 +49,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<object>();
             var normalCurrencyList = Enumerable.Empty<int>();
             var vipCurrencyList = Enumerable.Empty<int>();
+            var allSiteEnableCurrencyList = Enumerable.Empty<int>();
+
             try
             {
                 if (User.Identity.IsAuthenticated)
@@ -71,7 +73,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                         if (brandData != null)
                             normalCurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(brandData.CurrencyList);
                     }
+
                     vipCurrencyList = _rebateManageBLL.GetRebatePeriodList(brand).Select(x => x.CurrencyId).Distinct();
+                    allSiteEnableCurrencyList = _serverInfoBLL.GetSiteList().ToList().SelectMany(r => r.ICurrencyList).Distinct();
                 }
                 else
                 {
@@ -81,7 +85,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 {
                     SiteCurrencyList = normalCurrencyList,
                     RewardsCurrencyList = normalCurrencyList.Intersect(_RewardCurrencyList),
-                    VipCurrencyList = normalCurrencyList.Intersect(vipCurrencyList)
+                    VipCurrencyList = normalCurrencyList.Intersect(vipCurrencyList),
+                    AllSiteEnableCurrencyList = allSiteEnableCurrencyList
                 };
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }

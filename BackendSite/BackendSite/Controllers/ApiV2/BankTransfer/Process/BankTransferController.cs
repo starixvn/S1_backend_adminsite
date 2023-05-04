@@ -212,7 +212,12 @@ public class BankTransferController : ControllerBase
     [HttpPost]
     public ApiResult<IEnumerable<SelectListItem>> GetTransferTypeList()
     {
-        var except = new[] {TransferTypeEnum.Undefined};
+        var except = new[]
+        {
+            TransferTypeEnum.Undefined,
+            TransferTypeEnum.Deposit,
+            TransferTypeEnum.Withdrawal
+        };
 
         return new ApiResult<IEnumerable<SelectListItem>>
         {
