@@ -394,6 +394,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public string Title { get; set; }
             public string Content { get; set; }
+            public bool IsPopup { get; set; }
+            public string PopupMessage { get; set; }
         }
 
         public class CancelBonusRequest : CustIdRequest
@@ -634,8 +636,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     exportDatas.Add(exprotdata);
                 });
                 await Task.WhenAll(tasks);
-                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
-                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                //如果該名user的PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 var stream = _excelBll.ExportV2(exportDatas);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
@@ -2409,13 +2411,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 58 })]
         [HttpPost]
-        public ApiResult SendPersonalMsg(SendCustMessageRequest request)
+        public async Task<ApiResult> SendPersonalMsg(SendCustMessageRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                if (_messageBll.SendMessageToPlayer(authData.UserName, request.Title, request.Content, request.CustId) == 0)
+                if (await _messageBll.SendMessageToPlayer(authData.UserName, request.Title, request.Content, request.IsPopup, request.PopupMessage, request.CustId) == 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Send Fail.";

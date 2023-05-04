@@ -75,7 +75,7 @@ namespace BackendSite.Service.DAL
             props.Add("_CallOutStatus", callOutStatus);
             props.Add("_DateType", dateType);
 
-            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V6", props);
+            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V7", props);
 
             return result;
         }
