@@ -139,10 +139,10 @@ namespace BackendSite.Service.Library
             return (userIp >= begin) && (userIp <= end);
         }
         #endregion
-        public string GetFromUrl(HttpContext context)
+        public string GetFromUrl(HttpContext context, bool isCheckReferer = true)
         {
             var fromUrl = "";
-            if (context.Request.Headers.ContainsKey("Referer"))
+            if (isCheckReferer && context.Request.Headers.ContainsKey("Referer"))
             {
                 fromUrl = context.Request.Headers["Referer"].ToString();
             }
