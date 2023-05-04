@@ -889,7 +889,8 @@ namespace BackendSite.Service.Model.enums
         vn = 5,
         hi = 6,
         my = 7,
-        bd = 8
+        bd = 8,
+        kh = 9
     }
 
     public enum PromotionDisplayConditionType
@@ -1489,6 +1490,7 @@ namespace BackendSite.Service.Model.enums
         IDR = 15,
         VND = 51,
         INR = 61,
+        KHUSD = 72,
         BDT = 74
     }
 

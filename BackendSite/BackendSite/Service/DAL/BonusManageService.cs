@@ -208,7 +208,15 @@ namespace BackendSite.Service.DAL
                                 specific.CashBackSetting = new CashBackSetting
                                 {
                                     CashBackTpInfos = specific.CashBackList.Select(i => new CashBackTpInfo
-                                        { TpId = i.TpId, CategoryId = i.GameType }),
+                                    {
+                                        TpId = (i.TpId == 41)
+                                            ? i.GameType
+                                            : i.TpId,
+
+                                        CategoryId = (i.TpId == 41)
+                                            ? 9
+                                            : i.GameType
+                                    }),
                                     Percentage = cashBack.Percentage,
                                     LossAmount = cashBack.LossAmount
                                 };
@@ -424,6 +432,10 @@ namespace BackendSite.Service.DAL
                             {
                                 tpCategoryId = tpInfo.CategoryId;
                             }
+                            else if (promotion.TpId == (int)TpEnum.SBSW)
+                            {
+                                tpCategoryId = tpInfo.TpId;
+                            }
                             else
                             {
                                 tpCategoryId = tpInfo.CategoryId switch
@@ -442,7 +454,9 @@ namespace BackendSite.Service.DAL
                                 cashBackList.Add(new PromotionCashBackSetting
                                 {
                                     CurrencyId = specific.CurrencyId,
-                                    TpId = tpInfo.TpId,
+                                    TpId = (promotion.TpId == (int)TpEnum.SBSW)
+                                        ? promotion.TpId
+                                        : tpInfo.TpId,
                                     CategoryId = tpCategoryId,
                                     Level = vipLevel,
                                     Percentage = specific.CashBackSetting.Percentage,
@@ -610,9 +624,10 @@ namespace BackendSite.Service.DAL
             p.Add("_SameRealNameRestrict", promotion.SameRealNameRestrict);
             p.Add("_SameRealNameRestrictAvailableCount", _sameRealNameRestrictAvailableCount);
             p.Add("_BlockTagList", JsonConvert.SerializeObject(promotion.BlockTagList));
+            p.Add("_HideForUnlogin", promotion.HideForUnlogin);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_Promotion_Set_V6", transaction, p);
+            _mainDbClient.Execute("Admin_Promotion_Set_V7", transaction, p);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
