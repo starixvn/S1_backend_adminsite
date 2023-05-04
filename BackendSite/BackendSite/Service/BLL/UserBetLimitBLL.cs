@@ -106,11 +106,6 @@ namespace BackendSite.Service.BLL
             return await _userBetLimitService.Delete(input);
         }
 
-        public async Task<int> UpdateStatus(int custId, int status, string updateOperator)
-        {
-            return await _userBetLimitService.UpdateStatus(custId, status, updateOperator);
-        }
-
         public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
         {
             var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);

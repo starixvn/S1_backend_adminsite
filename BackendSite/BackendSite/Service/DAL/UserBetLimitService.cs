@@ -138,15 +138,6 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public async Task<int> UpdateStatus(int custId, int status, string updateOperator)
-        {
-            var p = new DynamicParameters();
-            p.Add("_CustId", custId);
-            p.Add("_Status", status);
-            p.Add("_Operator", updateOperator);
-            return await MainDbClient.ExecuteAsync("Admin_CustBetLimitStatus_Set", p);
-        }
-
         public async Task<CustBetLimitData> UserBetLimitGetByCustId(int custId)
         {
             var p = new DynamicParameters();

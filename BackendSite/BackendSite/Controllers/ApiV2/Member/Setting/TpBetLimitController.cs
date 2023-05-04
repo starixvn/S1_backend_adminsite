@@ -14,28 +14,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
     [ApiController]
     public class TpBetLimitController : ControllerBase
     {
-        #region Fields
-
         private readonly UserBetLimitBLL _userBetLimitBll;
-        private readonly CustInfoBLL _custInfoBll;
-        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
-        private readonly ILogger<TpBetLimitController> _logger;
-
-        #endregion
-
-        #region Constructor
 
         public TpBetLimitController(IServiceProvider provider)
         {
             _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
-            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
-            _logger = provider.GetRequiredService<ILogger<TpBetLimitController>>();
         }
-
-        #endregion
-
-        #region Model
 
         public class QueryUserBetLimitReq : ApiRequestPageModel
         {
@@ -49,8 +33,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             public int CustId { get; set; }
         }
-
-        #endregion
 
         /// <summary>
         /// TpBetLimit/GetList 取得會員下注限額資料清單
@@ -121,25 +103,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 };
             }
             throw new AdminException("Set bet limit failed");
-        }
-
-        /// <summary>
-        /// TpBetLimit/UpdateStatus 更新指定會員下注限額資料狀態
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// </remarks>
-        /// <param name="req"></param>
-        [HttpPost]
-        public async Task<ApiResult> UpdateStatus(BetLimitStatus req)
-        {
-            var updateOperator = User.Identity.Name;
-            var result = await _userBetLimitBll.UpdateStatus(req.CustId, req.Status, updateOperator);
-            return new ApiResult
-            {
-                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
-            };
         }
 
         /// <summary>
