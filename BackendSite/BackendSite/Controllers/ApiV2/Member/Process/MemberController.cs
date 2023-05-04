@@ -1384,7 +1384,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.AreaCode,
                 request.PhoneNo,
                 request.AffCode,
-                _tools.GetFromUrl(HttpContext),
+                _tools.GetFromUrl(HttpContext, false),
                 User.Identity.Name);
 
             if (result > 0)
