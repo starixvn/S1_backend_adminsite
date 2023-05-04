@@ -444,6 +444,7 @@ namespace BackendSite.Service.DAL
                                     (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
                                     (int)PromotionCategoryEnum.Fish => (int)TpCategoryEnum.Fishing,
                                     (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
+                                    (int)PromotionCategoryEnum.ESports => (int)TpCategoryEnum.ESports,
                                     _ => 0
                                 };
                             }
