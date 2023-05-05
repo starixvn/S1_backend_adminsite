@@ -166,8 +166,10 @@ namespace BackendSite.Service.Model
 
     public class CustBetLimitData
     {
+        [LogIgnore]
         public int CustId { get; set; }
         public string UserName { get; set; }
+        [LogIgnore]
         public int CurrencyId { get; set; }
         public string BetSetting { get; set; }
     }
