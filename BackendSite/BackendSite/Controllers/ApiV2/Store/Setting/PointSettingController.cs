@@ -15,14 +15,14 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
     {
         private readonly PointSettingBLL _pointSettingBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
-        private readonly UserBetLimitBLL _userBetLimitBll;
+        private readonly TpBLL _tpBLL;
         private readonly VipLevelBLL _vipLevelBll;
 
         public PointSettingController(IServiceProvider provider)
         {
             _pointSettingBll = provider.GetRequiredService<PointSettingBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
-            _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
+            _tpBLL = provider.GetRequiredService<TpBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
         }
 
@@ -207,7 +207,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
 
             if (result.ErrorCode == (int) ErrorCodeEnum.Success)
             {
-                var typeList = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(request.TpCategoryId);
+                var typeList = await _tpBLL.GetTpGameTypeListbyCategoryAsync(request.TpCategoryId);
                 var beforeData = before.Data.Any() 
                     ? JsonConvert.SerializeObject(new
                     {

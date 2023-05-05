@@ -14,12 +14,13 @@ namespace BackendSite.Service.BLL
     {
         private readonly CustInfoBLL _custInfoBll;
         private readonly UserBetLimitService _userBetLimitService;
+        private readonly ThirdPartyService _thirdPartyService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly string _apiUrl;
         private readonly CourierAdapter _courierAdapter;
         private readonly ILogger<UserBetLimitBLL> _logger;
 
-        public UserBetLimitBLL(CustInfoBLL custInfoBll, UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, IConfiguration configuration, CourierAdapter courierAdapter, ILogger<UserBetLimitBLL> logger)
+        public UserBetLimitBLL(CustInfoBLL custInfoBll, UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, IConfiguration configuration, CourierAdapter courierAdapter, ILogger<UserBetLimitBLL> logger, ThirdPartyService thirdPartyService)
         {
             _userBetLimitService = userBetLimitService;
             _adjustmentLogReportService = adjustmentLogReportService;
@@ -27,6 +28,7 @@ namespace BackendSite.Service.BLL
             _courierAdapter = courierAdapter;
             _custInfoBll = custInfoBll;
             _logger = logger;
+            _thirdPartyService = thirdPartyService;
         }
 
         public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
@@ -62,8 +64,7 @@ namespace BackendSite.Service.BLL
                     var before = setting.FirstOrDefault(a => a.GameTypeId == item.GameTypeId);
                     var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId);
                     var betLimit = await ParseSetting(custId, currencyId, before, (SportsSetting)after);
-
-                    var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_apiUrl}SetBetLimit", betLimit);
+                    var apiResult = await SetBetLimit(betLimit);
                     if (apiResult.ErrorCode != 0)
                         return -1;
                 }
@@ -146,43 +147,26 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
-        {
-            var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
-            var gameTypeWithBetLimit = tpGameType
-                .Select(a => new GameTypeBetLimit()
-                {
-                    TypeId = a.Type,
-                    TypeName = a.TypeName
-                });
-            return gameTypeWithBetLimit;
-        }
-
-        public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)
-        {
-            var tpGameType = await _userBetLimitService.GetTpListByCategoryAsync(categoryId);
-
-            return tpGameType;
-        }
-
         private async Task ResetBetLimit(int custId, int gameType, int currencyId) 
         {
             var defaultBetLimit = await _userBetLimitService.GetLimitGroup(gameType, currencyId);
 
             var tpId = await _userBetLimitService.GetTpIdByGameType(gameType);
-            var betLimitApi = $"{_apiUrl}SetBetLimit";
             var betLimit = new SetBetLimit
             {
                 TpId = tpId,
                 CustId = custId,
                 BetSetting = defaultBetLimit.LimitGroup
             };
-            var apiResult = await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>(betLimitApi, betLimit);
+            var apiResult = await SetBetLimit(betLimit);
             if (apiResult.ErrorCode != 0)
-                throw new AdminException("failed");
+                throw new AdminException(ErrorCodeEnum.SystemException);
         }
 
-
+        private async Task<ApiResult> SetBetLimit(SetBetLimit request) 
+        {
+            return await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_apiUrl}SetBetLimit", request);
+        }
 
         public async Task<IEnumerable<TpBetLimitGroupV2>> GetTpBetLimitGroupV2Async(int currencyId)
         {
@@ -193,7 +177,7 @@ namespace BackendSite.Service.BLL
 
             tpCategoryBetLimitList.ForEach(async x =>
             {
-                var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(x.CategoryId);
+                var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(x.CategoryId);
                 foreach (var type in tpGameType)
                 {
                     var betLimit = BetLimitFactory.Create(_userBetLimitService.ReportDbClient, (TpGameTypeEnum)type.Type);

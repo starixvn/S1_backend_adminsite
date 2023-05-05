@@ -579,7 +579,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq request)
         {
-            var data = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
+            var data = await _tpBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
             {
                 Data = data,
@@ -597,7 +597,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<SiteTpListIfo>>> GetTpListByCategory(GetTpListByCategoryReq request)
         {
-            var data = await _userBetLimitBll.GetTpListByCategoryAsync(request.CategoryId);
+            var data = await _tpBll.GetTpListByCategoryAsync(request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
             {
                 Data = data,
