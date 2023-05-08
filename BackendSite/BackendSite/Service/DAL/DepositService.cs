@@ -219,7 +219,7 @@ namespace BackendSite.Service.DAL
                 await using var conn = _mainDbClient.GetMySqlConnection();
                 await conn.OpenAsync();
                 await using var trans = await conn.BeginTransactionAsync();
-            
+
                 var props = new DynamicParameters();
                 props.Add("CustId", custId);
                 props.Add("DepositId", depositId);

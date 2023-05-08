@@ -175,6 +175,5 @@ namespace BackendSite.Controllers.ApiV2.Report
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-
     }
 }
