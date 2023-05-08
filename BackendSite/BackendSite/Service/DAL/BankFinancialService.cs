@@ -153,8 +153,6 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     _Id = bankFinancialTransferAccount.Id,
-                    _SiteId = bankFinancialTransferAccount.SiteId,
-                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
                     _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
@@ -183,7 +181,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V8";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V9";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
