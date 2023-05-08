@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="lbl_WithdrawalApprovedTitle"><value>ការដកប្រាក់ {0} របស់អ្នក ត្រូវបានអនុម័ត!</value></data>
+  <data name="lbl_DepositApprovedContent"><value>សូមអបអរសាទរ! ការដាក់ប្រាក់ {0} របស់អ្នក ត្រូវបានអនុម័ត! ឥឡូវនេះ ចំនួនទឹកប្រាក់ត្រូវបានបញ្ចូលទៅក្នុងគណនីរបស់អ្នក។ សូមជូនពរអ្នកជួបតែសំណាងល្អក្នុងការភ្នាល់!</value></data>
+  <data name="lbl_WithdrawalRejectTitle"><value>ការដកប្រាក់ {0} របស់អ្នក ត្រូវបានបដិសេធ!</value></data>
+  <data name="lbl_WithdrawalRejectContent"><value>សូមអភ័យទោសដែលជូនដំណឹងថា ការដកប្រាក់ {0} របស់អ្នក ត្រូវបានបដិសេធ។ ប្រសិនបើអ្នកមានសំណួរបន្ថែម សូមមេត្តាទាក់ទង CSD សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។</value></data>
+  <data name="lbl_DepositRejectTitle"><value>ការដាក់ប្រាក់ {0} របស់អ្នក ត្រូវបានបដិសេធ!</value></data>
+  <data name="lbl_WithdrawalApprovedContent"><value>សូមអរគុណសម្រាប់ការលេងជាមួយពួកយើង! ការដកប្រាក់ {0}របស់អ្នក ត្រូវបានអនុម័ត យើងសង្ឃឹមថានឹងជួបអ្នកម្តងទៀតនៅពេលក្រោយ!</value></data>
+  <data name="lbl_DepositApprovedTitle"><value>ការដាក់ប្រាក់ {0} របស់អ្នក ត្រូវបានអនុម័ត!</value></data>
+  <data name="lbl_DepositRejectContent"><value>សូមអភ័យទោសដែលជូនដំណឹងថាការដាក់ប្រាក់ {0} របស់អ្នក ត្រូវបានបដិសេធ។ ប្រសិនបើអ្នកមានសំណួរបន្ថែម សូមមេត្តាទាក់ទង CSD សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។</value></data>
+  </root>
