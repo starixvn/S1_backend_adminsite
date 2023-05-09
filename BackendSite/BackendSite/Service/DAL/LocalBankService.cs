@@ -50,9 +50,9 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V3", new { _SiteId = siteId });
         }
         
-        public IEnumerable<EWalletPay> GetEWalletPayList()
+        public IEnumerable<BankInfoPay> GetEWalletPayList(int siteId)
         {
-            return _reportDbClient.Query<EWalletPay>("Common_EWalletPayForPayout_Get");
+            return _reportDbClient.Query<BankInfoPay>("Common_EWalletPayForPayout_Get", new { _SiteId = siteId });
         }
 
         public IEnumerable<BankInfoPay> GetCryptoPayList(int siteId)

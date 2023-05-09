@@ -51,7 +51,7 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
-            if (financialType != 0)
+            if (financialType != 0  || financialTypeList.Any())
             {
                 financialTypeList.Add(financialType);
                 financialTypeList = financialTypeList.Distinct().ToList();
@@ -115,7 +115,7 @@ namespace BackendSite.Service.BLL
                 if (financialLog.FinancialType == FinancialType.TpTransfer)
                 {
                     var tpId = financialLog.Type - 2000;
-                    var tpName = tpId == (int)TpEnum.Saba ? "Sportsbook" : _common.GetTpName(tpId);
+                    var tpName = _common.GetTpName(tpId);
                     financialLog.Memo = financialLog.Direction == DirectionEnum.Add ? 
                         $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";            
                 }
@@ -167,7 +167,7 @@ namespace BackendSite.Service.BLL
                 })
                 .Select(x => new TpBetRecordListOneDayRes
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     CategoryName = x.Key.CategoryName,
                     CategoryId = x.Key.CategoryId,
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet),
@@ -211,7 +211,7 @@ namespace BackendSite.Service.BLL
                 })
                 .Select(x => new TpBetRecordbyCategoryIdRes
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     GameTypeName = x.Key.GameTypeName,
                     GameTypeID = x.Key.GameTypeID,
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.TurnOver),
@@ -227,7 +227,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset)
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset, bool isExport)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate)
                             .Where(i => i.GameType == gameTypeId);
@@ -253,6 +253,12 @@ namespace BackendSite.Service.BLL
                               }).ToList();
 
             IPageInfo pageInfo = new PageInfo();
+            if (isExport)
+            {
+                pageNumber = 1;
+                pageSize = result.Count;
+            }
+            
             var (index, count) = pageInfo.ListPagination(result.Count, pageNumber, pageSize);
             pageNumber = pageInfo.PageNumber;
             totalPages = pageInfo.TotalPages;
@@ -340,7 +346,7 @@ namespace BackendSite.Service.BLL
                 .GroupBy(x => new { SettledDate = x.SettledTime.ToOffset(offset).Date })
                 .Select(x => new TpBetRecordByDate
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
                     ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet ?? y.Stake),
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.Stake),

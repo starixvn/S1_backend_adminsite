@@ -27,13 +27,6 @@
         public string LoginPin { get; set; }
     }
     
-    public class EWalletPay
-    {
-        public int PayId { get; set; }
-        public string PayName { get; set; }
-        public int CurrencyId { get; set; }
-    }
-    
     public class Pay
     {
         /// <summary>
