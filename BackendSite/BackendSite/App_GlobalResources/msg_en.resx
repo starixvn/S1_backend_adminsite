@@ -186,9 +186,6 @@
   <data name="msg_LoginFailed" xml:space="preserve">
     <value>Login Failed, Please check with your username and password</value>
   </data>
-  <data name="msg_NoCustBetLimit" xml:space="preserve">
-    <value>No Data</value>
-  </data>
   <data name="msg_NoData" xml:space="preserve">
     <value>No data.Please check filter.</value>
   </data>

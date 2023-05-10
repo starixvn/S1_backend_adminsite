@@ -12,14 +12,13 @@ namespace BackendSite.Service.BLL
     {
         private readonly CustInfoBLL _custInfoBll;
         private readonly UserBetLimitService _userBetLimitService;
-        private readonly ThirdPartyService _thirdPartyService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly string _apiUrl;
         private readonly CourierAdapter _courierAdapter;
         private readonly ILogger<UserBetLimitBLL> _logger;
         private readonly List<int> CallApi = new() { 77 };
 
-        public UserBetLimitBLL(CustInfoBLL custInfoBll, UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, IConfiguration configuration, CourierAdapter courierAdapter, ILogger<UserBetLimitBLL> logger, ThirdPartyService thirdPartyService)
+        public UserBetLimitBLL(CustInfoBLL custInfoBll, UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, IConfiguration configuration, CourierAdapter courierAdapter, ILogger<UserBetLimitBLL> logger)
         {
             _userBetLimitService = userBetLimitService;
             _adjustmentLogReportService = adjustmentLogReportService;
@@ -27,7 +26,6 @@ namespace BackendSite.Service.BLL
             _courierAdapter = courierAdapter;
             _custInfoBll = custInfoBll;
             _logger = logger;
-            _thirdPartyService = thirdPartyService;
         }
 
         public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
@@ -73,9 +71,12 @@ namespace BackendSite.Service.BLL
                     var before = setting.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
                     var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
                     var betLimit = await Compare(custId, currencyId, before, after);
-                    var apiResult = await SetBetLimit(betLimit);
-                    if (apiResult.ErrorCode != 0)
-                        return -1;
+                    if (betLimit != null) 
+                    {
+                        var apiResult = await SetBetLimit(betLimit);
+                        if (apiResult.ErrorCode != 0)
+                            return -1;
+                    }
                 }
             }
 
@@ -112,7 +113,7 @@ namespace BackendSite.Service.BLL
         public async Task<CustBetLimitByCustIdV2> GetByCustIdV2(int custId)
         {
             var betLimit = await _userBetLimitService.UserBetLimitGetByCustId(custId);
-            if(betLimit == null) throw new AdminException(ErrorCodeEnum.NoCustBetLimit);
+            if (betLimit == null) return null;
 
             var betSettings = ToObject(betLimit.BetSetting);
 

@@ -101,8 +101,6 @@ namespace BackendSite.Service.Model.enums
         #endregion
 
         #region BetLimit
-        [Description("msg_NoCustBetLimit")]
-        NoCustBetLimit =  5200,
         [Description("msg_InvalidBetLimit")]
         InvalidBetLimit = 5201,
         #endregion
