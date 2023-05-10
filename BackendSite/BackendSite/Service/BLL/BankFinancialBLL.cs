@@ -1,12 +1,10 @@
-﻿using System.Drawing;
-using System.Transactions;
+﻿using System.Transactions;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
-using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.ApiModel;
 using NPOI.XSSF.UserModel;
