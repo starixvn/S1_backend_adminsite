@@ -180,8 +180,14 @@
   <data name="msg_InsertSuccessful" xml:space="preserve">
     <value>Insert Successful</value>
   </data>
+  <data name="msg_InvalidBetLimit" xml:space="preserve">
+    <value>Invalid bet limit input</value>
+  </data>
   <data name="msg_LoginFailed" xml:space="preserve">
     <value>Login Failed, Please check with your username and password</value>
+  </data>
+  <data name="msg_NoCustBetLimit" xml:space="preserve">
+    <value>No Data</value>
   </data>
   <data name="msg_NoData" xml:space="preserve">
     <value>No data.Please check filter.</value>

@@ -1,13 +1,10 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
-using BackendSite.Service.DAL.BetLimit;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
-using System.Collections.Generic;
 
 namespace BackendSite.Service.BLL
 {
@@ -20,6 +17,7 @@ namespace BackendSite.Service.BLL
         private readonly string _apiUrl;
         private readonly CourierAdapter _courierAdapter;
         private readonly ILogger<UserBetLimitBLL> _logger;
+        private readonly List<int> CallApi = new() { 77 };
 
         public UserBetLimitBLL(CustInfoBLL custInfoBll, UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, IConfiguration configuration, CourierAdapter courierAdapter, ILogger<UserBetLimitBLL> logger, ThirdPartyService thirdPartyService)
         {
@@ -57,23 +55,24 @@ namespace BackendSite.Service.BLL
             var customer = await _custInfoBll.GetCustId(null, userName, siteId);
             if (customer == null)
             {
-                throw new AdminException(ErrorCodeEnum.NoData, "User Not Found");
+                throw new AdminException(ErrorCodeEnum.CustNotFound, "User Not Found");
             }
             var custId = customer.CustId;
             var currencyId = customer.CurrencyId;
             var custBetLimit = await _userBetLimitService.UserBetLimitGetByCustId(custId);
-            var setting = new List<CustBetLimitSetting>();
-            if (custBetLimit != null)
-                setting = JsonConvert.DeserializeObject<List<CustBetLimitSetting>>(custBetLimit.BetSetting);
 
-            var betSettings = (List<BetLimitSetting>)ParseSetting(req["after"].betSetting);
+            var setting = new List<BetLimitSetting>();
+            if (custBetLimit != null)
+                setting = ToObject(custBetLimit.BetSetting);
+
+            var betSettings = (List<BetLimitSetting>)ToObject(req["after"].betSetting);
             foreach (var item in betSettings)
             {
-                if (item.GameTypeId == 77) 
+                if (CallApi.Contains(item.GameTypeId)) 
                 {
-                    var before = setting.FirstOrDefault(a => a.GameTypeId == item.GameTypeId);
-                    var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId);
-                    var betLimit = await ParseSetting(custId, currencyId, before, (SportsSetting)after);
+                    var before = setting.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
+                    var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
+                    var betLimit = await Compare(custId, currencyId, before, after);
                     var apiResult = await SetBetLimit(betLimit);
                     if (apiResult.ErrorCode != 0)
                         return -1;
@@ -90,7 +89,7 @@ namespace BackendSite.Service.BLL
                     MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
                     ActionType = result == 1 ? ActionType.Create : ActionType.Update,
                     BeforeDetailInfo = custBetLimit.ToLog(),
-                    AfterDetailInfo = new CustBetLimit()
+                    AfterDetailInfo = new AfterBetLimit()
                     {
                         UserName = userName,
                         BetSetting = betSettings
@@ -113,7 +112,9 @@ namespace BackendSite.Service.BLL
         public async Task<CustBetLimitByCustIdV2> GetByCustIdV2(int custId)
         {
             var betLimit = await _userBetLimitService.UserBetLimitGetByCustId(custId);
-            var betSettings = ParseSetting(betLimit.BetSetting);
+            if(betLimit == null) throw new AdminException(ErrorCodeEnum.NoCustBetLimit);
+
+            var betSettings = ToObject(betLimit.BetSetting);
 
             var resp = new CustBetLimitByCustIdV2()
             {
@@ -131,10 +132,15 @@ namespace BackendSite.Service.BLL
             if (betLimit == null)
                 return -1;
 
-            var betSettings = JsonConvert.DeserializeObject<List<CustBetLimitSetting>>(betLimit.BetSetting);
-            var sbo = betSettings.FirstOrDefault(a => a.GameTypeId == (int)TpGameTypeEnum.SBO_Sports);
-            if(sbo != null)
-                await ResetBetLimit(betLimit.CustId, sbo.GameTypeId, betLimit.CurrencyId);
+            var betSettings = ToObject(betLimit.BetSetting);
+            foreach (var item in betSettings)
+            {
+                if (CallApi.Contains(item.GameTypeId))
+                {
+                    var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
+                    await ResetBetLimit(betLimit.CustId, item.GameTypeId, betLimit.CurrencyId);
+                }
+            }
 
             var result = await _userBetLimitService.Delete(input);
             if (result > 0)
@@ -145,7 +151,7 @@ namespace BackendSite.Service.BLL
                     CurrencyId = input.CurrencyId,
                     MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
                     ActionType = ActionType.Delete,
-                    BeforeDetailInfo = input.Before.ToLog(),
+                    BeforeDetailInfo = betLimit.ToLog(),
                     Operator = input.Operator
                 };
 
@@ -160,7 +166,6 @@ namespace BackendSite.Service.BLL
         private async Task ResetBetLimit(int custId, int gameType, int currencyId) 
         {
             var defaultBetLimit = await _userBetLimitService.GetLimitGroup(gameType, currencyId);
-
             var tpId = await _userBetLimitService.GetTpIdByGameType(gameType);
             var betLimit = new SetBetLimit
             {
@@ -178,7 +183,7 @@ namespace BackendSite.Service.BLL
             return await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_apiUrl}SetBetLimit", request);
         }
 
-        private async Task<SetBetLimit> ParseSetting(int custId, int currencyId, CustBetLimitSetting before, SportsSetting after) 
+        private async Task<SetBetLimit> Compare(int custId, int currencyId, SportsSetting before, SportsSetting after) 
         {
             if (after == null)
             {
@@ -214,7 +219,7 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        private List<BetLimitSetting> ParseSetting(dynamic betSetting)
+        private List<BetLimitSetting> ToObject(dynamic betSetting)
         {
             var betSettings = new List<BetLimitSetting>();
             foreach (var item in betSetting)
@@ -224,7 +229,7 @@ namespace BackendSite.Service.BLL
                 {
                     var sports = new SportsSetting
                     {
-                        Checked = (bool)item["checked"],
+                        Checked = item["checked"],
                         TpCategory = item["tpCategory"],
                         TpCategoryName = item["tpCategoryName"],
                         GameTypeId = item["gameTypeId"],
@@ -234,7 +239,7 @@ namespace BackendSite.Service.BLL
                         MaxPerMatch = item["maxPerMatch"]
                     };
                     if (sports.Min > sports.Max || sports.Max > sports.MaxPerMatch)
-                        throw new AdminException("parameter error");
+                        throw new AdminException(ErrorCodeEnum.InvalidBetLimit);
                     betSettings.Add(sports);
                 }
                 else if (tpCategory == (int)TpCategoryEnum.LiveCasino)
@@ -242,7 +247,7 @@ namespace BackendSite.Service.BLL
                     
                     var liveCasino = new LiveCasinoSetting
                     {
-                        Checked = (bool)item["checked"],
+                        Checked = item["checked"],
                         TpCategory = item["tpCategory"],
                         TpCategoryName = item["tpCategoryName"],
                         GameTypeId = item["gameTypeId"],
@@ -256,9 +261,9 @@ namespace BackendSite.Service.BLL
             return betSettings;
         }
 
-        private List<CustBetLimitSetting> ParseSetting(string betLimit)
+        private List<BetLimitSetting> ToObject(string betLimit)
         {
-            var betSettings = new List<CustBetLimitSetting>();
+            var betSettings = new List<BetLimitSetting>();
             var setting = JsonConvert.DeserializeObject<dynamic>(betLimit);
 
             foreach (var item in setting)
@@ -266,7 +271,7 @@ namespace BackendSite.Service.BLL
                 var tpCategory = (int)item["TpCategory"];
                 if (tpCategory == (int)TpCategoryEnum.Sports)
                 {
-                    var sports = new CustBetLimitSetting
+                    var sports = new SportsSetting
                     {
                         Checked = item["Checked"],
                         TpCategory = item["TpCategory"],
@@ -278,14 +283,14 @@ namespace BackendSite.Service.BLL
                         MaxPerMatch = item["MaxPerMatch"]
                     };
                     if (sports.Min > sports.Max || sports.Max > sports.MaxPerMatch)
-                        throw new AdminException("parameter error");
+                        throw new AdminException(ErrorCodeEnum.InvalidBetLimit);
                     betSettings.Add(sports);
                 }
                 else if (tpCategory == (int)TpCategoryEnum.LiveCasino)
                 {
-                    var liveCasino = new CustBetLimitSetting
+                    var liveCasino = new LiveCasinoSetting
                     {
-                        Checked = (bool)item["Checked"],
+                        Checked = item["Checked"],
                         TpCategory = item["TpCategory"],
                         TpCategoryName = item["TpCategoryName"],
                         GameTypeId = item["GameTypeId"],

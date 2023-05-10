@@ -26,20 +26,6 @@ namespace BackendSite.Service.Model
         public int MaxPerMatch { get; set; }
     }
 
-    public class CustBetLimitSetting
-    {
-        public bool Checked { get; set; }
-        public int TpCategory { get; set; }
-        public string TpCategoryName { get; set; }
-        public int GameTypeId { get; set; }
-        public string GameTypeName { get; set; }
-        public string LimitGroup { get; set; }
-        public string LimitRange { get; set; }
-        public int Min { get; set; }
-        public int Max { get; set; }
-        public int MaxPerMatch { get; set; }
-    }
-
     public class SetBetLimit
     {
         public int TpId { set; get; }
@@ -100,7 +86,7 @@ namespace BackendSite.Service.Model
         public int MaxPerMatch { get; set; }
     }
 
-    public class CustBetLimit
+    public class AfterBetLimit
     {
         public string UserName { get; set; }
         [LogIgnore]
@@ -162,6 +148,6 @@ namespace BackendSite.Service.Model
         public int custId { get; set; }
         public string UserName { get; set; }
         public int CurrencyId { get; set; }
-        public List<CustBetLimitSetting> BetSetting { get; set; }
+        public List<BetLimitSetting> BetSetting { get; set; }
     }
 }
