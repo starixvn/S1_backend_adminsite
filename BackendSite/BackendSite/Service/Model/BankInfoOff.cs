@@ -44,7 +44,6 @@ namespace BackendSite.Service.Model
         public TransferAccountStatusEnum AccountStatus { get; set; }
         public BankCardManagementStatusEnum SettingStatus { get; set; }
         
-        [JsonIgnore]
         public string Purpose { get; set; }
 
         public IEnumerable<TransferAccountPurposeEnum> Purposes =>
