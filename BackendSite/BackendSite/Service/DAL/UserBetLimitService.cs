@@ -66,10 +66,6 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", custId);
             return await ReportDbClient.QueryFirstAsync<CustBetLimitData>("Admin_CustBetLimitByCustId_Get", p);
         }
-        public async Task<IEnumerable<TpCategoryData>> GetTpCategoryList()
-        {
-            return await ReportDbClient.QueryAsync<TpCategoryData>("Admin_TPCategory_Get", null);
-        }
         public Task<int> GetTpIdByGameType(int gameType)
         {
             return ReportDbClient.QueryFirstAsync<int>("Admin_TpIdByGameType_Get", new { _GameType = gameType });

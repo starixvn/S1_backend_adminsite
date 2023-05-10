@@ -27,14 +27,6 @@ namespace BackendSite.Service.BLL
             _custInfoBll = custInfoBll;
             _logger = logger;
         }
-
-        public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
-        {
-            var tpCategories = await _userBetLimitService.GetTpCategoryList();
-
-            return tpCategories.Where(a => a.CategoryId == (int)TpCategoryEnum.LiveCasino)
-                .Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
-        }
         public async Task<IEnumerable<BetLimitOption>> GetSettingList(int currencyId)
         {
             var dg = await _userBetLimitService.GetLimitGroup(10, currencyId);
@@ -138,7 +130,6 @@ namespace BackendSite.Service.BLL
             {
                 if (CallApi.Contains(item.GameTypeId))
                 {
-                    var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
                     await ResetBetLimit(betLimit.CustId, item.GameTypeId, betLimit.CurrencyId);
                 }
             }
