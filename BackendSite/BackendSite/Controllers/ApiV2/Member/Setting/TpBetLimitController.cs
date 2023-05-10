@@ -159,12 +159,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpCategoryBetLimit>>> GetTpCategoryList()
+        public async Task<ApiResult<IEnumerable<BetLimitOption>>> GetTpCategoryList(GetTpCategoryListReq request)
         {
-            var data = await _userBetLimitBll.GetTpCategoryList();
-            var apiResult = new ApiResult<IEnumerable<TpCategoryBetLimit>>
+            var apiResult = new ApiResult<IEnumerable<BetLimitOption>>
             {
-                Data = data,
+                Data = await _userBetLimitBll.GetSettingList(request.CurrencyId),
                 ErrorCode = 0
             };
 

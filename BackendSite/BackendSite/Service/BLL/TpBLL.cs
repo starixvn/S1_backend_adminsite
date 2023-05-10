@@ -262,5 +262,22 @@ namespace BackendSite.Service.BLL
             var result = await _thirdPartyService.GetTpGameTypeCurrency();
             return result.Where(x => x.SiteId == siteId && x.CurrencyId == currencyId);
         }
+        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        {
+            var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(categoryId);
+            var gameTypeWithBetLimit = tpGameType
+                .Select(a => new GameTypeBetLimit()
+                {
+                    TypeId = a.Type,
+                    TypeName = a.TypeName
+                });
+            return gameTypeWithBetLimit;
+        }
+        public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)
+        {
+            var tpGameType = await _thirdPartyService.GetTpListByCategoryAsync(categoryId);
+
+            return tpGameType;
+        }
     }
 }
