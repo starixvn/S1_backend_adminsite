@@ -1,12 +1,10 @@
-﻿using System.Drawing;
-using System.Transactions;
+﻿using System.Transactions;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
-using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.ApiModel;
 using NPOI.XSSF.UserModel;
@@ -269,6 +267,8 @@ namespace BackendSite.Service.BLL
                 count = 1;
                 message = "Update Transfer Account And Insert Log Success.";
             }
+            
+            _ = _cacheHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member);
 
             return (true, count, message);
         }
