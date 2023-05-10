@@ -1,0 +1,202 @@
+﻿using BackendSite.Attributes;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BackendSite.Controllers.ApiV2.Marketing.Bonus;
+
+[Authorize(AuthenticationSchemes = "backendV2")]
+[Route("apiV2/[controller]/[action]")]
+[ApiController]
+public class RebateExcludeGameController : ControllerBase
+{
+    #region Fields
+
+    private readonly RiskBLL _riskBll;
+    private readonly GameCasinoBLL _gameCasinoBll;
+    private readonly CustInfoBLL _custInfoBll;
+    private readonly ILogger<RiskController> _logger;
+    private readonly NewAuthorizeBLL _newAuthorizeBLL;
+    private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+
+    #endregion
+
+    #region Constructor
+
+    public RebateExcludeGameController(IServiceProvider provider)
+    {
+        _riskBll = provider.GetRequiredService<RiskBLL>();
+        _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
+        _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+        _logger = provider.GetRequiredService<ILogger<RiskController>>();
+        _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
+        _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+    }
+
+    #endregion
+
+    #region Model
+
+    public class QueryTpDisableUserReq : ApiRequestPageModel
+    {
+        private DateTimeOffset _startDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        public int SiteId { get; set; }
+        public string UserName { get; set; }
+        public DateTimeOffset StartDate
+        {
+            get => _startDate;
+            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+    }
+    public class TpDisableUserForGameDetailReq
+    {
+        public int CustId { get; set; }
+    }
+
+    #endregion
+
+    /// <summary>
+    /// TpDisable/GetList 取得第三方被禁止的用戶資料清單
+    /// </summary>
+    /// <remarks>
+    /// Http Method：POST
+    /// 
+    /// Func Path：CSD > Disable User For Game > [Submit]
+    /// </remarks>
+    /// <param name="req"></param>
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 1 })]
+    [HttpPost]
+    public ApiListResult<TpDisableUser> GetList(QueryTpDisableUserReq req)
+    {
+        var apiResult = new ApiListResult<TpDisableUser>();
+
+        var pageNumber = req.PageNumber;
+        List<int> siteIds = new List<int>();
+        siteIds.Add(req.SiteId);
+        apiResult.Data = _riskBll.GetTpDisableUser(
+            siteIds,
+            string.IsNullOrEmpty(req.UserName) ? null : req.UserName,
+            req.StartDate,
+            req.EndDate,
+            req.PageSize,
+            req.PageNumber,
+            out var totalPages,
+            out var rowCount);
+        apiResult.TotalPages = totalPages;
+        apiResult.PageNumber = pageNumber;
+        apiResult.RowCount = rowCount;
+        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
+        return apiResult;
+    }
+
+    /// <summary>
+    /// TpDisable/GetByCustId 取得指定第三方被禁止的會員資料
+    /// </summary>
+    /// <remarks>
+    /// Http Method：POST
+    /// 
+    /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit]
+    /// </remarks>
+    /// <param name="req"></param>
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 1 })]
+    [HttpPost]
+    public async Task<ApiResult<TpDisableUserForGameDetail>> GetByCurrencyId(TpDisableUserForGameDetailReq req)
+    {
+        var apiResult = new ApiResult<TpDisableUserForGameDetail>();
+
+        var tpList = await _gameCasinoBll.GetTpList();
+        var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(req.CustId);
+
+        if (userDisableGames.GameInfo != null && userDisableGames.GameInfo != "null")
+        {
+            var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
+
+            foreach (var disableGame in disableGames)
+            {
+                foreach (var tp in tpList)
+                {
+                    if (disableGame.TpId == tp.TpId)
+                    {
+                        tp.Checked = true;
+                        var games = await _gameCasinoBll.GetGameCasinoByTpId(tp.TpId);
+                        tp.GameList = games.Select(a => new TpGameCasino()
+                        {
+                            GameId = a.GameId,
+                            Name = a.Name,
+                            Checked = disableGame.GameList != null && disableGame.GameList.Any(c => c == a.GameId)
+                        }).ToList();
+                    }
+                }
+            }
+        }
+
+        var editInfo = new TpDisableUserForGameDetail()
+        {
+            SiteId = userDisableGames.SiteId,
+            UserName = userDisableGames.UserName,
+            DisableGames = tpList.ToList()
+        };
+        apiResult.Data = editInfo;
+        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
+        return apiResult;
+    }
+
+    /// <summary>
+    /// TpDisable/Set 新增or更新會員第三方被禁止的資料
+    /// </summary>
+    /// <remarks>
+    /// Http Method：POST
+    /// 
+    /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > [Submit]
+    /// </remarks>
+    /// <param name="disableGames"></param>
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 3 })]
+    [HttpPost]
+    public async Task<ApiResult> Set(DisableUser disableGames)
+    {
+        var apiResult = new ApiResult();
+        var authData = _newAuthorizeBLL.GetAuthData();
+        var updateOperator = authData.UserName;
+        var customer = await _custInfoBll.GetCustId(null, disableGames.UserName, disableGames.SiteId);
+        if (customer == null)
+        {
+            apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
+            apiResult.Message = "User Not Found";
+            return apiResult;
+        }
+
+        var result = await _riskBll.DisableUserForGame(customer.CustId, customer.SiteId,
+            disableGames.DisableTpGame, updateOperator);
+
+        if (result == 1 || result == 2)
+        {
+            var siteId = _newAuthorizeBLL.CheckBrand();
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = updateOperator,
+                SiteId = siteId,
+                CurrencyId = 0,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.GameExclusion,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = JsonConvert.SerializeObject(disableGames),
+                RefTransId = string.Empty
+            });
+        }
+
+        return new ApiResult
+        {
+            //result: 1 (新增成功),2 (修改成功)
+            ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result,
+        };
+
+    }
+
+}
