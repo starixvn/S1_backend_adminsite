@@ -26,7 +26,7 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public int ShieldLevel { get; set; }
     public int IovationLevel { get; set; }
     public string DeviceId { get; set; }
-    public IEnumerable<MemberTypeEnum> UserTypes { get; set; } = new List<MemberTypeEnum>() { MemberTypeEnum.Normal , MemberTypeEnum.Affiliate };
+    public IEnumerable<MemberTypeEnum> UserTypes { get; set; }
     public bool ExcludeTag { get; set; }
 }
 
