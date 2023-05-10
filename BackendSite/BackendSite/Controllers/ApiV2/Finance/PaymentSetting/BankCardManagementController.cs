@@ -135,7 +135,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             if (success)
             {
-                _ = Task.Run(() => _redisHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member));
+                _ = await _redisHelper.KeyDeleteByPatternAsync("PaySetting:*", RedisDataBase.Member);
                 
                 var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
                 var localPaySettings = await _bankDetailBll.GetLocalPaySettingAsync();
