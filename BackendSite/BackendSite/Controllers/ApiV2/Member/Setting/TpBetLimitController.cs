@@ -126,29 +126,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         /// <summary>
-        /// TpBetLimit/GetTpBetLimit 取得指定第三方投注限額
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// </remarks>
-        /// <param name="req"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 63, 3 })]
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpBetLimitGroupV2>>> GetTpBetLimitGroupAsync(GetTpBetLimitGroupReq req)
-        {
-            var data = await _userBetLimitBll.GetTpBetLimitGroupV2Async(req.CurrencyId);
-            var apiResult = new ApiResult<IEnumerable<TpBetLimitGroupV2>>
-            {
-                Data = data,
-                ErrorCode = 0
-            };
-            return apiResult;
-        }
-
-        /// <summary>
         /// TpBetLimit/GetTpCategoryList 取得UserBetLimit 可以設定的TpCategory
         /// </summary>
         /// <remarks>
