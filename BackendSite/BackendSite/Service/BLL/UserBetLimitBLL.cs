@@ -7,6 +7,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
+using System.Collections.Generic;
 
 namespace BackendSite.Service.BLL
 {
@@ -38,7 +39,16 @@ namespace BackendSite.Service.BLL
             return tpCategories.Where(a => a.CategoryId == (int)TpCategoryEnum.LiveCasino)
                 .Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
         }
-
+        public async Task<IEnumerable<BetLimitOption>> GetSettingList(int currencyId)
+        {
+            var dg = await _userBetLimitService.GetLimitGroup(10, currencyId);
+            var dgGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(dg.LimitGroup);
+            return new List<BetLimitOption>()
+            {
+                new BetLimitOption() { CategoryId = (int)TpCategoryEnum.LiveCasino, CategoryName = "Live Casino", GameType = 10, GameTypeName = "DG L.Casino", IsGroup = true, LimitGroup = dgGroup },
+                new BetLimitOption() { CategoryId = (int)TpCategoryEnum.Sports, CategoryName = "Sports", GameType = 77, GameTypeName = "SBO Sports", IsGroup = false, LimitInput = new LimitInput() { Min = 5, Max = 100000, MaxPerMatch = 340000 }}
+            };
+        }
         public async Task<int> SetUserBetLimit(dynamic req, string updateOperator)
         {
             var userName = (string)req["after"].userName;

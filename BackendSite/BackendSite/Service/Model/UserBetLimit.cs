@@ -75,6 +75,17 @@ namespace BackendSite.Service.Model
         public List<TpBetLimitGroup> GameTypeBetLimit { get; set; }
     }
 
+    public class BetLimitOption
+    {
+        public int CategoryId { set; get; }
+        public string CategoryName { set; get; }
+        public int GameType { set; get; }
+        public string GameTypeName { set; get; }
+        public bool IsGroup { get; set; }
+        public List<LimitGroup> LimitGroup { get; set; }
+        public LimitInput LimitInput { get; set; }
+    }
+
     public class GameTypeBetLimit
     {
         public int TypeId { set; get; }
@@ -95,6 +106,12 @@ namespace BackendSite.Service.Model
     {
         public string Group { get; set; }
         public string Range { get; set; }
+    }
+    public class LimitInput
+    {
+        public int Min { get; set; }
+        public int Max { get; set; }
+        public int MaxPerMatch { get; set; }
     }
 
     public class CustBetLimit
@@ -184,6 +201,10 @@ namespace BackendSite.Service.Model
         public List<TpCategoryBetLimit> BetSetting { get; set; }
     }
     public class GetTpBetLimitGroupReq
+    {
+        public int CurrencyId { get; set; }
+    }
+    public class GetTpCategoryListReq
     {
         public int CurrencyId { get; set; }
     }
