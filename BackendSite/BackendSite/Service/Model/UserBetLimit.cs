@@ -35,23 +35,9 @@ namespace BackendSite.Service.Model
         public string GameTypeName { get; set; }
         public string LimitGroup { get; set; }
         public string LimitRange { get; set; }
-        public List<LimitGroupList> LimitGroupList { get; set; }
         public int Min { get; set; }
         public int Max { get; set; }
         public int MaxPerMatch { get; set; }
-    }
-
-    public class LimitGroupList
-    {
-        public string Group { get; set; }
-        public string Range { get; set; }
-    }
-    public class SportBetLimit
-    {
-        public int MinBet { get; set; }
-        public int MaxBet { get; set; }
-        public int MaxPerMatch { get; set; }
-        public int TableLimit { get; set; }
     }
 
     public class SetBetLimit
@@ -129,14 +115,6 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
     }
 
-    public class BetSetting
-    {
-        [LogIgnore]
-        public int TpCategory { get; set; }
-        public string TpCategoryName { get; set; }
-        public List<TpBetSetting> TpBetSetting { get; set; }
-    }
-
     public class TpBetSetting
     {
         [LogIgnore]
@@ -154,16 +132,6 @@ namespace BackendSite.Service.Model
         public bool Checked { get; set; } = false;
     }
 
-    public class QueryUserBetLimit
-    {
-        public IEnumerable<int> SiteIds { get; set; }
-        public string UserName { get; set; }
-        public long StartDate { get; set; }
-        public long EndDate { get; set; }
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-    }
-
     public class UserBetLimit
     {
         public int CustId { get; set; }
@@ -175,12 +143,6 @@ namespace BackendSite.Service.Model
         public DateTimeOffset UpdateTime { get; set; }
     }
 
-    public class BetLimitStatus
-    {
-        public int CustId { get; set; }
-        public int Status { get; set; }
-    }
-
     public class CustBetLimitData
     {
         [LogIgnore]
@@ -189,20 +151,6 @@ namespace BackendSite.Service.Model
         [LogIgnore]
         public int CurrencyId { get; set; }
         public string BetSetting { get; set; }
-    }
-
-    public class CustBetLimitByCustId
-    {
-        public int SiteId { get; set; }
-        public string SiteName { get; set; }
-        public int custId { get; set; }
-        public string UserName { get; set; }
-        public int CurrencyId { get; set; }
-        public List<TpCategoryBetLimit> BetSetting { get; set; }
-    }
-    public class GetTpBetLimitGroupReq
-    {
-        public int CurrencyId { get; set; }
     }
     public class GetTpCategoryListReq
     {
@@ -215,21 +163,5 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int CurrencyId { get; set; }
         public List<CustBetLimitSetting> BetSetting { get; set; }
-    }
-    public class TpBetLimitGroupV2 : TpBetLimitGroup
-    {
-        public int CategoryId { set; get; }
-        public string CategoryName { set; get; }
-    }
-    public class CustBetLimitV2
-    {
-        public string UserName { get; set; }
-        public List<TpBetSettingV2> BetSetting { get; set; }
-    }
-    public class TpBetSettingV2 : TpBetSetting
-    {
-        public int TpCategory { get; set; }
-        public string TpCategoryName { get; set; }
-        public bool Checked { get; set; }
     }
 }

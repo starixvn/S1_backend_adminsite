@@ -113,7 +113,7 @@ namespace BackendSite.Service.BLL
         public async Task<CustBetLimitByCustIdV2> GetByCustIdV2(int custId)
         {
             var betLimit = await _userBetLimitService.UserBetLimitGetByCustId(custId);
-            var betSettings = await ParseSetting(betLimit.BetSetting, betLimit.CurrencyId);
+            var betSettings = ParseSetting(betLimit.BetSetting);
 
             var resp = new CustBetLimitByCustIdV2()
             {
@@ -176,37 +176,6 @@ namespace BackendSite.Service.BLL
         private async Task<ApiResult> SetBetLimit(SetBetLimit request) 
         {
             return await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_apiUrl}SetBetLimit", request);
-        }
-
-        public async Task<IEnumerable<TpBetLimitGroupV2>> GetTpBetLimitGroupV2Async(int currencyId)
-        {
-            var listTpLimitGroup = new List<TpBetLimitGroupV2>();
-            var tpCategories = await _userBetLimitService.GetTpCategoryList();
-            var tpCategoryBetLimitList = tpCategories.Where(a => a.CategoryId == (int)TpCategoryEnum.LiveCasino)
-                .Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
-
-            tpCategoryBetLimitList.ForEach(async x =>
-            {
-                var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(x.CategoryId);
-                foreach (var type in tpGameType)
-                {
-                    var betLimit = BetLimitFactory.Create(_userBetLimitService.ReportDbClient, (TpGameTypeEnum)type.Type);
-                    if (betLimit == null) continue;
-                    var group = await betLimit.GetLimitGroup(currencyId);
-                    var tpBetLimitGroup = new TpBetLimitGroupV2()
-                    {
-                        CategoryId = x.CategoryId,
-                        CategoryName = x.CategoryName,
-                        TypeId = type.Type,
-                        TypeName = type.TypeName,
-                        SelectedValue = group.DefaultGroup,
-                        LimitGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(group.LimitGroup)
-                    };
-                    listTpLimitGroup.Add(tpBetLimitGroup);
-                }
-            });
-
-            return listTpLimitGroup;
         }
 
         private async Task<SetBetLimit> ParseSetting(int custId, int currencyId, CustBetLimitSetting before, SportsSetting after) 
@@ -287,7 +256,7 @@ namespace BackendSite.Service.BLL
             return betSettings;
         }
 
-        private async Task<List<CustBetLimitSetting>> ParseSetting(string betLimit, int currencyId)
+        private List<CustBetLimitSetting> ParseSetting(string betLimit)
         {
             var betSettings = new List<CustBetLimitSetting>();
             var setting = JsonConvert.DeserializeObject<dynamic>(betLimit);
@@ -314,8 +283,6 @@ namespace BackendSite.Service.BLL
                 }
                 else if (tpCategory == (int)TpCategoryEnum.LiveCasino)
                 {
-                    var gameType = (int)item["GameTypeId"];
-                    var liveCasisnoGroup = await _userBetLimitService.GetLimitGroup(gameType, currencyId);
                     var liveCasino = new CustBetLimitSetting
                     {
                         Checked = (bool)item["Checked"],
@@ -324,8 +291,7 @@ namespace BackendSite.Service.BLL
                         GameTypeId = item["GameTypeId"],
                         GameTypeName = item["GameTypeName"],
                         LimitGroup = item["LimitGroup"],
-                        LimitRange = item["LimitRange"],
-                        LimitGroupList = JsonConvert.DeserializeObject<List<LimitGroupList>>(liveCasisnoGroup.LimitGroup)
+                        LimitRange = item["LimitRange"]
                     };
                     betSettings.Add(liveCasino);
                 }
