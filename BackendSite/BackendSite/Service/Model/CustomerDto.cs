@@ -267,6 +267,7 @@ public class CustomerDto
     public DateTime? PhoneVerifyTime { get; set; }
     public DateTime? EmailVerifyTime { get; set; }
     public int Exclusive { get; set; }
+    public int MemberType { get; set; }
 }
 
 public class CustomerTag
@@ -321,6 +322,7 @@ public class CustomerBasicInfo
     public DateTimeOffset? PhoneVerifyTime { get; set; }
     public DateTimeOffset? EmailVerifyTime { get; set; }
     public int Exclusive { get; set; }
+    public int MemberType { get; set; }
 }
 
 public class AffInfo
