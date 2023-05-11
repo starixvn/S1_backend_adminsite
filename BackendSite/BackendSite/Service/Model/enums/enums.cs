@@ -279,6 +279,7 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        UnCheckDepositReceipt = 93,
         SetDepositAmount = 94,
         CheckDepositReceipt = 95,
         DeleteReceipt = 96,
@@ -639,7 +640,8 @@ namespace BackendSite.Service.Model.enums
         PTSlotsGame = 7,
         PTLiveCasino = 8,
         SBSW = 9,
-        Mega888SlotRNGAndFishing = 10
+        Mega888SlotRNGAndFishing = 10,
+        ESports = 11
     }
 
     public enum FullFillTypeEnum
@@ -1177,7 +1179,8 @@ namespace BackendSite.Service.Model.enums
         Cockfighting = 5,
         Lottery = 6,
         VirtualSports = 7,
-        Poker = 8
+        Poker = 8,
+        ESports = 11
     }
 
     public enum LeaderBoardCategoryEnum
@@ -1253,7 +1256,8 @@ namespace BackendSite.Service.Model.enums
         [Description("Bank Transfer")]
         LocalBank = 0,
         [Description("Mobile E-Wallet")]
-        EWallet = 1
+        EWallet = 1,
+        QRPay = 2
     }
 
     #endregion

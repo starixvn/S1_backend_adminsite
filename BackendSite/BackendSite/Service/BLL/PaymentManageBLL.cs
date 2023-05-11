@@ -186,5 +186,12 @@ namespace BackendSite.Service.BLL
             _ = Task.Run(() => _redisHelper.KeyDeleteByPattern(pattern, db))
                 .ConfigureAwait(false);
         }
+        
+        public async Task<IEnumerable<PayGroup>> GetPayGroupWithCache()
+        {
+            var dbData = await _redisHelper.TryGetOrCreateAsync("PayGroupInfoList", TimeSpan.FromMinutes(5),
+                () => _paymentManageService.GetPayGroup(), RedisDataBase.Shared);
+            return dbData;
+        }
     }
 }

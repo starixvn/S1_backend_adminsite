@@ -21,7 +21,7 @@ namespace BackendSite.Service.DAL
         {
             var parameter = new DynamicParameters();
             parameter.Add("SiteId", siteId, DbType.Int32);
-            parameter.Add("TpId", tpId, DbType.Int32);        
+            parameter.Add("TpId", tpId, DbType.Int32);
             parameter.Add("Names", string.IsNullOrWhiteSpace(name) ? null : name);
             parameter.Add("GameId", string.IsNullOrWhiteSpace(gameId) ? null : gameId);
             parameter.Add("Status", (int)status, DbType.Int32);
@@ -29,7 +29,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<SlotGame>("Admin_SlotGame_Get_V2", parameter).ToList();
         }
 
-        public int SetSlotGame(int siteId, int currencyId,int slotGameId, SlotGameStatusEnum status, string Operator)
+        public int SetSlotGame(int siteId, int currencyId, int slotGameId, SlotGameStatusEnum status, string Operator)
         {
             var parameter = new DynamicParameters();
             parameter.Add("SiteId", siteId, DbType.Int32);
@@ -52,7 +52,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<SlotGame>("Admin_SlotGameCategory_Get_V2", parameter).ToList();
         }
-        public int SetSlotGameCategory(int siteId, int currencyId, int slotGameId, int categoryId, SlotGameStatusEnum status,string Operator)
+        public int SetSlotGameCategory(int siteId, int currencyId, int slotGameId, int categoryId, SlotGameStatusEnum status, string Operator)
         {
             var parameter = new DynamicParameters();
             parameter.Add("SiteId", siteId, DbType.Int32);
@@ -63,6 +63,41 @@ namespace BackendSite.Service.DAL
             parameter.Add("Operator", Operator);
 
             return _mainDbClient.Execute("Admin_SlotGameDetail_Set", parameter);
+        }
+
+        public bool SetSlotGameAllCurrency(int siteId, IEnumerable<int> currencyIds, int slotGameId, SlotGameStatusEnum status, string Operator)
+        {
+            using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var success = true;
+            currencyIds.ToList().ForEach(x =>
+            {
+                var parameter = new DynamicParameters();
+                parameter.Add("SiteId", siteId, DbType.Int32);
+                parameter.Add("CurrencyId", x, DbType.Int32);
+                parameter.Add("SlotGameId", slotGameId, DbType.Int32);
+                parameter.Add("Status", (int)status, DbType.Int32);
+                parameter.Add("Operator", Operator);
+
+                var result = _mainDbClient.Execute("Admin_SlotGameStatus_Set", trans, parameter) > 0;
+
+                if (!result)
+                {
+                    success = false;
+                }
+            });
+
+            if (success)
+            {
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
+            }
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            }
+
+            return success;
         }
     }
 }
