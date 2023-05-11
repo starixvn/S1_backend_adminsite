@@ -266,6 +266,7 @@ public class CustomerDto
     public DateTime? EmailRewardTime { get; set; }
     public DateTime? PhoneVerifyTime { get; set; }
     public DateTime? EmailVerifyTime { get; set; }
+    public int MemberType { get; set; }
 }
 
 public class CustomerTag
