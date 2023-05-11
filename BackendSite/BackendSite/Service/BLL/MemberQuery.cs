@@ -259,7 +259,8 @@ namespace BackendSite.Service.BLL
                 PhoneRewardTime = customer.PhoneRewardTime.ToOffset(TimeSpan.Zero),
                 EmailRewardTime = customer.EmailRewardTime.ToOffset(TimeSpan.Zero),
                 PhoneVerifyTime = customer.PhoneVerifyTime.ToOffset(TimeSpan.Zero),
-                EmailVerifyTime = customer.EmailVerifyTime.ToOffset(TimeSpan.Zero)
+                EmailVerifyTime = customer.EmailVerifyTime.ToOffset(TimeSpan.Zero),
+                MemberType = customer.MemberType
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
@@ -302,7 +303,7 @@ namespace BackendSite.Service.BLL
                 DeviceType = a.Platform,
                 AssociateCount = a.AssociateCount,
                 LastUpdateTime = a.LastUpdateTime
-            }).OrderByDescending(x=> x.LastUpdateTime);
+            }).OrderByDescending(x => x.LastUpdateTime);
         }
 
         public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId)
