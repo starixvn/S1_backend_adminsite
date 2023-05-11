@@ -320,6 +320,7 @@ public class CustomerBasicInfo
     public DateTimeOffset? EmailRewardTime { get; set; }
     public DateTimeOffset? PhoneVerifyTime { get; set; }
     public DateTimeOffset? EmailVerifyTime { get; set; }
+    public int MemberType { get; set; }
 }
 
 public class AffInfo
