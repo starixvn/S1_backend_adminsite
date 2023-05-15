@@ -57,6 +57,7 @@
         public int CurrencyId{ get; set; }
         public string Currency { get; set; }
         public decimal BonusAmountClaim { get; set; }
+        public decimal BaseBonusAmountClaim { get; set; }
         public decimal ComparedBonusAmountClaim { get; set; }
         public decimal ChangeRate { get; set; }
     }
