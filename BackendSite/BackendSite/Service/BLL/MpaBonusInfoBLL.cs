@@ -236,12 +236,14 @@ namespace BackendSite.Service.BLL
                  {
                      Currency = info.First().Currency,
                      CurrencyId = info.First().CurrencyId,
-                     BonusAmountClaim = info.Where(i => i.CurrencyId == info.First().CurrencyId).Sum(i => i.BaseBonusAmountClaim),
+                     BonusAmountClaim = info.Where(i => i.CurrencyId == info.First().CurrencyId).Sum(i => i.BonusAmountClaim),
+                     BaseBonusAmountClaim = info.Where(i => i.CurrencyId == info.First().CurrencyId).Sum(i => i.BaseBonusAmountClaim),
                  }).ToList();
 
              var groupByCurrencySum = new MpaMarketingBonusGroupByCurrency 
              {
-                 BonusAmountClaim = groupCurrencyData.Sum(x=>x.BonusAmountClaim)
+                 BonusAmountClaim = groupCurrencyData.Sum(x=>x.BonusAmountClaim),
+                 BaseBonusAmountClaim = groupCurrencyData.Sum(x=>x.BaseBonusAmountClaim)
              };
 
              if (input.IsCompared)
@@ -263,11 +265,11 @@ namespace BackendSite.Service.BLL
                  foreach (var datas in groupCurrencyData)
                  {
                      datas.ComparedBonusAmountClaim = comparedData.Where(i => i.CurrencyId == datas.CurrencyId).Sum(i => i.BaseBonusAmountClaim);
-                     datas.ChangeRate = datas.ComparedBonusAmountClaim != 0 ? (datas.BonusAmountClaim / datas.ComparedBonusAmountClaim - 1) * 100 : 0;
+                     datas.ChangeRate = datas.ComparedBonusAmountClaim != 0 ? (datas.BaseBonusAmountClaim / datas.ComparedBonusAmountClaim - 1) * 100 : 0;
                  }
 
                  groupByCurrencySum.ComparedBonusAmountClaim = groupCurrencyData.Sum(x => x.ComparedBonusAmountClaim);
-                 groupByCurrencySum.ChangeRate = groupByCurrencySum.ComparedBonusAmountClaim != 0 ? (groupByCurrencySum.BonusAmountClaim / groupByCurrencySum.ComparedBonusAmountClaim - 1) * 100 : 0;
+                 groupByCurrencySum.ChangeRate = groupByCurrencySum.ComparedBonusAmountClaim != 0 ? (groupByCurrencySum.BaseBonusAmountClaim / groupByCurrencySum.ComparedBonusAmountClaim - 1) * 100 : 0;
              }
              
              #endregion
