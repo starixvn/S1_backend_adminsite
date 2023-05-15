@@ -779,7 +779,7 @@ namespace BackendSite.Controllers.Api
                 if (result)
                 {
                     var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(para.TransId);
-                    var x = para.Pic.Replace("data:image/png;base64,", "");
+                    var x = para.Pic.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
                     var bytes = Convert.FromBase64String(x);
                     var stream = new MemoryStream(bytes);
 
