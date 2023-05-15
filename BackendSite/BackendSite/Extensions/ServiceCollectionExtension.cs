@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using RabbitMQ.Client;
 
 namespace BackendSite.Extensions
 {
@@ -33,7 +34,18 @@ namespace BackendSite.Extensions
                     DataBase = DataBase.IP
                 });
         }
-
+        public static void AddMessageQueueConnection(this IServiceCollection services, IConfiguration config)
+        {
+            var hostName = config.GetSection("RabbitMQ:HostName");
+            var userName = config.GetSection("RabbitMQ:UserName");
+            var password = config.GetSection("RabbitMQ:Password");
+            services.AddSingleton<IConnectionFactory>(_ => new ConnectionFactory()
+            {
+                HostName = hostName.Value,
+                UserName = userName.Value,
+                Password = password.Value
+            });
+        }
         public static IServiceCollection AddOptionListByDB<T>(this IServiceCollection services, string sql, object parameters = null)
         {
             var provider = services.BuildServiceProvider();
