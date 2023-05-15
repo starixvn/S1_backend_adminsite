@@ -304,6 +304,11 @@ namespace BackendSite.Service.BLL
             var depositRequest = GetDepositRequest(transId);
             return depositService.GetDepositReceiptByNo(depositId, receiptNo ,depositRequest.SiteId);
         }
+        
+        public IEnumerable<DepositMessage> GetDepositMessageByDepositIds(IEnumerable<int> depositIds)
+        {
+            return depositService.GetDepositMessage(depositIds);
+        }
 
         public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite,string selectBankCode,string selectCalCode ,string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string depositId, IEnumerable<string> userNames,string agent, string currencyId, string status, string levelStatus ,decimal startAmount, decimal endAmount,string payIds)
         {

@@ -201,6 +201,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.EndAmount,
                 request.SelectPayId,
                 request.PageNumber, out var totalPages, out var rowCount , ref currencyAmountRecord);
+
+            if (depositList.Any())
+            {
+                var msgs = _depositBll.GetDepositMessageByDepositIds(depositList.Select(x => x.DepositId));
+
+                if (msgs.Any())
+                {
+                    foreach (var deposit in depositList)
+                    {
+                        deposit.DepositMessageList = msgs
+                            .Where(x => x.DepositId == deposit.DepositId)
+                            .OrderByDescending(x => x.CreateTime);
+                    }
+                }
+            }
             
             apiListResult.Data = depositList;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
