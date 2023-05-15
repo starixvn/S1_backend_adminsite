@@ -50,6 +50,8 @@
         public MpaMarketingBonusGroupByBonusCode GroupByBonusCodeSum{ get; set; }
         public IEnumerable<MpaMarketingBonusGroupByCurrency> GroupByCurrency { get; set; }
         public IEnumerable<MpaMarketingBonusGroupByBonusCodeInfo> GroupByBonusCode { get; set; }
+        public int TotalBonusClaimants{ get; set; }
+
     }
     
     public class MpaMarketingBonusGroupByCurrency
