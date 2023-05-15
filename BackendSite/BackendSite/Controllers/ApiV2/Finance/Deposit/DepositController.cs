@@ -589,7 +589,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     var receipts = _depositBll.GetDepositReceipt(depositReceipt.TransId);
                     var receiptNo = receipts.Any() ? receipts.Max(x => x.ReceiptNo) + 1 : 1 ;
                     
-                    var x = depositReceipt.Receipt.Replace("data:image/png;base64,", "");
+                    var x = depositReceipt.Receipt.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
                     var bytes = Convert.FromBase64String(x);
                     var stream = new MemoryStream(bytes);
 

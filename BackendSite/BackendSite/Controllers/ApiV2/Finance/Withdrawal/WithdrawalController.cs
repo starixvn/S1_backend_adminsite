@@ -856,7 +856,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     foreach (var pic in request.Pic)
                     {
                         var countName = withdrawalPic.BankSlipPicCount - requestCount + count;
-                        var x = pic.Replace("data:image/png;base64,", "");
+                        var x = pic.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
                         var bytes = Convert.FromBase64String(x);
                         var stream = new MemoryStream(bytes);
 
