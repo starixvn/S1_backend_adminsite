@@ -269,7 +269,7 @@ namespace BackendSite.Service.BLL
             };
             var bonusResult = _mpaBonusInfoBll.GetMpaMarketingBonus(request);
             result.TotalBonusClaimants = bonusResult.TotalBonusClaimants;
-            result.BonusAmountClaimed = bonusResult.GroupByCurrencySum.BonusAmountClaim;
+            result.BonusAmountClaimed = bonusResult.GroupByCurrencySum.BaseBonusAmountClaim;
             
             #endregion
 
