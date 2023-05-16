@@ -37,6 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly string _awsDepositFolder;
         private readonly string _awsDepositBucketName;
         private readonly int _mainWalletType;
+        private readonly IRabbitMQProducer _producer;
 
         #endregion
 
@@ -53,6 +54,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _producer = provider.GetRequiredService<IRabbitMQProducer>();
             _awsDepositUrl = configuration.GetValue<string>("AwsDepositUrl");
             _awsDepositFolder = configuration.GetValue<string>("AwsDepositFolder");
             _awsDepositBucketName = configuration.GetValue<string>("AwsDepositBucketName");
@@ -389,14 +391,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 
                 if (depositConfirmResult > 0)
                 {
-                        var userLang = _custInfoBll.GetCustInfoWithCache(depositRequest.CustId).UserLang;
-                        // Send message to player
-                        var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                        var title = _selLangBll.GetResourceValue("lbl_DepositApprovedTitle", userLang);
-                        title = string.Format(title, request.TransId);
-                        var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
-                        content = string.Format(content, request.TransId);
-                        await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
+                    var userLang = _custInfoBll.GetCustInfoWithCache(depositRequest.CustId).UserLang;
+                    // Send message to player
+                    var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                    var title = _selLangBll.GetResourceValue("lbl_DepositApprovedTitle", userLang);
+                    title = string.Format(title, request.TransId);
+                    var content = _selLangBll.GetResourceValue("lbl_DepositApprovedContent", userLang);
+                    content = string.Format(content, request.TransId);
+                    await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
+
+                    _producer.Publish("MemberExchange", "deposit", new { depositRequest.CustId });
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
