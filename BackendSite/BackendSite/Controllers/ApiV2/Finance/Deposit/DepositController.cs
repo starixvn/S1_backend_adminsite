@@ -419,7 +419,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     content = string.Format(content, request.TransId);
                     await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
 
-                    _producer.Publish("MemberExchange", "deposit", new { depositRequest.CustId });
+                    _producer.Publish("MemberExchange", "deposit.local", new { depositRequest.CustId });
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
