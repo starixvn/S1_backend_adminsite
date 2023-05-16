@@ -29,23 +29,23 @@ namespace BackendSite.Service.BLL
         }
         public async Task<IEnumerable<BetLimitOption>> GetSettingList(int siteId, int currencyId)
         {
+            var listSetting = new List<BetLimitOption>();
             var dg = await _userBetLimitService.GetLimitGroup(10, currencyId);
-            var dgGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(dg.LimitGroup);
-
-            if (siteId == (int)SiteEnum.NOVA88) 
+            if (dg != null) 
             {
-                return new List<BetLimitOption>()
-                {
-                    new BetLimitOption() { CategoryId = (int)TpCategoryEnum.LiveCasino, CategoryName = "Live Casino", GameType = 10, GameTypeName = "DG L.Casino", IsGroup = true, LimitGroup = dgGroup }
-                };
+                var dgGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(dg.LimitGroup);
+                var dgOption = new BetLimitOption() { CategoryId = (int)TpCategoryEnum.LiveCasino, CategoryName = "Live Casino", GameType = 10, GameTypeName = "DG L.Casino", IsGroup = true, LimitGroup = dgGroup };
+                listSetting.Add(dgOption);
             }
+
             var sbo = await _userBetLimitService.GetLimitGroup(77, currencyId);
-            var sboGroup = JsonConvert.DeserializeObject<LimitInput>(sbo.LimitGroup);
-            return new List<BetLimitOption>()
+            if (sbo != null) 
             {
-                new BetLimitOption() { CategoryId = (int)TpCategoryEnum.LiveCasino, CategoryName = "Live Casino", GameType = 10, GameTypeName = "DG L.Casino", IsGroup = true, LimitGroup = dgGroup },
-                new BetLimitOption() { CategoryId = (int)TpCategoryEnum.Sports, CategoryName = "Sports", GameType = 77, GameTypeName = "SBO Sports", IsGroup = false, LimitInput = new LimitInput() { Min = sboGroup.Min, Max = sboGroup.Max, MaxPerMatch = sboGroup.MaxPerMatch }}
-            };
+                var sboGroup = JsonConvert.DeserializeObject<LimitInput>(sbo.LimitGroup);
+                var sboOption = new BetLimitOption() { CategoryId = (int)TpCategoryEnum.Sports, CategoryName = "Sports", GameType = 77, GameTypeName = "SBO Sports", IsGroup = false, LimitInput = new LimitInput() { Min = sboGroup.Min, Max = sboGroup.Max, MaxPerMatch = sboGroup.MaxPerMatch } };
+                listSetting.Add(sboOption);
+            }
+            return listSetting;
         }
         public async Task<int> SetUserBetLimit(dynamic req, string updateOperator)
         {
