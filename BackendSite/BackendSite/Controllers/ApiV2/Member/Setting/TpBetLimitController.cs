@@ -140,7 +140,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             var apiResult = new ApiResult<IEnumerable<BetLimitOption>>
             {
-                Data = await _userBetLimitBll.GetSettingList(request.CurrencyId),
+                Data = await _userBetLimitBll.GetSettingList(request.SiteId, request.CurrencyId),
                 ErrorCode = 0
             };
 

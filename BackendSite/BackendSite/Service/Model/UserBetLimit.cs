@@ -130,6 +130,7 @@ namespace BackendSite.Service.Model
     }
     public class GetTpCategoryListReq
     {
+        public int SiteId { get; set; }
         public int CurrencyId { get; set; }
     }
 
