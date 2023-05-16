@@ -1433,8 +1433,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     request.EndTime.ToUniversalTime().DateTime)
             };
         }
-
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 87 })]
         [HttpPost]
         public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
         {
