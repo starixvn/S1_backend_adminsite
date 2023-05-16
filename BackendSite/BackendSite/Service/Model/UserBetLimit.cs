@@ -101,16 +101,6 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
     }
 
-    public class TpBetSetting
-    {
-        [LogIgnore]
-        public int GameTypeId { get; set; }
-        public string GameTypeName { get; set; }
-        [LogIgnore]
-        public string LimitGroup { get; set; }
-        public string LimitRange { get; set; }
-    }
-
     public class TpBetLimitData
     {
         public string DefaultGroup { get; set; }
@@ -140,6 +130,7 @@ namespace BackendSite.Service.Model
     }
     public class GetTpCategoryListReq
     {
+        public int SiteId { get; set; }
         public int CurrencyId { get; set; }
     }
 
