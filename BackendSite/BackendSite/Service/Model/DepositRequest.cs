@@ -120,11 +120,13 @@ namespace BackendSite.Service.Model
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
         public string Network { set; get; }
-        public IEnumerable<DepositMessage> DepositMessageList { set; get; }
+        public IEnumerable<DepositMessageShow> DepositMessageList { set; get; }
     }
 
     public class DepositInfoForExport
     {
+        [EpplusIgnore]
+        public int DepositId { set; get; }
         public string TransId { set; get; }
         [EpplusIgnore]
         public int DepositType { set; get; }
@@ -217,6 +219,7 @@ namespace BackendSite.Service.Model
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
         public string Memo { set; get; }
+        public string SendMessages { set; get; }
     }
 
     public class DepositDetailSubmission
@@ -527,6 +530,17 @@ namespace BackendSite.Service.Model
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-        public string Message => Status.ToString();
+    }
+    
+    public class DepositMessageShow
+    {
+        public DepositMessageShow(DepositMessage data, TimeSpan offset)
+        {
+            CreateTime = data.CreateTime.ToOffset(offset);
+            Message = data.Status.ToString();
+        }
+        
+        public DateTimeOffset CreateTime { get; set; }
+        public string Message { get; set; }
     }
 }
