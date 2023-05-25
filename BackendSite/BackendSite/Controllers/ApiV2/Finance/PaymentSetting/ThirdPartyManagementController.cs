@@ -149,6 +149,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                     d.LoginPassword = _cryptor.Decrypt(d.LoginPassword);
                     d.TransferPin = _cryptor.Decrypt(d.TransferPin);
                     d.LoginPin = _cryptor.Decrypt(d.LoginPin);
+                    d.CorporateId = _cryptor.Decrypt(d.CorporateId);
                 }
             }
 
