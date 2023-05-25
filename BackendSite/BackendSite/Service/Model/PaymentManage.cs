@@ -156,6 +156,7 @@ namespace BackendSite.Service.Model
         public string LoginPassword { get; set; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
+        public string CorporateId { get; set; }
     }
 
     public class UpdatePaySettingStatusParams
@@ -196,6 +197,8 @@ namespace BackendSite.Service.Model
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string Operator { get; set; }
+        
+        public string CorporateId { get; set; }
     }
 
     public class GetPaySettingListParams
