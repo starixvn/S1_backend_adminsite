@@ -282,7 +282,7 @@ namespace BackendSite.Controllers.Api
         {
             var startTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.StartDate);
             var endTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.EndDate);
-            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime, new TimeSpan(8, 0, 0));
+            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime, null,new TimeSpan(8, 0, 0));
 
             var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
             {
@@ -323,7 +323,8 @@ namespace BackendSite.Controllers.Api
                     req.CustId,
                     req.SelDate,
                     startTime,
-                    endTime)
+                    endTime,
+                    null)
             };
             return apiResult;
         }
@@ -360,7 +361,8 @@ namespace BackendSite.Controllers.Api
                     req.SelDate.Date,
                     req.CategoryId,
                     startTime,
-                    endTime)
+                    endTime,
+                    null)
             };
             return apiResult;
         }
