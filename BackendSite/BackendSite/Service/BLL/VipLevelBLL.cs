@@ -231,10 +231,20 @@ namespace BackendSite.Service.BLL
             return CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Downgrade) && UpdateVipDowngradeReview(custIdList, calculateYearMonth, newStatus, updater);
         }
 
-        public async Task<IEnumerable<VipLevelSetting>> GetUpgradeSetting(int siteId, int CurrencyId)
+        public async Task<IEnumerable<VipUpgradeSetting>> GetUpgradeSetting(int siteId, int CurrencyId)
         {
-            var vip = await _vipLevelService.GetVipLevelSettingAsync(siteId);
-            var system = await _vipLevelService.GetVipSystem(siteId);
+            var vipLevel = await _vipLevelService.GetVipLevelSettingAsync(siteId);
+            var vipSystem = await _vipLevelService.GetVipSystem(siteId);
+            var result = new List<VipUpgradeSetting>();
+            foreach (var vip in vipLevel)
+            {
+                result.Add(new VipUpgradeSetting()
+                {
+
+                });
+            }
+
+            return result;
         }
 
         #endregion
