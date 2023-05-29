@@ -4,6 +4,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.CustVipLevel;
 using Newtonsoft.Json;
+using System.Security.Policy;
 
 namespace BackendSite.Service.BLL
 {
@@ -235,18 +236,68 @@ namespace BackendSite.Service.BLL
         {
             var vipLevel = await _vipLevelService.GetVipLevelSettingAsync(siteId);
             var vipSystem = await _vipLevelService.GetVipSystem(siteId);
+            var CurrencyVipSystem = vipSystem.ToList().FindAll(x => x.CurrencyId == CurrencyId);
             var result = new List<VipUpgradeSetting>();
+            var membershipRenewal = new Dictionary<int, string>();
+            membershipRenewal.Add(1, "Normal");
+            membershipRenewal.Add(2, "Lifetime");
+            membershipRenewal.Add(3, "3 Months");
+            membershipRenewal.Add(4, "3 Months");
+            membershipRenewal.Add(5, "3 Months");
+            membershipRenewal.Add(6, "3 Months");
+
             foreach (var vip in vipLevel)
             {
-                result.Add(new VipUpgradeSetting()
+                var level = CurrencyVipSystem.Find(x => x.Level == vip.Level);
+                if (level is null)
                 {
-
-                });
+                    result.Add(vip.Level switch
+                    {
+                        1 => new VipUpgradeSetting()
+                        {
+                            Level = vip.Level,
+                            LevelName = vip.LevelName,
+                            SiteId = siteId,
+                            CurrencyId = CurrencyId,
+                            UpDeposit = null,
+                            UpBonus = null,
+                            DownDeposit = null,
+                            DownTurnover = null,
+                            RankingValidityMembershipRenewal = membershipRenewal[vip.Level]
+                        },
+                        6 => new VipUpgradeSetting()
+                        {
+                            Level = vip.Level,
+                            LevelName = vip.LevelName,
+                            SiteId = siteId,
+                            CurrencyId = CurrencyId,
+                            UpDeposit = "By Invitation",
+                            UpBonus = "By Invitation",
+                            DownDeposit = "By Invitation",
+                            DownTurnover = "By Invitation",
+                            RankingValidityMembershipRenewal = membershipRenewal[vip.Level]
+                        }
+                    });
+                }
+                else
+                {
+                    result.Add(new VipUpgradeSetting()
+                    {
+                        Level = vip.Level,
+                        LevelName = vip.LevelName,
+                        SiteId = siteId,
+                        CurrencyId = CurrencyId,
+                        UpDeposit = level.UpDeposit.ToString(),
+                        UpBonus = level.UpBonus.ToString(),
+                        DownDeposit = level?.DownDeposit.ToString(),
+                        DownTurnover = level?.DownTurnover.ToString(),
+                        RankingValidityMembershipRenewal = membershipRenewal[vip.Level]
+                    });
+                }           
             }
 
             return result;
         }
-
         #endregion
 
         #region Private Methods

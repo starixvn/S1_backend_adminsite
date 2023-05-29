@@ -57,6 +57,7 @@
         public string DownDeposit { get; set; }
         public string DownTurnover { get; set; }
         public string LevelName { get; set; }
+        public string RankingValidityMembershipRenewal { get;set; }
     }
 
     public class VipSystem

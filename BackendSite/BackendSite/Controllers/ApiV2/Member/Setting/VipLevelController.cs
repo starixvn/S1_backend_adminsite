@@ -180,9 +180,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         }
 
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<VipLevelSetting>>> GetUpgradeSetting(GetUpgradeSettingRequest request)
+        public async Task<ApiResult<IEnumerable<VipUpgradeSetting>>> GetUpgradeSetting(GetUpgradeSettingRequest request)
         {
-            var apiListResult = new ApiResult<IEnumerable<VipLevelSetting>>
+            var apiListResult = new ApiResult<IEnumerable<VipUpgradeSetting>>
             {
                 Data = await _vipLevelBll.GetUpgradeSetting(request.SiteId, request.CurrencyId),
                 ErrorCode = 0
