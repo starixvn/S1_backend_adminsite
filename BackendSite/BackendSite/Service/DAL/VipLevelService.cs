@@ -5,6 +5,7 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using K4os.Compression.LZ4.Internal;
 
 namespace BackendSite.Service.DAL
 {
@@ -38,7 +39,7 @@ namespace BackendSite.Service.DAL
             var vipLevelInfo = _reportDbClient.QueryFirst<VipLevelInfo>("Admin_CustVipLevel_Get_V3", new { CustId });
             return vipLevelInfo;
         }
-        
+
         public async Task<VipLevelInfoDto> GetVipLevelInfoAsync(int custId)
         {
             return await _reportDbClient.QueryFirstAsync<VipLevelInfoDto>("Admin_CustVipLevel_Get_V4",
@@ -61,7 +62,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public async Task<IEnumerable<VipLevelLogDto>> GetVipLevelLogAsync(int custId)
         {
             return await _reportDbClient.QueryAsync<VipLevelLogDto>("Admin_CustVipLevelLog_Get_V5",
@@ -73,13 +74,17 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_CustVipLevel_Set", new { SiteId, CustId, UserName, VipLevel, Memo, Operator });
             return result;
         }
-        
+
         public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string memo, string updator)
         {
             var p = new DynamicParameters(new
             {
-                SiteId = siteId, CustId = custId, UserName = userName, 
-                VipLevel = vipLevel, Memo = memo, Operator = updator
+                SiteId = siteId,
+                CustId = custId,
+                UserName = userName,
+                VipLevel = vipLevel,
+                Memo = memo,
+                Operator = updator
             });
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevel_Set", p);
         }
@@ -95,8 +100,12 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters(new
             {
-                SiteId = siteId, CustId = custId, UserName = userName, 
-                Manually = manually, Memo = memo, Operator = updator
+                SiteId = siteId,
+                CustId = custId,
+                UserName = userName,
+                Manually = manually,
+                Memo = memo,
+                Operator = updator
             });
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevelManually_Set", p);
         }
@@ -185,8 +194,14 @@ namespace BackendSite.Service.DAL
             props.Add("_Status", newStatus);
             props.Add("_LastUpdateUser", updater);
             _mainDbClient.Execute("Admin_VipDowngradeReview_Set", props);
-            
+
             return true;
+        }
+
+        public async Task<IEnumerable<VipSystem>> GetVipSystem(int siteId)
+        {
+            return await _reportDbClient.QueryAsync<VipSystem>("Service_VipSystem_GetV2",
+                new DynamicParameters(new { SiteId = siteId }));
         }
 
         #region Private Methods

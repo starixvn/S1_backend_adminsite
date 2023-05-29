@@ -8,7 +8,7 @@ namespace BackendSite.Service.DAL.Interface
         Task<IEnumerable<VipLevelLogDto>> GetVipLevelLogAsync(int custId);
         Task<IEnumerable<VipLevelSetting>> GetVipLevelSettingAsync(int siteId);
         Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string memo, string updator);
-
         Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string memo, string updator);
+        Task<IEnumerable<VipSystem>> GetVipSystem(int siteId);
     }
 }

@@ -231,6 +231,12 @@ namespace BackendSite.Service.BLL
             return CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Downgrade) && UpdateVipDowngradeReview(custIdList, calculateYearMonth, newStatus, updater);
         }
 
+        public async Task<IEnumerable<VipLevelSetting>> GetUpgradeSetting(int siteId, int CurrencyId)
+        {
+            var vip = await _vipLevelService.GetVipLevelSettingAsync(siteId);
+            var system = await _vipLevelService.GetVipSystem(siteId);
+        }
+
         #endregion
 
         #region Private Methods

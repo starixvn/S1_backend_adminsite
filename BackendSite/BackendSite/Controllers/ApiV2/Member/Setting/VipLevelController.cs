@@ -33,7 +33,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         #region Constructor
-        
+
 
         #endregion
 
@@ -45,6 +45,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             public IFormFile ExcelUpload { get; set; }
         }
 
+        public class GetUpgradeSettingRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -174,5 +179,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
         }
 
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<VipLevelSetting>>> GetUpgradeSetting(GetUpgradeSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<VipLevelSetting>>
+            {
+                Data = await _vipLevelBll.GetUpgradeSetting(request.SiteId, request.CurrencyId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
     }
 }
