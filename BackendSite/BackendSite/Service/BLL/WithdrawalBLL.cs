@@ -1030,6 +1030,12 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        
+        public IEnumerable<WithdrawalMessage> GetWithdrawalMessageByWithdrawalIds(IEnumerable<int> withdrawalIds)
+        {
+            return _withdrawalService.GetWithdrawalMessage(withdrawalIds);
+        }
+        
         #endregion
 
         #region Private Methods
