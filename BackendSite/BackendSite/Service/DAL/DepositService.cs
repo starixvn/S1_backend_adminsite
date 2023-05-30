@@ -342,7 +342,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositCalCodeSetRequest calCodeInfo ,bool canReward = false)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -374,12 +374,19 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
-                    if (status == DepositStatusEnum.Draft && draftInfo != null)
+                    if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null)
                     {
                         var calCodeList = _bankFinancialService.GetTransferAccountList();
-                        draftInfo.DisplayName = calCodeList.FirstOrDefault(x => x.Id == draftInfo.BankId)?.DisplayName;
-                        comment =
-                            $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName} , After:{draftInfo.DisplayName}] , StatementTime : [Before:{beforeDepositData.StatementTime} , After:{draftInfo.StatementTime}] ]";
+                        calCodeInfo.DisplayName = calCodeList.FirstOrDefault(x => x.Id == calCodeInfo.BankId)?.DisplayName;
+
+                        if (status == DepositStatusEnum.Draft)
+                        {
+                            comment = $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName} , After:{calCodeInfo.DisplayName}] , StatementTime : [Before:{beforeDepositData.StatementTime} , After:{calCodeInfo.StatementTime}] ]";
+                        }
+                        else
+                        {
+                            comment = $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName}, After:{calCodeInfo.DisplayName}] ";
+                        }
                     }
                     
                     SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, Operator);
@@ -434,14 +441,14 @@ namespace BackendSite.Service.DAL
                         }
                     }
 
-                    if (status == DepositStatusEnum.Draft && draftInfo != null )
+                    if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null )
                     {
                         var p2 = new DynamicParameters(new
                         {
                             DepositId = depositId, 
                             SiteId = siteId,
-                            StatementTime = draftInfo.StatementTime?.DateTime ,
-                            BankId = draftInfo.BankId,
+                            StatementTime = status == DepositStatusEnum.Draft ? calCodeInfo.StatementTime?.DateTime : null ,
+                            BankId = calCodeInfo.BankId,
                             Operator = Operator
                         });
                         result = _mainDbClient.Execute("Admin_DepositInfoDraft_Set", trans, p2);
