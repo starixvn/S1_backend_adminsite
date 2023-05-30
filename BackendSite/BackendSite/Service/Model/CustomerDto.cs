@@ -505,6 +505,12 @@ public class SwitchEnableRebateRequest
     public EnableRebateEnum Status { get; set; }
 }
 
+public class SwitchEnableTurnoverRewardPointRequest
+{
+    public int CustId { get; set; }
+    public EnableTurnoverRewardPointEnum Status { get; set; }
+}
+
 public class ResetBankInfoRequest
 {
     public int CustId { get; set; }
