@@ -728,6 +728,14 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
             return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
+        
+        public IEnumerable<WithdrawalMessage> GetWithdrawalMessage(IEnumerable<int> withdrawalIds)
+        {
+            var props = new DynamicParameters();
+            props.Add("_WithdrawalIds", JsonConvert.SerializeObject(withdrawalIds));
+
+            return _mainDbClient.Query<WithdrawalMessage>("Admin_WithdrawalMessage_Get", props);
+        }
 
         public async Task<bool> SetWithdrawalInfoOnUser(string transId, string onUser)
         {

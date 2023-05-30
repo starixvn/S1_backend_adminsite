@@ -296,13 +296,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.SelectCalCode,
                 request.Agent,
                 out var totalPages, out var rowCount, ref currencyAmount);
-
+            
+            var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(
+                withdrawalRequestList.Select(x => x.WithdrawalId));
             foreach (var data in withdrawalRequestList)
             {
                 data.TransferPin = _cryptor.Decrypt(data.TransferPin);
                 data.LoginPin = _cryptor.Decrypt(data.LoginPin);
                 data.MobilePin = _cryptor.Decrypt(data.MobilePin);
                 data.CorporateID = _cryptor.Decrypt(data.CorporateID);
+                data.WithdrawalMessageList = msgs
+                    .Where(x => x.WithdrawalId == data.WithdrawalId)
+                    .OrderByDescending(x => x.CreateTime);
             }
 
             apiListResult.Data = withdrawalRequestList;
@@ -355,6 +360,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 string.IsNullOrEmpty(request.Agent) ? null : request.Agent,
                 request.WithdrawalMethod);
 
+            var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(
+                exportWithdrawal.Select(x => x.WithdrawalId));
+
             foreach (var data in exportWithdrawal)
             {
                 if (!string.IsNullOrWhiteSpace(data.EWalletName))
@@ -367,7 +375,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     }
                 }
 
-                exportData.Add(new WithdrawalInfoForExportData()
+                exportData.Add(new WithdrawalInfoForExportData
                 {
                     WithdrawalId = data.WithdrawalId,
                     TransId = data.TransId,
@@ -398,7 +406,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     WithdrawlCnt = data.WithdrawlCnt,
                     Operator = data.Operator,
                     UpdateTime = data.UpdateTime,
-                    FlowEndTime = data.FlowEndTime
+                    FlowEndTime = data.FlowEndTime,
+                    WithdrawalMessage = string.Join(", ", msgs
+                        .Where(x => x.WithdrawalId == data.WithdrawalId)
+                        .OrderBy(x => x.CreateTime)
+                        .Select(x => x.Message))
                 });
             }
 

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
 using Microsoft.AspNetCore.Mvc;
@@ -120,7 +121,7 @@ namespace BackendSite.Service.Model
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
         public string Network { set; get; }
-        public IEnumerable<DepositMessageShow> DepositMessageList { set; get; }
+        public IEnumerable<DepositMessage> DepositMessageList { set; get; }
     }
 
     public class DepositInfoForExport
@@ -407,6 +408,8 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
         public string DepositMessage { get; set; }
+        
+        public IEnumerable<DepositMessage> DepositMessageList { set; get; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -524,23 +527,12 @@ namespace BackendSite.Service.Model
     {
         private DateTimeOffset _createTime { set; get; }
         public DepositMessageStatus Status { get; set; }
+        public string Message => Status.GetDescription();
         public int DepositId { get; set; }
         public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-    }
-    
-    public class DepositMessageShow
-    {
-        public DepositMessageShow(DepositMessage data, TimeSpan offset)
-        {
-            CreateTime = data.CreateTime.ToOffset(offset);
-            Message = data.Status.ToString();
-        }
-        
-        public DateTimeOffset CreateTime { get; set; }
-        public string Message { get; set; }
     }
 }

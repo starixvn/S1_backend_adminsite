@@ -233,17 +233,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             if (depositList.Any())
             {
                 var msgs = _depositBll.GetDepositMessageByDepositIds(depositList.Select(x => x.DepositId));
-
-                if (msgs.Any())
+                var offset = request.StartDate.Offset;
+                foreach (var deposit in depositList)
                 {
-                    var offset = request.StartDate.Offset;
-                    foreach (var deposit in depositList)
-                    {
-                        deposit.DepositMessageList = msgs
-                            .Where(x => x.DepositId == deposit.DepositId)
-                            .Select(x => new DepositMessageShow(x, offset))
-                            .OrderByDescending(x => x.CreateTime);
-                    }
+                    deposit.DepositMessageList = msgs
+                        .Where(x => x.DepositId == deposit.DepositId)
+                        .OrderByDescending(x => x.CreateTime);
                 }
             }
             
@@ -309,7 +304,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         deposit.SendMessages = string.Join(", ", msgs
                                 .Where(x => x.DepositId == deposit.DepositId)
                                 .OrderBy(x => x.CreateTime)
-                                .Select(x => x.Status.ToString()));
+                                .Select(x => x.Message));
                     }
                 }
             }
