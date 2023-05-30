@@ -184,7 +184,13 @@ namespace BackendSite.Service.Model.enums
         Deduct = 2
     }
 
-    public enum WithdrawalLimitLogCreateFromEnum
+    public enum EnableTurnoverRewardPointEnum
+    {
+        Disable = 0,
+        Enable = 1
+    }
+
+    public enum WithdrawalLimitLogCreateFromEnum 
     {
         Default = 0,
         Deposit = 1,
