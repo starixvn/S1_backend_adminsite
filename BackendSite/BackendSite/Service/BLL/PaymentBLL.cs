@@ -83,6 +83,7 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
+
             if (financialTypeList.Any())
             {
                 data = data.Where(i => financialTypeList.Contains((int)i.FinancialType));
@@ -121,7 +122,6 @@ namespace BackendSite.Service.BLL
                 }
             }
         }
-
         public IEnumerable<BonusLog> GetBonusLog(int custId, IEnumerable<int> promoCategoryIds, DateTime? startDate, DateTime? endDate,
             string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
@@ -141,10 +141,11 @@ namespace BackendSite.Service.BLL
                 out transId);
         }
 
-        public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate)
+        public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate, IEnumerable<int> gameTypes)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = dataList
+                .Where(i => gameTypes.Contains(i.GameType))
                 .Join(_tpGameTypeList,
                   tpBetRecord => tpBetRecord.GameType,
                   tpGameType => tpGameType.Type,
@@ -183,10 +184,11 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<TpBetRecordbyCategoryIdRes> GetCustTpBetRecordListbyCategoryId(int custId, DateTime selDate,
-            int categoryId, DateTime startDate, DateTime endDate)
+            int categoryId, DateTime startDate, DateTime endDate ,IEnumerable<int> gameTypes)
         {
             var betList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = betList
+                .Where(i => gameTypes.Contains(i.GameType))
                 .Join(_tpGameTypeList,
                   tpBetRecord => tpBetRecord.GameType,
                   tpGameType => tpGameType.Type,
@@ -339,10 +341,11 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate, TimeSpan offset)
+        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate, IEnumerable<int> gameTypes, TimeSpan offset)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = dataList
+                .Where(i => gameTypes.Contains(i.GameType))
                 .GroupBy(x => new { SettledDate = x.SettledTime.ToOffset(offset).Date })
                 .Select(x => new TpBetRecordByDate
                 {

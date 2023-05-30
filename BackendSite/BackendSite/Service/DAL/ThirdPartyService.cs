@@ -143,6 +143,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+
         public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
         {
             return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = currency, SiteId = siteId }, commandType: CommandType.StoredProcedure);
@@ -181,6 +182,20 @@ namespace BackendSite.Service.DAL
         public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurrency()
         {
             return await _reportDbClient.QueryAsync<TpGameTypeCurrency>("Admin_TpGameTypeCurrency_Get");
+        }
+
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        {
+            var p = new DynamicParameters();
+            p.Add("CategoryId", categoryId);
+            return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", p);
+        }
+
+        public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CategoryId", categoryId);
+            return await _reportDbClient.QueryAsync<SiteTpListIfo>("Admin_TpListByCategory_Get", p);
         }
     }
 }

@@ -66,4 +66,5 @@
   <data name="msg_LoginFailed"><value>Login Failed, Please check with your username and password</value></data>
   <data name="msg_InsertSuccessful"><value>Insert Successful</value></data>
   <data name="msg_DateOutOfRange"><value>Filter date out of range.</value></data>
+  <data name="msg_InvalidBetLimit"><value>Invalid bet limit input</value></data>
   </root>

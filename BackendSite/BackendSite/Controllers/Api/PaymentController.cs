@@ -282,7 +282,7 @@ namespace BackendSite.Controllers.Api
         {
             var startTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.StartDate);
             var endTime = DateTimeExtensions.UnixToDateTime(custTpBetRecordListReq.EndDate);
-            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime, new TimeSpan(8, 0, 0));
+            var result = _paymentBLL.GetCustTpBetRecordList(custTpBetRecordListReq.CustId, startTime, endTime, null,new TimeSpan(8, 0, 0));
 
             var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
             {
@@ -323,7 +323,8 @@ namespace BackendSite.Controllers.Api
                     req.CustId,
                     req.SelDate,
                     startTime,
-                    endTime)
+                    endTime,
+                    null)
             };
             return apiResult;
         }
@@ -360,7 +361,8 @@ namespace BackendSite.Controllers.Api
                     req.SelDate.Date,
                     req.CategoryId,
                     startTime,
-                    endTime)
+                    endTime,
+                    null)
             };
             return apiResult;
         }
@@ -798,9 +800,8 @@ namespace BackendSite.Controllers.Api
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
             }
-
+            
             var stream = _excelBLL.ExportV2(searchResult.VipRebateInfoList);
-
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipRebateReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }

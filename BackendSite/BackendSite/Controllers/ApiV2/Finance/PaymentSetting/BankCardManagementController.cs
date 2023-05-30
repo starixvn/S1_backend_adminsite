@@ -3,7 +3,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.BankCardManagement;
 using Newtonsoft.Json;
@@ -23,11 +22,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         private readonly PaymentManageBLL _paymentManageBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly VipLevelBLL _vipLevelBll;
+        private readonly ILogger<BankCardManagementController> _logger;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly AWSS3Helper _s3Helper;
         private readonly string _folder;
         private readonly string _bucketName;
-        private readonly ILogger<BankCardManagementController> _logger;
         private readonly ICacheHelper _redisHelper;
 
         #endregion
@@ -41,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
+            _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
@@ -48,7 +48,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             var configuration = provider.GetRequiredService<IConfiguration>();
             _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
             _bucketName = configuration.GetValue<string>("AwsPaymentBucketName");
-            _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
         }
 
         #endregion
@@ -135,7 +134,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             if (success)
             {
-                _ = await _redisHelper.KeyDeleteByPatternAsync("PaySetting:*", RedisDataBase.Member);
+                _ = Task.Run(() => _redisHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member));
                 
                 var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
                 var localPaySettings = await _bankDetailBll.GetLocalPaySettingAsync();

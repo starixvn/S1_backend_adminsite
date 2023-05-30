@@ -657,12 +657,22 @@ namespace BackendSite.Service.BLL
                     {
                         ws.Cells[currentRow, colIdx].Value = "TOTAL：";
                     }
+                    else if (colName.Contains('%'))
+                    {
+                        var a = totaldata["TotalBonusAmountClaimed"];
+                        var b = totaldata["CompareTotalBonusAmountClaimed"];
+                        ws.Cells[currentRow, colIdx].Value = $"{ decimal.ToInt32(b != 0 ? (a / b - 1) * 100 : 0)}%";
+                    }
                     else
                     {
-                        if (!(item.Value is string))
+                        if (notSummaryTitles.Contains(colName))
+                        {
+                            ws.Cells[currentRow, colIdx].Value = string.Empty;
+                        }
+                        else if (item.Value is not string)
                         {
                             ws.Cells[currentRow, colIdx].Value = value;
-                        }
+                        } 
                     }
 
                     ws.Cells[currentRow, colIdx].Style.Border.Bottom.Style = ExcelBorderStyle.Double;
