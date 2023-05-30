@@ -5,6 +5,7 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.CustVipLevel;
 using Newtonsoft.Json;
 using System.Security.Policy;
+using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
 
 namespace BackendSite.Service.BLL
 {
@@ -289,14 +290,19 @@ namespace BackendSite.Service.BLL
                         CurrencyId = CurrencyId,
                         UpDeposit = level.UpDeposit.ToString(),
                         UpBonus = level.UpBonus.ToString(),
-                        DownDeposit = level?.DownDeposit.ToString(),
-                        DownTurnover = level?.DownTurnover.ToString(),
+                        DownDeposit = level.DownDeposit is null ? null : level.DownDeposit.ToString(),
+                        DownTurnover = level.DownTurnover is null ? null : level.DownTurnover.ToString(),
                         RankingValidityMembershipRenewal = membershipRenewal[vip.Level]
                     });
-                }           
+                }
             }
 
             return result;
+        }
+
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input)
+        {
+            return await _vipLevelService.SetUpgradeSetting(input);
         }
         #endregion
 

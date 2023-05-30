@@ -6,6 +6,10 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using K4os.Compression.LZ4.Internal;
+using BackendSite.Extensions;
+using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
+using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
@@ -204,6 +208,49 @@ namespace BackendSite.Service.DAL
                 new DynamicParameters(new { SiteId = siteId }));
         }
 
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input)
+        {
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            var p = new DynamicParameters();
+            p.Add("_SiteId", input.SiteId);
+            p.Add("_Level", input.After.Level);
+            p.Add("_CurrencyId", input.CurrencyId);
+            p.Add("_UpDeposit", input.After.UpDeposit);
+            p.Add("_UpBonus", input.After.UpBonus);
+            p.Add("_DownDeposit", input.After.DownDeposit);
+            p.Add("_DownTurnover", input.After.DownTurnover);
+
+            var result = await _mainDbClient
+                .ExecuteAsync("Admin_VipSystem_Set", trans, p);
+
+            if (result > 0)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.VipUpgradeSetting);
+                logParam.Add("_ActionType", (int)ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+
+                var logSuccess = await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
+                if (logSuccess)
+                {
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+                    return result;
+                }
+            }
+
+            await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
+
+            return result;
+        }
         #region Private Methods
 
         #endregion

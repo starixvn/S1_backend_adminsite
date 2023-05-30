@@ -3,6 +3,7 @@ using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +50,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
+        }
+
+        public class SetUpgradeSettingRequest
+        {
+            public int Level { get; set; }
+            public decimal UpDeposit { get; set; }
+            public decimal UpBonus { get; set; }
+            public decimal? DownDeposit { get; set; }
+            public decimal? DownTurnover { get; set; }
         }
         #endregion
 
@@ -179,6 +189,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
         }
 
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 1 })]
         [HttpPost]
         public async Task<ApiResult<IEnumerable<VipUpgradeSetting>>> GetUpgradeSetting(GetUpgradeSettingRequest request)
         {
@@ -188,6 +199,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 ErrorCode = 0
             };
             return apiListResult;
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> SetUpgradeSetting(ApiRequestWithLog<SetUpgradeSettingRequest> req)
+        {
+            if(req.After.Level == 6)
+            {
+                return new ApiResult { ErrorCode = (int)ErrorCodeEnum.UpdateFailed };
+            }
+            var result = await _vipLevelBll.SetUpgradeSetting(
+                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name));
+            return new ApiResult
+            {
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
         }
     }
 }
