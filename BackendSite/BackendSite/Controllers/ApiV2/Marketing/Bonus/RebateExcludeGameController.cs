@@ -1,6 +1,10 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus;
 
@@ -11,12 +15,11 @@ public class RebateExcludeGameController : ControllerBase
 {
     #region Fields
 
-    private readonly RiskBLL _riskBll;
-    private readonly GameCasinoBLL _gameCasinoBll;
-    private readonly CustInfoBLL _custInfoBll;
-    private readonly ILogger<RiskController> _logger;
-    private readonly NewAuthorizeBLL _newAuthorizeBLL;
+    private readonly ServerInfoBLL _serverInfoBll;
+    private readonly RebateManageBLL _rebateManageBll;
+    private readonly NewAuthorizeBLL _newAuthorizeBll;
     private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+    private readonly ILogger<RebateExcludeGameController> _logger;
 
     #endregion
 
@@ -24,179 +27,136 @@ public class RebateExcludeGameController : ControllerBase
 
     public RebateExcludeGameController(IServiceProvider provider)
     {
-        _riskBll = provider.GetRequiredService<RiskBLL>();
-        _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
-        _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-        _logger = provider.GetRequiredService<ILogger<RiskController>>();
-        _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
+        _serverInfoBll = provider.GetService<ServerInfoBLL>();
+        _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
+        _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+        _logger = provider.GetRequiredService<ILogger<RebateExcludeGameController>>();
     }
 
     #endregion
 
     #region Model
 
-    public class QueryTpDisableUserReq : ApiRequestPageModel
+    public class GetListRequest
     {
-        private DateTimeOffset _startDate { get; set; }
-        private DateTimeOffset _endDate { get; set; }
         public int SiteId { get; set; }
-        public string UserName { get; set; }
-        public DateTimeOffset StartDate
-        {
-            get => _startDate;
-            set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
-        public DateTimeOffset EndDate
-        {
-            get => _endDate;
-            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-        }
     }
-    public class TpDisableUserForGameDetailReq
+    public class GetByCurrencyIdRequest
     {
-        public int CustId { get; set; }
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+    }
+
+    public class SetRequest
+    {
+        public int SiteId { get; set; }
+
+        public int CurrencyId { get; set; }
+
+        public IEnumerable<ExcludeGame> ExcludeGameList { get; set; }
+    }
+
+    public class ExcludeGame
+    {
+        public int TpId { get; set; }
+        public int GameType { get; set; }
+        public int CategoryId { get; set; }
+        public string GameId { get; set; }
+        public string AppId { get; set; }
     }
 
     #endregion
 
     /// <summary>
-    /// TpDisable/GetList 取得第三方被禁止的用戶資料清單
+    /// RebateExcludeGame/GetList
     /// </summary>
     /// <remarks>
     /// Http Method：POST
     /// 
-    /// Func Path：CSD > Disable User For Game > [Submit]
+    /// Func Path：
     /// </remarks>
     /// <param name="req"></param>
-    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 1 })]
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 145, 1 })]
     [HttpPost]
-    public ApiListResult<TpDisableUser> GetList(QueryTpDisableUserReq req)
+    public ApiResult<IEnumerable<int>> GetList(GetListRequest req)
     {
-        var apiResult = new ApiListResult<TpDisableUser>();
-
-        var pageNumber = req.PageNumber;
-        List<int> siteIds = new List<int>();
-        siteIds.Add(req.SiteId);
-        apiResult.Data = _riskBll.GetTpDisableUser(
-            siteIds,
-            string.IsNullOrEmpty(req.UserName) ? null : req.UserName,
-            req.StartDate,
-            req.EndDate,
-            req.PageSize,
-            req.PageNumber,
-            out var totalPages,
-            out var rowCount);
-        apiResult.TotalPages = totalPages;
-        apiResult.PageNumber = pageNumber;
-        apiResult.RowCount = rowCount;
-        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-        return apiResult;
-    }
-
-    /// <summary>
-    /// TpDisable/GetByCustId 取得指定第三方被禁止的會員資料
-    /// </summary>
-    /// <remarks>
-    /// Http Method：POST
-    /// 
-    /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit]
-    /// </remarks>
-    /// <param name="req"></param>
-    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 1 })]
-    [HttpPost]
-    public async Task<ApiResult<TpDisableUserForGameDetail>> GetByCurrencyId(TpDisableUserForGameDetailReq req)
-    {
-        var apiResult = new ApiResult<TpDisableUserForGameDetail>();
-
-        var tpList = await _gameCasinoBll.GetTpList();
-        var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(req.CustId);
-
-        if (userDisableGames.GameInfo != null && userDisableGames.GameInfo != "null")
+        return new ApiResult<IEnumerable<int>>()
         {
-            var disableGames = JsonConvert.DeserializeObject<List<DisableTpGame>>(userDisableGames.GameInfo);
-
-            foreach (var disableGame in disableGames)
-            {
-                foreach (var tp in tpList)
-                {
-                    if (disableGame.TpId == tp.TpId)
-                    {
-                        tp.Checked = true;
-                        var games = await _gameCasinoBll.GetGameCasinoByTpId(tp.TpId);
-                        tp.GameList = games.Select(a => new TpGameCasino()
-                        {
-                            GameId = a.GameId,
-                            Name = a.Name,
-                            Checked = disableGame.GameList != null && disableGame.GameList.Any(c => c == a.GameId)
-                        }).ToList();
-                    }
-                }
-            }
-        }
-
-        var editInfo = new TpDisableUserForGameDetail()
-        {
-            SiteId = userDisableGames.SiteId,
-            UserName = userDisableGames.UserName,
-            DisableGames = tpList.ToList()
+            Data = _serverInfoBll.GetServerInfoWithSiteId(req.SiteId).ICurrencyList,
+            ErrorCode = (int)ErrorCodeEnum.Success
         };
-        apiResult.Data = editInfo;
-        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-        return apiResult;
     }
 
     /// <summary>
-    /// TpDisable/Set 新增or更新會員第三方被禁止的資料
+    /// RebateExcludeGame/GetByCurrencyId
     /// </summary>
     /// <remarks>
     /// Http Method：POST
     /// 
-    /// Func Path：CSD > Disable User For Game > [Submit] > Click[Edit] > [Submit]
+    /// Func Path：
+    /// </remarks>
+    /// <param name="req"></param>
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 145, 1 })]
+    [HttpPost]
+    public async Task<ApiResult<IEnumerable<RebateExcludeGame>>> GetByCurrencyId(GetByCurrencyIdRequest req)
+    {
+        return new ApiResult<IEnumerable<RebateExcludeGame>>()
+        {
+            Data = await _rebateManageBll.GetRebateExcludeGameByCurrencyIdAsync(req.SiteId, req.CurrencyId),
+            ErrorCode = (int)ErrorCodeEnum.Success
+        };
+    }
+
+    /// <summary>
+    /// RebateExcludeGame/Set
+    /// </summary>
+    /// <remarks>
+    /// Http Method：POST
+    /// 
+    /// Func Path：
     /// </remarks>
     /// <param name="disableGames"></param>
-    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 62, 3 })]
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 145, 3 })]
     [HttpPost]
-    public async Task<ApiResult> Set(DisableUser disableGames)
+    public async Task<ApiResult> Set(SetRequest req)
     {
         var apiResult = new ApiResult();
-        var authData = _newAuthorizeBLL.GetAuthData();
+        var authData = _newAuthorizeBll.GetAuthData();
         var updateOperator = authData.UserName;
-        var customer = await _custInfoBll.GetCustId(null, disableGames.UserName, disableGames.SiteId);
-        if (customer == null)
-        {
-            apiResult.ErrorCode = (int)ErrorCodeEnum.NoData;
-            apiResult.Message = "User Not Found";
-            return apiResult;
-        }
 
-        var result = await _riskBll.DisableUserForGame(customer.CustId, customer.SiteId,
-            disableGames.DisableTpGame, updateOperator);
+        var beforeDetailInfo = await _rebateManageBll.GetRebateExcludeGameByCurrencyIdAsync(req.SiteId, req.CurrencyId);
 
-        if (result == 1 || result == 2)
+        if (await _rebateManageBll.SetRebateExcludeGameByCurrencyIdAsync(
+            req.SiteId,
+            req.CurrencyId,
+            req.ExcludeGameList, updateOperator))
         {
-            var siteId = _newAuthorizeBLL.CheckBrand();
+            var afterDetailInfo = await _rebateManageBll.GetRebateExcludeGameByCurrencyIdAsync(req.SiteId, req.CurrencyId);
+
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = updateOperator,
-                SiteId = siteId,
-                CurrencyId = 0,
+                SiteId = req.SiteId,
+                CurrencyId = req.CurrencyId,
                 ActionType = ActionType.Update,
-                MenuEnum = AdminAdjustmentLogMenuEnum.GameExclusion,
-                BeforeDetailInfo = null,
-                AfterDetailInfo = JsonConvert.SerializeObject(disableGames),
+                MenuEnum = AdminAdjustmentLogMenuEnum.RebateExcludeGame,
+                BeforeDetailInfo = beforeDetailInfo.Any() ? JsonConvert.SerializeObject(beforeDetailInfo) : null,
+                AfterDetailInfo = afterDetailInfo.Any() ? JsonConvert.SerializeObject(afterDetailInfo) : null,
                 RefTransId = string.Empty
             });
+
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            };
         }
 
         return new ApiResult
         {
-            //result: 1 (新增成功),2 (修改成功)
-            ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result,
+            ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
         };
-
     }
 
 }
