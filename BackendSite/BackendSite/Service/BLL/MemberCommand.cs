@@ -477,4 +477,20 @@ public class MemberCommand : IMemberCommand
             _logger.LogError(e, "InsertAdminLog failed. params: " + JsonConvert.SerializeObject(adminLog));
         }
     }
+
+    public async Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status, string @operator)
+    {
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeStatus = (EnableTurnoverRewardPointEnum)customer.EnableRebate;
+        var result = await _memberService.SwitchEnableTurnoverRewardPointAsync(custId, status);
+        if (result <= 0) return 0;
+
+        var afterStatus = (EnableTurnoverRewardPointEnum)status;
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, EnableRebate = beforeStatus.ToString() }),
+            JsonConvert.SerializeObject(new { customer.UserName, EnableRebate = afterStatus.ToString() }), ActionType.Update,
+            custId, $"Enable Turnover Reward Point \"{afterStatus.ToString()}\"");
+        return result;
+    }
+
 }

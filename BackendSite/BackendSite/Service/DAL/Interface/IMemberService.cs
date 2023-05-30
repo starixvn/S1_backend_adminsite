@@ -48,4 +48,5 @@ public interface IMemberService
     Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId);
     Task<int> SetCustPromotionWhiteListAsync(CustPromotionWhiteList input);
     Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime);
+    Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status);
 }

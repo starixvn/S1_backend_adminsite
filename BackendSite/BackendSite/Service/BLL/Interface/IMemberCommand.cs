@@ -27,4 +27,6 @@ public interface IMemberCommand
     Task<int> LineUnbind(int custId, string @operator);
     Task<int> DeleteOnUserAsync(int custId, string @operator);
     Task<bool> SetCustPromotionWhiteListAsync(int custId, bool ipEnable, bool deviceEnable, bool realNameEnable, string @operator);
+
+    Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status, string @operator);
 }

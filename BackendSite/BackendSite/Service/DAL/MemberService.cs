@@ -105,7 +105,7 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
-        return await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get", p);
+        return await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p);
     }
 
     public async Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList)
@@ -411,6 +411,12 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters(new { CustId = custId , StartTime = startTime , EndTime = endTime });
         return await _sqlClienct.QueryAsync<PromotionReceiveFailLog>("Admin_PromotionReceiveFailLog_Get", p);
+    }
+
+    public async Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status)
+    {
+        var p = new DynamicParameters(new { _CustId = custId, _EnableTurnoverRewardPoint = status });
+        return await _mainSqlClient.ExecuteAsync("Admin_CustInfoEnableTurnoverRewardPoint_Set", p);
     }
 
 }
