@@ -5,6 +5,11 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using K4os.Compression.LZ4.Internal;
+using BackendSite.Extensions;
+using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
+using System.Security.Policy;
 
 namespace BackendSite.Service.DAL
 {
@@ -38,7 +43,7 @@ namespace BackendSite.Service.DAL
             var vipLevelInfo = _reportDbClient.QueryFirst<VipLevelInfo>("Admin_CustVipLevel_Get_V3", new { CustId });
             return vipLevelInfo;
         }
-        
+
         public async Task<VipLevelInfoDto> GetVipLevelInfoAsync(int custId)
         {
             return await _reportDbClient.QueryFirstAsync<VipLevelInfoDto>("Admin_CustVipLevel_Get_V4",
@@ -61,7 +66,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public async Task<IEnumerable<VipLevelLogDto>> GetVipLevelLogAsync(int custId)
         {
             return await _reportDbClient.QueryAsync<VipLevelLogDto>("Admin_CustVipLevelLog_Get_V5",
@@ -73,13 +78,17 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_CustVipLevel_Set", new { SiteId, CustId, UserName, VipLevel, Memo, Operator });
             return result;
         }
-        
+
         public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string memo, string updator)
         {
             var p = new DynamicParameters(new
             {
-                SiteId = siteId, CustId = custId, UserName = userName, 
-                VipLevel = vipLevel, Memo = memo, Operator = updator
+                SiteId = siteId,
+                CustId = custId,
+                UserName = userName,
+                VipLevel = vipLevel,
+                Memo = memo,
+                Operator = updator
             });
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevel_Set", p);
         }
@@ -95,8 +104,12 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters(new
             {
-                SiteId = siteId, CustId = custId, UserName = userName, 
-                Manually = manually, Memo = memo, Operator = updator
+                SiteId = siteId,
+                CustId = custId,
+                UserName = userName,
+                Manually = manually,
+                Memo = memo,
+                Operator = updator
             });
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevelManually_Set", p);
         }
@@ -197,10 +210,59 @@ namespace BackendSite.Service.DAL
             props.Add("_Status", newStatus);
             props.Add("_LastUpdateUser", updater);
             _mainDbClient.Execute("Admin_VipDowngradeReview_Set", props);
-            
+
             return true;
         }
 
+        public async Task<IEnumerable<VipSystem>> GetVipSystem(int siteId)
+        {
+            return await _reportDbClient.QueryAsync<VipSystem>("Service_VipSystem_GetV2",
+                new DynamicParameters(new { SiteId = siteId }));
+        }
+
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input)
+        {
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            var p = new DynamicParameters();
+            p.Add("_SiteId", input.SiteId);
+            p.Add("_Level", input.After.Level);
+            p.Add("_CurrencyId", input.CurrencyId);
+            p.Add("_UpDeposit", input.After.UpDeposit);
+            p.Add("_UpBonus", input.After.UpBonus);
+            p.Add("_DownDeposit", input.After.DownDeposit);
+            p.Add("_DownTurnover", input.After.DownTurnover);
+
+            var result = await _mainDbClient
+                .ExecuteAsync("Admin_VipSystem_Set", trans, p);
+
+            if (result > 0)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.VipUpgradeSetting);
+                logParam.Add("_ActionType", (int)ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+
+                var logSuccess = await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
+                if (logSuccess)
+                {
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+                    return result;
+                }
+            }
+
+            await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
+
+            return result;
+        }
         #region Private Methods
 
         #endregion

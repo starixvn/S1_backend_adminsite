@@ -902,7 +902,8 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
-        RebateExcludeGame = 89
+        RebateExcludeGame = 89,
+        VipUpgradeSetting = 90
     }
 
     #region BankFinancialTransferInfoLog

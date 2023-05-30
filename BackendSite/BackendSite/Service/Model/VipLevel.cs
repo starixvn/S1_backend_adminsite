@@ -47,4 +47,27 @@
         public int Level { get; set; }
         public string LevelName { get; set; }
     }
+    public class VipUpgradeSetting
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public int Level { get; set; }
+        public string UpDeposit { get; set; }
+        public string UpBonus { get; set; }
+        public string DownDeposit { get; set; }
+        public string DownTurnover { get; set; }
+        public string LevelName { get; set; }
+        public string RankingValidityMembershipRenewal { get;set; }
+    }
+
+    public class VipSystem
+    {
+        public int SiteId { get; set; }
+        public int Level { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal UpDeposit { get; set; }
+        public decimal UpBonus { get; set; }
+        public decimal? DownDeposit { get; set; }
+        public decimal? DownTurnover { get; set; }
+    }
 }
