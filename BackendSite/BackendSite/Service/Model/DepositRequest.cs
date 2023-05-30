@@ -484,7 +484,7 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
     }
     
-    public class DepositDraftSetRequest
+    public class DepositCalCodeSetRequest
     {
         public int? BankId { get; set; }
         public string DisplayName { get; set; }

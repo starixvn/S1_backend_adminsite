@@ -233,7 +233,7 @@ namespace BackendSite.Controllers.Api
             if (depositReq.Action == (int)DepositStatusEnum.Approved)
             {
                 if (depositReq.ActualDeposit > 0)
-                    depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
+                    depositConfirmReuslt = depositBLL.DepositApproved(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name ,null);
 
                 if (depositConfirmReuslt > 0)
                 {
@@ -276,7 +276,7 @@ namespace BackendSite.Controllers.Api
             }
             else if (depositReq.Action == (int)DepositStatusEnum.OnHold)
             {
-                depositConfirmReuslt = depositBLL.DepositOnHold(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name);
+                depositConfirmReuslt = depositBLL.DepositOnHold(depositReq.TransId, depositReq.ActualDeposit, depositReq.Comment, User.Identity.Name , null);
             }
             else if (depositReq.Action == (int)DepositStatusEnum.Pending)
             {

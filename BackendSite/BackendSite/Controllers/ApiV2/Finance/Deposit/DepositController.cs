@@ -387,6 +387,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var depositConfirmResult = (int)ErrorCodeEnum.Fail;
             var depositRequest = _depositBll.GetDepositRequest(request.TransId);
             
+            var calCodeInfo = new DepositCalCodeSetRequest()
+            {
+                BankId = request.BankId,
+                StatementTime = null
+            };
+            
             if (request.Action == (int)DepositStatusEnum.Approved)
             {
                 if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
@@ -400,7 +406,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
                     
                     if (request.ActualDeposit > 0)
-                        depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name, di);
+                        depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name, calCodeInfo ,di);
                 }
                 
                 if (depositConfirmResult > 0)
@@ -440,17 +446,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
             else if (request.Action == (int)DepositStatusEnum.Draft)
             {
-                var draftInfo = new DepositDraftSetRequest()
-                {
-                    BankId = request.BankId,
-                    StatementTime = request.StatementTime
-                };
-                
-                depositConfirmResult = _depositBll.DepositDraft(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name , draftInfo);
+                calCodeInfo.StatementTime = request.StatementTime;
+                depositConfirmResult = _depositBll.DepositDraft(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name , calCodeInfo);
             }
             else if (request.Action == (int)DepositStatusEnum.OnHold)
             {
-                depositConfirmResult = _depositBll.DepositOnHold(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name);
+                depositConfirmResult = _depositBll.DepositOnHold(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name ,calCodeInfo);
             }
             else if (request.Action == (int)DepositStatusEnum.Pending)
             {
@@ -610,7 +611,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 var depositRequest = _depositBll.GetDepositRequest(depositReceipt.TransId);
 
-                if (depositRequest.Status is not (DepositStatusEnum.Pending or DepositStatusEnum.OnHold))
+                if (depositRequest.Status is not (DepositStatusEnum.Pending or DepositStatusEnum.OnHold or DepositStatusEnum.Approved))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Wrong status ,Can't upload receipt";
