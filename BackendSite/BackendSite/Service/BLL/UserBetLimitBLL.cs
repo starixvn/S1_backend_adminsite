@@ -49,63 +49,71 @@ namespace BackendSite.Service.BLL
         }
         public async Task<int> SetUserBetLimit(dynamic req, string updateOperator)
         {
-            var userName = (string)req["after"].userName;
-            var siteId = (int)req["siteId"];
-
-            var customer = await _custInfoBll.GetCustId(null, userName, siteId);
-            if (customer == null)
+            try
             {
-                throw new AdminException(ErrorCodeEnum.CustNotFound, "User Not Found");
-            }
-            var custId = customer.CustId;
-            var currencyId = customer.CurrencyId;
-            var custBetLimit = await _userBetLimitService.UserBetLimitGetByCustId(custId);
+                var userName = (string)req["after"].userName;
+                var siteId = (int)req["siteId"];
 
-            var setting = new List<BetLimitSetting>();
-            if (custBetLimit != null)
-                setting = ToObject(custBetLimit.BetSetting);
-
-            var betSettings = (List<BetLimitSetting>)ToObject(req["after"].betSetting);
-            foreach (var item in betSettings)
-            {
-                if (CallApi.Contains(item.GameTypeId)) 
+                var customer = await _custInfoBll.GetCustId(null, userName, siteId);
+                if (customer == null)
                 {
-                    var before = setting.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
-                    var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
-                    var betLimit = await Compare(custId, currencyId, before, after);
-                    if (betLimit != null) 
+                    throw new AdminException(ErrorCodeEnum.CustNotFound, "User Not Found");
+                }
+                var custId = customer.CustId;
+                var currencyId = customer.CurrencyId;
+                var custBetLimit = await _userBetLimitService.UserBetLimitGetByCustId(custId);
+
+                var setting = new List<BetLimitSetting>();
+                if (custBetLimit != null)
+                    setting = ToObject(custBetLimit.BetSetting);
+
+                var betSettings = (List<BetLimitSetting>)ToObject(req["after"].betSetting);
+                foreach (var item in betSettings)
+                {
+                    if (CallApi.Contains(item.GameTypeId))
                     {
-                        var apiResult = await SetBetLimit(betLimit);
-                        if (apiResult.ErrorCode != 0)
-                            return -1;
+                        var before = setting.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
+                        var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
+                        var betLimit = await Compare(custId, currencyId, before, after);
+                        if (betLimit != null)
+                        {
+                            var apiResult = await SetBetLimit(betLimit);
+                            if (apiResult.ErrorCode != 0)
+                                return -1;
+                        }
                     }
                 }
-            }
 
-            var result = await _userBetLimitService.SetBetLimit(siteId, custId, JsonConvert.SerializeObject(betSettings), updateOperator);
-            if (result > 0) 
-            {
-                var logParam = new CreateAdminAdjustmentInfoLogInput
+                var result = await _userBetLimitService.SetBetLimit(siteId, custId, JsonConvert.SerializeObject(betSettings), updateOperator);
+                if (result > 0)
                 {
-                    SiteId = siteId,
-                    CurrencyId = currencyId,
-                    MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
-                    ActionType = result == 1 ? ActionType.Create : ActionType.Update,
-                    BeforeDetailInfo = custBetLimit.ToLog(),
-                    AfterDetailInfo = new AfterBetLimit()
+                    var logParam = new CreateAdminAdjustmentInfoLogInput
                     {
-                        UserName = userName,
-                        BetSetting = betSettings
-                    }.ToLog(),
-                    Operator = updateOperator
-                };
+                        SiteId = siteId,
+                        CurrencyId = currencyId,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
+                        ActionType = result == 1 ? ActionType.Create : ActionType.Update,
+                        BeforeDetailInfo = custBetLimit.ToLog(),
+                        AfterDetailInfo = new AfterBetLimit()
+                        {
+                            UserName = userName,
+                            BetSetting = betSettings
+                        }.ToLog(),
+                        Operator = updateOperator
+                    };
 
-                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
-                {
-                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                    {
+                        _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                    }
                 }
+                return result;
             }
-            return result;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return 0;
+            }
         }
 
         public Task<DataWithPage<UserBetLimit>> GetUserBetLimit(int siteId, IEnumerable<int> currencyIds, string userName, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
