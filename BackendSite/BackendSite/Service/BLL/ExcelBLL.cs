@@ -318,5 +318,13 @@ namespace BackendSite.Service.BLL
                 FileDownloadName = $"{fileName}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx"
             };
         }
+        
+        public FileContentResult ExcelFileDateRange(byte[] data, DateTime from , DateTime to ,string fileName)
+        {
+            return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = $"{fileName}_{from:yyyyMMdd}_{to:yyyyMMdd}.xlsx"
+            };
+        }
     }
 }

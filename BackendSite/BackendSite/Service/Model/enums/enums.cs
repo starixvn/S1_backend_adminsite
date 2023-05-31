@@ -1823,4 +1823,10 @@ namespace BackendSite.Service.Model.enums
 
         Crypto = 3
     }
+    
+    public enum ViewTimeType
+    {
+        Daily = 1,
+        Weekly = 2
+    }
 }
