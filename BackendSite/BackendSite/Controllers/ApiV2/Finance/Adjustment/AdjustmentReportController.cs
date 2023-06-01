@@ -15,14 +15,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
     {
         private readonly PaymentAdjustmentReportBLL _paymentAdjustmentBll;
         private readonly ExcelBLL _excelBll;
-        private readonly PermissionBLL _permissionBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
 
         public AdjustmentReportController(IServiceProvider provider)
         {
             _paymentAdjustmentBll = provider.GetRequiredService<PaymentAdjustmentReportBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
-            _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
@@ -42,6 +40,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             try
             {
                 var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
+                var memberTypes = request.MemberTypes != null && request.MemberTypes.Any() ? request.MemberTypes.Select(x => (int)x)
+                : ((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x);
                 var siteId = _newAuthorizeBll.GetAuthData().SiteId;
                 var queryResult = await _paymentAdjustmentBll.GetPaymentAdjustmentReportV2Async(siteId,
                     request.CurrencyIds,
@@ -52,6 +52,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     request.StartDate,
                     request.EndDate,
                     request.TransId,
+                    memberTypes,
                     request.PageNumber,
                     request.PageSize);
 
