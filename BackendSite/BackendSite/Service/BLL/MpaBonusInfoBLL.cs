@@ -235,7 +235,7 @@ namespace BackendSite.Service.BLL
                      BonusCode = x.Key.BonusCode,
                      BonusName = x.Key.BonusName,
                      Currency = x.Key.Currency,
-                     Date = x.Key.Date,
+                     Date = x.Key.Date.Date,
                      NumberOfBonusUser = x.Sum(y => y.NumberOfBonusUser),
                      BonusAmountClaim = x.Sum(y => y.BonusAmountClaim),
                      CurrencyId = x.Key.CurrencyId
@@ -279,7 +279,7 @@ namespace BackendSite.Service.BLL
                          BonusCode = x.Key.BonusCode,
                          BonusName = x.Key.BonusName,
                          Currency = x.Key.Currency,
-                         Date = x.Key.Date,
+                         Date = x.Key.Date.Date,
                          NumberOfBonusUser = x.Sum(y => y.NumberOfBonusUser),
                          BonusAmountClaim = x.Sum(y => y.BonusAmountClaim),
                          CurrencyId = x.Key.CurrencyId
