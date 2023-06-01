@@ -31,7 +31,7 @@ namespace BackendSite.Service.BLL
 
         public PerformanceHighlightData GetPerformanceHighlightData(GetDataRequest input)
         {
-            var result = InitPerformanceHighlightData(input);
+            var result = InitPerformanceHighlightData(input).Result;
             return result;
         }
         
@@ -39,7 +39,7 @@ namespace BackendSite.Service.BLL
         {
             var exportData = new List<PerformanceHighlightDataExport>();
             
-            var result = InitPerformanceHighlightData(input);
+            var result = InitPerformanceHighlightData(input).Result;
             
             #region MTD
             
@@ -65,7 +65,7 @@ namespace BackendSite.Service.BLL
                 BaseCurrencyId = input.BaseCurrencyId,
                 IsCompared = false
             };
-            var MTDResult = InitPerformanceHighlightData(MTDRequest);
+            var MTDResult = InitPerformanceHighlightData(MTDRequest).Result;
             
             #endregion
             
@@ -201,8 +201,8 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region private
-
-        private PerformanceHighlightData InitPerformanceHighlightData(GetDataRequest input)
+        
+        private async Task<PerformanceHighlightData> InitPerformanceHighlightData(GetDataRequest input)
         {
             var result = _mpaMarketingDashboardService.GetPerformanceHighlightData(
                 input.SiteId,
@@ -210,37 +210,57 @@ namespace BackendSite.Service.BLL
                 input.StartDate.DateTime,
                 input.EndDate.DateTime
             );
-            
-            #region Withdrawal Amount
 
-            var withSummaryResult = _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(
+            #region Withdrawal Amount
+            
+            var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(
                 input.SiteId, 
                 input.StartDate,
-                input.EndDate).Result.Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
-            _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(withSummaryResult, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
+                input.EndDate)).Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            withSummaryResult = withSummaryResult.GroupBy(x => new {x.Date, x.CurrencyId})
+                .Select(x=> new MpaMarketingWithdrawalAmountSummaryDto
+                {
+                    Date = x.Key.Date,
+                    WithdrawalAmount = x.Sum(y => y.WithdrawalAmount),
+                    CurrencyId = x.Key.CurrencyId
+                }).ToList();
+            await _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(withSummaryResult, input.StartDate, input.GetEndDate(), input.BaseCurrencyId);
            
             result.WithdrawalAmount = withSummaryResult.Sum(x => x.WithdrawalAmount);
 
-            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(input.SiteId, input.StartDate, input.EndDate).Result
+            var withDetails = (await _withdrawalAmountService.GetWithdrawalAmountDetailAsync(input.SiteId, input.StartDate, input.EndDate))
                 .Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
-            _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(withDetails, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
-            
             result.WithdrawalUsers  = withDetails.Sum(x => x.WithdrawalCount);
             
             #endregion
             
             #region Deposit Amount
 
-            var depositSummaryResult = _depositAmountService.GetDepositAmountSummaryAsync(
+            var depositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(
                 input.SiteId,
                 input.StartDate,
-                input.EndDate).Result.Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
-            _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(depositSummaryResult, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
+                input.EndDate)).Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            depositSummaryResult = depositSummaryResult.GroupBy(x => new {x.Date, x.CurrencyId})
+                .Select(x=> new MpaMarketingDepositAmountSummaryDto
+                {
+                    Date = x.Key.Date,
+                    DepositAmount = x.Sum(y => y.DepositAmount),
+                    CurrencyId = x.Key.CurrencyId
+                }).ToList();
+            await _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(depositSummaryResult, input.StartDate, input.GetEndDate(), input.BaseCurrencyId);
             
             result.DepositAmount = depositSummaryResult.Sum(x => x.DepositAmount);
             
             var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(input.SiteId, input.StartDate, input.EndDate)
                 .Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            depositSignUpDetail = depositSignUpDetail.GroupBy(x => new {x.Date, x.CurrencyId})
+                .Select(x=> new MpaMarketingDepositSignUpDetailDto
+                {
+                    Date = x.Key.Date,
+                    FirstDepositAmount = x.Sum(y => y.FirstDepositAmount),
+                    FirstDepositCount = x.Sum(y => y.FirstDepositCount),
+                    CurrencyId = x.Key.CurrencyId
+                }).ToList();
             _mpaMarketingDepositAmountBll.MultiplyExchangeRateSinUpSummary(depositSignUpDetail, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
             
             result.FirstDepositAmount = depositSignUpDetail.Sum(x => x.FirstDepositAmount);
@@ -305,7 +325,14 @@ namespace BackendSite.Service.BLL
                     input.SiteId, 
                     input.StartDateCompared.DateTime,
                     input.EndDateCompared.DateTime).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
-
+                compareWithWithdrawalSummaryResult = compareWithWithdrawalSummaryResult.GroupBy(x => new {x.Date, x.CurrencyId})
+                    .Select(x=> new MpaMarketingWithdrawalAmountSummaryDto
+                    {
+                        Date = x.Key.Date,
+                        WithdrawalAmount = x.Sum(y => y.WithdrawalAmount),
+                        CurrencyId = x.Key.CurrencyId
+                    }).ToList();
+                
                 _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(compareWithWithdrawalSummaryResult, input.StartDateCompared, input.GetCompareEndDate(), input.BaseCurrencyId).Wait();
                 
                 var withdrawalAmountCompared = compareWithWithdrawalSummaryResult.Sum(x => x.WithdrawalAmount);
@@ -320,6 +347,14 @@ namespace BackendSite.Service.BLL
                     input.StartDateCompared,
                     input.EndDateCompared).Result.Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
+                compareWithDepositSummaryResult = compareWithDepositSummaryResult.GroupBy(x => new {x.Date, x.CurrencyId})
+                    .Select(x=> new MpaMarketingDepositAmountSummaryDto
+                    {
+                        Date = x.Key.Date,
+                        DepositAmount = x.Sum(y => y.DepositAmount),
+                        CurrencyId = x.Key.CurrencyId
+                    }).ToList();
+                
                 _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(compareWithDepositSummaryResult, input.StartDateCompared, input.GetCompareEndDate(), input.BaseCurrencyId).Wait();
             
                 var depositAmountCompared = compareWithDepositSummaryResult.Sum(x => x.DepositAmount);
@@ -347,8 +382,7 @@ namespace BackendSite.Service.BLL
                 #endregion
                 
                 #region Retention Rate Compared
-
-      
+                
                 result.RetentionComparedRate =  result.BasedOnReportTotalUsers != 0 ? (decimal) (result.HasBetUsers - resultCompared.HasBetUsers)  / result.BasedOnReportTotalUsers : 0;
                 
                 #endregion
