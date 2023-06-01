@@ -1,4 +1,5 @@
-﻿using BackendSite.Controllers.ApiV2.Report;
+﻿using System.Diagnostics;
+using BackendSite.Controllers.ApiV2.Report;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
@@ -16,6 +17,7 @@ namespace BackendSite.Service.BLL
         private readonly IMpaMarketingWithdrawalAmountBLL _mpaMarketingWithdrawalAmountBll;
         private readonly IMpaMarketingWithdrawalAmountService _withdrawalAmountService;
         private readonly IMpaMarketingDepositAmountService _depositAmountService;
+        private readonly ILogger<MpaMarketingDashboardBLL> _logger;
 
         public MpaMarketingDashboardBLL(IServiceProvider provider)
         {
@@ -25,6 +27,7 @@ namespace BackendSite.Service.BLL
             _depositAmountService = provider.GetRequiredService<IMpaMarketingDepositAmountService>();
             _mpaMarketingDepositAmountBll = provider.GetRequiredService<IMpaMarketingDepositAmountBLL>();
             _mpaMarketingWithdrawalAmountBll = provider.GetRequiredService<IMpaMarketingWithdrawalAmountBLL>();
+            _logger = provider.GetRequiredService<ILogger<MpaMarketingDashboardBLL>>();
         }
 
         #region MpaMarketingDashboard
@@ -204,15 +207,22 @@ namespace BackendSite.Service.BLL
         
         private async Task<PerformanceHighlightData> InitPerformanceHighlightData(GetDataRequest input)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            
             var result = _mpaMarketingDashboardService.GetPerformanceHighlightData(
                 input.SiteId,
                 JsonConvert.SerializeObject(input.CurrencyIds),
                 input.StartDate.DateTime,
                 input.EndDate.DateTime
             );
+            
+            _logger.LogInformation($"GetPerformanceHighlightData：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
 
             #region Withdrawal Amount
             
+            sw.Restart();
             var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(
                 input.SiteId, 
                 input.StartDate,
@@ -228,6 +238,9 @@ namespace BackendSite.Service.BLL
            
             result.WithdrawalAmount = withSummaryResult.Sum(x => x.WithdrawalAmount);
 
+            _logger.LogInformation($"GetWithdrawalAmountSummaryAsync：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
+            
             var withDetails = (await _withdrawalAmountService.GetWithdrawalAmountDetailAsync(input.SiteId, input.StartDate, input.EndDate))
                 .Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
             result.WithdrawalUsers  = withDetails.Sum(x => x.WithdrawalCount);
@@ -236,6 +249,7 @@ namespace BackendSite.Service.BLL
             
             #region Deposit Amount
 
+            sw.Restart();
             var depositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(
                 input.SiteId,
                 input.StartDate,
@@ -251,6 +265,10 @@ namespace BackendSite.Service.BLL
             
             result.DepositAmount = depositSummaryResult.Sum(x => x.DepositAmount);
             
+            _logger.LogInformation($"GetDepositAmountSummaryAsync：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
+            
+            sw.Restart();
             var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(input.SiteId, input.StartDate, input.EndDate)
                 .Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
             depositSignUpDetail = depositSignUpDetail.GroupBy(x => new {x.Date, x.CurrencyId})
@@ -266,6 +284,9 @@ namespace BackendSite.Service.BLL
             result.FirstDepositAmount = depositSignUpDetail.Sum(x => x.FirstDepositAmount);
             result.FirstDepositCount = depositSignUpDetail.Sum(x => x.FirstDepositCount);
             
+            _logger.LogInformation($"GetDepositSignUpDetail：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
+            
             #endregion
 
             #region NetCash Amount
@@ -276,6 +297,7 @@ namespace BackendSite.Service.BLL
 
             #region Bonus Amount Claimed
             
+            sw.Restart();
             var request = new MpaBonusInfoReportController.GetMarketingDataRequest
             {
                 StartDate = input.StartDate,
@@ -290,6 +312,9 @@ namespace BackendSite.Service.BLL
             var bonusResult = _mpaBonusInfoBll.GetMpaMarketingBonus(request);
             result.TotalBonusClaimants = bonusResult.TotalBonusClaimants;
             result.BonusAmountClaimed = bonusResult.GroupByCurrencySum.BonusAmountClaim;
+            
+            _logger.LogInformation($"GetMpaMarketingBonus：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
             
             #endregion
 
