@@ -46,7 +46,8 @@ namespace BackendSite.Service.Model
 
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
-        
+        public IEnumerable<MemberTypeEnum> MemberTypes { get; set; }
+
     }
 
     #region Response

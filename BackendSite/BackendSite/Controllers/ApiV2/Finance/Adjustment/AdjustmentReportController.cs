@@ -85,6 +85,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         {
             var adjustTypeList = request.AdjustTypes.Select(x => (int)x);
             var siteId = _newAuthorizeBll.GetAuthData().SiteId;
+            var memberTypes = request.MemberTypes != null && request.MemberTypes.Any() ? request.MemberTypes.Select(x => (int)x)
+               : ((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x);
             var exportData = await _paymentAdjustmentBll.GetPaymentAdjustmentExportReportV2(siteId,
                 request.CurrencyIds,
                 request.UserName,
@@ -93,7 +95,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 adjustTypeList,
                 request.StartDate,
                 request.EndDate,
-                request.TransId);
+                request.TransId,
+                memberTypes);
 
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "PaymentAdjustmentReport");

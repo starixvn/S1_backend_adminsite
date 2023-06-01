@@ -179,7 +179,8 @@ namespace BackendSite.Service.DAL
             string depositId,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
-            string transId)
+            string transId,
+            string memberTypes)
         {
             var props = new DynamicParameters();
             props.Add("_SiteIds", siteIds);
@@ -194,6 +195,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
             props.Add("_TpUserName", string.IsNullOrWhiteSpace(sabaId) ? null : sabaId);
             props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
+            props.Add("_MemberTypes", memberTypes);
 
             var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V7", props);
             return result;

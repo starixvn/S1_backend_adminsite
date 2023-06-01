@@ -246,7 +246,8 @@ namespace BackendSite.Service.BLL
           IEnumerable<int> adjustTypes,
           DateTimeOffset startDate,
           DateTimeOffset endDate,
-          string transId)
+          string transId,
+          IEnumerable<int> memberTypes)
         {
             #region AdjustType
 
@@ -274,7 +275,8 @@ namespace BackendSite.Service.BLL
                     depositId,
                     startDate,
                     endDate,
-                    transId)).ToList();
+                    transId,
+                    JsonConvert.SerializeObject(memberTypes))).ToList();
 
 
             var result = new List<PaymentAdjustmentReportExport>();
