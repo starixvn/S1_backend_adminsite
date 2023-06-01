@@ -203,8 +203,26 @@ namespace BackendSite.Service.DAL
 
             return (result, custId);
         }
+        
+        
+        public List<MpaMarketingBonus> GetMpaMarketingBonus(
+            int siteId,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
 
-        public CustBonusSum GetCustBonusSum(int siteId, int custId)
+            var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
+
+            return result.ToList();
+        }
+        
+        public CustBonusSum GetCustBonusSum(int siteId,int custId)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);

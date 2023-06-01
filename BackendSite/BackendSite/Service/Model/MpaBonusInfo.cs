@@ -44,6 +44,13 @@
     
     #region MpaMarketing
     
+    public interface IMpaMarketingBonusAmountBaseDto
+    {
+        public DateTime Date { get; set; }
+        public decimal BonusAmountClaim { get; set; }
+        public int CurrencyId { get; set; }
+    }
+    
     public class MpaMarketingBonusInfo
     {
         public MpaMarketingBonusGroupByCurrency GroupByCurrencySum{ get; set; }
@@ -59,7 +66,6 @@
         public int CurrencyId{ get; set; }
         public string Currency { get; set; }
         public decimal BonusAmountClaim { get; set; }
-        public decimal BaseBonusAmountClaim { get; set; }
         public decimal ComparedBonusAmountClaim { get; set; }
         public decimal ChangeRate { get; set; }
     }
@@ -76,13 +82,13 @@
         public string BonusName { get; set; }
         public int NumberOfBonusUser{ get; set; }
         public decimal BonusAmountClaim { get; set; }
-        public decimal BaseBonusAmountClaim { get; set; }
     }
     
-    public class MpaMarketingBonus : MpaMarketingBonusGroupByBonusCode
+    public class MpaMarketingBonus : MpaMarketingBonusGroupByBonusCode, IMpaMarketingBonusAmountBaseDto
     {
+        public DateTime Date { get; set; }
         public int SiteId{ get; set; }
-        public int CurrencyId{ get; set; }
+        public int CurrencyId { get; set; }
         public string Currency { get; set; }
     }
     
