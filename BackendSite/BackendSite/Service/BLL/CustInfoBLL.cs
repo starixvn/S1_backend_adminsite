@@ -285,7 +285,7 @@ namespace BackendSite.Service.BLL
                 (int) BonusInfoStatusEnum.Running,
                 (int) BonusInfoStatusEnum.TrasferOut,
             };
-            return await _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), @operator);
+            return await _bonusInfoService.CancelBonusByBonusId(bonusId, JsonConvert.SerializeObject(statusList), @operator);
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
@@ -503,7 +503,7 @@ namespace BackendSite.Service.BLL
                 await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
-            
+
             await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
@@ -870,12 +870,7 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
-            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if (sabaWallet != null)
-            {
-                result.SabaWallet = sabaWallet.Balance;
-            }
             if (ptwallet != null)
             {
                 result.PTWallet = ptwallet.Balance;
@@ -886,12 +881,7 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
-            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if (sabaWallet != null)
-            {
-                result.SabaWallet = sabaWallet.Balance;
-            }
             if (ptwallet != null)
             {
                 result.PTWallet = ptwallet.Balance;

@@ -47,34 +47,7 @@ namespace BackendSite.Service.BLL
         {
             var serverInfo = serverInfoService.GetModel();
             return pendingFundService.PendingFundList(serverInfo.SiteId);
-        }
-
-        public async Task<ApiResult<TransferResult>> ProcessAsync(PendingFund pendingFund)
-        {
-            var serverInfo = serverInfoService.GetModel();
-            pendingFund.Balance = walletService.GetBalance(pendingFund.CustId);
-            var apiResult = new ApiResult<TransferResult>();
-
-            if (pendingFund.Balance > 0)
-            {
-                var tpTransfer = new TpTransfer
-                {
-                    TpId = 1,
-                    CustId = pendingFund.CustId,
-                    Amount = pendingFund.Balance,
-                    direction = TpDirection.ToTp,
-                    inputs = new Dictionary<string, string>()
-                };
-                var myUrl = $"{apiUrl}Transfer";
-                apiResult = await courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, tpTransfer);
-            }
-            else
-            {
-                apiResult.Message = "Balance less than 0";
-            }
-
-            return apiResult;
-        }
+        } 
 
         public class TpBonusTransfer
         {

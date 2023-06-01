@@ -172,7 +172,6 @@ public class MemberExportData
     public bool IsTest { get; set; }
     public bool IsKyc { get; set; }
     public bool IsRisk { get; set; }
-    public decimal SabaWallet { get; set; }
     public decimal PTWallet { get; set; }
     public decimal SeamlessWallet { get; set; }
     public decimal BonusWallet { get; set; }
@@ -216,6 +215,7 @@ public class CustomerDto
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
@@ -287,6 +287,7 @@ public class CustomerBasicInfo
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }

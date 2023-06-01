@@ -250,6 +250,7 @@ namespace BackendSite.Service.Model.enums
         Canceled = 5,
         Expired = 6, //No Use
         OnHold = 7, //No Use
+        UnCheckDepositReceipt = 93,
         SetDepositAmount = 94,
         CheckDepositReceipt = 95,
         DeleteReceipt = 96,
@@ -401,6 +402,8 @@ namespace BackendSite.Service.Model.enums
         Approved = 6,
         Rejected = 7,
         ToKyc = 8,
+        Receive = 9, //No Use
+        UnReceive = 10, //No Use
         Error = 99 //No Use
     }
 
@@ -415,7 +418,8 @@ namespace BackendSite.Service.Model.enums
         OnHold = 63,
         Verified = 69,
         Process = 70,
-        ToKyc = 71
+        ToKyc = 71,
+        Receive = 72
     }
     
     public enum WithdrawalDateTypeEnum
@@ -607,7 +611,8 @@ namespace BackendSite.Service.Model.enums
         PTSlotsGame = 7,
         PTLiveCasino = 8,
         SBSW = 9,
-        Mega888SlotRNGAndFishing = 10
+        Mega888SlotRNGAndFishing = 10,
+        ESports = 11
     }
 
     public enum FullFillTypeEnum
@@ -885,7 +890,8 @@ namespace BackendSite.Service.Model.enums
         vn = 5,
         hi = 6,
         my = 7,
-        bd = 8
+        bd = 8,
+        kh = 9
     }
 
     public enum PromotionDisplayConditionType
@@ -1142,7 +1148,8 @@ namespace BackendSite.Service.Model.enums
         Cockfighting = 5,
         Lottery = 6,
         VirtualSports = 7,
-        Poker = 8
+        Poker = 8,
+        ESports = 11
     }
     
     public enum LeaderBoardCategoryEnum
@@ -1218,7 +1225,8 @@ namespace BackendSite.Service.Model.enums
         [Description("Bank Transfer")]
         LocalBank = 0,
         [Description("Mobile E-Wallet")]
-        EWallet = 1
+        EWallet = 1,
+        QRPay = 2
     }
 
     #endregion
@@ -1484,6 +1492,7 @@ namespace BackendSite.Service.Model.enums
         IDR = 15,
         VND = 51,
         INR = 61,
+        KHUSD = 72,
         BDT = 74
     }
 
@@ -1752,5 +1761,32 @@ namespace BackendSite.Service.Model.enums
         /// 我方買入(玩家存款)
         /// </summary>
         Buy = 1
+    }
+
+    public enum WithdrawalInfoProcessWayEnum
+    {
+        /// <summary>
+        /// 手動出款
+        /// </summary>
+        Manual = 0,
+
+        /// <summary>
+        /// 自動出款
+        /// </summary>
+        Auto = 1,
+
+        /// <summary>
+        /// 自動出款失敗後轉回手動出款
+        /// </summary>
+        AutoFailBackManual = 2
+    }
+
+    public enum WithdrawalAccountTypeEnum
+    {
+        EWallet = 1,
+
+        BankCard = 2,
+
+        Crypto = 3
     }
 }

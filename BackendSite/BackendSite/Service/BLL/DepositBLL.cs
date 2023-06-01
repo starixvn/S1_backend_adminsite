@@ -154,10 +154,10 @@ namespace BackendSite.Service.BLL
             return await depositService.SetDepositReceiptPic(siteId , custId, depositId, receiptNo ,fileName ,creator);
         }
 
-        public int CheckDepositReceipt(int siteId ,string transId,  string Operator)
+        public int CheckDepositReceipt(int siteId ,string transId, bool status, string Operator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
-            return depositService.CheckDepositReceipt(siteId ,depositId, Operator);
+            return depositService.CheckDepositReceipt(siteId ,depositId, status, Operator);
         }
         
         private int ValidateDepositReceiptPic(string transId)
