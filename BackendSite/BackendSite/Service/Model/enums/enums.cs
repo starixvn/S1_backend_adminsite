@@ -1225,7 +1225,8 @@ namespace BackendSite.Service.Model.enums
         [Description("Bank Transfer")]
         LocalBank = 0,
         [Description("Mobile E-Wallet")]
-        EWallet = 1
+        EWallet = 1,
+        QRPay = 2
     }
 
     #endregion
