@@ -222,6 +222,20 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
             public bool IsCompared { get; set; }
+            
+            public DateTimeOffset GetEndDate()
+            {
+                //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
+                var endDate = EndDate.AddMonths(1).AddDays(EndDate.AddMonths(1).Day);
+                return endDate;
+            }
+            public DateTimeOffset GetCompareEndDate()
+            {
+                //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
+                var endDate = ComparedEndDate.AddMonths(1).AddDays(ComparedEndDate.AddMonths(1).Day);
+                return endDate;
+            }
+            
         }
         
         public class GetMarketingDetailRequest : IOrderBy
@@ -534,8 +548,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                     { "Currency", "ALL" },
                     { "BonusName", item.GroupInfo.BonusName },
                     { "NoOfUsersClaimingBonus", item.GroupInfo.NumberOfBonusUser },
-                    { "TotalBonusAmountClaimed_Detail", item.GroupInfo.BonusAmountClaim },
-                    { "TotalBonusAmountClaimed_Base", item.GroupInfo.BaseBonusAmountClaim },
+                    { "TotalBonusAmountClaimed_Detail", item.GroupInfo.BonusAmountClaim }
                 };
                 summaryBonusCodeContent.Add(newItem);
                 

@@ -268,16 +268,14 @@ namespace BackendSite.Service.DAL
             int siteId,
             string currencyIds,
             DateTime startDate,
-            DateTime endDate,
-            int baseCurrencyId)
+            DateTime endDate)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_CurrencyIds", currencyIds);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            props.Add("_BaseCurrencyId", baseCurrencyId);
-            
+
             var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
 
             return result.ToList();
