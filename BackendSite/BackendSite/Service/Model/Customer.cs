@@ -601,6 +601,8 @@ namespace BackendSite.Service.Model
         public decimal TodayWithdrawal { get; set; }
         public decimal TodayWinLoss { get; set; }
         public decimal TodayBetting { get; set; }
+        public decimal TodayBonus { get; set; }
+        public decimal TodayReward { get; set; }
     }
     public class DashboardWinLossGroup
     {
