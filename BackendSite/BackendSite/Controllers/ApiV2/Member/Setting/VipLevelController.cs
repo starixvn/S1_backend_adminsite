@@ -57,8 +57,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             public int Level { get; set; }
             public decimal UpDeposit { get; set; }
             public decimal UpBonus { get; set; }
-            public decimal? DownDeposit { get; set; }
-            public decimal? DownTurnover { get; set; }
+            public decimal DownDeposit { get; set; }
+            public decimal DownTurnover { get; set; }
         }
         #endregion
 
@@ -203,14 +203,43 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
         [HttpPost]
-        public async Task<ApiResult> SetUpgradeSetting(ApiRequestWithLog<SetUpgradeSettingRequest> req)
+        public async Task<ApiResult> SetUpDeposit(ApiRequestWithLog<SetUpgradeSettingRequest> req)
         {
-            if(req.After.Level == 6)
-            {
-                return new ApiResult { ErrorCode = (int)ErrorCodeEnum.UpdateFailed };
-            }
             var result = await _vipLevelBll.SetUpgradeSetting(
-                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name));
+                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name), UpgradeSettingEnum.UpDeposit);
+            return new ApiResult
+            {
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+        }
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> SetUpBonus(ApiRequestWithLog<SetUpgradeSettingRequest> req)
+        {
+            var result = await _vipLevelBll.SetUpgradeSetting(
+                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name), UpgradeSettingEnum.UpBonus);
+            return new ApiResult
+            {
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+        }
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> SetDownDeposit(ApiRequestWithLog<SetUpgradeSettingRequest> req)
+        {
+            var result = await _vipLevelBll.SetUpgradeSetting(
+                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name), UpgradeSettingEnum.DownDeposit);
+            return new ApiResult
+            {
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+        }
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> SetDownTurnover(ApiRequestWithLog<SetUpgradeSettingRequest> req)
+        {
+            var result = await _vipLevelBll.SetUpgradeSetting(
+                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name), UpgradeSettingEnum.DownTurnover);
             return new ApiResult
             {
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
