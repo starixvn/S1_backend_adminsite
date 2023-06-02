@@ -62,7 +62,7 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
-                item.DepositAmount = item.DepositAmount / rate;
+                item.DepositAmount = item.DepositAmount * rate;
             }
         }
 
@@ -325,10 +325,10 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
-                item.DepositAmount = item.DepositAmount / rate;
+                item.DepositAmount = item.DepositAmount * rate;
                 if (item.FirstDepositAmount > 0)
                 {
-                    item.FirstDepositAmount = item.FirstDepositAmount / rate;
+                    item.FirstDepositAmount = item.FirstDepositAmount * rate;
                 }
             }
         }
