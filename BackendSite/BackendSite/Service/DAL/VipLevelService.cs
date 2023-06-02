@@ -220,23 +220,40 @@ namespace BackendSite.Service.DAL
                 new DynamicParameters(new { SiteId = siteId }));
         }
 
-        public async Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input)
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input, UpgradeSettingEnum upgradeSettingEnum)
         {
             await using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
+            var sp = string.Empty;
             var p = new DynamicParameters();
             p.Add("_SiteId", input.SiteId);
             p.Add("_Level", input.After.Level);
             p.Add("_CurrencyId", input.CurrencyId);
-            p.Add("_UpDeposit", input.After.UpDeposit);
-            p.Add("_UpBonus", input.After.UpBonus);
-            p.Add("_DownDeposit", input.After.DownDeposit);
-            p.Add("_DownTurnover", input.After.DownTurnover);
+
+            switch (upgradeSettingEnum)
+            {
+                case UpgradeSettingEnum.UpDeposit:
+                    p.Add("_UpDeposit", input.After.UpDeposit);
+                    sp = "Admin_UpDeposit_Set";
+                    break;
+                case UpgradeSettingEnum.UpBonus:
+                    p.Add("_UpBonus", input.After.UpBonus);
+                    sp = "Admin_UpBonus_Set";
+                    break;
+                case UpgradeSettingEnum.DownDeposit:
+                    p.Add("_DownDeposit", input.After.DownDeposit);
+                    sp = "Admin_DownDeposit_Set";
+                    break;
+                case UpgradeSettingEnum.DownTurnover:
+                    p.Add("_DownTurnover", input.After.DownTurnover);
+                    sp = "Admin_DownTurnover_Set";
+                    break;
+            }
 
             var result = await _mainDbClient
-                .ExecuteAsync("Admin_VipSystem_Set", trans, p);
+                .ExecuteAsync(sp, trans, p);
 
             if (result > 0)
             {
@@ -263,6 +280,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        
         #region Private Methods
 
         #endregion
