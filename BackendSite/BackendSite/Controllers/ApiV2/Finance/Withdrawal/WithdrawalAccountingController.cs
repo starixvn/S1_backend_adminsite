@@ -475,7 +475,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 out var newUploadPictureTimes);
             if (result)
             {
-                var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
+                var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
                 var bytes = Convert.FromBase64String(pictureBaseOnSixFour);
                 var stream = new MemoryStream(bytes);
 
