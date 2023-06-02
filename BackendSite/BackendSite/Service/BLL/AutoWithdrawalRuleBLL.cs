@@ -1,17 +1,24 @@
 ﻿using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using NPOI.POIFS.Crypt.Dsig;
+using YamlDotNet.Core;
 
 namespace BackendSite.Service.BLL
 {
     public class AutoWithdrawalRuleBLL : IAutoWithdrawalRuleBLL
     {
         private readonly IAutoWithdrawalRuleService _autoWithdrawalRuleService;
+        private readonly VipLevelBLL _vipLevelBll;
+        private readonly ITagBLL _tagBLL;
 
-        public AutoWithdrawalRuleBLL(IAutoWithdrawalRuleService autoWithdrawalRuleService)
+        public AutoWithdrawalRuleBLL(IAutoWithdrawalRuleService autoWithdrawalRuleService, VipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ITagBLL tagBll)
         {
             _autoWithdrawalRuleService = autoWithdrawalRuleService;
+            _vipLevelBll = vipLevelBll;
+            _tagBLL = tagBll;
         }
 
         public async Task<IEnumerable<AutoWithdrawalRuleDataListResponse>> GetDataListAsync(AutoWithdrawalRuleDataListRequest request)
@@ -48,17 +55,110 @@ namespace BackendSite.Service.BLL
 
         public async Task CreateAutoWithdrawalRuleAsync(AutoWithdrawalRuleCreateRequest request, string userName)
         {
+            var beforeLog = GetActivityLogObj(
+                siteId: request.SiteId,
+                currencyId: request.CurrencyId,
+                withdrawalAmount: request.WithdrawalAmount,
+                accountWithdrawalCount: request.AccountWithdrawalCount,
+                vipLevels: request.VipLevels,
+                tags: request.Tags,
+                withdrawalTypes: request.WithdrawalTypes,
+                status: true);
+
+            await _autoWithdrawalRuleService.InsertLogAsync(siteId: request.SiteId,
+                custId: 0,
+                currencyId: (int)request.CurrencyId,
+                beforeData: beforeLog,
+                afterData: null,
+                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoWithdrawalRule,
+                actionType: ActionType.Create,
+                userName);
+
             await _autoWithdrawalRuleService.CreateAutoWithdrawalRuleAsync(request, userName);
         }
 
         public async Task SetAutoWithdrawalRuleAsync(AutoWithdrawalRuleSetRequest request, string userName)
         {
+            // todo before:value after:value
             await _autoWithdrawalRuleService.SetAutoWithdrawalRuleAsync(request, userName);
         }
 
         public async Task DeleteAutoWithdrawalRuleAsync(AutoWithdrawalRuleDeleteRequest request)
         {
+            // todo log before:value after N/A
             await _autoWithdrawalRuleService.DeleteAutoWithdrawalRuleAsync(request);
         }
+
+        private object GetActivityLogObj(int siteId, CurrencyEnum currencyId, decimal withdrawalAmount,
+            int accountWithdrawalCount,
+            List<int> vipLevels,
+            List<int> tags,
+            List<int> withdrawalTypes,
+            bool status)
+        {
+            return new
+            {
+                Currency = currencyId.ToString(),
+                WithdrawalAmount = withdrawalAmount,
+                AccountWithdrawalCount = accountWithdrawalCount,
+                VIPLevel = GetVipLevelName(vipLevels,siteId),
+                Tagging = GetTagNames(tags),
+                WithdrawalType = GetWithdrawalTypeName(withdrawalTypes),
+                Status = status
+            };
+        }
+
+        private string GetVipLevelName(List<int> vips,int siteId)
+        {
+            if(!vips.Any()) return string.Empty;
+
+            var vipData = _vipLevelBll.GetVipLevelSetting(siteId).ToList();
+            var vipLevelNames = vips.Select(vipLevel => vipData.Where(r => r.Level == vipLevel).Select(x => x.LevelName).FirstOrDefault() ?? string.Empty).ToList();
+            var result =  string.Join(",", vipLevelNames.ToArray());
+
+            return result;
+        }
+
+        private string GetTagNames(List<int> tags)
+        {
+            if(tags.Any()) return string.Empty;
+
+            var tagData = _tagBLL.GetAllTag().Result.ToList();
+            var tagNames = tags.Select(tagId => tagData.Where(r => r.Id == tagId).Select(r => r.TagName).FirstOrDefault()).ToList();
+            var result = string.Join(",", tagNames.ToArray());
+
+            return result;
+        }
+
+        private string GetWithdrawalTypeName(List<int> withdrawalTypes)
+        {
+            if(!withdrawalTypes.Any()) return string.Empty;
+
+            var withdrawalTypeData = new List<WithdrawalOptionDto>()
+            {
+                new()
+                {
+                    Name = WithdrawalMethodEnum.EWallet.ToString(),
+                    Value = (int)WithdrawalMethodEnum.EWallet
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.BankCard.ToString(),
+                    Value = (int)WithdrawalMethodEnum.BankCard
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.Crypto.ToString(),
+                    Value = (int)WithdrawalMethodEnum.Crypto
+                }
+            };
+
+            var withdrawalTypeNames = withdrawalTypes.Select(withdrawalTypeValue => withdrawalTypeData.Where(r => r.Value == withdrawalTypeValue).Select(x => x.Name).FirstOrDefault()).ToList();
+            var result = string.Join(",", withdrawalTypeNames.ToArray());
+
+            return result;
+        }
+
+
     }
 }
