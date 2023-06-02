@@ -7,6 +7,8 @@ namespace BackendSite.Service.DAL.Interface
     {
         Task<IEnumerable<AutoWithdrawalRuleDataListDto>> GetDataListAsync(AutoWithdrawalRuleDataListRequest req);
 
+        Task<AutoWithdrawalRuleDataListDto> GetDataByIdAsync(int id);
+
         Task CreateAutoWithdrawalRuleAsync(AutoWithdrawalRuleCreateRequest req, string userName);
 
         Task SetAutoWithdrawalRuleAsync(AutoWithdrawalRuleSetRequest req, string userName);

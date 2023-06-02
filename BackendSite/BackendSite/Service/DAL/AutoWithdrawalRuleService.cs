@@ -26,6 +26,14 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<AutoWithdrawalRuleDataListDto>("Admin_AutoWithdrawalRuleSetting_Get", p);
         }
 
+        public Task<AutoWithdrawalRuleDataListDto> GetDataByIdAsync(int id)
+        {
+            var p = new DynamicParameters();
+            p.Add("_Id", id);
+            return _reportDbClient.QueryFirstAsync<AutoWithdrawalRuleDataListDto>("Admin_AutoWithdrawalRuleSetting_GetById", p);
+        }
+
+
         public Task CreateAutoWithdrawalRuleAsync(AutoWithdrawalRuleCreateRequest req, string userName)
         {
             var p = new DynamicParameters();
