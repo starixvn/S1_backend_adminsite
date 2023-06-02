@@ -909,7 +909,8 @@ namespace BackendSite.Service.Model.enums
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
         RebateExcludeGame = 89,
-        VipUpgradeSetting = 90
+        VipUpgradeSetting = 90,
+        AutoWithdrawalRule = 91,
     }
 
     #region BankFinancialTransferInfoLog
