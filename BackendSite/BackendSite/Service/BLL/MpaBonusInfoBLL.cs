@@ -427,7 +427,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
-                item.BonusAmountClaim = item.BonusAmountClaim / rate;
+                item.BonusAmountClaim = item.BonusAmountClaim * rate;
             }
         }
         
