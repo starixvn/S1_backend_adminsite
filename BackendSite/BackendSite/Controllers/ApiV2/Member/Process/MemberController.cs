@@ -1053,6 +1053,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// Member/SwitchRebatePayout 起停用派發Turnover Point
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 88 })]
+        [HttpPost]
+        public async Task<ApiResult> SwitchEnableTurnoverRewardPointAsync(SwitchEnableTurnoverRewardPointRequest request)
+        {
+            if (await _memberCommand.SwitchEnableTurnoverRewardPointAsync(request.CustId, (int)request.Status, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
         /// Member/ResetBankInfo 重置BankInfo
         /// </summary>
         /// <remarks>

@@ -570,4 +570,10 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId });
         return await _sqlClienct.QueryAsync<CustTpGameTypeSettingDto>("Admin_CustTpGameTypeSetting_Get", p);
     }
+
+    public async Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status)
+    {
+        var p = new DynamicParameters(new { _CustId = custId, _EnableTurnoverRewardPoint = status });
+        return await _mainSqlClient.ExecuteAsync("Admin_CustInfoEnableTurnoverRewardPoint_Set", p);
+    }
 }

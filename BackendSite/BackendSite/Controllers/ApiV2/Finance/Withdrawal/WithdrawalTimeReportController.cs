@@ -77,6 +77,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 var searchResult = _withdrawalBll.WithdrawalTimeReportGet(JsonConvert.SerializeObject(req.SiteIds),
                 req.WithdrawalId,req.StartDate,req.EndDate, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.CustId, req.PageNumber,req.PageSize, out List<TotalAmount> currencyTotalAmount);
+                var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(
+                    searchResult.WithdrawalTimeList.Select(x => x.WithdrawalId));
 
                 foreach (var data in searchResult.WithdrawalTimeList)
                 {
@@ -89,6 +91,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         data.ProcessTime = new DateTimeOffset(data.ProcessTime.Value.DateTime, TimeSpan.Zero);
                     if (data.DepositTime != null)
                         data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
+                    data.WithdrawalMessageList = msgs
+                        .Where(x => x.WithdrawalId == data.WithdrawalId)
+                        .OrderByDescending(x => x.CreateTime);
                 }
 
                 apiListResult.Data = searchResult.WithdrawalTimeList;
@@ -128,13 +133,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 , JsonConvert.SerializeObject(req.Status)
                 , JsonConvert.SerializeObject(req.CurrencyId)
                 , req.MemberId);
-            TimeSpan offset = req.StartDate.Offset;
+            var offset = req.StartDate.Offset;
+            var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(
+                exportData.Select(x => x.WithdrawalId));
             foreach (var data in exportData)
             {
                 data.CreateTime = data.CreateTime.ToOffset(offset);
                 data.UpdateTime = data.UpdateTime.ToOffset(offset);
                 if (data.FlowEndTime != null)
                     data.FlowEndTime = data.FlowEndTime?.ToOffset(offset);
+                data.WithdrawalMessage = string.Join(", ", msgs
+                    .Where(x => x.WithdrawalId == data.WithdrawalId)
+                    .OrderBy(x => x.CreateTime)
+                    .Select(x => x.Message));
             }
             var stream = _excelBll.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
