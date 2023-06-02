@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
 
 namespace BackendSite.Service.DAL.Interface
@@ -12,6 +13,6 @@ namespace BackendSite.Service.DAL.Interface
         Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string memo, string updator);
         Task<int> SetAutoCustVipExclusionAsync(int siteId, int custId, string userName, int exclusive);
         Task<IEnumerable<VipSystem>> GetVipSystem(int siteId);
-        Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input);
+        Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input, UpgradeSettingEnum upgradeSettingEnum);
     }
 }

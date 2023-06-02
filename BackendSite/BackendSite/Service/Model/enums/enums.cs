@@ -1899,4 +1899,12 @@ namespace BackendSite.Service.Model.enums
 
         Crypto = 3
     }
+
+    public enum UpgradeSettingEnum 
+    {
+        UpDeposit = 0,
+        UpBonus = 1,
+        DownDeposit = 2,
+        DownTurnover = 3,
+    }
 }

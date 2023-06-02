@@ -330,9 +330,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input)
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input, UpgradeSettingEnum upgradeSettingEnum)
         {
-            return await _vipLevelService.SetUpgradeSetting(input);
+            return await _vipLevelService.SetUpgradeSetting(input, upgradeSettingEnum);
         }
         #endregion
 
