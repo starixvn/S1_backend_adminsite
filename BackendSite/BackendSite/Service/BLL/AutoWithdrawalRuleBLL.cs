@@ -89,6 +89,30 @@ namespace BackendSite.Service.BLL
         private async Task SetActivityLog(AutoWithdrawalRuleSetRequest request, string userName,
             AutoWithdrawalRuleDataListDto originData)
         {
+            var beforeLog = GetBeforeChangeLog(originData);
+
+            var afterLog = GetActivityLogObj(
+                siteId: originData.SiteId,
+                currencyId: originData.CurrencyId,
+                withdrawalAmount: request.WithdrawalAmount,
+                accountWithdrawalCount: request.AccountWithdrawalCount,
+                vipLevels: request.VipLevels,
+                tags: request.Tags,
+                withdrawalTypes: request.WithdrawalTypes,
+                status: GetStatus(request.Status));
+
+            await _autoWithdrawalRuleService.InsertLogAsync(siteId: originData.SiteId,
+                custId: 0,
+                currencyId: (int)originData.CurrencyId,
+                beforeData: beforeLog,
+                afterData: afterLog,
+                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoWithdrawalRule,
+                actionType: ActionType.Update,
+                userName);
+        }
+
+        private object GetBeforeChangeLog(AutoWithdrawalRuleDataListDto originData)
+        {
             var defaultList = new List<int>();
             var vipLevels = string.IsNullOrEmpty(originData.VipLevelStr)
                 ? defaultList
@@ -111,31 +135,23 @@ namespace BackendSite.Service.BLL
                 tags: tags,
                 withdrawalTypes: withdrawalTypes,
                 status: GetStatus(originData.Status));
+            return beforeLog;
+        }
 
-            var afterLog = GetActivityLogObj(
-                siteId: originData.SiteId,
-                currencyId: originData.CurrencyId,
-                withdrawalAmount: request.WithdrawalAmount,
-                accountWithdrawalCount: request.AccountWithdrawalCount,
-                vipLevels: request.VipLevels,
-                tags: request.Tags,
-                withdrawalTypes: request.WithdrawalTypes,
-                status: GetStatus(request.Status));
+        public async Task DeleteAutoWithdrawalRuleAsync(AutoWithdrawalRuleDeleteRequest request, string userName)
+        {
+            var originData = await _autoWithdrawalRuleService.GetDataByIdAsync(request.Id);
+            await _autoWithdrawalRuleService.DeleteAutoWithdrawalRuleAsync(request);
+            var beforeLog = GetBeforeChangeLog(originData);
 
             await _autoWithdrawalRuleService.InsertLogAsync(siteId: originData.SiteId,
                 custId: 0,
                 currencyId: (int)originData.CurrencyId,
                 beforeData: beforeLog,
-                afterData: afterLog,
+                afterData: null,
                 adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoWithdrawalRule,
-                actionType: ActionType.Update,
+                actionType: ActionType.Delete,
                 userName);
-        }
-
-        public async Task DeleteAutoWithdrawalRuleAsync(AutoWithdrawalRuleDeleteRequest request)
-        {
-            // todo log before:value after N/A
-            await _autoWithdrawalRuleService.DeleteAutoWithdrawalRuleAsync(request);
         }
 
         #region private method
@@ -172,7 +188,7 @@ namespace BackendSite.Service.BLL
 
         private string GetTagNames(List<int> tags)
         {
-            if (tags.Any()) return string.Empty;
+            if (!tags.Any()) return string.Empty;
 
             var tagData = _tagBLL.GetAllTag().Result.ToList();
             var tagNames = tags.Select(tagId => tagData.Where(r => r.Id == tagId).Select(r => r.TagName).FirstOrDefault()).ToList();

@@ -91,7 +91,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             try
             {
-                await _autoWithdrawalRuleBll.DeleteAutoWithdrawalRuleAsync(request);
+                await _autoWithdrawalRuleBll.DeleteAutoWithdrawalRuleAsync(request, AuthData.UserName);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
