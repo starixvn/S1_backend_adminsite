@@ -208,9 +208,6 @@ namespace BackendSite.Service.BLL
         
         private async Task<PerformanceHighlightData> InitPerformanceHighlightData(GetDataRequest input)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            
             var performanceHighlightTask = Task.Run(() => GetPerformanceHighlightDataTask(input,false));
             var withdrawalAmountSummaryTask = Task.Run(() => GetWithdrawalAmountSummaryTask(input,false));
             var withdrawalAmountDetailTask = Task.Run(() => GetWithdrawalAmountDetailTask(input));
@@ -229,7 +226,8 @@ namespace BackendSite.Service.BLL
                 var comparedDepositAmountSummaryTask = Task.Run(() => GetDepositAmountSummaryTask(input,true));
 
                 await Task.WhenAll(performanceHighlightTask, withdrawalAmountSummaryTask, withdrawalAmountDetailTask,
-                    depositAmountSummaryTask,depositSignUpDetailTask,comparedPerformanceHighlightTask,comparedWithdrawalAmountSummaryTask
+                    depositAmountSummaryTask,depositSignUpDetailTask,mpaMarketingBonusTask,
+                    comparedPerformanceHighlightTask,comparedWithdrawalAmountSummaryTask
                     ,comparedDepositAmountSummaryTask);
                 
                 comparedResult = comparedPerformanceHighlightTask.Result;
@@ -239,11 +237,8 @@ namespace BackendSite.Service.BLL
             else
             {
                 await Task.WhenAll(performanceHighlightTask, withdrawalAmountSummaryTask, withdrawalAmountDetailTask,
-                    depositAmountSummaryTask,depositSignUpDetailTask);
+                    depositAmountSummaryTask,depositSignUpDetailTask,mpaMarketingBonusTask);
             }
-            
-            _logger.LogInformation($"InitPerformanceHighlightDataTask：{sw.Elapsed.TotalSeconds} （秒）");
-            sw.Stop();
             
             var result = performanceHighlightTask.Result;
             
@@ -339,17 +334,26 @@ namespace BackendSite.Service.BLL
 
         private async Task<PerformanceHighlightData> GetPerformanceHighlightDataTask(GetDataRequest input , bool isCompared)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            
             var result = _mpaMarketingDashboardService.GetPerformanceHighlightData(
                 input.SiteId,
                 JsonConvert.SerializeObject(input.CurrencyIds),
                 isCompared ? input.StartDateCompared.DateTime : input.StartDate.DateTime,
                 isCompared ? input.EndDateCompared.DateTime : input.EndDate.DateTime
             );
+            
+            _logger.LogInformation($"GetPerformanceHighlightData：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
             return result;
         }
         
         private async Task<IEnumerable<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountSummaryTask(GetDataRequest input , bool isCompared)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            
             var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(
                 input.SiteId, 
                 isCompared ? input.StartDateCompared.DateTime : input.StartDate.DateTime,
@@ -367,19 +371,31 @@ namespace BackendSite.Service.BLL
                 isCompared ? input.GetCompareEndDate() :  input.GetEndDate(),
                 input.BaseCurrencyId);
 
+            _logger.LogInformation($"GetWithdrawalAmountSummaryAsync：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
+            
             return withSummaryResult;
         }
         
         private async Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailTask(GetDataRequest input)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            
             var withDetails = (await _withdrawalAmountService.GetWithdrawalAmountDetailAsync(input.SiteId, input.StartDate, input.EndDate))
                 .Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            
+            _logger.LogInformation($"GetWithdrawalAmountDetailAsync：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
             
             return withDetails;
         }
         
         private async Task<IEnumerable<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryTask(GetDataRequest input , bool isCompared)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            
             var depositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(
                 input.SiteId,
                 isCompared ? input.StartDateCompared.DateTime : input.StartDate.DateTime,
@@ -397,11 +413,17 @@ namespace BackendSite.Service.BLL
                 isCompared ? input.GetCompareEndDate() :  input.GetEndDate(),
                 input.BaseCurrencyId);
 
+            _logger.LogInformation($"GetDepositAmountSummaryAsync：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
+            
             return depositSummaryResult;
         }
         
         private async Task<IEnumerable<MpaMarketingDepositSignUpDetailDto>> GetDepositSignUpDetailTask(GetDataRequest input)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            
             var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(input.SiteId, input.StartDate, input.EndDate)
                 .Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
             depositSignUpDetail = depositSignUpDetail.GroupBy(x => new {x.Date, x.CurrencyId})
@@ -414,11 +436,17 @@ namespace BackendSite.Service.BLL
                 }).ToList();
             _mpaMarketingDepositAmountBll.MultiplyExchangeRateSinUpSummary(depositSignUpDetail, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
             
+            _logger.LogInformation($"MultiplyExchangeRateSinUpSummary：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
+            
             return depositSignUpDetail;
         }
         
         private async Task<MpaMarketingBonusInfo> GetMpaMarketingBonusTask(GetDataRequest input)
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            
             var request = new MpaBonusInfoReportController.GetMarketingDataRequest
             {
                 StartDate = input.StartDate,
@@ -431,6 +459,9 @@ namespace BackendSite.Service.BLL
                 IsCompared = input.IsCompared
             };
             var bonusResult = _mpaBonusInfoBll.GetMpaMarketingBonus(request);
+            
+            _logger.LogInformation($"GetMpaMarketingBonus：{sw.Elapsed.TotalSeconds} （秒）");
+            sw.Stop();
             
             return bonusResult;
         }
