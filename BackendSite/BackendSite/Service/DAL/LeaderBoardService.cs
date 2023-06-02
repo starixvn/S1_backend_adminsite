@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
             props.Add("_CategoryId", categoryId);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get", props);
+            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V2", props);
             
             return result;
         }
