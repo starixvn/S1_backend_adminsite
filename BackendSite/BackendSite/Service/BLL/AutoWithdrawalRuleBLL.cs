@@ -12,7 +12,7 @@ namespace BackendSite.Service.BLL
         private readonly VipLevelBLL _vipLevelBll;
         private readonly ITagBLL _tagBLL;
 
-        public AutoWithdrawalRuleBLL(IAutoWithdrawalRuleService autoWithdrawalRuleService, VipLevelBLL vipLevelBll, CustInfoBLL custInfoBll, ITagBLL tagBll)
+        public AutoWithdrawalRuleBLL(IAutoWithdrawalRuleService autoWithdrawalRuleService, VipLevelBLL vipLevelBll, ITagBLL tagBll)
         {
             _autoWithdrawalRuleService = autoWithdrawalRuleService;
             _vipLevelBll = vipLevelBll;
@@ -51,6 +51,7 @@ namespace BackendSite.Service.BLL
             }).ToList();
         }
 
+        #region Create
         public async Task CreateAutoWithdrawalRuleAsync(AutoWithdrawalRuleCreateRequest request, string userName)
         {
             await _autoWithdrawalRuleService.CreateAutoWithdrawalRuleAsync(request, userName);
@@ -78,6 +79,10 @@ namespace BackendSite.Service.BLL
                 actionType: ActionType.Create,
                 userName);
         }
+
+        #endregion
+
+        #region Set
 
         public async Task SetAutoWithdrawalRuleAsync(AutoWithdrawalRuleSetRequest request, string userName)
         {
@@ -111,6 +116,51 @@ namespace BackendSite.Service.BLL
                 userName);
         }
 
+        #endregion
+
+        #region Delete
+        public async Task DeleteAutoWithdrawalRuleAsync(AutoWithdrawalRuleDeleteRequest request, string userName)
+        {
+            var originData = await _autoWithdrawalRuleService.GetDataByIdAsync(request.Id);
+            await _autoWithdrawalRuleService.DeleteAutoWithdrawalRuleAsync(request);
+            var beforeLog = GetBeforeChangeLog(originData);
+
+            await _autoWithdrawalRuleService.InsertLogAsync(siteId: originData.SiteId,
+                custId: 0,
+                currencyId: (int)originData.CurrencyId,
+                beforeData: beforeLog,
+                afterData: null,
+                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoWithdrawalRule,
+                actionType: ActionType.Delete,
+                userName);
+        }
+
+        #endregion
+
+        public List<WithdrawalOptionDto> GetWithdrawalOption()
+        {
+            return new List<WithdrawalOptionDto>()
+            {
+                new()
+                {
+                    Name = WithdrawalMethodEnum.EWallet.ToString(),
+                    Value = (int)WithdrawalMethodEnum.EWallet
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.BankCard.ToString(),
+                    Value = (int)WithdrawalMethodEnum.BankCard
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.Crypto.ToString(),
+                    Value = (int)WithdrawalMethodEnum.Crypto
+                }
+            };
+        }
+
+        #region private common method
+
         private object GetBeforeChangeLog(AutoWithdrawalRuleDataListDto originData)
         {
             var defaultList = new List<int>();
@@ -137,24 +187,6 @@ namespace BackendSite.Service.BLL
                 status: GetStatus(originData.Status));
             return beforeLog;
         }
-
-        public async Task DeleteAutoWithdrawalRuleAsync(AutoWithdrawalRuleDeleteRequest request, string userName)
-        {
-            var originData = await _autoWithdrawalRuleService.GetDataByIdAsync(request.Id);
-            await _autoWithdrawalRuleService.DeleteAutoWithdrawalRuleAsync(request);
-            var beforeLog = GetBeforeChangeLog(originData);
-
-            await _autoWithdrawalRuleService.InsertLogAsync(siteId: originData.SiteId,
-                custId: 0,
-                currencyId: (int)originData.CurrencyId,
-                beforeData: beforeLog,
-                afterData: null,
-                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoWithdrawalRule,
-                actionType: ActionType.Delete,
-                userName);
-        }
-
-        #region private method
 
         private object GetActivityLogObj(int siteId, CurrencyEnum currencyId, decimal withdrawalAmount,
             int accountWithdrawalCount,
@@ -201,25 +233,7 @@ namespace BackendSite.Service.BLL
         {
             if (!withdrawalTypes.Any()) return string.Empty;
 
-            var withdrawalTypeData = new List<WithdrawalOptionDto>()
-            {
-                new()
-                {
-                    Name = WithdrawalMethodEnum.EWallet.ToString(),
-                    Value = (int)WithdrawalMethodEnum.EWallet
-                },
-                new()
-                {
-                    Name = WithdrawalMethodEnum.BankCard.ToString(),
-                    Value = (int)WithdrawalMethodEnum.BankCard
-                },
-                new()
-                {
-                    Name = WithdrawalMethodEnum.Crypto.ToString(),
-                    Value = (int)WithdrawalMethodEnum.Crypto
-                }
-            };
-
+            var withdrawalTypeData = this.GetWithdrawalOption();
             var withdrawalTypeNames = withdrawalTypes.Select(withdrawalTypeValue => withdrawalTypeData.Where(r => r.Value == withdrawalTypeValue).Select(x => x.Name).FirstOrDefault()).ToList();
             var result = string.Join(",", withdrawalTypeNames.ToArray());
 
