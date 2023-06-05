@@ -88,16 +88,19 @@ namespace BackendSite.Service.BLL
                          foreach (var domain in domainList)
                          {
                              var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
-                             landingPagesList = landingPagesList.Except(signUpData).ToList();
-                             var childData = new SignUpData
+                             if (signUpData.Count > 0)
                              {
-                                 SignUpSource = domain,
-                                 NewlyRegisterUsers = signUpData.Count(),
-                                 DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
-                                 FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
-                                 TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
-                             };
-                             nova88Data.Children.Add(childData);
+                                 landingPagesList = landingPagesList.Except(signUpData).ToList();
+                                 var childData = new SignUpData
+                                 {
+                                     SignUpSource = domain,
+                                     NewlyRegisterUsers = signUpData.Count(),
+                                     DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
+                                     FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
+                                     TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
+                                 };
+                                 nova88Data.Children.Add(childData);
+                             }
                          }
                          
                          nova88Data.NewlyRegisterUsers = nova88Data.Children.Sum(info => info.NewlyRegisterUsers);
@@ -193,16 +196,19 @@ namespace BackendSite.Service.BLL
                          foreach (var domain in domainList)
                          {
                              var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
-                             landingPagesList = landingPagesList.Except(signUpData).ToList();
-                             var childData = new SignUpData
+                             if (signUpData.Count > 0)
                              {
-                                 SignUpSource = domain,
-                                 NewlyRegisterUsers = signUpData.Count(),
-                                 DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
-                                 FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
-                                 TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
-                             };
-                             goal123Data.Children.Add(childData);
+                                 landingPagesList = landingPagesList.Except(signUpData).ToList();
+                                 var childData = new SignUpData
+                                 {
+                                     SignUpSource = domain,
+                                     NewlyRegisterUsers = signUpData.Count(),
+                                     DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
+                                     FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
+                                     TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
+                                 };
+                                 goal123Data.Children.Add(childData);
+                             }
                          }
                          
                          goal123Data.NewlyRegisterUsers = goal123Data.Children.Sum(info => info.NewlyRegisterUsers);
@@ -298,16 +304,19 @@ namespace BackendSite.Service.BLL
                          foreach (var domain in domainList)
                          {
                              var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
-                             landingPagesList = landingPagesList.Except(signUpData).ToList();
-                             var childData = new SignUpData
+                             if (signUpData.Count > 0)
                              {
-                                 SignUpSource = domain,
-                                 NewlyRegisterUsers = signUpData.Count(),
-                                 DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
-                                 FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
-                                 TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
-                             };
-                             bwingData.Children.Add(childData);
+                                 landingPagesList = landingPagesList.Except(signUpData).ToList();
+                                 var childData = new SignUpData
+                                 {
+                                     SignUpSource = domain,
+                                     NewlyRegisterUsers = signUpData.Count(),
+                                     DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
+                                     FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
+                                     TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
+                                 };
+                                 bwingData.Children.Add(childData);
+                             }
                          }
                          
                          bwingData.NewlyRegisterUsers = bwingData.Children.Sum(info => info.NewlyRegisterUsers);
