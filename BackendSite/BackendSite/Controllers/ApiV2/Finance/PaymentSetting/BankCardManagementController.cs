@@ -21,6 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         private readonly SelLangBLL _selLangBll;
         private readonly BankDetailBLL _bankDetailBll;
+        private readonly PaymentManageBLL _paymentManageBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
@@ -38,9 +39,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
+            _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
-            _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
@@ -48,6 +49,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             var configuration = provider.GetRequiredService<IConfiguration>();
             _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
             _bucketName = configuration.GetValue<string>("AwsPaymentBucketName");
+            _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
         }
 
         #endregion
@@ -134,10 +136,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             if (success)
             {
-                _ = Task.Run(() => _redisHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member));
+                _ = await _redisHelper.KeyDeleteByPatternAsync("PaySetting:*", RedisDataBase.Member);
                 
                 var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
                 var localPaySettings = await _bankDetailBll.GetLocalPaySettingAsync();
+                var payGroups = await _paymentManageBll.GetPayGroupWithCache();
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
                     SiteId = request.SiteId,
@@ -161,7 +164,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                         Status = oldData.Status.ToString(),
                         SupportChannels = string.Join(", ", oldData.SupportChannels.Select(x => x.ToString())),
                         oldData.QrCodeUrl,
-                        oldData.GroupName
+                        PayGroups = request.GroupIds == null
+                            ? string.Empty
+                            : string.Join(", ", payGroups.Join(oldData.GroupIds,
+                                pg => pg.GroupId,
+                                g => g,
+                                (pg, g) => pg.GroupName))
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
@@ -177,7 +185,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                         request.Memo,
                         SupportChannels = string.Join(", ", request.SupportChannels.Select(x => x.ToString())),
                         request.QrCodeUrl,
-                        localPaySettings.FirstOrDefault(x => x.GroupId == request.GroupId)?.GroupName
+                        PayGroups = request.GroupIds == null
+                            ? string.Empty
+                            : string.Join(", ", payGroups.Join(request.GroupIds,
+                                pg => pg.GroupId,
+                                g => g,
+                                (pg, g) => pg.GroupName))
                     }),
                     Operator = updater
                 });

@@ -8,6 +8,8 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Library;
 using BackendSite.ExceptionHandling;
+using static BackendSite.Controllers.Api.CustManageController;
+using System.Text;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -27,6 +29,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ExcelBLL _excelBll;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly BonusInfoBLL _bonusInfoBll;
+        private readonly SelLangBLL _selLangBll;
+        private readonly MessageBLL _messageBll;
         private readonly ILogger<MemberController> _logger;
 
         public MemberController(IServiceProvider provider)
@@ -42,6 +47,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _memberQuery = provider.GetRequiredService<IMemberQuery>();
             _vipLevelBll = provider.GetRequiredService<IVipLevelBLL>();
+            _bonusInfoBll = provider.GetRequiredService<BonusInfoBLL>();
+            _selLangBll = provider.GetRequiredService<SelLangBLL>();
+            _messageBll = provider.GetRequiredService<MessageBLL>();
             _logger = provider.GetRequiredService<ILogger<MemberController>>();
         }
 
@@ -141,23 +149,119 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> CancelBonusByBonusId(CancelBonusRequest request)
         {
             var apiResult = new ApiResult();
-            var result = await _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
-            if (result.Result == 0)
+            var data = _bonusInfoBll.GetTransferBonusCancel(request.BonusId);
+
+            //轉帳制
+            if (data != null && data.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                apiResult.Message = "Cancel Bonus Fail";
+                if (data.Status == (int)BonusStatus.Running)
+                {
+                    await CancelBonus(request, data, apiResult);
+                    return apiResult;
+                }
+
+                var winLossAmount = _bonusInfoBll.GetBonusWinLoss(request.BonusId)?.FirstOrDefault() ?? 0m;
+                var transferBonusAmount = data.BonusAmount + data.LockedAmount;
+                var remainingBonus = transferBonusAmount + winLossAmount;
+
+                switch (data.PromotionType)
+                {
+                    case PromotionTypeEnum.FstDeposit:
+                    case PromotionTypeEnum.ReDeposit:
+                    case PromotionTypeEnum.FreeBet:
+                    case PromotionTypeEnum.Cashback:
+                    case PromotionTypeEnum.SpecialBonus:
+                    case PromotionTypeEnum.RetentionFreeBet:
+
+                        //確認剩餘本金
+                        var refundAmount = remainingBonus - data.BonusAmount;
+                        if (refundAmount < 0)
+                        {
+                            refundAmount = 0;
+                        }
+                        else if (refundAmount > data.LockedAmount)
+                        {
+                            refundAmount = data.LockedAmount;
+                        }
+
+                        // var bonus = remainingBonus - refundAmount;
+
+                        //呼叫轉帳 API 扣款
+                        if (remainingBonus > 0)
+                        {
+                            var tpBonusCancelTransfer = new TpBonusCancelTransfer
+                            {
+                                TpId = data.TpId,
+                                CustId = data.CustId,
+                                UserName = data.UserName,
+                                SiteId = data.SiteId,
+                                PromoCategoryId = data.PromoCategoryId,
+                                BonusId = data.BonusId,
+                                RemainingBonus = remainingBonus,
+                                RefundAmount = refundAmount,
+                                UpdateBonusTransferStatus = true
+                            };
+                            var result = _bonusInfoBll.BonusCancelTransfer(tpBonusCancelTransfer);
+                            apiResult.ErrorCode = result.ErrorCode;
+                            apiResult.Message = result.Message;
+                        }
+                        else
+                        {
+                            await CancelBonus(request, data, apiResult);
+                            return apiResult;
+                        }
+                        break;
+                }
                 return apiResult;
             }
-            const string menu = "CustManage/CustInfoList";
+
+            //單一錢包
+            if (data != null)
+            {
+                var result = await _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
+                if (result.Result == 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Cancel Bonus Fail";
+                    return apiResult;
+                }
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Can't find available bonus";
+                return apiResult;
+            }
+
             var info = new Dictionary<string, dynamic>
             {
-                { "MenuName", "Customer Info" },
-                { "Action", "Cancel Bonus" }
+                {"MenuName", "Customer Info"},
+                {"Action", "Cancel Bonus"}
             };
-            _serverInfoBll.AdminOperateLog(null, request.CustId, menu, ActionType.Update, info, User.Identity.Name);
-
+            _serverInfoBll.AdminOperateLog(null, request.CustId, "CustManage/CustInfoList", ActionType.Update, info, User.Identity.Name);
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
+
+        }
+
+
+        private async Task CancelBonus(CancelBonusRequest bonusReq, CancelBonus data, ApiResult apiResult)
+        {
+            var result = await _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId, User.Identity.Name);
+
+            if (result.Result > 0)
+            {
+                var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
+                var msg = new StringBuilder();
+                msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
+                await _messageBll.SendMessageAsync(new Message("Bonus Service", data.CustId, data.UserLang, title, msg.ToString()));
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Fail.";
+            }
         }
 
         /// <summary>
@@ -204,7 +308,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<IActionResult> Export(ExportMemberRequest request)
         {
             var exportData = await _memberQuery.GetExportDataAsync(request);
-            var stream = _excelBll.Export(exportData, offset: request.StartDate.Offset);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "CustInfoList");
         }
 

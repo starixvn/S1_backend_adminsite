@@ -10,6 +10,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using System.Net;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.ApiModel;
 using Newtonsoft.Json;
 
@@ -22,6 +23,7 @@ namespace BackendSite.Controllers.Api
     public class WithdrawalController : ControllerBase
     {
         private readonly WithdrawalBLL withdrawalBLL;
+        private readonly IWithdrawalStateTransferBLL _withdrawalStateTransferBll;
         private readonly SelLangBLL selLangBLL;
         private readonly MessageBLL messageBLL;
         private readonly CustInfoBLL custInfoBLL;
@@ -42,6 +44,7 @@ namespace BackendSite.Controllers.Api
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
             withdrawalBLL = provider.GetRequiredService<WithdrawalBLL>();
+            _withdrawalStateTransferBll = provider.GetRequiredService<IWithdrawalStateTransferBLL>();
             selLangBLL = provider.GetRequiredService<SelLangBLL>();
             messageBLL = provider.GetRequiredService<MessageBLL>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -209,7 +212,7 @@ namespace BackendSite.Controllers.Api
                 var hasPic = await CheckWithdrawalPictureAsync(withdrawalReq.TransId);
                 _logger.LogInformation($"CheckWithdrawalPicture use: {timer.ElapsedMilliseconds} ms");
                 timer.Restart();
-                withdrawConfirmReuslt = withdrawalBLL.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment,
+                withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalApproved(withdrawalReq.TransId, withdrawalReq.Comment,
                     User.Identity.Name, authData.UserId, hasPic);
                 _logger.LogInformation($"WithdrawalApproved use: {timer.ElapsedMilliseconds} ms");
 
@@ -224,7 +227,7 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, withdrawalReq.TransId);
                     var content = selLangBLL.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                    await messageBLL.SendMessageAsync(new Message(sender, withdrawConfirmReuslt, userLang, title, content));
                     _logger.LogInformation($" SendMessageToPlayer use: {timer.ElapsedMilliseconds} ms");
 
                     #region Copy Picture
@@ -243,7 +246,7 @@ namespace BackendSite.Controllers.Api
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Rejected)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalRejected(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                    _withdrawalStateTransferBll.WithdrawalRejected(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
 
                 if (withdrawConfirmReuslt > 0)
                 {
@@ -255,13 +258,13 @@ namespace BackendSite.Controllers.Api
                     title = string.Format(title, withdrawalReq.TransId);
                     var content = selLangBLL.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
                     content = string.Format(content, withdrawalReq.TransId);
-                    messageBLL.SendMessageToPlayer(sender, title, content, withdrawConfirmReuslt);
+                    await messageBLL.SendMessageAsync(new Message(sender, withdrawConfirmReuslt, userLang, title, content));
                 }
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Verify)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                    _withdrawalStateTransferBll.WithdrawalVerify(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Process)
             {
@@ -304,7 +307,7 @@ namespace BackendSite.Controllers.Api
                 {
                     var custId = 0;
                     var amount = 0m;
-                    withdrawConfirmReuslt = withdrawalBLL.WithdrawalProcess(withdrawalReq.TransId,
+                    withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalProcess(withdrawalReq.TransId,
                         withdrawalReq.Comment, User.Identity.Name,authData.UserId,
                         Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType,
                         null,out custId, out amount);
@@ -341,7 +344,7 @@ namespace BackendSite.Controllers.Api
                             await courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
                         if (apiOnlineResult == null)
                         {
-                            withdrawConfirmReuslt = withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId,
+                            withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalVerify(withdrawalReq.TransId,
                                 apiResult.Message, User.Identity.Name);
                             apiResult.ErrorCode = 1101;
                             apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
@@ -349,7 +352,7 @@ namespace BackendSite.Controllers.Api
                         }
                         else if (apiOnlineResult.ErrorCode != 0)
                         {
-                            withdrawConfirmReuslt = withdrawalBLL.WithdrawalVerify(withdrawalReq.TransId,
+                            withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalVerify(withdrawalReq.TransId,
                                 apiOnlineResult.Message, User.Identity.Name);
                             return apiOnlineResult;
                         }
@@ -359,22 +362,22 @@ namespace BackendSite.Controllers.Api
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.OnHold)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalOnHold(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                    _withdrawalStateTransferBll.WithdrawalOnHold(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Draft)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, null, User.Identity.Name);
+                    _withdrawalStateTransferBll.WithdrawalDraft(withdrawalReq.TransId, withdrawalReq.Comment, null, User.Identity.Name);
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Pending)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalPending(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                    _withdrawalStateTransferBll.WithdrawalPending(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.ToKyc)
             {
                 withdrawConfirmReuslt =
-                    withdrawalBLL.WithdrawalToKyc(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
+                    _withdrawalStateTransferBll.WithdrawalToKyc(withdrawalReq.TransId, withdrawalReq.Comment, User.Identity.Name);
             }
 
             if (withdrawConfirmReuslt <= 0)
@@ -443,24 +446,6 @@ namespace BackendSite.Controllers.Api
         public class WithdrawalEWalletReq
         {
             public int CurrencyId { get; set; }
-        }
-        
-        [HttpPost]
-        public ApiResult<IEnumerable<EWalletPay>> GetEWalletPayList(WithdrawalEWalletReq withdrawalReq)
-        {
-            var apiResult = new ApiResult<IEnumerable<EWalletPay>>();
-            var eWalletPay = bankDetailBLL.GetEWalletPayList();
-            var _eWalletPayInfo = (from x in eWalletPay
-                            where x.CurrencyId == withdrawalReq.CurrencyId
-                            select new EWalletPay
-                            {
-                                PayId = x.PayId,
-                                PayName = x.PayName,
-                                CurrencyId = x.CurrencyId
-                            });
-            apiResult.Data = _eWalletPayInfo;
-            apiResult.ErrorCode = 0;
-            return apiResult;
         }
         
         [HttpPost]
@@ -794,7 +779,7 @@ namespace BackendSite.Controllers.Api
                 if (result)
                 {
                     var WithdrawalPic = withdrawalBLL.GetWithdrawalPicCount(para.TransId);
-                    var x = para.Pic.Replace("data:image/png;base64,", "");
+                    var x = para.Pic.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
                     var bytes = Convert.FromBase64String(x);
                     var stream = new MemoryStream(bytes);
 

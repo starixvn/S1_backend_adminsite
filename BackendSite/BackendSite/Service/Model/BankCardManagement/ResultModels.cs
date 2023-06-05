@@ -23,7 +23,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         [JsonIgnore]
         public string FinancialAccountPurposes { set; get; }
         private IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>($"[{FinancialAccountPurposes}]");
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(FinancialAccountPurposes);
         
         [JsonIgnore]
         public TransferChannelEnum FinancialAccountChannel { set; get; }
@@ -58,9 +58,10 @@ namespace BackendSite.Service.Model.BankCardManagement
             => JsonConvert.DeserializeObject<IEnumerable<BankCardManagementSupportChannelEnum>>(JsonSupportChannels ?? "[]");
         public IEnumerable<string> SupportChannelNames =>
             SupportChannels.Select(x => x.ToString());
-        
-        public int GroupId { get; set; }
-        public string GroupName { set; get; }
+        [JsonIgnore]
+        public string JsonGroupIds { set; get; }
+        public IEnumerable<int> GroupIds =>
+            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonGroupIds ?? "[]");
         public string QrCodeUrl { set; get; }
         public DateTimeOffset LastUpdateTime
         {

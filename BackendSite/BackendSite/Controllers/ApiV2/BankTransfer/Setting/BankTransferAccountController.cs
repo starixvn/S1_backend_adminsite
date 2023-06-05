@@ -7,6 +7,7 @@ using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
 {
@@ -164,7 +165,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 CurrencyId = req.CurrencyId,
                 Agent = req.Agent,
                 Channel = req.Channel,
-                Purpose = string.Join(",", req.Purposes.Select(x=> (int)x)),
+                Purpose = req.Purposes.Select(p => (int)p).OrderBy(p => p).ToList(),
                 Reason = req.Reason,
                 Remark = req.Remark,
                 Status = req.Status,

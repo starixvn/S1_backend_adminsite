@@ -119,6 +119,7 @@ namespace BackendSite.Service.Model
         public string FromBankName { set; get; }
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
+        public string Network { set; get; }
     }
 
     public class DepositInfoForExport
@@ -132,7 +133,7 @@ namespace BackendSite.Service.Model
         public string Currency { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
-        public string NetWork { set; get; }
+        public string Network { set; get; }
         public decimal CryptoAmount { set; get; }
         public string Agent { set; get; }
         public string BankAgent { set; get; }
@@ -214,6 +215,7 @@ namespace BackendSite.Service.Model
         public string AffiliateCode { get; set; }
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
+        public string Memo { set; get; }
     }
 
     public class DepositDetailSubmission
@@ -328,7 +330,7 @@ namespace BackendSite.Service.Model
     
     public class DepositReceiptModel
     {
-        public IActionResult Receipt { get; set; }
+        public string Receipt { get; set; }
         public int ReceiptNo { get; set; }
         public int CreateFrom { get; set; }
         public string Creator { get; set; }
@@ -498,7 +500,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int ReceiptNo { get; set; }
         public string TransId { get; set; }
-        public IFormFile Receipt { get; set; }
+        public string Receipt { get; set; }
     }
     
     public class CheckDepositReceiptRequest

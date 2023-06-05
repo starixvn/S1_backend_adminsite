@@ -123,6 +123,9 @@ namespace BackendSite.Service.Model
         [Description("用戶Tag封鎖清單")]
         public IEnumerable<int> BlockTagList => string.IsNullOrEmpty(BlockTagListJson) ? new List<int>() : JsonConvert.DeserializeObject<IEnumerable<int>>(BlockTagListJson);
         public string BlockTagListJson { get; set; }
+
+        [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
+        public bool HideForUnlogin { get; set; }
     }
 
     public class PromotionInfoReq 
@@ -233,6 +236,9 @@ namespace BackendSite.Service.Model
 
         [Description("用戶Tag封鎖清單")]
         public IEnumerable<int> BlockTagList { get; set; } = new List<int>();
+
+        [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
+        public bool HideForUnlogin { get; set; }
     }
     
     public class PromotionSpecific
@@ -398,21 +404,7 @@ namespace BackendSite.Service.Model
         public bool IsForVipLevel  { get; set; }
         public IEnumerable<int> SelectedVipLevel { get; set; }
     }
-    public class LeaderboardExtraPointList
-    {
-        public DateTimeOffset ActiveDate { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string Currency { get; set; }
-        public string CategoryName { get; set; }
-        public decimal ExtraPoint { get; set; }
-        public DateTimeOffset CreateTime { set; get; }
-        public DateTimeOffset UpdateTime { set; get; }
-        public string LastUpdateUser { get; set; }
-
-    }
-
+    
     public class PromotionCashBackSetting
     {
         public int CurrencyId { get; set; }

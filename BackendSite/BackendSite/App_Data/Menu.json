@@ -19,24 +19,6 @@
   },
   {
     "Key": "",
-    "Title": "CSD",
-    "Icon": "icon-csd",
-    "Roles": null,
-    "Childs": [
-      {
-        "Key": "lbl_CustomerAdministration",
-        "Title": "Customer Administration",
-        "FuncKey": "CustManage/CustInfoList",
-        "Controller": "CustManage",
-        "Action": "CustInfoList",
-        "Icon": "",
-        "Roles": null,
-        "Childs": null
-      }
-    ]
-  },
-  {
-    "Key": "",
     "Title": "CMS",
     "Icon": "icon-csd",
     "Roles": null,

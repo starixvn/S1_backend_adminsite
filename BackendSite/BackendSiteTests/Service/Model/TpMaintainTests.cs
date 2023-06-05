@@ -13,7 +13,7 @@ namespace BackendSite.Service.Model.TpMaintain.Tests
             _tpMaintain = new TpMaintain
             {
                 SiteId = 1,
-                TpId = 1,
+                TpId = 41,
                 TpGameType = 1,
                 TpCategoryId = 1,
                 BeginDate = new DateTime(2020, 01, 01),

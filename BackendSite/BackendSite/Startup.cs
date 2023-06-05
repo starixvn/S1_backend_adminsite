@@ -40,6 +40,7 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(_configuration);
+            services.AddMessageQueueConnection(_configuration);
             services.Configure<Dictionary<string, SiteConfig>>(_configuration.GetSection("SiteConfig"));          
             services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
@@ -78,7 +79,7 @@ namespace BackendSite
                 });
 
             }
-
+            services.AddSingleton<IRabbitMQProducer, RabbitMQProducer>();
             services.AddTransient<IMemberQuery, MemberQuery>();
             services.AddTransient<IMemberCommand, MemberCommand>();
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
@@ -91,6 +92,10 @@ namespace BackendSite
             services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
             services.AddTransient<IMpaMarketingWithdrawalAmountBLL, MpaMarketingWithdrawalAmountBLL>();
             services.AddTransient<IMpaMarketingDepositAmountBLL, MpaMarketingDepositAmountBLL>();
+            services.AddTransient<IAutoWithdrawalRuleBLL, AutoWithdrawalRuleBLL>();
+            services.AddTransient<IWithdrawalStateTransferBLL, WithdrawalStateTransferBLL>();
+            services.AddTransient<IWithdrawalReceiveBLL, WithdrawalReceiveBLL>();
+            services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
 
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
@@ -114,6 +119,9 @@ namespace BackendSite
             services.AddTransient<IMpaCommonService, MpaCommonService>();
             services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
             services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
+            services.AddTransient<IAutoWithdrawalRuleService, AutoWithdrawalRuleService>();
+
+
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
