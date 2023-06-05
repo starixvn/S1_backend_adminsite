@@ -68,7 +68,7 @@
         public string Currency { get; set; }
         public DateTime RegTime { get; set; }
         public string SignupUrl{ get; set; }
-        public int AffCode{ get; set; }
+        public string AffCode{ get; set; }
         public bool IsDeposit{ get; set; }
         public decimal FirstDeposit { get; set; }
         public decimal TotalDeposit { get; set; }
