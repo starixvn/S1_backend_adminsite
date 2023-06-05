@@ -342,7 +342,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false, string depositInfo = null)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -386,7 +386,7 @@ namespace BackendSite.Service.DAL
 
                     if (status == DepositStatusEnum.Approved)
                     {
-                        if (depositRequest.DepositType != 3)
+                        if (depositRequest.DepositType is not (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet))
                         {
                             var pay = (IPay)depositRequest.oDepositInfo;
                             type = payTypePosition + pay.PayId;
@@ -408,7 +408,7 @@ namespace BackendSite.Service.DAL
 
                         if (result > 0)
                         {
-                            if (depositRequest.DepositType == 3)
+                            if (depositRequest.DepositType == DepositTypeEnum.LocalBanking)
                             {
                                 var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
                                 result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, trans);
@@ -417,6 +417,15 @@ namespace BackendSite.Service.DAL
                             {
                                 var pay = (IPay)depositRequest.oDepositInfo;
                                 result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, trans);
+                            }
+                        }
+
+                        if (result > 0 && !string.IsNullOrEmpty(depositInfo))
+                        {
+                            result = UpdateDepositInfo(depositRequest.TransId, depositInfo, trans);
+                            if (result < 1)
+                            {
+                                _logger.LogError($"UpdateDepositInfo Failed. TransId: {transId}, depositInfo: {depositInfo}");
                             }
                         }
 
@@ -466,8 +475,19 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        
+        private int UpdateDepositInfo(string transId, string depositInfo, IDbTransaction trans)
+        {
+            return _mainDbClient.Execute("Service_DepositInfoDepositInfo_Set",
+                trans,
+                new
+                {
+                    _TransId = transId,
+                    _DepositInfo = depositInfo
+                });
+        }
 
-        private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlTransaction trans)
+        private int SetDepositInfoFirstDeposit(int depositId, int siteId, IDbTransaction trans)
         {
             return _mainDbClient.Execute("DepositInfoFirstDeposit_Set",
                 trans,

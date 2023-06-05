@@ -33,6 +33,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         #endregion
 
         #region API Model
+
+        public class CryptoAmountCalculationRequest
+        {
+            public decimal CryptoAmount { get; set; }
+            public decimal ExchangeRate { get; set; }
+            public CurrencyEnum CurrencyId { get; set; }
+        }
+        
+        public class CryptoAmountCalculationResponse
+        {
+            public decimal Amount { get; set; }
+        }
+        
         #endregion
 
         /// <summary>
@@ -106,5 +119,22 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 : new ApiResult((int)ErrorCodeEnum.Success, string.Empty);
         }
         
+        [HttpPost]
+        public ApiResult<CryptoAmountCalculationResponse> CryptoAmountCalculation(CryptoAmountCalculationRequest request)
+        {
+            var tmpAmount = request.CryptoAmount / request.ExchangeRate;
+            var amount = request.CurrencyId is CurrencyEnum.VND or CurrencyEnum.INR
+                ? Math.Floor(tmpAmount)
+                : Math.Floor(tmpAmount * 100) / 100; // VND、INR以外保留小數兩位
+            
+            return new ApiResult<CryptoAmountCalculationResponse>
+            {
+                Data = new CryptoAmountCalculationResponse
+                {
+                    Amount = amount
+                },
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
     }
 }

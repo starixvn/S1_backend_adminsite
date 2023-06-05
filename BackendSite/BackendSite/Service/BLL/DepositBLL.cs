@@ -245,11 +245,12 @@ namespace BackendSite.Service.BLL
             return depositService.GetDepositRequestComment(depositId, depositRequest.SiteId);
         }
 
-        public int DepositApproved(string transId, decimal actualDeposit, string comment, string Operator)
+        public int DepositApproved(string transId, decimal actualDeposit, string comment, string Operator, string depositInfo = null)
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
-            return depositService.SetDepositInfo(transId, depositRequest.SiteId, depositRequest.Amount, comment, Operator, forStatus, DepositStatusEnum.Approved, depositRequest,null, CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId));
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Approved,
+                depositRequest,null, CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId), depositInfo);
         }
 
         public int DepositReject(string transId, decimal actualDeposit, string comment, string Operator)
