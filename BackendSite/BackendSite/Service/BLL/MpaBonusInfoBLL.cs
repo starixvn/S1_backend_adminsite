@@ -229,14 +229,16 @@ namespace BackendSite.Service.BLL
                      JsonConvert.SerializeObject(input.CurrencyIds),
                      input.StartDate.DateTime,
                      input.EndDate.DateTime)).ToList();
-             data = data.GroupBy(x => new {x.Date.Date, x.CurrencyId, x.Currency ,x.BonusCode ,x.BonusName})
+
+             data = data.GroupBy(x => new {x.Date.Date, x.CustId, x.CurrencyId, x.Currency ,x.BonusCode ,x.BonusName})
                  .Select(x=> new MpaMarketingBonus
                  {
                      BonusCode = x.Key.BonusCode,
                      BonusName = x.Key.BonusName,
+                     CustId = x.Key.CustId,
                      Currency = x.Key.Currency,
                      Date = x.Key.Date.Date,
-                     NumberOfBonusUser = x.Sum(y => y.NumberOfBonusUser),
+                     NumberOfBonusUser = x.Select(y => y.CustId).Distinct().Count(),
                      BonusAmountClaim = x.Sum(y => y.BonusAmountClaim),
                      CurrencyId = x.Key.CurrencyId
                  }).ToList();
@@ -273,14 +275,11 @@ namespace BackendSite.Service.BLL
                          JsonConvert.SerializeObject(input.CurrencyIds),
                          input.ComparedStartDate.DateTime,
                          input.ComparedEndDate.DateTime));
-                 comparedData = comparedData.GroupBy(x => new {x.Date.Date, x.CurrencyId, x.Currency ,x.BonusCode ,x.BonusName})
+                 
+                 comparedData = comparedData.GroupBy(x => new {x.Date.Date ,x.CurrencyId})
                      .Select(x=> new MpaMarketingBonus
                      {
-                         BonusCode = x.Key.BonusCode,
-                         BonusName = x.Key.BonusName,
-                         Currency = x.Key.Currency,
                          Date = x.Key.Date.Date,
-                         NumberOfBonusUser = x.Sum(y => y.NumberOfBonusUser),
                          BonusAmountClaim = x.Sum(y => y.BonusAmountClaim),
                          CurrencyId = x.Key.CurrencyId
                      }).ToList();
@@ -302,19 +301,30 @@ namespace BackendSite.Service.BLL
              #region GroupByBonusCode
 
              var groupBonusCodeData = data
-                 .GroupBy(x => new {x.BonusCode})
+                 .GroupBy(x => new {x.BonusCode,x.BonusName})
                  .Select(info => new MpaMarketingBonusGroupByBonusCode 
                  {
-                     BonusCode = info.First().BonusCode,
-                     BonusName = info.First().BonusName,
-                     NumberOfBonusUser = info.Where(i => i.BonusCode == info.First().BonusCode).Sum(i => i.NumberOfBonusUser),
-                     BonusAmountClaim = info.Where(i => i.BonusCode == info.First().BonusCode).Sum(i => i.BonusAmountClaim)
+                     BonusCode = info.Key.BonusCode,
+                     BonusName = info.Key.BonusName,
+                     NumberOfBonusUser = info.Select(i => i.CustId).Distinct().Count(),
+                     BonusAmountClaim =  info.Sum(i => i.BonusAmountClaim)
                  }).ToList();
 
              var list = groupBonusCodeData.Select(detailData => new MpaMarketingBonusGroupByBonusCodeInfo 
              {
                 GroupInfo = detailData, 
-                Children = data.Where(x => x.BonusCode == detailData.BonusCode)
+                Children = data.GroupBy(x => new {x.Date.Date, x.CurrencyId, x.Currency ,x.BonusCode ,x.BonusName})
+                    .Where(y => y.Key.BonusCode == detailData.BonusCode)
+                    .Select(info => new MpaMarketingBonus
+                    {
+                        Date = info.Key.Date,
+                        BonusCode = info.Key.BonusCode,
+                        BonusName = info.Key.BonusName,
+                        Currency = info.Key.Currency,
+                        CurrencyId = info.Key.CurrencyId,
+                        NumberOfBonusUser = info.Select(i => i.CustId).Distinct().Count(),
+                        BonusAmountClaim = info.Sum(i => i.BonusAmountClaim)
+                    })
              }).ToList();
             
             var groupByBonusCodeSum = new MpaMarketingBonusGroupByBonusCode 

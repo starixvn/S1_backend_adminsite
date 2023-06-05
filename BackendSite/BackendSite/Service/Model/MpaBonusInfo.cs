@@ -78,6 +78,7 @@
     
     public class MpaMarketingBonusGroupByBonusCode
     {
+        public string CustId { get; set; }
         public string BonusCode { get; set; }
         public string BonusName { get; set; }
         public int NumberOfBonusUser{ get; set; }
