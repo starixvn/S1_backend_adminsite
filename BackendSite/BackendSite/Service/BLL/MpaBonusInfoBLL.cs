@@ -228,7 +228,7 @@ namespace BackendSite.Service.BLL
                      input.SiteId,
                      JsonConvert.SerializeObject(input.CurrencyIds),
                      input.StartDate.DateTime,
-                     input.EndDate.DateTime)).ToList();
+                     input.EndDate.DateTime));
              
              originData = originData.GroupBy(x => new {x.Date.Date, x.CustId, x.CurrencyId, x.Currency ,x.BonusCode ,x.BonusName})
                  .Select(x=> new MpaMarketingBonus
@@ -241,20 +241,20 @@ namespace BackendSite.Service.BLL
                      NumberOfBonusUser = x.Select(y => y.CustId).Distinct().Count(),
                      BonusAmountClaim = x.Sum(y => y.BonusAmountClaim),
                      CurrencyId = x.Key.CurrencyId
-                 }).ToList();
+                 });
 
-             var baseCurrencyData = originData;
+             var baseCurrencyData = originData.ToList();
              MultiplyExchangeRateAmountSummary(baseCurrencyData, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
              
              #region GroupByCurrency
 
              var groupCurrencyData = originData
-                 .GroupBy(x => new {x.CurrencyId})
+                 .GroupBy(x => new {x.CurrencyId , x.Currency})
                  .Select(info => new MpaMarketingBonusGroupByCurrency
                  {
-                     Currency = info.First().Currency,
-                     CurrencyId = info.First().CurrencyId,
-                     BonusAmountClaim = info.Where(i => i.CurrencyId == info.First().CurrencyId).Sum(i => i.BonusAmountClaim)
+                     Currency = info.Key.Currency,
+                     CurrencyId = info.Key.CurrencyId,
+                     BonusAmountClaim = info.Where(i => i.CurrencyId == info.Key.CurrencyId).Sum(i => i.BonusAmountClaim)
                  }).ToList();
 
              var groupByCurrencySum = new MpaMarketingBonusGroupByCurrency 
@@ -340,7 +340,7 @@ namespace BackendSite.Service.BLL
                 GroupByCurrencySum = groupByCurrencySum,
                 GroupByBonusCode = list,
                 GroupByBonusCodeSum = groupByBonusCodeSum,
-                TotalBonusClaimants = originData.Count
+                TotalBonusClaimants = originData.Count()
             };
             
             return result;
