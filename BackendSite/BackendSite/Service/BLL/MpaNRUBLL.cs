@@ -87,7 +87,7 @@ namespace BackendSite.Service.BLL
                          var domainList = _mpaDomainConfig["Nova88"][groupUrl];
                          foreach (var domain in domainList)
                          {
-                             var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
+                             var signUpData = landingPagesList.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
                              if (signUpData.Count > 0)
                              {
                                  landingPagesList = landingPagesList.Except(signUpData).ToList();
@@ -111,7 +111,7 @@ namespace BackendSite.Service.BLL
                      }
                      
                      //AFF
-                     var affList = data.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
+                     var affList = landingPagesList.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
                      var affData = new SignUpDataSum
                      {
                          SignUpSource = "AFF",
@@ -124,7 +124,7 @@ namespace BackendSite.Service.BLL
                      nruData.SignUpDataSum.Add(affData);
 
                      //APP
-                     var appList = data.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
+                     var appList = landingPagesList.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
                      var appData = new SignUpDataSum
                      {
                          SignUpSource = "APP",
@@ -138,7 +138,7 @@ namespace BackendSite.Service.BLL
 
                      //Nova88.com
                      var creditSite = new List<int>() { 400,417,418,419}; //'Nova88Ref05','Nova88Ref06','Nova88Ref07','Nova88Ref08'
-                     var nova88ComList = data.Where(x => creditSite.Contains(x.AgentId)).ToList();
+                     var nova88ComList = landingPagesList.Where(x => creditSite.Contains(x.AgentId)).ToList();
                      var nova88ComData = new SignUpDataSum
                      {
                          SignUpSource = "Nova88.com",
@@ -195,7 +195,7 @@ namespace BackendSite.Service.BLL
                          var domainList = _mpaDomainConfig["Goal123"][groupUrl];
                          foreach (var domain in domainList)
                          {
-                             var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
+                             var signUpData = landingPagesList.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
                              if (signUpData.Count > 0)
                              {
                                  landingPagesList = landingPagesList.Except(signUpData).ToList();
@@ -219,7 +219,7 @@ namespace BackendSite.Service.BLL
                      }
                      
                      //AFF
-                     var goalAffList = data.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
+                     var goalAffList = landingPagesList.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
                      var goalAffData = new SignUpDataSum
                      {
                          SignUpSource = "AFF",
@@ -232,7 +232,7 @@ namespace BackendSite.Service.BLL
                      nruData.SignUpDataSum.Add(goalAffData);
 
                      //APP
-                     var goalAppList = data.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
+                     var goalAppList = landingPagesList.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
                      var goalAppData = new SignUpDataSum
                      {
                          SignUpSource = "APP",
@@ -246,7 +246,7 @@ namespace BackendSite.Service.BLL
 
                      //Bong88/Viva88
                      var goalCreditSite = new List<int>() {106734}; //'Goal123Ref01'
-                     var bong88List = data.Where(x => goalCreditSite.Contains(x.AgentId)).ToList();
+                     var bong88List = landingPagesList.Where(x => goalCreditSite.Contains(x.AgentId)).ToList();
                      var bong88ListData = new SignUpDataSum
                      {
                          SignUpSource = "Bong88/Viva88",
@@ -303,7 +303,7 @@ namespace BackendSite.Service.BLL
                          var domainList = _mpaDomainConfig["Bwing"][groupUrl];
                          foreach (var domain in domainList)
                          {
-                             var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
+                             var signUpData = landingPagesList.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
                              if (signUpData.Count > 0)
                              {
                                  landingPagesList = landingPagesList.Except(signUpData).ToList();
@@ -327,7 +327,7 @@ namespace BackendSite.Service.BLL
                      }
                      
                      //AFF
-                     var bwingAffList = data.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
+                     var bwingAffList = landingPagesList.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
                      var bwingAffData = new SignUpDataSum
                      {
                          SignUpSource = "AFF",
@@ -340,7 +340,7 @@ namespace BackendSite.Service.BLL
                      nruData.SignUpDataSum.Add(bwingAffData);
 
                      //APP
-                     var bwingAppList = data.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
+                     var bwingAppList = landingPagesList.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
                      var bwingAppData = new SignUpDataSum
                      {
                          SignUpSource = "APP",
@@ -354,7 +354,7 @@ namespace BackendSite.Service.BLL
 
                      //Bong88/Viva88
                      var bwingCreditSite = new List<int>() {106733}; //'BwingRef01'
-                     var bwingBong88List = data.Where(x => bwingCreditSite.Contains(x.AgentId)).ToList();
+                     var bwingBong88List = landingPagesList.Where(x => bwingCreditSite.Contains(x.AgentId)).ToList();
                      var bwingBong88ListData = new SignUpDataSum
                      {
                          SignUpSource = "Bong88/Viva88",
@@ -368,10 +368,10 @@ namespace BackendSite.Service.BLL
 
                      //Landing Pages
                      var bwingLandingPagesChilds = landingPagesList
-                         .GroupBy(i => i.SignupUrl)
+                         .GroupBy(x => x.SignupUrl)
                          .Select( i => new SignUpData
                          {
-                             SignUpSource = i.First().SignupUrl,
+                             SignUpSource = i.Key,
                              NewlyRegisterUsers = i.Count(),
                              DepositUsers = i.Count(info => info.TotalDeposit > 0),
                              FirstDepositAmount = i.Sum(info => info.FirstDeposit),
