@@ -91,7 +91,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             try
             {
-                await _autoWithdrawalRuleBll.DeleteAutoWithdrawalRuleAsync(request);
+                await _autoWithdrawalRuleBll.DeleteAutoWithdrawalRuleAsync(request, AuthData.UserName);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -109,24 +109,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             return new ApiResult<IEnumerable<WithdrawalOptionDto>>
             {
-                Data = new List<WithdrawalOptionDto>()
-                {
-                    new()
-                    {
-                        Name = WithdrawalMethodEnum.EWallet.ToString(),
-                        Value = (int)WithdrawalMethodEnum.EWallet
-                    },
-                    new()
-                    {
-                        Name = WithdrawalMethodEnum.BankCard.ToString(),
-                        Value = (int)WithdrawalMethodEnum.BankCard
-                    },
-                    new()
-                    {
-                        Name = WithdrawalMethodEnum.Crypto.ToString(),
-                        Value = (int)WithdrawalMethodEnum.Crypto
-                    }
-                },
+                Data = _autoWithdrawalRuleBll.GetWithdrawalOption(),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
