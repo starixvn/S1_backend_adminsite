@@ -191,14 +191,11 @@ namespace BackendSite.Service.Model
         public decimal FreeBet { get; set; }
         public decimal CashBack { get; set; }
         public decimal RetentionBonus { get; set; }
+        public decimal DeviceBonus { get; set; }
         public decimal ManualBonus { get; set; }
         public decimal CancelBonusAmount { get; set; }
         public decimal RewardPoint { get; set; }
-        public decimal TotalBonus
-        {
-            get => FirstDeposit + ReDeposit + FreeBet + CashBack + RetentionBonus + ManualBonus;
-            set => TotalBonus = value;
-        }
+        public decimal TotalBonus => FirstDeposit + ReDeposit + FreeBet + CashBack + RetentionBonus + ManualBonus + DeviceBonus;
     }
 
     public class CustRebateCategory
