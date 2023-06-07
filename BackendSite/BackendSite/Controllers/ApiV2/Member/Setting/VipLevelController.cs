@@ -203,43 +203,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
         [HttpPost]
-        public async Task<ApiResult> SetUpDeposit(ApiRequestWithLog<SetUpgradeSettingRequest> req)
+        public async Task<ApiResult> SetUpgradeSetting(ApiRequestWithLog<VipUpgradeSetting> req)
         {
             var result = await _vipLevelBll.SetUpgradeSetting(
-                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name), UpgradeSettingEnum.UpDeposit);
-            return new ApiResult
-            {
-                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
-            };
-        }
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
-        [HttpPost]
-        public async Task<ApiResult> SetUpBonus(ApiRequestWithLog<SetUpgradeSettingRequest> req)
-        {
-            var result = await _vipLevelBll.SetUpgradeSetting(
-                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name), UpgradeSettingEnum.UpBonus);
-            return new ApiResult
-            {
-                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
-            };
-        }
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
-        [HttpPost]
-        public async Task<ApiResult> SetDownDeposit(ApiRequestWithLog<SetUpgradeSettingRequest> req)
-        {
-            var result = await _vipLevelBll.SetUpgradeSetting(
-                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name), UpgradeSettingEnum.DownDeposit);
-            return new ApiResult
-            {
-                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
-            };
-        }
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
-        [HttpPost]
-        public async Task<ApiResult> SetDownTurnover(ApiRequestWithLog<SetUpgradeSettingRequest> req)
-        {
-            var result = await _vipLevelBll.SetUpgradeSetting(
-                new ParamsWithLog<SetUpgradeSettingRequest>(req, User.Identity.Name), UpgradeSettingEnum.DownTurnover);
+                new ParamsWithLog<VipUpgradeSetting>(req, User.Identity.Name));
             return new ApiResult
             {
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
