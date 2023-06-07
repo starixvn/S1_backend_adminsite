@@ -12,6 +12,6 @@ namespace BackendSite.Service.DAL.Interface
         Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string memo, string updator);
         Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string memo, string updator);
         Task<IEnumerable<VipSystem>> GetVipSystem(int siteId);
-        Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input, UpgradeSettingEnum upgradeSettingEnum);
+        Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input);
     }
 }

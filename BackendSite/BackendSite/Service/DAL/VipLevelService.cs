@@ -208,40 +208,47 @@ namespace BackendSite.Service.DAL
                 new DynamicParameters(new { SiteId = siteId }));
         }
 
-        public async Task<int> SetUpgradeSetting(ParamsWithLog<SetUpgradeSettingRequest> input, UpgradeSettingEnum upgradeSettingEnum)
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input)
         {
+            var result = 0;
             await using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             var sp = string.Empty;
-            var p = new DynamicParameters();
-            p.Add("_SiteId", input.SiteId);
-            p.Add("_Level", input.After.Level);
-            p.Add("_CurrencyId", input.CurrencyId);
-
-            switch (upgradeSettingEnum)
+            
+            foreach(var x in input.After.Detail)
             {
-                case UpgradeSettingEnum.UpDeposit:
-                    p.Add("_UpDeposit", input.After.UpDeposit);
-                    sp = "Admin_UpDeposit_Set";
-                    break;
-                case UpgradeSettingEnum.UpBonus:
-                    p.Add("_UpBonus", input.After.UpBonus);
-                    sp = "Admin_UpBonus_Set";
-                    break;
-                case UpgradeSettingEnum.DownDeposit:
-                    p.Add("_DownDeposit", input.After.DownDeposit);
-                    sp = "Admin_DownDeposit_Set";
-                    break;
-                case UpgradeSettingEnum.DownTurnover:
-                    p.Add("_DownTurnover", input.After.DownTurnover);
-                    sp = "Admin_DownTurnover_Set";
-                    break;
+                var p = new DynamicParameters();
+                switch (input.After.Type)
+                {
+                    case UpgradeSettingEnum.UpDeposit:
+                        p.Add("_UpDeposit", decimal.Parse(x.LevelValue));
+                        sp = "Admin_UpDeposit_Set";
+                        break;
+                    case UpgradeSettingEnum.UpBonus:
+                        p.Add("_UpBonus", decimal.Parse(x.LevelValue));
+                        sp = "Admin_UpBonus_Set";
+                        break;
+                    case UpgradeSettingEnum.DownDeposit:
+                        p.Add("_UpBonus", decimal.Parse(x.LevelValue));
+                        sp = "Admin_DownDeposit_Set";
+                        break;
+                    case UpgradeSettingEnum.DownTurnover:
+                        p.Add("_UpBonus", decimal.Parse(x.LevelValue));
+                        sp = "Admin_DownTurnover_Set";
+                        break;
+                }
+                p.Add("_Level", x.Level);
+                p.Add("_SiteId", input.SiteId);
+                p.Add("_CurrencyId", input.CurrencyId);
+                result = await _mainDbClient.ExecuteAsync(sp, trans, p);
+                if (result == 0)
+                {
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                    return result;
+                }
             }
-
-            var result = await _mainDbClient
-                .ExecuteAsync(sp, trans, p);
 
             if (result > 0)
             {
@@ -255,7 +262,6 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
                 logParam.Add("_Operator", input.Operator);
 
-
                 var logSuccess = await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (logSuccess)
                 {
@@ -268,7 +274,6 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
         #region Private Methods
 
         #endregion
