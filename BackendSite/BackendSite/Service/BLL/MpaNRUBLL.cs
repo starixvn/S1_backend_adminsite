@@ -73,6 +73,33 @@ namespace BackendSite.Service.BLL
                      
                      #region NOVA88
 
+                     //AFF
+                     var affList = landingPagesList.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
+                     var affData = new SignUpDataSum
+                     {
+                         SignUpSource = "AFF",
+                         NewlyRegisterUsers = affList.Count(),
+                         DepositUsers = affList.Count(info => info.TotalDeposit > 0),
+                         FirstDepositAmount = affList.Sum(info => info.FirstDeposit),
+                         TotalDepositAmount = affList.Sum(info => info.TotalDeposit),
+                     };
+                     landingPagesList = landingPagesList.Except(affList).ToList();
+                     nruData.SignUpDataSum.Add(affData);
+
+                     //Nova88.com
+                     var creditSite = new List<int>() { 400,417,418,419}; //'Nova88Ref05','Nova88Ref06','Nova88Ref07','Nova88Ref08'
+                     var nova88ComList = landingPagesList.Where(x => creditSite.Contains(x.AgentId)).ToList();
+                     var nova88ComData = new SignUpDataSum
+                     {
+                         SignUpSource = "Nova88.com",
+                         NewlyRegisterUsers = nova88ComList.Count(),
+                         DepositUsers = nova88ComList.Count(info => info.TotalDeposit > 0),
+                         FirstDepositAmount = nova88ComList.Sum(info => info.FirstDeposit),
+                         TotalDepositAmount = nova88ComList.Sum(info => info.TotalDeposit),
+                     };
+                     landingPagesList = landingPagesList.Except(nova88ComList).ToList();
+                     nruData.SignUpDataSum.Add(nova88ComData);
+                     
                      //GroupBy Domain
                      groupUrlDic = _mpaDomainConfig["Nova88"];
                      
@@ -87,17 +114,20 @@ namespace BackendSite.Service.BLL
                          var domainList = _mpaDomainConfig["Nova88"][groupUrl];
                          foreach (var domain in domainList)
                          {
-                             var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
-                             landingPagesList = landingPagesList.Except(signUpData).ToList();
-                             var childData = new SignUpData
+                             var signUpData = landingPagesList.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
+                             if (signUpData.Count > 0)
                              {
-                                 SignUpSource = domain,
-                                 NewlyRegisterUsers = signUpData.Count(),
-                                 DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
-                                 FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
-                                 TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
-                             };
-                             nova88Data.Children.Add(childData);
+                                 landingPagesList = landingPagesList.Except(signUpData).ToList();
+                                 var childData = new SignUpData
+                                 {
+                                     SignUpSource = domain,
+                                     NewlyRegisterUsers = signUpData.Count(),
+                                     DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
+                                     FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
+                                     TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
+                                 };
+                                 nova88Data.Children.Add(childData);
+                             }
                          }
                          
                          nova88Data.NewlyRegisterUsers = nova88Data.Children.Sum(info => info.NewlyRegisterUsers);
@@ -107,21 +137,8 @@ namespace BackendSite.Service.BLL
                          nruData.SignUpDataSum.Add(nova88Data);
                      }
                      
-                     //AFF
-                     var affList = data.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
-                     var affData = new SignUpDataSum
-                     {
-                         SignUpSource = "AFF",
-                         NewlyRegisterUsers = affList.Count(),
-                         DepositUsers = affList.Count(info => info.TotalDeposit > 0),
-                         FirstDepositAmount = affList.Sum(info => info.FirstDeposit),
-                         TotalDepositAmount = affList.Sum(info => info.TotalDeposit),
-                     };
-                     landingPagesList = landingPagesList.Except(affList).ToList();
-                     nruData.SignUpDataSum.Add(affData);
-
                      //APP
-                     var appList = data.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
+                     var appList = landingPagesList.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
                      var appData = new SignUpDataSum
                      {
                          SignUpSource = "APP",
@@ -132,20 +149,6 @@ namespace BackendSite.Service.BLL
                      };
                      landingPagesList = landingPagesList.Except(appList).ToList();
                      nruData.SignUpDataSum.Add(appData);
-
-                     //Nova88.com
-                     var creditSite = new List<int>() { 400,417,418,419}; //'Nova88Ref05','Nova88Ref06','Nova88Ref07','Nova88Ref08'
-                     var nova88ComList = data.Where(x => creditSite.Contains(x.AgentId)).ToList();
-                     var nova88ComData = new SignUpDataSum
-                     {
-                         SignUpSource = "Nova88.com",
-                         NewlyRegisterUsers = nova88ComList.Count(),
-                         DepositUsers = nova88ComList.Count(info => info.TotalDeposit > 0),
-                         FirstDepositAmount = nova88ComList.Sum(info => info.FirstDeposit),
-                         TotalDepositAmount = nova88ComList.Sum(info => info.TotalDeposit),
-                     };
-                     landingPagesList = landingPagesList.Except(nova88ComList).ToList();
-                     nruData.SignUpDataSum.Add(nova88ComData);
                      
                      //Landing Pages
                      var landingPagesChilds = landingPagesList
@@ -178,6 +181,33 @@ namespace BackendSite.Service.BLL
                      
                      #region GOAL123
 
+                     //AFF
+                     var goalAffList = landingPagesList.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
+                     var goalAffData = new SignUpDataSum
+                     {
+                         SignUpSource = "AFF",
+                         NewlyRegisterUsers = goalAffList.Count,
+                         DepositUsers = goalAffList.Count(info => info.TotalDeposit > 0),
+                         FirstDepositAmount = goalAffList.Sum(info => info.FirstDeposit),
+                         TotalDepositAmount = goalAffList.Sum(info => info.TotalDeposit),
+                     };
+                     landingPagesList = landingPagesList.Except(goalAffList).ToList();
+                     nruData.SignUpDataSum.Add(goalAffData);
+                     
+                     //Bong88/Viva88
+                     var goalCreditSite = new List<int>() {106734}; //'Goal123Ref01'
+                     var bong88List = landingPagesList.Where(x => goalCreditSite.Contains(x.AgentId)).ToList();
+                     var bong88ListData = new SignUpDataSum
+                     {
+                         SignUpSource = "Bong88/Viva88",
+                         NewlyRegisterUsers = bong88List.Count(),
+                         DepositUsers = bong88List.Count(info => info.TotalDeposit > 0),
+                         FirstDepositAmount = bong88List.Sum(info => info.FirstDeposit),
+                         TotalDepositAmount = bong88List.Sum(info => info.TotalDeposit),
+                     };
+                     landingPagesList = landingPagesList.Except(bong88List).ToList();
+                     nruData.SignUpDataSum.Add(bong88ListData);
+                     
                      //GroupBy Domain
                      groupUrlDic = _mpaDomainConfig["Goal123"];
                      
@@ -192,17 +222,20 @@ namespace BackendSite.Service.BLL
                          var domainList = _mpaDomainConfig["Goal123"][groupUrl];
                          foreach (var domain in domainList)
                          {
-                             var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
-                             landingPagesList = landingPagesList.Except(signUpData).ToList();
-                             var childData = new SignUpData
+                             var signUpData = landingPagesList.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
+                             if (signUpData.Count > 0)
                              {
-                                 SignUpSource = domain,
-                                 NewlyRegisterUsers = signUpData.Count(),
-                                 DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
-                                 FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
-                                 TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
-                             };
-                             goal123Data.Children.Add(childData);
+                                 landingPagesList = landingPagesList.Except(signUpData).ToList();
+                                 var childData = new SignUpData
+                                 {
+                                     SignUpSource = domain,
+                                     NewlyRegisterUsers = signUpData.Count(),
+                                     DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
+                                     FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
+                                     TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
+                                 };
+                                 goal123Data.Children.Add(childData);
+                             }
                          }
                          
                          goal123Data.NewlyRegisterUsers = goal123Data.Children.Sum(info => info.NewlyRegisterUsers);
@@ -212,21 +245,8 @@ namespace BackendSite.Service.BLL
                          nruData.SignUpDataSum.Add(goal123Data);
                      }
                      
-                     //AFF
-                     var goalAffList = data.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
-                     var goalAffData = new SignUpDataSum
-                     {
-                         SignUpSource = "AFF",
-                         NewlyRegisterUsers = goalAffList.Count,
-                         DepositUsers = goalAffList.Count(info => info.TotalDeposit > 0),
-                         FirstDepositAmount = goalAffList.Sum(info => info.FirstDeposit),
-                         TotalDepositAmount = goalAffList.Sum(info => info.TotalDeposit),
-                     };
-                     landingPagesList = landingPagesList.Except(goalAffList).ToList();
-                     nruData.SignUpDataSum.Add(goalAffData);
-
                      //APP
-                     var goalAppList = data.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
+                     var goalAppList = landingPagesList.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
                      var goalAppData = new SignUpDataSum
                      {
                          SignUpSource = "APP",
@@ -237,21 +257,7 @@ namespace BackendSite.Service.BLL
                      };
                      landingPagesList = landingPagesList.Except(goalAppList).ToList();
                      nruData.SignUpDataSum.Add(goalAppData);
-
-                     //Bong88/Viva88
-                     var goalCreditSite = new List<int>() {106734}; //'Goal123Ref01'
-                     var bong88List = data.Where(x => goalCreditSite.Contains(x.AgentId)).ToList();
-                     var bong88ListData = new SignUpDataSum
-                     {
-                         SignUpSource = "Bong88/Viva88",
-                         NewlyRegisterUsers = bong88List.Count(),
-                         DepositUsers = bong88List.Count(info => info.TotalDeposit > 0),
-                         FirstDepositAmount = bong88List.Sum(info => info.FirstDeposit),
-                         TotalDepositAmount = bong88List.Sum(info => info.TotalDeposit),
-                     };
-                     landingPagesList = landingPagesList.Except(bong88List).ToList();
-                     nruData.SignUpDataSum.Add(bong88ListData);
-
+                     
                      //Landing Pages
                      var goalLandingPagesChilds = landingPagesList
                          .GroupBy(i => i.SignupUrl)
@@ -282,7 +288,34 @@ namespace BackendSite.Service.BLL
                  case (int)SiteEnum.BWING:
                      
                      #region BWING
-
+                     
+                     //AFF
+                     var bwingAffList = landingPagesList.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
+                     var bwingAffData = new SignUpDataSum
+                     {
+                         SignUpSource = "AFF",
+                         NewlyRegisterUsers = bwingAffList.Count,
+                         DepositUsers = bwingAffList.Count(info => info.TotalDeposit > 0),
+                         FirstDepositAmount = bwingAffList.Sum(info => info.FirstDeposit),
+                         TotalDepositAmount = bwingAffList.Sum(info => info.TotalDeposit),
+                     };
+                     landingPagesList = landingPagesList.Except(bwingAffList).ToList();
+                     nruData.SignUpDataSum.Add(bwingAffData);
+                     
+                     //Bong88/Viva88
+                     var bwingCreditSite = new List<int>() {106733}; //'BwingRef01'
+                     var bwingBong88List = landingPagesList.Where(x => bwingCreditSite.Contains(x.AgentId)).ToList();
+                     var bwingBong88ListData = new SignUpDataSum
+                     {
+                         SignUpSource = "Bong88/Viva88",
+                         NewlyRegisterUsers = bwingBong88List.Count(),
+                         DepositUsers = bwingBong88List.Count(info => info.TotalDeposit > 0),
+                         FirstDepositAmount = bwingBong88List.Sum(info => info.FirstDeposit),
+                         TotalDepositAmount = bwingBong88List.Sum(info => info.TotalDeposit),
+                     };
+                     landingPagesList = landingPagesList.Except(bwingBong88List).ToList();
+                     nruData.SignUpDataSum.Add(bwingBong88ListData);
+                     
                      //GroupBy Domain
                      groupUrlDic = _mpaDomainConfig["Bwing"];
                      
@@ -297,17 +330,20 @@ namespace BackendSite.Service.BLL
                          var domainList = _mpaDomainConfig["Bwing"][groupUrl];
                          foreach (var domain in domainList)
                          {
-                             var signUpData = data.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
-                             landingPagesList = landingPagesList.Except(signUpData).ToList();
-                             var childData = new SignUpData
+                             var signUpData = landingPagesList.Where(x => x.SignupUrl?.Contains(domain)??false).ToList();
+                             if (signUpData.Count > 0)
                              {
-                                 SignUpSource = domain,
-                                 NewlyRegisterUsers = signUpData.Count(),
-                                 DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
-                                 FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
-                                 TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
-                             };
-                             bwingData.Children.Add(childData);
+                                 landingPagesList = landingPagesList.Except(signUpData).ToList();
+                                 var childData = new SignUpData
+                                 {
+                                     SignUpSource = domain,
+                                     NewlyRegisterUsers = signUpData.Count(),
+                                     DepositUsers = signUpData.Count(info => info.TotalDeposit > 0),
+                                     FirstDepositAmount = signUpData.Sum(info => info.FirstDeposit),
+                                     TotalDepositAmount = signUpData.Sum(info => info.TotalDeposit)
+                                 };
+                                 bwingData.Children.Add(childData);
+                             }
                          }
                          
                          bwingData.NewlyRegisterUsers = bwingData.Children.Sum(info => info.NewlyRegisterUsers);
@@ -317,21 +353,8 @@ namespace BackendSite.Service.BLL
                          nruData.SignUpDataSum.Add(bwingData);
                      }
                      
-                     //AFF
-                     var bwingAffList = data.Where(x => !string.IsNullOrEmpty(x.AffCode)).ToList();
-                     var bwingAffData = new SignUpDataSum
-                     {
-                         SignUpSource = "AFF",
-                         NewlyRegisterUsers = bwingAffList.Count,
-                         DepositUsers = bwingAffList.Count(info => info.TotalDeposit > 0),
-                         FirstDepositAmount = bwingAffList.Sum(info => info.FirstDeposit),
-                         TotalDepositAmount = bwingAffList.Sum(info => info.TotalDeposit),
-                     };
-                     landingPagesList = landingPagesList.Except(bwingAffList).ToList();
-                     nruData.SignUpDataSum.Add(bwingAffData);
-
                      //APP
-                     var bwingAppList = data.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
+                     var bwingAppList = landingPagesList.Where(x => x.SignupUrl?.Contains("app")??false).ToList();
                      var bwingAppData = new SignUpDataSum
                      {
                          SignUpSource = "APP",
@@ -342,27 +365,13 @@ namespace BackendSite.Service.BLL
                      };
                      landingPagesList = landingPagesList.Except(bwingAppList).ToList();
                      nruData.SignUpDataSum.Add(bwingAppData);
-
-                     //Bong88/Viva88
-                     var bwingCreditSite = new List<int>() {106733}; //'BwingRef01'
-                     var bwingBong88List = data.Where(x => bwingCreditSite.Contains(x.AgentId)).ToList();
-                     var bwingBong88ListData = new SignUpDataSum
-                     {
-                         SignUpSource = "Bong88/Viva88",
-                         NewlyRegisterUsers = bwingBong88List.Count(),
-                         DepositUsers = bwingBong88List.Count(info => info.TotalDeposit > 0),
-                         FirstDepositAmount = bwingBong88List.Sum(info => info.FirstDeposit),
-                         TotalDepositAmount = bwingBong88List.Sum(info => info.TotalDeposit),
-                     };
-                     landingPagesList = landingPagesList.Except(bwingBong88List).ToList();
-                     nruData.SignUpDataSum.Add(bwingBong88ListData);
-
+                     
                      //Landing Pages
                      var bwingLandingPagesChilds = landingPagesList
-                         .GroupBy(i => i.SignupUrl)
+                         .GroupBy(x => x.SignupUrl)
                          .Select( i => new SignUpData
                          {
-                             SignUpSource = i.First().SignupUrl,
+                             SignUpSource = i.Key,
                              NewlyRegisterUsers = i.Count(),
                              DepositUsers = i.Count(info => info.TotalDeposit > 0),
                              FirstDepositAmount = i.Sum(info => info.FirstDeposit),

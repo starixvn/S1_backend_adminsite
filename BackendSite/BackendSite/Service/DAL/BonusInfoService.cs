@@ -205,7 +205,7 @@ namespace BackendSite.Service.DAL
         }
         
         
-        public List<MpaMarketingBonus> GetMpaMarketingBonus(
+        public IEnumerable<MpaMarketingBonus> GetMpaMarketingBonus(
             int siteId,
             string currencyIds,
             DateTime startDate,
@@ -219,7 +219,7 @@ namespace BackendSite.Service.DAL
 
             var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
 
-            return result.ToList();
+            return result;
         }
         
         public CustBonusSum GetCustBonusSum(int siteId,int custId)

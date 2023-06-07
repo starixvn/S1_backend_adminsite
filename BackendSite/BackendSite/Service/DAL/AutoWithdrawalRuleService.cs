@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL.Interface;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -24,6 +25,14 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", req.SiteId);
             return _reportDbClient.QueryAsync<AutoWithdrawalRuleDataListDto>("Admin_AutoWithdrawalRuleSetting_Get", p);
         }
+
+        public Task<AutoWithdrawalRuleDataListDto> GetDataByIdAsync(int id)
+        {
+            var p = new DynamicParameters();
+            p.Add("_Id", id);
+            return _reportDbClient.QueryFirstAsync<AutoWithdrawalRuleDataListDto>("Admin_AutoWithdrawalRuleSetting_GetById", p);
+        }
+
 
         public Task CreateAutoWithdrawalRuleAsync(AutoWithdrawalRuleCreateRequest req, string userName)
         {
@@ -58,6 +67,23 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_SQ", req.Id);
             return _mainDbClient.ExecuteAsync("Admin_AutoWithdrawalRuleSetting_Del", p);
+        }
+
+        public async Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beforeData, object afterData,
+            AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CustId", custId);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_Menu", (int)adminAdjustmentLogMenu);
+            p.Add("_ActionType", (int)actionType);
+            p.Add("_RefTransId", string.Empty);
+            p.Add("_BeforeDetailInfo", beforeData.ToLog());
+            p.Add("_AfterDetailInfo", afterData.ToLog());
+            p.Add("_Operator", updater);
+
+            return await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins_V2", p) > 0;
         }
     }
 }

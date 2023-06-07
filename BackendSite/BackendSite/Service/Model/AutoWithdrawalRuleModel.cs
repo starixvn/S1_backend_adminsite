@@ -98,6 +98,8 @@ namespace BackendSite.Service.Model
         public string TagStr { get; set; }
 
         public string WithdrawalTypeStr { get; set; }
+
+        public int SiteId { get; set; }
     }
 
     public class WithdrawalOptionDto
