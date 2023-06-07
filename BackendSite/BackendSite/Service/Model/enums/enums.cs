@@ -661,7 +661,32 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-
+    
+    public enum BonusSummaryType
+    {
+        WelcomeBonus = 1,
+        ReDeposit = 2,
+        FreeBet = 3,
+        Rebate = 6,
+        CashBack = 7,
+        ManualBonus = 8,
+        RetentionFreeBet = 9,
+        Referral = 10,
+        VerificationReward = 11,
+        PrizeDraw = 12,
+        Other = 13,
+        VipUpgrade = 14,
+        ReferralFreeCredit = 15
+    }
+    
+    public enum BonusSummaryTransactionType
+    {
+        IncreaseBonus = 1,
+        DecreaseBonus = 2,
+        Phone = 3,
+        Email = 4
+    }
+    
     #endregion
 
     #region PromotionCashBackSetting
@@ -1252,8 +1277,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
-
+    
     #region Banner
 
     public enum BannerTypeEnum
@@ -1370,6 +1394,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1789,5 +1814,11 @@ namespace BackendSite.Service.Model.enums
         BankCard = 2,
 
         Crypto = 3
+    }
+    
+    public enum ViewTimeType
+    {
+        Daily = 1,
+        Weekly = 2
     }
 }
