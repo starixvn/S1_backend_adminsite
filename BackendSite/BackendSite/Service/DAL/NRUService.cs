@@ -53,7 +53,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
             
-            var result = _mainDbClient.Query<MpaMarketingNRUBonus>("Admin_MarketingNRUBonusList_Get", props);
+            var result = _reportDbClient.Query<MpaMarketingNRUBonus>("Admin_MarketingNRUBonusList_Get", props);
 
             return result.ToList();
         }
@@ -72,7 +72,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
             
-            var result = _mainDbClient.Query<MpaMarketingNRUBonusDetail>("Admin_MarketingNRUBonusDetailList_Get", props);
+            var result = _reportDbClient.Query<MpaMarketingNRUBonusDetail>("Admin_MarketingNRUBonusDetailList_Get", props);
 
             return result.ToList();
         }
