@@ -721,14 +721,18 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var key in keys)
             {
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpCategoryName == key).ToList();
+                var progressiveWin = dateSummary.Sum(x => x.ProgressiveWin);
+                var progressiveBet = dateSummary.Sum(x => x.ProgressiveBet);
+                var progressiveDiff = progressiveWin - progressiveBet;
+
                 var result = new MpaWinLossByTpCategoryResponse
                 {
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR),
+                    GGR = dateSummary.Sum(x => x.GGR) + progressiveDiff,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
-                    ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
-                    ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
+                    ProgressiveWin = progressiveWin,
+                    ProgressiveBet = progressiveBet,
                     Commission = dateSummary.Sum(x => x.Commission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
@@ -748,17 +752,14 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             // total
-            var progressiveWin = exportData.Sum(x => x.Value.ProgressiveWin);
-            var progressiveBet = exportData.Sum(x => x.Value.ProgressiveBet);
-            var progressiveDiff = progressiveWin - progressiveBet;
             exportData.Add("total", new MpaWinLossByTpCategoryResponse()
             {
                 TurnOver = exportData.Sum(x => x.Value.TurnOver),
                 ValidTurnOver = exportData.Sum(x => x.Value.ValidTurnOver),
-                GGR = exportData.Sum(x => x.Value.GGR) + progressiveDiff,
+                GGR = exportData.Sum(x => x.Value.GGR),
                 PlayerWinLoss = exportData.Sum(x => x.Value.PlayerWinLoss),
-                ProgressiveWin = progressiveWin,
-                ProgressiveBet = progressiveBet,
+                ProgressiveWin = exportData.Sum(x => x.Value.ProgressiveWin),
+                ProgressiveBet = exportData.Sum(x => x.Value.ProgressiveBet),
                 Commission = exportData.Sum(x => x.Value.Commission),
                 BetCount = exportData.Sum(x => x.Value.BetCount),
                 AvgBetAmount = (exportData.Sum(x => x.Value.BetCount) != 0 && exportData.Sum(x => x.Value.TurnOver) != 0)
