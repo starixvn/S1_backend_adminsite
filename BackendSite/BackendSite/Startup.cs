@@ -96,6 +96,7 @@ namespace BackendSite
             services.AddTransient<IWithdrawalStateTransferBLL, WithdrawalStateTransferBLL>();
             services.AddTransient<IWithdrawalReceiveBLL, WithdrawalReceiveBLL>();
             services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
+            services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
 
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<LiveRegistrationDecorator>();
@@ -120,9 +121,8 @@ namespace BackendSite
             services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
             services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
             services.AddTransient<IAutoWithdrawalRuleService, AutoWithdrawalRuleService>();
-
-
-
+            
+            
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;

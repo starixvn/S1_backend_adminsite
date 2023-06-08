@@ -342,7 +342,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositDraftSetRequest draftInfo ,bool canReward = false)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositCalCodeSetRequest calCodeInfo ,bool canReward = false, string depositInfo = null)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -374,19 +374,26 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
-                    if (status == DepositStatusEnum.Draft && draftInfo != null)
+                    if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null)
                     {
                         var calCodeList = _bankFinancialService.GetTransferAccountList();
-                        draftInfo.DisplayName = calCodeList.FirstOrDefault(x => x.Id == draftInfo.BankId)?.DisplayName;
-                        comment =
-                            $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName} , After:{draftInfo.DisplayName}] , StatementTime : [Before:{beforeDepositData.StatementTime} , After:{draftInfo.StatementTime}] ]";
+                        calCodeInfo.DisplayName = calCodeList.FirstOrDefault(x => x.Id == calCodeInfo.BankId)?.DisplayName;
+
+                        if (status == DepositStatusEnum.Draft)
+                        {
+                            comment = $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName} , After:{calCodeInfo.DisplayName}] , StatementTime : [Before:{beforeDepositData.StatementTime} , After:{calCodeInfo.StatementTime}] ]";
+                        }
+                        else
+                        {
+                            comment = $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName}, After:{calCodeInfo.DisplayName}] ";
+                        }
                     }
                     
                     SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, Operator);
 
                     if (status == DepositStatusEnum.Approved)
                     {
-                        if (depositRequest.DepositType != 3)
+                        if (depositRequest.DepositType is not (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet))
                         {
                             var pay = (IPay)depositRequest.oDepositInfo;
                             type = payTypePosition + pay.PayId;
@@ -408,7 +415,7 @@ namespace BackendSite.Service.DAL
 
                         if (result > 0)
                         {
-                            if (depositRequest.DepositType == 3)
+                            if (depositRequest.DepositType == DepositTypeEnum.LocalBanking)
                             {
                                 var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
                                 result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, trans);
@@ -417,6 +424,15 @@ namespace BackendSite.Service.DAL
                             {
                                 var pay = (IPay)depositRequest.oDepositInfo;
                                 result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, trans);
+                            }
+                        }
+
+                        if (result > 0 && !string.IsNullOrEmpty(depositInfo))
+                        {
+                            result = UpdateDepositInfo(depositRequest.TransId, depositInfo, trans);
+                            if (result < 1)
+                            {
+                                _logger.LogError($"UpdateDepositInfo Failed. TransId: {transId}, depositInfo: {depositInfo}");
                             }
                         }
 
@@ -434,14 +450,14 @@ namespace BackendSite.Service.DAL
                         }
                     }
 
-                    if (status == DepositStatusEnum.Draft && draftInfo != null )
+                    if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null )
                     {
                         var p2 = new DynamicParameters(new
                         {
                             DepositId = depositId, 
                             SiteId = siteId,
-                            StatementTime = draftInfo.StatementTime?.DateTime ,
-                            BankId = draftInfo.BankId,
+                            StatementTime = status == DepositStatusEnum.Draft ? calCodeInfo.StatementTime?.DateTime : null ,
+                            BankId = calCodeInfo.BankId,
                             Operator = Operator
                         });
                         result = _mainDbClient.Execute("Admin_DepositInfoDraft_Set", trans, p2);
@@ -466,8 +482,19 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        
+        private int UpdateDepositInfo(string transId, string depositInfo, IDbTransaction trans)
+        {
+            return _mainDbClient.Execute("Service_DepositInfoDepositInfo_Set",
+                trans,
+                new
+                {
+                    _TransId = transId,
+                    _DepositInfo = depositInfo
+                });
+        }
 
-        private int SetDepositInfoFirstDeposit(int depositId, int siteId, MySqlTransaction trans)
+        private int SetDepositInfoFirstDeposit(int depositId, int siteId, IDbTransaction trans)
         {
             return _mainDbClient.Execute("DepositInfoFirstDeposit_Set",
                 trans,
