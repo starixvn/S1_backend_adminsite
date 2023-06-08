@@ -651,7 +651,7 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = "All",
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR) - progressiveDiff,
+                    GGR = dateSummary.Sum(x => x.GGR) + progressiveDiff,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = progressiveWin,
                     ProgressiveBet = progressiveBet,
