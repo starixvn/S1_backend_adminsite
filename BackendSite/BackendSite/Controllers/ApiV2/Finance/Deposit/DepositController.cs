@@ -406,7 +406,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
                     
                     if (request.ActualDeposit > 0)
-                        depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name, calCodeInfo, di);
+                        depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name, calCodeInfo ,di);
                 }
                 
                 if (depositConfirmResult > 0)
@@ -611,7 +611,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 var depositRequest = _depositBll.GetDepositRequest(depositReceipt.TransId);
 
-                if (depositRequest.Status is not (DepositStatusEnum.Pending or DepositStatusEnum.OnHold or DepositStatusEnum.Approved))
+                if (depositRequest.Status is not (DepositStatusEnum.Pending or DepositStatusEnum.OnHold))
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Wrong status ,Can't upload receipt";

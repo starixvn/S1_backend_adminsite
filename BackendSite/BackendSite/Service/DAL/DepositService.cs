@@ -342,8 +342,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status,
-        	DepositRequest depositRequest, DepositCalCodeSetRequest calCodeInfo, bool canReward = false, string depositInfo = null)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositCalCodeSetRequest calCodeInfo ,bool canReward = false, string depositInfo = null)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");

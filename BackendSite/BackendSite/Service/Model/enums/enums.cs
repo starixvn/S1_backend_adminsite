@@ -853,6 +853,7 @@ namespace BackendSite.Service.Model.enums
         CancelBonusInCustInfo = 83,
         SetBlockCryptoWallet = 84,
         ReleaseCryptoWallet = 85,
+        AutoWithdrawalRule = 91,
     }
 
     #region BankFinancialTransferInfoLog

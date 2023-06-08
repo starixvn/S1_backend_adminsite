@@ -10,6 +10,8 @@ namespace BackendSite.Service.BLL.Interface
 
         Task SetAutoWithdrawalRuleAsync(AutoWithdrawalRuleSetRequest request, string userName);
 
-        Task DeleteAutoWithdrawalRuleAsync(AutoWithdrawalRuleDeleteRequest request);
+        Task DeleteAutoWithdrawalRuleAsync(AutoWithdrawalRuleDeleteRequest request, string userName);
+
+        List<WithdrawalOptionDto> GetWithdrawalOption();
     }
 }

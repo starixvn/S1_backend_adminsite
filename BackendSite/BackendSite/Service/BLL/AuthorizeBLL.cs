@@ -64,6 +64,8 @@ namespace BackendSite.Service.BLL
                 int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out var userId);
                 authData.UserId = userId;
                 authData.UserName = httpContextAccessor.HttpContext.User.Identity.Name;
+                int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint).Value, out var SiteId);
+                authData.SiteId = SiteId;
                 //authData.Token = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "Token").Value;
                 //authData.LangId = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == "LangId").Value;
             }
