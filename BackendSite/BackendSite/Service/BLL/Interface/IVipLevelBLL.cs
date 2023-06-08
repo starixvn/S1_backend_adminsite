@@ -13,5 +13,6 @@ namespace BackendSite.Service.BLL.Interface
         Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string updator);
         Task<IEnumerable<VipUpgradeSetting>> GetUpgradeSetting(int siteId, int CurrencyId);
         Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input);
+        Task<IEnumerable<int>> GetVipUpgradeSupportCurrency(int siteId);
     }
 }

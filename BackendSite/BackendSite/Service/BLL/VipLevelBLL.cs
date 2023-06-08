@@ -274,6 +274,12 @@ namespace BackendSite.Service.BLL
         {
             return await _vipLevelService.SetUpgradeSetting(input);
         }
+
+        public async Task<IEnumerable<int>> GetVipUpgradeSupportCurrency(int siteId)
+        {
+            var vipSystem = await _vipLevelService.GetVipSystem(siteId);
+            return vipSystem.GroupBy(y=> y.CurrencyId).Select(x => x.Key);
+        }
         #endregion
 
         #region Private Methods
