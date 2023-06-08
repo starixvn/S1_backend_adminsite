@@ -16,5 +16,11 @@ namespace BackendSite.Service.BLL.Interface
             string summaryTitle,
             string detailTitle,
             IEnumerable<PropertyInfo> properties = null);
+
+        Task MultiplyExchangeRate<TEntity>(List<TEntity> source,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int baseCurrencyId)
+            where TEntity : class, IMpaMarketingWithdrawalAmountBaseDto;
     }
 }

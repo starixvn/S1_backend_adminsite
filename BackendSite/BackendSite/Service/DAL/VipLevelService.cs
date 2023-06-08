@@ -101,11 +101,23 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevelManually_Set", p);
         }
 
-        public IEnumerable<VipSettingModel> GetVipSetting(int vipType)
+        public Task<int> SetAutoCustVipExclusionAsync(int siteId, int custId, string userName, int exclusive)
+        {
+            return _mainDbClient.ExecuteAsync("Admin_AutoCustVipExclusion_Set", new
+            {
+                _SiteId = siteId,
+                _CustId = custId,
+                _UserName = userName,
+                _Exclusive = exclusive
+            });
+        }
+
+        public VipSettingModel GetVipSetting(int vipType, int siteId)
         {
             var props = new DynamicParameters();
             props.Add("_Status", vipType);
-            return _reportDbClient.Query<VipSettingModel>("Admin_VipSetting_Get", props);
+            props.Add("_SiteId", siteId);
+            return _reportDbClient.QueryFirst<VipSettingModel>("Admin_VipSetting_Get_V2", props);
         }
 
         public IEnumerable<VipUpgradeReviewDataModel> GetVipUpgradeReviewList(int siteId,
