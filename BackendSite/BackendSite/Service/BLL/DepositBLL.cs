@@ -250,19 +250,8 @@ namespace BackendSite.Service.BLL
         {
             var forStatus = new List<int> { (int)DepositStatusEnum.Pending };
             var depositRequest = GetDepositRequest(transId);
-            var result = depositService.SetDepositInfo(transId,
-                depositRequest.SiteId,
-                depositRequest.Amount,
-                comment,
-                Operator,
-                forStatus,
-                DepositStatusEnum.Approved,
-                depositRequest,
-                calCodeInfo,
-                CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId),
-                depositInfo);
-
-            return result;
+            return depositService.SetDepositInfo(transId, depositRequest.SiteId, actualDeposit, comment, Operator, forStatus, DepositStatusEnum.Approved,
+                depositRequest, calCodeInfo, CommonExtension.CanRewardPoint(depositRequest.SiteId, depositRequest.CurrencyId), depositInfo);
         }
 
         public int DepositReject(string transId, decimal actualDeposit, string comment, string Operator)
