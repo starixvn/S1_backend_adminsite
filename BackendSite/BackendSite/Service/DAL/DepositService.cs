@@ -935,5 +935,13 @@ namespace BackendSite.Service.DAL
 
             return _mainDbClient.Execute("Admin_DepositMessage_Set", props) > 0;
         }
+        
+        public IEnumerable<DepositMessage> GetDepositMessage(IEnumerable<int> depositIds)
+        {
+            var props = new DynamicParameters();
+            props.Add("_DepositIds", JsonConvert.SerializeObject(depositIds));
+
+            return _mainDbClient.Query<DepositMessage>("Admin_DepositMessage_Get", props);
+        }
     }
 }
