@@ -630,31 +630,31 @@ namespace BackendSite.Service.BLL.Mpa
         {
             // 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
+
+            //處理 GGR 邏輯
+            foreach (var item in data.OriginTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
+            foreach (var item in data.AlreadyMultiplyRateTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
+
             var exportData = new List<MpaWinLossByTpCategoryDto>();
             exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
                 ? data.OriginTpBetRecordResult
                 : data.AlreadyMultiplyRateTpBetRecordResult);
-            exportData.ForEach(x => x.GGR = x.GGR + (x.ProgressiveWin - x.ProgressiveBet));
-
+            
             var keys = data.OriginTpBetRecordResult.Select(x => x.TpCategoryName).Distinct();
 
             foreach (var key in keys)
             {
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpCategoryName == key).ToList();
-                var progressiveWin = dateSummary.Sum(x => x.ProgressiveWin);
-                var progressiveBet = dateSummary.Sum(x => x.ProgressiveBet);
-                var progressiveDiff = progressiveWin - progressiveBet;
-
                 var result = new MpaWinLossByTpCategoryDto
                 {
                     TpCategoryName = key,
                     Currency = "All",
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR) + progressiveDiff,
+                    GGR = dateSummary.Sum(x => x.GGR),
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
-                    ProgressiveWin = progressiveWin,
-                    ProgressiveBet = progressiveBet,
+                    ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
