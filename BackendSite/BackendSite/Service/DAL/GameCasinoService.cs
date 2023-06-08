@@ -39,5 +39,10 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+
+        public async Task<IEnumerable<SlotGameDetail>> GetSlotGame()
+        {
+            return await _reportDbClient.QueryAsync<SlotGameDetail>("Admin_SlotGame_All_Get");
+        }
     }
 }

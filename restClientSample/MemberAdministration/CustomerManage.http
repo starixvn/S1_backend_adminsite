@@ -57,6 +57,31 @@ POST {{url}}/apiV2/Member/CheckDuplicateName
 Content-Type: application/json
 
 {
-    "custId":645204,
-    "fullName": "蟹安安"
+    "custId":648546,
+    "fullName": "Hồ thái nhật"
+}
+
+###
+POST {{url}}/apiV2/Member/EditFullName
+Content-Type: application/json
+
+{
+    "custId":648546,
+    "fullName": "Hồ thái nhật"
+}
+
+###
+POST {{url}}/apiV2/Member/GetBasicInfo
+Content-Type: application/json
+
+{
+    "custId":648546
+}
+
+###
+POST {{url}}/apiV2/Member/ResetOtpTimes
+Content-Type: application/json
+
+{
+    "custId":644082
 }

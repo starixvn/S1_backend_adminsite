@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
@@ -42,6 +43,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset EndTime { get; set; }
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
+
         /// <summary>
         /// 是否排序
         /// </summary>
@@ -56,6 +58,7 @@ namespace BackendSite.Service.Model
         /// 1=降序
         /// </summary>
         public OrderByDirection OrderByDirection { get; set; }
+
         public string GetRedisKey()
         {         
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
@@ -75,6 +78,7 @@ namespace BackendSite.Service.Model
             }
             return key.ToString();
         }
+        public IEnumerable<MemberTypeEnum> MemberTypes { get; set; }
     }
 
     public class BetListReport : IDisposable

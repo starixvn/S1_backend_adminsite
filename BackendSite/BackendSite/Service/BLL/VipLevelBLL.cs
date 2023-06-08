@@ -6,6 +6,9 @@ using BackendSite.Service.Model.CustVipLevel;
 using Newtonsoft.Json;
 using BackendSite.Service.DAL.Interface;
 using BarcodeReader.ImageSharp;
+using System.Security.Policy;
+using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
+using BackendSite.Extensions;
 
 namespace BackendSite.Service.BLL
 {
@@ -261,6 +264,46 @@ namespace BackendSite.Service.BLL
             return CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Downgrade) && UpdateVipDowngradeReview(custIdList, calculateYearMonth, newStatus, updater);
         }
 
+        public async Task<IEnumerable<VipUpgradeSetting>> GetUpgradeSetting(int siteId, int currencyId)
+        {
+            var vipSystem = await _vipLevelService.GetVipSystem(siteId);
+            var currencyVipSystem = vipSystem.ToList().FindAll(x => x.CurrencyId == currencyId);
+            var result = new List<VipUpgradeSetting>();
+            var typeList = new List<UpgradeSettingEnum>();
+            typeList.Add(UpgradeSettingEnum.UpBonus);
+            typeList.Add(UpgradeSettingEnum.UpDeposit);
+            typeList.Add(UpgradeSettingEnum.DownDeposit);
+            typeList.Add(UpgradeSettingEnum.DownTurnover);
+
+            typeList.ForEach(x =>
+            {
+                var detail = x switch
+                {
+                    UpgradeSettingEnum.UpBonus => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.UpBonus.ToString() }).ToList(),
+                    UpgradeSettingEnum.UpDeposit => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.UpDeposit.ToString() }).ToList(),
+                    UpgradeSettingEnum.DownDeposit => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.DownDeposit is null ? null : o.DownDeposit.ToString() }).ToList(),
+                    UpgradeSettingEnum.DownTurnover => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.DownTurnover is null ? null : o.DownTurnover.ToString() }).ToList()
+                };
+                //Leve1跟6沒有提供設定,這邊寫死資料讓前端顯示用
+                detail.Add(new VipUpgradeSettingDetail() { Level = 1, LevelValue = null });
+                detail.Add(new VipUpgradeSettingDetail() { Level = 6, LevelValue = "By Invitation" });
+                result.Add(new VipUpgradeSetting()
+                {
+                    SiteId = siteId,
+                    CurrencyId = currencyId,
+                    Type = x,
+                    TypeName = x.GetDescription(),
+                    Detail = detail.OrderBy(y => y.Level)
+                });
+            });
+
+            return result.OrderBy(x=> x.Type);
+        }
+
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input)
+        {
+            return await _vipLevelService.SetUpgradeSetting(input);
+        }
         #endregion
 
         #region Private Methods

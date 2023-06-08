@@ -29,10 +29,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly SportsBLL _sportsBll;
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
-        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly MarketingBLL _marketingBll;
-        private readonly WinLostReportBLL _winLostReportBll;
+		private readonly WinLostReportBLL _winLostReportBll;
         private readonly ReportBLL _reportBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly PermissionBLL _permissionBll;
         private readonly Cryptor _cryptor;
         private readonly PaymentManageBLL _paymentManageBll;
@@ -53,7 +53,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _marketingBll = provider.GetRequiredService<MarketingBLL>();
-            _winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
+			_winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
@@ -135,8 +135,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int CategoryId { get; set; }
         }
-        
-        public class GetTpGameTypeByCategoryAndTpIdReq
+		
+		public class GetTpGameTypeByCategoryAndTpIdReq
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
@@ -557,7 +557,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 .GetOfflineBankAccount(request.SiteId, custInfo.CurrencyId)
                 .Where(x => x.Purposes.Contains(request.Purpose) 
                             && x.AccountStatus == TransferAccountStatusEnum.Open
-                            && x.Channel == TransferChannelEnum.LocalBank);
+                            && x.Channel == TransferChannelEnum.LocalBank
+                            && x.Channel != TransferChannelEnum.CryptoWallet);
 
             return new ApiResult<IEnumerable<OfflineBankAccount>>
             {
@@ -579,7 +580,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq request)
         {
-            var data = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
+            var data = await _tpBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
             {
                 Data = data,
@@ -597,7 +598,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<SiteTpListIfo>>> GetTpListByCategory(GetTpListByCategoryReq request)
         {
-            var data = await _userBetLimitBll.GetTpListByCategoryAsync(request.CategoryId);
+            var data = await _tpBll.GetTpListByCategoryAsync(request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
             {
                 Data = data,
@@ -991,24 +992,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
         
         /// <summary>
-        /// Transfer Info Management > Filter > Acc. No.
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult GetTransferAccountList(GetAccountListRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
-            {
-                Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-
-            return apiResult;
-        }
-
-        
-        /// <summary>
         /// 取得第三方遊戲類型清單ByCategoryAndTpId
         /// </summary>
         /// <param name="request"></param>
@@ -1022,6 +1005,37 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
             {
                 Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
+        /// Transfer Info Management > Filter > Acc. No.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult GetTransferAccountList(GetAccountListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
+            {
+                Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
+                
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public ApiResult GetFinancialAccountList(GetFinancialAccountListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
+            {
+                Data = _bankFinancialBll.GetFinancialAccountList(request.SiteId, request.Purposes),
+                
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 

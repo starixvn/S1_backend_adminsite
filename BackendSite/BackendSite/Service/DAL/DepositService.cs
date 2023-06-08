@@ -269,7 +269,7 @@ namespace BackendSite.Service.DAL
                 props.Add("CustId", custId);
                 props.Add("DepositId", depositId);
                 props.Add("ReceiptNo", receiptNo);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans ,props );
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans, props);
 
                 if (result > 0)
                 {
@@ -933,6 +933,14 @@ namespace BackendSite.Service.DAL
             props.Add("_Status", (int)input.After.Status);
 
             return _mainDbClient.Execute("Admin_DepositMessage_Set", props) > 0;
+        }
+        
+        public IEnumerable<DepositMessage> GetDepositMessage(IEnumerable<int> depositIds)
+        {
+            var props = new DynamicParameters();
+            props.Add("_DepositIds", JsonConvert.SerializeObject(depositIds));
+
+            return _mainDbClient.Query<DepositMessage>("Admin_DepositMessage_Get", props);
         }
     }
 }

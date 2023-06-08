@@ -18,8 +18,16 @@ public class MemberCommand : IMemberCommand
     private readonly IAdminLogService _adminLogService;
     private readonly IBonusApiService _bonusApi;
     private readonly ILogger<MemberCommand> _logger;
+    private readonly ServerInfoBLL _ServerInfoBll;
 
-    public MemberCommand(IMemberService memberService, CodeGenerator codeGenerator, Tools tools, IAdminLogService adminLogService, ILogger<MemberCommand> logger, IBonusApiService bonusApi, CustInfoBLL custInfoBll, VerificationRewardService verificationRewardService)
+    public MemberCommand(IMemberService memberService,
+        CodeGenerator codeGenerator,
+        Tools tools,
+        IAdminLogService adminLogService,
+        ILogger<MemberCommand> logger,
+        IBonusApiService bonusApi,
+        CustInfoBLL custInfoBll,
+        VerificationRewardService verificationRewardService, ServerInfoBLL serverInfoBll)
     {
         _memberService = memberService;
         _codeGenerator = codeGenerator;
@@ -29,6 +37,7 @@ public class MemberCommand : IMemberCommand
         _bonusApi = bonusApi;
         _custInfoBll = custInfoBll;
         _verificationRewardService = verificationRewardService;
+        _ServerInfoBll = serverInfoBll;
     }
 
     public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
@@ -414,29 +423,29 @@ public class MemberCommand : IMemberCommand
         var beforeWhiteList = await _memberService.GetCustPromotionWhiteListAsync(custId);
         var result = await _memberService.SetCustPromotionWhiteListAsync(new CustPromotionWhiteList()
         {
-           CustId = custId,
-           IpEnable = ipEnable,
-           DeviceEnable = deviceEnable,
-           RealNameEnable = realNameEnable,
-           SiteId = customer.SiteId,
-           UserName = customer.UserName,
-           Operator = @operator
+            CustId = custId,
+            IpEnable = ipEnable,
+            DeviceEnable = deviceEnable,
+            RealNameEnable = realNameEnable,
+            SiteId = customer.SiteId,
+            UserName = customer.UserName,
+            Operator = @operator
         });
-        
+
         if (result < 1)
         {
             return false;
-        }         
+        }
 
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
-            JsonConvert.SerializeObject(new 
-            { 
+            JsonConvert.SerializeObject(new
+            {
                 customer.UserName,
                 IpEnable = beforeWhiteList?.IpEnable ?? false,
                 DeviceEnable = beforeWhiteList?.DeviceEnable ?? false,
                 RealNameEnable = beforeWhiteList?.RealNameEnable ?? false,
             }),
-            JsonConvert.SerializeObject(new 
+            JsonConvert.SerializeObject(new
             {
                 customer.UserName,
                 IpEnable = ipEnable,
@@ -477,4 +486,85 @@ public class MemberCommand : IMemberCommand
             _logger.LogError(e, "InsertAdminLog failed. params: " + JsonConvert.SerializeObject(adminLog));
         }
     }
+
+    public async Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
+        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl, string @operator)
+    {
+        var result = await _memberService.RegisterMemberAsync(siteId,
+                userName,
+                userPwd,
+                email,
+                currencyId,
+                _ServerInfoBll.GetServerInfoWithSiteId(siteId).DefLang,
+                memberType,
+                areaCode,
+                phoneNo,
+                affCode,
+                signupUrl);
+
+        if (result.IsSuccess > 0) //Success
+        {
+            await CreateAdminLog(@operator, siteId, currencyId, null,
+                JsonConvert.SerializeObject(new { UserName = userName }), ActionType.Create,
+                result.CustId, "Member Create.", AdminAdjustmentLogMenuEnum.RegisterMember);
+        }
+        return result.IsSuccess;
+    }
+
+    public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, CustTpGameTypeSettingGetType setType, IEnumerable<int> tpGameTypes, string @operator)
+    {
+        var oldData = await _memberService.GetCustTpGameTypeSettingAsync(custId);
+        var deleteGameType = Enumerable.Empty<int>();
+        var addGameType = Enumerable.Empty<int>();
+        switch (setType)
+        {
+            case CustTpGameTypeSettingGetType.IsPlay: //DB只記錄不可玩
+                oldData = oldData.Where(x => x.NoPlay == false); //ex.舊1,2,3可以玩，新2,3,4可以玩 => 1變成不可玩，4變成可玩
+                deleteGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //刪除 4
+                addGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //加入 1
+                break;
+            case CustTpGameTypeSettingGetType.NoPlay: //DB只記錄不可玩
+                oldData = oldData.Where(x => x.NoPlay == true); //ex.舊1,2,3不可玩，新2,3,4不可玩 => 1變成可玩，4變成不可玩
+                deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //刪除 1
+                addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //加入 4
+                break;
+            case CustTpGameTypeSettingGetType.IsShow: //DB只記錄不顯示
+                oldData = oldData.Where(x => x.NoShow == false); //ex.舊1,2,3可顯示，新2,3,4可顯示 => 1變成不顯示，4變成顯示
+                deleteGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //刪除 4
+                addGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //加入 1
+                break;
+            case CustTpGameTypeSettingGetType.NoShow: //DB只記錄不顯示
+                oldData = oldData.Where(x => x.NoShow == true); //ex.舊1,2,3不顯示，新2,3,4不顯示 => 1變成可顯示，4變成不顯示
+                deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //刪除 1
+                addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //加入 4
+                break;
+        }
+
+        var type = _custInfoBll.ConvertCustTpGameTypeSettingType(setType);
+        var result = await _memberService.SetCustTpGameTypeSettingAsync(custId, deleteGameType, addGameType, type);
+
+        if (result) //Success
+        {
+            var customer = _custInfoBll.GetCustInfoWithCache(custId);
+            await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, JsonConvert.SerializeObject(oldData.Select(x => x.GameType)),
+                JsonConvert.SerializeObject(tpGameTypes), ActionType.Update,
+                custId, $"CustTpGameTypeSetting-{setType} Set.", AdminAdjustmentLogMenuEnum.SetCustTpGameTypeSetting);
+        }
+        return result;
+    }
+    public async Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status, string @operator)
+    {
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeStatus = (EnableTurnoverRewardPointEnum)customer.EnableRebate;
+        var result = await _memberService.SwitchEnableTurnoverRewardPointAsync(custId, status);
+        if (result <= 0) return 0;
+
+        var afterStatus = (EnableTurnoverRewardPointEnum)status;
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new { customer.UserName, EnableRebate = beforeStatus.ToString() }),
+            JsonConvert.SerializeObject(new { customer.UserName, EnableRebate = afterStatus.ToString() }), ActionType.Update,
+            custId, $"Enable Turnover Reward Point \"{afterStatus.ToString()}\"");
+        return result;
+    }
+
 }

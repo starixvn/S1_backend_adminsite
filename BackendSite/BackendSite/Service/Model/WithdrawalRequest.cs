@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 
 namespace BackendSite.Service.Model
 {
@@ -119,7 +120,7 @@ namespace BackendSite.Service.Model
         public string ProcessWayName => ProcessWay.ToString();
 
         public string OnUser { get; set; }
-
+        public IEnumerable<WithdrawalMessage> WithdrawalMessageList { set; get; }
     }
     public class WithdrawalInfo
     {
@@ -382,6 +383,7 @@ namespace BackendSite.Service.Model
         public string VerifiedBy { get; set; }
         public string ProcessedBy { get; set; }
         public string ApprovedBy { get; set; }
+        public IEnumerable<WithdrawalMessage> WithdrawalMessageList { set; get; }
     }
 
     public class WithdrawalTimeExportData
@@ -403,6 +405,7 @@ namespace BackendSite.Service.Model
         public string ToApprovedTime { get; set; }
         public string ApprovedBy { get; set; }
         public string CompleteTime { get; set; }
+        public string WithdrawalMessage { set; get; }
     }
     public class USDTWithdrawalLimit
     {
@@ -487,6 +490,7 @@ namespace BackendSite.Service.Model
         public string Operator { set; get; }
         public DateTimeOffset? UpdateTime { set; get; }
         public DateTimeOffset? FlowEndTime { set; get; }
+        public string WithdrawalMessage { set; get; }
     }
     public class WithdrawalAccountingModel
     {
@@ -496,7 +500,6 @@ namespace BackendSite.Service.Model
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
     }
-    
     public class WithdrawalManualRequest
     {
         public string TransId { set; get; }
@@ -508,5 +511,18 @@ namespace BackendSite.Service.Model
         public int ErrorCode { get; set; }
 
         public string Message { get; set; }
+    }
+    
+    public class WithdrawalMessage
+    {
+        private DateTimeOffset _createTime { set; get; }
+        public WithdrawalMessageStatus Status { get; set; }
+        public string Message => Status.GetDescription();
+        public int WithdrawalId { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
 }
