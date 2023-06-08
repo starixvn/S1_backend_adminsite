@@ -642,6 +642,7 @@ namespace BackendSite.Service.BLL.Mpa
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpCategoryName == key).ToList();
                 var progressiveWin = dateSummary.Sum(x => x.ProgressiveWin);
                 var progressiveBet = dateSummary.Sum(x => x.ProgressiveBet);
+                var progressiveDiff = progressiveWin - progressiveBet;
 
                 var result = new MpaWinLossByTpCategoryDto
                 {
@@ -649,7 +650,7 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = "All",
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR) + (progressiveWin - progressiveBet),
+                    GGR = dateSummary.Sum(x => x.GGR) + progressiveDiff,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = progressiveWin,
                     ProgressiveBet = progressiveBet,
