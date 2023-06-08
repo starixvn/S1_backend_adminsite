@@ -1901,7 +1901,7 @@ namespace BackendSite.Service.Model.enums
         Crypto = 3
     }
 
-    public enum UpgradeSettingEnum 
+    public enum UpgradeSettingEnum
     {
         [Description("Tier Upgrade Bonus")]
         UpDeposit = 0,
