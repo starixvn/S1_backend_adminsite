@@ -634,6 +634,7 @@ namespace BackendSite.Service.BLL.Mpa
             exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
                 ? data.OriginTpBetRecordResult
                 : data.AlreadyMultiplyRateTpBetRecordResult);
+            exportData.ForEach(x => x.GGR = x.GGR + (x.ProgressiveWin - x.ProgressiveBet));
 
             var keys = data.OriginTpBetRecordResult.Select(x => x.TpCategoryName).Distinct();
 
@@ -650,7 +651,7 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = "All",
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR) + progressiveDiff,
+                    GGR = dateSummary.Sum(x => x.GGR) - progressiveDiff,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = progressiveWin,
                     ProgressiveBet = progressiveBet,
@@ -871,7 +872,7 @@ namespace BackendSite.Service.BLL.Mpa
                 : winLossByPlayer.AlreadyMultiplyRateData);
 
             var userNames = winLossByPlayer.OriginData.Select(x => x.UserName).Distinct();
-            
+
             foreach (var userName in userNames)
             {
                 var dateSummary = winLossByPlayer.AlreadyMultiplyRateData.Where(x => x.UserName == userName).ToList();
@@ -960,7 +961,7 @@ namespace BackendSite.Service.BLL.Mpa
             var key = request.GetWinLossByPlayerRedisKey();
             var masterKey = $"MpaWinLossByPlayer:{key}";
             var cacheTime = TimeSpan.FromMinutes(15);
-            var apiData = new List<MpaWinLossByPlayerResponse>(); 
+            var apiData = new List<MpaWinLossByPlayerResponse>();
             apiData.Clear();
             var rowCount = 0;
             var excludeUserName = new List<string>();
