@@ -63,6 +63,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             public string LoginPassword { get; set; }
             public string TransferPin { get; set; }
             public string LoginPin { get; set; }
+            public string CorporateId { get; set; }
         }
         
         public class UpdateBankInfoByPayIdRequest
@@ -148,6 +149,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                     d.LoginPassword = _cryptor.Decrypt(d.LoginPassword);
                     d.TransferPin = _cryptor.Decrypt(d.TransferPin);
                     d.LoginPin = _cryptor.Decrypt(d.LoginPin);
+                    d.CorporateId = _cryptor.Decrypt(d.CorporateId);
                 }
             }
 
@@ -183,6 +185,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                 LoginPassword = _cryptor.Encrypt(request.LoginPassword),
                 LoginPin = _cryptor.Encrypt(request.LoginPin),
                 TransferPin = _cryptor.Encrypt(request.TransferPin),
+                CorporateId = _cryptor.Encrypt(request.CorporateId),
                 Operator = authData.UserName
             });
             
