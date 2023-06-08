@@ -453,7 +453,7 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
                 UniquePlayers = data.UniquePlayers,
                 Margin = (exportData.Sum(x => x.GGR) != 0 && exportData.Sum(x => x.TurnOver) != 0)
-                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.TurnOver)
+                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m
             });
 
@@ -525,7 +525,7 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
                 UniquePlayers = data.UniquePlayers,
                 Margin = (responseResult.Sum(x => x.Value.GGR) != 0 && responseResult.Sum(x => x.Value.TurnOver) != 0)
-                        ? responseResult.Sum(x => x.Value.GGR) / responseResult.Sum(x => x.Value.TurnOver)
+                        ? responseResult.Sum(x => x.Value.GGR) / responseResult.Sum(x => x.Value.ValidTurnOver)
                         : 0.00m
             });
 
@@ -686,7 +686,7 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
                 UniquePlayers = data.UniquePlayers,
                 Margin = (exportData.Sum(x => x.GGR) != 0 && exportData.Sum(x => x.TurnOver) != 0)
-                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.TurnOver)
+                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m
             });
 
@@ -758,7 +758,7 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
                 UniquePlayers = data.UniquePlayers,
                 Margin = (exportData.Sum(x => x.Value.GGR) != 0 && exportData.Sum(x => x.Value.TurnOver) != 0)
-                        ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.TurnOver)
+                        ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
                         : 0.00m
             });
 
