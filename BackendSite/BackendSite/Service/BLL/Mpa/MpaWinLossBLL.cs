@@ -748,14 +748,17 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             // total
+            var progressiveWin = exportData.Sum(x => x.Value.ProgressiveWin);
+            var progressiveBet = exportData.Sum(x => x.Value.ProgressiveBet);
+            var progressiveDiff = progressiveWin - progressiveBet;
             exportData.Add("total", new MpaWinLossByTpCategoryResponse()
             {
                 TurnOver = exportData.Sum(x => x.Value.TurnOver),
                 ValidTurnOver = exportData.Sum(x => x.Value.ValidTurnOver),
-                GGR = exportData.Sum(x => x.Value.GGR),
+                GGR = exportData.Sum(x => x.Value.GGR) + progressiveDiff,
                 PlayerWinLoss = exportData.Sum(x => x.Value.PlayerWinLoss),
-                ProgressiveWin = exportData.Sum(x => x.Value.ProgressiveWin),
-                ProgressiveBet = exportData.Sum(x => x.Value.ProgressiveBet),
+                ProgressiveWin = progressiveWin,
+                ProgressiveBet = progressiveBet,
                 Commission = exportData.Sum(x => x.Value.Commission),
                 BetCount = exportData.Sum(x => x.Value.BetCount),
                 AvgBetAmount = (exportData.Sum(x => x.Value.BetCount) != 0 && exportData.Sum(x => x.Value.TurnOver) != 0)
