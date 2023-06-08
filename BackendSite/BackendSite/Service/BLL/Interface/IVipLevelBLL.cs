@@ -14,5 +14,6 @@ namespace BackendSite.Service.BLL.Interface
         Task<int> VipAutomationExclusion(int custId, bool enable, string updator);
         Task<IEnumerable<VipUpgradeSetting>> GetUpgradeSetting(int siteId, int CurrencyId);
         Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input);
+        Task<IEnumerable<int>> GetVipUpgradeSupportCurrency(int siteId);
     }
 }

@@ -212,5 +212,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
             };
         }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<int>>> GetVipUpgradeSupportCurrency(GetUpgradeSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<int>>
+            {
+                Data = await _vipLevelBll.GetVipUpgradeSupportCurrency(request.SiteId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
     }
 }
