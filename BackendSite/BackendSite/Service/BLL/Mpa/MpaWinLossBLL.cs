@@ -652,8 +652,8 @@ namespace BackendSite.Service.BLL.Mpa
             _logger.LogInformation($"log GetTpBetRecordGroupByTpCategoryResult data begin：{JsonConvert.SerializeObject(data.AlreadyMultiplyRateTpBetRecordResult)}");
 
             //處理 GGR 邏輯
-            foreach (var item in data.OriginTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
-            foreach (var item in data.AlreadyMultiplyRateTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
+            //foreach (var item in data.OriginTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
+            //foreach (var item in data.AlreadyMultiplyRateTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
 
             _logger.LogInformation($"log GetTpBetRecordGroupByTpCategoryResult data after：{JsonConvert.SerializeObject(data.AlreadyMultiplyRateTpBetRecordResult)}");
 
@@ -736,10 +736,6 @@ namespace BackendSite.Service.BLL.Mpa
             //// 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
 
-            //處理 GGR 邏輯
-            foreach (var item in data.OriginTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet); }
-            foreach (var item in data.AlreadyMultiplyRateTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet); }
-
             var tpBetRecordResult = data.OriginTpBetRecordResult;
 
             var combineResult = request.OrderBy
@@ -768,7 +764,7 @@ namespace BackendSite.Service.BLL.Mpa
                         ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
-                    Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
+                    Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0  
                         ? ggr / dateSummary.Sum(x => x.ValidTurnOver)
                         : 0.00m,
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
@@ -862,14 +858,14 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = currencyNameMapper[r.Key.CurrencyId],
                     TurnOver = r.Sum(x => x.StakeSummary),
                     ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    GGR = r.Sum(x => x.WinLossSummary) * -1,
+                    GGR = (r.Sum(x => x.WinLossSummary) * -1) + (r.Sum(x => x.ProgressiveWinSummary) - r.Sum(x => x.ProgressiveBetSummary)),
                     PlayerWinLoss = r.Sum(x => x.WinLossSummary),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
                     Commission = r.Sum(x => x.RevenueSummary),
                     BetCount = r.Sum(x => x.RowCount),
                     AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) / r.Sum(x => x.ValidBetSummary) : 0.00m,
+                    Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) + (r.Sum(x => x.ProgressiveWinSummary) - r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary) : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
             }
