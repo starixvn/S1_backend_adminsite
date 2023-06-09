@@ -1360,6 +1360,10 @@ namespace BackendSite.Service.BLL.Mpa
             var transaction = transactionTask.Result;
             var bonus = bonusTask.Result;
 
+            //處理 GGR 邏輯
+            foreach (var item in betRecord.OriginBetRecord) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet); }
+            foreach (var item in betRecord.AlreadyMultiplyRateBetRecord) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet); }
+
             var originBetRecord = betRecord.OriginBetRecord;
             var alreadyMultiplyRateBetRecord = betRecord.AlreadyMultiplyRateBetRecord;
 

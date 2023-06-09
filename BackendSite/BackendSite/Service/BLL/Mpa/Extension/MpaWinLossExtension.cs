@@ -99,7 +99,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 item.ProgressiveBet = Math.Round(item.ProgressiveBet, 2);
                 item.Commission = Math.Round(item.Commission, 2);
                 item.AvgBetAmount = Math.Round(item.AvgBetAmount, 2);
-                item.MarginStr = Math.Round((item.Margin * 100), 2).ToString() + "%";
+                item.MarginStr = decimal.Round((item.Margin * 100), 2).ToString() + "%";
                 item.TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2);
                 item.TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2);
                 item.TotalBonus = Math.Round(item.TotalBonus, 2);
@@ -120,7 +120,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 item.ProgressiveBet = Math.Round(item.ProgressiveBet, 2);
                 item.Commission = Math.Round(item.Commission, 2);
                 item.AvgBetAmount = Math.Round(item.AvgBetAmount, 2);
-                item.MarginStr = Math.Round((item.Margin * 100), 2).ToString() + "%";
+                item.MarginStr = decimal.Round((item.Margin * 100), 2).ToString() + "%";
             }
 
             return data;
@@ -138,7 +138,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 item.ProgressiveBet = Math.Round(item.ProgressiveBet, 2);
                 item.Commission = Math.Round(item.Commission, 2);
                 item.AvgBetAmount = Math.Round(item.AvgBetAmount, 2);
-                item.MarginStr = Math.Round((item.Margin * 100), 2).ToString() + "%";
+                item.MarginStr = decimal.Round((item.Margin * 100), 2).ToString() + "%";
             }
 
             return data;
@@ -156,7 +156,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 item.ProgressiveBet = Math.Round(item.ProgressiveBet, 2);
                 item.Commission = Math.Round(item.Commission, 2);
                 item.AvgBetAmount = Math.Round(item.AvgBetAmount, 2);
-                item.MarginStr = Math.Round((item.Margin * 100), 2).ToString() + "%";
+                item.MarginStr = decimal.Round((item.Margin * 100), 2).ToString() + "%";
                 item.ClosingBalance = Math.Round(item.ClosingBalance, 2);
                 item.TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2);
                 item.TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2);
@@ -178,7 +178,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 item.ProgressiveBet = Math.Round(item.ProgressiveBet, 2);
                 item.Commission = Math.Round(item.Commission, 2);
                 item.AvgBetAmount = Math.Round(item.AvgBetAmount, 2);
-                item.MarginStr = Math.Round((item.Margin * 100), 2).ToString() + "%";
+                item.MarginStr = decimal.Round((item.Margin * 100), 2).ToString() + "%";
                 item.TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2);
                 item.TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2);
                 item.TotalBonus = Math.Round(item.TotalBonus, 2);
