@@ -692,7 +692,7 @@ namespace BackendSite.Service.BLL.Mpa
                 exportData.Add(result);
             }
 
-            _logger.LogInformation($"log GetMapWinLossByTpCategoryExport exportData result：{JsonConvert.SerializeObject(exportData)}");
+            _logger.LogInformation($"log GetMapWinLossByTpCategoryExport exportData：{JsonConvert.SerializeObject(exportData)}");
 
 
             exportData = request.OrderBy
@@ -749,12 +749,13 @@ namespace BackendSite.Service.BLL.Mpa
                 var progressiveWin = dateSummary.Sum(x => x.ProgressiveWin);
                 var progressiveBet = dateSummary.Sum(x => x.ProgressiveBet);
                 var progressiveDiff = progressiveWin - progressiveBet;
+                var ggr = dateSummary.Sum(x => x.GGR) + progressiveDiff;
 
                 var result = new MpaWinLossByTpCategoryResponse
                 {
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR) + progressiveDiff,
+                    GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = progressiveWin,
                     ProgressiveBet = progressiveBet,
@@ -766,7 +767,7 @@ namespace BackendSite.Service.BLL.Mpa
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
-                        ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
+                        ? ggr / dateSummary.Sum(x => x.ValidTurnOver)
                         : 0.00m,
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
                     ? GetOriginalCurrencyDetailByTpCategory(combineResult, key)
