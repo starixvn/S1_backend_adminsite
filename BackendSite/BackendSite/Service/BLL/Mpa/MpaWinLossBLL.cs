@@ -649,13 +649,7 @@ namespace BackendSite.Service.BLL.Mpa
             // 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
 
-            _logger.LogInformation($"log GetTpBetRecordGroupByTpCategoryResult data begin：{JsonConvert.SerializeObject(data.AlreadyMultiplyRateTpBetRecordResult)}");
-
-            //處理 GGR 邏輯
-            //foreach (var item in data.OriginTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
-            //foreach (var item in data.AlreadyMultiplyRateTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
-
-            _logger.LogInformation($"log GetTpBetRecordGroupByTpCategoryResult data after：{JsonConvert.SerializeObject(data.AlreadyMultiplyRateTpBetRecordResult)}");
+            _logger.LogInformation($"log GetMapWinLossByTpCategoryExport data：{JsonConvert.SerializeObject(data.AlreadyMultiplyRateTpBetRecordResult)}");
 
             var exportData = new List<MpaWinLossByTpCategoryDto>();
             exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
@@ -735,6 +729,8 @@ namespace BackendSite.Service.BLL.Mpa
 
             //// 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
+
+            _logger.LogInformation($"log GetMapWinLossByTpCategoryResult data：{JsonConvert.SerializeObject(data.AlreadyMultiplyRateTpBetRecordResult)}");
 
             var tpBetRecordResult = data.OriginTpBetRecordResult;
 
@@ -865,7 +861,9 @@ namespace BackendSite.Service.BLL.Mpa
                     Commission = r.Sum(x => x.RevenueSummary),
                     BetCount = r.Sum(x => x.RowCount),
                     AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) + (r.Sum(x => x.ProgressiveWinSummary) - r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary) : 0.00m,
+                    Margin = r.Sum(x => x.ValidBetSummary) != 0 
+                        ? (r.Sum(x => x.WinLossSummary) * -1) + (r.Sum(x => x.ProgressiveWinSummary) - r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary) 
+                        : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
             }
