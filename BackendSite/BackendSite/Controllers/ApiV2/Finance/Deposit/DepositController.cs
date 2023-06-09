@@ -229,6 +229,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.EndAmount,
                 request.SelectPayId,
                 request.PageNumber, out var totalPages, out var rowCount , ref currencyAmountRecord);
+
+            if (depositList.Any())
+            {
+                var msgs = _depositBll.GetDepositMessageByDepositIds(depositList.Select(x => x.DepositId));
+                var offset = request.StartDate.Offset;
+                foreach (var deposit in depositList)
+                {
+                    deposit.DepositMessageList = msgs
+                        .Where(x => x.DepositId == deposit.DepositId)
+                        .OrderByDescending(x => x.CreateTime);
+                }
+            }
             
             apiListResult.Data = depositList;
             apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -279,6 +291,23 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.EndAmount,
                 request.SelectPayId.Any() ? JsonConvert.SerializeObject(request.SelectPayId) : null
                 );
+            
+            if (exportDeposit.Any())
+            {
+                var msgs = _depositBll.GetDepositMessageByDepositIds(exportDeposit.Select(x => x.DepositId));
+
+                if (msgs.Any())
+                {
+                    var offset = request.StartDate.Offset;
+                    foreach (var deposit in exportDeposit)
+                    {
+                        deposit.SendMessages = string.Join(", ", msgs
+                                .Where(x => x.DepositId == deposit.DepositId)
+                                .OrderBy(x => x.CreateTime)
+                                .Select(x => x.Message));
+                    }
+                }
+            }
             
             var stream = _excelBll.ExportV2(exportDeposit);
             return _excelBll.ExcelFile(stream, "DepositRequestList");

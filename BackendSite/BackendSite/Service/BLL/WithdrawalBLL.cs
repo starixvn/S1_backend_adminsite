@@ -1038,6 +1038,12 @@ namespace BackendSite.Service.BLL
             return await _withdrawalService.SetWithdrawalProcessWay(withdrawalId, processWay);
         }
 
+        
+        public IEnumerable<WithdrawalMessage> GetWithdrawalMessageByWithdrawalIds(IEnumerable<int> withdrawalIds)
+        {
+            return _withdrawalService.GetWithdrawalMessage(withdrawalIds);
+        }
+        
         #endregion
 
         #region Private Methods
