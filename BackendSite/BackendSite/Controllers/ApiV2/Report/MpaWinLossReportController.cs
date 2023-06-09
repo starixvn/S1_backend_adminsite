@@ -150,7 +150,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByTpCategoryTypeExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMapWinLossByTpCategoryExport(request, MpaWinLossGroupByTypeEnum.TpCategory);
-            var stream = _excelBll.ExportV2(exportData);
+            var stream = _excelBll.ExportV2(exportData, 1);
             return _excelBll.ExcelFile(stream, "WinLossByTpCategoryExport");
         }
 

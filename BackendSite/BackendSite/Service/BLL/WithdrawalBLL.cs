@@ -1030,6 +1030,14 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+
+        public async Task<bool> SetWithdrawalProcessWay(string transId, WithdrawalInfoProcessWayEnum processWay)
+        {
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
+            return await _withdrawalService.SetWithdrawalProcessWay(withdrawalId, processWay);
+        }
+
         
         public IEnumerable<WithdrawalMessage> GetWithdrawalMessageByWithdrawalIds(IEnumerable<int> withdrawalIds)
         {
