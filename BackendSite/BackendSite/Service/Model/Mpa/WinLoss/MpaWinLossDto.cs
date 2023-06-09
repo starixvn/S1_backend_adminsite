@@ -501,7 +501,10 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
         public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
 
         public int DepositCount { get; set; }
 
@@ -566,7 +569,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
+
         public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
     }
 
     public class TpBetRecordByTpGameTypeWrapper
@@ -653,7 +660,10 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
         public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
 
         public int DepositCount { get; set; }
 
@@ -724,7 +734,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
+
         public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
 
         public int DepositCount { get; set; }
 
