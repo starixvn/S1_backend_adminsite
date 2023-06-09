@@ -854,7 +854,7 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = currencyNameMapper[r.Key.CurrencyId],
                     TurnOver = r.Sum(x => x.StakeSummary),
                     ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    GGR = (r.Sum(x => x.WinLossSummary) * -1) + (r.Sum(x => x.ProgressiveWinSummary) - r.Sum(x => x.ProgressiveBetSummary)),
+                    GGR = GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
                     PlayerWinLoss = r.Sum(x => x.WinLossSummary),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
@@ -862,7 +862,7 @@ namespace BackendSite.Service.BLL.Mpa
                     BetCount = r.Sum(x => x.RowCount),
                     AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
                     Margin = r.Sum(x => x.ValidBetSummary) != 0 
-                        ? (r.Sum(x => x.WinLossSummary) * -1) + (r.Sum(x => x.ProgressiveWinSummary) - r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary) 
+                        ? GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary) 
                         : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
@@ -876,6 +876,11 @@ namespace BackendSite.Service.BLL.Mpa
             };
 
             return wrapperResult;
+        }
+
+        private decimal GetGGR(decimal winLossSummary, decimal progressiveWinSummary, decimal progressiveBetSummary)
+        {
+            return (winLossSummary * -1) + (progressiveWinSummary - progressiveBetSummary);
         }
 
         #endregion
