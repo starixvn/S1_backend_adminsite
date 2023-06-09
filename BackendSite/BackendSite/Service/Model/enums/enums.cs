@@ -677,7 +677,7 @@ namespace BackendSite.Service.Model.enums
         Other = 13,
         VipUpgrade = 14,
         ReferralFreeCredit = 15,
-        DeviceType = 16
+        DeviceBonus = 16
     }
     
     public enum BonusSummaryTransactionType
