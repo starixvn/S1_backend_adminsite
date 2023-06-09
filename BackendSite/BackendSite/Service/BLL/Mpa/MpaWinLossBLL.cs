@@ -735,6 +735,11 @@ namespace BackendSite.Service.BLL.Mpa
 
             //// 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
+
+            //處理 GGR 邏輯
+            foreach (var item in data.OriginTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet); }
+            foreach (var item in data.AlreadyMultiplyRateTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet); }
+
             var tpBetRecordResult = data.OriginTpBetRecordResult;
 
             var combineResult = request.OrderBy
@@ -746,10 +751,7 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var key in keys)
             {
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpCategoryName == key).ToList();
-                var progressiveWin = dateSummary.Sum(x => x.ProgressiveWin);
-                var progressiveBet = dateSummary.Sum(x => x.ProgressiveBet);
-                var progressiveDiff = progressiveWin - progressiveBet;
-                var ggr = dateSummary.Sum(x => x.GGR) + progressiveDiff;
+                var ggr = dateSummary.Sum(x => x.GGR);
 
                 var result = new MpaWinLossByTpCategoryResponse
                 {
@@ -757,8 +759,8 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
-                    ProgressiveWin = progressiveWin,
-                    ProgressiveBet = progressiveBet,
+                    ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
