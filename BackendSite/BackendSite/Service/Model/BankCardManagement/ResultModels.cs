@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Amazon.CloudFront.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
@@ -13,18 +9,21 @@ namespace BackendSite.Service.Model.BankCardManagement
         public int FinancialAccountId { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
+        
         public string Agent { set; get; }
         /// <summary>
         /// 目前只有 INR IFSCCode 使用
         /// </summary>
         public string AccountCode { set; get; }
+        
+        public string FrontendDisplayName { set; get; }
         public decimal MinAmount { set; get; }
         public decimal MaxAmount { set; get; }
         public decimal DailyLimitAmount { set; get; }
         [JsonIgnore]
         public string FinancialAccountPurposes { set; get; }
         private IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>($"[{FinancialAccountPurposes}]");
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(FinancialAccountPurposes);
         
         [JsonIgnore]
         public TransferChannelEnum FinancialAccountChannel { set; get; }
@@ -59,6 +58,10 @@ namespace BackendSite.Service.Model.BankCardManagement
             => JsonConvert.DeserializeObject<IEnumerable<BankCardManagementSupportChannelEnum>>(JsonSupportChannels ?? "[]");
         public IEnumerable<string> SupportChannelNames =>
             SupportChannels.Select(x => x.ToString());
+        [JsonIgnore]
+        public string JsonGroupIds { set; get; }
+        public IEnumerable<int> GroupIds =>
+            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonGroupIds ?? "[]");
         public string QrCodeUrl { set; get; }
         public DateTimeOffset LastUpdateTime
         {

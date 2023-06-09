@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using static BackendSite.Extensions.MethodExtension;
 
 namespace BackendSite.Controllers.Api
 {
@@ -29,15 +30,14 @@ namespace BackendSite.Controllers.Api
         private readonly PermissionBLL _permissionBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly Common _common;
-        private readonly PaymentBLL _paymentBll;
         private readonly ExcelBLL _excelBll;
         private readonly ImageEditorBLL _imageEditorBll;
         private readonly BonusInfoBLL _bonusInfoBll;
         private readonly SelLangBLL _selLangBll;
         private readonly MessageBLL _messageBll;
         private readonly AuthorizeBLL _authorizeBll;
-        private readonly BonusInfoService _bonusInfoService;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly ILogger<CustManageController> _logger;
 
         #endregion
 
@@ -50,15 +50,14 @@ namespace BackendSite.Controllers.Api
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _common = provider.GetRequiredService<Common>();
-            _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _bonusInfoBll = provider.GetRequiredService<BonusInfoBLL>();
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _logger = provider.GetRequiredService<ILogger<CustManageController>>();
         }
 
         #endregion
@@ -377,8 +376,8 @@ namespace BackendSite.Controllers.Api
                     exportDatas.Add(exprotdata);
                 });
                 await Task.WhenAll(tasks);
-                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
-                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                //如果該名user的PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 var stream = _excelBll.ExportV2(exportDatas);
                 return _excelBll.ExcelFile(stream, "CustInfoList");
             }
@@ -437,31 +436,36 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiResult<CustInfoDetail> GetCustInfoDetail(CustInfoReq custInfoReq)
         {
-
-            var custInfoDetail = _custInfoBll.GetCustInfoDetail(custInfoReq.CustId, custInfoReq.UserName);
-            if (custInfoDetail != null)
+            var result = new ApiResult<CustInfoDetail>
             {
-                if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
+                Data = new CustInfoDetail(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+            
+            try
+            {
+                var custInfoDetail = _custInfoBll.GetCustInfoDetail(custInfoReq.CustId, custInfoReq.UserName);
+                if (custInfoDetail != null)
                 {
-                    custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
-                    custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
-                    if (custInfoDetail.CustLineProfile != null)
+                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_readDetail"))
                     {
-                        custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                        custInfoDetail.Email = MaskEmail(custInfoDetail.Email);
+                        custInfoDetail.PhoneNo = MaskPhone(custInfoDetail.PhoneNo);
+                        if (custInfoDetail.CustLineProfile != null)
+                        {
+                            custInfoDetail.CustLineProfile.userId = MaskLineId(custInfoDetail.CustLineProfile.userId);
+                        }
                     }
+
+                    result.Data = custInfoDetail;
                 }
-
-                return new ApiResult<CustInfoDetail>
-                {
-                    Data = custInfoDetail,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-
             }
-            else
+            catch (Exception e)
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
+                _logger.LogError(e, GetCurrentMethod());
             }
+
+            return result;
         }
 
         /// <summary>
@@ -962,24 +966,21 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo [ResetCustBankInfo]
 
         [HttpPost]
-        public ApiResult ResetCustBankInfo(CustIdRequest request)
+        public async Task<ApiResult> ResetCustBankInfo(CustIdRequest request)
         {
             var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            var AccountInfoList = await _custInfoBll.GetCustBankDetailAsync(request.CustId);
             string before = null;
-            if (!string.IsNullOrWhiteSpace(custProfile.BankInfo))
+            if (!_custInfoBll.ResetCustBankInfo(request.CustId))
             {
-                if (!_custInfoBll.ResetCustBankInfo(request.CustId))
-                {
-                    throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
-                }
-
-                before = new
-                {
-                    AccountName = custProfile.AccountName,
-                    BankInfo = JsonConvert.DeserializeObject<IEnumerable<BankInfoDetail>>(custProfile.BankInfo),
-                    USDTInfo = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo)
-                }.ToLog();
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
             }
+
+            before = new
+            {
+                AccountName = custProfile.AccountName,
+                AccountInfoList
+            }.ToLog();
 
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
@@ -1004,21 +1005,17 @@ namespace BackendSite.Controllers.Api
         #region CSD > Customer Administration > CustInfo [ResetCustUSDTInfo]
 
         [HttpPost]
-        public ApiResult ResetCustUSDTInfo(CustIdRequest request)
+        public async Task<ApiResult> ResetCustUSDTInfo(CustIdRequest request)
         {
-            var custProfile = _custInfoBll.GetCustProfile(request.CustId);
+            var cryptoAccountInfoList = await _custInfoBll.GetCustCryptoInfoListAsync(request.CustId);
             string before = null;
-            if (!string.IsNullOrWhiteSpace(custProfile.USDTInfo))
+
+            if (!_custInfoBll.ResetCustUSDTInfo(request.CustId))
             {
-                if (!_custInfoBll.ResetCustUSDTInfo(request.CustId))
-                {
-                    throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
-                }
-
-                var usdtDetailList = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo);
-                before = usdtDetailList.ToLog();
-
+                throw new AdminException(ErrorCodeEnum.Fail, "Reset Fail.");
             }
+
+            before = cryptoAccountInfoList.ToLog();
 
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
@@ -1831,7 +1828,7 @@ namespace BackendSite.Controllers.Api
                 var msg = new StringBuilder();
                 msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
                 var authData = _authorizeBll.GetAuthData();
-                _messageBll.SendMessageToPlayer("Bonus Service", title, msg.ToString(), data.CustId, authData.UserId);
+                await _messageBll.SendMessageAsync(new Message( "Bonus Service", data.CustId, data.UserLang, title, msg.ToString()));
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             else

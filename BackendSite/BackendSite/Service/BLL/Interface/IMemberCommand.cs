@@ -26,4 +26,5 @@ public interface IMemberCommand
     Task<ApiResult> SetVerificationRewardAsync(int custId, OTPTypeEnum otpType, string @operator);
     Task<int> LineUnbind(int custId, string @operator);
     Task<int> DeleteOnUserAsync(int custId, string @operator);
+    Task<bool> SetCustPromotionWhiteListAsync(int custId, bool ipEnable, bool deviceEnable, bool realNameEnable, string @operator);
 }

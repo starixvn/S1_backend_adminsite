@@ -4,7 +4,6 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using System.Data;
 using BackendSite.Extensions;
-using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
@@ -43,7 +42,7 @@ namespace BackendSite.Service.DAL
 
         public bool Set(ParamsWithLog<SetLineChannel> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
@@ -69,7 +68,7 @@ namespace BackendSite.Service.DAL
             
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -77,18 +76,18 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
 
         public bool Delete(ParamsWithLog<DeleteLineChannel> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
@@ -110,7 +109,7 @@ namespace BackendSite.Service.DAL
             
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
@@ -118,11 +117,11 @@ namespace BackendSite.Service.DAL
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }

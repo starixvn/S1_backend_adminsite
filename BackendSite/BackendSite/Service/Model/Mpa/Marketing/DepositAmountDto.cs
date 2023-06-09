@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace BackendSite.Service.Model.Mpa.Marketing
+﻿namespace BackendSite.Service.Model.Mpa.Marketing
 {
     public interface IMpaMarketingDepositAmountBaseDto
     {

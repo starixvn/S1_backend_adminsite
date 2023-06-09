@@ -1,17 +1,14 @@
 ﻿using BackendSite.Service.Model;
-using MySql.Data.MySqlClient;
 using Dapper;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
 
 namespace BackendSite.Service.DAL
 {
     public class BonusInfoService
     {
-        private readonly IConfiguration _configuration;
         private readonly WalletService _walletService;
         private readonly WithdrawalLimitService _withdrawalLimitService;
         private readonly CustInfoService _custInfoService;
@@ -20,7 +17,6 @@ namespace BackendSite.Service.DAL
 
         public BonusInfoService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _walletService = provider.GetRequiredService<WalletService>();
@@ -135,11 +131,11 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<decimal>("Service_BonusWinLoss_Get", props);
         }
 
-        public async Task<(int Result, int CustId)> CancelBonusByBonusId(bool isReturnAmount, int bonusId, string statusList, string @operator)
+        public async Task<(int Result, int CustId)> CancelBonusByBonusId(int bonusId, string statusList, string @operator)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            conn.Open();
-            using var trans = conn.BeginTransaction();
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
             var p = new DynamicParameters(new { _BonusId = bonusId, _StatusList = statusList });
             p.Add("_SiteId", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -147,7 +143,7 @@ namespace BackendSite.Service.DAL
             p.Add("_LockedAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_BonusAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_Bonus", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = _mainDbClient.Execute("Common_CancelBonusByBonusId_SetV3", p, conn, trans);
+            var result = _mainDbClient.Execute("Common_CancelBonusByBonusId_SetV3", trans, p);
 
             var siteId = p.Get<int?>("_SiteId") ?? 0;
             var custId = p.Get<int?>("_CustId") ?? 0;
@@ -156,51 +152,54 @@ namespace BackendSite.Service.DAL
             var bonusAmount = p.Get<decimal?>("_BonusAmount") ?? 0;
             var bonus = p.Get<decimal?>("_Bonus") ?? 0;
 
-            if (isReturnAmount)
+            decimal backAmount = 0;
+            if (bonus >= lockedAmount + bonusAmount)
             {
-                decimal backAmount = 0;
-                if (bonus >= lockedAmount + bonusAmount)
-                {
-                    backAmount = lockedAmount;
-                }
-                else
-                {
-                    backAmount = bonus - bonusAmount;
-                }
+                backAmount = lockedAmount;
+            }
+            else
+            {
+                backAmount = bonus - bonusAmount;
+            }
 
-                //避免輸光 負負得正
-                if (backAmount < 0)
-                {
-                    backAmount = 0;
-                }
+            //避免輸光 負負得正
+            if (backAmount < 0)
+            {
+                backAmount = 0;
+            }
 
-                if (backAmount > 0)
-                {
-                    result = _walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, conn, trans);
+            if (backAmount > 0)
+            {
+                result = _walletService.SetBalance(custId, siteId, userName, backAmount, 7, $"Cancel Bonus({bonus.ToString("#,##0.##")}), Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterAmount, out var is1stDepoist, trans);
 
-                    if (result > 0)
-                        result = _withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), out var afterWithdrawalLimit, conn, trans);
-                }
+                if (result > 0)
+                    result = _withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, backAmount, (int)WithdrawalLimitAdjustmentReasonEnum.None, $"Cancel Bonus, Return Amount: {backAmount.ToString("#,##0.##")}", bonusId.ToString(), (int)WithdrawalLimitLogCreateFromEnum.Bonus, @operator, out var afterWithdrawalLimit, trans);
+            }
 
-                //回收bonus紀錄
-                var cancelBonusAmount = bonus - backAmount;
-                if (cancelBonusAmount > 0 && result > 0)
-                {
-                    var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
-                    result = _mainDbClient.Execute("Service_CancelBonusAmount_Set", cp, conn, trans);
-                }
+            //回收bonus紀錄
+            var cancelBonusAmount = bonus - backAmount;
+            if (cancelBonusAmount > 0 && result > 0)
+            {
+                var cp = new DynamicParameters(new { _BonusId = bonusId, _CancelBonus = cancelBonusAmount });
+                result = _mainDbClient.Execute("Service_CancelBonusAmount_Set", trans, cp);
             }
 
             var custSimpleInfo = await _custInfoService.GetCustId(custId, null, null);
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custId, custSimpleInfo.CurrencyId, new { BonusId = bonusId, Status = "Running" },
-               new { BonusId = bonusId, Status = "Cancel" }, AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, ActionType.Update, @operator, conn, trans))
+               new { BonusId = bonusId, Status = "Cancel" }, AdminAdjustmentLogMenuEnum.CancelBonusInCustInfo, ActionType.Update, @operator, trans))
             {
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return (0, custId);
             }
 
             if (result > 0)
-                trans.Commit();
+            {
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+            }
+            else
+            {
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
+            }
 
             return (result, custId);
         }

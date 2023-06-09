@@ -101,6 +101,31 @@ namespace BackendSite.Service.Model
         public IEnumerable<PromotionDisplayConditionModel> PromotionDisplayCondition { get; set; }
         public IEnumerable<string> CurrencyList => string.IsNullOrEmpty(Currencys) ? new List<string>() : JsonConvert.DeserializeObject<IEnumerable<string>>(Currencys);
         public string Currencys { get; set; }
+
+        [Description("啟用相同DeviceID領取限制: 0.不限制 1.限制")]
+        public bool SameDeviceIDRestrict { get; set; }
+
+        [Description("相同DeviceID領取限制的可用次數")]
+        public int SameDeviceIDAvailableCount { get; set; }
+
+        [Description("啟用相同IP領取限制: 0.不限制 1.限制")]
+        public bool SameIPRestrict { get; set; }
+
+        [Description("相同IP領取限制的可用次數")]
+        public int SameIPRestrictAvailableCount { get; set; }
+
+        [Description("啟用相同實名領取限制: 0.不限制 1.限制")]
+        public bool SameRealNameRestrict { get; set; }
+
+        [Description("相同實名領取限制的可用次數")]
+        public int SameRealNameRestrictAvailableCount { get; set; }
+
+        [Description("用戶Tag封鎖清單")]
+        public IEnumerable<int> BlockTagList => string.IsNullOrEmpty(BlockTagListJson) ? new List<int>() : JsonConvert.DeserializeObject<IEnumerable<int>>(BlockTagListJson);
+        public string BlockTagListJson { get; set; }
+
+        [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
+        public bool HideForUnlogin { get; set; }
     }
 
     public class PromotionInfoReq 
@@ -190,6 +215,30 @@ namespace BackendSite.Service.Model
         public int AutoExtend { get; set; }
         public string LastUpdateUser { get; set; }
         public IEnumerable<PromotionSpecific> Specific { get; set; }
+
+        [Description("啟用相同DeviceID領取限制: 0.不限制 1.限制")]
+        public bool SameDeviceIDRestrict { get; set; }
+
+        [Description("相同DeviceID領取限制的可用次數")]
+        public int SameDeviceIDAvailableCount { get; set; }
+
+        [Description("啟用相同IP領取限制: 0.不限制 1.限制")]
+        public bool SameIPRestrict { get; set; }
+
+        [Description("相同IP領取限制的可用次數")]
+        public int SameIPRestrictAvailableCount { get; set; }
+
+        [Description("啟用相同實名領取限制: 0.不限制 1.限制")]
+        public bool SameRealNameRestrict { get; set; }
+
+        [Description("相同實名領取限制的可用次數")]
+        public int SameRealNameRestrictAvailableCount { get; set; }
+
+        [Description("用戶Tag封鎖清單")]
+        public IEnumerable<int> BlockTagList { get; set; } = new List<int>();
+
+        [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
+        public bool HideForUnlogin { get; set; }
     }
     
     public class PromotionSpecific
@@ -355,21 +404,7 @@ namespace BackendSite.Service.Model
         public bool IsForVipLevel  { get; set; }
         public IEnumerable<int> SelectedVipLevel { get; set; }
     }
-    public class LeaderboardExtraPointList
-    {
-        public DateTimeOffset ActiveDate { get; set; }
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string Currency { get; set; }
-        public string CategoryName { get; set; }
-        public decimal ExtraPoint { get; set; }
-        public DateTimeOffset CreateTime { set; get; }
-        public DateTimeOffset UpdateTime { set; get; }
-        public string LastUpdateUser { get; set; }
-
-    }
-
+    
     public class PromotionCashBackSetting
     {
         public int CurrencyId { get; set; }

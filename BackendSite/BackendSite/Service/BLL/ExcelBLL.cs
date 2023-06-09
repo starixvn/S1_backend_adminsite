@@ -1,12 +1,9 @@
-﻿using System.Drawing;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Reflection;
 using BackendSite.Attributes;
-using Org.BouncyCastle.Utilities;
-using NPOI.SS.Formula.Functions;
-using BackendSite.Service.Model.Mpa.Marketing;
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL
 {
@@ -34,6 +31,41 @@ namespace BackendSite.Service.BLL
         public bool IsValidFile(string contentType)
         {
             return _excelContentType.Exists(a => a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public List<ExcelData> Read(IFormFile formFile) 
+        {
+            var excelList = new List<ExcelData>();
+            var excelPkg = new ExcelPackage(formFile.OpenReadStream());
+            var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+            var isLastRow = false;
+            var rowId = 2; // 因為有標題列，所以從第2列開始讀起
+
+            do // 讀取資料，直到讀到空白列為止
+            {
+                var custUsername = sheet.Cells[rowId, 1].Text.Trim();
+                var sabaId = sheet.Cells[rowId, 2].Text.Trim();
+                var tmp = sabaId.Split('_');
+                int? custId = (tmp.Length == 2 && int.TryParse(tmp[1], out var id)) ? id : null;
+
+                if (string.IsNullOrEmpty(custUsername) && custId == null)
+                {
+                    isLastRow = true;
+                }
+                else
+                {
+                    excelList.Add(new ExcelData
+                    {
+                        CustId = custId,
+                        CustUserName = string.IsNullOrEmpty(custUsername) ? null : custUsername,
+                        SabaId = sabaId,
+                        RowId = rowId,
+                    });
+                    rowId += 1;
+                }
+            } while (!isLastRow);
+
+            return excelList;
         }
 
         public byte[] ExportToMultiSheet(List<ExportDataToExcel> t)
@@ -120,7 +152,7 @@ namespace BackendSite.Service.BLL
             return ms.ToArray();
         }
 
-        public byte[] ExportV2<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        public virtual byte[] ExportV2<T>(IEnumerable<T> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var ms = new MemoryStream();
@@ -139,6 +171,70 @@ namespace BackendSite.Service.BLL
                 if (rows > 0 && cols > 0)
                 {
                     ws.Cells[1, 1].LoadFromCollection(t, true);
+
+                    using (var range = ws.Cells[1, 1, rows, cols])
+                    {
+                        // 標題列
+                        var title = ws.Cells[1, 1, 1, cols];
+                        title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                    }
+                }
+            }
+            p.Save();
+            return ms.ToArray();
+        }
+
+        public virtual byte[] ExportV2<T>(IEnumerable<T> t, int ignoreColumnCount ,IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            var ws = p.Workbook.Worksheets.Add(nameof(t));
+
+            if (t.Any())
+            {
+                if (properties == null)
+                {
+                    properties = t.FirstOrDefault().GetType().GetProperties();
+                }
+
+                var rows = t.Count() + 1;
+                var cols = properties.Count() - ignoreColumnCount;
+                if (rows > 0 && cols > 0)
+                {
+                    ws.Cells[1, 1].LoadFromCollection(t, true);
+
+                    using (var range = ws.Cells[1, 1, rows, cols])
+                    {
+                        // 標題列
+                        var title = ws.Cells[1, 1, 1, cols];
+                        title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                        title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                    }
+                }
+            }
+            p.Save();
+            return ms.ToArray();
+        }
+
+
+        public virtual byte[] ExportV2(IEnumerable<Dictionary<string, object>> data)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            var ws = p.Workbook.Worksheets.Add("data");
+
+            if (data.Any())
+            {
+                var rows = data.Count() + 1;
+                var cols = data.FirstOrDefault().Count;
+                if (rows > 0 && cols > 0)
+                {
+                    ws.Cells[1, 1].LoadFromDictionaries(data, true);
 
                     using (var range = ws.Cells[1, 1, rows, cols])
                     {

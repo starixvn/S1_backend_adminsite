@@ -285,4 +285,24 @@ namespace BackendSite.Service.Model
             return t.ToString().GetHashCode();
         }
     }
+    
+    public class LocalPaySetting
+    {
+        public int CurrencyId { get; set; }
+        
+        public int SysId { get; set; }
+        
+        public int GroupId { get; set; }
+        
+        public string GroupName { get; set; }
+        
+        public DepositTypeEnum Type { get; set; }
+    }
+    
+    public class PayGroup
+    {
+        public int GroupId { get; set; }
+        public string GroupName { get; set; }
+        public DepositTypeEnum Type { get; set; }
+    }
 }

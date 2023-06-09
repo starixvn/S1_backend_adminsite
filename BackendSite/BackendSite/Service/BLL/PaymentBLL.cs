@@ -42,7 +42,7 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId, int financialType,
-            int pageSize, int pageNumber, out IPageInfo pageInfo)
+            int pageSize, int pageNumber, out IPageInfo pageInfo, List<int> financialTypeList)
         {
             pageInfo = new PageInfo();
             var key = $"GetFinancialLog:{custId}:{startDate:yyyyMMddHHmmssfff}:{endDate:yyyyMMddHHmmssfff}";
@@ -51,9 +51,11 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
-            if (financialType != 0)
+            if (financialType != 0  || financialTypeList.Any())
             {
-                key += $":{financialType}";
+                financialTypeList.Add(financialType);
+                financialTypeList = financialTypeList.Distinct().ToList();
+                key += $":{string.Join(":", financialTypeList.Select(i => i.ToString()))}";
             }
 
             var cacheTime = TimeSpan.FromMinutes(1);
@@ -63,7 +65,7 @@ namespace BackendSite.Service.BLL
                 //Export
                 if (pageNumber == -1)
                 {
-                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber);
+                    return _cacheHelper.GetListByRange<FinancialLog>(key, 0, pageNumber, RedisDataBase.Shared);
                 }
 
                 //Redis Pagination
@@ -81,9 +83,9 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
-            if (financialType != 0)
+            if (financialTypeList.Any())
             {
-                data = data.Where(i => i.FinancialType == (FinancialType)financialType);
+                data = data.Where(i => financialTypeList.Contains((int)i.FinancialType));
             }
 
             var list = data.OrderByDescending(i => i.CreateTime).ThenByDescending(x => x.Id);
@@ -113,7 +115,7 @@ namespace BackendSite.Service.BLL
                 if (financialLog.FinancialType == FinancialType.TpTransfer)
                 {
                     var tpId = financialLog.Type - 2000;
-                    var tpName = tpId == (int)TpEnum.Saba ? "Sportsbook" : _common.GetTpName(tpId);
+                    var tpName = _common.GetTpName(tpId);
                     financialLog.Memo = financialLog.Direction == DirectionEnum.Add ? 
                         $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";            
                 }
@@ -139,10 +141,11 @@ namespace BackendSite.Service.BLL
                 out transId);
         }
 
-        public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate)
+        public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate, IEnumerable<int> gameTypes)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = dataList
+                .Where(i => gameTypes.Contains(i.GameType))
                 .Join(_tpGameTypeList,
                   tpBetRecord => tpBetRecord.GameType,
                   tpGameType => tpGameType.Type,
@@ -165,7 +168,7 @@ namespace BackendSite.Service.BLL
                 })
                 .Select(x => new TpBetRecordListOneDayRes
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     CategoryName = x.Key.CategoryName,
                     CategoryId = x.Key.CategoryId,
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet.Equals(null) ? y.TurnOver : y.ValidBet),
@@ -181,10 +184,11 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<TpBetRecordbyCategoryIdRes> GetCustTpBetRecordListbyCategoryId(int custId, DateTime selDate,
-            int categoryId, DateTime startDate, DateTime endDate)
+            int categoryId, DateTime startDate, DateTime endDate ,IEnumerable<int> gameTypes)
         {
             var betList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = betList
+                .Where(i => gameTypes.Contains(i.GameType))
                 .Join(_tpGameTypeList,
                   tpBetRecord => tpBetRecord.GameType,
                   tpGameType => tpGameType.Type,
@@ -209,7 +213,7 @@ namespace BackendSite.Service.BLL
                 })
                 .Select(x => new TpBetRecordbyCategoryIdRes
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     GameTypeName = x.Key.GameTypeName,
                     GameTypeID = x.Key.GameTypeID,
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.TurnOver),
@@ -225,7 +229,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset)
+        public IEnumerable<TpBetRecordDetailbyGameType> GetCustTpBetRecordDetailListbyGameType(int custId, int gameTypeId, DateTime startDate, DateTime endDate, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount, TimeSpan offset, bool isExport)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate)
                             .Where(i => i.GameType == gameTypeId);
@@ -251,6 +255,12 @@ namespace BackendSite.Service.BLL
                               }).ToList();
 
             IPageInfo pageInfo = new PageInfo();
+            if (isExport)
+            {
+                pageNumber = 1;
+                pageSize = result.Count;
+            }
+            
             var (index, count) = pageInfo.ListPagination(result.Count, pageNumber, pageSize);
             pageNumber = pageInfo.PageNumber;
             totalPages = pageInfo.TotalPages;
@@ -331,14 +341,15 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate, TimeSpan offset)
+        public IEnumerable<TpBetRecordByDate> GetCustTpBetRecordList(int custId, DateTime startDate, DateTime endDate, IEnumerable<int> gameTypes, TimeSpan offset)
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = dataList
+                .Where(i => gameTypes.Contains(i.GameType))
                 .GroupBy(x => new { SettledDate = x.SettledTime.ToOffset(offset).Date })
                 .Select(x => new TpBetRecordByDate
                 {
-                    SettledDate = x.Key.SettledDate,
+                    SettledDate = x.Key.SettledDate.ToString("yyyy-MM-dd"),
                     TotalTO = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid || y.SettlementType == (int)SettlementType.SettledForValidNotRollover).Sum(y => y.ValidBet ?? y.Stake),
                     ValidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForValid).Sum(y => y.ValidBet ?? y.Stake),
                     InvalidBet = x.Where(y => y.SettlementType == (int)SettlementType.SettledForInvalid).Sum(y => y.ValidBet ?? y.Stake),

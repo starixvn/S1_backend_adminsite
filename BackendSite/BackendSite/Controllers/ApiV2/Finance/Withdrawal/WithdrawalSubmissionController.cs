@@ -62,6 +62,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string AccountHolderName { set; get; }
             public decimal Amount { set; get; }
             public string Memo { set; get; }
+            /// <summary>
+            /// 參考匯率
+            /// </summary>
+            public decimal ExchangeRate { get; set; }
+            /// <summary>
+            /// 參考加密貨幣金額
+            /// </summary>
+            public decimal ExchangeAmount { get; set; }
         }
 
         #endregion
@@ -162,6 +170,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.AccountNo,
                 request.AccountHolderName,
                 request.Amount,
+                request.ExchangeRate,
+                request.ExchangeAmount,
                 request.Memo,
                 authData.UserName);
 

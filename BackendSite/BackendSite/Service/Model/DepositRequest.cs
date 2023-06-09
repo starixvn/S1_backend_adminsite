@@ -2,6 +2,7 @@
 using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model
@@ -10,8 +11,8 @@ namespace BackendSite.Service.Model
     {
         public string TransId { set; get; }
         public int DepositId { set; get; }
-        public int DepositType { set; get; }
-        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
+        public DepositTypeEnum DepositType { set; get; }
+        public string DepositTypeName => DepositType.ToString();
         public int CurrencyId { get; set; }
         public string IsoCode { set; get; }
         public int CustId { set; get; }
@@ -34,15 +35,15 @@ namespace BackendSite.Service.Model
         public IDepositInfo oDepositInfo =>
                 DepositType switch
                 {
-                    1 => JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo),
-                    2 => JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo),
-                    3 => JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo),
+                    DepositTypeEnum.OnlineBanking => JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo),
+                    DepositTypeEnum.MobilePay => JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo),
+                    DepositTypeEnum.LocalBanking => JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo),
                     _ => null
                 };
         public int FirstDeposit { set; get; }
-        public int Status { set; get; }
-        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
-        public List<int> UsableActionButton { set; get; }
+        public DepositStatusEnum Status { set; get; }
+        public string StatusName => Status.ToString();
+        public IEnumerable<DepositActionEnum> UsableActionButton { set; get; }
         public bool Receipt { set; get; }
         public string RefId { set; get; }
         private DateTimeOffset? _depositTime;
@@ -66,9 +67,9 @@ namespace BackendSite.Service.Model
         public string CalCode =>
             DepositType switch
             {
-                (int)DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
-                (int)DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
-                (int)DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
+                DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
+                DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
         public int IsKyc { set; get; }
@@ -116,6 +117,9 @@ namespace BackendSite.Service.Model
         public string FromAccountNo { set; get; }
         public string FromBankCode { set; get; }
         public string FromBankName { set; get; }
+        public int CheckReceipt { set; get; }
+        public string CheckReceiptBy { set; get; }
+        public string Network { set; get; }
     }
 
     public class DepositInfoForExport
@@ -129,7 +133,7 @@ namespace BackendSite.Service.Model
         public string Currency { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
-        public string NetWork { set; get; }
+        public string Network { set; get; }
         public decimal CryptoAmount { set; get; }
         public string Agent { set; get; }
         public string BankAgent { set; get; }
@@ -209,6 +213,9 @@ namespace BackendSite.Service.Model
             }
         }
         public string AffiliateCode { get; set; }
+        public int CheckReceipt { set; get; }
+        public string CheckReceiptBy { set; get; }
+        public string Memo { set; get; }
     }
 
     public class DepositDetailSubmission
@@ -288,6 +295,9 @@ namespace BackendSite.Service.Model
         public string AccountName { get; set; }
         public string AccountNo { get; set; }
         public int CurrencyId { get; set; }
+        public bool IsLocalPay { get; set; }
+        public int GroupId { get; set; }
+        public string Code { get; set; }
     }
     public class DepositComments
     {
@@ -307,10 +317,29 @@ namespace BackendSite.Service.Model
     public class DepositReceipt
     {
         public int DepositId { get; set; }
+        public int ReceiptNo { get; set; }
         public string RefNo { get; set; }
-        public DateTime DepositTime { get; set; }
         public string PicFileName { get; set; }
         public byte[] DepositPic { get; set; }
+        public int CreateFrom { get; set; }
+        public string Creator { get; set; }
+        public DateTime DepositTime { get; set; }
+        public DateTime CreateTime { get; set; }
+       
+    }
+    
+    public class DepositReceiptModel
+    {
+        public string Receipt { get; set; }
+        public int ReceiptNo { get; set; }
+        public int CreateFrom { get; set; }
+        public string Creator { get; set; }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
 
     public class DepositLimit
@@ -448,7 +477,7 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
     }
     
-    public class DepositDraftSetRequest
+    public class DepositCalCodeSetRequest
     {
         public int? BankId { get; set; }
         public string DisplayName { get; set; }
@@ -463,5 +492,27 @@ namespace BackendSite.Service.Model
         public Decimal ActualDeposit { get; set; }
         public DepositStatusEnum Action { get; set; }
         public string ActionName { get; set; }
+    }
+    
+    public class DepositReceiptFile
+    {
+        public int SiteId { get; set; }
+        public int CustId { get; set; }
+        public int ReceiptNo { get; set; }
+        public string TransId { get; set; }
+        public string Receipt { get; set; }
+    }
+    
+    public class CheckDepositReceiptRequest
+    {
+        public string TransId { get; set; }
+    }
+    
+    public class DeleteReceiptRequest
+    {
+        public int SiteId { get; set; }
+        public int CustId { get; set; }
+        public int ReceiptNo { get; set; }
+        public string TransId { get; set; }
     }
 }

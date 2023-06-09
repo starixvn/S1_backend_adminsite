@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
@@ -85,10 +85,10 @@ namespace BackendSite.Service.BLL
                     IsTest = a.IsTest,
                     IP = a.IP,
                     LevelName = a.LevelName,
-                    RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
-                    LastActiveTime = Convert(a.ReloadTime, TimeSpan.Zero),
-                    LastTagUpdateTime = Convert(a.LastTagUpdateTime, TimeSpan.Zero),
-                    LastStatusUpdateTime = Convert(a.LastStatusUpdateTime, TimeSpan.Zero),
+                    RegTime = a.RegTime.ToOffset(TimeSpan.Zero),
+                    LastActiveTime = a.ReloadTime.ToOffset(TimeSpan.Zero),
+                    LastTagUpdateTime = a.LastTagUpdateTime.ToOffset(TimeSpan.Zero),
+                    LastStatusUpdateTime = a.LastStatusUpdateTime.ToOffset(TimeSpan.Zero),
                     Balance = a.Balance,
                     Bonus = a.Bonus,
                     DeviceScore = a.DeviceScore,
@@ -103,6 +103,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<MemberExportData>> GetExportDataAsync(ExportMemberRequest request)
         {
+            var timespan = request.StartDate.Offset;
+
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var userName = string.IsNullOrEmpty(request.UserName) ? null : request.UserName;
@@ -147,7 +149,7 @@ namespace BackendSite.Service.BLL
                 PhoneNo = a.PhoneNo,
                 LevelName = a.LevelName,
                 Agent = a.Agent,
-                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero).ToOffset(timespan),
                 Status = ((CustomerStatusEnum)a.Status).ToString(),
                 SabaId = a.SabaId,
                 SignupUrl = a.SignupUrl,
@@ -165,8 +167,8 @@ namespace BackendSite.Service.BLL
                     exportDatas.Add(exportData);
                 });
                 await Task.WhenAll(tasks);
-                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
-                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                //如果該名user的PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 return exportDatas;
             }
             return data;
@@ -219,6 +221,7 @@ namespace BackendSite.Service.BLL
                 UserName = customer.UserName,
                 UserLang = customer.UserLang,
                 AccountName = customer.AccountName,
+                SabaId = customer.SabaId,
                 PhoneVerified = customer.PhoneVerified,
                 EmailVerified = customer.EmailVerified,
                 ActStatus = customer.ActStatus,
@@ -232,10 +235,10 @@ namespace BackendSite.Service.BLL
                 AgentName = customer.Agent,
                 SuperiorAffiliateId = customer.AffId,
                 SuperiorAffiliateCode = customer.AffCode,
-                RegisteredTime = customer.RegTime,
-                FirstDepositTime = customer.FirstDepositTime,
-                LastLoginTime = customer.LastLoginTime,
-                LastActiveTime = customer.LastDepositTime,
+                RegisteredTime = customer.RegTime.ToOffset(TimeSpan.Zero),
+                FirstDepositTime = customer.FirstDepositTime.ToOffset(TimeSpan.Zero),
+                LastLoginTime = customer.LastLoginTime.ToOffset(TimeSpan.Zero),
+                LastActiveTime = customer.LastDepositTime.ToOffset(TimeSpan.Zero),
                 BirthDay = customer.BirthDay,
                 BirthMonth = customer.BirthMonth,
                 BirthYear = customer.BirthYear,
@@ -249,8 +252,11 @@ namespace BackendSite.Service.BLL
                 TagList = customer.TagList == null
                     ? new List<CustomerTag>()
                     : await _memberService.GetCustomerTagsAsync(customer.TagList),
-                PhoneRewardTime = customer.PhoneRewardTime,
-                EmailRewardTime = customer.EmailRewardTime
+                PhoneRewardTime = customer.PhoneRewardTime.ToOffset(TimeSpan.Zero),
+                EmailRewardTime = customer.EmailRewardTime.ToOffset(TimeSpan.Zero),
+                PhoneVerifyTime = customer.PhoneVerifyTime.ToOffset(TimeSpan.Zero),
+                EmailVerifyTime = customer.EmailVerifyTime.ToOffset(TimeSpan.Zero),
+                Exclusive = customer.Exclusive
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
@@ -280,7 +286,7 @@ namespace BackendSite.Service.BLL
                     DeviceType = a.DeviceType,
                     AssociateCount = a.AssociateCount,
                     LastUpdateTime = a.LastUpdateTime
-                });
+                }).OrderByDescending(x => x.LastUpdateTime);
             }
 
             var shield = await _deviceService.GetCustShieldRiskInfoList(custId);
@@ -293,7 +299,7 @@ namespace BackendSite.Service.BLL
                 DeviceType = a.Platform,
                 AssociateCount = a.AssociateCount,
                 LastUpdateTime = a.LastUpdateTime
-            });
+            }).OrderByDescending(x=> x.LastUpdateTime);
         }
 
         public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId)
@@ -325,10 +331,41 @@ namespace BackendSite.Service.BLL
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);
         }
+        
+        public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+        {
+            return await _memberService.GetCustomerAssociateBankUserAsync(custId);
+        }
 
         public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)
         {
             return await _memberService.GetCustRealNameChangeLogAsync(custId);
+        }
+
+        public async Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId)
+        {
+            var result  = await _memberService.GetCustPromotionWhiteListAsync(custId);
+            if (result == null)
+            {
+                var customer = _custInfoBll.GetCustInfoWithCache(custId);
+                result = new CustPromotionWhiteList()
+                {
+                    CustId = custId,
+                    IpEnable = false,
+                    DeviceEnable = false,
+                    RealNameEnable = false,
+                    SiteId = customer.SiteId,
+                    UserName = customer.UserName,
+                    Operator = string.Empty
+                };
+            }
+            
+            return result;
+        }
+
+        public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime)
+        {
+            return await _memberService.GetPromotionReceiveFailLogAsync(custId, startTime, endTime);
         }
 
         private int CalculatePointLevel(IEnumerable<PointLevelInfo> pointLevelInfos, int currencyId, int depositSum, int withdrawSum, bool isKyc, bool isRisk, int userLevel)

@@ -172,7 +172,6 @@ public class MemberExportData
     public bool IsTest { get; set; }
     public bool IsKyc { get; set; }
     public bool IsRisk { get; set; }
-    public decimal SabaWallet { get; set; }
     public decimal PTWallet { get; set; }
     public decimal SeamlessWallet { get; set; }
     public decimal BonusWallet { get; set; }
@@ -197,6 +196,13 @@ public class MemberExportData
 public class GetCustomerBasicInfoRequest
 {
     public int CustId { get; set; }
+    public DateTimeOffset StartTime { get; set; }
+    public DateTimeOffset EndTime { get; set; }
+}
+
+public class GetCustomerAssociateBankUserRequest
+{
+    public int CustId { get; set; }
 }
 
 public class CustomerDto
@@ -209,6 +215,7 @@ public class CustomerDto
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
@@ -235,10 +242,10 @@ public class CustomerDto
     /// 會員本身的代理推薦碼
     /// </summary>
     public string AffiliateCode { get; set; }
-    public DateTimeOffset RegTime { get; set; }
-    public DateTimeOffset? FirstDepositTime { get; set; }
-    public DateTimeOffset LastLoginTime { get; set; }
-    public DateTimeOffset? LastDepositTime { get; set; }
+    public DateTime RegTime { get; set; }
+    public DateTime? FirstDepositTime { get; set; }
+    public DateTime LastLoginTime { get; set; }
+    public DateTime? LastDepositTime { get; set; }
     public string BirthDay { get; set; }
     public string BirthMonth { get; set; }
     public string BirthYear { get; set; }
@@ -255,8 +262,11 @@ public class CustomerDto
     public string AddressCity { get; set; }
     public string AddressLineFirst { get; set; }
     public string AddressLineSecond { get; set; }
-    public DateTimeOffset? PhoneRewardTime { get; set; }
-    public DateTimeOffset? EmailRewardTime { get; set; }
+    public DateTime? PhoneRewardTime { get; set; }
+    public DateTime? EmailRewardTime { get; set; }
+    public DateTime? PhoneVerifyTime { get; set; }
+    public DateTime? EmailVerifyTime { get; set; }
+    public int Exclusive { get; set; }
 }
 
 public class CustomerTag
@@ -277,6 +287,7 @@ public class CustomerBasicInfo
     public string UserName { get; set; }
     public string UserLang { get; set; }
     public string AccountName { get; set; }
+    public string SabaId { get; set; }
     public bool PhoneVerified { get; set; }
     public bool EmailVerified { get; set; }
     public int ActStatus { get; set; }
@@ -307,6 +318,9 @@ public class CustomerBasicInfo
     public AffInfo AffInfo { get; set; }
     public DateTimeOffset? PhoneRewardTime { get; set; }
     public DateTimeOffset? EmailRewardTime { get; set; }
+    public DateTimeOffset? PhoneVerifyTime { get; set; }
+    public DateTimeOffset? EmailVerifyTime { get; set; }
+    public int Exclusive { get; set; }
 }
 
 public class AffInfo
@@ -373,6 +387,12 @@ public class SetVipLevelManuallyRequest
 {
     public int CustId { get; set; }
     public int Manually { get; set; }
+}
+
+public class AutoVipDowngradeExclusionRequest
+{
+    public int CustId { get; set; }
+    public bool Enable { get; set; }
 }
 
 public class AddTagRequest
@@ -526,6 +546,14 @@ public class CustomerLoginIp
     public int UserCount { get; set; }
 }
 
+public class CustomerAssociateBankInfo
+{
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public string PaymentName { get; set; }
+    public string AssociateNo { get; set; }
+}
+
 public class CustomerBalanceInfo
 {
     public decimal Balance { get; set; }
@@ -625,4 +653,45 @@ public class CustRealNameChangeLog
     public string AfterName { get; set; }
     public DateTimeOffset UpdateTime { get; set; }
     public string Operator { get; set; }
+}
+
+public class GetListByFileRequest
+{
+    public int SiteId { get; set; }
+    public IFormFile File { get; set; }
+    public string Memo { get; set; }
+}
+public class GetCustinfoByImportDataRequest
+{
+    public int SiteId { get; set; }
+}
+public class CustPromotionWhiteList
+{
+    public int CustId { get; set; }
+    public int SiteId { get; set; } 
+    public string UserName { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }   
+    public string Operator { get; set; }
+}
+
+public class SetCustPromotionWhiteListRequest
+{
+    public int CustId { get; set; }
+    public bool IpEnable { get; set; }
+    public bool DeviceEnable { get; set; }
+    public bool RealNameEnable { get; set; }
+}
+
+public class PromotionReceiveFailLog
+{
+    public string BonusCode { get; set; }
+    public string PromotionTypeName { get; set; }
+    public DateTimeOffset CreateTime { get; set; }
+    public string ErrorCode { get; set; }
+    public string ErrorReason { get; set; }
+    public int SiteId { get; set; }
+    public int CustId { get; set; }
+    public int CurrencyId { get; set; }
 }

@@ -159,6 +159,13 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _sqlClienct.QueryFirstAsync<CustomerBalanceInfo>("Admin_CustomerBalanceInfo_Get", p);
     }
+    
+    public async Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId)
+    {
+        var p = new DynamicParameters(new { _CustId = custId });
+        return await _sqlClienct.QueryAsync<CustomerAssociateBankInfo>("Admin_AssociateBankAccountNo_Get", p);
+    }
+    
     public async Task<bool> IsExistsPhoneNo(int custId, int siteId, string areaCode, string phoneNo)
     {
         return await _sqlClienct.ExecuteScalarAsync<int>("Admin_ExistsPhoneNo_Get",
@@ -190,22 +197,23 @@ public class MemberService : IMemberService
         return await _mainSqlClient.QueryAsync<SimilarAccountInfo>("Admin_SimilarAccountName_Get", p);
     }
 
-    public async Task<bool> EditFullNameAsync(int custId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
+    public async Task<bool> EditFullNameAsync(int custId,int siteId, string fullName, IEnumerable<SimilarAccountInfo> duplicateAccounts)
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
+        p.Add("_SiteId", siteId);
         p.Add("_FullName", fullName);
 
         if (!duplicateAccounts.Any())
         {
-            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p) > 0;
+            return await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", p) > 0;
         }
 
         await using var conn = _mainSqlClient.GetMySqlConnection();
-        conn.Open();
+        await conn.OpenAsync();
         await using var trans = await conn.BeginTransactionAsync();
         
-        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set", p, conn, trans) > 0;
+        var success = await _mainSqlClient.ExecuteAsync("Admin_CustBankInfoAccountName_Set_V2", trans, p) > 0;
 
         if (success)
         {
@@ -226,7 +234,7 @@ public class MemberService : IMemberService
             
             if (!custTags.Any())
             {
-                _mainSqlClient.CommitAndDisposeConnection(conn, trans);
+                await _mainSqlClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
 
@@ -235,15 +243,15 @@ public class MemberService : IMemberService
                 item.TagList = item.TagList.Append((int) CustTagEnum.Duplicate);
             }
             
-            success = await SetCustInfoTagList(custTags, conn, trans);
+            success = await SetCustInfoTagList(custTags, trans);
             if (success)
             {
-                _mainSqlClient.CommitAndDisposeConnection(conn, trans);
+                await _mainSqlClient.CommitAndDisposeConnectionAsync(conn, trans);
                 return true;
             }
         }
 
-        _mainSqlClient.RollbackAndDisposeConnection(conn, trans);
+        await _mainSqlClient.RollbackAndDisposeConnectionAsync(conn, trans);
         return false;
     }
 
@@ -356,7 +364,7 @@ public class MemberService : IMemberService
     public async Task<int> ResetCryptoInfoAsync(int custId)
     {
         var p = new DynamicParameters(new { CustId = custId });
-        return await _mainSqlClient.ExecuteAsync("Admin_ResetCustUSDTInfo_Set", p);
+        return await _mainSqlClient.ExecuteAsync("Admin_ResetCryptoWallet_Set", p);
     }
 
     public async Task<int> ResetEWalletAsync(int custId)
@@ -371,14 +379,14 @@ public class MemberService : IMemberService
         return await _mainSqlClient.ExecuteAsync("Admin_CustLineProfile_Del", p);
     }
     
-    public async Task<bool> SetCustInfoTagList(IEnumerable<CustTagList> tagList, MySqlConnection conn, MySqlTransaction trans)
+    public async Task<bool> SetCustInfoTagList(IEnumerable<CustTagList> tagList, MySqlTransaction trans)
     {
         var parameter = new DynamicParameters(new
         {
             _Infos = JsonConvert.SerializeObject(tagList)
         });
             
-        return await _mainSqlClient.ExecuteAsync("Service_CustInfoTagList_Set", parameter, conn, trans) > 0;
+        return await _mainSqlClient.ExecuteAsync("Service_CustInfoTagList_Set", trans, parameter) > 0;
     }
 
     public async Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId)
@@ -386,4 +394,23 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { CustId = custId });
         return await _sqlClienct.QueryAsync<CustRealNameChangeLog>("Admin_CustRealNameChangeLog_Get", p);
     }
+
+    public async Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId)
+    {
+        var p = new DynamicParameters(new { CustId = custId });
+        return await _sqlClienct.QueryFirstAsync<CustPromotionWhiteList>("Service_CustPromotionWhiteList_Get", p);
+    }
+
+    public async Task<int> SetCustPromotionWhiteListAsync(CustPromotionWhiteList input)
+    {
+        var p = new DynamicParameters(input);
+        return await _mainSqlClient.ExecuteAsync("Admin_CustPromotionWhiteList_Set", p);
+    }
+
+    public async Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime)
+    {
+        var p = new DynamicParameters(new { CustId = custId , StartTime = startTime , EndTime = endTime });
+        return await _sqlClienct.QueryAsync<PromotionReceiveFailLog>("Admin_PromotionReceiveFailLog_Get", p);
+    }
+
 }
