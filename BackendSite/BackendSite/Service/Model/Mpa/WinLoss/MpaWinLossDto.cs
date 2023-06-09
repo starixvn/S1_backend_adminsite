@@ -590,7 +590,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         [JsonIgnore]
         public string TpCategoryName { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         //MYR、CNY...etc
         public string Currency { get; set; }
 
