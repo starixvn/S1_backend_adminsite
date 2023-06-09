@@ -138,7 +138,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 item.ProgressiveBet = Math.Round(item.ProgressiveBet, 2);
                 item.Commission = Math.Round(item.Commission, 2);
                 item.AvgBetAmount = Math.Round(item.AvgBetAmount, 2);
-                item.Margin = Math.Round(item.Margin, 2);
+                item.MarginStr = Math.Round((item.Margin * 100), 2).ToString() + "%";
             }
 
             return data;
@@ -458,6 +458,17 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return result;
         }
 
+        public static DateTime ToOffSetReturnDate(this DateTime dateTime, TimeSpan offset)
+        {
+            return new DateTimeOffset(dateTime, new TimeSpan(0, 0, 0)).ToOffset(offset).Date;
+        }
+
+        public static string DateMapperToRateDate(this DateTime date)
+        {
+            if (date == DateTime.Today) return date.ToString("yyyy-MM-dd");
+            if (date.ToString("yyyy-MM") == DateTime.Now.ToString("yyyy-MM")) return DateTime.UtcNow.ToString("yyyy-MM-dd");
+            return date.AddMonths(1).AddDays(-date.AddMonths(1).Day).ToString("yyyy-MM-dd");
+        }
     }
 }
 

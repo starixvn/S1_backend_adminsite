@@ -1,5 +1,7 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using System.ComponentModel;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss
 {
@@ -605,7 +607,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
         public decimal Margin { get; set; }
+
+        [DisplayName("Margin")]
+        public string MarginStr { get; set; }
     }
 
     public class TpBetRecordByTpCategoryWrapper
