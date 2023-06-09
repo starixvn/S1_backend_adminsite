@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel;
+using BackendSite.Extensions.Attributes;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss
 {
@@ -606,7 +608,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
-        [JsonIgnore]
+        [EpplusIgnore]
         public decimal Margin { get; set; }
 
         [DisplayName("Margin")]
