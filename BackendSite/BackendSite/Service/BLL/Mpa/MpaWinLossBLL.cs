@@ -7,6 +7,7 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.Mpa.WinLoss;
 using System.Diagnostics;
+using Newtonsoft.Json;
 using NPOI.POIFS.Crypt.Dsig;
 
 namespace BackendSite.Service.BLL.Mpa
@@ -648,9 +649,13 @@ namespace BackendSite.Service.BLL.Mpa
             // 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
 
+            _logger.LogInformation($"log GetTpBetRecordGroupByTpCategoryResult data begin：{JsonConvert.SerializeObject(data.AlreadyMultiplyRateTpBetRecordResult)}");
+
             //處理 GGR 邏輯
             foreach (var item in data.OriginTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
             foreach (var item in data.AlreadyMultiplyRateTpBetRecordResult) { item.GGR = item.GGR + (item.ProgressiveWin - item.ProgressiveBet);}
+
+            _logger.LogInformation($"log GetTpBetRecordGroupByTpCategoryResult data after：{JsonConvert.SerializeObject(data.AlreadyMultiplyRateTpBetRecordResult)}");
 
             var exportData = new List<MpaWinLossByTpCategoryDto>();
             exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
@@ -686,6 +691,9 @@ namespace BackendSite.Service.BLL.Mpa
 
                 exportData.Add(result);
             }
+
+            _logger.LogInformation($"log GetMapWinLossByTpCategoryExport exportData result：{JsonConvert.SerializeObject(exportData)}");
+
 
             exportData = request.OrderBy
                 ? exportData.OrderBy(request).ToList()
