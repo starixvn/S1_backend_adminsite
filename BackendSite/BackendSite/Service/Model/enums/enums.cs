@@ -1823,4 +1823,11 @@ namespace BackendSite.Service.Model.enums
         Daily = 1,
         Weekly = 2
     }
+
+    public enum MemberTypeEnum
+    {
+        Normal = 1,
+        Affiliate = 2,
+        LiveStreaming = 3
+    }
 }
