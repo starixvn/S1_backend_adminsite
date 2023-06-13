@@ -243,11 +243,11 @@ namespace BackendSite.Service.DAL
                         sp = "Admin_UpBonus_Set";
                         break;
                     case UpgradeSettingEnum.DownDeposit:
-                        p.Add("_UpBonus", decimal.Parse(x.LevelValue));
+                        p.Add("_DownDeposit", decimal.Parse(x.LevelValue));
                         sp = "Admin_DownDeposit_Set";
                         break;
                     case UpgradeSettingEnum.DownTurnover:
-                        p.Add("_UpBonus", decimal.Parse(x.LevelValue));
+                        p.Add("_DownTurnover", decimal.Parse(x.LevelValue));
                         sp = "Admin_DownTurnover_Set";
                         break;
                 }
