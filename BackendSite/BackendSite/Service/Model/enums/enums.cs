@@ -1523,6 +1523,8 @@ namespace BackendSite.Service.Model.enums
         GOAL123 = 2,
         [Description("Bwing")]
         BWING = 3,
+        [Description("Soon88")]
+        SOON88 = 4,
         [Description("ivorysport")]
         IVORYSPORT = 5
     }
