@@ -209,12 +209,12 @@ namespace BackendSite.Service.BLL
         {
             return await messageService.NewBatchMessage(siteId, currencyId, author, isPopup, personalMsg);
         }
-        public async Task<bool> DeleteBatchMessage(int siteId, int batchId, string @operator)
+        public async Task<int> DeleteBatchMessage(int siteId, int batchId, string @operator)
         {
             var batcjMsg = messageService.GetBatchMessage(batchId);
-            if (batcjMsg == null) return false;
+            if (batcjMsg == null) return -1;
 
-            if(batcjMsg.Status == 0) throw new AdminException("batch message is processing, please wait a moment.");
+            if (batcjMsg.Status == 0) return -2;
 
             var isSuccess = await messageService.DeleteBatchMessage(batchId);
             if (isSuccess)
@@ -231,7 +231,7 @@ namespace BackendSite.Service.BLL
                     RefTransId = batchId.ToString()
                 });
             }
-            return isSuccess;
+            return 1;
         }
         public bool UpdateBatchMessage(int batchId, bool isPopup, string message, string Operator)
         {
