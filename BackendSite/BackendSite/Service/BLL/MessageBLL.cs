@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -212,6 +213,8 @@ namespace BackendSite.Service.BLL
         {
             var batcjMsg = messageService.GetBatchMessage(batchId);
             if (batcjMsg == null) return false;
+
+            if(batcjMsg.Status == 0) throw new AdminException("batch message is processing, please wait a moment.");
 
             var isSuccess = await messageService.DeleteBatchMessage(batchId);
             if (isSuccess)
