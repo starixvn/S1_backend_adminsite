@@ -4,6 +4,7 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -38,6 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly string _awsDepositBucketName;
         private readonly int _mainWalletType;
         private readonly IRabbitMQProducer _producer;
+        private readonly ILogger<DepositController> _logger;
 
         #endregion
 
@@ -55,6 +57,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _producer = provider.GetRequiredService<IRabbitMQProducer>();
+            _logger = provider.GetRequiredService<ILogger<DepositController>>();
             _awsDepositUrl = configuration.GetValue<string>("AwsDepositUrl");
             _awsDepositFolder = configuration.GetValue<string>("AwsDepositFolder");
             _awsDepositBucketName = configuration.GetValue<string>("AwsDepositBucketName");
@@ -330,7 +333,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             try
             {
                 var depositRequest = _depositBll.GetDepositRequest(request.TransId);
-                
+                _logger.LogInformation($"{request.TransId}：{JsonConvert.SerializeObject(depositRequest)} debug");
+
                 if (depositRequest != null)
                 {
                     var usableActionButton = GetUsableActionButton(depositRequest);
