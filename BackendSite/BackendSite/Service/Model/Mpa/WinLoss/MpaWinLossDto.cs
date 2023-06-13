@@ -1,5 +1,7 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using System.ComponentModel;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss
 {
@@ -188,7 +190,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
+        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
 
         [JsonProperty(Order = 11)]
         public int DepositCount { get; set; }
@@ -249,7 +251,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
+        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
     }
 
     public class MpaWinLossByTpCategoryCurrencyDetailDto
@@ -293,7 +295,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
+        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
     }
 
     public class MpaWinLossByPlayerCurrencyDetailDto
@@ -336,7 +338,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 12)]
-        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
+        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
 
         [JsonProperty(Order = 13)]
         public decimal ClosingBalance { get; set; }
@@ -452,7 +454,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int UniquePlayers { get; set; }
 
         [JsonProperty(Order = 10)]
-        public decimal Margin => GGR != 0 && TurnOver != 0 ? GGR / TurnOver : 0.00m;
+        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
 
         [JsonProperty(Order = 11)]
         public int DepositCount { get; set; }
@@ -499,7 +501,10 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
         public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
 
         public int DepositCount { get; set; }
 
@@ -564,7 +569,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
+
         public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
     }
 
     public class TpBetRecordByTpGameTypeWrapper
@@ -581,7 +590,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         [JsonIgnore]
         public string TpCategoryName { get; set; }
 
-        [JsonIgnore]
+        //[JsonIgnore]
         //MYR、CNY...etc
         public string Currency { get; set; }
 
@@ -605,7 +614,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
         public decimal Margin { get; set; }
+
+        [DisplayName("Margin")]
+        public string MarginStr { get; set; }
     }
 
     public class TpBetRecordByTpCategoryWrapper
@@ -647,7 +660,10 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
         public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
 
         public int DepositCount { get; set; }
 
@@ -718,7 +734,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
+        [EpplusIgnore]
+
         public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
 
         public int DepositCount { get; set; }
 

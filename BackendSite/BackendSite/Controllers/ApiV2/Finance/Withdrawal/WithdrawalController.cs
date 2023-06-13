@@ -548,7 +548,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                     if (withdrawalData.ProcessWay == WithdrawalInfoProcessWayEnum.Auto) // 自動出款要走 Verify + Process 流程
                     {
-                        var paymentGateWay = _autoWithdrawalPaymentGateWayBll.GetPaymentGateWay(withdrawalData, authData.SiteId);
+                        var paymentGateWay = _autoWithdrawalPaymentGateWayBll.GetPaymentGateWay(withdrawalData, withdrawalData.SiteId);
                         if (paymentGateWay == null)
                         {
                             // 找不到 paymentGateWay 就單純只做 Verify，並且 comment 失敗原因

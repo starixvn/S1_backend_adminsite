@@ -2,7 +2,6 @@
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -21,7 +20,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly MessageBLL _messageBll;
         private readonly ServerInfoService _serverInfoService;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly Common _common;
         private readonly ILogger<PersonalMessageController> _logger;
         private readonly ExcelBLL _excelBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
@@ -32,7 +30,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _serverInfoService = provider.GetRequiredService<ServerInfoService>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _common = provider.GetRequiredService<Common>();
             _logger = provider.GetRequiredService<ILogger<PersonalMessageController>>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
@@ -183,7 +180,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     
                 });
             }
-
+            _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = authData.UserName,
+                SiteId = req.optSite,
+                CurrencyId = req.currency,
+                ActionType = ActionType.Create,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SMSGenerator,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = JsonConvert.SerializeObject(req),
+                RefTransId = batchId.ToString()
+            });
             return new ApiResult<int>()
             {
                 Data = batchId,
@@ -225,15 +232,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> DeleteBatchMessage(DeleteBatchMessageReq req)
         {
             var authData = _newAuthorizeBLL.GetAuthData();
-            if (!await _messageBll.DeleteBatchMessage(authData.SiteId, req.BatchId, authData.UserName))
-            {
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Fail,
-                    Message = "Delete fail."
-                };
-            }
-
+            var error = await _messageBll.DeleteBatchMessage(authData.SiteId, req.BatchId, authData.UserName);
+            if (error == -1)
+                return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Delete fail." };
+            else if(error == -2)
+                return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "batch message is processing, please wait a moment" };
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success
