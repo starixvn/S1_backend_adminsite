@@ -37,7 +37,8 @@ public class MemberCommand : IMemberCommand
         var tagList = !string.IsNullOrEmpty(tagListStr) ? JsonConvert.DeserializeObject<List<int>>(tagListStr) : new List<int>();
         var beforeTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
 
-        tagList.Add(tagId);
+        if (!tagList.Contains(tagId))
+            tagList.Add(tagId);
         var result = await _memberService.SetCustTag(custId, tagList);
         if (result <= 0) return result;
 
@@ -414,29 +415,29 @@ public class MemberCommand : IMemberCommand
         var beforeWhiteList = await _memberService.GetCustPromotionWhiteListAsync(custId);
         var result = await _memberService.SetCustPromotionWhiteListAsync(new CustPromotionWhiteList()
         {
-           CustId = custId,
-           IpEnable = ipEnable,
-           DeviceEnable = deviceEnable,
-           RealNameEnable = realNameEnable,
-           SiteId = customer.SiteId,
-           UserName = customer.UserName,
-           Operator = @operator
+            CustId = custId,
+            IpEnable = ipEnable,
+            DeviceEnable = deviceEnable,
+            RealNameEnable = realNameEnable,
+            SiteId = customer.SiteId,
+            UserName = customer.UserName,
+            Operator = @operator
         });
-        
+
         if (result < 1)
         {
             return false;
-        }         
+        }
 
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
-            JsonConvert.SerializeObject(new 
-            { 
+            JsonConvert.SerializeObject(new
+            {
                 customer.UserName,
                 IpEnable = beforeWhiteList?.IpEnable ?? false,
                 DeviceEnable = beforeWhiteList?.DeviceEnable ?? false,
                 RealNameEnable = beforeWhiteList?.RealNameEnable ?? false,
             }),
-            JsonConvert.SerializeObject(new 
+            JsonConvert.SerializeObject(new
             {
                 customer.UserName,
                 IpEnable = ipEnable,
