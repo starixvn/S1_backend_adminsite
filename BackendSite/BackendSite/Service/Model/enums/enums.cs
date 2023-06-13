@@ -847,6 +847,7 @@ namespace BackendSite.Service.Model.enums
         CancelBonusInCustInfo = 83,
         SetBlockCryptoWallet = 84,
         ReleaseCryptoWallet = 85,
+        ResetSmsOtpTimes = 86,
         AutoWithdrawalRule = 91,
     }
 
