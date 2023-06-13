@@ -232,15 +232,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> DeleteBatchMessage(DeleteBatchMessageReq req)
         {
             var authData = _newAuthorizeBLL.GetAuthData();
-            if (!await _messageBll.DeleteBatchMessage(authData.SiteId, req.BatchId, authData.UserName))
-            {
-                return new ApiResult
-                {
-                    ErrorCode = (int)ErrorCodeEnum.Fail,
-                    Message = "Delete fail."
-                };
-            }
-
+            var error = await _messageBll.DeleteBatchMessage(authData.SiteId, req.BatchId, authData.UserName);
+            if (error == -1)
+                return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Delete fail." };
+            else if(error == -2)
+                return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "batch message is processing, please wait a moment" };
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success
