@@ -1,12 +1,10 @@
-﻿using System.Drawing;
-using System.Transactions;
+﻿using System.Transactions;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
-using LazZiya.ImageResize;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.ApiModel;
 
@@ -129,6 +127,7 @@ namespace BackendSite.Service.BLL
                 AccountNo = string.IsNullOrWhiteSpace(input.AccountNo) ? string.Empty : input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
+                FrontendDisplayName = input.FrontendDisplayName ?? string.Empty,
                 BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
                 BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : _cryptor.Encrypt(input.BankLoginAccount),
                 BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : _cryptor.Encrypt(input.BankLoginPassword),
@@ -162,6 +161,7 @@ namespace BackendSite.Service.BLL
                     AccountNo = oldData.AccountNo,
                     AccountName = oldData.AccountName,
                     DisplayName = oldData.DisplayName,
+                    oldData.FrontendDisplayName,
                     oldData.BankLoginUrl,
                     BankLoginAccount = oldData.BankLoginAccount,
                     BankLoginPassword = oldData.BankLoginPassword,
@@ -183,6 +183,7 @@ namespace BackendSite.Service.BLL
                     AccountNo = input.AccountNo,
                     AccountName = input.AccountName,
                     DisplayName = input.DisplayName,
+                    input.FrontendDisplayName,
                     input.BankLoginUrl,
                     transferAccountModel.BankLoginAccount,
                     transferAccountModel.BankLoginPassword,
@@ -262,6 +263,8 @@ namespace BackendSite.Service.BLL
                 count = 1;
                 message = "Update Transfer Account And Insert Log Success.";
             }
+            
+            _ = _cacheHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member);
 
             return (true, count, message);
         }

@@ -130,6 +130,7 @@ namespace BackendSite.Service.DAL
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
@@ -153,8 +154,6 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     _Id = bankFinancialTransferAccount.Id,
-                    _SiteId = bankFinancialTransferAccount.SiteId,
-                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
                     _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
@@ -167,6 +166,7 @@ namespace BackendSite.Service.DAL
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
                     _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
@@ -183,7 +183,37 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V8";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V9";
+
+            return _mainDbClient.Execute(SpName, parameters);
+        }
+
+        public int InsertTransferAccountLog(ActionType action, BankFinancialTransferAccountModel bankFinancialTransferAccount)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _SiteId = bankFinancialTransferAccount.SiteId,
+                    _SiteName = bankFinancialTransferAccount.SiteName,
+                    _CurrencyId = bankFinancialTransferAccount.CurrencyId,
+                    _SysId = bankFinancialTransferAccount.SysId,
+                    _Purpose = bankFinancialTransferAccount.Purpose,
+                    _Channel = bankFinancialTransferAccount.Channel,
+                    _Agent = bankFinancialTransferAccount.Agent,
+                    _PayId = bankFinancialTransferAccount.PayId,
+                    _AccountNo = bankFinancialTransferAccount.AccountNo,
+                    _AccountName = bankFinancialTransferAccount.AccountName,
+                    _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _InitialAmount = bankFinancialTransferAccount.InitialAmount,
+                    _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
+                    _Reason = bankFinancialTransferAccount.Reason,
+                    _Remark = bankFinancialTransferAccount.Remark,
+                    _Status = bankFinancialTransferAccount.Status,
+                    _Operator = bankFinancialTransferAccount.Updator,
+                    _Action = action
+                });
+
+            var SpName = "Admin_BankFinancialTransferAccountLog_Ins_V2";
 
             return _mainDbClient.Execute(SpName, parameters);
         }

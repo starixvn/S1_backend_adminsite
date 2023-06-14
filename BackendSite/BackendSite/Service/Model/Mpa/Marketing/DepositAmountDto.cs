@@ -64,6 +64,8 @@
         public decimal FirstDepositAmount { get; set; }
 
         public int DepositCount { get; set; }
+        
+        public int FirstDepositCount { get; set; }
 
         public string AffCode { get; set; }
 

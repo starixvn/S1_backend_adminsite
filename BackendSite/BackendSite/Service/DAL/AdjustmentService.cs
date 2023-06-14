@@ -388,24 +388,28 @@ namespace BackendSite.Service.DAL
                         }
                         else
                         {
-                            var withdrawalLimitP = new DynamicParameters(new
+                            var p = new DynamicParameters(new
                             {
-                                AdjustType = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType,
-                                CustId = adjustmentAndWithdrawalLimit.CustId,
-                                UserName = adjustmentAndWithdrawalLimit.UserName,
-                                Operator = adjustmentAndWithdrawalLimit.Operator,
-                                CurrencyId = adjustmentAndWithdrawalLimit.CurrencyId,
-                                SiteId = adjustmentAndWithdrawalLimit.SiteId,
-                                Amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmount,
-                                Memo = adjustmentAndWithdrawalLimit.Memo,
-                                Prefix = $"L{common.GetEnv()}"
+                                _SiteId = adjustmentAndWithdrawalLimit.SiteId,
+                                _CurrencyId = adjustmentAndWithdrawalLimit.CurrencyId,
+                                _AdjustType = adjustmentAndWithdrawalLimit.AdjustType,
+                                _ReasonId = WithdrawalLimitAdjustmentReasonEnum.None,
+                                _CustId = adjustmentAndWithdrawalLimit.CustId,
+                                _UserName = adjustmentAndWithdrawalLimit.UserName,
+                                _Amount = adjustmentAndWithdrawalLimit.Amount,
+                                _Memo = adjustmentAndWithdrawalLimit.Memo,
+                                _Prefix = $"L{common.GetEnv()}",
+                                _Operator = adjustmentAndWithdrawalLimit.Operator
                             });
-                            withdrawalLimitP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
+                            p.Add("_TransId", dbType: DbType.String, direction: ParameterDirection.Output);
+                            p.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-                            _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins", trans, withdrawalLimitP);
-                            var transId = withdrawalLimitP.Get<string>("TransId");
+                            _ = _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins_V2", trans, p);
+            
+                            var transId = p.Get<string>("_TransId") ?? string.Empty;
+                            var resultCode = p.Get<int>("_Result");
 
-                            if (string.IsNullOrEmpty(transId))
+                            if (string.IsNullOrEmpty(transId) || resultCode != 0)
                             {
                                 //return 22;
                                 result = 0;

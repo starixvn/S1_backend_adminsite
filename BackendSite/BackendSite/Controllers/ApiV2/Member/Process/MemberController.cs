@@ -8,6 +8,8 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Library;
 using BackendSite.ExceptionHandling;
+using static BackendSite.Controllers.Api.CustManageController;
+using System.Text;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -27,7 +29,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ExcelBLL _excelBll;
         private readonly string _bonusApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly BonusInfoBLL _bonusInfoBll;
+        private readonly SelLangBLL _selLangBll;
+        private readonly MessageBLL _messageBll;
         private readonly ILogger<MemberController> _logger;
+        private readonly ICacheHelper _redisHelper;
+        private readonly DateTimeHelper _dateTimeHelper;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         public MemberController(IServiceProvider provider)
         {
@@ -42,7 +50,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _memberQuery = provider.GetRequiredService<IMemberQuery>();
             _vipLevelBll = provider.GetRequiredService<IVipLevelBLL>();
+            _bonusInfoBll = provider.GetRequiredService<BonusInfoBLL>();
+            _selLangBll = provider.GetRequiredService<SelLangBLL>();
+            _messageBll = provider.GetRequiredService<MessageBLL>();
             _logger = provider.GetRequiredService<ILogger<MemberController>>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -141,23 +155,119 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> CancelBonusByBonusId(CancelBonusRequest request)
         {
             var apiResult = new ApiResult();
-            var result = await _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
-            if (result.Result == 0)
+            var data = _bonusInfoBll.GetTransferBonusCancel(request.BonusId);
+
+            //轉帳制
+            if (data != null && data.WalletType == (int)TpListWalletTypeEnum.FundTransfer)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                apiResult.Message = "Cancel Bonus Fail";
+                if (data.Status == (int)BonusStatus.Running)
+                {
+                    await CancelBonus(request, data, apiResult);
+                    return apiResult;
+                }
+
+                var winLossAmount = _bonusInfoBll.GetBonusWinLoss(request.BonusId)?.FirstOrDefault() ?? 0m;
+                var transferBonusAmount = data.BonusAmount + data.LockedAmount;
+                var remainingBonus = transferBonusAmount + winLossAmount;
+
+                switch (data.PromotionType)
+                {
+                    case PromotionTypeEnum.FstDeposit:
+                    case PromotionTypeEnum.ReDeposit:
+                    case PromotionTypeEnum.FreeBet:
+                    case PromotionTypeEnum.Cashback:
+                    case PromotionTypeEnum.SpecialBonus:
+                    case PromotionTypeEnum.RetentionFreeBet:
+
+                        //確認剩餘本金
+                        var refundAmount = remainingBonus - data.BonusAmount;
+                        if (refundAmount < 0)
+                        {
+                            refundAmount = 0;
+                        }
+                        else if (refundAmount > data.LockedAmount)
+                        {
+                            refundAmount = data.LockedAmount;
+                        }
+
+                        // var bonus = remainingBonus - refundAmount;
+
+                        //呼叫轉帳 API 扣款
+                        if (remainingBonus > 0)
+                        {
+                            var tpBonusCancelTransfer = new TpBonusCancelTransfer
+                            {
+                                TpId = data.TpId,
+                                CustId = data.CustId,
+                                UserName = data.UserName,
+                                SiteId = data.SiteId,
+                                PromoCategoryId = data.PromoCategoryId,
+                                BonusId = data.BonusId,
+                                RemainingBonus = remainingBonus,
+                                RefundAmount = refundAmount,
+                                UpdateBonusTransferStatus = true
+                            };
+                            var result = _bonusInfoBll.BonusCancelTransfer(tpBonusCancelTransfer);
+                            apiResult.ErrorCode = result.ErrorCode;
+                            apiResult.Message = result.Message;
+                        }
+                        else
+                        {
+                            await CancelBonus(request, data, apiResult);
+                            return apiResult;
+                        }
+                        break;
+                }
                 return apiResult;
             }
-            const string menu = "CustManage/CustInfoList";
+
+            //單一錢包
+            if (data != null)
+            {
+                var result = await _custInfoBll.CancelBonusByBonusId(request.BonusId, User.Identity.Name);
+                if (result.Result == 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Cancel Bonus Fail";
+                    return apiResult;
+                }
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Can't find available bonus";
+                return apiResult;
+            }
+
             var info = new Dictionary<string, dynamic>
             {
-                { "MenuName", "Customer Info" },
-                { "Action", "Cancel Bonus" }
+                {"MenuName", "Customer Info"},
+                {"Action", "Cancel Bonus"}
             };
-            _serverInfoBll.AdminOperateLog(null, request.CustId, menu, ActionType.Update, info, User.Identity.Name);
-
+            _serverInfoBll.AdminOperateLog(null, request.CustId, "CustManage/CustInfoList", ActionType.Update, info, User.Identity.Name);
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             return apiResult;
+
+        }
+
+
+        private async Task CancelBonus(CancelBonusRequest bonusReq, CancelBonus data, ApiResult apiResult)
+        {
+            var result = await _custInfoBll.CancelBonusByBonusId(bonusReq.BonusId, User.Identity.Name);
+
+            if (result.Result > 0)
+            {
+                var title = _selLangBll.GetResourceValue("lbl_CancelBonusTitle", data.UserLang);
+                var msg = new StringBuilder();
+                msg.AppendLine(_selLangBll.GetResourceValue("lbl_CancelBonus1", data.UserLang));
+                await _messageBll.SendMessageAsync(new Message("Bonus Service", data.CustId, data.UserLang, title, msg.ToString()));
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            else
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                apiResult.Message = "Fail.";
+            }
         }
 
         /// <summary>
@@ -420,6 +530,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 };
             }
             throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel Manually fail");
+        }
+
+        /// <summary>
+        /// Member/VipAutomationExclusion 設定VIP自動降級排除
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 86 })]
+        [HttpPost]
+        public async Task<ApiResult> VipAutomationExclusion(AutoVipDowngradeExclusionRequest custIdReq)
+        {
+            var result = await _vipLevelBll.VipAutomationExclusion(custIdReq.CustId, custIdReq.Enable, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success"
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set auto vip downgrade exclusion fail");
         }
 
         /// <summary>
@@ -1291,6 +1427,40 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     request.EndTime.ToUniversalTime().DateTime)
             };
         }
-
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 87 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, custInfo.CurrencyId);
+            var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
+            
+            if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
+            {
+                var result = await _redisHelper.StringSetAsync(key, 0, TimeSpan.FromDays(1), RedisDataBase.Shared);
+                
+                return new ApiResult
+                {
+                    ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                };
+            }
+            
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = User.Identity.Name,
+                SiteId = custInfo.SiteId,
+                CurrencyId = custInfo.CurrencyId,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = null
+            });
+            
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
     }
 }

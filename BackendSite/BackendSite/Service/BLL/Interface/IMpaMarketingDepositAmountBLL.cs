@@ -17,5 +17,17 @@ namespace BackendSite.Service.BLL.Interface
             List<SignUpChildDto> depositSinUpSummary,
             List<DepositSignUpDetailData> depositSignUpDetail,
             DepositAmountRequest request);
+
+        Task MultiplyExchangeRateSinUpSummary<TEntity>(List<TEntity> source,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int baseCurrencyId)
+            where TEntity : class, IMpaMarketingDepositSignUpBaseDto;
+
+        Task MultiplyExchangeRateAmountSummary<TEntity>(List<TEntity> source,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int baseCurrencyId)
+            where TEntity : class, IMpaMarketingDepositAmountBaseDto;
     }
 }

@@ -332,7 +332,8 @@ namespace BackendSite.Service.DAL
                 _LoginAccount = input.LoginAccount,
                 _LoginPassword = input.LoginPassword,
                 _LoginPin = input.LoginPin,
-                _TransferPin = input.TransferPin
+                _TransferPin = input.TransferPin,
+                _CorporateId = input.CorporateId
             });
             
             #endregion
@@ -351,7 +352,8 @@ namespace BackendSite.Service.DAL
                 pay.LoginAccount,
                 pay.LoginPassword,
                 pay.LoginPin,
-                pay.TransferPin
+                pay.TransferPin,
+                pay.CorporateId
             }));
             logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
             {
@@ -360,12 +362,13 @@ namespace BackendSite.Service.DAL
                 input.LoginAccount,
                 input.LoginPassword,
                 input.LoginPin,
-                input.TransferPin
+                input.TransferPin,
+                input.CorporateId
             }));
             logParam.Add("_Operator", input.Operator);
             #endregion
 
-            if (_mainDbClient.Execute("Admin_SitePayList_LoginInfo_Set", trans, props) > 0)
+            if (_mainDbClient.Execute("Admin_SitePayList_LoginInfo_Set_V2", trans, props) > 0)
             {
                 if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0)
                 {
@@ -704,6 +707,11 @@ namespace BackendSite.Service.DAL
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             
             return false;
+        }
+        
+        public async Task<IEnumerable<PayGroup>> GetPayGroup()
+        {
+            return await _reportDbClient.QueryAsync<PayGroup>("Service_PayGroup_Get");
         }
 
         #endregion
