@@ -311,20 +311,21 @@ namespace BackendSite.Service.DAL
 
             var result = new CustBonusSum
             {
-                FirstDeposit = data.FirstOrDefault(x =>
-                    x.PromotionType == PromotionTypeEnum.FstDeposit)?.BonusAmount ?? 0,
-                ReDeposit = data.FirstOrDefault(x =>
-                    x.PromotionType == PromotionTypeEnum.ReDeposit)?.BonusAmount ?? 0,
-                FreeBet = data.FirstOrDefault(x =>
-                    x.PromotionType == PromotionTypeEnum.FreeBet)?.BonusAmount ?? 0,
-                CashBack = data.FirstOrDefault(x =>
-                    x.PromotionType == PromotionTypeEnum.Cashback)?.BonusAmount ?? 0,
-                ManualBonus = data.FirstOrDefault(x =>
-                    x.PromotionType == PromotionTypeEnum.SpecialBonus)?.BonusAmount ?? 0,
-                RetentionBonus = data.FirstOrDefault(x =>
-                    x.PromotionType == PromotionTypeEnum.RetentionFreeBet)?.BonusAmount ?? 0,
-                DeviceBonus = data.FirstOrDefault(x =>
-                    x.PromotionType == PromotionTypeEnum.DeviceBonus)?.BonusAmount ?? 0,
+                FirstDeposit = data.Where(x => x.PromotionType == PromotionTypeEnum.FstDeposit)
+                    .Sum(x => x.BonusAmount),
+                ReDeposit = data.Where(x => x.PromotionType == PromotionTypeEnum.ReDeposit)
+                    .Sum(x => x.BonusAmount),
+                FreeBet = data.Where(x => x.PromotionType == PromotionTypeEnum.FreeBet)
+                    .Sum(x => x.BonusAmount),
+                CashBack = data.Where(x => x.PromotionType == PromotionTypeEnum.Cashback)
+                    .Sum(x => x.BonusAmount),
+                ManualBonus = data.Where(x => x.PromotionType == PromotionTypeEnum.SpecialBonus)
+                    .Sum(x => x.BonusAmount),
+                RetentionBonus = data.Where(x => x.PromotionType == PromotionTypeEnum.RetentionFreeBet)
+                    .Sum(x => x.BonusAmount),
+                DeviceBonus = data.Where(x => x.PromotionType == PromotionTypeEnum.DeviceBonus)
+                    .Sum(x => x.BonusAmount),
+                CancelBonusAmount = data.Sum(x => x.CancelBonus),
                 RewardPoint = props.Get<decimal?>("_RewardPoint") ?? 0
             };
             
