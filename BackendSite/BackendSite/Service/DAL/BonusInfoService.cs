@@ -303,9 +303,31 @@ namespace BackendSite.Service.DAL
         public CustBonusSum GetCustBonusSum(int siteId,int custId)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
             props.Add("_CustId", custId);
-            var result = _reportDbClient.QueryFirst<CustBonusSum>("Admin_CustBonusSum_Get", props);
+            props.Add("_RewardPoint", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            
+            var data =
+                _reportDbClient.Query<CustBonusTypeBonusAmount>("Admin_CustBonusSum_Get_V2", props);
+
+            var result = new CustBonusSum
+            {
+                FirstDeposit = data.FirstOrDefault(x =>
+                    x.PromotionType == PromotionTypeEnum.FstDeposit)?.BonusAmount ?? 0,
+                ReDeposit = data.FirstOrDefault(x =>
+                    x.PromotionType == PromotionTypeEnum.ReDeposit)?.BonusAmount ?? 0,
+                FreeBet = data.FirstOrDefault(x =>
+                    x.PromotionType == PromotionTypeEnum.FreeBet)?.BonusAmount ?? 0,
+                CashBack = data.FirstOrDefault(x =>
+                    x.PromotionType == PromotionTypeEnum.Cashback)?.BonusAmount ?? 0,
+                ManualBonus = data.FirstOrDefault(x =>
+                    x.PromotionType == PromotionTypeEnum.SpecialBonus)?.BonusAmount ?? 0,
+                RetentionBonus = data.FirstOrDefault(x =>
+                    x.PromotionType == PromotionTypeEnum.RetentionFreeBet)?.BonusAmount ?? 0,
+                DeviceBonus = data.FirstOrDefault(x =>
+                    x.PromotionType == PromotionTypeEnum.DeviceBonus)?.BonusAmount ?? 0,
+                RewardPoint = props.Get<decimal?>("_RewardPoint") ?? 0
+            };
+            
             return result;
         }
 
