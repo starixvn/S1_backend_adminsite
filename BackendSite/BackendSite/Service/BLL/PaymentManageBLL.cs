@@ -178,7 +178,14 @@ namespace BackendSite.Service.BLL
         
         public bool SetCryptoInfoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
         {
-            return _paymentManageService.SetCryptoStatus(siteId, currencyId, network, status, @operator);
+            var result = _paymentManageService.SetCryptoStatus(siteId, currencyId, network, status, @operator);
+
+            if (result)
+            {
+                _ = _redisHelper.KeyDeleteByPattern($"PaySetting:SupportCrypto:{siteId}", RedisDataBase.Member);
+            }
+            
+            return result;
         }
 
         private void ClearRedisPaySettingCache(string pattern, RedisDataBase db)
