@@ -695,3 +695,8 @@ public class PromotionReceiveFailLog
     public int CustId { get; set; }
     public int CurrencyId { get; set; }
 }
+
+public class ResetOtpTimesRequest
+{
+    public int CustId { get; set; }
+}
