@@ -189,6 +189,7 @@ namespace BackendSite.Service.Model
     {
         public PromotionTypeEnum PromotionType { get; set; }
         public decimal BonusAmount { get; set; }
+        public decimal CancelBonus { get; set; }
     }
     
     public class CustBonusSum
