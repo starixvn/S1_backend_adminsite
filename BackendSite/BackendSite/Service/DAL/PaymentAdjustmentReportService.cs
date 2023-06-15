@@ -88,6 +88,7 @@ namespace BackendSite.Service.DAL
          DateTimeOffset startDate,
          DateTimeOffset endDate,
          string transId,
+         string memberTypes,
          int startIndex,
          int pageSize)
         {
@@ -107,10 +108,11 @@ namespace BackendSite.Service.DAL
             props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
             props.Add("_TpUserName", string.IsNullOrWhiteSpace(sabaId) ? null : sabaId);
             props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
+            props.Add("_MemberTypes", memberTypes);
 
             #region GetCurrencyTotalAmount
 
-            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmount_Get_V6", props)).ToList();
+            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmount_Get_V7", props)).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.Add(new TotalAmount()
@@ -128,7 +130,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V6", props);
+            result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V7", props);
             result.CurrencyAmount = currencyTotalAmount;
             result.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -177,7 +179,8 @@ namespace BackendSite.Service.DAL
             string depositId,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
-            string transId)
+            string transId,
+            string memberTypes)
         {
             var props = new DynamicParameters();
             props.Add("_SiteIds", siteIds);
@@ -192,8 +195,9 @@ namespace BackendSite.Service.DAL
             props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
             props.Add("_TpUserName", string.IsNullOrWhiteSpace(sabaId) ? null : sabaId);
             props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
+            props.Add("_MemberTypes", memberTypes);
 
-            var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V6", props);
+            var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V7", props);
             return result;
         }
 

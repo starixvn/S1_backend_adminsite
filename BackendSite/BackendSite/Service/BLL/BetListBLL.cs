@@ -3,6 +3,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using Newtonsoft.Json;
 
@@ -74,9 +75,12 @@ namespace BackendSite.Service.BLL
                 TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
                 StartDate,
                 EndDate,
+                MemberTypeJson = input.MemberTypes != null && input.MemberTypes.Any()
+                ? JsonConvert.SerializeObject(input.MemberTypes.Select(x => (int)x))
+                : JsonConvert.SerializeObject(((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x)),
             });
 
-            var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V3", parameters);
+            var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V4", parameters);
 
             //Sort
             var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.SettledTime).AsQueryable();

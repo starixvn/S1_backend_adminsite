@@ -1253,5 +1253,19 @@ namespace BackendSite.Service.BLL
         {
             return _custInfoService.GetCryptoList(custId);
         }
+
+        public CustTpGameTypeSettingTypeEnum ConvertCustTpGameTypeSettingType(CustTpGameTypeSettingGetType type)
+        {
+            switch (type)
+            {
+                case CustTpGameTypeSettingGetType.IsShow:
+                case CustTpGameTypeSettingGetType.NoShow:
+                default:
+                    return CustTpGameTypeSettingTypeEnum.NoShow;
+                case CustTpGameTypeSettingGetType.IsPlay:
+                case CustTpGameTypeSettingGetType.NoPlay:
+                    return CustTpGameTypeSettingTypeEnum.NoPlay;
+            }
+        }
     }
 }

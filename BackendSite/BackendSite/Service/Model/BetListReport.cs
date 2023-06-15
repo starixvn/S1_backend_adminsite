@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel.DataAnnotations;
@@ -75,6 +76,7 @@ namespace BackendSite.Service.Model
             }
             return key.ToString();
         }
+        public IEnumerable<MemberTypeEnum> MemberTypes { get; set; }
     }
 
     public class BetListReport : IDisposable
