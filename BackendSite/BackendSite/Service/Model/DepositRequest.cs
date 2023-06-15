@@ -69,7 +69,7 @@ namespace BackendSite.Service.Model
             DepositType switch
             {
                 DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
-                DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
+                DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{Network}",
                 DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
