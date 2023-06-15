@@ -719,8 +719,14 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-
-
+    
+    public enum BonusGroupByType
+    {
+        BonusCode = 0,
+        Date = 1 ,
+        Month = 2
+    }
+    
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
