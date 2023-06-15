@@ -34,6 +34,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly SelLangBLL _selLangBll;
         private readonly MessageBLL _messageBll;
         private readonly ILogger<MemberController> _logger;
+        private readonly ICacheHelper _redisHelper;
+        private readonly DateTimeHelper _dateTimeHelper;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
         public MemberController(IServiceProvider provider)
         {
@@ -53,6 +56,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _logger = provider.GetRequiredService<ILogger<MemberController>>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -526,6 +532,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 };
             }
             throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel Manually fail");
+        }
+
+        /// <summary>
+        /// Member/VipAutomationExclusion 設定VIP自動降級排除
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 86 })]
+        [HttpPost]
+        public async Task<ApiResult> VipAutomationExclusion(AutoVipDowngradeExclusionRequest custIdReq)
+        {
+            var result = await _vipLevelBll.VipAutomationExclusion(custIdReq.CustId, custIdReq.Enable, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success"
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set auto vip downgrade exclusion fail");
         }
 
         /// <summary>
@@ -1498,6 +1530,40 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
 
-
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 87 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, custInfo.CurrencyId);
+            var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
+            
+            if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
+            {
+                var result = await _redisHelper.StringSetAsync(key, 0, TimeSpan.FromDays(1), RedisDataBase.Shared);
+                
+                return new ApiResult
+                {
+                    ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                };
+            }
+            
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = User.Identity.Name,
+                SiteId = custInfo.SiteId,
+                CurrencyId = custInfo.CurrencyId,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = null
+            });
+            
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
     }
 }

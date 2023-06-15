@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +12,8 @@ namespace BackendSite.Service.Model
     {
         public string TransId { set; get; }
         public int DepositId { set; get; }
-        public int DepositType { set; get; }
-        public string DepositTypeName => Enum.GetName(typeof(DepositTypeEnum), DepositType);
+        public DepositTypeEnum DepositType { set; get; }
+        public string DepositTypeName => DepositType.ToString();
         public int CurrencyId { get; set; }
         public string IsoCode { set; get; }
         public int CustId { set; get; }
@@ -35,15 +36,15 @@ namespace BackendSite.Service.Model
         public IDepositInfo oDepositInfo =>
                 DepositType switch
                 {
-                    1 => JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo),
-                    2 => JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo),
-                    3 => JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo),
+                    DepositTypeEnum.OnlineBanking => JsonConvert.DeserializeObject<DepositInfo1_1>(DepositInfo),
+                    DepositTypeEnum.MobilePay => JsonConvert.DeserializeObject<DepositInfo2_1>(DepositInfo),
+                    DepositTypeEnum.LocalBanking => JsonConvert.DeserializeObject<DepositInfo3_1>(DepositInfo),
                     _ => null
                 };
         public int FirstDeposit { set; get; }
-        public int Status { set; get; }
-        public string StatusName => Enum.GetName(typeof(DepositStatusEnum), Status);
-        public List<int> UsableActionButton { set; get; }
+        public DepositStatusEnum Status { set; get; }
+        public string StatusName => Status.ToString();
+        public IEnumerable<DepositActionEnum> UsableActionButton { set; get; }
         public bool Receipt { set; get; }
         public string RefId { set; get; }
         private DateTimeOffset? _depositTime;
@@ -67,9 +68,9 @@ namespace BackendSite.Service.Model
         public string CalCode =>
             DepositType switch
             {
-                (int)DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
-                (int)DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
-                (int)DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
+                DepositTypeEnum.OnlineBanking => $"{SiteName}-{PayName}-{BankCode}",
+                DepositTypeEnum.MobilePay => $"{SiteName}-{PayName}-{ChannelName}",
+                DepositTypeEnum.LocalBanking => DisplayName,//$"{SiteName}-{BankCode}-{AccountName?.Replace(" ", string.Empty)}-{AccountNo?.Substring(AccountNo.Length > 4 ? AccountNo.Length - 4 : 0)}",
                 _ => null
             };
         public int IsKyc { set; get; }
@@ -120,10 +121,13 @@ namespace BackendSite.Service.Model
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
         public string Network { set; get; }
+        public IEnumerable<DepositMessage> DepositMessageList { set; get; }
     }
 
     public class DepositInfoForExport
     {
+        [EpplusIgnore]
+        public int DepositId { set; get; }
         public string TransId { set; get; }
         [EpplusIgnore]
         public int DepositType { set; get; }
@@ -216,6 +220,7 @@ namespace BackendSite.Service.Model
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
         public string Memo { set; get; }
+        public string SendMessages { set; get; }
     }
 
     public class DepositDetailSubmission
@@ -403,6 +408,8 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
         public string DepositMessage { get; set; }
+        
+        public IEnumerable<DepositMessage> DepositMessageList { set; get; }
     }
 
     public class DepositTimeReportOldPara : ApiRequestPageModel
@@ -477,7 +484,7 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
     }
     
-    public class DepositDraftSetRequest
+    public class DepositCalCodeSetRequest
     {
         public int? BankId { get; set; }
         public string DisplayName { get; set; }
@@ -514,5 +521,18 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int ReceiptNo { get; set; }
         public string TransId { get; set; }
+    }
+    
+    public class DepositMessage
+    {
+        private DateTimeOffset _createTime { set; get; }
+        public DepositMessageStatus Status { get; set; }
+        public string Message => Status.GetDescription();
+        public int DepositId { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
     }
 }

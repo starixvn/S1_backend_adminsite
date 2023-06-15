@@ -46,7 +46,8 @@ public class MemberCommand : IMemberCommand
         var tagList = !string.IsNullOrEmpty(tagListStr) ? JsonConvert.DeserializeObject<List<int>>(tagListStr) : new List<int>();
         var beforeTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
 
-        tagList.Add(tagId);
+        if (!tagList.Contains(tagId))
+            tagList.Add(tagId);
         var result = await _memberService.SetCustTag(custId, tagList);
         if (result <= 0) return result;
 

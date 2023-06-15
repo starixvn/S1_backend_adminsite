@@ -267,6 +267,7 @@ public class CustomerDto
     public DateTime? PhoneVerifyTime { get; set; }
     public DateTime? EmailVerifyTime { get; set; }
     public int MemberType { get; set; }
+    public int Exclusive { get; set; }
 }
 
 public class CustomerTag
@@ -321,6 +322,7 @@ public class CustomerBasicInfo
     public DateTimeOffset? PhoneVerifyTime { get; set; }
     public DateTimeOffset? EmailVerifyTime { get; set; }
     public int MemberType { get; set; }
+    public int Exclusive { get; set; }
 }
 
 public class AffInfo
@@ -387,6 +389,12 @@ public class SetVipLevelManuallyRequest
 {
     public int CustId { get; set; }
     public int Manually { get; set; }
+}
+
+public class AutoVipDowngradeExclusionRequest
+{
+    public int CustId { get; set; }
+    public bool Enable { get; set; }
 }
 
 public class AddTagRequest
@@ -689,7 +697,6 @@ public class PromotionReceiveFailLog
     public int CustId { get; set; }
     public int CurrencyId { get; set; }
 }
-
 public class RegisterCustomerRequest
 {
     public int SiteId { get; set; }
@@ -731,3 +738,9 @@ public class SetTpGameTypeSettingRequest
     public CustTpGameTypeSettingGetType SetDataType { get; set; }
     public IEnumerable<int> TpGameTypes { get; set; }
 }
+
+public class ResetOtpTimesRequest
+{
+    public int CustId { get; set; }
+}
+

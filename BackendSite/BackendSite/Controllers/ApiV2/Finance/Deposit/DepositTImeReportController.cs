@@ -76,16 +76,22 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             
             var result = _depositBll.DepositTimeReportGet(req, out int totalPages, out int rowCount, out List<TotalAmount>  currencyTotalAmount);
 
-            foreach (var data in result)
+            if (result.Any())
             {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-                if (data.DepositTime != null)
-                    data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
-                if (data.ApprovedTime != null)
-                    data.ApprovedTime = new DateTimeOffset(data.ApprovedTime.Value.DateTime, TimeSpan.Zero);
+                var msgs = _depositBll.GetDepositMessageByDepositIds(result.Select(x => x.DepositId));
+                foreach (var data in result)
+                {
+                    data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
+                    data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
+                    if (data.DepositTime != null)
+                        data.DepositTime = new DateTimeOffset(data.DepositTime.Value.DateTime, TimeSpan.Zero);
+                    if (data.ApprovedTime != null)
+                        data.ApprovedTime = new DateTimeOffset(data.ApprovedTime.Value.DateTime, TimeSpan.Zero);
+                    data.DepositMessageList = msgs
+                        .Where(x => x.DepositId == data.DepositId)
+                        .OrderByDescending(x => x.CreateTime);
+                }
             }
-
             apiListResult.Data = result;
             apiListResult.PageNumber = req.PageNumber;
             apiListResult.TotalPages = totalPages;
@@ -117,16 +123,27 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 , JsonConvert.SerializeObject(req.Statuses)
                 , JsonConvert.SerializeObject(req.CurrencyIds)
                 ,req.MemberId);
-            TimeSpan offset = req.StartDate.Offset;
-            foreach (var data in exportData)
+            var offset = req.StartDate.Offset;
+            
+            if (exportData.Any())
             {
-                data.CreateTime = data.CreateTime.ToOffset(offset);
-                data.UpdateTime = data.UpdateTime.ToOffset(offset);
-                if (data.EndFlowTime != null)
-                    data.EndFlowTime = data.EndFlowTime?.ToOffset(offset);
-                if (data.StatementTime != null)
-                    data.StatementTime = data.StatementTime?.ToOffset(offset);
+                var msgs = _depositBll.GetDepositMessageByDepositIds(exportData.Select(x => x.DepositId));
+
+                foreach (var data in exportData)
+                {
+                    data.CreateTime = data.CreateTime.ToOffset(offset);
+                    data.UpdateTime = data.UpdateTime.ToOffset(offset);
+                    if (data.EndFlowTime != null)
+                        data.EndFlowTime = data.EndFlowTime?.ToOffset(offset);
+                    if (data.StatementTime != null)
+                        data.StatementTime = data.StatementTime?.ToOffset(offset);
+                    data.SendMessage = string.Join(", ", msgs
+                        .Where(x => x.DepositId == data.DepositId)
+                        .OrderBy(x => x.CreateTime)
+                        .Select(x => x.Message));
+                }
             }
+            
 
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "DepositTimeReport");
