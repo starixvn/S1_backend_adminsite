@@ -81,6 +81,7 @@
   <data name="Currency_13"><value>CNY</value></data>
   <data name="Currency_20"><value>UUS</value></data>
   <data name="Currency_32"><value>JPY</value></data>
+  <data name="Currency_72"><value>KHUSD</value></data>
   <data name="lbl_WithdrawalRequest"><value>Withdrawal Request</value></data>
   <data name="lbl_WithdrawalType"><value>Withdrawal Type</value></data>
   <data name="lbl_MessageDepositWithdrawalSender"><value>System</value></data>

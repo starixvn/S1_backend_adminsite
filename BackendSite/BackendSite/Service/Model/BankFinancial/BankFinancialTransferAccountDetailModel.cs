@@ -89,6 +89,8 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶顯示名稱
         /// </summary>
         public string DisplayName { get; set; }
+        
+        public string FrontendDisplayName { get; set; }
 
         /// <summary>
         /// 讀寫 初始金額
@@ -180,6 +182,7 @@ namespace BackendSite.Service.Model.BankFinancial
             AccountNo = data.AccountNo;
             AccountName = data.AccountName;
             DisplayName = data.DisplayName;
+            FrontendDisplayName = data.FrontendDisplayName;
             InitialAmount = data.InitialAmount;
             InitialTime = data.InitialTime;
             Status = data.Status;
@@ -225,6 +228,8 @@ namespace BackendSite.Service.Model.BankFinancial
 
         public string DisplayName { get; set; }
 
+        public string FrontendDisplayName { get; set; }
+
         public decimal InitialAmount { get; set; }
         public DateTimeOffset InitialTime { get; set; }
         
@@ -254,6 +259,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public string AccountNo { get; set; }
         public string AccountName { get; set; }
         public string DisplayName { get; set; }
+        public string FrontendDisplayName { get; set; }
         public decimal InitialAmount { get; set; }
         public decimal MaxBalanceAlertAmount { get; set; }
         public string Remark { get; set; }
