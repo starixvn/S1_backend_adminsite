@@ -4,6 +4,7 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
 using Dapper;
 using System.Data;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.DAL
 {
@@ -18,7 +19,7 @@ namespace BackendSite.Service.DAL
             _redisHelper = redisHelper;
         }
 
-        public async Task<IEnumerable<MpaRateDto>> GetMpaExchangeRate(DateTimeOffset starTime, DateTimeOffset endTime,int baseCurrencyId = 0)
+        public async Task<IEnumerable<MpaRateDto>> GetMpaExchangeRate(DateTimeOffset starTime, DateTimeOffset endTime, int baseCurrencyId = 0)
         {
             var redisKey = $"MpaExchangeRate:{starTime:yyyy-MM-dd HH:mm:ss}:{endTime:yyyy-MM-dd HH:mm:ss}:{baseCurrencyId}";
 
@@ -34,7 +35,7 @@ namespace BackendSite.Service.DAL
             {
                 var exchangeRate = await _redisHelper.TryGetOrCreateAsync(redisKey,
                     TimeSpan.FromMinutes(10),
-                    async () => (await GetRateFromDb(starTime, endTime)).Where(x=>x.TargetCurrencyId == baseCurrencyId));
+                    async () => (await GetRateFromDb(starTime, endTime)).Where(x => x.TargetCurrencyId == baseCurrencyId));
 
                 return exchangeRate;
             }
@@ -120,6 +121,27 @@ namespace BackendSite.Service.DAL
             };
 
             return $"{originRegisteredDate.Substring(0, 3)}{monthText}{originRegisteredDate.Substring(5, originRegisteredDate.Length - 5)}";
+        }
+
+        public Dictionary<TKey, TValue> SortExportData<TKey, TValue>(Dictionary<TKey, TValue> exportData, string sortField, OrderByDirection sortOrder)
+        {
+            var propertyNames = typeof(TValue).GetProperties().Where(x => x.Name.ToLower() == sortField.ToLower());
+            var propertyName = propertyNames.Select(x => x.Name).FirstOrDefault() ?? "";
+
+            var propertyInfo = typeof(TValue).GetProperty(propertyName);
+            if (propertyInfo == null || propertyInfo.PropertyType != typeof(decimal))
+            {
+                throw new ArgumentException("Invalid sort field or type.");
+            }
+
+            if (sortOrder == OrderByDirection.Ascending)
+            {
+                return exportData.OrderBy(kvp => (decimal)propertyInfo.GetValue(kvp.Value))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            }
+
+            return exportData.OrderByDescending(kvp => (decimal)propertyInfo.GetValue(kvp.Value))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
         private Task<IEnumerable<MpaRateDto>> GetRateFromDb(DateTimeOffset starTime, DateTimeOffset endTime)
