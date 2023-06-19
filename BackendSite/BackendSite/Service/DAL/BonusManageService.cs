@@ -105,7 +105,54 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<ScratchCardExport>("Admin_ScratchCardCodeListExport_Get_V2", new DynamicParameters(new { SpecialCode = specialCode }));
         }
-        
+
+        /// <summary>
+        /// 設定bonus允許名單ID
+        /// </summary>
+        /// <param name="bonusCode"></param>
+        /// <param name="siteId"></param>
+        /// <param name="creator"></param>
+        /// <returns></returns>
+        public int SetBonusCustUsingInfo(int siteId ,string bonusCode, string creator )
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_BonusCode", bonusCode);
+            p.Add("_Creator", creator);
+            p.Add("_Id", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            _mainDbClient.Execute("Admin_BonusCustUsingInfo_Set", p);
+            var id = p.Get<int?>("_Id") == null ? 0 : p.Get<int>("_Id");
+
+            return id;
+        }
+
+        /// <summary>
+        /// 設定bonus允許名單
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public bool SetBonusCustUsingDetail(List<BonusCustUsing> list)
+        {
+            var result = _mainDbClient.Execute("Admin_BonusCustUsingDetail_Set", list);
+            
+            return result > 0;
+        }
+
+        /// <summary>
+        /// 取得 bonus允許名單
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<BonusCustUsingList> GetBonusCustUsingDetail(int siteId, string bonusCode)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_BonusCode", bonusCode);
+            var result = _reportDbClient.Query<BonusCustUsingList>("Admin_BonusCustUsingDetail_Get", p);
+            
+            return result ;
+        }
+
         #region Public Method
 
         /// <summary>
@@ -813,7 +860,7 @@ namespace BackendSite.Service.DAL
 
             return affectCount == expectedRow;
         }
-
+        
         #endregion
 
         #region
