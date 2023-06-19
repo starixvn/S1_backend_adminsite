@@ -887,6 +887,7 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
+        RebateExcludeGame = 89,
         AutoWithdrawalRule = 91
     }
 
