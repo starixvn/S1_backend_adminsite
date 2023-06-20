@@ -160,7 +160,8 @@ namespace BackendSite.Service.BLL
                 AffiliateId = a.AffiliateId,
                 AffiliateCode = a.AffiliateCode,
                 LastActivityIp = a.LastActivityIp,
-                Tag = GetTag(allTagList, a.TagList)
+                Tag = GetTag(allTagList, a.TagList),
+                UserType = a.UserType
             });
             if (request.ExportTransferWallet)
             {
