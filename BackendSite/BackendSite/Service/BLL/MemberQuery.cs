@@ -98,7 +98,30 @@ namespace BackendSite.Service.BLL
                 TotalPages = memberList.TotalPages,
                 RowCount = memberList.RowCount
             };
+
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                response.Data = SortByUserName(response.Data, request.UserName);
+            }
             return response;
+        }
+
+        private IEnumerable<MemberList> SortByUserName(IEnumerable<MemberList> source, string userName)
+        {
+            // 先全部用UserName排序
+            var result = source.OrderBy(i => i.UserName).ToList();
+            // 檢查是否有完全符合的UserName
+            var index = result.FindIndex(x => x.UserName == userName);           
+            if (index != -1)
+            {
+                var item = result[index];
+                // 移除比對相符的資料
+                result.RemoveAt(index);
+                // 放到第一筆資料
+                result.Insert(0, item);
+            }
+
+            return result;
         }
 
         public async Task<IEnumerable<MemberExportData>> GetExportDataAsync(ExportMemberRequest request)

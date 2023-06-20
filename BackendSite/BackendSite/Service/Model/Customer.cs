@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -184,6 +185,13 @@ namespace BackendSite.Service.Model
 
     #region CustBonusTotalSum
 
+    public class CustBonusTypeBonusAmount
+    {
+        public PromotionTypeEnum PromotionType { get; set; }
+        public decimal BonusAmount { get; set; }
+        public decimal CancelBonus { get; set; }
+    }
+    
     public class CustBonusSum
     {
         public decimal FirstDeposit { get; set; }
@@ -191,14 +199,11 @@ namespace BackendSite.Service.Model
         public decimal FreeBet { get; set; }
         public decimal CashBack { get; set; }
         public decimal RetentionBonus { get; set; }
+        public decimal DeviceBonus { get; set; }
         public decimal ManualBonus { get; set; }
         public decimal CancelBonusAmount { get; set; }
         public decimal RewardPoint { get; set; }
-        public decimal TotalBonus
-        {
-            get => FirstDeposit + ReDeposit + FreeBet + CashBack + RetentionBonus + ManualBonus;
-            set => TotalBonus = value;
-        }
+        public decimal TotalBonus => FirstDeposit + ReDeposit + FreeBet + CashBack + RetentionBonus + ManualBonus + DeviceBonus;
     }
 
     public class CustRebateCategory
@@ -604,6 +609,8 @@ namespace BackendSite.Service.Model
         public decimal TodayWithdrawal { get; set; }
         public decimal TodayWinLoss { get; set; }
         public decimal TodayBetting { get; set; }
+        public decimal TodayBonus { get; set; }
+        public decimal TodayReward { get; set; }
     }
 
     public class ImportDataByExcelModel
