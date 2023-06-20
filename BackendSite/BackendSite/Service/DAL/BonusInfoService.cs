@@ -204,6 +204,51 @@ namespace BackendSite.Service.DAL
             return (result, custId);
         }
         
+        public List<MpaBonusInfo> GetMpaBonusInfoList(
+            int siteId,
+            string currencyIds,
+            string bonusStatuses,
+            string bonusTypes,
+            string bonusCode,
+            DateTime startDate,
+            DateTime endDate,
+            string claimStatuses,
+            string timeZone)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_Statuses", bonusStatuses);
+            props.Add("_BonusTypes", bonusTypes);
+            props.Add("_BonusCode", bonusCode);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_ClaimStatuses", claimStatuses);
+            props.Add("_TimeZone", timeZone);
+            
+            var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get_V2", props);
+
+            return result.ToList();
+        }
+        
+        public List<MpaBonusGGR> GetMpaBonusGGRList(
+            int siteId,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            string timeZone)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            props.Add("_TimeZone", timeZone);
+            
+            var result = _reportDbClient.Query<MpaBonusGGR>("Admin_BonusSummaryGGR_Get", props);
+
+            return result.ToList();
+        }
         
         public IEnumerable<MpaMarketingBonus> GetMpaMarketingBonus(
             int siteId,
@@ -225,9 +270,32 @@ namespace BackendSite.Service.DAL
         public CustBonusSum GetCustBonusSum(int siteId,int custId)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
             props.Add("_CustId", custId);
-            var result = _reportDbClient.QueryFirst<CustBonusSum>("Admin_CustBonusSum_Get", props);
+            props.Add("_RewardPoint", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            
+            var data =
+                _reportDbClient.Query<CustBonusTypeBonusAmount>("Admin_CustBonusSum_Get_V2", props);
+
+            var result = new CustBonusSum
+            {
+                FirstDeposit = data.Where(x => x.PromotionType == PromotionTypeEnum.FstDeposit)
+                    .Sum(x => x.BonusAmount),
+                ReDeposit = data.Where(x => x.PromotionType == PromotionTypeEnum.ReDeposit)
+                    .Sum(x => x.BonusAmount),
+                FreeBet = data.Where(x => x.PromotionType == PromotionTypeEnum.FreeBet)
+                    .Sum(x => x.BonusAmount),
+                CashBack = data.Where(x => x.PromotionType == PromotionTypeEnum.Cashback)
+                    .Sum(x => x.BonusAmount),
+                ManualBonus = data.Where(x => x.PromotionType == PromotionTypeEnum.SpecialBonus)
+                    .Sum(x => x.BonusAmount),
+                RetentionBonus = data.Where(x => x.PromotionType == PromotionTypeEnum.RetentionFreeBet)
+                    .Sum(x => x.BonusAmount),
+                DeviceBonus = data.Where(x => x.PromotionType == PromotionTypeEnum.DeviceBonus)
+                    .Sum(x => x.BonusAmount),
+                CancelBonusAmount = data.Sum(x => x.CancelBonus),
+                RewardPoint = props.Get<decimal?>("_RewardPoint") ?? 0
+            };
+            
             return result;
         }
 
@@ -279,39 +347,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<BonusCodeInfo>("Admin_BonusCode_Get", new { BonusIdList = JsonConvert.SerializeObject(bonusIdList) });
         }
-
-        public List<MpaBonusInfo> GetMpaBonusInfoList(
-            int siteId,
-            string currencyIds,
-            string bonusStatuses,
-            string bonusTypes,
-            string bonusCode,
-            DateTime startDate,
-            DateTime endDate,
-            string claimStatuses,
-            int baseCurrencyId,
-            bool isGroupByDate,
-            string timeZone
-            )
-        {
-            var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyIds", currencyIds);
-            props.Add("_Statuses", bonusStatuses);
-            props.Add("_BonusTypes", bonusTypes);
-            props.Add("_BonusCode", bonusCode);
-            props.Add("_StartDate", startDate);
-            props.Add("_EndDate", endDate);
-            props.Add("_ClaimStatuses", claimStatuses);
-            props.Add("_BaseCurrencyId", baseCurrencyId);
-            props.Add("_IsGroupByDate", isGroupByDate);
-            props.Add("_TimeZone", timeZone);
-
-            var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get", props);
-
-            return result.ToList();
-        }
-
+        
         public List<MpaBonusDetail> GetMpaBonusDetailList(
             int siteId,
             string currencyIds,
@@ -335,26 +371,7 @@ namespace BackendSite.Service.DAL
             var result = _reportDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
             return result.ToList();
         }
-
-        public List<MpaMarketingBonus> GetMpaMarketingBonus(
-            int siteId,
-            string currencyIds,
-            DateTime startDate,
-            DateTime endDate,
-            int baseCurrencyId)
-        {
-            var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyIds", currencyIds);
-            props.Add("_StartDate", startDate);
-            props.Add("_EndDate", endDate);
-            props.Add("_BaseCurrencyId", baseCurrencyId);
-
-            var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
-
-            return result.ToList();
-        }
-
+        
         public List<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(
             int siteId,
             string currencyIds,

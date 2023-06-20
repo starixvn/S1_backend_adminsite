@@ -78,6 +78,7 @@ namespace BackendSite.Service.BLL
                 {
                     UserName = item.UserName,
                     FullName = item.AccountName,
+                    AffCode = item.AffCode,
                     PhoneNo = item.PhoneNo,
                     RegTime = new DateTimeOffset(item.RegTime, TimeSpan.Zero).ToOffset(offset),
                     LastActiveTime = new DateTimeOffset(item.LastActiveTime, TimeSpan.Zero).ToOffset(offset),
@@ -105,6 +106,7 @@ namespace BackendSite.Service.BLL
                     { "RegTime", a.RegTime },
                     { "LastActiveTime", a.LastActiveTime },
                     { "DepositStatus", a.DepositStatus },
+                    { "AffiliatesCode", a.AffCode },
                     { "Note", a.Note },
                     { "ReferralUrl", a.ReferralUrl },
                     { "FTD Date", a.FTDDate.Equals(default) ? "" : a.FTDDate.ToString("yyyy-MM-dd HH:mm:ss") },

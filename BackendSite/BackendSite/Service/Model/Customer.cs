@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -184,6 +185,13 @@ namespace BackendSite.Service.Model
 
     #region CustBonusTotalSum
 
+    public class CustBonusTypeBonusAmount
+    {
+        public PromotionTypeEnum PromotionType { get; set; }
+        public decimal BonusAmount { get; set; }
+        public decimal CancelBonus { get; set; }
+    }
+    
     public class CustBonusSum
     {
         public decimal FirstDeposit { get; set; }

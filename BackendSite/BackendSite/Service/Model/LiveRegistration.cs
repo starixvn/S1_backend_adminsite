@@ -26,6 +26,7 @@ namespace BackendSite.Service.Model
     public class ExportRegLiveStatusData
     {
         public string UserName { get; set; }
+        public string AffCode { get; set; }
         public int ActStatus { get; set; }
         public DateTime RegTime { get; set; }
         public DateTime LastActiveTime { get; set; }
@@ -79,6 +80,7 @@ namespace BackendSite.Service.Model
     {
         public string UserName { get; set; }
         public string FullName { get; set; }
+        public string AffCode { get; set; }
         public string DepositStatus { get; set; }
         public DateTimeOffset RegTime { get; set; }
         public DateTimeOffset LastActiveTime { get; set; }

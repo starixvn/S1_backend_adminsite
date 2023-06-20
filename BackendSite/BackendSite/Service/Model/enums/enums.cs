@@ -655,7 +655,8 @@ namespace BackendSite.Service.Model.enums
         Rebate = 6,
         Cashback = 7,
         SpecialBonus = 8,
-        RetentionFreeBet = 9
+        RetentionFreeBet = 9,
+        DeviceBonus = 10
     }
 
     public enum PromotionCategoryEnum
@@ -718,8 +719,14 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-
-
+    
+    public enum BonusGroupByType
+    {
+        BonusCode = 0,
+        Date = 1 ,
+        Month = 2
+    }
+    
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -1522,7 +1529,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Goal123")]
         GOAL123 = 2,
         [Description("Bwing")]
-        BWING = 3
+        BWING = 3,
+        [Description("Soon88")]
+        SOON88 = 4,
+        [Description("ivorysport")]
+        IVORYSPORT = 5
     }
 
     public enum AffSiteEnum
