@@ -691,7 +691,6 @@ namespace BackendSite.Service.BLL.Mpa
         {
             // 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
-            var exportData = new List<MpaWinLossByTpCategoryDto>();
             var allCurrencySummary = new List<MpaWinLossByTpCategoryDto>();
             var keys = data.OriginTpBetRecordResult.Select(x => x.TpCategoryName).Distinct();
 
@@ -723,7 +722,8 @@ namespace BackendSite.Service.BLL.Mpa
                 allCurrencySummary.Add(result);
             }
 
-            // sort
+            #region Sort
+
             allCurrencySummary = request.OrderBy
                 ? allCurrencySummary.OrderBy(request).ToList()
                 : allCurrencySummary;
@@ -732,6 +732,7 @@ namespace BackendSite.Service.BLL.Mpa
                 ? data.OriginTpBetRecordResult
                 : data.AlreadyMultiplyRateTpBetRecordResult;
 
+            var exportData = new List<MpaWinLossByTpCategoryDto>();
             foreach (var currencySummary in allCurrencySummary)
             {
                 var currencyDetail = request.OrderBy
@@ -742,8 +743,10 @@ namespace BackendSite.Service.BLL.Mpa
                 exportData.AddRange(currencyDetail);
             }
 
+            #endregion
 
-            // total
+            #region total
+
             exportData.Add(new MpaWinLossByTpCategoryDto()
             {
                 TpCategoryName = "total",
@@ -763,6 +766,8 @@ namespace BackendSite.Service.BLL.Mpa
                     ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m
             });
+
+            #endregion
 
             return exportData.ToExcelFormat();
         }
@@ -813,21 +818,28 @@ namespace BackendSite.Service.BLL.Mpa
                 exportData.Add(key, result);
             }
 
-            // Sort
+            #region Sort
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "tpcategoryname"
+                ? "key"
+                : request.OrderByProperty;
+
             exportData = request.OrderBy
-                ? _mpaCommonService.SortApiData(exportData, request.OrderByProperty, request.OrderByDirection)
+                ? _mpaCommonService.SortApiData(exportData, orderByProperty, request.OrderByDirection)
                 : exportData;
 
             foreach (var item in exportData)
             {
                 var currencyDetail = request.OrderBy
-                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, request.OrderByProperty, request.OrderByDirection)
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, orderByProperty, request.OrderByDirection)
                     : item.Value.CurrencyDetail;
-
                 item.Value.CurrencyDetail = currencyDetail;
             }
 
-            // total
+            #endregion
+
+            #region total
+
             exportData.Add("total", new MpaWinLossByTpCategoryResponse()
             {
                 TurnOver = exportData.Sum(x => x.Value.TurnOver),
@@ -846,6 +858,8 @@ namespace BackendSite.Service.BLL.Mpa
                     ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
                     : 0.00m
             });
+
+            #endregion
 
             return exportData.ToApiFormat();
         }
@@ -1347,9 +1361,18 @@ namespace BackendSite.Service.BLL.Mpa
                 };
 
                 apiData.Add(key, result);
-
             }
 
+            var orderByProperty = request.OrderByProperty.ToLower() == "username"
+                ? "key"
+                : request.OrderByProperty;
+
+
+            apiData = request.OrderBy
+                ? _mpaCommonService.SortApiData(apiData, request.OrderByProperty, request.OrderByDirection)
+                : apiData;
+
+            
             return apiData.ToApiFormat();
         }
 

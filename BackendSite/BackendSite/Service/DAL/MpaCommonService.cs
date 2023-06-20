@@ -141,7 +141,7 @@ namespace BackendSite.Service.DAL
             var propertyName = propertyNames.Select(x => x.Name).FirstOrDefault() ?? "";
 
             var propertyInfo = typeof(TValue).GetProperty(propertyName);
-            if (propertyInfo == null || propertyInfo.PropertyType != typeof(decimal))
+            if (propertyInfo == null)
             {
                 throw new ArgumentException("Invalid sort field or type.");
             }
