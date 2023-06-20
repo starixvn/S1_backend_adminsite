@@ -148,7 +148,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
             p.Add("_BonusCode", bonusCode);
-            var result = _reportDbClient.Query<BonusCustUsingList>("Admin_BonusCustUsingDetail_Get", p);
+            var result = _reportDbClient.Query<BonusCustUsingList>("Service_BonusCustUsingDetail_Get", p);
             
             return result ;
         }
