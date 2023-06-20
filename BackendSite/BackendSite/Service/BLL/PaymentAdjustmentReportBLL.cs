@@ -303,7 +303,8 @@ namespace BackendSite.Service.BLL
                 Memo = row.Memo,
                 Operator = row.Operator,
                 WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
-                DepositId = row.DepositId
+                DepositId = row.DepositId,
+                UserType = row.UserType
             }));
 
             return result;
