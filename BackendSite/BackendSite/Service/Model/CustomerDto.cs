@@ -160,6 +160,8 @@ public class MemberExportDataDto
     public decimal SeamlessWallet { get; set; }
     public decimal BonusWallet { get; set; }
     public string TagList { get; set; }
+
+    public MemberTypeEnum UserType { get; set; }
 }
 
 public class MemberExportData
@@ -192,9 +194,7 @@ public class MemberExportData
     public string AffiliateCode { get; set; }
     public string LastActivityIp { get; set; }
     public string Tag { get; set; }
-    [ExportIgnore]
     public MemberTypeEnum UserType { get; set; }
-    public string UserTypeName => UserType.ToString();
 }
 
 public class GetCustomerBasicInfoRequest
