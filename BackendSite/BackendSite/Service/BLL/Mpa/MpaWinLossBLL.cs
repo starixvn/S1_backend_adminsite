@@ -420,13 +420,9 @@ namespace BackendSite.Service.BLL.Mpa
         {
             // 注單資料
             var data = await GetTpBetRecordGroupByTpGameTypeResult(request, groupByType);
-
             var keys = data.OriginTpBetRecordResult.Select(x => x.TpGameTypeName).Distinct();
-            var exportData = new List<MpaWinLossByTpGameTypeDto>();
-            exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
-                ? data.OriginTpBetRecordResult
-                : data.AlreadyMultiplyRateTpBetRecordResult);
 
+            var allCurrencySummary = new List<MpaWinLossByTpGameTypeDto>();
             foreach (var key in keys)
             {
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpGameTypeName == key).ToList();
@@ -452,14 +448,34 @@ namespace BackendSite.Service.BLL.Mpa
                         : 0.00m
                 };
 
-                exportData.Add(result);
+                allCurrencySummary.Add(result);
             }
 
-            exportData = request.OrderBy
-                ? exportData.OrderBy(request).ToList()
-                : exportData.OrderBy(x => x.TpGameTypeName).ThenBy(x => x.Currency).ToList();
+            #region sort
 
-            // total
+            allCurrencySummary = request.OrderBy
+                ? allCurrencySummary.OrderBy(request).ToList()
+                : allCurrencySummary;
+
+            var currencyDetails = request.DisplayGroupBreakdownInOriginalCurrency
+                ? data.OriginTpBetRecordResult
+                : data.AlreadyMultiplyRateTpBetRecordResult;
+
+            var exportData = new List<MpaWinLossByTpGameTypeDto>();
+
+            foreach (var currencySummary in allCurrencySummary)
+            {
+                var currencyDetail = request.OrderBy
+                    ? currencyDetails.Where(r => r.TpGameTypeName == currencySummary.TpGameTypeName).OrderBy(request).ToList()
+                    : currencyDetails.Where(r => r.TpGameTypeName == currencySummary.TpGameTypeName).ToList();
+                exportData.Add(currencySummary);
+                exportData.AddRange(currencyDetail);
+            }
+
+            #endregion
+
+            #region total
+
             exportData.Add(new MpaWinLossByTpGameTypeDto()
             {
                 TpGameTypeName = "total",
@@ -480,6 +496,8 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m
             });
 
+            #endregion
+
             return exportData.ToExcelFormat();
         }
 
@@ -491,18 +509,12 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByTpGameTypeResponseToFrontEnd>> GetMapWinLossByTpGameTypeResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            var responseResult = new Dictionary<string, MpaWinLossByTpGameTypeResponse>();
-
             // 注單資料
             var data = await GetTpBetRecordGroupByTpGameTypeResult(request, groupByType);
             var tpBetRecordResult = data.OriginTpBetRecordResult;
 
-            var combineResult = request.OrderBy
-                ? tpBetRecordResult.OrderBy(request)
-                : tpBetRecordResult.OrderBy(r => r.TpGameTypeName).ThenBy(x => x.Currency).AsEnumerable();
-
-            var keys = combineResult.Select(x => x.TpGameTypeName).Distinct();
-
+            var keys = tpBetRecordResult.Select(x => x.TpGameTypeName).Distinct();
+            var responseResult = new Dictionary<string, MpaWinLossByTpGameTypeResponse>();
             foreach (var key in keys)
             {
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpGameTypeName == key).ToList();
@@ -533,7 +545,28 @@ namespace BackendSite.Service.BLL.Mpa
                 responseResult.Add(key, result);
             }
 
-            // total
+            #region Sort Data
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "tpgametypename"
+                ? "key"
+                : request.OrderByProperty;
+
+            responseResult = request.OrderBy
+                ? _mpaCommonService.SortApiData(responseResult, orderByProperty, request.OrderByDirection)
+                : responseResult;
+
+            foreach (var item in responseResult)
+            {
+                var currencyDetail = request.OrderBy
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, orderByProperty, request.OrderByDirection)
+                    : item.Value.CurrencyDetail;
+                item.Value.CurrencyDetail = currencyDetail;
+            }
+
+            #endregion
+
+            #region total
+
             responseResult.Add("total", new MpaWinLossByTpGameTypeResponse()
             {
                 TurnOver = responseResult.Sum(x => x.Value.TurnOver),
@@ -552,6 +585,8 @@ namespace BackendSite.Service.BLL.Mpa
                         ? responseResult.Sum(x => x.Value.GGR) / responseResult.Sum(x => x.Value.ValidTurnOver)
                         : 0.00m
             });
+
+            #endregion
 
             return responseResult.ToApiFormat();
         }

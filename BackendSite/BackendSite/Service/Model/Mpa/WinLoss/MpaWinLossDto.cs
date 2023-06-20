@@ -542,9 +542,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
     public class MpaWinLossByTpGameTypeDto
     {
-        [JsonIgnore]
-        public string Date { get; set; }
-
         public string TpGameTypeName { get; set; }
 
         public string Currency { get; set; }
@@ -572,6 +569,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         [EpplusIgnore]
 
         public decimal Margin { get; set; }
+        [DisplayName("Margin")]
 
         public string MarginStr { get; set; }
     }
