@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -47,6 +48,7 @@ namespace BackendSite.Service.Model
         public int Category { get; set; }
         public string CategoryName { get; set; }
         public string DepositId { get; set; }
+        public MemberTypeEnum UserType { get; set; }
     }
 
     public class PaymentAdjustmentWrapper
