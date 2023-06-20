@@ -1904,9 +1904,9 @@ namespace BackendSite.Service.Model.enums
 
     public enum UpgradeSettingEnum
     {
-        [Description("Tier Upgrade Bonus")]
-        UpDeposit = 0,
         [Description("Monthly Minimum Deposit")]
+        UpDeposit = 0,
+        [Description("Tier Upgrade Bonus")]
         UpBonus = 1,
         [Description("Minimum Deposit Within Validity Period")]
         DownDeposit = 2,
