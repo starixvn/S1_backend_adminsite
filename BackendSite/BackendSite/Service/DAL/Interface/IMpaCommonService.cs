@@ -57,7 +57,7 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="sortField"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Dictionary<TKey, TValue> SortExportData<TKey, TValue>(
+        Dictionary<TKey, TValue> SortApiData<TKey, TValue>(
             Dictionary<TKey, TValue> exportData,
             string sortField,
             OrderByDirection sortOrder);

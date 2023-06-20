@@ -123,8 +123,20 @@ namespace BackendSite.Service.DAL
             return $"{originRegisteredDate.Substring(0, 3)}{monthText}{originRegisteredDate.Substring(5, originRegisteredDate.Length - 5)}";
         }
 
-        public Dictionary<TKey, TValue> SortExportData<TKey, TValue>(Dictionary<TKey, TValue> exportData, string sortField, OrderByDirection sortOrder)
+        public Dictionary<TKey, TValue> SortApiData<TKey, TValue>(Dictionary<TKey, TValue> exportData, string sortField, OrderByDirection sortOrder)
         {
+            if (sortField == "key")
+            {
+                if (sortOrder == OrderByDirection.Ascending)
+                {
+                    return exportData.OrderBy(kvp => kvp.Key)
+                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                }
+
+                return exportData.OrderByDescending(kvp => kvp.Key)
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            }
+            
             var propertyNames = typeof(TValue).GetProperties().Where(x => x.Name.ToLower() == sortField.ToLower());
             var propertyName = propertyNames.Select(x => x.Name).FirstOrDefault() ?? "";
 
@@ -136,11 +148,11 @@ namespace BackendSite.Service.DAL
 
             if (sortOrder == OrderByDirection.Ascending)
             {
-                return exportData.OrderBy(kvp => (decimal)propertyInfo.GetValue(kvp.Value))
+                return exportData.OrderBy(kvp => propertyInfo.GetValue(kvp.Value))
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
 
-            return exportData.OrderByDescending(kvp => (decimal)propertyInfo.GetValue(kvp.Value))
+            return exportData.OrderByDescending(kvp => propertyInfo.GetValue(kvp.Value))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 

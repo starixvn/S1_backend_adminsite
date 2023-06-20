@@ -47,11 +47,7 @@ namespace BackendSite.Service.BLL.Mpa
             var originCombineResult = ByDateCombineResult(request, betRecord.OriginTpBetRecordResult, transaction.OriginTransactionResult, bonus.OriginBonusResult).ToList();
             var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, betRecord.AlreadyMultiplyRateTpBetRecordResult, transaction.AlreadyMultiplyRateTransactionResult, bonus.AlreadyMultiplyRateBonusResult).ToList();
 
-            var exportData = new List<MpaWinLossByDateDto>();
-            exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
-            ? originCombineResult
-            : alreadyMultiplyRateCombineResult);
-
+            var allCurrencySummary = new List<MpaWinLossByDateDto>();
             var keys = originCombineResult.Select(x => x.Date).Distinct();
             foreach (var key in keys)
             {
@@ -83,12 +79,28 @@ namespace BackendSite.Service.BLL.Mpa
                     TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                 };
 
-                exportData.Add(result);
+                allCurrencySummary.Add(result);
             }
 
-            exportData = request.OrderBy
-                ? exportData.OrderBy(request).ToList()
-                : exportData.OrderBy(x => x.Date).ThenBy(x => x.Currency).ToList();
+            #region Sort
+
+            allCurrencySummary = request.OrderBy
+                ? allCurrencySummary.OrderBy(request).ToList()
+                : allCurrencySummary;
+            var currencyDetails = request.DisplayGroupBreakdownInOriginalCurrency
+                ? originCombineResult
+                : alreadyMultiplyRateCombineResult;
+            var exportData = new List<MpaWinLossByDateDto>();
+            foreach (var currencySummary in allCurrencySummary)
+            {
+                var currencyDetail = request.OrderBy
+                    ? currencyDetails.Where(r => r.Date == currencySummary.Date).OrderBy(request).ToList()
+                    : currencyDetails.Where(r => r.Date == currencySummary.Date).ToList();
+                exportData.Add(currencySummary);
+                exportData.AddRange(currencyDetail);
+            }
+
+            #endregion
 
             // total
             exportData.Add(new MpaWinLossByDateDto()
@@ -180,6 +192,28 @@ namespace BackendSite.Service.BLL.Mpa
                 exportData.Add(key, result);
             }
 
+            #region Sort Data
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "date"
+                ? "key"
+                : request.OrderByProperty;
+
+            exportData = request.OrderBy
+                ? _mpaCommonService.SortApiData(exportData, orderByProperty, request.OrderByDirection)
+                : exportData;
+
+            foreach (var item in exportData)
+            {
+                var currencyDetail = request.OrderBy
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, orderByProperty, request.OrderByDirection)
+                    : item.Value.CurrencyDetail;
+                item.Value.CurrencyDetail = currencyDetail;
+            }
+
+            #endregion
+
+            #region total
+
             // total
             exportData.Add("total", new MpaWinLossByDateResponse()
             {
@@ -198,16 +232,17 @@ namespace BackendSite.Service.BLL.Mpa
                 TotalWithDrawAmount = exportData.Sum(x => x.Value.TotalWithDrawAmount),
                 TotalBonus = exportData.Sum(x => x.Value.TotalBonus),
                 AvgBetAmount = exportData.Sum(x => x.Value.BetCount) != 0
-                    ? (exportData.Sum(x => x.Value.TurnOver) / exportData.Sum(x => x.Value.BetCount))
-                    : 0.00m,
+                ? (exportData.Sum(x => x.Value.TurnOver) / exportData.Sum(x => x.Value.BetCount))
+                : 0.00m,
 
                 Margin = exportData.Sum(x => x.Value.ValidTurnOver) != 0
-                    ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
-                    : 0.00m,
+                ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
+                : 0.00m,
             });
-            var rs = exportData.ToApiFormat();
 
-            return rs;
+            #endregion
+
+            return exportData.ToApiFormat(); 
         }
 
         /// <summary>
@@ -254,7 +289,7 @@ namespace BackendSite.Service.BLL.Mpa
                 TotalBonus = r.Sum(x => x.TotalBonus)
             });
 
-            return request.OrderBy ? combineResult.OrderBy(request) : combineResult.OrderBy(x => x.Date).ThenBy(x => x.Currency);
+            return combineResult;
         }
 
         /// <summary>
@@ -654,7 +689,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             // sort
-            allCurrencySummary = request.OrderBy 
+            allCurrencySummary = request.OrderBy
                 ? allCurrencySummary.OrderBy(request).ToList()
                 : allCurrencySummary;
 
@@ -671,7 +706,7 @@ namespace BackendSite.Service.BLL.Mpa
                 exportData.Add(currencySummary);
                 exportData.AddRange(currencyDetail);
             }
- 
+
 
             // total
             exportData.Add(new MpaWinLossByTpCategoryDto()
@@ -745,13 +780,13 @@ namespace BackendSite.Service.BLL.Mpa
 
             // Sort
             exportData = request.OrderBy
-                ? _mpaCommonService.SortExportData(exportData, request.OrderByProperty, request.OrderByDirection)
+                ? _mpaCommonService.SortApiData(exportData, request.OrderByProperty, request.OrderByDirection)
                 : exportData;
 
             foreach (var item in exportData)
             {
                 var currencyDetail = request.OrderBy
-                    ? _mpaCommonService.SortExportData(item.Value.CurrencyDetail, request.OrderByProperty, request.OrderByDirection)
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, request.OrderByProperty, request.OrderByDirection)
                     : item.Value.CurrencyDetail;
 
                 item.Value.CurrencyDetail = currencyDetail;
