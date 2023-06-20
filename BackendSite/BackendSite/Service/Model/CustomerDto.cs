@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 namespace BackendSite.Service.Model;
 
@@ -191,6 +192,9 @@ public class MemberExportData
     public string AffiliateCode { get; set; }
     public string LastActivityIp { get; set; }
     public string Tag { get; set; }
+    [ExportIgnore]
+    public MemberTypeEnum UserType { get; set; }
+    public string UserTypeName => UserType.ToString();
 }
 
 public class GetCustomerBasicInfoRequest
@@ -707,6 +711,7 @@ public class ResetOtpTimesRequest
 {
     public int CustId { get; set; }
 }
+
 public class RegisterCustomerRequest
 {
     public int SiteId { get; set; }
