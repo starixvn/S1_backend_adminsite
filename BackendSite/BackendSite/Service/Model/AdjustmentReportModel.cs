@@ -116,6 +116,9 @@ namespace BackendSite.Service.Model
         public string CategoryName { get; set; }
 
         public string DepositId { get; set; }
+        [ExportIgnore]
+        public MemberTypeEnum UserType { get; set; }
+        public string UserTypeName => UserType.ToString();
     }
 
 
