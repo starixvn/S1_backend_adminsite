@@ -56,6 +56,7 @@ namespace BackendSite.Service.Model
         public bool IsGroup { get; set; }
         public List<LimitGroup> LimitGroup { get; set; }
         public LimitInput LimitInput { get; set; }
+        public string DefaultGroup { get; set; }
     }
 
     public class GameTypeBetLimit

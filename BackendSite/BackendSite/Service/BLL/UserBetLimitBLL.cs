@@ -34,7 +34,7 @@ namespace BackendSite.Service.BLL
             if (dg != null) 
             {
                 var dgGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(dg.LimitGroup);
-                var dgOption = new BetLimitOption() { CategoryId = (int)TpCategoryEnum.LiveCasino, CategoryName = "Live Casino", GameType = (int)TpGameTypeEnum.DG_LiveCasino, GameTypeName = "DG L.Casino", IsGroup = true, LimitGroup = dgGroup };
+                var dgOption = new BetLimitOption() { CategoryId = (int)TpCategoryEnum.LiveCasino, CategoryName = "Live Casino", GameType = (int)TpGameTypeEnum.DG_LiveCasino, GameTypeName = "DG L.Casino", IsGroup = true, LimitGroup = dgGroup, DefaultGroup = dg.DefaultGroup };
                 listSetting.Add(dgOption);
             }
 
