@@ -242,7 +242,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             #endregion
 
-            return exportData.ToApiFormat(); 
+            return exportData.ToApiFormat();
         }
 
         /// <summary>
@@ -1372,7 +1372,7 @@ namespace BackendSite.Service.BLL.Mpa
                 ? _mpaCommonService.SortApiData(apiData, request.OrderByProperty, request.OrderByDirection)
                 : apiData;
 
-            
+
             return apiData.ToApiFormat();
         }
 
@@ -1456,28 +1456,15 @@ namespace BackendSite.Service.BLL.Mpa
             var alreadyMultiplyRateBonus = bonus.AlreadyMultiplyRateBonus;
 
             // 注單 + 存提款資料合併
-            var originCombineData = request.OrderBy
-                ? originBetRecord
-                    .Concat(originTransaction)
-                    .Concat(originBonus)
-                    .OrderBy(request)
-                    .ToList()
-                : originBetRecord
+            var originCombineData = originBetRecord
                     .Concat(originTransaction)
                     .Concat(originBonus)
                     .ToList();
 
-            var alreadyMultiplyRateCombineData = request.OrderBy
-                ? alreadyMultiplyRateBetRecord
-                    .Concat(alreadyMultiplyRateTransaction)
-                    .Concat(alreadyMultiplyRateBonus)
-                    .OrderBy(request)
-                    .ToList()
-                : alreadyMultiplyRateBetRecord
+            var alreadyMultiplyRateCombineData = alreadyMultiplyRateBetRecord
                     .Concat(alreadyMultiplyRateTransaction)
                     .Concat(alreadyMultiplyRateBonus)
                     .ToList();
-
 
             var originCombineResult = GetGroupResult(originCombineData);
             var alreadyMultiplyRateCombineResult = GetGroupResult(alreadyMultiplyRateCombineData);
@@ -1510,13 +1497,8 @@ namespace BackendSite.Service.BLL.Mpa
                     }).ToList();
             }
 
-            var exportData = new List<MpaWinLossByCurrencyDto>();
-            exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
-            ? originCombineResult
-            : alreadyMultiplyRateCombineResult);
-
             var keys = originCombineResult.Select(x => x.Currency).Distinct();
-
+            var allCurrencySummary = new List<MpaWinLossByCurrencyDto>();
             foreach (var key in keys)
             {
                 var dateSummary = alreadyMultiplyRateCombineResult.Where(x => x.Currency == key).ToList();
@@ -1546,12 +1528,29 @@ namespace BackendSite.Service.BLL.Mpa
                     TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                 };
 
-                exportData.Add(result);
+                allCurrencySummary.Add(result);
             }
 
-            exportData = request.OrderBy
-                ? exportData.OrderBy(request).ToList()
-                : exportData.OrderByDescending(r => r.Currency).ToList();
+            #region Sort
+
+            allCurrencySummary = request.OrderBy
+                ? allCurrencySummary.OrderBy(request).ToList()
+                : allCurrencySummary;
+            var currencyDetails = request.DisplayGroupBreakdownInOriginalCurrency
+                ? originCombineResult
+                : alreadyMultiplyRateCombineResult;
+
+            var exportData = new List<MpaWinLossByCurrencyDto>();
+            foreach (var currencySummary in allCurrencySummary)
+            {
+                var currencyDetail = request.OrderBy
+                    ? currencyDetails.Where(r => r.Currency == currencySummary.Currency.Replace("_All", "")).OrderBy(request).ToList()
+                    : currencyDetails.Where(r => r.Currency == currencySummary.Currency.Replace("_All", "")).ToList();
+                exportData.Add(currencySummary);
+                exportData.AddRange(currencyDetail);
+            }
+
+            #endregion
 
             // total
             exportData.Add(new MpaWinLossByCurrencyDto()
@@ -1610,27 +1609,15 @@ namespace BackendSite.Service.BLL.Mpa
             var alreadyMultiplyRateBonus = bonus.AlreadyMultiplyRateBonus;
 
             // 注單 + 存提款資料合併
-            var originCombineData = request.OrderBy
-                ? originBetRecord
-                    .Concat(originTransaction)
-                    .Concat(originBonus)
-                    .OrderBy(request)
-                    .ToList()
-                : originBetRecord
-                    .Concat(originTransaction)
-                    .Concat(originBonus)
-                    .ToList();
+            var originCombineData = originBetRecord
+                .Concat(originTransaction)
+                .Concat(originBonus)
+                .ToList();
 
-            var alreadyMultiplyRateCombineData = request.OrderBy
-                ? alreadyMultiplyRateBetRecord
-                    .Concat(alreadyMultiplyRateTransaction)
-                    .Concat(alreadyMultiplyRateBonus)
-                    .OrderBy(request)
-                    .ToList()
-                : alreadyMultiplyRateBetRecord
-                    .Concat(alreadyMultiplyRateTransaction)
-                    .Concat(alreadyMultiplyRateBonus)
-                    .ToList();
+            var alreadyMultiplyRateCombineData = alreadyMultiplyRateBetRecord
+                .Concat(alreadyMultiplyRateTransaction)
+                .Concat(alreadyMultiplyRateBonus)
+                .ToList();
 
             var originCombineResult = GetGroupResult(originCombineData);
             var alreadyMultiplyRateCombineResult = GetGroupResult(alreadyMultiplyRateCombineData);
@@ -1702,7 +1689,28 @@ namespace BackendSite.Service.BLL.Mpa
                 apiData.Add(key, result);
             }
 
-            // total
+            #region Sort
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "currency"
+                ? "key"
+                : request.OrderByProperty;
+
+            apiData = request.OrderBy
+                ? _mpaCommonService.SortApiData(apiData, orderByProperty, request.OrderByDirection)
+                : apiData;
+
+            foreach (var item in apiData)
+            {
+                var currencyDetail = request.OrderBy
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, orderByProperty, request.OrderByDirection)
+                    : item.Value.CurrencyDetail;
+                item.Value.CurrencyDetail = currencyDetail;
+            }
+
+            #endregion
+
+            #region total
+
             apiData.Add("total", new MpaWinLossByCurrencyResponse()
             {
                 TurnOver = apiData.Sum(x => x.Value.TurnOver),
@@ -1727,6 +1735,8 @@ namespace BackendSite.Service.BLL.Mpa
                     ? apiData.Sum(x => x.Value.GGR) / apiData.Sum(x => x.Value.ValidTurnOver)
                     : 0.00m,
             });
+
+            #endregion
 
             return apiData.ToApiFormat();
         }
