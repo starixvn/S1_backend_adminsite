@@ -1552,7 +1552,8 @@ namespace BackendSite.Service.BLL.Mpa
 
             #endregion
 
-            // total
+            #region total
+
             exportData.Add(new MpaWinLossByCurrencyDto()
             {
                 Currency = "total",
@@ -1578,6 +1579,8 @@ namespace BackendSite.Service.BLL.Mpa
                     ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m,
             });
+
+            #endregion
 
             return exportData.ToExcelFormat();
         }
