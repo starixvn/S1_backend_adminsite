@@ -67,14 +67,15 @@ namespace BackendSite.Service.BLL
                 if (custBetLimit != null)
                     setting = ToObject(custBetLimit.BetSetting);
 
-                var betSettings = (List<BetLimitSetting>)ToObject(req["after"].betSetting);
+                List<BetLimitSetting> betSettings = await ToObject(currencyId, req["after"].betSetting);
+
                 foreach (var item in betSettings)
                 {
                     if (CallApi.Contains(item.GameTypeId))
                     {
                         var before = setting.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
                         var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
-                        var betLimit = await Compare(custId, currencyId, before, after);
+                        var betLimit = await Compare(custId, before, after);
                         if (betLimit != null)
                         {
                             var apiResult = await SetBetLimit(betLimit);
@@ -193,60 +194,45 @@ namespace BackendSite.Service.BLL
             return await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_apiUrl}SetBetLimit", request);
         }
 
-        private async Task<SetBetLimit> Compare(int custId, int currencyId, SportsSetting before, SportsSetting after) 
+        private async Task<SetBetLimit> Compare(int custId, SportsSetting before, SportsSetting after) 
         {
-            if (after == null)
+            var tpId = await _userBetLimitService.GetTpIdByGameType(after.GameTypeId);
+            var betLimit = new SetBetLimit
             {
-                if (before == null) return null;
-
-                var defaultBetLimit = await _userBetLimitService.GetLimitGroup(before.GameTypeId, currencyId);
-
-                var tpId = await _userBetLimitService.GetTpIdByGameType(before.GameTypeId);
-                var betLimit = new SetBetLimit
+                TpId = tpId,
+                CustId = custId,
+                BetSetting = JsonConvert.SerializeObject(new
                 {
-                    TpId = tpId,
-                    CustId = custId,
-                    BetSetting = defaultBetLimit.LimitGroup
-                };
+                    after.Min,
+                    after.Max,
+                    after.MaxPerMatch
+                })
+            };
 
-                return betLimit;
-            }
-            else 
-            {
-                var tpId = await _userBetLimitService.GetTpIdByGameType(after.GameTypeId);
-                var betLimit = new SetBetLimit
-                {
-                    TpId = tpId,
-                    CustId = custId,
-                    BetSetting = JsonConvert.SerializeObject(new
-                    {
-                        after.Min,
-                        after.Max,
-                        after.MaxPerMatch
-                    })
-                };
-                return betLimit;
-            }
+            return betLimit;
         }
-
-        private List<BetLimitSetting> ToObject(dynamic betSetting)
+        private async Task<List<BetLimitSetting>> ToObject(int currencyId, dynamic betSetting)
         {
             var betSettings = new List<BetLimitSetting>();
             foreach (var item in betSetting)
             {
-                var tpCategory = (int)item.tpCategory;
+                var tpCategory = (int)item["tpCategory"];
+                var enable = (bool)item["checked"];
+                var gameTypeId = (int)item["gameTypeId"];
                 if (tpCategory == (int)TpCategoryEnum.Sports)
                 {
+                    TpBetLimitData spoDefault = await _userBetLimitService.GetLimitGroup(gameTypeId, currencyId);
+                    var input = JsonConvert.DeserializeObject<LimitInput>(spoDefault.LimitGroup);
                     var sports = new SportsSetting
                     {
-                        Checked = item["checked"],
+                        Checked = enable,
                         TpCategory = item["tpCategory"],
                         TpCategoryName = item["tpCategoryName"],
                         GameTypeId = item["gameTypeId"],
                         GameTypeName = item["gameTypeName"],
-                        Min = item["min"],
-                        Max = item["max"],
-                        MaxPerMatch = item["maxPerMatch"]
+                        Min = enable ? item["min"] : input.Min,
+                        Max = enable ? item["max"] : input.Max,
+                        MaxPerMatch = enable ? item["maxPerMatch"] : input.MaxPerMatch
                     };
                     if (sports.Min > sports.Max || sports.Max > sports.MaxPerMatch)
                         throw new AdminException(ErrorCodeEnum.InvalidBetLimit);
@@ -254,15 +240,15 @@ namespace BackendSite.Service.BLL
                 }
                 else if (tpCategory == (int)TpCategoryEnum.LiveCasino)
                 {
-                    
+                    TpBetLimitData dgDefault = await _userBetLimitService.GetLimitGroup(gameTypeId, currencyId);
                     var liveCasino = new LiveCasinoSetting
                     {
-                        Checked = item["checked"],
+                        Checked = enable,
                         TpCategory = item["tpCategory"],
                         TpCategoryName = item["tpCategoryName"],
                         GameTypeId = item["gameTypeId"],
                         GameTypeName = item["gameTypeName"],
-                        LimitGroup = item["limitGroup"],
+                        LimitGroup = enable ? item["limitGroup"] : dgDefault.DefaultGroup,
                         LimitRange = item["limitRange"]
                     };
                     betSettings.Add(liveCasino);
