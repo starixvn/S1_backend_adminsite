@@ -106,7 +106,6 @@ namespace BackendSite.Service.Model
     {
         public string DefaultGroup { get; set; }
         public string LimitGroup { get; set; }
-        public bool Checked { get; set; } = false;
     }
 
     public class UserBetLimit
