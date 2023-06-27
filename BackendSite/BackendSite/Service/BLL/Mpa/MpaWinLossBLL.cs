@@ -102,7 +102,8 @@ namespace BackendSite.Service.BLL.Mpa
 
             #endregion
 
-            // total
+            #region Total
+
             exportData.Add(new MpaWinLossByDateDto()
             {
                 Date = "Total",
@@ -127,6 +128,8 @@ namespace BackendSite.Service.BLL.Mpa
                     ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m,
             });
+
+            #endregion
 
             return exportData.ToExcelFormat();
         }
@@ -416,7 +419,7 @@ namespace BackendSite.Service.BLL.Mpa
         /// <param name="request"></param>
         /// <param name="groupByType"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<MpaWinLossByTpGameTypeDto>> GetMapWinLossByTpGameTypeExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        public async Task<IEnumerable<MpaWinLossByTpGameTypeDtoExport>> GetMapWinLossByTpGameTypeExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料
             var data = await GetTpBetRecordGroupByTpGameTypeResult(request, groupByType);
@@ -498,7 +501,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             #endregion
 
-            return exportData.ToExcelFormat();
+            return exportData.ToExcelFormat2();
         }
 
         /// <summary>

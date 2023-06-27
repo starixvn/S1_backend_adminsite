@@ -798,6 +798,35 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string TotalBonus { get; set; }
     }
 
+    public class MpaWinLossByTpGameTypeDtoExport
+    {
+        public string TpGameTypeName { get; set; }
+
+        public string Currency { get; set; }
+
+        public string TurnOver { get; set; }
+
+        public string ValidTurnOver { get; set; }
+
+        public string GGR { get; set; }
+
+        public string PlayerWinLoss { get; set; }
+
+        public string ProgressiveWin { get; set; }
+
+        public string ProgressiveBet { get; set; }
+
+        public string Commission { get; set; }
+
+        public int BetCount { get; set; }
+
+        public string AvgBetAmount { get; set; }
+
+        public int UniquePlayers { get; set; }
+
+        public string Margin { get; set; }
+    }
+
 
 
     #endregion

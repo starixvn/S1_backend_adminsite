@@ -117,7 +117,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByTpGameTypeExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMapWinLossByTpGameTypeExport(request, MpaWinLossGroupByTypeEnum.GameType);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByTpGameTypeExport");
         }
 

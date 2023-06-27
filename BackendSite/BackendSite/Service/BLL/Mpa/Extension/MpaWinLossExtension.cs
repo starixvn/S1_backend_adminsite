@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace BackendSite.Service.BLL.Mpa.Extension
 {
@@ -88,6 +87,20 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return data;
         }
 
+        public static DateTime ToOffSetReturnDate(this DateTime dateTime, TimeSpan offset)
+        {
+            return new DateTimeOffset(dateTime, new TimeSpan(0, 0, 0)).ToOffset(offset).Date;
+        }
+
+        public static string DateMapperToRateDate(this DateTime date)
+        {
+            if (date == DateTime.Today) return date.ToString("yyyy-MM-dd");
+            if (date.ToString("yyyy-MM") == DateTime.Now.ToString("yyyy-MM")) return DateTime.UtcNow.ToString("yyyy-MM-dd");
+            return date.AddMonths(1).AddDays(-date.AddMonths(1).Day).ToString("yyyy-MM-dd");
+        }
+
+        #region ToExcelFormat
+
         public static IEnumerable<MpaWinLossByDateDtoExport> ToExcelFormat(this List<MpaWinLossByDateDto> originData)
         {
             return originData.Select(item => new MpaWinLossByDateDtoExport
@@ -115,23 +128,27 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         }
 
 
-        public static IEnumerable<MpaWinLossByTpGameTypeDto> ToExcelFormat(this List<MpaWinLossByTpGameTypeDto> data)
+        public static IEnumerable<MpaWinLossByTpGameTypeDtoExport> ToExcelFormat(this List<MpaWinLossByTpGameTypeDto> originData)
         {
-            foreach (var item in data)
-            {
-                item.TurnOver = Math.Round(item.TurnOver, 2);
-                item.ValidTurnOver = Math.Round(item.ValidTurnOver, 2);
-                item.GGR = Math.Round(item.GGR, 2);
-                item.PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2);
-                item.ProgressiveWin = Math.Round(item.ProgressiveWin, 2);
-                item.ProgressiveBet = Math.Round(item.ProgressiveBet, 2);
-                item.Commission = Math.Round(item.Commission, 2);
-                item.AvgBetAmount = Math.Round(item.AvgBetAmount, 2);
-                item.MarginStr = decimal.Round((item.Margin * 100), 2).ToString() + "%";
-            }
-
-            return data;
+            return originData.Select(item => new MpaWinLossByTpGameTypeDtoExport
+                {
+                    TpGameTypeName = item.TpGameTypeName,
+                    Currency = item.Currency,
+                    TurnOver = Math.Round(item.TurnOver, 2).ToString("N2"),
+                    ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
+                    GGR = Math.Round(item.GGR, 2).ToString("N2"),
+                    PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                    ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
+                    ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
+                    Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                    BetCount = item.BetCount,
+                    AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
+                    UniquePlayers = item.UniquePlayers,
+                    Margin = decimal.Round((item.Margin * 100), 2).ToString() + "%"
+                })
+                .ToList();
         }
+
 
         public static IEnumerable<MpaWinLossByTpCategoryDto> ToExcelFormat(this List<MpaWinLossByTpCategoryDto> data)
         {
@@ -193,6 +210,12 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             return data;
         }
+
+
+
+        #endregion
+
+        #region ToApiDataFormat
 
         public static IEnumerable<MpaWinLossByDateResponseToFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByDateResponse> source)
         {
@@ -465,17 +488,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return result;
         }
 
-        public static DateTime ToOffSetReturnDate(this DateTime dateTime, TimeSpan offset)
-        {
-            return new DateTimeOffset(dateTime, new TimeSpan(0, 0, 0)).ToOffset(offset).Date;
-        }
-
-        public static string DateMapperToRateDate(this DateTime date)
-        {
-            if (date == DateTime.Today) return date.ToString("yyyy-MM-dd");
-            if (date.ToString("yyyy-MM") == DateTime.Now.ToString("yyyy-MM")) return DateTime.UtcNow.ToString("yyyy-MM-dd");
-            return date.AddMonths(1).AddDays(-date.AddMonths(1).Day).ToString("yyyy-MM-dd");
-        }
+        #endregion
     }
 }
 
