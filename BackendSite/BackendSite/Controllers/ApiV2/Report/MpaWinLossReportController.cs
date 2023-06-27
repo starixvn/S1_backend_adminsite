@@ -237,7 +237,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByCurrencyExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMapWinLossByCurrencyExport(request, MpaWinLossGroupByTypeEnum.Currency);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByCurrencyExport");
         }
 

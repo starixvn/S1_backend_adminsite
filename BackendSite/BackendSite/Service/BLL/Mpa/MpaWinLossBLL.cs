@@ -1436,7 +1436,7 @@ namespace BackendSite.Service.BLL.Mpa
         /// <param name="request"></param>
         /// <param name="groupByType"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<MpaWinLossByCurrencyDto>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        public async Task<IEnumerable<MpaWinLossByCurrencyDtoExport>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料
             var betRecordTask = Task.Run(() => GetTpBetRecordGroupByCurrencyResult(request, groupByType));

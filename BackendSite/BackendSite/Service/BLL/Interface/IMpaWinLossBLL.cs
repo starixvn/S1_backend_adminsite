@@ -85,7 +85,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByCurrencyDto>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossByCurrencyDtoExport>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// api
