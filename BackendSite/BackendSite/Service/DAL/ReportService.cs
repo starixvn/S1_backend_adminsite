@@ -278,7 +278,7 @@ namespace BackendSite.Service.DAL
                   _EndDate = input.EndDate,
               });
 
-            return _reportDbClient.Query<GameStatisticalDao>("Admin_GameStatisticalReport_Get", parameters);
+            return _reportDbClient.Query<GameStatisticalDao>("Admin_GameStatisticalReport_Get_V2", parameters);
         }
         
         public IEnumerable<PaymentReportDepositDetail> GetPaymentReportDepositDetail(GetPaymentReportParams input)

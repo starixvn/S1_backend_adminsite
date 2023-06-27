@@ -13,10 +13,11 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
         /// <param name="format"></param>
+        /// <param name="memberTypeJson"></param>
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
         Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTimeOffset starTime,
-            DateTimeOffset endTime, string format, MpaDateType mpaDateType = MpaDateType.SettledDate);
+            DateTimeOffset endTime, string format, string memberTypeJson, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
 
         /// <summary>
@@ -41,10 +42,10 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="starTime"></param>
         /// <param name="endTime"></param>
         /// <param name="format"></param>
-        /// <param name="mpaDateType"></param>
+        /// <param name="memberTypeJson"></param>
         /// <returns></returns>
         Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime,
-            DateTimeOffset endTime, string format);
+            DateTimeOffset endTime, string format, string memberTypeJson);
 
 
         /// <summary>
@@ -71,7 +72,6 @@ namespace BackendSite.Service.DAL.Interface
         /// <returns></returns>
         Task<IEnumerable<TpCategoryDto>> GetTpCategory();
 
-
         /// <summary>
         /// 取得Bonus
         /// </summary>
@@ -79,7 +79,9 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="starTime">起始時間</param>
         /// <param name="endTime">結束時間</param>
         /// <param name="format">日期 format 格式</param>
+        /// <param name="memberTypeJson">玩家類型</param>
         /// <returns>Bonus 資訊</returns>
-        Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format);
+        /// <returns></returns>
+        Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson);
     }
 }
