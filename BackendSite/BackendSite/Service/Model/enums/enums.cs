@@ -851,6 +851,7 @@ namespace BackendSite.Service.Model.enums
         ReleaseCryptoWallet = 85,
         ResetSmsOtpTimes = 86,
         AutoWithdrawalRule = 91,
+        AutoVerifyRule = 92,
     }
 
     #region BankFinancialTransferInfoLog
@@ -1824,5 +1825,11 @@ namespace BackendSite.Service.Model.enums
     {
         Daily = 1,
         Weekly = 2
+    }
+    
+    public enum AutoType
+    {
+        AutoVerify = 1,
+        AutoApproved = 2
     }
 }

@@ -94,6 +94,7 @@ namespace BackendSite
             services.AddTransient<IMpaMarketingWithdrawalAmountBLL, MpaMarketingWithdrawalAmountBLL>();
             services.AddTransient<IMpaMarketingDepositAmountBLL, MpaMarketingDepositAmountBLL>();
             services.AddTransient<IAutoWithdrawalRuleBLL, AutoWithdrawalRuleBLL>();
+            services.AddTransient<IAutoVerifyRuleBLL, AutoVerifyRuleBLL>();
             services.AddTransient<IWithdrawalStateTransferBLL, WithdrawalStateTransferBLL>();
             services.AddTransient<IWithdrawalReceiveBLL, WithdrawalReceiveBLL>();
             services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
@@ -122,6 +123,7 @@ namespace BackendSite
             services.AddTransient<IMpaMarketingWithdrawalAmountService, MpaMarketingWithdrawalAmountService>();
             services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
             services.AddTransient<IAutoWithdrawalRuleService, AutoWithdrawalRuleService>();
+            services.AddTransient<IAutoVerifyRuleService, AutoVerifyRuleService>();
             
             
             services.AddControllersWithViews().AddJsonOptions(options =>
