@@ -365,9 +365,6 @@ namespace BackendSite.Service.BLL.Mpa
             }
         }
 
-
-
-
         private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetCurrencyDetailByDate(List<MpaWinLossByDateDto> dateSummary)
         {
             return dateSummary.ToDictionary(k => k.Currency, v => new MpaWinLossByDayCurrencyDetailDto
@@ -501,7 +498,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             #endregion
 
-            return exportData.ToExcelFormat2();
+            return exportData.ToExcelFormat();
         }
 
         /// <summary>
@@ -690,7 +687,7 @@ namespace BackendSite.Service.BLL.Mpa
         /// <param name="request"></param>
         /// <param name="groupByType"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<MpaWinLossByTpCategoryDto>> GetMapWinLossByTpCategoryExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        public async Task<IEnumerable<MpaWinLossByTpCategoryDtoExport>> GetMapWinLossByTpCategoryExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
@@ -966,7 +963,7 @@ namespace BackendSite.Service.BLL.Mpa
         /// <param name="request"></param>
         /// <param name="groupByType"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<MpaWinLossByPlayerDto>> GetMpaWinLossByPlayerExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        public async Task<IEnumerable<MpaWinLossByPlayerDtoExport>> GetMpaWinLossByPlayerExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var winLossByPlayer = await GetWinLossByPlayer(request, groupByType);
             var excludeUserName = new List<string>();
@@ -1022,7 +1019,8 @@ namespace BackendSite.Service.BLL.Mpa
                 ? exportData.OrderBy(request).ToList()
                 : exportData.OrderBy(x => x.UserName).ThenBy(x => x.Currency).ToList();
 
-            // total
+            #region total
+
             exportData.Add(new MpaWinLossByPlayerDto()
             {
                 TpUserName = "total",
@@ -1049,6 +1047,8 @@ namespace BackendSite.Service.BLL.Mpa
                     ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m,
             });
+
+            #endregion
 
             return exportData.ToExcelFormat();
         }
