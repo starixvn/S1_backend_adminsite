@@ -32,7 +32,7 @@ namespace BackendSite.Service.BLL.Mpa
         /// <param name="request"></param>
         /// <param name="groupByType"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<MpaWinLossByDateDto>> GetMpaWinLossByDateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        public async Task<IEnumerable<MpaWinLossByDateDtoExport>> GetMpaWinLossByDateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料 & 存提款 & Bonus
             var bonusTask = Task.Run(() => GetBonusByDateResult(request, groupByType));

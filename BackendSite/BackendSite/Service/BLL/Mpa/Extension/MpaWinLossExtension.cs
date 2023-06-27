@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace BackendSite.Service.BLL.Mpa.Extension
 {
@@ -87,26 +88,32 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             return data;
         }
 
-        public static IEnumerable<MpaWinLossByDateDto> ToExcelFormat(this List<MpaWinLossByDateDto> data)
+        public static IEnumerable<MpaWinLossByDateDtoExport> ToExcelFormat(this List<MpaWinLossByDateDto> originData)
         {
-            foreach (var item in data)
-            {
-                item.TurnOver = Math.Round(item.TurnOver, 2);
-                item.ValidTurnOver = Math.Round(item.ValidTurnOver, 2);
-                item.GGR = Math.Round(item.GGR, 2);
-                item.PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2);
-                item.ProgressiveWin = Math.Round(item.ProgressiveWin, 2);
-                item.ProgressiveBet = Math.Round(item.ProgressiveBet, 2);
-                item.Commission = Math.Round(item.Commission, 2);
-                item.AvgBetAmount = Math.Round(item.AvgBetAmount, 2);
-                item.MarginStr = decimal.Round((item.Margin * 100), 2).ToString() + "%";
-                item.TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2);
-                item.TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2);
-                item.TotalBonus = Math.Round(item.TotalBonus, 2);
-            }
-
-            return data;
+            return originData.Select(item => new MpaWinLossByDateDtoExport
+                {
+                    Date = item.Date,
+                    Currency = item.Currency,
+                    TurnOver = Math.Round(item.TurnOver, 2).ToString("N2"),
+                    ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
+                    GGR = Math.Round(item.GGR, 2).ToString("N2"),
+                    PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                    ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
+                    ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
+                    Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                    BetCount = item.BetCount,
+                    AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
+                    UniquePlayers = item.UniquePlayers,
+                    Margin = decimal.Round((item.Margin * 100), 2).ToString() + "%",
+                    DepositCount = item.DepositCount,
+                    TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2).ToString("N2"),
+                    WithDrawCount = item.WithDrawCount,
+                    TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2).ToString("N2"),
+                    TotalBonus = Math.Round(item.TotalBonus, 2).ToString("N2")
+                })
+                .ToList();
         }
+
 
         public static IEnumerable<MpaWinLossByTpGameTypeDto> ToExcelFormat(this List<MpaWinLossByTpGameTypeDto> data)
         {

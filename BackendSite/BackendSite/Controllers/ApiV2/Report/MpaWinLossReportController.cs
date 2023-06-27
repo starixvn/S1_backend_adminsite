@@ -51,7 +51,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByDateExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Date);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByDateExport");
         }
 
@@ -84,7 +84,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByMonthExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Month);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByMonthExport");
         }
 
