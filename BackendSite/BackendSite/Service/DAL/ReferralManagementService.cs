@@ -23,13 +23,13 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
         }
-        
+
         public async Task<ReferralDetailData> GetReferralDetail(int siteId, int currencyId)
         {
             return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get",
                 new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId }));
         }
-        
+
         public void SetReferral(List<ReferralManagement> referralList)
         {
             var para = new List<ReferralList>();
@@ -68,12 +68,12 @@ namespace BackendSite.Service.DAL
 
             return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
         }
-        
+
         public int SetReferralStatus(int siteId, int currencyId, int status)
         {
             return _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
         }
-        
+
         public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
         {
             return await _mainDbClient.ExecuteAsync("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
@@ -101,8 +101,8 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
         }
-        
-        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, string orderByProperty, OrderByDirection orderByDirection )
+
+        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, string orderByProperty, OrderByDirection orderByDirection)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
@@ -128,8 +128,8 @@ namespace BackendSite.Service.DAL
             };
             return referralCustData;
         }
-        
-        public IEnumerable<ReferralExcel> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+
+        public IEnumerable<ReferralExcel> GetReferralCustListExport(string selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate)
         {
             var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId, StartDate = startDate, EndDate = endDate });
 
@@ -169,6 +169,39 @@ namespace BackendSite.Service.DAL
             RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return result;
+        }
+
+        public async Task<(IEnumerable<DepositReferralReportDao> Data, int TotalPages, int RowCount)> GetDepositReferralCustList(
+            int siteId,
+            string currencyId,
+            DateTime startDate,
+            DateTime endDate,
+            string userName,
+            int pageSize,
+            int startIndex)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyIds", currencyId);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            p.Add("_UserName", userName);
+            p.Add("_PageSize", pageSize);
+            p.Add("_StartIndex", startIndex);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = await _reportDbClient.QueryAsync<DepositReferralReportDao>("Admin_DepositReferralCustList_Get", p);
+
+            return (Data: data, TotalPages: p.Get<int?>("_TotalPages") ?? 0, RowCount: p.Get<int?>("_RowCount") ?? 0);
+        }
+
+        public async Task<IEnumerable<DepositReferralReport_ReferralReferredDao>> GetDepositReferralReferredList(int custId, DateTime startDate, DateTime endDate)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferralReferredList_Get", p);
         }
     }
 }

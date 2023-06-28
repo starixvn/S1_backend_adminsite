@@ -86,7 +86,7 @@ namespace BackendSite.Service.Model
         public int PeriodDays { get; set; }
         public bool Status { get; set; }
     }
-    
+
     public class ReferralDetail
     {
         public int SiteId { get; set; }
@@ -102,7 +102,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<ReferralContent> SpecificList { get; set; }
         public int Status { get; set; }
     }
-    
+
     public class ReferralDetailData
     {
         public int SiteId { get; set; }
@@ -118,7 +118,7 @@ namespace BackendSite.Service.Model
         public string Details { get; set; }
         public int Status { get; set; }
     }
-    
+
     public class ReferralCustList
     {
         public int SiteId { get; set; }
@@ -204,5 +204,25 @@ namespace BackendSite.Service.Model
         public decimal FreeCreditSum { get; set; }
         public DateTimeOffset? RewardTime { get; set; }
         public string Status { get; set; }
+    }
+
+    public class DepositReferralReportDao
+    {
+        public int CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public decimal TotalDeposit { get; set; }
+        public decimal ReferralAmount { get; set; }
+    }
+
+    public class DepositReferralReport_ReferralReferredDao
+    {
+        public string DepositDate { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public decimal TotalDeposit { get; set; }
+        public decimal RewardPercentage { get; set; }
+        public decimal ReferralAmount { get; set; }
     }
 }
