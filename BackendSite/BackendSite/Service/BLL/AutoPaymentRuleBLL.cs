@@ -6,25 +6,25 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class AutoVerifyRuleBLL : IAutoVerifyRuleBLL
+    public class AutoPaymentRuleBLL : IAutoPaymentRuleBLL
     {
-        private readonly IAutoVerifyRuleService _autoWithdrawalRuleService;
+        private readonly IAutoPaymentRuleService _autoPaymentRuleService;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly ITagBLL _tagBll;
 
-        public AutoVerifyRuleBLL(IAutoVerifyRuleService autoWithdrawalRuleService, VipLevelBLL vipLevelBll, ITagBLL tagBll)
+        public AutoPaymentRuleBLL(IAutoPaymentRuleService autoWithdrawalRuleService, VipLevelBLL vipLevelBll, ITagBLL tagBll)
         {
-            _autoWithdrawalRuleService = autoWithdrawalRuleService;
+            _autoPaymentRuleService = autoWithdrawalRuleService;
             _vipLevelBll = vipLevelBll;
             _tagBll = tagBll;
         }
 
-        public async Task<IEnumerable<AutoVerifyRuleDataListResponse>> GetDataListAsync(AutoVerifyRuleDataListRequest request)
+        public async Task<IEnumerable<AutoPaymentRuleDataListResponse>> GetDataListAsync(AutoPaymentRuleDataListRequest request)
         {
-            var data = await _autoWithdrawalRuleService.GetDataListAsync(request);
+            var data = await _autoPaymentRuleService.GetDataListAsync(request);
             var defaultList = new List<int>();
 
-            return data.Select(item => new AutoVerifyRuleDataListResponse
+            return data.Select(item => new AutoPaymentRuleDataListResponse
             {
                 Id = item.Id,
                 CurrencyId = item.CurrencyId,
@@ -53,15 +53,16 @@ namespace BackendSite.Service.BLL
         }
 
         #region Create
-        public async Task CreateAutoVerifyRuleAsync(AutoVerifyRuleCreateRequest request, string userName)
+        public async Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest request, string userName)
         {
-            await _autoWithdrawalRuleService.CreateAutoVerifyRuleAsync(request, userName);
+            await _autoPaymentRuleService.CreateAutoPaymentRuleAsync(request, userName);
             await CreateActivityLog(request, userName);
         }
 
-        private async Task CreateActivityLog(AutoVerifyRuleCreateRequest request, string userName)
+        private async Task CreateActivityLog(AutoPaymentRuleCreateRequest request, string userName)
         {
             var afterLog = GetActivityLogObj(
+                autoType:request.AutoType,
                 siteId: request.SiteId,
                 currencyId: request.CurrencyId,
                 withdrawalAmount: request.WithdrawalAmount,
@@ -72,12 +73,13 @@ namespace BackendSite.Service.BLL
                 deviceLevel: request.DeviceLevel,
                 status: true);
     
-            await _autoWithdrawalRuleService.InsertLogAsync(siteId: request.SiteId,
+            await _autoPaymentRuleService.InsertLogAsync(
+                siteId: request.SiteId,
                 custId: 0,
                 currencyId: (int)request.CurrencyId,
                 beforeData: null,
                 afterData: afterLog,
-                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoVerifyRule,
+                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoPaymentRule,
                 actionType: ActionType.Create,
                 userName);
         }
@@ -86,19 +88,20 @@ namespace BackendSite.Service.BLL
 
         #region Set
 
-        public async Task SetAutoVerifyRuleAsync(AutoVerifyRuleSetRequest request, string userName)
+        public async Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest request, string userName)
         {
-            var originData = await _autoWithdrawalRuleService.GetDataByIdAsync(request.Id);
-            await _autoWithdrawalRuleService.SetAutoVerifyRuleAsync(request, userName);
+            var originData = await _autoPaymentRuleService.GetDataByIdAsync(request.Id);
+            await _autoPaymentRuleService.SetAutoPaymentRuleAsync(request, userName);
             await SetActivityLog(request, userName, originData);
         }
 
-        private async Task SetActivityLog(AutoVerifyRuleSetRequest request, string userName,
-            AutoVerifyRuleDataListDto originData)
+        private async Task SetActivityLog(AutoPaymentRuleSetRequest request, string userName,
+            AutoPaymentRuleDataListDto originData)
         {
             var beforeLog = GetBeforeChangeLog(originData);
 
             var afterLog = GetActivityLogObj(
+                autoType:originData.AutoType,
                 siteId: originData.SiteId,
                 currencyId: originData.CurrencyId,
                 withdrawalAmount: request.WithdrawalAmount,
@@ -109,12 +112,12 @@ namespace BackendSite.Service.BLL
                 deviceLevel:request.DeviceLevel,
                 status: GetStatus(request.Status));
 
-            await _autoWithdrawalRuleService.InsertLogAsync(siteId: originData.SiteId,
+            await _autoPaymentRuleService.InsertLogAsync(siteId: originData.SiteId,
                 custId: 0,
                 currencyId: (int)originData.CurrencyId,
                 beforeData: beforeLog,
                 afterData: afterLog,
-                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoVerifyRule,
+                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoPaymentRule,
                 actionType: ActionType.Update,
                 userName);
         }
@@ -122,18 +125,18 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region Delete
-        public async Task DeleteAutoVerifyRuleAsync(AutoVerifyRuleDeleteRequest request, string userName)
+        public async Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, string userName)
         {
-            var originData = await _autoWithdrawalRuleService.GetDataByIdAsync(request.Id);
-            await _autoWithdrawalRuleService.DeleteAutoVerifyRuleAsync(request);
+            var originData = await _autoPaymentRuleService.GetDataByIdAsync(request.Id);
+            await _autoPaymentRuleService.DeleteAutoPaymentRuleAsync(request);
             var beforeLog = GetBeforeChangeLog(originData);
 
-            await _autoWithdrawalRuleService.InsertLogAsync(siteId: originData.SiteId,
+            await _autoPaymentRuleService.InsertLogAsync(siteId: originData.SiteId,
                 custId: 0,
                 currencyId: (int)originData.CurrencyId,
                 beforeData: beforeLog,
                 afterData: null,
-                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoVerifyRule,
+                adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoPaymentRule,
                 actionType: ActionType.Delete,
                 userName);
         }
@@ -142,7 +145,7 @@ namespace BackendSite.Service.BLL
         
         #region private common method
 
-        private object GetBeforeChangeLog(AutoVerifyRuleDataListDto originData)
+        private object GetBeforeChangeLog(AutoPaymentRuleDataListDto originData)
         {
             var defaultList = new List<int>();
             var vipLevels = string.IsNullOrEmpty(originData.VipLevelStr)
@@ -158,6 +161,7 @@ namespace BackendSite.Service.BLL
                 : JsonConvert.DeserializeObject<List<string>>(originData.DeviceLevelStr);
                 
             var beforeLog = GetActivityLogObj(
+                autoType:originData.AutoType,
                 siteId: originData.SiteId,
                 currencyId: originData.CurrencyId,
                 withdrawalAmount: originData.WithdrawalAmount,
@@ -171,7 +175,7 @@ namespace BackendSite.Service.BLL
             return beforeLog;
         }
 
-        private object GetActivityLogObj(int siteId, CurrencyEnum currencyId, decimal withdrawalAmount,
+        private object GetActivityLogObj(AutoType autoType,int siteId, CurrencyEnum currencyId, decimal withdrawalAmount,
             int accountWithdrawalCount,
             List<int> vipLevels,
             List<int> tags,
@@ -181,6 +185,7 @@ namespace BackendSite.Service.BLL
         {
             return new
             {
+                AutoType = autoType.ToString(),
                 Currency = currencyId.ToString(),
                 WithdrawalAmount = withdrawalAmount,
                 AccountWithdrawalCount = accountWithdrawalCount,

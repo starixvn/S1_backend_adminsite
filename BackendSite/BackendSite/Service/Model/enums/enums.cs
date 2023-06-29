@@ -851,7 +851,7 @@ namespace BackendSite.Service.Model.enums
         ReleaseCryptoWallet = 85,
         ResetSmsOtpTimes = 86,
         AutoWithdrawalRule = 91,
-        AutoVerifyRule = 92,
+        AutoPaymentRule = 92,
     }
 
     #region BankFinancialTransferInfoLog

@@ -8,35 +8,37 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
-    public class AutoVerifyRuleService : IAutoVerifyRuleService
+    public class AutoPaymentRuleService : IAutoPaymentRuleService
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
-        public AutoVerifyRuleService(IEnumerable<MySqlClient> sqlClients)
+        public AutoPaymentRuleService(IEnumerable<MySqlClient> sqlClients)
         {
             _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
-        public Task<IEnumerable<AutoVerifyRuleDataListDto>> GetDataListAsync(AutoVerifyRuleDataListRequest req)
+        public Task<IEnumerable<AutoPaymentRuleDataListDto>> GetDataListAsync(AutoPaymentRuleDataListRequest req)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", req.SiteId);
-            return _reportDbClient.QueryAsync<AutoVerifyRuleDataListDto>("Admin_AutoVerifyRuleSetting_Get", p);
+            p.Add("_AutoType", (int)req.AutoType);
+            return _reportDbClient.QueryAsync<AutoPaymentRuleDataListDto>("Admin_AutoPaymentRuleSetting_Get", p);
         }
 
-        public Task<AutoVerifyRuleDataListDto> GetDataByIdAsync(int id)
+        public Task<AutoPaymentRuleDataListDto> GetDataByIdAsync(int id)
         {
             var p = new DynamicParameters();
             p.Add("_Id", id);
-            return _reportDbClient.QueryFirstAsync<AutoVerifyRuleDataListDto>("Admin_AutoVerifyRuleSetting_GetById", p);
+            return _reportDbClient.QueryFirstAsync<AutoPaymentRuleDataListDto>("Admin_AutoPaymentRuleSetting_GetById", p);
         }
 
 
-        public Task CreateAutoVerifyRuleAsync(AutoVerifyRuleCreateRequest req, string userName)
+        public Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest req, string userName)
         {
             var p = new DynamicParameters();
+            p.Add("_AutoType", (int)req.AutoType);
             p.Add("_SiteId", req.SiteId);
             p.Add("_CurrencyId", (int)req.CurrencyId);
             p.Add("_WithdrawalAmount", req.WithdrawalAmount);
@@ -46,10 +48,10 @@ namespace BackendSite.Service.DAL
             p.Add("_DeviceScores", req.DeviceScores);
             p.Add("_DeviceLevel", JsonConvert.SerializeObject(req.DeviceLevel));
             p.Add("_CreateUser", userName);
-            return _mainDbClient.ExecuteAsync("Admin_AutoVerifyRuleSetting_Ins", p);
+            return _mainDbClient.ExecuteAsync("Admin_AutoPaymentRuleSetting_Ins", p);
         }
 
-        public Task SetAutoVerifyRuleAsync(AutoVerifyRuleSetRequest req, string userName)
+        public Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest req, string userName)
         {
             var p = new DynamicParameters();
             p.Add("_SQ", req.Id);
@@ -61,14 +63,14 @@ namespace BackendSite.Service.DAL
             p.Add("_DeviceScores", req.DeviceScores);
             p.Add("_DeviceLevel", JsonConvert.SerializeObject(req.DeviceLevel));
             p.Add("_LastUpdateUser", userName);
-            return _mainDbClient.ExecuteAsync("Admin_AutoVerifyRuleSetting_Set", p);
+            return _mainDbClient.ExecuteAsync("Admin_AutoPaymentRuleSetting_Set", p);
         }
 
-        public Task DeleteAutoVerifyRuleAsync(AutoVerifyRuleDeleteRequest req)
+        public Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest req)
         {
             var p = new DynamicParameters();
             p.Add("_SQ", req.Id);
-            return _mainDbClient.ExecuteAsync("Admin_AutoVerifyRuleSetting_Del", p);
+            return _mainDbClient.ExecuteAsync("Admin_AutoPaymentRuleSetting_Del", p);
         }
 
         public async Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beforeData, object afterData,

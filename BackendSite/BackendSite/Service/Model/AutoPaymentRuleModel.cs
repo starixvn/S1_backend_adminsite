@@ -4,13 +4,16 @@ namespace BackendSite.Service.Model
 {
     #region Reuqest Model
 
-    public class AutoVerifyRuleDataListRequest
+    public class AutoPaymentRuleDataListRequest
     {
         public int SiteId { get; set; }
+        public AutoType AutoType { get; set; }
     }
 
-    public class AutoVerifyRuleCreateRequest
+    public class AutoPaymentRuleCreateRequest
     {
+        public AutoType AutoType { get; set; }
+        
         public int SiteId { get; set; }
 
         public CurrencyEnum CurrencyId { get; set; }
@@ -28,7 +31,7 @@ namespace BackendSite.Service.Model
         public int DeviceScores { get; set; }
     }
 
-    public class AutoVerifyRuleSetRequest
+    public class AutoPaymentRuleSetRequest
     {
         /// <summary>
         /// DB SQ
@@ -54,7 +57,7 @@ namespace BackendSite.Service.Model
         
     }
 
-    public class AutoVerifyRuleDeleteRequest
+    public class AutoPaymentRuleDeleteRequest
     {
         public int Id {get; set; }
     }
@@ -63,7 +66,7 @@ namespace BackendSite.Service.Model
 
     #region Base 共用欄位
 
-    public class AutoVerifyRuleDataListBase
+    public class AutoPaymentRuleDataListBase
     {
         /// <summary>
         /// DB SQ
@@ -88,8 +91,10 @@ namespace BackendSite.Service.Model
 
     #region DTO
 
-    public class AutoVerifyRuleDataListDto : AutoVerifyRuleDataListBase
+    public class AutoPaymentRuleDataListDto : AutoPaymentRuleDataListBase
     {
+        public AutoType AutoType { get; set; }
+        
         public CurrencyEnum CurrencyId { get; set; }
 
         public decimal WithdrawalAmount { get; set; }
@@ -111,7 +116,7 @@ namespace BackendSite.Service.Model
 
     #region Response Model
 
-    public class AutoVerifyRuleDataListResponse : AutoVerifyRuleDataListBase
+    public class AutoPaymentRuleDataListResponse : AutoPaymentRuleDataListBase
     {
         public CurrencyEnum CurrencyId { get; set; }
 
@@ -131,7 +136,5 @@ namespace BackendSite.Service.Model
 
     }
     #endregion
-
     
-
 }
