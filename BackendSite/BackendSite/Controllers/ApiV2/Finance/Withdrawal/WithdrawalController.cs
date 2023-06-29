@@ -229,6 +229,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string AccountName { set; get; }
             public string AccountNo { set; get; }
             public string IFSCCode { set; get; }
+            
+            public int WithdrawalType { set; get; }
         }
 
         public class UploadPictureRequest : GetByTransIdRequest
@@ -1205,7 +1207,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 ChannelId = withdrawalInfo.ChannelId ?? 0,
                 AccountName = withdrawalInfo.AccountName,
                 AccountNo = withdrawalInfo.AccountNo,
-                IFSCCode = withdrawalInfo.IFSCCode
+                IFSCCode = withdrawalInfo.IFSCCode,
+                WithdrawalType = (int)request.WithdrawalType
             };
 
             var apiOnlineResult = await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
