@@ -3,17 +3,17 @@ using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL.Interface
 {
-    public interface IAutoVerifyRuleService
+    public interface IAutoPaymentRuleService
     {
-        Task<IEnumerable<AutoVerifyRuleDataListDto>> GetDataListAsync(AutoVerifyRuleDataListRequest req);
+        Task<IEnumerable<AutoPaymentRuleDataListDto>> GetDataListAsync(AutoPaymentRuleDataListRequest req);
 
-        Task<AutoVerifyRuleDataListDto> GetDataByIdAsync(int id);
+        Task<AutoPaymentRuleDataListDto> GetDataByIdAsync(int id);
 
-        Task CreateAutoVerifyRuleAsync(AutoVerifyRuleCreateRequest req, string userName);
+        Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest req, string userName);
 
-        Task SetAutoVerifyRuleAsync(AutoVerifyRuleSetRequest req, string userName);
+        Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest req, string userName);
 
-        Task DeleteAutoVerifyRuleAsync(AutoVerifyRuleDeleteRequest req);
+        Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest req);
 
         Task<bool> InsertLogAsync(int siteId, int custId, int currencyId, object beforeData, object afterData,
             AdminAdjustmentLogMenuEnum adminAdjustmentLogMenu, ActionType actionType, string updater);

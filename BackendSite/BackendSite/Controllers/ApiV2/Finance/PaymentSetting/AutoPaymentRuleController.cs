@@ -11,24 +11,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
     [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class AutoVerifyRuleController : BaseController
+    public class AutoPaymentRuleController : BaseController
     {
-        private readonly IAutoVerifyRuleBLL _autoVerifyRuleBll;
+        private readonly IAutoPaymentRuleBLL _autoPaymentRuleBll;
 
-        public AutoVerifyRuleController(IAutoVerifyRuleBLL autoVerifyRuleBll,
+        public AutoPaymentRuleController(IAutoPaymentRuleBLL autoPaymentRuleBll,
             IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
-            _autoVerifyRuleBll = autoVerifyRuleBll;
+            _autoPaymentRuleBll = autoPaymentRuleBll;
         }
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 89 })]
-        public async Task<ApiResult<IEnumerable<AutoVerifyRuleDataListResponse>>> GetDataListAsync(AutoVerifyRuleDataListRequest request)
+        public async Task<ApiResult<IEnumerable<AutoPaymentRuleDataListResponse>>> GetDataListAsync(AutoPaymentRuleDataListRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<AutoVerifyRuleDataListResponse>>();
+            var apiResult = new ApiResult<IEnumerable<AutoPaymentRuleDataListResponse>>();
             try
             {
-                var responseData = await _autoVerifyRuleBll.GetDataListAsync(request);
+                var responseData = await _autoPaymentRuleBll.GetDataListAsync(request);
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -43,12 +43,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 89 })]
-        public async Task<ApiResult> CreateAsync(AutoVerifyRuleCreateRequest request)
+        public async Task<ApiResult> CreateAsync(AutoPaymentRuleCreateRequest request)
         {
             var apiResult = new ApiResult { ErrorCode = (int)ErrorCodeEnum.SystemException };
             try
             {
-                await _autoVerifyRuleBll.CreateAutoVerifyRuleAsync(request, AuthData.UserName);
+                await _autoPaymentRuleBll.CreateAutoPaymentRuleAsync(request, AuthData.UserName);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (MySqlException ex) when (ex?.Number == 1062)
@@ -65,13 +65,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 89 })]
-        public async Task<ApiResult> SetAsync(AutoVerifyRuleSetRequest request)
+        public async Task<ApiResult> SetAsync(AutoPaymentRuleSetRequest request)
         {
             var apiResult = new ApiResult();
 
             try
             {
-                await _autoVerifyRuleBll.SetAutoVerifyRuleAsync(request, AuthData.UserName);
+                await _autoPaymentRuleBll.SetAutoPaymentRuleAsync(request, AuthData.UserName);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -85,13 +85,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 89 })]
-        public async Task<ApiResult> DeleteAsync(AutoVerifyRuleDeleteRequest request)
+        public async Task<ApiResult> DeleteAsync(AutoPaymentRuleDeleteRequest request)
         {
             var apiResult = new ApiResult();
 
             try
             {
-                await _autoVerifyRuleBll.DeleteAutoVerifyRuleAsync(request, AuthData.UserName);
+                await _autoPaymentRuleBll.DeleteAutoPaymentRuleAsync(request, AuthData.UserName);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

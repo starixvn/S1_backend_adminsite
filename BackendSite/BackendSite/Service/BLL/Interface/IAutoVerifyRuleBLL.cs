@@ -2,15 +2,15 @@
 
 namespace BackendSite.Service.BLL.Interface
 {
-    public interface IAutoVerifyRuleBLL
+    public interface IAutoPaymentRuleBLL
     {
-        Task<IEnumerable<AutoVerifyRuleDataListResponse>> GetDataListAsync(AutoVerifyRuleDataListRequest request);
+        Task<IEnumerable<AutoPaymentRuleDataListResponse>> GetDataListAsync(AutoPaymentRuleDataListRequest request);
 
-        Task CreateAutoVerifyRuleAsync(AutoVerifyRuleCreateRequest request, string userName);
+        Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest request, string userName);
 
-        Task SetAutoVerifyRuleAsync(AutoVerifyRuleSetRequest request, string userName);
+        Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest request, string userName);
 
-        Task DeleteAutoVerifyRuleAsync(AutoVerifyRuleDeleteRequest request, string userName);
+        Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, string userName);
         
     }
 }
