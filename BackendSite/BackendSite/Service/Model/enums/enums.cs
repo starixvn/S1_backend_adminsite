@@ -930,8 +930,8 @@ namespace BackendSite.Service.Model.enums
         RebateExcludeGame = 89,
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
-        AutoVerifyRule = 92,
-        NewReferral = 93
+        AutoPaymentRule = 92,
+        DepositReferral = 93
     }
 
     #region BankFinancialTransferInfoLog
