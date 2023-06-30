@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using System.Reflection.Metadata;
 
 namespace BackendSite.Service.Model
 {
@@ -12,7 +13,7 @@ namespace BackendSite.Service.Model
         public string ValidBet { get; set; }
         public string Deposit { get; set; }
         public string IsoCode { get; set; }
-        public bool Status { get; set; }
+        public ReferralStatusEnum Status { get; set; }
     }
     public class GetReferralListRequest
     {
@@ -58,17 +59,80 @@ namespace BackendSite.Service.Model
         public decimal Deposit { get; set; }
         [JsonProperty("periodDays")]
         public string PeriodDays { get; set; }
+        [JsonProperty("depositRewardPercentage")]
+        public decimal DepositRewardPercentage { get; set; }
+        [JsonProperty("minPayout")]
+        public decimal MinPayout { get; set; }
+        [JsonProperty("maxPayout")]
+        public decimal MaxPayout { get; set; }
         [JsonProperty("specificList")]
         public IEnumerable<ReferralContent> SpecificList { get; set; }
+
+        public SetReferralRequest(SetNewReferralRequest item)
+        {
+            SiteId = item.SiteId;
+            CurrencyId = item.CurrencyId;
+            DepositRewardPercentage = item.DepositRewardPercentage;
+            MinPayout = item.MinPayout;
+            MaxPayout = item.MaxPayout;
+            SpecificList = item.SpecificList;
+        }
+    }
+
+    public class SetNewReferralRequest
+    {
+        [JsonProperty("siteId")]
+        public int SiteId { get; set; }
+        [JsonProperty("currencyId")]
+        public int CurrencyId { get; set; }
+        [JsonProperty("depositRewardPercentage")]
+        public decimal DepositRewardPercentage { get; set; }
+        [JsonProperty("minPayout")]
+        public decimal MinPayout { get; set; }
+        [JsonProperty("maxPayout")]
+        public decimal MaxPayout { get; set; }
+        [JsonProperty("specificList")]
+        public IEnumerable<ReferralContent> SpecificList { get; set; }
+
+        public SetNewReferralRequest()
+        {
+
+        }
+
+        public SetNewReferralRequest(SetReferralRequest item)
+        {
+            SiteId = item.SiteId;
+            CurrencyId = item.CurrencyId;
+            DepositRewardPercentage = item.DepositRewardPercentage;
+            MinPayout = item.MinPayout;
+            MaxPayout = item.MaxPayout;
+            SpecificList = item.SpecificList;
+        }
     }
 
     public class ReferralContent
     {
+        public ReferralTypeEnum Type { get; set; }
         public string LangId { get; set; }
         public string BannerUrl { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Detail { get; set; }
+
+        public ReferralContent()
+        {
+
+        }
+
+        public ReferralContent(ReferralTypeEnum type, ReferralContent content)
+        {
+            Type = type;
+            LangId = content.LangId;
+            BannerUrl = content.BannerUrl;
+            Title = content.Title;
+            Description = content.Description;
+            Detail = content.Detail;
+        }
     }
 
     public class ReferralList
@@ -84,7 +148,48 @@ namespace BackendSite.Service.Model
         public decimal ValidBet { get; set; }
         public decimal Deposit { get; set; }
         public int PeriodDays { get; set; }
-        public bool Status { get; set; }
+        public decimal DepositRewardPercentage { get; set; }
+        public decimal MinPayout { get; set; }
+        public decimal MaxPayout { get; set; }
+        public ReferralStatusEnum Status { get; set; }
+    }
+
+    public class ReferralManagementDto
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public decimal BonusAmount { get; set; }
+        public int InvitationLimit { get; set; }
+        public decimal ReferralFreeCredit { get; set; }
+        public decimal AgentValidBet { get; set; }
+        public decimal AgentDeposit { get; set; }
+        public decimal ValidBet { get; set; }
+        public decimal Deposit { get; set; }
+        public int PeriodDays { get; set; }
+        public ReferralStatusEnum Status { get; set; }
+    }
+
+    public class NewReferralManagementDto
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public decimal DepositRewardPercentage { get; set; }
+        public decimal MinPayout { get; set; }
+        public decimal MaxPayout { get; set; }
+        public ReferralStatusEnum Status { get; set; }
+
+        public NewReferralManagementDto(ReferralList item)
+        {
+            SiteId = item.SiteId;
+            CurrencyId = item.CurrencyId;
+            IsoCode = item.IsoCode;
+            DepositRewardPercentage = item.DepositRewardPercentage;
+            MinPayout = item.MinPayout;
+            MaxPayout = item.MaxPayout;
+            Status = item.Status;
+        }
     }
 
     public class ReferralDetail
@@ -99,8 +204,33 @@ namespace BackendSite.Service.Model
         public decimal ValidBet { get; set; }
         public decimal Deposit { get; set; }
         public string PeriodDays { get; set; }
+        public decimal DepositRewardPercentage { get; set; }
+        public decimal MinPayout { get; set; }
+        public decimal MaxPayout { get; set; }
         public IEnumerable<ReferralContent> SpecificList { get; set; }
-        public int Status { get; set; }
+        public ReferralStatusEnum Status { get; set; }
+    }
+
+    public class NewReferralDetailDto
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public decimal DepositRewardPercentage { get; set; }
+        public decimal MinPayout { get; set; }
+        public decimal MaxPayout { get; set; }
+        public IEnumerable<ReferralContent> SpecificList { get; set; }
+        public ReferralStatusEnum Status { get; set; }
+
+        public NewReferralDetailDto(ReferralDetail item)
+        {
+            SiteId = item.SiteId;
+            CurrencyId = item.CurrencyId;
+            DepositRewardPercentage = item.DepositRewardPercentage;
+            MinPayout = item.MinPayout;
+            MaxPayout = item.MaxPayout;
+            SpecificList = item.SpecificList.Where(x => x.Type == ReferralTypeEnum.DepositReferral);
+            Status = item.Status;
+        }
     }
 
     public class ReferralDetailData
@@ -115,8 +245,11 @@ namespace BackendSite.Service.Model
         public decimal ValidBet { get; set; }
         public decimal Deposit { get; set; }
         public string PeriodDays { get; set; }
+        public decimal DepositRewardPercentage { get; set; }
+        public decimal MinPayout { get; set; }
+        public decimal MaxPayout { get; set; }
         public string Details { get; set; }
-        public int Status { get; set; }
+        public ReferralStatusEnum Status { get; set; }
     }
 
     public class ReferralCustList

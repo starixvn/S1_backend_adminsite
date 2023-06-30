@@ -21,12 +21,12 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
-            return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
+            return _mainDbClient.Query<ReferralList>("Admin_Referral_Get_V2", new DynamicParameters(new { SiteId = siteId }));
         }
 
         public async Task<ReferralDetailData> GetReferralDetail(int siteId, int currencyId)
         {
-            return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get",
+            return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get_V2",
                 new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId }));
         }
 
@@ -51,9 +51,10 @@ namespace BackendSite.Service.DAL
                 }
             });
         }
-        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
+        public async Task<int> SetReferralAsync(int type,SetReferralRequest setReferralRequest)
         {
             var p = new DynamicParameters();
+            p.Add("_Type", type);
             p.Add("_SiteId", setReferralRequest.SiteId);
             p.Add("_CurrencyId", setReferralRequest.CurrencyId);
             p.Add("_BonusAmount", setReferralRequest.BonusAmount);
@@ -64,10 +65,27 @@ namespace BackendSite.Service.DAL
             p.Add("_ValidBet", setReferralRequest.ValidBet);
             p.Add("_Deposit", setReferralRequest.Deposit);
             p.Add("_PeriodDays", setReferralRequest.PeriodDays);
+            p.Add("_DepositRewardPercentage", setReferralRequest.DepositRewardPercentage);
+            p.Add("_MinPayout", setReferralRequest.MinPayout);
+            p.Add("_MaxPayout", setReferralRequest.MaxPayout);
+            p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));
+
+            return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V3", p);
+        }
+
+        public async Task<int> SetNewReferralAsync(SetReferralRequest setReferralRequest)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", setReferralRequest.SiteId);
+            p.Add("_CurrencyId", setReferralRequest.CurrencyId);
+            p.Add("_DepositRewardPercentage", setReferralRequest.DepositRewardPercentage);
+            p.Add("_MinPayout", setReferralRequest.MinPayout);
+            p.Add("_MaxPayout", setReferralRequest.MaxPayout);
             p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));
 
             return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
         }
+
 
         public int SetReferralStatus(int siteId, int currencyId, int status)
         {
