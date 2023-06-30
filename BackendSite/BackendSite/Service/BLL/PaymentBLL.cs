@@ -83,6 +83,7 @@ namespace BackendSite.Service.BLL
                 RefTransId = string.IsNullOrEmpty(refTransId) ? null : refTransId
             };
             var data = _partitionService.MonthlyQuery<FinancialLog>(startDate, endDate, "Service_FinancialLog_Get", parameters);
+
             if (financialTypeList.Any())
             {
                 data = data.Where(i => financialTypeList.Contains((int)i.FinancialType));

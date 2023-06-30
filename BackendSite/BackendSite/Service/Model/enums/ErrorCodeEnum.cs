@@ -99,5 +99,10 @@ namespace BackendSite.Service.Model.enums
         [Description("msg_VerifyCustErrorByParaNotEnough")]
         VerifyCustErrorByParaNotEnough = 5100,
         #endregion
+
+        #region BetLimit
+        [Description("msg_InvalidBetLimit")]
+        InvalidBetLimit = 5201,
+        #endregion
     }
 }

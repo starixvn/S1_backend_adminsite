@@ -178,7 +178,13 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
-    public enum WithdrawalLimitLogCreateFromEnum
+    public enum WithdrawalLimitLogMainTypeEnum
+    {
+        Add = 1,
+        Deduct = 2
+    }
+
+    public enum WithdrawalLimitLogCreateFromEnum 
     {
         Default = 0,
         Deposit = 1,
@@ -881,6 +887,7 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
+        RebateExcludeGame = 89,
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91
     }
@@ -1096,7 +1103,9 @@ namespace BackendSite.Service.Model.enums
         [Description("UNDER CREDIT")]
         UnderCredit = 20,
         [Description("REFUND")]
-        Refund = 21
+        Refund = 21,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
@@ -1198,7 +1207,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum TpGameTypeEnum
     {
-        DG_LiveCasino = 10
+        DG_LiveCasino = 10,
+        SBO_Sports = 77,
     }
 
     public enum TpCategoryEnum
@@ -1508,7 +1518,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         All = 0,
@@ -1580,6 +1589,7 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
+
 
     public enum ShieldRiskTagged
     {
@@ -1817,6 +1827,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         BoDelete = 2
     }
+    
     public enum ExchangeTypeEnum
     {
         /// <summary>

@@ -131,16 +131,18 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int CategoryId { get; set; }
         }
         
-        public class GetTpListByCategoryReq
-        {
-            public int CategoryId { get; set; }
-        }
-        
         public class GetTpGameTypeByCategoryAndTpIdReq
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
         }
+        
+         public class GetTpListByCategoryReq
+        {
+
+            public int CategoryId { get; set; }
+        }
+
 
 
         public class GameCasinoByTpIdReq
@@ -579,7 +581,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq request)
         {
-            var data = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
+            var data = await _tpBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
             {
                 Data = data,
@@ -597,7 +599,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<SiteTpListIfo>>> GetTpListByCategory(GetTpListByCategoryReq request)
         {
-            var data = await _userBetLimitBll.GetTpListByCategoryAsync(request.CategoryId);
+            var data = await _tpBll.GetTpListByCategoryAsync(request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
             {
                 Data = data,
@@ -1001,6 +1003,20 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
             {
                 Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
+                
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public ApiResult GetFinancialAccountList(GetFinancialAccountListRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
+            {
+                Data = _bankFinancialBll.GetFinancialAccountList(request.SiteId, request.Purposes),
+                
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
