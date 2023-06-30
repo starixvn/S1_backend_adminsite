@@ -61,7 +61,7 @@ namespace BackendSite.Service.BLL
                 BeforeDetailInfo = referral == null ? null : JsonConvert.SerializeObject(ToDictionary(referral)),
                 AfterDetailInfo = JsonConvert.SerializeObject(ToDictionary(new SetNewReferralRequest(setReferral))),
                 ActionType = ActionType.Update,
-                MenuEnum = type == ReferralTypeEnum.Referral ? AdminAdjustmentLogMenuEnum.Referral : AdminAdjustmentLogMenuEnum.NewReferral
+                MenuEnum = type == ReferralTypeEnum.Referral ? AdminAdjustmentLogMenuEnum.Referral : AdminAdjustmentLogMenuEnum.DepositReferral
             };
             if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
