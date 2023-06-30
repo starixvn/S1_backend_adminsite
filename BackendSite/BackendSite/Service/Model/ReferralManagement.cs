@@ -70,7 +70,7 @@ namespace BackendSite.Service.Model
 
         public SetReferralRequest()
         {
-            
+
         }
 
         public SetReferralRequest(SetNewReferralRequest item)
@@ -351,6 +351,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public string UserName { get; set; }
         public decimal TotalDeposit { get; set; }
+        public decimal TotalCalculateReward { get; set; }
         public decimal ReferralAmount { get; set; }
     }
 
