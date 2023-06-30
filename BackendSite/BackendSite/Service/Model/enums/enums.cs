@@ -691,7 +691,7 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-    
+
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -709,7 +709,7 @@ namespace BackendSite.Service.Model.enums
         ReferralFreeCredit = 15,
         DeviceBonus = 16
     }
-    
+
     public enum BonusSummaryTransactionType
     {
         IncreaseBonus = 1,
@@ -717,7 +717,7 @@ namespace BackendSite.Service.Model.enums
         Phone = 3,
         Email = 4
     }
-    
+
     #endregion
 
     #region PromotionCashBackSetting
@@ -774,7 +774,18 @@ namespace BackendSite.Service.Model.enums
     public enum ReferralStatusEnum
     {
         Disable = 0,
-        Enable = 1
+        ReferralEnable = 1,
+        DepositReferralEnable = 2
+    }
+
+    /// <summary>
+    /// Referral for 文案語系區分使用
+    /// </summary>
+    public enum ReferralTypeEnum
+    {
+        None = 0,
+        Referral = 1,         //舊制
+        DepositReferral = 2   //新制 
     }
 
     #endregion
@@ -881,7 +892,8 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
-        AutoWithdrawalRule = 91
+        AutoWithdrawalRule = 91,
+        NewReferral = 92
     }
 
     #region BankFinancialTransferInfoLog
@@ -1312,7 +1324,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
     #region Banner
 
     public enum BannerTypeEnum
@@ -1429,7 +1441,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
-    
+
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1854,7 +1866,7 @@ namespace BackendSite.Service.Model.enums
 
         Crypto = 3
     }
-    
+
     public enum ViewTimeType
     {
         Daily = 1,
