@@ -96,6 +96,18 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region CustTpGameTypeSetting For Frontend Use
+
+    public enum CustTpGameTypeSettingGetType
+    {
+        NoShow = 1,  //表示不顯示
+        IsShow = 11,  //表示顯示
+        NoPlay = 2,   //表示不可玩
+        IsPlay = 21   //表示可玩
+    }
+
+    #endregion
+
     #region AdminModule
 
     public enum AdminModuleStatusEnum
@@ -166,18 +178,25 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
-    public enum WithdrawalLimitLogCreateFromEnum 
+    public enum WithdrawalLimitLogCreateFromEnum
     {
         Default = 0,
         Deposit = 1,
         LimitAdjustment = 2,
         BalanceAdjustment = 3,
-        Bonus = 4 ,
+        Bonus = 4,
         ReferralReward = 5,
         VerificationReward = 6,
         DrawPrize = 7
     }
-    
+
+    public enum MemberTypeEnum
+    {
+        Normal = 1,
+        Affiliate = 2,
+        LiveStreaming = 3
+    }
+
     #endregion
 
     #region CustProfile
@@ -217,6 +236,16 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region CustTpGameTypeSetting
+
+    public enum CustTpGameTypeSettingTypeEnum
+    {
+        NoShow = 1,  //有資料表示不顯示
+        NoPlay = 2   //有資料表示不可玩
+    }
+
+    #endregion
+
     #region Tag
 
     public enum TagStatusEnum
@@ -237,7 +266,8 @@ namespace BackendSite.Service.Model.enums
         CryptoPay = 4,
         LoadCard = 5,
         QRPay = 6,
-        BankAutoChannel = 7
+        BankAutoChannel = 7,
+        CryptoWallet = 8
     }
 
     public enum DepositStatusEnum
@@ -285,7 +315,7 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
-    
+
     public enum DepositDateTypeEnum
     {
         CreateTime = 1,
@@ -294,10 +324,10 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositReceiptCreateFromEnum
     {
-        User = 1 , 
+        User = 1,
         BackendUser = 2
     }
-    
+
     #endregion
 
     #region PayList
@@ -421,7 +451,7 @@ namespace BackendSite.Service.Model.enums
         ToKyc = 71,
         Receive = 72
     }
-    
+
     public enum WithdrawalDateTypeEnum
     {
         CreateTime = 1,
@@ -597,7 +627,8 @@ namespace BackendSite.Service.Model.enums
         Rebate = 6,
         Cashback = 7,
         SpecialBonus = 8,
-        RetentionFreeBet = 9
+        RetentionFreeBet = 9,
+        DeviceBonus = 10
     }
 
     public enum PromotionCategoryEnum
@@ -660,7 +691,33 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-
+    
+    public enum BonusSummaryType
+    {
+        WelcomeBonus = 1,
+        ReDeposit = 2,
+        FreeBet = 3,
+        Rebate = 6,
+        CashBack = 7,
+        ManualBonus = 8,
+        RetentionFreeBet = 9,
+        Referral = 10,
+        VerificationReward = 11,
+        PrizeDraw = 12,
+        Other = 13,
+        VipUpgrade = 14,
+        ReferralFreeCredit = 15,
+        DeviceBonus = 16
+    }
+    
+    public enum BonusSummaryTransactionType
+    {
+        IncreaseBonus = 1,
+        DecreaseBonus = 2,
+        Phone = 3,
+        Email = 4
+    }
+    
     #endregion
 
     #region PromotionCashBackSetting
@@ -821,7 +878,11 @@ namespace BackendSite.Service.Model.enums
         CancelBonusInCustInfo = 83,
         SetBlockCryptoWallet = 84,
         ReleaseCryptoWallet = 85,
-        VipUpgradeSetting = 90
+        ResetSmsOtpTimes = 86,
+        RegisterMember = 87,
+        SetCustTpGameTypeSetting = 88,
+        VipUpgradeSetting = 90,
+        AutoWithdrawalRule = 91
     }
 
     #region BankFinancialTransferInfoLog
@@ -1152,14 +1213,14 @@ namespace BackendSite.Service.Model.enums
         Poker = 8,
         ESports = 11
     }
-    
+
     public enum LeaderBoardCategoryEnum
     {
         Sports = 1,
         Casino = 2,
         LiveCasino = 3
     }
-    
+
     #region VerificationReward
 
     public enum VerificationTypeEnum
@@ -1252,8 +1313,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-
-
+    
     #region Banner
 
     public enum BannerTypeEnum
@@ -1370,6 +1430,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
+    
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1434,7 +1495,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Goal123")]
         GOAL123 = 2,
         [Description("Bwing")]
-        BWING = 3
+        BWING = 3,
+        [Description("Soon88")]
+        SOON88 = 4,
+        [Description("ivorysport")]
+        IVORYSPORT = 5
     }
 
     public enum AffSiteEnum
@@ -1789,6 +1854,12 @@ namespace BackendSite.Service.Model.enums
         BankCard = 2,
 
         Crypto = 3
+    }
+    
+    public enum ViewTimeType
+    {
+        Daily = 1,
+        Weekly = 2
     }
 
     public enum UpgradeSettingEnum 

@@ -98,8 +98,9 @@ namespace BackendSite.Service.BLL
             var affectTransferData = 0;
             var oldData = new BankFinancialTransferAccountDetailModel();
             var isCreate = input.Id == 0;
+            var siteIds = ((SiteEnum[])Enum.GetValues(typeof(SiteEnum))).Select(x => (int)x);
 
-            if (!CheckParameterForSetTransferAccount(input, out var message))
+            if (!CheckParameterForSetTransferAccount(input, siteIds, out var message))
             {
                 return (false, count, message);
             }
@@ -127,6 +128,7 @@ namespace BackendSite.Service.BLL
                 AccountNo = string.IsNullOrWhiteSpace(input.AccountNo) ? string.Empty : input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
+                FrontendDisplayName = input.FrontendDisplayName ?? string.Empty,
                 BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
                 BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : _cryptor.Encrypt(input.BankLoginAccount),
                 BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : _cryptor.Encrypt(input.BankLoginPassword),
@@ -160,6 +162,7 @@ namespace BackendSite.Service.BLL
                     AccountNo = oldData.AccountNo,
                     AccountName = oldData.AccountName,
                     DisplayName = oldData.DisplayName,
+                    oldData.FrontendDisplayName,
                     oldData.BankLoginUrl,
                     BankLoginAccount = oldData.BankLoginAccount,
                     BankLoginPassword = oldData.BankLoginPassword,
@@ -181,6 +184,7 @@ namespace BackendSite.Service.BLL
                     AccountNo = input.AccountNo,
                     AccountName = input.AccountName,
                     DisplayName = input.DisplayName,
+                    input.FrontendDisplayName,
                     input.BankLoginUrl,
                     transferAccountModel.BankLoginAccount,
                     transferAccountModel.BankLoginPassword,
@@ -281,7 +285,8 @@ namespace BackendSite.Service.BLL
         #region Private Methods Set TransferAccount
 
         private bool CheckParameterForSetTransferAccount(BankFinancialTransferAccountModel input,
-                                                         out string message)
+            IEnumerable<int> SiteIds,
+            out string message)
         {
             message = string.Empty;
 
@@ -297,22 +302,16 @@ namespace BackendSite.Service.BLL
             if (input.Id == null)
             {
                 message = "Data-[Id] invalid.Notify admin please.";
-
                 return false;
             }
 
             if (input.SiteId == null)
             {
                 message = "Data-[Site] invalid.";
-
                 return false;
-
             }
 
-            if (input.SiteId != 4 &&
-                input.SiteId != 1 &&
-                input.SiteId != 2 &&
-                input.SiteId != 3)
+            if (!SiteIds.Contains(input.SiteId))
             {
                 message = "Data-[Site] not match.";
 

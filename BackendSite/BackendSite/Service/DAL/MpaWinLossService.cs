@@ -10,13 +10,16 @@ namespace BackendSite.Service.DAL
     public class MpaWinLossService: IMpaWinLossService
     {
         private readonly MySqlClient _reportDbClient;
+        private readonly ILogger<MpaWinLossService> _logger;
 
-        public MpaWinLossService(IEnumerable<MySqlClient> sqlClients)
+        public MpaWinLossService(IEnumerable<MySqlClient> sqlClients, ILogger<MpaWinLossService> logger)
         {
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
+            _logger = logger;
         }
 
         public Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format,
+            string memberTypeJson,
             MpaDateType mpaDateType = MpaDateType.SettledDate)
         {
             var p = new DynamicParameters();
@@ -24,8 +27,12 @@ namespace BackendSite.Service.DAL
             p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
+            p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
-            return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get", p);
+
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V2", p);
+            
+            return data;
         }
 
         public Task<IEnumerable<TResult>> GetMapTpBetRecordByPlayer<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format,
@@ -45,14 +52,17 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByPlayer_Get", p);
         }
 
-        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format)
+        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
             p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
-            return _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get", p);
+            p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
+
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get_V2", p);
+            return data;
         }
 
         public Task<IEnumerable<TpGameTypeOptionDto>> GetTpGameTypeOption()
@@ -76,15 +86,18 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TpCategoryDto>("Admin_TPCategory_Get");
         }
 
-        public Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format)
+        public Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
             p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
+            p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
 
-            return _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get", p);
+            var data = _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get_V2", p);
+            
+            return data;
         }
     }
 }

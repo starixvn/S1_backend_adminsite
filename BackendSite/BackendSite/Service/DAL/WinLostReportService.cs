@@ -24,7 +24,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<GameType> GetAllGameType()
         {
-            return _reportDbClient.Query<GameType>("Admin_TpGameType_Get", null, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<GameType>("Admin_TpGameType_Get_V2", null, commandType: CommandType.StoredProcedure);
         }
     }
 }

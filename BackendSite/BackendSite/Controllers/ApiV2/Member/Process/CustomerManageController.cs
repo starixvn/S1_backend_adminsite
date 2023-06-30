@@ -109,6 +109,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
+            public IEnumerable<int> GameTypes { get; set; }
         }
 
         /// <summary>
@@ -464,12 +465,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public class CustTpBetRecordListOneDayReq : CustIdWithDateRangeRequest
         {
             public DateTime SelDate { get; set; }
+            public IEnumerable<int> GameTypes { get; set; }
         }
 
         public class CustTpBetRecordListbyCategoryIdReq : CustIdWithDateRangeRequest
         {
             public DateTime SelDate { get; set; }
             public int CategoryId { get; set; }
+            public IEnumerable<int> GameTypes { get; set; }
         }
 
         public class CustTpBetRecordDetailListbyGameTypeReq : ApiRequestPageModel
@@ -1816,6 +1819,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     request.CustId,
                     request.StartDate.ToUniversalTime().DateTime,
                     request.EndDate.ToUniversalTime().DateTime,
+                    request.GameTypes,
                     request.StartDate.Offset),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
@@ -1828,6 +1832,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.CustId,
                 request.StartDate.ToUniversalTime().DateTime,
                 request.EndDate.ToUniversalTime().DateTime,
+                request.GameTypes,
                 request.StartDate.Offset);
             
             var stream = _excelBll.ExportV2(apiResult);
@@ -1857,7 +1862,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     req.CustId,
                     req.SelDate.Date,
                     req.StartDate.ToUniversalTime().DateTime,
-                    req.EndDate.ToUniversalTime().DateTime)
+                    req.EndDate.ToUniversalTime().DateTime,
+                    req.GameTypes)
             };
             return apiResult;
         }
@@ -1870,7 +1876,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 req.CustId,
                 req.SelDate.Date,
                 req.StartDate.ToUniversalTime().DateTime,
-                req.EndDate.ToUniversalTime().DateTime);
+                req.EndDate.ToUniversalTime().DateTime,
+                req.GameTypes);
             
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecordByDay");
@@ -1900,7 +1907,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     req.SelDate.Date,
                     req.CategoryId,
                     req.StartDate.ToUniversalTime().DateTime,
-                    req.EndDate.ToUniversalTime().DateTime)
+                    req.EndDate.ToUniversalTime().DateTime,
+                    req.GameTypes)
             };
             return apiResult;
         }
@@ -1914,7 +1922,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 req.SelDate.Date,
                 req.CategoryId,
                 req.StartDate.ToUniversalTime().DateTime,
-                req.EndDate.ToUniversalTime().DateTime);
+                req.EndDate.ToUniversalTime().DateTime,
+                req.GameTypes);
             
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecordListByCategoryId");

@@ -14,12 +14,14 @@ namespace BackendSite.Service.BLL.Mpa
         private readonly IMpaWinLossService _mpaWinLossService;
         private readonly IMpaCommonService _mpaCommonService;
         private readonly ICacheHelper _redisHelper;
+        private readonly ILogger<MpaWinLossBLL> _logger;
 
-        public MpaWinLossBLL(IMpaWinLossService mpaWinLossService, ICacheHelper redisHelper, IMpaCommonService mpaCommonService)
+        public MpaWinLossBLL(IMpaWinLossService mpaWinLossService, ICacheHelper redisHelper, IMpaCommonService mpaCommonService, ILogger<MpaWinLossBLL> logger)
         {
             _mpaWinLossService = mpaWinLossService;
             _mpaCommonService = mpaCommonService;
             _redisHelper = redisHelper;
+            _logger = logger;
         }
 
         #region GropuByDate、Month
@@ -32,28 +34,20 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByDateDto>> GetMpaWinLossByDateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            // 注單資料
-            var betRecord = await GetTpBetRecordGroupByDateResult(request, groupByType);
-            var originTpBetRecord = betRecord.OriginTpBetRecordResult;
-            var alreadyMultiplyRateTpBetRecord = betRecord.AlreadyMultiplyRateTpBetRecordResult;
-
-            // 存提款 
-            var transaction = await GetTransactionByDateResult(request, groupByType);
-            var originTransaction = transaction.OriginTransactionResult;
-            var alreadyMultiplyRateTpTransaction = transaction.AlreadyMultiplyRateTransactionResult;
-
-            // Bonus
-            var bonus = await GetBonusByDateResult(request, groupByType);
+            // 注單資料 & 存提款 & Bonus
+            var bonusTask = Task.Run(() => GetBonusByDateResult(request, groupByType));
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByDateResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByDateResult(request, groupByType));
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
 
             // 組合結果
-            var originCombineResult = ByDateCombineResult(request, originTpBetRecord, originTransaction, bonus.OriginBonusResult).ToList();
-            var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, alreadyMultiplyRateTpBetRecord, alreadyMultiplyRateTpTransaction, bonus.AlreadyMultiplyRateBonusResult).ToList();
+            var originCombineResult = ByDateCombineResult(request, betRecord.OriginTpBetRecordResult, transaction.OriginTransactionResult, bonus.OriginBonusResult).ToList();
+            var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, betRecord.AlreadyMultiplyRateTpBetRecordResult, transaction.AlreadyMultiplyRateTransactionResult, bonus.AlreadyMultiplyRateBonusResult).ToList();
 
-            var exportData = new List<MpaWinLossByDateDto>();
-            exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
-            ? originCombineResult
-            : alreadyMultiplyRateCombineResult);
-
+            var allCurrencySummary = new List<MpaWinLossByDateDto>();
             var keys = originCombineResult.Select(x => x.Date).Distinct();
             foreach (var key in keys)
             {
@@ -76,7 +70,7 @@ namespace BackendSite.Service.BLL.Mpa
                     WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
                     TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
@@ -85,12 +79,28 @@ namespace BackendSite.Service.BLL.Mpa
                     TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                 };
 
-                exportData.Add(result);
+                allCurrencySummary.Add(result);
             }
 
-            exportData = request.OrderBy
-                ? exportData.OrderBy(request).ToList()
-                : exportData.OrderBy(x => x.Date).ThenBy(x => x.Currency).ToList();
+            #region Sort
+
+            allCurrencySummary = request.OrderBy
+                ? allCurrencySummary.OrderBy(request).ToList()
+                : allCurrencySummary;
+            var currencyDetails = request.DisplayGroupBreakdownInOriginalCurrency
+                ? originCombineResult
+                : alreadyMultiplyRateCombineResult;
+            var exportData = new List<MpaWinLossByDateDto>();
+            foreach (var currencySummary in allCurrencySummary)
+            {
+                var currencyDetail = request.OrderBy
+                    ? currencyDetails.Where(r => r.Date == currencySummary.Date).OrderBy(request).ToList()
+                    : currencyDetails.Where(r => r.Date == currencySummary.Date).ToList();
+                exportData.Add(currencySummary);
+                exportData.AddRange(currencyDetail);
+            }
+
+            #endregion
 
             // total
             exportData.Add(new MpaWinLossByDateDto()
@@ -111,7 +121,7 @@ namespace BackendSite.Service.BLL.Mpa
                 TotalWithDrawAmount = exportData.Sum(x => x.TotalWithDrawAmount),
                 TotalBonus = exportData.Sum(x => x.TotalBonus),
                 AvgBetAmount = exportData.Sum(x => x.BetCount) != 0
-                    ? (exportData.Sum(x => x.ValidTurnOver) / exportData.Sum(x => x.BetCount))
+                    ? (exportData.Sum(x => x.TurnOver) / exportData.Sum(x => x.BetCount))
                     : 0.00m,
                 Margin = exportData.Sum(x => x.ValidTurnOver) != 0
                     ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
@@ -129,22 +139,19 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByDateResponseToFrontEnd>> GetMapWinLossByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            // 注單資料
-            var betRecord = await GetTpBetRecordGroupByDateResult(request, groupByType);
-            var originTpBetRecord = betRecord.OriginTpBetRecordResult;
-            var alreadyMultiplyRateTpBetRecord = betRecord.AlreadyMultiplyRateTpBetRecordResult;
+            // 注單資料 & 存提款 & Bonus
+            var bonusTask = Task.Run(() => GetBonusByDateResult(request, groupByType));
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByDateResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByDateResult(request, groupByType));
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
 
-            // 存提款 
-            var transaction = await GetTransactionByDateResult(request, groupByType);
-            var originTransaction = transaction.OriginTransactionResult;
-            var alreadyMultiplyRateTpTransaction = transaction.AlreadyMultiplyRateTransactionResult;
-
-            // Bonus
-            var bonus = await GetBonusByDateResult(request, groupByType);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
 
             // 組合結果
-            var originCombineResult = ByDateCombineResult(request, originTpBetRecord, originTransaction, bonus.OriginBonusResult).ToList();
-            var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, alreadyMultiplyRateTpBetRecord, alreadyMultiplyRateTpTransaction, bonus.AlreadyMultiplyRateBonusResult).ToList();
+            var originCombineResult = ByDateCombineResult(request, betRecord.OriginTpBetRecordResult, transaction.OriginTransactionResult, bonus.OriginBonusResult).ToList();
+            var alreadyMultiplyRateCombineResult = ByDateCombineResult(request, betRecord.AlreadyMultiplyRateTpBetRecordResult, transaction.AlreadyMultiplyRateTransactionResult, bonus.AlreadyMultiplyRateBonusResult).ToList();
 
             var exportData = new Dictionary<string, MpaWinLossByDateResponse>();
             var keys = originCombineResult.Select(x => x.Date).Distinct();
@@ -152,11 +159,13 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var key in keys)
             {
                 var dateSummary = alreadyMultiplyRateCombineResult.Where(x => x.Date == key).ToList();
+                var ggr = dateSummary.Sum(x => x.GGR);
+
                 var result = new MpaWinLossByDateResponse
                 {
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR),
+                    GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
@@ -168,11 +177,11 @@ namespace BackendSite.Service.BLL.Mpa
                     WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
                     TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
-                        ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
+                        ? ggr / dateSummary.Sum(x => x.ValidTurnOver)
                         : 0.00m,
                     TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
@@ -182,6 +191,28 @@ namespace BackendSite.Service.BLL.Mpa
 
                 exportData.Add(key, result);
             }
+
+            #region Sort Data
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "date"
+                ? "key"
+                : request.OrderByProperty;
+
+            exportData = request.OrderBy
+                ? _mpaCommonService.SortApiData(exportData, orderByProperty, request.OrderByDirection)
+                : exportData;
+
+            foreach (var item in exportData)
+            {
+                var currencyDetail = request.OrderBy
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, orderByProperty, request.OrderByDirection)
+                    : item.Value.CurrencyDetail;
+                item.Value.CurrencyDetail = currencyDetail;
+            }
+
+            #endregion
+
+            #region total
 
             // total
             exportData.Add("total", new MpaWinLossByDateResponse()
@@ -201,13 +232,15 @@ namespace BackendSite.Service.BLL.Mpa
                 TotalWithDrawAmount = exportData.Sum(x => x.Value.TotalWithDrawAmount),
                 TotalBonus = exportData.Sum(x => x.Value.TotalBonus),
                 AvgBetAmount = exportData.Sum(x => x.Value.BetCount) != 0
-                    ? (exportData.Sum(x => x.Value.ValidTurnOver) / exportData.Sum(x => x.Value.BetCount))
-                    : 0.00m,
+                ? (exportData.Sum(x => x.Value.TurnOver) / exportData.Sum(x => x.Value.BetCount))
+                : 0.00m,
 
                 Margin = exportData.Sum(x => x.Value.ValidTurnOver) != 0
-                    ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
-                    : 0.00m,
+                ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
+                : 0.00m,
             });
+
+            #endregion
 
             return exportData.ToApiFormat();
         }
@@ -251,12 +284,12 @@ namespace BackendSite.Service.BLL.Mpa
                 TotalDepositAmount = r.Sum(x => x.TotalDepositAmount),
                 WithDrawCount = r.Sum(x => x.WithDrawCount),
                 TotalWithDrawAmount = r.Sum(x => x.TotalWithDrawAmount),
-                AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.ValidTurnOver) / r.Sum(x => x.BetCount) : 0.00m,
+                AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.TurnOver) / r.Sum(x => x.BetCount) : 0.00m,
                 Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
                 TotalBonus = r.Sum(x => x.TotalBonus)
             });
 
-            return request.OrderBy ? combineResult.OrderBy(request) : combineResult.OrderBy(x => x.Date).ThenBy(x => x.Currency);
+            return combineResult;
         }
 
         /// <summary>
@@ -286,14 +319,16 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = currencyNameMapper[r.Key.CurrencyId],
                     TurnOver = r.Sum(x => x.StakeSummary),
                     ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    GGR = r.Sum(x => x.WinLossSummary) * -1,
+                    GGR = GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
                     PlayerWinLoss = r.Sum(x => x.WinLossSummary),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
                     Commission = r.Sum(x => x.RevenueSummary),
                     BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.ValidBetSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) / r.Sum(x => x.ValidBetSummary) : 0.00m,
+                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
+                    Margin = r.Sum(x => x.ValidBetSummary) != 0
+                        ? GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary)
+                        : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
             }
@@ -307,6 +342,28 @@ namespace BackendSite.Service.BLL.Mpa
 
             return wrapperResult;
         }
+
+        private static void BetRecordSetDateToOffSet(MpaWinLossRequest request, MpaTpBetRecordWrapper betRecordResult,
+            MpaWinLossGroupByTypeEnum groupByType)
+        {
+            if (betRecordResult == null) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date && groupByType != MpaWinLossGroupByTypeEnum.Month) return;
+
+            var offset = request.StarTime.Offset;
+
+            foreach (var item in betRecordResult.OriginBetRecord)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
+
+            foreach (var item in betRecordResult.AlreadyMultiplyRateBetRecord)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
+        }
+
+
+
 
         private static Dictionary<string, MpaWinLossByDayCurrencyDetailDto> GetCurrencyDetailByDate(List<MpaWinLossByDateDto> dateSummary)
         {
@@ -364,11 +421,8 @@ namespace BackendSite.Service.BLL.Mpa
             // 注單資料
             var data = await GetTpBetRecordGroupByTpGameTypeResult(request, groupByType);
             var keys = data.OriginTpBetRecordResult.Select(x => x.TpGameTypeName).Distinct();
-            var exportData = new List<MpaWinLossByTpGameTypeDto>();
-            exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
-                ? data.OriginTpBetRecordResult
-                : data.AlreadyMultiplyRateTpBetRecordResult);
 
+            var allCurrencySummary = new List<MpaWinLossByTpGameTypeDto>();
             foreach (var key in keys)
             {
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpGameTypeName == key).ToList();
@@ -386,7 +440,7 @@ namespace BackendSite.Service.BLL.Mpa
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
@@ -394,14 +448,34 @@ namespace BackendSite.Service.BLL.Mpa
                         : 0.00m
                 };
 
-                exportData.Add(result);
+                allCurrencySummary.Add(result);
             }
 
-            exportData = request.OrderBy
-                ? exportData.OrderBy(request).ToList()
-                : exportData.OrderBy(x => x.TpGameTypeName).ThenBy(x => x.Currency).ToList();
+            #region sort
 
-            // total
+            allCurrencySummary = request.OrderBy
+                ? allCurrencySummary.OrderBy(request).ToList()
+                : allCurrencySummary;
+
+            var currencyDetails = request.DisplayGroupBreakdownInOriginalCurrency
+                ? data.OriginTpBetRecordResult
+                : data.AlreadyMultiplyRateTpBetRecordResult;
+
+            var exportData = new List<MpaWinLossByTpGameTypeDto>();
+
+            foreach (var currencySummary in allCurrencySummary)
+            {
+                var currencyDetail = request.OrderBy
+                    ? currencyDetails.Where(r => r.TpGameTypeName == currencySummary.TpGameTypeName).OrderBy(request).ToList()
+                    : currencyDetails.Where(r => r.TpGameTypeName == currencySummary.TpGameTypeName).ToList();
+                exportData.Add(currencySummary);
+                exportData.AddRange(currencyDetail);
+            }
+
+            #endregion
+
+            #region total
+
             exportData.Add(new MpaWinLossByTpGameTypeDto()
             {
                 TpGameTypeName = "total",
@@ -418,9 +492,11 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
                 UniquePlayers = data.UniquePlayers,
                 Margin = (exportData.Sum(x => x.GGR) != 0 && exportData.Sum(x => x.TurnOver) != 0)
-                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.TurnOver)
+                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m
             });
+
+            #endregion
 
             return exportData.ToExcelFormat();
         }
@@ -433,26 +509,21 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByTpGameTypeResponseToFrontEnd>> GetMapWinLossByTpGameTypeResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            var responseResult = new Dictionary<string, MpaWinLossByTpGameTypeResponse>();
-
             // 注單資料
             var data = await GetTpBetRecordGroupByTpGameTypeResult(request, groupByType);
             var tpBetRecordResult = data.OriginTpBetRecordResult;
 
-            var combineResult = request.OrderBy
-                ? tpBetRecordResult.OrderBy(request)
-                : tpBetRecordResult.OrderBy(r => r.TpGameTypeName).ThenBy(x => x.Currency).AsEnumerable();
-
-            var keys = combineResult.Select(x => x.TpGameTypeName).Distinct();
-
+            var keys = tpBetRecordResult.Select(x => x.TpGameTypeName).Distinct();
+            var responseResult = new Dictionary<string, MpaWinLossByTpGameTypeResponse>();
             foreach (var key in keys)
             {
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpGameTypeName == key).ToList();
+                var ggr = dateSummary.Sum(x => x.GGR);
                 var result = new MpaWinLossByTpGameTypeResponse
                 {
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR),
+                    GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
@@ -460,11 +531,11 @@ namespace BackendSite.Service.BLL.Mpa
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
-                        ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
+                        ? ggr / dateSummary.Sum(x => x.ValidTurnOver)
                         : 0.00m,
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
                     ? GetOriginalCurrencyDetailByTpGameType(data.OriginTpBetRecordResult, key)
@@ -474,7 +545,28 @@ namespace BackendSite.Service.BLL.Mpa
                 responseResult.Add(key, result);
             }
 
-            // total
+            #region Sort Data
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "tpgametypename"
+                ? "key"
+                : request.OrderByProperty;
+
+            responseResult = request.OrderBy
+                ? _mpaCommonService.SortApiData(responseResult, orderByProperty, request.OrderByDirection)
+                : responseResult;
+
+            foreach (var item in responseResult)
+            {
+                var currencyDetail = request.OrderBy
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, orderByProperty, request.OrderByDirection)
+                    : item.Value.CurrencyDetail;
+                item.Value.CurrencyDetail = currencyDetail;
+            }
+
+            #endregion
+
+            #region total
+
             responseResult.Add("total", new MpaWinLossByTpGameTypeResponse()
             {
                 TurnOver = responseResult.Sum(x => x.Value.TurnOver),
@@ -490,9 +582,11 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
                 UniquePlayers = data.UniquePlayers,
                 Margin = (responseResult.Sum(x => x.Value.GGR) != 0 && responseResult.Sum(x => x.Value.TurnOver) != 0)
-                        ? responseResult.Sum(x => x.Value.GGR) / responseResult.Sum(x => x.Value.TurnOver)
+                        ? responseResult.Sum(x => x.Value.GGR) / responseResult.Sum(x => x.Value.ValidTurnOver)
                         : 0.00m
             });
+
+            #endregion
 
             return responseResult.ToApiFormat();
         }
@@ -557,14 +651,16 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = currencyNameMapper[r.Key.CurrencyId],
                     TurnOver = r.Sum(x => x.StakeSummary),
                     ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    GGR = r.Sum(x => x.WinLossSummary) * -1,
+                    GGR = GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
                     PlayerWinLoss = r.Sum(x => x.WinLossSummary),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
                     Commission = r.Sum(x => x.RevenueSummary),
                     BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.ValidBetSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) / r.Sum(x => x.ValidBetSummary) : 0.00m,
+                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
+                    Margin = r.Sum(x => x.ValidBetSummary) != 0
+                        ? GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary)
+                        : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
             }
@@ -595,11 +691,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             // 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
-            var exportData = new List<MpaWinLossByTpCategoryDto>();
-            exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
-                ? data.OriginTpBetRecordResult
-                : data.AlreadyMultiplyRateTpBetRecordResult);
-
+            var allCurrencySummary = new List<MpaWinLossByTpCategoryDto>();
             var keys = data.OriginTpBetRecordResult.Select(x => x.TpCategoryName).Distinct();
 
             foreach (var key in keys)
@@ -619,7 +711,7 @@ namespace BackendSite.Service.BLL.Mpa
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
@@ -627,14 +719,34 @@ namespace BackendSite.Service.BLL.Mpa
                         : 0.00m,
                 };
 
-                exportData.Add(result);
+                allCurrencySummary.Add(result);
             }
 
-            exportData = request.OrderBy
-                ? exportData.OrderBy(request).ToList()
-                : exportData.OrderBy(x => x.TpCategoryName).ThenBy(x => x.Currency).ToList();
+            #region Sort
 
-            // total
+            allCurrencySummary = request.OrderBy
+                ? allCurrencySummary.OrderBy(request).ToList()
+                : allCurrencySummary;
+
+            var currencyDetails = request.DisplayGroupBreakdownInOriginalCurrency
+                ? data.OriginTpBetRecordResult
+                : data.AlreadyMultiplyRateTpBetRecordResult;
+
+            var exportData = new List<MpaWinLossByTpCategoryDto>();
+            foreach (var currencySummary in allCurrencySummary)
+            {
+                var currencyDetail = request.OrderBy
+                        ? currencyDetails.Where(r => r.TpCategoryName == currencySummary.TpCategoryName).OrderBy(request).ToList()
+                        : currencyDetails.Where(r => r.TpCategoryName == currencySummary.TpCategoryName).ToList();
+
+                exportData.Add(currencySummary);
+                exportData.AddRange(currencyDetail);
+            }
+
+            #endregion
+
+            #region total
+
             exportData.Add(new MpaWinLossByTpCategoryDto()
             {
                 TpCategoryName = "total",
@@ -651,9 +763,11 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
                 UniquePlayers = data.UniquePlayers,
                 Margin = (exportData.Sum(x => x.GGR) != 0 && exportData.Sum(x => x.TurnOver) != 0)
-                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.TurnOver)
+                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m
             });
+
+            #endregion
 
             return exportData.ToExcelFormat();
         }
@@ -668,24 +782,21 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var exportData = new Dictionary<string, MpaWinLossByTpCategoryResponse>();
 
-            //// 注單資料
+            // 注單資料
             var data = await GetTpBetRecordGroupByTpCategoryResult(request, groupByType);
             var tpBetRecordResult = data.OriginTpBetRecordResult;
-
-            var combineResult = request.OrderBy
-                ? tpBetRecordResult.OrderBy(request)
-                : tpBetRecordResult;
-
-            var keys = combineResult.Select(x => x.TpCategoryName).Distinct();
+            var keys = tpBetRecordResult.Select(x => x.TpCategoryName).Distinct();
 
             foreach (var key in keys)
             {
                 var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpCategoryName == key).ToList();
+                var ggr = dateSummary.Sum(x => x.GGR);
+
                 var result = new MpaWinLossByTpCategoryResponse
                 {
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR),
+                    GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
@@ -693,21 +804,42 @@ namespace BackendSite.Service.BLL.Mpa
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
-                        ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
+                        ? ggr / dateSummary.Sum(x => x.ValidTurnOver)
                         : 0.00m,
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
-                    ? GetOriginalCurrencyDetailByTpCategory(combineResult, key)
+                    ? GetOriginalCurrencyDetailByTpCategory(tpBetRecordResult, key)
                     : GetCurrencyDetailByTpCategory(dateSummary)
                 };
 
                 exportData.Add(key, result);
             }
 
-            // total
+            #region Sort
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "tpcategoryname"
+                ? "key"
+                : request.OrderByProperty;
+
+            exportData = request.OrderBy
+                ? _mpaCommonService.SortApiData(exportData, orderByProperty, request.OrderByDirection)
+                : exportData;
+
+            foreach (var item in exportData)
+            {
+                var currencyDetail = request.OrderBy
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, orderByProperty, request.OrderByDirection)
+                    : item.Value.CurrencyDetail;
+                item.Value.CurrencyDetail = currencyDetail;
+            }
+
+            #endregion
+
+            #region total
+
             exportData.Add("total", new MpaWinLossByTpCategoryResponse()
             {
                 TurnOver = exportData.Sum(x => x.Value.TurnOver),
@@ -723,9 +855,11 @@ namespace BackendSite.Service.BLL.Mpa
                     : 0.00m,
                 UniquePlayers = data.UniquePlayers,
                 Margin = (exportData.Sum(x => x.Value.GGR) != 0 && exportData.Sum(x => x.Value.TurnOver) != 0)
-                        ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.TurnOver)
-                        : 0.00m
+                    ? exportData.Sum(x => x.Value.GGR) / exportData.Sum(x => x.Value.ValidTurnOver)
+                    : 0.00m
             });
+
+            #endregion
 
             return exportData.ToApiFormat();
         }
@@ -790,14 +924,16 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = currencyNameMapper[r.Key.CurrencyId],
                     TurnOver = r.Sum(x => x.StakeSummary),
                     ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    GGR = r.Sum(x => x.WinLossSummary) * -1,
+                    GGR = GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
                     PlayerWinLoss = r.Sum(x => x.WinLossSummary),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
                     Commission = r.Sum(x => x.RevenueSummary),
                     BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.ValidBetSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) / r.Sum(x => x.ValidBetSummary) : 0.00m,
+                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
+                    Margin = r.Sum(x => x.ValidBetSummary) != 0
+                        ? GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary)
+                        : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
             }
@@ -810,6 +946,11 @@ namespace BackendSite.Service.BLL.Mpa
             };
 
             return wrapperResult;
+        }
+
+        private decimal GetGGR(decimal winLossSummary, decimal progressiveWinSummary, decimal progressiveBetSummary)
+        {
+            return (winLossSummary * -1) + (progressiveWinSummary - progressiveBetSummary);
         }
 
         #endregion
@@ -825,6 +966,7 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<IEnumerable<MpaWinLossByPlayerDto>> GetMpaWinLossByPlayerExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var winLossByPlayer = await GetWinLossByPlayer(request, groupByType);
+            var excludeUserName = new List<string>();
             var exportData = new List<MpaWinLossByPlayerDto>();
             exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
                 ? winLossByPlayer.OriginData
@@ -835,32 +977,38 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var userName in userNames)
             {
                 var dateSummary = winLossByPlayer.AlreadyMultiplyRateData.Where(x => x.UserName == userName).ToList();
+                var validTurnOver = dateSummary.Sum(x => x.ValidTurnOver);
+                var turnOver = dateSummary.Sum(x => x.TurnOver);
+                var ggr = dateSummary.Sum(x => x.GGR);
+                var betCount = dateSummary.Sum(x => x.BetCount);
+                if (betCount == 0) { excludeUserName.Add(userName); }
+
                 var responseItem = new MpaWinLossByPlayerDto
                 {
                     TpUserName = dateSummary.Select(r => r.TpUserName).FirstOrDefault(),
                     Currency = "All",
                     UserName = dateSummary.Select(r => r.UserName).FirstOrDefault(),
-                    TurnOver = dateSummary.Sum(x => x.TurnOver),
-                    ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR),
+                    TurnOver = turnOver,
+                    ValidTurnOver = validTurnOver,
+                    GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
-                    BetCount = dateSummary.Sum(x => x.BetCount),
+                    BetCount = betCount,
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     ClosingBalance = dateSummary.Sum(x => x.ClosingBalance),
                     DepositCount = dateSummary.Sum(x => x.DepositCount),
                     TotalDepositAmount = dateSummary.Sum(x => x.TotalDepositAmount),
                     WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
                     TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
-                    AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
-                        : 0.00m,
+                    AvgBetAmount = betCount != 0
+                        ? turnOver / betCount
+                        : decimal.Zero,
 
-                    Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
-                        ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
-                        : 0.00m,
+                    Margin = validTurnOver != 0
+                        ? ggr / validTurnOver
+                        : decimal.Zero,
                     TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                 };
 
@@ -884,14 +1032,14 @@ namespace BackendSite.Service.BLL.Mpa
                 Commission = exportData.Sum(x => x.Commission),
                 BetCount = exportData.Sum(x => x.BetCount),
                 ClosingBalance = exportData.Sum(x => x.ClosingBalance),
-                UniquePlayers = exportData.DistinctBy(x => x.UserName).Count(),
+                UniquePlayers = exportData.Where(x => !excludeUserName.Contains(x.UserName)).DistinctBy(x => x.UserName).Count(),
                 DepositCount = exportData.Sum(x => x.DepositCount),
                 TotalDepositAmount = exportData.Sum(x => x.TotalDepositAmount),
                 WithDrawCount = exportData.Sum(x => x.WithDrawCount),
                 TotalWithDrawAmount = exportData.Sum(x => x.TotalWithDrawAmount),
                 TotalBonus = exportData.Sum(x => x.TotalBonus),
                 AvgBetAmount = exportData.Sum(x => x.BetCount) != 0
-                    ? (exportData.Sum(x => x.ValidTurnOver) / exportData.Sum(x => x.BetCount))
+                    ? (exportData.Sum(x => x.TurnOver) / exportData.Sum(x => x.BetCount))
                     : 0.00m,
 
                 Margin = exportData.Sum(x => x.ValidTurnOver) != 0
@@ -911,129 +1059,101 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<MpaWinLossByPlayerResponseToFrontEndWrapper> GetMpaWinLossByPlayerResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             IPageInfo pageInfo = new PageInfo();
-            var key = request.GetWinLossByPlayerRedisKey();
-            var masterKey = $"MpaWinLossByPlayer:{key}";
-            var sortKey = $"{masterKey}:{request.OrderByProperty}:{request.OrderByDirection}";
-            var cacheTime = TimeSpan.FromMinutes(15);
             var apiData = new List<MpaWinLossByPlayerResponse>();
-            var rowCount = 0;
             apiData.Clear();
+            var rowCount = 0;
+            var excludeUserName = new List<string>();
+            MpaWinLossByPlayerResponse totalItem;
 
-            if (_redisHelper.KeyExists(masterKey))
+            var result = await GetWinLossByPlayer(request, groupByType);
+            var userNames = result.OriginData.Select(x => x.UserName).Distinct();
+            foreach (var userName in userNames)
             {
-                if (request.OrderBy && !_redisHelper.KeyExists(sortKey))
-                {
-                    // 取出全部資料重新排序
-                    var sortData = (await _redisHelper.GetListByRangeAsync<MpaWinLossByPlayerResponse>(masterKey, 0, -1)).OrderBy(request);
-                    rowCount = sortData.Count();
+                var dateSummary = result.AlreadyMultiplyRateData.Where(x => x.UserName == userName).ToList();
+                var ggr = dateSummary.Sum(x => x.GGR);
+                var betCount = dateSummary.Sum(x => x.BetCount);
+                if (betCount == 0) { excludeUserName.Add(userName); }
 
-                    // 刪除舊資料重設cache
-                    if (_redisHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
-                    {
-                        AddCache(sortData, masterKey, sortKey, cacheTime, request.OrderBy);
-                    }
-                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), request.PageNumber, request.PageSize);
-                    apiData.AddRange(sortData.GetRange(sortIndex, sortCount));
-                }
-                else
+                var responseItem = new MpaWinLossByPlayerResponse
                 {
-                    if (request.PageNumber == -1) //取全部 for excel export
-                    {
-                        var data = await _redisHelper.GetListByRangeAsync<MpaWinLossByPlayerResponse>(masterKey, 0, request.PageNumber);
-                        apiData.AddRange(data);
-                    }
-                    else
-                    {
-                        //Redis Pagination
-                        var total = (int)_redisHelper.GetListLength(masterKey);
-                        rowCount = total;
-                        var (startIndex, endIndex) = pageInfo.RedisPagination(total, request.PageNumber, request.PageSize);
-                        var data = await _redisHelper.GetListByRangeAsync<MpaWinLossByPlayerResponse>(masterKey, startIndex, endIndex);
-                        apiData.AddRange(data);
-                    }
-                }
+                    SabaId = dateSummary.Select(r => r.TpUserName).FirstOrDefault(),
+                    UserName = dateSummary.Select(r => r.UserName).FirstOrDefault(),
+                    TurnOver = dateSummary.Sum(x => x.TurnOver),
+                    ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
+                    GGR = ggr,
+                    PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
+                    Commission = dateSummary.Sum(x => x.Commission),
+                    BetCount = betCount,
+                    UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
+                    ClosingBalance = dateSummary.Sum(x => x.ClosingBalance),
+                    DepositCount = dateSummary.Sum(x => x.DepositCount),
+                    TotalDepositAmount = dateSummary.Sum(x => x.TotalDepositAmount),
+                    WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
+                    TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
+                    AvgBetAmount = betCount != 0
+                        ? dateSummary.Sum(x => x.TurnOver) / betCount
+                        : 0.00m,
+
+                    Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
+                        ? ggr / dateSummary.Sum(x => x.ValidTurnOver)
+                        : 0.00m,
+                    TotalBonus = dateSummary.Sum(x => x.TotalBonus),
+                    CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
+                        ? GetOriginalCurrencyDetailByPlayer(result.OriginData, userName)
+                        : GetCurrencyDetailByPlayer(dateSummary)
+                };
+                apiData.Add(responseItem);
             }
-            else
+
+            rowCount = apiData.Count;
+            apiData = request.OrderBy ? apiData.OrderBy(request).ToList() : apiData;
+            totalItem = GetMpaWinLossByPlayerTotal(apiData.ToDictionary(k => k.UserName, v => v), excludeUserName);
+
+            if (request.PageNumber != -1)
             {
-                var result = await GetWinLossByPlayer(request, groupByType);
-                var userNames = result.OriginData.Select(x => x.UserName).Distinct();
-                foreach (var userName in userNames)
-                {
-                    var dateSummary = result.AlreadyMultiplyRateData.Where(x => x.UserName == userName).ToList();
-                    var responseItem = new MpaWinLossByPlayerResponse
-                    {
-                        SabaId = dateSummary.Select(r => r.TpUserName).FirstOrDefault(),
-                        UserName = dateSummary.Select(r => r.UserName).FirstOrDefault(),
-                        TurnOver = dateSummary.Sum(x => x.TurnOver),
-                        ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                        GGR = dateSummary.Sum(x => x.GGR),
-                        PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
-                        ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
-                        ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
-                        Commission = dateSummary.Sum(x => x.Commission),
-                        BetCount = dateSummary.Sum(x => x.BetCount),
-                        UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
-                        ClosingBalance = dateSummary.Sum(x => x.ClosingBalance),
-                        DepositCount = dateSummary.Sum(x => x.DepositCount),
-                        TotalDepositAmount = dateSummary.Sum(x => x.TotalDepositAmount),
-                        WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
-                        TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
-                        AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                            ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
-                            : 0.00m,
-
-                        Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
-                            ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
-                            : 0.00m,
-                        TotalBonus = dateSummary.Sum(x => x.TotalBonus),
-                        CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
-                            ? GetOriginalCurrencyDetailByPlayer(result.OriginData, userName)
-                            : GetCurrencyDetailByPlayer(dateSummary)
-                    };
-                    apiData.Add(responseItem);
-                }
-
-                rowCount = apiData.Count;
-                apiData = request.OrderBy ? apiData.OrderBy(request).ToList() : apiData;
-                AddCache(apiData, masterKey, sortKey, cacheTime, request.OrderBy);
-
-                if (request.PageNumber != -1) //取全部 for excel export
-                {
-                    var (index, count) = pageInfo.ListPagination(apiData.Count, request.PageNumber, request.PageSize);
-                    apiData = apiData.GetRange(index, count);
-                }
+                var (index, count) = pageInfo.ListPagination(apiData.Count, request.PageNumber, request.PageSize);
+                apiData = apiData.GetRange(index, count);
             }
 
             var response = apiData.ToDictionary(k => k.UserName, v => v);
+            response.Add("total", totalItem);
+            return response.ToApiFormat(rowCount);
+        }
 
-            // total
-            response.Add("total", new MpaWinLossByPlayerResponse()
+        private static MpaWinLossByPlayerResponse GetMpaWinLossByPlayerTotal(Dictionary<string, MpaWinLossByPlayerResponse> response, List<string> excludeUserName)
+        {
+            var validTurnOver = response.Sum(x => x.Value.ValidTurnOver);
+            var turnOver = response.Sum(x => x.Value.TurnOver);
+            var betCount = response.Sum(x => x.Value.BetCount);
+            var ggr = response.Sum(x => x.Value.GGR);
+
+            return new MpaWinLossByPlayerResponse()
             {
-                TurnOver = response.Sum(x => x.Value.TurnOver),
-                ValidTurnOver = response.Sum(x => x.Value.ValidTurnOver),
-                GGR = response.Sum(x => x.Value.GGR),
+                TurnOver = turnOver,
+                ValidTurnOver = validTurnOver,
+                GGR = ggr,
                 PlayerWinLoss = response.Sum(x => x.Value.PlayerWinLoss),
                 ProgressiveWin = response.Sum(x => x.Value.ProgressiveWin),
                 ProgressiveBet = response.Sum(x => x.Value.ProgressiveBet),
                 Commission = response.Sum(x => x.Value.Commission),
-                BetCount = response.Sum(x => x.Value.BetCount),
+                BetCount = betCount,
                 ClosingBalance = response.Sum(x => x.Value.ClosingBalance),
-                UniquePlayers = response.DistinctBy(x => x.Value.UserName).Count(),
+                UniquePlayers = response.Where(x => !excludeUserName.Contains(x.Key)).DistinctBy(x => x.Value.UserName).Count(),
                 DepositCount = response.Sum(x => x.Value.DepositCount),
                 TotalDepositAmount = response.Sum(x => x.Value.TotalDepositAmount),
                 WithDrawCount = response.Sum(x => x.Value.WithDrawCount),
                 TotalWithDrawAmount = response.Sum(x => x.Value.TotalWithDrawAmount),
                 TotalBonus = response.Sum(x => x.Value.TotalBonus),
-                AvgBetAmount = response.Sum(x => x.Value.BetCount) != 0
-                    ? (response.Sum(x => x.Value.ValidTurnOver) / response.Sum(x => x.Value.BetCount))
-                    : 0.00m,
+                AvgBetAmount = betCount != 0
+                    ? (turnOver / betCount)
+                    : decimal.Zero,
 
-                Margin = response.Sum(x => x.Value.ValidTurnOver) != 0
-                    ? response.Sum(x => x.Value.GGR) / response.Sum(x => x.Value.ValidTurnOver)
-                    : 0.00m,
-            });
-
-            return response.ToApiFormat(rowCount);
+                Margin = validTurnOver != 0
+                    ? ggr / validTurnOver
+                    : decimal.Zero,
+            };
         }
 
         /// <summary>
@@ -1044,26 +1164,18 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         private async Task<MpaWinLossByPlayerWrapper> GetWinLossByPlayer(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            // 注單資料
-            var betRecord = await GetTpBetRecordGroupByPlayerResult(request, groupByType);
-            var originBetRecord = betRecord.OriginTpBetRecordResult;
-            var alreadyMultiplyBetRecord = betRecord.AlreadyMultiplyRateTpBetRecordResult;
-
-            // 存提款 
-            var transaction = await GetTransactionByPlayerResult(request, groupByType);
-            var originTransaction = transaction.OriginTransactionResult;
-            var alreadyMultiplyTransaction = transaction.AlreadyMultiplyRateTransactionResult;
-
-            // bonus
-            var bonus = await GetBonusByPlayerResult(request, groupByType);
-            var originBonus = bonus.OriginBonusResult;
-            var alreadyMultiplyBonus = bonus.AlreadyMultiplyRateBonusResult;
-
+            // 注單資料 & 存提款 & bonus
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByPlayerResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByPlayerResult(request, groupByType));
+            var bonusTask = Task.Run(() => GetBonusByPlayerResult(request, groupByType));
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
 
             // 注單 + 存提款 + bonus 資料合併
-            var originCombineData = originBetRecord.Concat(originTransaction).Concat(originBonus).ToList();
-            var alreadyMultiplyCombineData = alreadyMultiplyBetRecord.Concat(alreadyMultiplyTransaction)
-                .Concat(alreadyMultiplyBonus).ToList();
+            var originCombineData = betRecord.OriginTpBetRecordResult.Concat(transaction.OriginTransactionResult).Concat(bonus.OriginBonusResult).ToList();
+            var alreadyMultiplyCombineData = betRecord.AlreadyMultiplyRateTpBetRecordResult.Concat(transaction.AlreadyMultiplyRateTransactionResult).Concat(bonus.AlreadyMultiplyRateBonusResult).ToList();
 
             var originData = GetGroupResult(originCombineData);
             var alreadyMultiplyRateData = GetGroupResult(alreadyMultiplyCombineData);
@@ -1076,29 +1188,29 @@ namespace BackendSite.Service.BLL.Mpa
                     x.TpUserName,
                     x.Currency,
                 })
-                    .Select(r => new MpaWinLossByPlayerDto
-                    {
-                        UserName = r.Key.UserName,
-                        TpUserName = r.Key.TpUserName,
-                        Currency = r.Key.Currency,
-                        ClosingBalance = r.Sum(x => x.ClosingBalance),
-                        TurnOver = r.Sum(x => x.TurnOver),
-                        ValidTurnOver = r.Sum(x => x.ValidTurnOver),
-                        GGR = r.Sum(x => x.GGR),
-                        PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
-                        ProgressiveWin = r.Sum(x => x.ProgressiveWin),
-                        ProgressiveBet = r.Sum(x => x.ProgressiveBet),
-                        Commission = r.Sum(x => x.Commission),
-                        BetCount = r.Sum(x => x.BetCount),
-                        UniquePlayers = r.Sum(x => x.UniquePlayers),
-                        DepositCount = r.Sum(x => x.DepositCount),
-                        TotalDepositAmount = r.Sum(x => x.TotalDepositAmount),
-                        WithDrawCount = r.Sum(x => x.WithDrawCount),
-                        TotalWithDrawAmount = r.Sum(x => x.TotalWithDrawAmount),
-                        AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.ValidTurnOver) / r.Sum(x => x.BetCount) : 0.00m,
-                        Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
-                        TotalBonus = r.Sum(x => x.TotalBonus)
-                    }).ToList();
+                .Select(r => new MpaWinLossByPlayerDto
+                {
+                    UserName = r.Key.UserName,
+                    TpUserName = r.Key.TpUserName,
+                    Currency = r.Key.Currency,
+                    ClosingBalance = r.Sum(x => x.ClosingBalance),
+                    TurnOver = r.Sum(x => x.TurnOver),
+                    ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                    GGR = r.Sum(x => x.GGR),
+                    PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    ProgressiveWin = r.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                    Commission = r.Sum(x => x.Commission),
+                    BetCount = r.Sum(x => x.BetCount),
+                    UniquePlayers = r.Sum(x => x.UniquePlayers),
+                    DepositCount = r.Sum(x => x.DepositCount),
+                    TotalDepositAmount = r.Sum(x => x.TotalDepositAmount),
+                    WithDrawCount = r.Sum(x => x.WithDrawCount),
+                    TotalWithDrawAmount = r.Sum(x => x.TotalWithDrawAmount),
+                    AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.TurnOver) / r.Sum(x => x.BetCount) : 0.00m,
+                    Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
+                    TotalBonus = r.Sum(x => x.TotalBonus)
+                }).ToList();
             }
 
             var wrapperResult = new MpaWinLossByPlayerWrapper
@@ -1185,14 +1297,16 @@ namespace BackendSite.Service.BLL.Mpa
                     TurnOver = r.Sum(x => x.StakeSummary),
                     ClosingBalance = r.Select(x => x.ClosingBalance).FirstOrDefault(),
                     ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    GGR = r.Sum(x => x.WinLossSummary) * -1,
+                    GGR = GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
                     PlayerWinLoss = r.Sum(x => x.WinLossSummary),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
                     Commission = r.Sum(x => x.RevenueSummary),
                     BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.ValidBetSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) / r.Sum(x => x.ValidBetSummary) : 0.00m,
+                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
+                    Margin = r.Sum(x => x.ValidBetSummary) != 0
+                        ? GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary)
+                        : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
             }
@@ -1206,6 +1320,8 @@ namespace BackendSite.Service.BLL.Mpa
 
             return wrapperResult;
         }
+
+
 
         #endregion
 
@@ -1236,7 +1352,7 @@ namespace BackendSite.Service.BLL.Mpa
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
@@ -1245,8 +1361,17 @@ namespace BackendSite.Service.BLL.Mpa
                 };
 
                 apiData.Add(key, result);
-
             }
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "username"
+                ? "key"
+                : request.OrderByProperty;
+
+
+            apiData = request.OrderBy
+                ? _mpaCommonService.SortApiData(apiData, request.OrderByProperty, request.OrderByDirection)
+                : apiData;
+
 
             return apiData.ToApiFormat();
         }
@@ -1282,7 +1407,7 @@ namespace BackendSite.Service.BLL.Mpa
                     ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
                     Commission = r.Sum(x => x.RevenueSummary),
                     BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.ValidBetSummary) / r.Sum(x => x.RowCount) : 0.00m,
+                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
                     Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) / r.Sum(x => x.ValidBetSummary) : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
@@ -1311,44 +1436,35 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<IEnumerable<MpaWinLossByCurrencyDto>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             // 注單資料
-            var betRecord = await GetTpBetRecordGroupByCurrencyResult(request, groupByType);
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByCurrencyResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByCurrencyResult(request, groupByType));
+            var bonusTask = Task.Run(() => GetBonusByCurrencyResult(request, groupByType));
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
+
             var originBetRecord = betRecord.OriginBetRecord;
             var alreadyMultiplyRateBetRecord = betRecord.AlreadyMultiplyRateBetRecord;
 
             // 存提款 
-            var transaction = await GetTransactionByCurrencyResult(request, groupByType);
             var originTransaction = transaction.OriginTransaction;
             var alreadyMultiplyRateTransaction = transaction.AlreadyMultiplyRateTransaction;
 
             // bonus
-            var bonus = await GetBonusByCurrencyResult(request, groupByType);
             var originBonus = bonus.OriginBonus;
             var alreadyMultiplyRateBonus = bonus.AlreadyMultiplyRateBonus;
 
-
             // 注單 + 存提款資料合併
-            var originCombineData = request.OrderBy
-                ? originBetRecord
-                    .Concat(originTransaction)
-                    .Concat(originBonus)
-                    .OrderBy(request)
-                    .ToList()
-                : originBetRecord
+            var originCombineData = originBetRecord
                     .Concat(originTransaction)
                     .Concat(originBonus)
                     .ToList();
 
-            var alreadyMultiplyRateCombineData = request.OrderBy
-                ? alreadyMultiplyRateBetRecord
-                    .Concat(alreadyMultiplyRateTransaction)
-                    .Concat(alreadyMultiplyRateBonus)
-                    .OrderBy(request)
-                    .ToList()
-                : alreadyMultiplyRateBetRecord
+            var alreadyMultiplyRateCombineData = alreadyMultiplyRateBetRecord
                     .Concat(alreadyMultiplyRateTransaction)
                     .Concat(alreadyMultiplyRateBonus)
                     .ToList();
-
 
             var originCombineResult = GetGroupResult(originCombineData);
             var alreadyMultiplyRateCombineResult = GetGroupResult(alreadyMultiplyRateCombineData);
@@ -1375,19 +1491,14 @@ namespace BackendSite.Service.BLL.Mpa
                         TotalDepositAmount = r.Sum(x => x.TotalDepositAmount),
                         WithDrawCount = r.Sum(x => x.WithDrawCount),
                         TotalWithDrawAmount = r.Sum(x => x.TotalWithDrawAmount),
-                        AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.ValidTurnOver) / r.Sum(x => x.BetCount) : 0.00m,
+                        AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.TurnOver) / r.Sum(x => x.BetCount) : 0.00m,
                         Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
                         TotalBonus = r.Sum(x => x.TotalBonus)
                     }).ToList();
             }
 
-            var exportData = new List<MpaWinLossByCurrencyDto>();
-            exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
-            ? originCombineResult
-            : alreadyMultiplyRateCombineResult);
-
             var keys = originCombineResult.Select(x => x.Currency).Distinct();
-
+            var allCurrencySummary = new List<MpaWinLossByCurrencyDto>();
             foreach (var key in keys)
             {
                 var dateSummary = alreadyMultiplyRateCombineResult.Where(x => x.Currency == key).ToList();
@@ -1408,7 +1519,7 @@ namespace BackendSite.Service.BLL.Mpa
                     WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
                     TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
@@ -1417,14 +1528,32 @@ namespace BackendSite.Service.BLL.Mpa
                     TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                 };
 
-                exportData.Add(result);
+                allCurrencySummary.Add(result);
             }
 
-            exportData = request.OrderBy
-                ? exportData.OrderBy(request).ToList()
-                : exportData.OrderByDescending(r => r.Currency).ToList();
+            #region Sort
 
-            // total
+            allCurrencySummary = request.OrderBy
+                ? allCurrencySummary.OrderBy(request).ToList()
+                : allCurrencySummary;
+            var currencyDetails = request.DisplayGroupBreakdownInOriginalCurrency
+                ? originCombineResult
+                : alreadyMultiplyRateCombineResult;
+
+            var exportData = new List<MpaWinLossByCurrencyDto>();
+            foreach (var currencySummary in allCurrencySummary)
+            {
+                var currencyDetail = request.OrderBy
+                    ? currencyDetails.Where(r => r.Currency == currencySummary.Currency.Replace("_All", "")).OrderBy(request).ToList()
+                    : currencyDetails.Where(r => r.Currency == currencySummary.Currency.Replace("_All", "")).ToList();
+                exportData.Add(currencySummary);
+                exportData.AddRange(currencyDetail);
+            }
+
+            #endregion
+
+            #region total
+
             exportData.Add(new MpaWinLossByCurrencyDto()
             {
                 Currency = "total",
@@ -1443,13 +1572,15 @@ namespace BackendSite.Service.BLL.Mpa
                 TotalWithDrawAmount = exportData.Sum(x => x.TotalWithDrawAmount),
                 TotalBonus = exportData.Sum(x => x.TotalBonus),
                 AvgBetAmount = exportData.Sum(x => x.BetCount) != 0
-                    ? (exportData.Sum(x => x.ValidTurnOver) / exportData.Sum(x => x.BetCount))
+                    ? (exportData.Sum(x => x.TurnOver) / exportData.Sum(x => x.BetCount))
                     : 0.00m,
 
                 Margin = exportData.Sum(x => x.ValidTurnOver) != 0
                     ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
                     : 0.00m,
             });
+
+            #endregion
 
             return exportData.ToExcelFormat();
         }
@@ -1462,44 +1593,34 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         public async Task<IEnumerable<MpaWinLossByCurrencyResponseFrontEnd>> GetMapWinLossByCurrencyResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            // 注單資料
-            var betRecord = await GetTpBetRecordGroupByCurrencyResult(request, groupByType);
+            // 注單資料 & 存提款 & bonus
+            var betRecordTask = Task.Run(() => GetTpBetRecordGroupByCurrencyResult(request, groupByType));
+            var transactionTask = Task.Run(() => GetTransactionByCurrencyResult(request, groupByType));
+            var bonusTask = Task.Run(() => GetBonusByCurrencyResult(request, groupByType));
+            await Task.WhenAll(betRecordTask, transactionTask, bonusTask);
+            var betRecord = betRecordTask.Result;
+            var transaction = transactionTask.Result;
+            var bonus = bonusTask.Result;
+
             var originBetRecord = betRecord.OriginBetRecord;
             var alreadyMultiplyRateBetRecord = betRecord.AlreadyMultiplyRateBetRecord;
 
-            // 存提款 
-            var transaction = await GetTransactionByCurrencyResult(request, groupByType);
             var originTransaction = transaction.OriginTransaction;
             var alreadyMultiplyRateTransaction = transaction.AlreadyMultiplyRateTransaction;
 
-            // bonus
-            var bonus = await GetBonusByCurrencyResult(request, groupByType);
             var originBonus = bonus.OriginBonus;
             var alreadyMultiplyRateBonus = bonus.AlreadyMultiplyRateBonus;
 
-
             // 注單 + 存提款資料合併
-            var originCombineData = request.OrderBy
-                ? originBetRecord
-                    .Concat(originTransaction)
-                    .Concat(originBonus)
-                    .OrderBy(request)
-                    .ToList()
-                : originBetRecord
-                    .Concat(originTransaction)
-                    .Concat(originBonus)
-                    .ToList();
+            var originCombineData = originBetRecord
+                .Concat(originTransaction)
+                .Concat(originBonus)
+                .ToList();
 
-            var alreadyMultiplyRateCombineData = request.OrderBy
-                ? alreadyMultiplyRateBetRecord
-                    .Concat(alreadyMultiplyRateTransaction)
-                    .Concat(alreadyMultiplyRateBonus)
-                    .OrderBy(request)
-                    .ToList()
-                : alreadyMultiplyRateBetRecord
-                    .Concat(alreadyMultiplyRateTransaction)
-                    .Concat(alreadyMultiplyRateBonus)
-                    .ToList();
+            var alreadyMultiplyRateCombineData = alreadyMultiplyRateBetRecord
+                .Concat(alreadyMultiplyRateTransaction)
+                .Concat(alreadyMultiplyRateBonus)
+                .ToList();
 
             var originCombineResult = GetGroupResult(originCombineData);
             var alreadyMultiplyRateCombineResult = GetGroupResult(alreadyMultiplyRateCombineData);
@@ -1510,26 +1631,26 @@ namespace BackendSite.Service.BLL.Mpa
                 {
                     x.Currency,
                 })
-                    .Select(r => new MpaWinLossByCurrencyDto
-                    {
-                        Currency = r.Key.Currency,
-                        TurnOver = r.Sum(x => x.TurnOver),
-                        ValidTurnOver = r.Sum(x => x.ValidTurnOver),
-                        GGR = r.Sum(x => x.GGR),
-                        PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
-                        ProgressiveWin = r.Sum(x => x.ProgressiveWin),
-                        ProgressiveBet = r.Sum(x => x.ProgressiveBet),
-                        Commission = r.Sum(x => x.Commission),
-                        BetCount = r.Sum(x => x.BetCount),
-                        UniquePlayers = r.Sum(x => x.UniquePlayers),
-                        DepositCount = r.Sum(x => x.DepositCount),
-                        TotalDepositAmount = r.Sum(x => x.TotalDepositAmount),
-                        WithDrawCount = r.Sum(x => x.WithDrawCount),
-                        TotalWithDrawAmount = r.Sum(x => x.TotalWithDrawAmount),
-                        AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.ValidTurnOver) / r.Sum(x => x.BetCount) : 0.00m,
-                        Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
-                        TotalBonus = r.Sum(x => x.TotalBonus)
-                    }).ToList();
+                .Select(r => new MpaWinLossByCurrencyDto
+                {
+                    Currency = r.Key.Currency,
+                    TurnOver = r.Sum(x => x.TurnOver),
+                    ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                    GGR = r.Sum(x => x.GGR),
+                    PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    ProgressiveWin = r.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                    Commission = r.Sum(x => x.Commission),
+                    BetCount = r.Sum(x => x.BetCount),
+                    UniquePlayers = r.Sum(x => x.UniquePlayers),
+                    DepositCount = r.Sum(x => x.DepositCount),
+                    TotalDepositAmount = r.Sum(x => x.TotalDepositAmount),
+                    WithDrawCount = r.Sum(x => x.WithDrawCount),
+                    TotalWithDrawAmount = r.Sum(x => x.TotalWithDrawAmount),
+                    AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.TurnOver) / r.Sum(x => x.BetCount) : 0.00m,
+                    Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
+                    TotalBonus = r.Sum(x => x.TotalBonus)
+                }).ToList();
             }
 
             var apiData = new Dictionary<string, MpaWinLossByCurrencyResponse>();
@@ -1537,14 +1658,17 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var key in keys)
             {
                 var dateSummary = alreadyMultiplyRateCombineResult.Where(x => x.Currency == key).ToList();
+                var progressiveWin = dateSummary.Sum(x => x.ProgressiveWin);
+                var progressiveBet = dateSummary.Sum(x => x.ProgressiveBet);
+                var progressiveDiff = progressiveWin - progressiveBet;
                 var result = new MpaWinLossByCurrencyResponse
                 {
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR),
+                    GGR = dateSummary.Sum(x => x.GGR) + progressiveDiff,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
-                    ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
-                    ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
+                    ProgressiveWin = progressiveWin,
+                    ProgressiveBet = progressiveBet,
                     Commission = dateSummary.Sum(x => x.Commission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
@@ -1553,7 +1677,7 @@ namespace BackendSite.Service.BLL.Mpa
                     WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
                     TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.ValidTurnOver) / dateSummary.Sum(x => x.BetCount)
+                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
                         : 0.00m,
 
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
@@ -1568,7 +1692,28 @@ namespace BackendSite.Service.BLL.Mpa
                 apiData.Add(key, result);
             }
 
-            // total
+            #region Sort
+
+            var orderByProperty = request.OrderByProperty.ToLower() == "currency"
+                ? "key"
+                : request.OrderByProperty;
+
+            apiData = request.OrderBy
+                ? _mpaCommonService.SortApiData(apiData, orderByProperty, request.OrderByDirection)
+                : apiData;
+
+            foreach (var item in apiData)
+            {
+                var currencyDetail = request.OrderBy
+                    ? _mpaCommonService.SortApiData(item.Value.CurrencyDetail, orderByProperty, request.OrderByDirection)
+                    : item.Value.CurrencyDetail;
+                item.Value.CurrencyDetail = currencyDetail;
+            }
+
+            #endregion
+
+            #region total
+
             apiData.Add("total", new MpaWinLossByCurrencyResponse()
             {
                 TurnOver = apiData.Sum(x => x.Value.TurnOver),
@@ -1586,13 +1731,15 @@ namespace BackendSite.Service.BLL.Mpa
                 TotalWithDrawAmount = apiData.Sum(x => x.Value.TotalWithDrawAmount),
                 TotalBonus = apiData.Sum(x => x.Value.TotalBonus),
                 AvgBetAmount = apiData.Sum(x => x.Value.BetCount) != 0
-                    ? (apiData.Sum(x => x.Value.ValidTurnOver) / apiData.Sum(x => x.Value.BetCount))
+                    ? (apiData.Sum(x => x.Value.TurnOver) / apiData.Sum(x => x.Value.BetCount))
                     : 0.00m,
 
                 Margin = apiData.Sum(x => x.Value.ValidTurnOver) != 0
                     ? apiData.Sum(x => x.Value.GGR) / apiData.Sum(x => x.Value.ValidTurnOver)
                     : 0.00m,
             });
+
+            #endregion
 
             return apiData.ToApiFormat();
         }
@@ -1661,14 +1808,16 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = currencyNameMapper[r.Key.CurrencyId],
                     TurnOver = r.Sum(x => x.StakeSummary),
                     ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    GGR = r.Sum(x => x.WinLossSummary) * -1,
+                    GGR = GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
                     PlayerWinLoss = r.Sum(x => x.WinLossSummary),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
                     Commission = r.Sum(x => x.RevenueSummary),
                     BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.ValidBetSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0 ? (r.Sum(x => x.WinLossSummary) * -1) / r.Sum(x => x.ValidBetSummary) : 0.00m,
+                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
+                    Margin = r.Sum(x => x.ValidBetSummary) != 0
+                        ? GetGGR(r.Sum(x => x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary)
+                        : 0.00m,
                     UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                 }).ToList();
             }
@@ -1790,6 +1939,24 @@ namespace BackendSite.Service.BLL.Mpa
             return wrapperResult;
         }
 
+        private static void TransactionSetDateToOffSet(MpaWinLossRequest request, TransactionRelayWrapper transaction,
+            MpaWinLossGroupByTypeEnum groupByType)
+        {
+            if (transaction == null) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date && groupByType != MpaWinLossGroupByTypeEnum.Month) return;
+            var offset = request.StarTime.Offset;
+
+            foreach (var item in transaction.OriginTransaction)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
+
+            foreach (var item in transaction.AlreadyMultiplyRateTransaction)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
+        }
+
         /// <summary>
         /// 取得 (充值單/提款單) 結果 By Currency
         /// </summary>
@@ -1851,7 +2018,6 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var bonus = await GetMapWinLossBonusByDate(request, groupByType);
-
             var originBonusResult = GetGroupResult(bonus.OriginBonus);
             var alreadyMultiplyRateBonusResult = GetGroupResult(bonus.AlreadyMultiplyRateBonus);
 
@@ -1878,6 +2044,24 @@ namespace BackendSite.Service.BLL.Mpa
             };
 
             return wrapperResult;
+        }
+
+        private static void BonusSetDateToOffSet(MpaWinLossRequest request, MpaWinLossBonusWrapper bonus,
+            MpaWinLossGroupByTypeEnum groupByType)
+        {
+            if (bonus == null) return;
+            if (groupByType != MpaWinLossGroupByTypeEnum.Date && groupByType != MpaWinLossGroupByTypeEnum.Month) return;
+            var offset = request.StarTime.Offset;
+
+            foreach (var item in bonus.OriginBonus)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
+
+            foreach (var item in bonus.AlreadyMultiplyRateBonus)
+            {
+                item.Date = item.Date.ToOffSetReturnDate(offset);
+            }
         }
 
         /// <summary>
@@ -2001,14 +2185,28 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<IEnumerable<MpaTpBetRecordDto>> GetMapTpBetRecordByDate(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
-            var redisKey =
-                $"MapTpBetRecord:{groupByType}:SiteId:{request.SiteId}:DateType:{request.DateType}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
+            var startDate = request.StarTime;
+            var endDate = request.EndTime;
+            var interval = TimeSpan.FromDays(16);
+            var segmentCount = (int)Math.Ceiling((endDate - startDate).TotalDays / interval.TotalDays);
+            var data = new List<MpaTpBetRecordDto>();
+            var tasks = new List<Task<IEnumerable<MpaTpBetRecordDto>>>();
+            for (var i = 0; i < segmentCount; i++)
+            {
+                var segmentStart = startDate.AddDays(i * interval.TotalDays);
+                var segmentEnd = segmentStart.AddDays(interval.TotalDays);
+                if (segmentEnd > endDate) segmentEnd = endDate;
+                tasks.Add(Task.Run(() => _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, segmentStart, segmentEnd.AddSeconds(-1), format, request.MemberTypeJson(), request.DateType)));
+            }
 
-            if (_redisHelper.KeyExists(redisKey))
-                return await _redisHelper.GetListByRangeAsync<MpaTpBetRecordDto>(redisKey, 0, -1);
-            var data = await _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteId, request.StarTime,
-                request.EndTime, format, request.DateType);
-            var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), data);
+            await Task.WhenAll(tasks);
+            foreach (var task in tasks)
+            {
+                data.AddRange(task.Result);
+            }
+
+            data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
+
             return data;
         }
 
@@ -2016,31 +2214,12 @@ namespace BackendSite.Service.BLL.Mpa
             MpaWinLossGroupByTypeEnum groupByType)
         {
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
-            var redisKey =
-                $"MapTransaction:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
+            var originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime, request.EndTime, format, request.MemberTypeJson())).ToList();
+            originTransaction = FilterMapWinLossTransaction(request, originTransaction);
 
-            var originTransaction = Enumerable.Empty<TransactionRelayDto>();
-            if (_redisHelper.KeyExists(redisKey))
-            {
-                originTransaction = await _redisHelper.GetListByRangeAsync<TransactionRelayDto>(redisKey, 0, -1);
-            }
-            else
-            {
-                originTransaction = await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteId, request.StarTime,
-                    request.EndTime, format);
-                var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originTransaction);
-            }
-
-            originTransaction = originTransaction.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
-            if (!string.IsNullOrEmpty(request.UserName))
-            {
-                originTransaction = originTransaction.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName).ToList();
-            }
-
-            var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
-
+            var mapRate = await GetMapRate(request);
             var alreadyMultiplyRateTransaction = (from item in originTransaction
-                                                  let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+                                                  let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                                   select new TransactionRelayDto()
                                                   {
                                                       Date = item.Date,
@@ -2051,10 +2230,9 @@ namespace BackendSite.Service.BLL.Mpa
                                                       TpUserName = item.TpUserName,
                                                       SummaryType = item.SummaryType,
                                                       TransactionType = item.TransactionType,
-                                                      Amount = item.Amount / rate,
+                                                      Amount = item.Amount * rate,
                                                       RowCount = item.RowCount
                                                   }).ToList();
-
 
             var wrapperResult = new TransactionRelayWrapper()
             {
@@ -2062,36 +2240,32 @@ namespace BackendSite.Service.BLL.Mpa
                 AlreadyMultiplyRateTransaction = alreadyMultiplyRateTransaction
             };
 
+            TransactionSetDateToOffSet(request, wrapperResult, groupByType);
             return wrapperResult;
+        }
+
+        private static List<TransactionRelayDto> FilterMapWinLossTransaction(MpaWinLossRequest request, List<TransactionRelayDto> originTransaction)
+        {
+            originTransaction = originTransaction.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                originTransaction = originTransaction
+                    .Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName).ToList();
+            }
+
+            return originTransaction;
         }
 
         private async Task<MpaWinLossBonusWrapper> GetMapWinLossBonusByDate(MpaWinLossRequest request,
             MpaWinLossGroupByTypeEnum groupByType)
         {
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
-            var redisKey =
-                $"MapBonus:{groupByType}:SiteId:{request.SiteId}:{request.StarTime:yyyy-MM-dd HH:mm:ss}:{request.EndTime:yyyy-MM-dd HH:mm:ss}";
+            var originBonus = (await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format, request.MemberTypeJson())).ToList();
+            originBonus = FilterMpaWinLossBonus(request, originBonus);
 
-            var originBonus = Enumerable.Empty<MpaWinLossBonusDto>();
-            if (_redisHelper.KeyExists(redisKey))
-            {
-                originBonus = await _redisHelper.GetListByRangeAsync<MpaWinLossBonusDto>(redisKey, 0, -1);
-            }
-            else
-            {
-                originBonus = (await _mpaWinLossService.GetMpaWinLossBonus(request.SiteId, request.StarTime, request.EndTime, format)).ToList();
-                var _ = _redisHelper.InsertList(redisKey, TimeSpan.FromMinutes(15), originBonus);
-            }
-
-            originBonus = originBonus.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
-            if (!string.IsNullOrEmpty(request.UserName))
-            {
-                originBonus = originBonus.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName).ToList();
-            }
-
-            var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
+            var mapRate = await GetMapRate(request);
             var alreadyMultiplyRateBonus = (from item in originBonus
-                                            let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+                                            let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                             select new MpaWinLossBonusDto()
                                             {
                                                 Date = item.Date,
@@ -2099,7 +2273,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                 UserName = item.UserName,
                                                 TpUserName = item.TpUserName,
                                                 CurrencyId = item.CurrencyId,
-                                                BonusAmountClaim = item.BonusAmountClaim / rate
+                                                BonusAmountClaim = item.BonusAmountClaim * rate
                                             }).ToList();
 
             var wrapperResult = new MpaWinLossBonusWrapper()
@@ -2107,20 +2281,30 @@ namespace BackendSite.Service.BLL.Mpa
                 OriginBonus = originBonus.ToList(),
                 AlreadyMultiplyRateBonus = alreadyMultiplyRateBonus
             };
+            BonusSetDateToOffSet(request, wrapperResult, groupByType);
+
 
             return wrapperResult;
         }
 
-        private void AddCache(IEnumerable<MpaWinLossByPlayerResponse> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        private static List<MpaWinLossBonusDto> FilterMpaWinLossBonus(MpaWinLossRequest request, List<MpaWinLossBonusDto> originBonus)
+        {
+            originBonus = originBonus.Where(r => request.CurrencyIds.Contains(r.CurrencyId)).ToList();
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                originBonus = originBonus.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName)
+                    .ToList();
+            }
+
+            return originBonus;
+        }
+
+        private void AddCache(IEnumerable<MpaWinLossByPlayerResponse> list, string masterKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
             _ = Task.Run(() =>
             {
                 _redisHelper.InsertList(masterKey, cacheTime, list);
-                if (orderBy)
-                {
-                    _redisHelper.StringSetAsync(sortKey, sortKey, cacheTime);
-                }
             });
         }
 
@@ -2128,12 +2312,12 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var format = groupByType switch
             {
-                MpaWinLossGroupByTypeEnum.Date => "%Y-%m-%d",
+                MpaWinLossGroupByTypeEnum.Date => "%m/%d/%Y %H:%i",
+                MpaWinLossGroupByTypeEnum.Month => "%m/%d/%Y %H:%i",
                 MpaWinLossGroupByTypeEnum.GameType => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.TpCategory => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.Player => "%Y-%m-%d",
                 MpaWinLossGroupByTypeEnum.Currency => "%Y-%m-%d",
-                MpaWinLossGroupByTypeEnum.Month => "%Y-%m",
                 _ => string.Empty
             };
             return format;
@@ -2152,9 +2336,9 @@ namespace BackendSite.Service.BLL.Mpa
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
 
-            var mapRate = (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime)).ToList();
+            var mapRate = await GetMapRate(request);
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult
-                                                          let rate = _mpaCommonService.MapperExchangeRate(mapRate, item.Date, item.CurrencyId, request.BaseCurrencyId)
+                                                          let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                                           select new MpaTpBetRecordDto()
                                                           {
                                                               Date = item.Date,
@@ -2170,18 +2354,26 @@ namespace BackendSite.Service.BLL.Mpa
                                                               BonusId = item.BonusId,
                                                               PromotionType = item.PromotionType,
                                                               TicketStatus = item.TicketStatus,
-                                                              StakeSummary = item.StakeSummary / rate,
-                                                              ValidBetSummary = item.ValidBetSummary / rate,
-                                                              WinLossSummary = item.WinLossSummary / rate,
-                                                              RevenueSummary = item.RevenueSummary / rate,
-                                                              ProgressiveWinSummary = item.ProgressiveWinSummary / rate,
-                                                              ProgressiveBetSummary = item.ProgressiveBetSummary / rate,
-                                                              ClosingBalance = item.ClosingBalance / rate,
+                                                              StakeSummary = item.StakeSummary * rate,
+                                                              ValidBetSummary = item.ValidBetSummary * rate,
+                                                              WinLossSummary = item.WinLossSummary * rate,
+                                                              RevenueSummary = item.RevenueSummary * rate,
+                                                              ProgressiveWinSummary = item.ProgressiveWinSummary * rate,
+                                                              ProgressiveBetSummary = item.ProgressiveBetSummary * rate,
+                                                              ClosingBalance = item.ClosingBalance * rate,
                                                               RowCount = item.RowCount,
                                                           }).ToList();
 
             wrapperResult.OriginBetRecord = tpBetRecordRelayResult;
+            BetRecordSetDateToOffSet(request, wrapperResult, groupByType);
             return wrapperResult;
+        }
+
+        private async Task<Dictionary<string, decimal>> GetMapRate(MpaWinLossRequest request)
+        {
+            return (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime, request.BaseCurrencyId))
+                .Where(x => x.TargetCurrencyId == request.BaseCurrencyId)
+                .ToDictionary(k => $"{k.RateDate.ToString("yyyy-MM-dd")}{k.CurrencyId}{k.TargetCurrencyId}", v => v.Rate);
         }
 
         #endregion
