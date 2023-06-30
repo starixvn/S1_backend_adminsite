@@ -809,7 +809,18 @@ namespace BackendSite.Service.Model.enums
     public enum ReferralStatusEnum
     {
         Disable = 0,
-        Enable = 1
+        ReferralEnable = 1,
+        DepositReferralEnable = 2
+    }
+
+    /// <summary>
+    /// Referral for 文案語系區分使用
+    /// </summary>
+    public enum ReferralTypeEnum
+    {
+        None = 0,
+        Referral = 1,         //舊制
+        DepositReferral = 2   //新制 
     }
 
     #endregion
@@ -920,6 +931,7 @@ namespace BackendSite.Service.Model.enums
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
         AutoPaymentRule = 92,
+        DepositReferral = 93
     }
 
     #region BankFinancialTransferInfoLog

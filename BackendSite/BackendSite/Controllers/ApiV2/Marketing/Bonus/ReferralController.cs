@@ -52,10 +52,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<ApiResult<ReferralDetail>> Get(GetReferralRequest request)
         {
+            var data = await _managementDecorator.GetReferralDetail(request.SiteId, request.CurrencyId);
+            data.SpecificList = data.SpecificList.Where(x => x.Type == ReferralTypeEnum.Referral);
+
             var apiResult = new ApiResult<ReferralDetail>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _managementDecorator.GetReferralDetail(request.SiteId, request.CurrencyId)
+                Data = data
             };
             return apiResult;
         }
@@ -96,12 +99,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public async Task<ApiResult> Set(SetReferralRequest setReferral)
         {
             _managementDecorator.Operator = User.Identity.Name;
-            var result = await _managementDecorator.SetReferralAsync(setReferral);
+            var result = await _managementDecorator.SetReferralAsync(ReferralTypeEnum.Referral, setReferral);
             var apiResult = new ApiResult
             {
                 ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result
             };
             return apiResult;
         }
+
     }
 }
