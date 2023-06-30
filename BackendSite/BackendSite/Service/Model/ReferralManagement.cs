@@ -68,6 +68,11 @@ namespace BackendSite.Service.Model
         [JsonProperty("specificList")]
         public IEnumerable<ReferralContent> SpecificList { get; set; }
 
+        public SetReferralRequest()
+        {
+            
+        }
+
         public SetReferralRequest(SetNewReferralRequest item)
         {
             SiteId = item.SiteId;
