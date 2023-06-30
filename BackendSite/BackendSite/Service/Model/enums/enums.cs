@@ -892,8 +892,10 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
+        VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
-        NewReferral = 92
+        AutoPaymentRule = 92,
+        DepositReferral = 93
     }
 
     #region BankFinancialTransferInfoLog
