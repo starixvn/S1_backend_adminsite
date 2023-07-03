@@ -1,14 +1,10 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Amazon.S3.Model;
+using BackendSite.Service.Library;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.BankCardManagement;
 using Newtonsoft.Json;
@@ -25,8 +21,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         private readonly SelLangBLL _selLangBll;
         private readonly BankDetailBLL _bankDetailBll;
+        private readonly PaymentManageBLL _paymentManageBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly VipLevelBLL _vipLevelBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly AWSS3Helper _s3Helper;
+        private readonly string _folder;
+        private readonly string _bucketName;
+        private readonly ILogger<BankCardManagementController> _logger;
+        private readonly ICacheHelper _redisHelper;
 
         #endregion
 
@@ -36,8 +39,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
+            _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
+            _bucketName = configuration.GetValue<string>("AwsPaymentBucketName");
+            _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
         }
 
         #endregion
@@ -73,17 +85,33 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public async Task<ApiListResult<OfflineBankingSetting>> GetList(GetOfflineBankingSettingRequest request)
         {
-            var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
-                new GetOfflineBankingSettingParams(request));
-
-            return new ApiListResult<OfflineBankingSetting>
+            try
             {
-                Data = datas,
-                PageNumber = request.PageNumber,
-                TotalPages = totalPages,
-                RowCount = rowCount,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
+                var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
+                    new GetOfflineBankingSettingParams(request));
+                
+                return new ApiListResult<OfflineBankingSetting>
+                {
+                    Data = datas,
+                    PageNumber = request.PageNumber,
+                    TotalPages = totalPages,
+                    RowCount = rowCount,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "BankCardManagement/GetList");
+                return new ApiListResult<OfflineBankingSetting>
+                {
+                    Data = new List<OfflineBankingSetting>(),
+                    PageNumber = request.PageNumber,
+                    TotalPages = 0,
+                    RowCount = 0,
+                    ErrorCode = (int)ErrorCodeEnum.Fail
+                };
+            }
+            
         }
 
         /// <summary>
@@ -101,14 +129,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public async Task<ApiResult> SetAsync(SetOfflineBankingSettingRequest request)
         {
-            var updater = User.Identity.Name;
+            var updater = _newAuthorizeBll.GetAuthData().UserName;
             var oldData = await _bankDetailBll.GetOfflineBankingSettingByIdAsync(request.FinancialAccountId);
             var success = await _bankDetailBll.SetOfflineBankingSettingAsync(
                 new SetOfflineBankingSettingParams(request, updater));
 
             if (success)
             {
+                _ = await _redisHelper.KeyDeleteByPatternAsync("PaySetting:*", RedisDataBase.Member);
+                
                 var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
+                var localPaySettings = await _bankDetailBll.GetLocalPaySettingAsync();
+                var payGroups = await _paymentManageBll.GetPayGroupWithCache();
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
                     SiteId = request.SiteId,
@@ -131,7 +163,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                         oldData.Sort,
                         Status = oldData.Status.ToString(),
                         SupportChannels = string.Join(", ", oldData.SupportChannels.Select(x => x.ToString())),
-                        oldData.QrCodeUrl
+                        oldData.QrCodeUrl,
+                        PayGroups = request.GroupIds == null
+                            ? string.Empty
+                            : string.Join(", ", payGroups.Join(oldData.GroupIds,
+                                pg => pg.GroupId,
+                                g => g,
+                                (pg, g) => pg.GroupName))
                     }),
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
@@ -146,7 +184,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                         Status = request.Status.ToString(),
                         request.Memo,
                         SupportChannels = string.Join(", ", request.SupportChannels.Select(x => x.ToString())),
-                        request.QrCodeUrl
+                        request.QrCodeUrl,
+                        PayGroups = request.GroupIds == null
+                            ? string.Empty
+                            : string.Join(", ", payGroups.Join(request.GroupIds,
+                                pg => pg.GroupId,
+                                g => g,
+                                (pg, g) => pg.GroupName))
                     }),
                     Operator = updater
                 });
@@ -160,7 +204,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         [HttpPost]
         public async Task<ApiResult<GetQrCodeUrlResult>> GetQrCodeUrl([FromForm] GetQrCodeUrlRequest request)
         {
-            var result = await QrCodeExtension.DecodeFromImage(request.File);
+            var result = await UploadToS3(request.File);
+
 
             return new ApiResult<GetQrCodeUrlResult>
             {
@@ -170,6 +215,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                 },
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+        private async Task<string> UploadToS3(IFormFile file)
+        {
+            var ext = Path.GetExtension(file.FileName);
+            var path = $"/pay-qrcode/{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}{ext}";
+            var key = _folder + path;
+            var success = await _s3Helper.UploadFileAsync(file, _bucketName, key);
+
+            return success ? path : string.Empty;
         }
         
         #endregion

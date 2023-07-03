@@ -39,6 +39,29 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         /// <summary>
+        /// SlotGamesManagement/GetSlotCategoryList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        ///
+        /// Func Path：CMS >  Slot Games Management
+        /// </remarks>
+        [HttpPost]
+        public ApiResult<IEnumerable<SlotCategoryInfo>> GetSlotCategoryList()
+        {
+            var all = new SlotCategoryInfo { Id = 0, Name = "All (Set Status)" };
+            var data = _gameCasinoManageBLL.GetSlotCategoryList();
+
+            var apiResult = new ApiResult<IEnumerable<SlotCategoryInfo>>
+            {
+                Data = data.Append(all).OrderBy(x => x.Id),
+                ErrorCode = 0
+            };
+
+            return apiResult;
+        }
+
+        /// <summary>
         /// SlotGamesManagement/GetSlotGameList 
         /// </summary>
         /// <remarks>
@@ -137,7 +160,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             try
             {
                 var result = _slotGamesManagementBLL.SetSlotGameCategory(request, User.Identity.Name);
-                if(result > 0)
+                if (result > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 }
@@ -154,6 +177,39 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
 
+        /// <summary>
+        /// SlotGamesManagement/SetSlotGame 
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CMS >  Slot Games Management 
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
+        public ApiResult SetSlotGameAllCurrency(SetSlotGameReq request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var result = _slotGamesManagementBLL.SetSlotGameAllCurrency(request, User.Identity.Name);
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
         #endregion
     }
 }

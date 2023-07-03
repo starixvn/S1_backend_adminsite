@@ -7,6 +7,7 @@ using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
 {
@@ -92,6 +93,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     AccountNo = x.AccountNo,
                     AccountName = x.AccountName,
                     DisplayName = x.DisplayName,
+                    FrontendDisplayName = x.FrontendDisplayName,
                     Status = x.Status.ToString(),
                     InitialAmount = x.InitialAmount,
                     MaxBalanceAlertAmount = x.MaxBalanceAlertAmount,
@@ -163,7 +165,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 CurrencyId = req.CurrencyId,
                 Agent = req.Agent,
                 Channel = req.Channel,
-                Purpose = string.Join(",", req.Purposes.Select(x=> (int)x)),
+                Purpose = req.Purposes.Select(p => (int)p).OrderBy(p => p).ToList(),
                 Reason = req.Reason,
                 Remark = req.Remark,
                 Status = req.Status,
@@ -171,6 +173,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 AccountNo = req.AccountNo,
                 AccountCode = req.AccountCode,
                 DisplayName = req.DisplayName,
+                FrontendDisplayName = req.FrontendDisplayName,
                 InitialAmount = req.InitialAmount,
                 InitialTime = req.InitialTime,
                 MaxBalanceAlertAmount = req.MaxBalanceAlertAmount,

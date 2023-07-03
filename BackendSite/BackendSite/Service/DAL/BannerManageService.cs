@@ -1,9 +1,7 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
-using BackendSite.Controllers.ApiV2.CMS.Setting;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -24,7 +22,7 @@ namespace BackendSite.Service.DAL
         }
         public int SetBanner(ParamsWithLog<SetRequest> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             
@@ -66,23 +64,23 @@ namespace BackendSite.Service.DAL
             p.Add("Sort", input.After.Sort);
             p.Add("AdminUser", input.Operator);
             
-            var result = _mainDbClient.Execute("Admin_Banner_Set_V3", p, conn, trans);
+            var result = _mainDbClient.Execute("Admin_Banner_Set_V3", trans, p);
             
             if(result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit(); 
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
             
@@ -112,9 +110,8 @@ namespace BackendSite.Service.DAL
 
         public BannerInfo GetBanner(int siteId, string bannerName , int currency)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var result = new BannerInfo();
-            var queryResult = conn.QueryFirstOrDefault("Admin_Banner_Get_V3", new {SiteId = siteId, BannerName = bannerName , CurrencyId = currency }, commandType: CommandType.StoredProcedure);
+            var queryResult = _reportDbClient.QueryFirst<dynamic>("Admin_Banner_Get_V3", new {SiteId = siteId, BannerName = bannerName , CurrencyId = currency });
 
             if (queryResult != null)
             {
@@ -146,7 +143,7 @@ namespace BackendSite.Service.DAL
         }
         public int UpdateBannerStatus(ParamsWithLog<UpdateStatusRequest> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             
@@ -170,29 +167,29 @@ namespace BackendSite.Service.DAL
             p.Add("Status", (int)input.After.Status);
             p.Add("AdminUser", input.Operator);
             
-            var result = _mainDbClient.Execute("Admin_BannerStatus_Set", p, conn, trans);
+            var result = _mainDbClient.Execute("Admin_BannerStatus_Set", trans, p);
             
             if(result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit(); 
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
         
         public int DeleteBanner(ParamsWithLog<GetBannerRequest> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             
@@ -215,23 +212,23 @@ namespace BackendSite.Service.DAL
             p.Add("_CurrencyId", input.CurrencyId);
             p.Add("_BannerName", input.Before.BannerName);
 
-            var result = _mainDbClient.Execute("Admin_Banner_Del", p, conn, trans);
+            var result = _mainDbClient.Execute("Admin_Banner_Del", trans, p);
             
             if(result > 0)
             {
-                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, conn, trans) > 0;
+                var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
                 {
-                    trans.Rollback();
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                     return 0;
                 }
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
-            trans.Commit(); 
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
         

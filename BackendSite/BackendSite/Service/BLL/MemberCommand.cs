@@ -14,12 +14,20 @@ public class MemberCommand : IMemberCommand
     private readonly VerificationRewardService _verificationRewardService;
     private readonly CodeGenerator _codeGenerator;
     private readonly Tools _tools;
-    private readonly CustInfoBLL _custInfoBll; 
+    private readonly CustInfoBLL _custInfoBll;
     private readonly IAdminLogService _adminLogService;
     private readonly IBonusApiService _bonusApi;
     private readonly ILogger<MemberCommand> _logger;
+    private readonly ServerInfoBLL _ServerInfoBll;
 
-    public MemberCommand(IMemberService memberService, CodeGenerator codeGenerator, Tools tools, IAdminLogService adminLogService, ILogger<MemberCommand> logger, IBonusApiService bonusApi, CustInfoBLL custInfoBll, VerificationRewardService verificationRewardService)
+    public MemberCommand(IMemberService memberService,
+        CodeGenerator codeGenerator,
+        Tools tools,
+        IAdminLogService adminLogService,
+        ILogger<MemberCommand> logger,
+        IBonusApiService bonusApi,
+        CustInfoBLL custInfoBll,
+        VerificationRewardService verificationRewardService, ServerInfoBLL serverInfoBll)
     {
         _memberService = memberService;
         _codeGenerator = codeGenerator;
@@ -29,25 +37,27 @@ public class MemberCommand : IMemberCommand
         _bonusApi = bonusApi;
         _custInfoBll = custInfoBll;
         _verificationRewardService = verificationRewardService;
+        _ServerInfoBll = serverInfoBll;
     }
-    
+
     public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
     {
         var tagListStr = await _memberService.GetCustomerTagsAsync(custId);
         var tagList = !string.IsNullOrEmpty(tagListStr) ? JsonConvert.DeserializeObject<List<int>>(tagListStr) : new List<int>();
         var beforeTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
 
-        tagList.Add(tagId);
+        if (!tagList.Contains(tagId))
+            tagList.Add(tagId);
         var result = await _memberService.SetCustTag(custId, tagList);
         if (result <= 0) return result;
-        
+
         var tempTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
         var afterTag = tempTag.ToList();
         var newTag = afterTag.FirstOrDefault(a => a.Id == tagId)?.TagName;
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeTagName = beforeTag.Select(a => a.TagName);
         var afterTagName = afterTag.Select(a => a.TagName);
-        
+
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, Tag = JsonConvert.SerializeObject(beforeTagName) }),
             JsonConvert.SerializeObject(new { customer.UserName, Tag = JsonConvert.SerializeObject(afterTagName) }), ActionType.Create,
@@ -60,22 +70,22 @@ public class MemberCommand : IMemberCommand
         var tagListStr = await _memberService.GetCustomerTagsAsync(custId);
         if (string.IsNullOrEmpty(tagListStr)) return 0;
         var tagList = JsonConvert.DeserializeObject<List<int>>(tagListStr);
-        
+
         var tempTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
         var beforeTag = tempTag.ToList();
         var idx = tagList.FindIndex(id => id == tagId);
         if (idx == -1) return 0;
-        
+
         tagList.RemoveAt(idx);
         var result = await _memberService.SetCustTag(custId, tagList);
         if (result <= 0) return result;
-        
+
         var afterTag = await _memberService.GetCustomerTagsAsync(JsonConvert.SerializeObject(tagList));
         var newTag = beforeTag.FirstOrDefault(a => a.Id == tagId)?.TagName;
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var beforeTagName = beforeTag.Select(a => a.TagName);
         var afterTagName = afterTag.Select(a => a.TagName);
-        
+
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, Tag = JsonConvert.SerializeObject(beforeTagName) }),
             JsonConvert.SerializeObject(new { customer.UserName, Tag = JsonConvert.SerializeObject(afterTagName) }), ActionType.Delete,
@@ -83,12 +93,12 @@ public class MemberCommand : IMemberCommand
 
         return result;
     }
-    
+
     private async Task<IEnumerable<SimilarAccountInfo>> GetSimilarAccountNameAsync(int siteId, IEnumerable<string> accountNames)
     {
         return await _memberService.GetSimilarAccountNameAsync(siteId, accountNames);
     }
-        
+
     public async Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, int custId, string accountName)
     {
         /* 相同定義：
@@ -102,7 +112,7 @@ public class MemberCommand : IMemberCommand
          * Hồ thái nhật（不同）
          * HoThaiNhat（相同）
          */
-            
+
         var patterns = new[]
         {
             accountName,
@@ -112,7 +122,7 @@ public class MemberCommand : IMemberCommand
         var result = similarAccList
             .Where(x => x.CustId != custId
                 && patterns.Any(y => y.Equals(x.AccountName, StringComparison.CurrentCultureIgnoreCase)));
-        
+
         return result;
     }
 
@@ -122,20 +132,20 @@ public class MemberCommand : IMemberCommand
         var beforeName = customer.AccountName;
         var duplicateAccounts = await GetDuplicateAccountInfoAsync(customer.SiteId, custId, fullName);
 
-        var result = await _memberService.EditFullNameAsync(custId, fullName, duplicateAccounts);
+        var result = await _memberService.EditFullNameAsync(custId, customer.SiteId, fullName, duplicateAccounts);
         if (!result) return false;
-        
+
         await CreateAdminLog(
-            @operator: @operator, 
-            siteId: customer.SiteId, 
+            @operator: @operator,
+            siteId: customer.SiteId,
             currencyId: customer.CurrencyId,
             beforeLog: JsonConvert.SerializeObject(new { customer.UserName, AccountName = beforeName }),
-            afterLog: JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }), 
+            afterLog: JsonConvert.SerializeObject(new { customer.UserName, AccountName = fullName }),
             action: ActionType.Update,
             custId: custId,
             message: $"Edit FullName \"{fullName}\"",
             menuEnum: AdminAdjustmentLogMenuEnum.SetCustomerFullName);
-        
+
         return true;
     }
 
@@ -143,19 +153,19 @@ public class MemberCommand : IMemberCommand
     {
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
 
-        if (await _memberService.IsExistsEmail(custId, email, customer.SiteId)) 
+        if (await _memberService.IsExistsEmail(custId, email, customer.SiteId))
             return -1;
 
         var beforeEmail = customer.Email;
         var result = await _memberService.EditEmailAsync(custId, email);
-        if (result <= 0) 
+        if (result <= 0)
             return 0;
 
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, Email = beforeEmail }),
             JsonConvert.SerializeObject(new { customer.UserName, Email = email }), ActionType.Update,
             custId, $"Edit Email \"{email}\"");
-        
+
         return result;
     }
 
@@ -167,13 +177,13 @@ public class MemberCommand : IMemberCommand
         var beforePhone = customer.PhoneNo;
         var result = await _memberService.SetPhoneNoAsync(custId, phoneNo);
         if (result <= 0) return 0;
-        
+
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, PhoneNo = beforePhone }),
             JsonConvert.SerializeObject(new { customer.UserName, PhoneNo = phoneNo }), ActionType.Update,
             custId, $"Edit PhoneNo \"{phoneNo}\"");
-        
-        return result; 
+
+        return result;
     }
 
     public async Task<int> EditBirthdayAsync(int custId, int year, int month, int date, string @operator)
@@ -203,20 +213,20 @@ public class MemberCommand : IMemberCommand
 
         var result = await _memberService.EditAddressAsync(custId, country, state, postCode, city, line1, line2);
         if (result <= 0) return 0;
-        
+
         var address = AddressFormat.Format(line2, line1, city, postCode, state, country);
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, Address = beforeAddress }),
             JsonConvert.SerializeObject(new { customer.UserName, Address = address }), ActionType.Update,
             custId, $"Edit Address \"{address}\"");
-        return result; 
+        return result;
     }
 
     public async Task<int> SwitchKycAsync(int custId, int status, string @operator)
     {
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
         var beforeStatus = customer.IsKyc;
-        
+
         var result = await _memberService.SwitchKycAsync(custId, status);
         if (result <= 0) return 0;
 
@@ -225,7 +235,7 @@ public class MemberCommand : IMemberCommand
             JsonConvert.SerializeObject(new { customer.UserName, IsKyc = beforeStatus.ToString() }),
             JsonConvert.SerializeObject(new { customer.UserName, IsKyc = afterStatus.ToString() }), ActionType.Update,
             custId, $"Edit IsKyc \"{afterStatus}\"");
-        return result; 
+        return result;
     }
 
     public async Task<int> SwitchRiskAsync(int custId, int status, string @operator)
@@ -241,7 +251,7 @@ public class MemberCommand : IMemberCommand
             JsonConvert.SerializeObject(new { customer.UserName, IsRisk = beforeStatus.ToString() }),
             JsonConvert.SerializeObject(new { customer.UserName, IsRisk = afterStatus.ToString() }), ActionType.Update,
             custId, $"Edit IsRisk \"{afterStatus}\"");
-        return result; 
+        return result;
     }
 
     public async Task<int> SwitchPhoneVerifiedAsync(int custId, int status, string @operator)
@@ -257,7 +267,7 @@ public class MemberCommand : IMemberCommand
             JsonConvert.SerializeObject(new { customer.UserName, PhoneVerified = beforeStatus.ToString() }),
             JsonConvert.SerializeObject(new { customer.UserName, PhoneVerified = afterStatus.ToString() }), ActionType.Update,
             custId, $"Edit PhoneVerified \"{afterStatus}\"");
-        return result; 
+        return result;
     }
 
     public async Task<int> SwitchEmailVerifiedAsync(int custId, int status, string @operator)
@@ -265,7 +275,7 @@ public class MemberCommand : IMemberCommand
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
         var beforeStatus = customer.EmailVerified;
 
-        var result =  await _memberService.SwitchEmailVerifiedAsync(custId, status);
+        var result = await _memberService.SwitchEmailVerifiedAsync(custId, status);
         if (result <= 0) return 0;
 
         var afterStatus = status != 0;
@@ -273,19 +283,19 @@ public class MemberCommand : IMemberCommand
             JsonConvert.SerializeObject(new { customer.UserName, EmailVerified = beforeStatus.ToString() }),
             JsonConvert.SerializeObject(new { customer.UserName, EmailVerified = afterStatus.ToString() }), ActionType.Update,
             custId, $"Edit EmailVerified \"{afterStatus}\"");
-        return result; 
+        return result;
     }
 
     public async Task<string> ResetPasswordAsync(int custId, string @operator)
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
-        
+
         _codeGenerator.Maximum = 8;
         _codeGenerator.Minimum = 6;
         _codeGenerator.RepeatCharacters = true;
         var newPassword = _codeGenerator.Generate();
         var md5NewPassword = _tools.MD5Encrypt(newPassword);
-        
+
         var result = await _memberService.ResetPasswordAsync(custId, md5NewPassword);
         if (result <= 0) return "";
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
@@ -316,7 +326,7 @@ public class MemberCommand : IMemberCommand
         var beforeStatus = (EnableRebateEnum)customer.EnableRebate;
         var result = await _memberService.SwitchRebatePayoutAsync(custId, status);
         if (result <= 0) return 0;
-        
+
         var afterStatus = (EnableRebateEnum)status;
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, EnableRebate = beforeStatus.ToString() }),
@@ -329,7 +339,7 @@ public class MemberCommand : IMemberCommand
     {
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
         var bankInfo = await _custInfoBll.GetCustBankDetailAsync(custId);
-        var result =  await _memberService.ResetBankInfoAsync(custId);
+        var result = await _memberService.ResetBankInfoAsync(custId);
         if (result <= 0) return 0;
 
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
@@ -341,13 +351,13 @@ public class MemberCommand : IMemberCommand
 
     public async Task<int> ResetCryptoInfoAsync(int custId, string @operator)
     {
-        var custProfile = _custInfoBll.GetCustProfile(custId);
+        var cryptoInfo = await _custInfoBll.GetCustCryptoInfoListAsync(custId);
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
-        var result =  await _memberService.ResetCryptoInfoAsync(custId);
+        var result = await _memberService.ResetCryptoInfoAsync(custId);
         if (result <= 0) return 0;
 
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
-            JsonConvert.SerializeObject(new { customer.UserName, CryptoInfo = JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo) }),
+            JsonConvert.SerializeObject(new { customer.UserName, CryptoInfo = cryptoInfo }),
             JsonConvert.SerializeObject(new { customer.UserName, CryptoInfo = "" }), ActionType.Update,
             custId, $"Reset CryptoInfo");
         return result;
@@ -359,7 +369,7 @@ public class MemberCommand : IMemberCommand
         var eWallet = await _custInfoBll.GetCustEWalletDetailAsync(custId);
         var result = await _memberService.ResetEWalletAsync(custId);
         if (result <= 0) return 0;
-        
+
         await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, EWalletInfo = eWallet }),
             JsonConvert.SerializeObject(new { customer.UserName, EWalletInfo = "" }), ActionType.Update,
@@ -372,12 +382,12 @@ public class MemberCommand : IMemberCommand
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var result = await _bonusApi.SetVerificationRewardAsync(custId, (int)otpType);
         if (result.ErrorCode != 0) return result;
-        
+
         var rewardSetting = await _verificationRewardService.GetVerificationReward(customer.SiteId, customer.CurrencyId);
         var reward = otpType == OTPTypeEnum.SMS ? rewardSetting.PhoneReward : rewardSetting.EmailReward;
-        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, 
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, OtpType = otpType.ToString(), Reward = 0, }),
-            JsonConvert.SerializeObject(new { customer.UserName, OtpType = otpType.ToString(), Reward = reward }), ActionType.Update, 
+            JsonConvert.SerializeObject(new { customer.UserName, OtpType = otpType.ToString(), Reward = reward }), ActionType.Update,
             custId, $"{otpType.ToString()} Verification Reward \"{reward}\"");
         return result;
     }
@@ -387,10 +397,10 @@ public class MemberCommand : IMemberCommand
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         var result = await _memberService.DeleteLineProfileAsync(custId);
         if (result <= 0) return 0;
-        
-        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, 
+
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, LineStatus = "Binding" }),
-            JsonConvert.SerializeObject(new { customer.UserName, LineStatus = "Unbind" }), ActionType.Update, 
+            JsonConvert.SerializeObject(new { customer.UserName, LineStatus = "Unbind" }), ActionType.Update,
             custId, "Line Unbind");
         return result;
     }
@@ -398,14 +408,54 @@ public class MemberCommand : IMemberCommand
     public async Task<int> DeleteOnUserAsync(int custId, string @operator)
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
-        var result =  await _memberService.DeleteOnUserAsync(custId);
+        var result = await _memberService.DeleteOnUserAsync(custId);
         if (result <= 0) return 0;
 
-        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, 
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
             JsonConvert.SerializeObject(new { customer.UserName, OnlineStatus = "Online" }),
-            JsonConvert.SerializeObject(new { customer.UserName, OnlineStatus = "Offline" }), ActionType.Update, 
+            JsonConvert.SerializeObject(new { customer.UserName, OnlineStatus = "Offline" }), ActionType.Update,
             custId, "Kick Out");
         return result;
+    }
+
+    public async Task<bool> SetCustPromotionWhiteListAsync(int custId, bool ipEnable, bool deviceEnable, bool realNameEnable, string @operator)
+    {
+        var customer = _custInfoBll.GetCustInfoWithCache(custId);
+        var beforeWhiteList = await _memberService.GetCustPromotionWhiteListAsync(custId);
+        var result = await _memberService.SetCustPromotionWhiteListAsync(new CustPromotionWhiteList()
+        {
+            CustId = custId,
+            IpEnable = ipEnable,
+            DeviceEnable = deviceEnable,
+            RealNameEnable = realNameEnable,
+            SiteId = customer.SiteId,
+            UserName = customer.UserName,
+            Operator = @operator
+        });
+
+        if (result < 1)
+        {
+            return false;
+        }
+
+        await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId,
+            JsonConvert.SerializeObject(new
+            {
+                customer.UserName,
+                IpEnable = beforeWhiteList?.IpEnable ?? false,
+                DeviceEnable = beforeWhiteList?.DeviceEnable ?? false,
+                RealNameEnable = beforeWhiteList?.RealNameEnable ?? false,
+            }),
+            JsonConvert.SerializeObject(new
+            {
+                customer.UserName,
+                IpEnable = ipEnable,
+                DeviceEnable = deviceEnable,
+                RealNameEnable = realNameEnable,
+            }), ActionType.Update,
+            custId, $"Update Promotion WhiteList.");
+
+        return true;
     }
 
     private async Task CreateAdminLog(string @operator, int siteId, int currencyId, string beforeLog, string afterLog, ActionType action, int custId, string message, AdminAdjustmentLogMenuEnum menuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo)
@@ -434,7 +484,73 @@ public class MemberCommand : IMemberCommand
         }
         catch (Exception e)
         {
-            _logger.LogError(e,"InsertAdminLog failed. params: " + JsonConvert.SerializeObject(adminLog));
+            _logger.LogError(e, "InsertAdminLog failed. params: " + JsonConvert.SerializeObject(adminLog));
         }
+    }
+
+    public async Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
+        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl, string @operator)
+    {
+        var result = await _memberService.RegisterMemberAsync(siteId,
+                userName,
+                userPwd,
+                email,
+                currencyId,
+                _ServerInfoBll.GetServerInfoWithSiteId(siteId).DefLang,
+                memberType,
+                areaCode,
+                phoneNo,
+                affCode,
+                signupUrl);
+
+        if (result.IsSuccess > 0) //Success
+        {
+            await CreateAdminLog(@operator, siteId, currencyId, null,
+                JsonConvert.SerializeObject(new { UserName = userName }), ActionType.Create,
+                result.CustId, "Member Create.", AdminAdjustmentLogMenuEnum.RegisterMember);
+        }
+        return result.IsSuccess;
+    }
+
+    public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, CustTpGameTypeSettingGetType setType, IEnumerable<int> tpGameTypes, string @operator)
+    {
+        var oldData = await _memberService.GetCustTpGameTypeSettingAsync(custId);
+        var deleteGameType = Enumerable.Empty<int>();
+        var addGameType = Enumerable.Empty<int>();
+        switch (setType)
+        {
+            case CustTpGameTypeSettingGetType.IsPlay: //DB只記錄不可玩
+                oldData = oldData.Where(x => x.NoPlay == false); //ex.舊1,2,3可以玩，新2,3,4可以玩 => 1變成不可玩，4變成可玩
+                deleteGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //刪除 4
+                addGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //加入 1
+                break;
+            case CustTpGameTypeSettingGetType.NoPlay: //DB只記錄不可玩
+                oldData = oldData.Where(x => x.NoPlay == true); //ex.舊1,2,3不可玩，新2,3,4不可玩 => 1變成可玩，4變成不可玩
+                deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //刪除 1
+                addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //加入 4
+                break;
+            case CustTpGameTypeSettingGetType.IsShow: //DB只記錄不顯示
+                oldData = oldData.Where(x => x.NoShow == false); //ex.舊1,2,3可顯示，新2,3,4可顯示 => 1變成不顯示，4變成顯示
+                deleteGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //刪除 4
+                addGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //加入 1
+                break;
+            case CustTpGameTypeSettingGetType.NoShow: //DB只記錄不顯示
+                oldData = oldData.Where(x => x.NoShow == true); //ex.舊1,2,3不顯示，新2,3,4不顯示 => 1變成可顯示，4變成不顯示
+                deleteGameType = oldData.Select(x => x.GameType).Where(x => !tpGameTypes.Contains(x)); //刪除 1
+                addGameType = tpGameTypes.Where(x => !oldData.Select(x => x.GameType).Contains(x)); //加入 4
+                break;
+        }
+
+        var type = _custInfoBll.ConvertCustTpGameTypeSettingType(setType);
+        var result = await _memberService.SetCustTpGameTypeSettingAsync(custId, deleteGameType, addGameType, type);
+
+        if (result) //Success
+        {
+            var customer = _custInfoBll.GetCustInfoWithCache(custId);
+            await CreateAdminLog(@operator, customer.SiteId, customer.CurrencyId, JsonConvert.SerializeObject(oldData.Select(x => x.GameType)),
+                JsonConvert.SerializeObject(tpGameTypes), ActionType.Update,
+                custId, $"CustTpGameTypeSetting-{setType} Set.", AdminAdjustmentLogMenuEnum.SetCustTpGameTypeSetting);
+        }
+        return result;
     }
 }

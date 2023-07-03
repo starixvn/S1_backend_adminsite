@@ -61,20 +61,6 @@ namespace BackendSite.Service.DAL
         #endregion
 
         #region Transfer Account
-
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(bool isSetting, int siteId, int id)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _IsSetting = isSetting,
-                    _SiteId = siteId,
-                    _Id = id
-                });
-
-            var SpName = "Admin_BankFinancialTransferAccount_Get";
-            return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName, parameters);
-        }
         
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoListParams input)
         {
@@ -93,7 +79,7 @@ namespace BackendSite.Service.DAL
                     _Id = input.Id
                 });
 
-            var spName = "Admin_BankFinancialTransferAccount_Get_V2";
+            var spName = "Admin_BankFinancialTransferAccount_Get_V3";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(spName, parameters);
         }
 
@@ -131,7 +117,7 @@ namespace BackendSite.Service.DAL
                     _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = bankFinancialTransferAccount.Purpose,
+                    _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
@@ -144,6 +130,7 @@ namespace BackendSite.Service.DAL
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
                     _InitialAmount = bankFinancialTransferAccount.InitialAmount,
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
@@ -158,7 +145,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V6", parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V8", parameters);
         }
 
         public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
@@ -167,11 +154,9 @@ namespace BackendSite.Service.DAL
                 new
                 {
                     _Id = bankFinancialTransferAccount.Id,
-                    _SiteId = bankFinancialTransferAccount.SiteId,
-                    _SiteName = bankFinancialTransferAccount.SiteName,
                     _CurrencyId = bankFinancialTransferAccount.CurrencyId,
                     _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = bankFinancialTransferAccount.Purpose,
+                    _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
                     _Channel = bankFinancialTransferAccount.Channel,
                     _Agent = bankFinancialTransferAccount.Agent,
                     _PayId = bankFinancialTransferAccount.PayId,
@@ -181,6 +166,7 @@ namespace BackendSite.Service.DAL
                     _AccountName = bankFinancialTransferAccount.AccountName,
                     _AccountCode = bankFinancialTransferAccount.AccountCode,
                     _DisplayName = bankFinancialTransferAccount.DisplayName,
+                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
                     _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
                     _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
                     _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
@@ -197,7 +183,7 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V6";
+            var SpName = "Admin_BankFinancialTransferAccount_Upd_V9";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
@@ -246,7 +232,7 @@ namespace BackendSite.Service.DAL
                 _Purposes = purposes == null ? null : JsonConvert.SerializeObject(purposes)
             });
             return _reportDbClient
-                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V3", parameters);
+                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V4", parameters);
         }
 
         public int GetTransferDataCount(string accountNo)
@@ -303,36 +289,6 @@ namespace BackendSite.Service.DAL
         #endregion
 
         #region Transfer Info
-
-        public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetTransferInfoList(bool isSetting,
-                                                                                     TransferTypeEnum? transferType,
-                                                                                     DateTime? fromDate,
-                                                                                     DateTime? toDate,
-                                                                                     string fromAccountNo,
-                                                                                     string fromAccountDisplayName,
-                                                                                     string toAccountNo,
-                                                                                     string toAccountDisplayName,
-                                                                                     int? reason,
-                                                                                     string transferId)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _IsSetting = isSetting,
-                    _TransferType = transferType,
-                    _TransFromDate = fromDate,
-                    _TransToDate = toDate,
-                    _FromAccountNo = fromAccountNo,
-                    _FromAccountDisplayName = fromAccountDisplayName,
-                    _ToAccountNo = toAccountNo,
-                    _ToAccountDisplayName = toAccountDisplayName,
-                    _Reason = reason,
-                    _TransferId = transferId
-                });
-
-            var SpName = "Admin_BankFinancialTransferInfo_Get_V2";
-            return _reportDbClient.Query<BankFinancialTransferInfoTransDetailModel>(SpName, parameters);
-        }
         
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoList(GetTransferInfoListParams input,
             int startIndex,

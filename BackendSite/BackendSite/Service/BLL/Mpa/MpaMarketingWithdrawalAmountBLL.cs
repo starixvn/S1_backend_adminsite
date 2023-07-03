@@ -220,7 +220,7 @@ namespace BackendSite.Service.BLL.Mpa
             return ms.ToArray();
         }
 
-        private async Task MultiplyExchangeRate<TEntity>(List<TEntity> source,
+        public async Task MultiplyExchangeRate<TEntity>(List<TEntity> source,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
             int baseCurrencyId)
@@ -231,7 +231,7 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
-                item.WithdrawalAmount = item.WithdrawalAmount / rate;
+                item.WithdrawalAmount = item.WithdrawalAmount * rate;
             }
         }
 

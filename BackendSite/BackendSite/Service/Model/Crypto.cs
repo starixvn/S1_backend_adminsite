@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -108,5 +109,19 @@ namespace BackendSite.Service.Model
         public int NetworkType;
     }
     
+    public class CryptoExchangeReq
+    {
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string ChannelName { get; set; }
+        public decimal Amount { get; set; }
+        public ExchangeTypeEnum Type { get; set; }
+    }
     
+    public class CryptoExchangeInfo
+    {
+        public decimal Rate { get; set; }
+        public decimal ExchangeAmount { get; set; }
+        public long Timestamp { get; set; }
+    }
 }

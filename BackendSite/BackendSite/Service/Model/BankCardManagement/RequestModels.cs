@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
@@ -33,5 +32,6 @@ namespace BackendSite.Service.Model.BankCardManagement
         public BankCardManagementStatusEnum Status { get; set; }
         public IEnumerable<BankCardManagementSupportChannelEnum> SupportChannels { get; set; }
         public string QrCodeUrl { get; set; }
+        public IEnumerable<int> GroupIds { get; set; }
     }
 }
