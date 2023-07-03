@@ -1,10 +1,7 @@
 ﻿using BackendSite.Service.Model;
-using MySql.Data.MySqlClient;
 using Dapper;
-using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {

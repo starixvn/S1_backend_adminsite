@@ -500,7 +500,6 @@ namespace BackendSite.Service.Model
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
     }
-    
     public class WithdrawalManualRequest
     {
         public string TransId { set; get; }

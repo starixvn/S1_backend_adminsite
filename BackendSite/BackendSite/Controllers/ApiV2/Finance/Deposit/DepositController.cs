@@ -686,7 +686,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
                 
                 bool permission;
-                if (depositRequest.Status is DepositStatusEnum.Approved or DepositStatusEnum.Rejected or DepositStatusEnum.Canceled)
+                if (depositRequest.Status is DepositStatusEnum.Approved or DepositStatusEnum.Rejected or DepositStatusEnum.Canceled )
                 {
                     permission = permissionList.Contains(78); //刪除權限
                 }

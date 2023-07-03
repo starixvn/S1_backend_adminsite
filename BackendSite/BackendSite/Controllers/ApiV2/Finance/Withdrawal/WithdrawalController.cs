@@ -229,8 +229,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public string AccountName { set; get; }
             public string AccountNo { set; get; }
             public string IFSCCode { set; get; }
+            
+            public int WithdrawalType { set; get; }
         }
-
+        
         public class UploadPictureRequest : GetByTransIdRequest
         {
             public IEnumerable<string> Pic { get; set; }
@@ -263,7 +265,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiListResultCurrencyAmount<WithdrawalRequest> GetList(GetListRequest request)
         {
@@ -331,7 +332,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 2 })]
         [HttpPost]
         public IActionResult Export(GetExportRequest request)
         {
@@ -430,7 +430,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public async Task<ApiResult<WithdrawalRequest>> GetByTransId(GetByTransIdRequest request)
         {
@@ -484,7 +483,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 1 })]
         [HttpPost]
         public ApiResult<IEnumerable<WithdrawalComments>> GetCommentByTransId(GetByTransIdRequest request)
         {
@@ -1192,7 +1190,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var myUrl = request.WithdrawalType == WithdrawalTypeEnum.CryptoPay
                 ? $"{_payApiUrl}CryptoWithdrawal"
                 : $"{_payApiUrl}Withdrawal";
-
             myUrl = withdrawalInfo.AccountType == "ewallet" ? $"{_payApiUrl}EWalletWithdrawal" : myUrl;
 
             var reqWithdrawalOnline = new ReqWithdrawalOnline
@@ -1205,7 +1202,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 ChannelId = withdrawalInfo.ChannelId ?? 0,
                 AccountName = withdrawalInfo.AccountName,
                 AccountNo = withdrawalInfo.AccountNo,
-                IFSCCode = withdrawalInfo.IFSCCode
+                IFSCCode = withdrawalInfo.IFSCCode,
+                WithdrawalType = (int)request.WithdrawalType
             };
 
             var apiOnlineResult = await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);

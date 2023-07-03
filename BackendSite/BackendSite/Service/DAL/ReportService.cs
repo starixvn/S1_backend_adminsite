@@ -235,7 +235,7 @@ namespace BackendSite.Service.DAL
             parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var spName = "Admin_RewardBonusReport_Get";
+            var spName = "Admin_RewardBonusReport_Get_V2";
             var result = _reportDbClient.Query<RewardBonusReportModel>(spName, parameters);
             rowCount = parameters.Get<int>("_RowCount");
             totalPages = parameters.Get<int>("_TotalPages");
@@ -261,7 +261,7 @@ namespace BackendSite.Service.DAL
                     _EndDate = input.EndDate,
                 });
             
-            var spName = "Admin_RewardBonusReport_Export";
+            var spName = "Admin_RewardBonusReport_Export_V2";
             var result = _reportDbClient.Query<RewardBonusReportModel>(spName, parameters);
            
 

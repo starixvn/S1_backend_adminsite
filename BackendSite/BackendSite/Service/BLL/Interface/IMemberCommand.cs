@@ -31,4 +31,5 @@ public interface IMemberCommand
         MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,
         string @operator);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, CustTpGameTypeSettingGetType setDataType, IEnumerable<int> tpGameTypes, string @operator);
+    Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status, string @operator);
 }
