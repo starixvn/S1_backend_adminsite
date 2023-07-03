@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.Mpa.WinLoss;
+﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.Mpa.WinLoss;
 
 namespace BackendSite.Service.DAL.Interface
 {
@@ -45,5 +46,20 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="registeredDate"></param>
         /// <returns></returns>
         string RegisteredDateFormatter(DateTime registeredDate);
+
+
+        /// <summary>
+        /// Mpa 支援 Dictionary 排序
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="exportData"></param>
+        /// <param name="sortField"></param>
+        /// <param name="sortOrder"></param>
+        /// <returns></returns>
+        Dictionary<TKey, TValue> SortApiData<TKey, TValue>(
+            Dictionary<TKey, TValue> exportData,
+            string sortField,
+            OrderByDirection sortOrder);
     }
 }

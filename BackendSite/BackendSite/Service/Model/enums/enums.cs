@@ -96,6 +96,18 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region CustTpGameTypeSetting For Frontend Use
+
+    public enum CustTpGameTypeSettingGetType
+    {
+        NoShow = 1,  //表示不顯示
+        IsShow = 11,  //表示顯示
+        NoPlay = 2,   //表示不可玩
+        IsPlay = 21   //表示可玩
+    }
+
+    #endregion
+
     #region AdminModule
 
     public enum AdminModuleStatusEnum
@@ -166,18 +178,25 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
-    public enum WithdrawalLimitLogCreateFromEnum 
+    public enum WithdrawalLimitLogCreateFromEnum
     {
         Default = 0,
         Deposit = 1,
         LimitAdjustment = 2,
         BalanceAdjustment = 3,
-        Bonus = 4 ,
+        Bonus = 4,
         ReferralReward = 5,
         VerificationReward = 6,
         DrawPrize = 7
     }
-    
+
+    public enum MemberTypeEnum
+    {
+        Normal = 1,
+        Affiliate = 2,
+        LiveStreaming = 3
+    }
+
     #endregion
 
     #region CustProfile
@@ -213,6 +232,16 @@ namespace BackendSite.Service.Model.enums
     {
         Disable = 0,
         Enable = 1
+    }
+
+    #endregion
+
+    #region CustTpGameTypeSetting
+
+    public enum CustTpGameTypeSettingTypeEnum
+    {
+        NoShow = 1,  //有資料表示不顯示
+        NoPlay = 2   //有資料表示不可玩
     }
 
     #endregion
@@ -286,7 +315,7 @@ namespace BackendSite.Service.Model.enums
         Rejected = 4,
         Canceled = 5
     }
-    
+
     public enum DepositDateTypeEnum
     {
         CreateTime = 1,
@@ -295,10 +324,10 @@ namespace BackendSite.Service.Model.enums
 
     public enum DepositReceiptCreateFromEnum
     {
-        User = 1 , 
+        User = 1,
         BackendUser = 2
     }
-    
+
     #endregion
 
     #region PayList
@@ -422,7 +451,7 @@ namespace BackendSite.Service.Model.enums
         ToKyc = 71,
         Receive = 72
     }
-    
+
     public enum WithdrawalDateTypeEnum
     {
         CreateTime = 1,
@@ -850,6 +879,8 @@ namespace BackendSite.Service.Model.enums
         SetBlockCryptoWallet = 84,
         ReleaseCryptoWallet = 85,
         ResetSmsOtpTimes = 86,
+        RegisterMember = 87,
+        SetCustTpGameTypeSetting = 88,
         AutoWithdrawalRule = 91,
         AutoPaymentRule = 92,
     }
@@ -1167,7 +1198,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum TpGameTypeEnum
     {
-        DG_LiveCasino = 10
+        DG_LiveCasino = 10,
+        SBO_Sports = 77,
     }
 
     public enum TpCategoryEnum
@@ -1182,14 +1214,14 @@ namespace BackendSite.Service.Model.enums
         Poker = 8,
         ESports = 11
     }
-    
+
     public enum LeaderBoardCategoryEnum
     {
         Sports = 1,
         Casino = 2,
         LiveCasino = 3
     }
-    
+
     #region VerificationReward
 
     public enum VerificationTypeEnum
@@ -1464,7 +1496,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Goal123")]
         GOAL123 = 2,
         [Description("Bwing")]
-        BWING = 3
+        BWING = 3,
+        [Description("Soon88")]
+        SOON88 = 4,
+        [Description("ivorysport")]
+        IVORYSPORT = 5
     }
 
     public enum AffSiteEnum
