@@ -888,6 +888,7 @@ namespace BackendSite.Service.Model.enums
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
         RebateExcludeGame = 89,
+        VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91
     }
 
@@ -1870,5 +1871,17 @@ namespace BackendSite.Service.Model.enums
     {
         Daily = 1,
         Weekly = 2
+    }
+
+    public enum UpgradeSettingEnum 
+    {
+        [Description("Monthly Minimum Deposit")]
+        UpDeposit = 0,
+        [Description("Tier Upgrade Bonus")]
+        UpBonus = 1,
+        [Description("Minimum Deposit Within Validity Period")]
+        DownDeposit = 2,
+        [Description("Minimum Turnover Within Validity Period")]
+        DownTurnover = 3,
     }
 }
