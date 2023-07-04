@@ -194,7 +194,7 @@ namespace BackendSite.Service.DAL
             string currencyId,
             DateTime startDate,
             DateTime endDate,
-            string userName,
+            int custId,
             int pageSize,
             int startIndex)
         {
@@ -203,7 +203,7 @@ namespace BackendSite.Service.DAL
             p.Add("_CurrencyIds", currencyId);
             p.Add("_StartDate", startDate);
             p.Add("_EndDate", endDate);
-            p.Add("_UserName", userName);
+            p.Add("_CustId", custId);
             p.Add("_PageSize", pageSize);
             p.Add("_StartIndex", startIndex);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
