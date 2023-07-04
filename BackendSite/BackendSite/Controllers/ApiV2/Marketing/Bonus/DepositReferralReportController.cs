@@ -1,14 +1,10 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
-using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
