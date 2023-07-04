@@ -19,14 +19,14 @@ public class DepositReferralReportBLL
         IEnumerable<int> currencyIds,
         DateTime startDate,
         DateTime endDate,
-        string userName,
+        int custId,
         int pageNumber,
         int pageSize)
     => await _referralManagementService.GetDepositReferralCustList(siteId,
             JsonConvert.SerializeObject(currencyIds),
             startDate,
             endDate,
-            userName,
+            custId,
             Math.Abs(pageSize),
             (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
 

@@ -40,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly Common _common;
         private readonly AdminBLL _adminBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly DepositReferralReportBLL _depositReferralReportBll;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -78,6 +79,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _common = provider.GetRequiredService<Common>();
             _adminBll = provider.GetRequiredService<AdminBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _depositReferralReportBll = provider.GetRequiredService<DepositReferralReportBLL>();
         }
 
         #endregion
@@ -109,7 +111,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
-            public IEnumerable<int> GameTypes { get; set; }
         }
 
         /// <summary>
@@ -182,6 +183,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string sabaId { get; set; }
             public int SiteId { get; set; }
         }
+
         #endregion
 
         public class CustInfoListRequest : ApiRequestPageModel
@@ -431,7 +433,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
-            public List<int> FinancialTypeList { get; set; } = new ();
+            public List<int> FinancialTypeList { get; set; } = new();
         }
 
         public class GetFinancialLogExportRequest
@@ -441,7 +443,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
-            public List<int> FinancialTypeList { get; set; } = new ();
+            public List<int> FinancialTypeList { get; set; } = new();
         }
 
         public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -460,6 +462,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public IEnumerable<int> PromoCategoryIds { get; set; }
             public string RefTransId { get; set; }
+        }
+
+        public class CustTpBetRecordReq : CustIdWithDateRangeRequest
+        {
+            public IEnumerable<int> GameTypes { get; set; }
         }
 
         public class CustTpBetRecordListOneDayReq : CustIdWithDateRangeRequest
@@ -484,7 +491,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
         }
 
-        public class CustTpBetRecordDetailListbyGameTypeExportReq 
+        public class CustTpBetRecordDetailListbyGameTypeExportReq
         {
             public DateTime SelDate { get; set; }
             public int GameTypeId { get; set; }
@@ -1811,7 +1818,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecord(CustIdWithDateRangeRequest request)
+        public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecord(CustTpBetRecordReq request)
         {
             var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
             {
@@ -1825,8 +1832,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-        
-        public IActionResult GetCustTpBetRecordExport(CustIdWithDateRangeRequest request)
+
+        public IActionResult GetCustTpBetRecordExport(CustTpBetRecordReq request)
         {
             var apiResult = _paymentBll.GetCustTpBetRecordList(
                 request.CustId,
@@ -1834,7 +1841,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.EndDate.ToUniversalTime().DateTime,
                 request.GameTypes,
                 request.StartDate.Offset);
-            
+
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecord");
         }
@@ -1878,11 +1885,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 req.StartDate.ToUniversalTime().DateTime,
                 req.EndDate.ToUniversalTime().DateTime,
                 req.GameTypes);
-            
+
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecordByDay");
         }
-        
+
         /// <summary>
         /// CustomerManage/GetCustTpBetRecordByCategoryId 取得指定客戶指定第三方分類下注紀錄
         /// </summary>
@@ -1912,7 +1919,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public IActionResult GetCustTpBetRecordByCategoryIdExport(CustTpBetRecordListbyCategoryIdReq req)
@@ -1924,7 +1931,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 req.StartDate.ToUniversalTime().DateTime,
                 req.EndDate.ToUniversalTime().DateTime,
                 req.GameTypes);
-            
+
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecordListByCategoryId");
         }
@@ -1968,7 +1975,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             apiResult.TotalPages = totalPages;
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public IActionResult GetCustTpBetRecordDetailByGameTypeExport(CustTpBetRecordDetailListbyGameTypeExportReq req)
@@ -1977,7 +1984,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var totalPages = 0;
             var rowCount = 0;
             var pageNumber = 0;
-            
+
             var apiResult = _paymentBll.GetCustTpBetRecordDetailListbyGameType(
                 req.CustId,
                 req.GameTypeId,
@@ -1989,7 +1996,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ref rowCount,
                 req.StartDate.Offset,
                 true);
-            
+
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecordDetailByGameType");
         }
@@ -2642,7 +2649,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #endregion
 
-        #region CSD > Customer Administration > CustInfo > Referral History
+        #region CSD > Customer Administration > CustInfo > Referral History (舊制)
 
         /// <summary>
         /// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料
@@ -2690,6 +2697,68 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Referral History (新制-DepositReferral)
+
+        /// <summary>
+        /// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
+        [HttpPost]
+        public async Task<ApiListResult<DepositReferralReportDao>> GetDepositReferralListByCustId(CustIdWithDateRangeAndPageRequest request)
+        {
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+
+            var data = await _depositReferralReportBll.GetList(custInfo.SiteId,
+                new List<int>() { custInfo.CurrencyId },
+                request.StartDate.DateTime,
+                request.EndDate.DateTime,
+                custInfo.CustId,
+                request.PageNumber,
+                request.PageSize);
+
+            return new ApiListResult<DepositReferralReportDao>
+            {
+                Data = data.Data,
+                TotalPages = data.TotalPages,
+                PageNumber = request.PageNumber,
+                RowCount = data.RowCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+
+        /// <summary>
+        /// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料明細
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<DepositReferralReport_ReferralReferredDao>>> GetDepositReferralDetailByCustId(CustIdWithDateRangeRequest request)
+        {
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+
+            return new ApiResult<IEnumerable<DepositReferralReport_ReferralReferredDao>>()
+            {
+                Data = await _depositReferralReportBll.GetDetailByCustId(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         #endregion
@@ -3109,7 +3178,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return result;
         }
-        
+
         /// <summary>
         /// CustomerManage/GetAdjustmentWithdrawalLimitLog 取得手動調整提款額度限額的log
         /// </summary>
@@ -3128,10 +3197,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
 
             var searchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, 1, 1000);
-            
+
             foreach (var model in searchResult.WithdrawalLimitLogList)
             {
-                if (model.CreateFrom == (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment)
+                if (model.CreateFrom == (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment)
                 {
                     var modelResult = new AdjustmentWithdrawalLimitLog
                     {
@@ -3146,12 +3215,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     result.AdjustmentWithdrawalLimitLogList.Add(modelResult);
                 }
             }
-            
+
             result.TotalAmount = result.AdjustmentWithdrawalLimitLogList.Sum(x => x.MainType == (int)DirectionEnum.Add ? x.Amount : x.Amount * -1);
-            
+
             return result;
         }
-        
+
         #endregion
 
         #region CSD > Customer Administration > CustInfo [Get TPWallet]

@@ -1,13 +1,10 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
-using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
@@ -19,13 +16,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #region Fields
 
         private readonly DepositReferralReportBLL _depositReferralReportBll;
+        private readonly CustInfoBLL _custInfoBll;
 
         #endregion
 
         #region Constructors
-        public DepositReferralReportController(DepositReferralReportBLL depositReferralReportBll)
+        public DepositReferralReportController(DepositReferralReportBLL depositReferralReportBll, CustInfoBLL custInfoBll)
         {
             _depositReferralReportBll = depositReferralReportBll;
+            _custInfoBll = custInfoBll;
         }
         #endregion
 
@@ -62,13 +61,22 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<ApiListResult<DepositReferralReportDao>> GetList(GetListRequest request)
         {
+            var custId = 0;
+            if (!string.IsNullOrWhiteSpace(request.UserName))
+            {
+                var custInfo = await _custInfoBll.GetCustInfosAsync(request.SiteId, new List<string>() { request.UserName });
+                if (custInfo.Any())
+                    custId = custInfo.First().CustId;
+                else
+                    custId = -1;
+            }
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var data = await _depositReferralReportBll.GetList(request.SiteId,
                 request.CurrencyIds,
                 startTime,
                 endTime,
-                request.UserName,
+                custId,
                 request.PageNumber,
                 request.PageSize);
 
