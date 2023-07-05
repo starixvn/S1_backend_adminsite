@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model
 {
@@ -53,6 +54,7 @@ namespace BackendSite.Service.Model
         [LogPropertyName("AdjustReason")]
         public string CategoryName { get; set; }
         public string Memo { get; set; }
+        public AdjustTypeEnum AdjustType { get; set; }
     }
     
     public class AdjustmentDepositLog
