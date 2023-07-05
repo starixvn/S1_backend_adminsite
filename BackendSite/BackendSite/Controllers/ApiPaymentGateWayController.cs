@@ -15,7 +15,6 @@ namespace BackendSite.Controllers
         private readonly IWithdrawalStateTransferBLL _withdrawalStateTransferBll;
         private readonly IAutoWithdrawalPaymentGateWayBLL _autoWithdrawalPaymentGateWayBll;
         private readonly Tools _tools;
-        private readonly string _backEndKey;
 
         public ApiPaymentGateWayController(IServiceProvider provider)
         {
@@ -23,61 +22,55 @@ namespace BackendSite.Controllers
             _withdrawalStateTransferBll = provider.GetRequiredService<IWithdrawalStateTransferBLL>();
             _autoWithdrawalPaymentGateWayBll = provider.GetRequiredService<IAutoWithdrawalPaymentGateWayBLL>();
             _tools = provider.GetRequiredService<Tools>();
-            var configuration = provider.GetRequiredService<IConfiguration>();         
-            _backEndKey = configuration.GetValue<string>("ApiPaymentGateWayKey");
         }
 
         [HttpPost]
-        public async Task<ApiResult> AutoPayment(AutoPaymentRequest request)
+        public ApiResult AutoPayment(AutoPaymentRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                var tokenCompared = _tools.MD5Encrypt($"{request.TransId}{_backEndKey}");
-                if (tokenCompared == request.Token)
+                var isValid = _tools.BackendTokenCheck(request.TransId, request.Token);
+                if (!isValid)
                 {
-                    var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                    if (withdrawalData != null)
-                    {
-                        if (withdrawalData.ProcessWay == WithdrawalInfoProcessWayEnum.Auto) // 自動出款要走 Verify + Process 流程
-                        {
-                            var authData = new AuthData
-                            {
-                                UserName = "Auto System"
-                            };
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Invalid Token";
+                }
 
-                            var sendToNextRequest = new SendToNextRequest
-                                {
-                                    TransId = request.TransId,
-                                    Comment = "Auto Payment to Process"
-                                };
-                            
-                            apiResult =  _autoWithdrawalPaymentGateWayBll.AutoWithdrawalProcessWay(sendToNextRequest, withdrawalData, authData, apiResult, out int withdrawConfirmResult);
-                            if (withdrawConfirmResult > 0)
-                            {
-                                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                                return apiResult;
-                            }
-                        }
-                        else
-                        {
-                            var result = _withdrawalStateTransferBll.WithdrawalVerify(withdrawalData.TransId, request.Comment, "Auto System");
-                            if (result > 0)
-                            {
-                                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                            }
-                        }
-                    }
-                    else
+                var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                if (withdrawalData == null)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "TransId doesn't exist";
+                }
+
+                if (withdrawalData?.ProcessWay == WithdrawalInfoProcessWayEnum.Auto) // 自動出款要走 Verify + Process 流程
+                {
+                    var authData = new AuthData
                     {
-                        apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                        apiResult.Message = "TransId doesn't exist";
+                        UserName = "Auto System"
+                    };
+
+                    var sendToNextRequest = new SendToNextRequest
+                    {
+                        TransId = request.TransId,
+                        Comment = "Auto Payment to Process"
+                    };
+
+                    apiResult = _autoWithdrawalPaymentGateWayBll.AutoWithdrawalProcessWay(sendToNextRequest, withdrawalData, authData, apiResult, out int withdrawConfirmResult);
+                    if (withdrawConfirmResult > 0)
+                    {
+                        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                        return apiResult;
                     }
                 }
                 else
                 {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "Invalid Token";
+                    var result = _withdrawalStateTransferBll.WithdrawalVerify(withdrawalData.TransId, request.Comment, "Auto System");
+                    if (result > 0)
+                    {
+                        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                    }
                 }
             }
             catch (Exception ex)
