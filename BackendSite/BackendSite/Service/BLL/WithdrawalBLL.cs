@@ -1030,6 +1030,12 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
+        
+        public IEnumerable<WithdrawalMessage> GetWithdrawalMessageByWithdrawalIds(IEnumerable<int> withdrawalIds)
+        {
+            return _withdrawalService.GetWithdrawalMessage(withdrawalIds);
+        }
+        
 
         public async Task<bool> SetWithdrawalProcessWay(string transId, WithdrawalInfoProcessWayEnum processWay)
         {
@@ -1038,12 +1044,6 @@ namespace BackendSite.Service.BLL
             return await _withdrawalService.SetWithdrawalProcessWay(withdrawalId, processWay);
         }
 
-        
-        public IEnumerable<WithdrawalMessage> GetWithdrawalMessageByWithdrawalIds(IEnumerable<int> withdrawalIds)
-        {
-            return _withdrawalService.GetWithdrawalMessage(withdrawalIds);
-        }
-        
         #endregion
 
         #region Private Methods

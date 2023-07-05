@@ -167,7 +167,7 @@ namespace BackendSite.Service.Model
         public List<int> ITagList { get; set; }
         public int EnablePromotion { get; set; }
         public decimal Bonus { get; set; }
-        public string LineUserId { get; set; }
+        public int EnableRebatePayout { get; set; }
         public CustLineProfileModel CustLineProfile { get; set; }
         public string AddressCountry { get; set; }
         public string AddressState { get; set; }
@@ -507,6 +507,42 @@ namespace BackendSite.Service.Model
         public int RowCount { get; set; }
     }
     
+    public class CustBankInfo
+    {
+        public string AccountName { set; get; }
+        public string BankInfo { set; get; }
+        public string USDTInfo { set; get; }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public IEnumerable<BankInfoDetail> bankInfoDetail { set; get; }
+        public IEnumerable<USDTDetail> usdtDetail { set; get; }
+    }
+
+    public class BankLockInfoDetail : BankInfoDetail
+    {
+        public int Status { get; set; }
+        public string UpdateOperator { get; set; }
+        private DateTimeOffset? _updateTime { get; set; }
+        public DateTimeOffset? UpdateTime
+        {
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        private DateTimeOffset _createTime { get; set; }
+        public DateTimeOffset CreateTime
+        {
+            get => _createTime;
+            set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
+        }
+        public string AccountName { get; set; }
+        public string BankName { get; set; }
+    }
+
+    
     public class AdjustmentWithdrawalLimitLog
     {
         public int MainType { get; set; }
@@ -529,11 +565,13 @@ namespace BackendSite.Service.Model
         private DateTimeOffset _createTime { get; set; }
         public int CustId { get; set; }
         public string userId { get; set; }
+
         public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+
     }
 
     public class CustEWalletLog
@@ -560,6 +598,16 @@ namespace BackendSite.Service.Model
             get => _loginTime;
             set => _loginTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
+    }
+
+    public class CustDashBoardTodayModel
+    {
+        public decimal TodayDeposit { get; set; }
+        public decimal TodayWithdrawal { get; set; }
+        public decimal TodayWinLoss { get; set; }
+        public decimal TodayBetting { get; set; }
+        public decimal TodayBonus { get; set; }
+        public decimal TodayReward { get; set; }
     }
     public class DashboardWinLossGroup
     {
@@ -603,15 +651,6 @@ namespace BackendSite.Service.Model
         public string TpUserName { get; set; }
     }
 
-    public class CustDashBoardTodayModel
-    {
-        public decimal TodayDeposit { get; set; }
-        public decimal TodayWithdrawal { get; set; }
-        public decimal TodayWinLoss { get; set; }
-        public decimal TodayBetting { get; set; }
-        public decimal TodayBonus { get; set; }
-        public decimal TodayReward { get; set; }
-    }
 
     public class ImportDataByExcelModel
     {

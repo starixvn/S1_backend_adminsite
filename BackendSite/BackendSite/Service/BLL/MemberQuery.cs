@@ -284,8 +284,8 @@ namespace BackendSite.Service.BLL
                 EmailRewardTime = customer.EmailRewardTime.ToOffset(TimeSpan.Zero),
                 PhoneVerifyTime = customer.PhoneVerifyTime.ToOffset(TimeSpan.Zero),
                 EmailVerifyTime = customer.EmailVerifyTime.ToOffset(TimeSpan.Zero),
-                MemberType = customer.MemberType,
-                Exclusive = customer.Exclusive
+                Exclusive = customer.Exclusive,
+                MemberType = customer.MemberType
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {
@@ -356,6 +356,7 @@ namespace BackendSite.Service.BLL
             };
             return response;
         }
+
         public async Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId)
         {
             return await _memberService.GetCustomerBalanceInfoAsync(custId);

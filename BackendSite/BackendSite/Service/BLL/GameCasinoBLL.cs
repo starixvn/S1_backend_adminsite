@@ -40,5 +40,10 @@ namespace BackendSite.Service.BLL
 
             return casinoGames;
         }
+
+        public async Task<IEnumerable<SlotGameDetail>> GetSlotGame()
+        {
+            return await _gameCasinoService.GetSlotGame();
+        }
     }
 }

@@ -111,13 +111,13 @@ namespace BackendSite.Service.Model
         public string ChannelName { set; get; }
         public int VipLevel { set; get; }
         public string Operator { set; get; }
-        public string BonusCode { set; get; }
-        public string BonusDescription { set; get; }
         public string Agent { set; get; }
         public string DepositFrom { set; get; }
         public string FromAccountNo { set; get; }
         public string FromBankCode { set; get; }
         public string FromBankName { set; get; }
+        public string BonusCode { set; get; }
+        public string BonusDescription { set; get; }
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
         public string Network { set; get; }

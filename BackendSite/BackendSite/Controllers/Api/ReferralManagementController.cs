@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -18,7 +19,7 @@ namespace BackendSite.Controllers.Api
         private readonly ReportBLL reportBLL;
         private readonly ExcelBLL excelBll;
 
-        public ReferralManagementController(ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL ,ExcelBLL excelBll)
+        public ReferralManagementController(ServerInfoBLL serverInfoBLL, ReferralManagementBLL referralManagementBLL, ReportBLL reportBLL, ExcelBLL excelBll)
         {
             this.serverInfoBLL = serverInfoBLL;
             this.referralManagementBLL = referralManagementBLL;
@@ -48,7 +49,7 @@ namespace BackendSite.Controllers.Api
                     ValidBet = referral == null ? string.Empty : referral.ValidBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
-                    Status = referral?.Status ?? false
+                    Status = referral.Status
                 });
             }
 
@@ -91,7 +92,7 @@ namespace BackendSite.Controllers.Api
                     return apiResult;
                 }
 
-                if (referral.Status)
+                if (referral.Status == ReferralStatusEnum.ReferralEnable)
                     status = 0;
 
                 referralManagementBLL.SetReferralStatus(SiteId, CurrencyId, status);
@@ -143,12 +144,12 @@ namespace BackendSite.Controllers.Api
             if (req.PageSize > 0)
                 pageSize = req.PageSize;
             apiResult.Data = referralManagementBLL.GetReferralCustList(
-                req.SelectSite, 
-                req.UserName, 
-                req.CurrencyId, 
+                req.SelectSite,
+                req.UserName,
+                req.CurrencyId,
                 req.StartDate?.DateTime,
                 req.EndDate?.DateTime,
-                pageSize, 
+                pageSize,
                 ref pageNumber, out var totalPages, out var rowCount);
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = pageNumber;
@@ -160,7 +161,7 @@ namespace BackendSite.Controllers.Api
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/ReferralReport" })]
-        public IActionResult GetReferralCustListExport(string selectSite,string userName,int currencyId, DateTimeOffset? startDate,DateTimeOffset? endDate)
+        public IActionResult GetReferralCustListExport(string selectSite, string userName, int currencyId, DateTimeOffset? startDate, DateTimeOffset? endDate)
         {
             var exportData = referralManagementBLL.GetReferralCustListExport(
                 selectSite,
@@ -170,14 +171,14 @@ namespace BackendSite.Controllers.Api
                 endDate?.DateTime.AddHours(-8)).ToList();
 
             exportData.ForEach(s => s.RegTime = new DateTimeOffset(s.RegTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
-            exportData.ForEach(s => s.RewardTime = s.RewardTime == null? s.RewardTime: new DateTimeOffset(s.RewardTime.Value.DateTime.AddHours(8), TimeSpan.FromHours(8)));
+            exportData.ForEach(s => s.RewardTime = s.RewardTime == null ? s.RewardTime : new DateTimeOffset(s.RewardTime.Value.DateTime.AddHours(8), TimeSpan.FromHours(8)));
 
             var stream = excelBll.ExportV2(exportData);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ReferralCustList_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
-      
-        
+
+
         public class RefFriendListReq
         {
             private DateTimeOffset? _startDate;
@@ -240,7 +241,7 @@ namespace BackendSite.Controllers.Api
                 pageSize,
                 pageNumber,
                 out var totalPages,
-                out var rowCount,true);
+                out var rowCount, true);
             foreach (var x in data)
             {
                 referralStatus.TryGetValue(x.Status, out var name);
