@@ -15,6 +15,14 @@ public class DepositReferralReportBLL
         _logger = provider.GetRequiredService<ILogger<DepositReferralReportBLL>>();
     }
 
+    public async Task<(IEnumerable<DepositReferralReport_ReferralReferredDao> Data, int TotalPages, int ReferreCount, decimal TotalRewardAmount, decimal TotalPayoutAmount)> GetListByCustId(int custId,
+    int pageNumber,
+    int pageSize)
+=> await _referralManagementService.GetDepositReferralListByCustId(
+        custId,
+        Math.Abs(pageSize),
+        (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
+
     public async Task<(IEnumerable<DepositReferralReportDao> Data, int TotalPages, int RowCount)> GetList(int siteId,
         IEnumerable<int> currencyIds,
         DateTime startDate,

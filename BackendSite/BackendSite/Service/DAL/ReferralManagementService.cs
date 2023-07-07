@@ -189,6 +189,29 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public async Task<(IEnumerable<DepositReferralReport_ReferralReferredDao> Data, int TotalPages, int ReferreCount,
+    decimal TotalRewardAmount, decimal TotalPayoutAmount)> GetDepositReferralListByCustId(
+    int custId,
+    int pageSize,
+    int startIndex)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_PageSize", pageSize);
+            p.Add("_StartIndex", startIndex);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_TotalRewardAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_TotalPayoutAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            var data = await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferrerList_Get_ByCustId", p);
+
+            return (Data: data,
+                TotalPages: p.Get<int?>("_TotalPages") ?? 0,
+                ReferreCount: p.Get<int?>("_RowCount") ?? 0,
+                TotalRewardAmount: p.Get<decimal?>("_TotalRewardAmount") ?? 0,
+                TotalPayoutAmount: p.Get<decimal?>("_TotalPayoutAmount") ?? 0);
+        }
+
         public async Task<(IEnumerable<DepositReferralReportDao> Data, int TotalPages, int RowCount)> GetDepositReferralCustList(
             int siteId,
             string currencyId,
@@ -208,9 +231,11 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", startIndex);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var data = await _reportDbClient.QueryAsync<DepositReferralReportDao>("Admin_DepositReferralCustList_Get", p);
+            var data = await _reportDbClient.QueryAsync<DepositReferralReportDao>("Admin_DepositReferrerList_Get_ByCustId", p);
 
-            return (Data: data, TotalPages: p.Get<int?>("_TotalPages") ?? 0, RowCount: p.Get<int?>("_RowCount") ?? 0);
+            return (Data: data,
+                TotalPages: p.Get<int?>("_TotalPages") ?? 0,
+                RowCount: p.Get<int?>("_RowCount") ?? 0);
         }
 
         public async Task<IEnumerable<DepositReferralReportForExportDao>> GetDepositReferralCustListForExport(
