@@ -2703,63 +2703,63 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #region CSD > Customer Administration > CustInfo > Referral History (新制-DepositReferral)
 
-        /// <summary>
-        /// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
-        [HttpPost]
-        public async Task<ApiListResult<DepositReferralReportDao>> GetDepositReferralListByCustId(CustIdWithDateRangeAndPageRequest request)
-        {
-            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+        ///// <summary>
+        ///// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料
+        ///// </summary>
+        ///// <remarks>
+        ///// Http Method：POST
+        ///// 
+        ///// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
+        ///// </remarks>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
+        //[HttpPost]
+        //public async Task<ApiListResult<DepositReferralReportDao>> GetDepositReferralListByCustId(CustIdWithDateRangeAndPageRequest request)
+        //{
+        //    var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
 
-            var data = await _depositReferralReportBll.GetList(custInfo.SiteId,
-                new List<int>() { custInfo.CurrencyId },
-                request.StartDate.DateTime,
-                request.EndDate.DateTime,
-                custInfo.CustId,
-                request.PageNumber,
-                request.PageSize);
+        //    var data = await _depositReferralReportBll.GetList(custInfo.SiteId,
+        //        new List<int>() { custInfo.CurrencyId },
+        //        request.StartDate.DateTime,
+        //        request.EndDate.DateTime,
+        //        custInfo.CustId,
+        //        request.PageNumber,
+        //        request.PageSize);
 
-            return new ApiListResult<DepositReferralReportDao>
-            {
-                Data = data.Data,
-                TotalPages = data.TotalPages,
-                PageNumber = request.PageNumber,
-                RowCount = data.RowCount,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
+        //    return new ApiListResult<DepositReferralReportDao>
+        //    {
+        //        Data = data.Data,
+        //        TotalPages = data.TotalPages,
+        //        PageNumber = request.PageNumber,
+        //        RowCount = data.RowCount,
+        //        ErrorCode = (int)ErrorCodeEnum.Success
+        //    };
+        //}
 
-        /// <summary>
-        /// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料明細
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<DepositReferralReport_ReferralReferredDao>>> GetDepositReferralDetailByCustId(CustIdWithDateRangeRequest request)
-        {
-            var startTime = request.StartDate.ToUniversalTime().DateTime;
-            var endTime = request.EndDate.ToUniversalTime().DateTime;
+        ///// <summary>
+        ///// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料明細
+        ///// </summary>
+        ///// <remarks>
+        ///// Http Method：POST
+        ///// 
+        ///// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
+        ///// </remarks>
+        ///// <param name="request"></param>
+        ///// <returns></returns>
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
+        //[HttpPost]
+        //public async Task<ApiResult<IEnumerable<DepositReferralReport_ReferralReferredDao>>> GetDepositReferralDetailByCustId(CustIdWithDateRangeRequest request)
+        //{
+        //    var startTime = request.StartDate.ToUniversalTime().DateTime;
+        //    var endTime = request.EndDate.ToUniversalTime().DateTime;
 
-            return new ApiResult<IEnumerable<DepositReferralReport_ReferralReferredDao>>()
-            {
-                Data = await _depositReferralReportBll.GetDetailByCustId(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime),
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
+        //    return new ApiResult<IEnumerable<DepositReferralReport_ReferralReferredDao>>()
+        //    {
+        //        Data = await _depositReferralReportBll.GetDetailByCustId(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime),
+        //        ErrorCode = (int)ErrorCodeEnum.Success
+        //    };
+        //}
 
         #endregion
 

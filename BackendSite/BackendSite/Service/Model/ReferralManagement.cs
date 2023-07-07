@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 using System.Reflection.Metadata;
 
@@ -346,22 +347,48 @@ namespace BackendSite.Service.Model
 
     public class DepositReferralReportDao
     {
+        public string SiteName { get; set; }
         public int CurrencyId { get; set; }
-        public string CurrencyName { get; set; }
+        public string Currency { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public decimal TotalDeposit { get; set; }
-        public decimal TotalCalculateReward { get; set; }
         public decimal ReferralAmount { get; set; }
+        public decimal PayoutAmount { get; set; }
     }
 
     public class DepositReferralReport_ReferralReferredDao
     {
         public string DepositDate { get; set; }
+        public string SiteName { get; set; }
+        public int AgentId { get; set; }
+        public string AgentUserName { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string Currency { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public decimal TotalDeposit { get; set; }
+        public decimal ReferralAmount { get; set; }
+    }
+    public class DepositReferralReportForExportDao
+    {
+        public string SiteName { get; set; }
+        public string Currency { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public decimal TotalDeposit { get; set; }
-        public decimal RewardPercentage { get; set; }
+        public decimal ReferralAmount { get; set; }
+        public decimal PayoutAmount { get; set; }
+    }
+
+    public class DepositReferralReport_ReferralReferredForExportDao
+    {
+        public string SiteName { get; set; }
+        public string AgentUserName { get; set; }
+        public string UserName { get; set; }
+        public string Currency { get; set; }
+        public DateTimeOffset RegTime { get; set; }
+        public decimal TotalDeposit { get; set; }
         public decimal ReferralAmount { get; set; }
     }
 }
