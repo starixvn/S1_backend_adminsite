@@ -30,7 +30,28 @@ public class DepositReferralReportBLL
             Math.Abs(pageSize),
             (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
 
-    public async Task<IEnumerable<DepositReferralReport_ReferralReferredDao>> GetDetailByCustId(int custId, DateTime startTime, DateTime endTime)
-    => await _referralManagementService.GetDepositReferralReferredList(custId, startTime, endTime);
+    public async Task<IEnumerable<DepositReferralReport_ReferralReferredDao>> GetDetailByCustId(IEnumerable<int> custIds, DateTime startTime, DateTime endTime)
+    => await _referralManagementService.GetDepositReferralReferredList(JsonConvert.SerializeObject(custIds), startTime, endTime);
+
+    public async Task<(IEnumerable<DepositReferralReportForExportDao> ReferrerResult, IEnumerable<DepositReferralReport_ReferralReferredForExportDao> ReferredResult)> Export(
+        int siteId,
+        IEnumerable<int> currencyIds,
+        DateTime startDate,
+        DateTime endDate,
+        int custId)
+    {
+        var referrerResult = await _referralManagementService.GetDepositReferralCustListForExport(siteId,
+            JsonConvert.SerializeObject(currencyIds),
+            startDate,
+            endDate,
+            custId);
+
+        var referredResult = await _referralManagementService.GetDepositReferralReferredListForExport(
+            JsonConvert.SerializeObject(referrerResult.Select(x => x.CustId).Distinct()),
+            startDate,
+            endDate);
+
+        return (ReferrerResult: referrerResult, ReferredResult: referredResult);
+    }
 
 }

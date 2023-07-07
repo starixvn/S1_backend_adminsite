@@ -16,14 +16,18 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #region Fields
 
         private readonly DepositReferralReportBLL _depositReferralReportBll;
+        private readonly ExcelBLL _excelBll;
         private readonly CustInfoBLL _custInfoBll;
 
         #endregion
 
         #region Constructors
-        public DepositReferralReportController(DepositReferralReportBLL depositReferralReportBll, CustInfoBLL custInfoBll)
+        public DepositReferralReportController(DepositReferralReportBLL depositReferralReportBll,
+            ExcelBLL excelBll,
+            CustInfoBLL custInfoBll)
         {
             _depositReferralReportBll = depositReferralReportBll;
+            _excelBll = excelBll;
             _custInfoBll = custInfoBll;
         }
         #endregion
@@ -42,6 +46,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public class GetDetailByCustIdRequest
         {
             public int CustId { get; set; }
+            public DateTimeOffset StartDate { get; set; }
+            public DateTimeOffset EndDate { get; set; }
+        }
+
+        public class ExportRequest
+        {
+            public int SiteId { get; set; }
+            public string UserName { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
         }
@@ -111,9 +124,37 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             return new ApiResult<IEnumerable<DepositReferralReport_ReferralReferredDao>>()
             {
-                Data = await _depositReferralReportBll.GetDetailByCustId(request.CustId, startTime, endTime),
+                Data = await _depositReferralReportBll.GetDetailByCustId(new int[] { request.CustId }, startTime, endTime),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 147, 2 })]
+        public async Task<IActionResult> Export(ExportRequest request)
+        {
+            var custId = 0;
+            if (!string.IsNullOrWhiteSpace(request.UserName))
+            {
+                var custInfo = await _custInfoBll.GetCustInfosAsync(request.SiteId, new List<string>() { request.UserName });
+                if (custInfo.Any())
+                    custId = custInfo.First().CustId;
+                else
+                    custId = -1;
+            }
+            var startTime = request.StartDate.ToUniversalTime().DateTime;
+            var endTime = request.EndDate.ToUniversalTime().DateTime;
+            var result = await _depositReferralReportBll.Export(request.SiteId,
+                request.CurrencyIds,
+                startTime,
+                endTime,
+                custId);
+
+            var stream = _excelBll.ExportV2(
+                new Dictionary<string, IEnumerable<DepositReferralReportForExportDao>>() { { "Referrer", result.ReferrerResult } },
+                new Dictionary<string, IEnumerable<DepositReferralReport_ReferralReferredForExportDao>>() { { "Referred", result.ReferredResult } });
+
+            return _excelBll.ExcelFile(stream, "NewReferralReport");
         }
     }
 }
