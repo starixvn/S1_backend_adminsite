@@ -1,4 +1,6 @@
 ﻿using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
 
 namespace BackendSite.Service.BLL.Interface
 {
@@ -10,5 +12,8 @@ namespace BackendSite.Service.BLL.Interface
         Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string updator);
         Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string updator);
         Task<int> VipAutomationExclusion(int custId, bool enable, string updator);
+        Task<IEnumerable<VipUpgradeSetting>> GetUpgradeSetting(int siteId, int CurrencyId);
+        Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input);
+        Task<IEnumerable<int>> GetVipUpgradeSupportCurrency(int siteId);
     }
 }

@@ -881,6 +881,7 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
+        VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91
     }
 
@@ -1197,7 +1198,8 @@ namespace BackendSite.Service.Model.enums
 
     public enum TpGameTypeEnum
     {
-        DG_LiveCasino = 10
+        DG_LiveCasino = 10,
+        SBO_Sports = 77,
     }
 
     public enum TpCategoryEnum
@@ -1859,5 +1861,17 @@ namespace BackendSite.Service.Model.enums
     {
         Daily = 1,
         Weekly = 2
+    }
+
+    public enum UpgradeSettingEnum 
+    {
+        [Description("Monthly Minimum Deposit")]
+        UpDeposit = 0,
+        [Description("Tier Upgrade Bonus")]
+        UpBonus = 1,
+        [Description("Minimum Deposit Within Validity Period")]
+        DownDeposit = 2,
+        [Description("Minimum Turnover Within Validity Period")]
+        DownTurnover = 3,
     }
 }
