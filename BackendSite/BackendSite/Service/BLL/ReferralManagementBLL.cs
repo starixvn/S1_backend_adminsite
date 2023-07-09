@@ -68,9 +68,9 @@ namespace BackendSite.Service.BLL
             return referralManagementService.SetReferralStatus(siteId, currencyId, status);
         }
 
-        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, ReferralStatusEnum status)
         {
-            return await referralManagementService.SetReferralStatusAsync(siteId, currencyId, status);
+            return await referralManagementService.SetReferralStatusAsync(siteId, currencyId, (int)status);
         }
 
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)

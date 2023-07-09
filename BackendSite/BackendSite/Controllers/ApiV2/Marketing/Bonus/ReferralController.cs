@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -12,8 +13,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [ApiController]
     public class ReferralController : ControllerBase
     {
-        private readonly ReferralManagementDecorator _managementDecorator;
-        public ReferralController(ReferralManagementDecorator managementDecorator)
+        private readonly IReferralManagementBLL _managementDecorator;
+        public ReferralController(IReferralManagementBLL managementDecorator)
         {
             _managementDecorator = managementDecorator;
         }
@@ -77,7 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public async Task<ApiResult> UpdateStatus(SetReferralStatusRequest request)
         {
             _managementDecorator.Operator = User.Identity.Name;
-            var result = await _managementDecorator.SetReferralStatusAsync(request.SiteId, request.CurrencyId, (int)request.Status);
+            var result = await _managementDecorator.SetReferralStatusAsync(request.SiteId, request.CurrencyId, request.Status);
             var apiResult = new ApiResult
             {
                 ErrorCode = result > 0 ? (int)ErrorCodeEnum.Success : result

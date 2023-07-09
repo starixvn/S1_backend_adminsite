@@ -124,8 +124,8 @@ namespace BackendSite
             services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
             services.AddTransient<IAutoWithdrawalRuleService, AutoWithdrawalRuleService>();
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
-            
-            
+            services.DecoratorReferralManagement();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
