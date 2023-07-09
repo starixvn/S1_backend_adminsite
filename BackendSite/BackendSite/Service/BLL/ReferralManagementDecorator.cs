@@ -97,7 +97,7 @@ namespace BackendSite.Service.BLL
             return _referralManagementBll.SetReferralStatus(siteId, currencyId, status);
         }
 
-        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, ReferralStatusEnum status)
         {
             var referral = await _referralManagementBll.GetReferralDetail(siteId, currencyId);
             if (referral == null)
