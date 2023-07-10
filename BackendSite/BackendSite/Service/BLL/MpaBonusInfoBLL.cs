@@ -491,16 +491,6 @@ namespace BackendSite.Service.BLL
 
             var withData = withdrawalAmountSummaryTask.Result;
             var depositData = depositAmountSummaryTask.Result;
-           
-            foreach (var mpaBonusInfo in result)
-            {
-                mpaBonusInfo.TotalDeposit = depositData
-                    .Where(x => x.CustId == mpaBonusInfo.CustId)
-                    .Sum(y => y.DepositAmount);
-                mpaBonusInfo.TotalWithdrawal = withData
-                    .Where(x => x.CustId == mpaBonusInfo.CustId)
-                    .Sum(y => y.WithdrawalAmount);
-            }
             
             #endregion
             
@@ -526,7 +516,7 @@ namespace BackendSite.Service.BLL
                             TotalClaimants = result.Count(y => y.BonusCode == x.Key.BonusCode),
                             TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
                             TotalDeposit = depositData.Where(a => x.Select(y=>y.CustId).Distinct().Contains(a.CustId)).Sum(b=>b.DepositAmount),
-                            TotalWithdrawal = withData.Where(a => x.Select(y=>y.CustId).Distinct().Contains(a.CustId)).Sum(b=>b.WithdrawalAmount),
+                            TotalWithdrawal = withData.Where(a => x.Select(y=>y.CustId).Distinct().Contains(a.CustId)).Sum(b=>b.WithdrawalAmount)
                         }).ToList();
                     
                     break;
@@ -551,34 +541,12 @@ namespace BackendSite.Service.BLL
                             OtherPlatformCount = result.Count(y => y.ClaimStatus == 5 && y.RecordDate == x.Key.RecordDate),
                             TotalClaimants = result.Count(y => y.BonusCode == x.Key.BonusCode && y.RecordDate == x.Key.RecordDate),
                             TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                            TotalDeposit = x.Sum(y => y.TotalDeposit),
-                            TotalWithdrawal = x.Sum(y => y.TotalWithdrawal),
+                            TotalDeposit = depositData.Where(b =>x.Key.RecordDate == b.Date.Date).Where(a => x.Select(y=>y.CustId).Distinct().Contains(a.CustId)).Sum(b=>b.DepositAmount),
+                            TotalWithdrawal = withData.Where(b =>x.Key.RecordDate == b.Date.Date).Where(a => x.Select(y=>y.CustId).Distinct().Contains(a.CustId)).Sum(b=>b.WithdrawalAmount)
                         }).ToList();
                     break;
                 
                 case BonusGroupByType.Month:
-                    
-                    // result = result.GroupBy(x => new { RecordDate = x.RecordDate.Date,x.BonusCode,x.BonusName,x.BonusType,x.TypeName,x.StartTime,x.EndTime,x.BonusStatus})
-                    //     .Select(x=> new MpaBonusInfo
-                    //     {
-                    //         RecordDate = x.Key.RecordDate.Date,
-                    //         BonusCode = x.Key.BonusCode,
-                    //         BonusName = x.Key.BonusName,
-                    //         BonusType = x.Key.BonusType,
-                    //         TypeName = x.Key.TypeName,
-                    //         StartTime = x.Key.StartTime,
-                    //         EndTime = x.Key.EndTime,
-                    //         BonusStatus = x.Key.BonusStatus,
-                    //         GGR = x.Sum(y => y.GGR),
-                    //         RunningCount = result.Count(y => y.ClaimStatus == (int)BonusStatus.Running && y.RecordDate == x.Key.RecordDate.Date),
-                    //         CancelCount = result.Count(y => y.ClaimStatus is (int)BonusStatus.Canceled or (int)BonusStatus.Expiry && y.RecordDate == x.Key.RecordDate.Date),
-                    //         FulFillCount = result.Count(y => y.ClaimStatus == (int)BonusStatus.Fulfill && y.RecordDate == x.Key.RecordDate.Date),
-                    //         OtherPlatformCount = result.Count(y => y.ClaimStatus == 5 && y.RecordDate == x.Key.RecordDate.Date),
-                    //         TotalClaimants = result.Count(y => y.BonusCode == x.Key.BonusCode && y.RecordDate == x.Key.RecordDate.Date),
-                    //         TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                    //         TotalDeposit = x.Sum(y => y.TotalDeposit),
-                    //         TotalWithdrawal = x.Sum(y => y.TotalWithdrawal),
-                    //     }).ToList();
                     
                     result = result.GroupBy(x => new {x.RecordDate.Year, x.RecordDate.Month, x.BonusCode, x.BonusName, x.BonusType, x.TypeName, x.StartTime, x.EndTime, x.BonusStatus })
                         .Select(x => new MpaBonusInfo
@@ -598,8 +566,8 @@ namespace BackendSite.Service.BLL
                             OtherPlatformCount = result.Count(y => y.ClaimStatus == 5 && y.RecordDate.Year == x.Key.Year && y.RecordDate.Month == x.Key.Month),
                             TotalClaimants = result.Count(y => y.BonusCode == x.Key.BonusCode && y.RecordDate.Year == x.Key.Year && y.RecordDate.Month == x.Key.Month),
                             TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                            TotalDeposit = x.Sum(y => y.TotalDeposit),
-                            TotalWithdrawal = x.Sum(y => y.TotalWithdrawal),
+                            TotalDeposit = depositData.Where(b => new DateTime(x.Key.Year, x.Key.Month, 1) == new DateTime(b.Date.Year, b.Date.Month, 1) ).Where(a => x.Select(y=>y.CustId).Distinct().Contains(a.CustId)).Sum(b=>b.DepositAmount),
+                            TotalWithdrawal = withData.Where(b => new DateTime(x.Key.Year, x.Key.Month, 1) == new DateTime(b.Date.Year, b.Date.Month, 1) ).Where(a => x.Select(y=>y.CustId).Distinct().Contains(a.CustId)).Sum(b=>b.WithdrawalAmount)
                         }).ToList();
                     
                     break;
