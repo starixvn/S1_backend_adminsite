@@ -495,10 +495,10 @@ namespace BackendSite.Service.BLL
             foreach (var mpaBonusInfo in result)
             {
                 mpaBonusInfo.TotalDeposit = depositData
-                    .Where(x => x.Date.Date == mpaBonusInfo.RecordDate && x.CustId == mpaBonusInfo.CustId)
+                    .Where(x => x.CustId == mpaBonusInfo.CustId)
                     .Sum(y => y.DepositAmount);
                 mpaBonusInfo.TotalWithdrawal = withData
-                    .Where(x => x.Date.Date == mpaBonusInfo.RecordDate && x.CustId == mpaBonusInfo.CustId)
+                    .Where(x => x.CustId == mpaBonusInfo.CustId)
                     .Sum(y => y.WithdrawalAmount);
             }
             
