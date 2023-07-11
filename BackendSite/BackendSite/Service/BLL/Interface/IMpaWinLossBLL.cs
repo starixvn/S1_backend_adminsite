@@ -11,7 +11,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByDateDto>> GetMpaWinLossByDateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossByDateDtoExport>> GetMpaWinLossByDateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// api
@@ -27,7 +27,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByTpGameTypeDto>> GetMapWinLossByTpGameTypeExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossByTpGameTypeDtoExport>> GetMapWinLossByTpGameTypeExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// api
@@ -43,7 +43,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByTpCategoryDto>> GetMapWinLossByTpCategoryExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossByTpCategoryDtoExport>> GetMapWinLossByTpCategoryExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// api 
@@ -59,7 +59,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByPlayerDto>> GetMpaWinLossByPlayerExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossByPlayerDtoExport>> GetMpaWinLossByPlayerExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// api
@@ -85,7 +85,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByCurrencyDto>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossByCurrencyDtoExport>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// api
