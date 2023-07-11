@@ -105,8 +105,11 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int PageNumber { get; set; }
         public int RowCount { get; set; }
-        public decimal TotalRewardAmount { get; set; }
-        public decimal TotalPayoutAmount { get; set; }
+        public decimal Referral_TotalRewardCount { get; set; }
+        public decimal DepositReferral_TotalRewardCount { get; set; }
+        public decimal DepositReferral__TotalRewardAmount { get; set; }
+        public decimal Referral_TotalPayoutAmount { get; set; }
+        public decimal DepositReferral_TotalPayoutAmount { get; set; }
         public string PageRange { get; set; }
     }
 

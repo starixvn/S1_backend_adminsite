@@ -2728,8 +2728,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 TotalPages = data.TotalPages,
                 PageNumber = request.PageNumber,
                 RowCount = data.ReferreCount,
-                TotalRewardAmount = data.TotalRewardAmount,
-                TotalPayoutAmount = data.TotalPayoutAmount,
+                Referral_TotalRewardCount = data.Referral_TotalRewardCount,
+                DepositReferral_TotalRewardCount = data.DepositReferral_TotalRewardCount,
+                DepositReferral__TotalRewardAmount = data.DepositReferral_TotalRewardAmount,
+                Referral_TotalPayoutAmount = data.Referral_TotalPayoutAmount,
+                DepositReferral_TotalPayoutAmount = data.DepositReferral_TotalPayoutAmount,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
