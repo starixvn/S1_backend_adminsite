@@ -8,8 +8,8 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Library;
 using BackendSite.ExceptionHandling;
-using static BackendSite.Controllers.Api.CustManageController;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -1557,7 +1557,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ActionType = ActionType.Update,
                 MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
                 BeforeDetailInfo = null,
-                AfterDetailInfo = custInfo.UserName
+                AfterDetailInfo = JsonConvert.SerializeObject(new {custInfo.UserName})
             });
             
             return new ApiResult
