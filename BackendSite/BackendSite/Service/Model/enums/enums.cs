@@ -1892,4 +1892,10 @@ namespace BackendSite.Service.Model.enums
         [Description("Minimum Turnover Within Validity Period")]
         DownTurnover = 3,
     }
+    
+    public enum AutoType
+    {
+        AutoVerify = 1,
+        AutoApproved = 2
+    }
 }
