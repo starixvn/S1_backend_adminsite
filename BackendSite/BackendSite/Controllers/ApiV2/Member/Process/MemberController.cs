@@ -1495,7 +1495,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ActionType = ActionType.Update,
                 MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
                 BeforeDetailInfo = null,
-                AfterDetailInfo = null
+                AfterDetailInfo = custInfo.UserName
             });
 
             return new ApiResult
