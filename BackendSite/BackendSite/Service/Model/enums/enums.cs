@@ -1742,7 +1742,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Wrong Bank submitted")]
         WrongBankSubmitted = 5,
         [Description("Inactive Bank Account submission")]
-        InactiveBankAccountSubmission = 6
+        InactiveBankAccountSubmission = 6,
+        [Description("System Unstable")]
+        SystemUnstable = 7,
+        [Description("Bank Under Maintenance")]
+        BankUnderMaintenance = 8,
     }
 
     public enum WithdrawalMessageStatus
