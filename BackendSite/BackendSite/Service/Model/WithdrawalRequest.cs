@@ -5,6 +5,35 @@ using BackendSite.Extensions;
 
 namespace BackendSite.Service.Model
 {
+    public class GetByTransIdRequest
+    {
+        public string TransId { get; set; }
+    }
+
+    public class SendToNextRequest : GetByTransIdRequest
+    {
+        public string Comment { set; get; }
+        public WithdrawalStatusEnum Action { set; get; }
+        public string WithdrawalInfo { set; get; }
+        public WithdrawalTypeEnum? WithdrawalType { set; get; }
+        public int? SelId { set; get; }
+        public int? ChannelId { set; get; }
+        public IEnumerable<WithdrawalAccountingModel> WithdrawalAccountingModels { set; get; }
+    }
+    
+    public class ReqWithdrawalOnline
+    {
+        public int SysId { get; set; }
+        public string TransId { get; set; }
+        public int PayId { get; set; }
+        public int ChannelId { get; set; }
+        public int CustId { get; set; }
+        public decimal Amount { get; set; }
+        public string AccountName { set; get; }
+        public string AccountNo { set; get; }
+        public string IFSCCode { set; get; }
+    }
+    
     public class WithdrawalRequest
     {
         private DateTimeOffset _flowEndTime { set; get; }

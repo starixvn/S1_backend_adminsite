@@ -178,7 +178,13 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
-    public enum WithdrawalLimitLogCreateFromEnum
+    public enum WithdrawalLimitLogMainTypeEnum
+    {
+        Add = 1,
+        Deduct = 2
+    }
+
+    public enum WithdrawalLimitLogCreateFromEnum 
     {
         Default = 0,
         Deposit = 1,
@@ -692,6 +698,13 @@ namespace BackendSite.Service.Model.enums
         Deposit = 1
     }
     
+    public enum BonusGroupByType
+    {
+        BonusCode = 0,
+        Date = 1 ,
+        Month = 2
+    }
+    
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -881,8 +894,10 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
+        RebateExcludeGame = 89,
         VipUpgradeSetting = 90,
-        AutoWithdrawalRule = 91
+        AutoWithdrawalRule = 91,
+        AutoPaymentRule = 92,
     }
 
     #region BankFinancialTransferInfoLog
@@ -1096,7 +1111,9 @@ namespace BackendSite.Service.Model.enums
         [Description("UNDER CREDIT")]
         UnderCredit = 20,
         [Description("REFUND")]
-        Refund = 21
+        Refund = 21,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
@@ -1509,7 +1526,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         All = 0,
@@ -1581,6 +1597,7 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
+
 
     public enum ShieldRiskTagged
     {
@@ -1725,7 +1742,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Wrong Bank submitted")]
         WrongBankSubmitted = 5,
         [Description("Inactive Bank Account submission")]
-        InactiveBankAccountSubmission = 6
+        InactiveBankAccountSubmission = 6,
+        [Description("System Unstable")]
+        SystemUnstable = 7,
+        [Description("Bank Under Maintenance")]
+        BankUnderMaintenance = 8,
     }
 
     public enum WithdrawalMessageStatus
@@ -1818,6 +1839,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         BoDelete = 2
     }
+    
     public enum ExchangeTypeEnum
     {
         /// <summary>
@@ -1873,5 +1895,11 @@ namespace BackendSite.Service.Model.enums
         DownDeposit = 2,
         [Description("Minimum Turnover Within Validity Period")]
         DownTurnover = 3,
+    }
+    
+    public enum AutoType
+    {
+        AutoVerify = 1,
+        AutoApproved = 2
     }
 }
