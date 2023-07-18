@@ -1552,6 +1552,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = User.Identity.Name,
+                CustId = request.CustId,
                 SiteId = custInfo.SiteId,
                 CurrencyId = custInfo.CurrencyId,
                 ActionType = ActionType.Update,
