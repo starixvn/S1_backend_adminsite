@@ -1470,42 +1470,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
         }
         
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 87 })]
-        [HttpPost]
-        public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
-        {
-            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
-            var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, custInfo.CurrencyId);
-            var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
-
-            if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
-            {
-                var result = await _redisHelper.StringSetAsync(key, 0, TimeSpan.FromDays(1), RedisDataBase.Shared);
-
-                return new ApiResult
-                {
-                    ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
-                };
-            }
-
-            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
-            {
-                Operator = User.Identity.Name,
-                SiteId = custInfo.SiteId,
-                CustId = request.CustId,
-                CurrencyId = custInfo.CurrencyId,
-                ActionType = ActionType.Update,
-                MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
-                BeforeDetailInfo = null,
-                AfterDetailInfo = JsonConvert.SerializeObject(new {custInfo.UserName})
-            });
-
-            return new ApiResult
-            {
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
         /// <summary>
         /// Member/RegisterMember 會員註冊
         /// </summary>
@@ -1604,6 +1568,49 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 87 })]
+        [HttpPost]
+        public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
+        {
+            var times = "-";
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
+            var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, custInfo.CurrencyId);
+            var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
+            
+            if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
+            {
+                times = await _redisHelper.StringGetAsync(key, RedisDataBase.Shared);
+                var result = await _redisHelper.StringSetAsync(key, 0, TimeSpan.FromDays(1), RedisDataBase.Shared);
+
+                if (!result)
+                {
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Fail,
+                        Message = "Reset OTP times failed!"
+                    };
+                }
+            }
+            
+            _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = User.Identity.Name,
+                CustId = request.CustId,
+                SiteId = custInfo.SiteId,
+                CurrencyId = custInfo.CurrencyId,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
+                BeforeDetailInfo = JsonConvert.SerializeObject(new {Times = times, custInfo.UserName}),
+                AfterDetailInfo = JsonConvert.SerializeObject(new {Times = "0", custInfo.UserName})
+            });
+            
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
     }
 }
