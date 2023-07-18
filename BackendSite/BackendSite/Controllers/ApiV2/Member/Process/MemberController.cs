@@ -9,8 +9,8 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Library;
 using BackendSite.ExceptionHandling;
-using static BackendSite.Controllers.Api.CustManageController;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -1531,29 +1531,36 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
         {
+            var times = "-";
             var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
             var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, custInfo.CurrencyId);
             var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
             
             if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
             {
+                times = await _redisHelper.StringGetAsync(key, RedisDataBase.Shared);
                 var result = await _redisHelper.StringSetAsync(key, 0, TimeSpan.FromDays(1), RedisDataBase.Shared);
-                
-                return new ApiResult
+
+                if (!result)
                 {
-                    ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
-                };
+                    return new ApiResult
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Fail,
+                        Message = "Reset OTP times failed!"
+                    };
+                }
             }
             
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = User.Identity.Name,
+                CustId = request.CustId,
                 SiteId = custInfo.SiteId,
                 CurrencyId = custInfo.CurrencyId,
                 ActionType = ActionType.Update,
                 MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
-                BeforeDetailInfo = null,
-                AfterDetailInfo = null
+                BeforeDetailInfo = JsonConvert.SerializeObject(new {Times = times, custInfo.UserName}),
+                AfterDetailInfo = JsonConvert.SerializeObject(new {Times = "0", custInfo.UserName})
             });
             
             return new ApiResult
