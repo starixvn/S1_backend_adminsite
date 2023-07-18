@@ -74,6 +74,7 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", input.SiteId);
+            props.Add("_CustId", input.CustId);
             props.Add("_CurrencyId", input.CurrencyId);
             props.Add("_Menu", (int) input.MenuEnum);
             props.Add("_ActionType", (int) input.ActionType);
@@ -83,7 +84,7 @@ namespace BackendSite.Service.DAL
             props.Add("_Operator", input.Operator);
             
             var result =
-                _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", props);
+                _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins_V2", props);
 
             return result > 0;
         }

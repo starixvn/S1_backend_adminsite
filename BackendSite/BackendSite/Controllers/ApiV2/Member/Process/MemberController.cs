@@ -1492,6 +1492,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 Operator = User.Identity.Name,
                 SiteId = custInfo.SiteId,
+                CustId = request.CustId,
                 CurrencyId = custInfo.CurrencyId,
                 ActionType = ActionType.Update,
                 MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
