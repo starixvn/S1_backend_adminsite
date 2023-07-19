@@ -1878,4 +1878,10 @@ namespace BackendSite.Service.Model.enums
         [Description("Minimum Turnover Within Validity Period")]
         DownTurnover = 3,
     }
+
+    public enum CashBackPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2
+    }
 }
