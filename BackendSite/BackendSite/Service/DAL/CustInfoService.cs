@@ -761,7 +761,7 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", custId);
             p.Add("_CurrencyId", currencyId);
 
-            return await _reportDbClient.QueryFirstWithNoCacheAsync<CustDashBoardTodayModel>("Admin_CustDashBoard_Today_Get", p);
+            return await _reportDbClient.QueryFirstWithNoCacheAsync<CustDashBoardTodayModel>("Admin_CustDashBoard_Today_Get_V2", p);
         }
 
         public IEnumerable<BlockBankAcc> GetBankList(int custId)
