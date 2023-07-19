@@ -1949,4 +1949,10 @@ namespace BackendSite.Service.Model.enums
         AutoVerify = 1,
         AutoApproved = 2
     }
+
+    public enum CashBackPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2
+    }
 }
