@@ -238,7 +238,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", startIndex);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var data = await _reportDbClient.QueryAsync<DepositReferralReportDao>("Admin_DepositReferrerList_Get_ByCustId", p);
+            var data = await _reportDbClient.QueryAsync<DepositReferralReportDao>("Admin_DepositReferralCustList_Get", p);
 
             return (Data: data,
                 TotalPages: p.Get<int?>("_TotalPages") ?? 0,
