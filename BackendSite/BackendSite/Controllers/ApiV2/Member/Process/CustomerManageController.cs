@@ -3069,13 +3069,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         [HttpPost]
-        public async Task<ApiResult<CustDashBoardTodayModel>> GetTodayDashboardAsync(GetTodayDashboardRequest request)
+        public async Task<ApiResult<CustDashBoardTodayResponse>> GetTodayDashboardAsync(GetTodayDashboardRequest request)
         {
             var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
             var result =
                 await _custInfoBll.GetCustDashBoardTodayAsync(request.CustId, custInfo.CurrencyId);
 
-            return new ApiResult<CustDashBoardTodayModel>
+            return new ApiResult<CustDashBoardTodayResponse>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 Data = result

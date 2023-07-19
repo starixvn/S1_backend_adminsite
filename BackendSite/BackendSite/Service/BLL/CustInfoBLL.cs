@@ -998,9 +998,21 @@ namespace BackendSite.Service.BLL
             return queryResult;
         }
 
-        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        public async Task<CustDashBoardTodayResponse> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
-            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+            var data = await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+            _logger.LogInformation($"GetCustDashBoardTodayAsyncResult：{JsonConvert.SerializeObject(data)} CsutId:{custId} and currencyId:{currencyId}");
+
+            return new CustDashBoardTodayResponse()
+            {
+                TodayDeposit = data.TodayDeposit,
+                TodayWithdrawal = data.TodayWithdrawal,
+                TodayWinLoss = data.TodayWinLoss,
+                TodayBetting = data.TodayBetting,
+                TodayBonus = data.TodayBonus,
+                TodayReward = data.TodayReferralAmount + data.TodayReferralFreeCredit + data.TodayPhoneReward +
+                              data.TodayEmailReward + data.TodayDraw + data.TodayUpgradeAmount
+            };
         }
 
         public IEnumerable<BlockBankAcc> GetBankList(int custId)
