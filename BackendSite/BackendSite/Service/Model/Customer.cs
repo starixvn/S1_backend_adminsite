@@ -600,15 +600,6 @@ namespace BackendSite.Service.Model
         }
     }
 
-    public class CustDashBoardTodayModel
-    {
-        public decimal TodayDeposit { get; set; }
-        public decimal TodayWithdrawal { get; set; }
-        public decimal TodayWinLoss { get; set; }
-        public decimal TodayBetting { get; set; }
-        public decimal TodayBonus { get; set; }
-        public decimal TodayReward { get; set; }
-    }
     public class DashboardWinLossGroup
     {
         public decimal Winnings { set; get; }
@@ -649,6 +640,35 @@ namespace BackendSite.Service.Model
         public int GameType { set; get; }
         public string GameName { get; set; }
         public string TpUserName { get; set; }
+    }
+
+    public class CustDashBoardTodayBaseDto
+    {
+        public decimal TodayDeposit { get; set; }
+        public decimal TodayWithdrawal { get; set; }
+        public decimal TodayWinLoss { get; set; }
+        public decimal TodayBetting { get; set; }
+        public decimal TodayBonus { get; set; }
+    }
+
+    public class CustDashBoardTodayModel : CustDashBoardTodayBaseDto
+    {
+        public decimal TodayReferralAmount { get; set; }
+
+        public decimal TodayReferralFreeCredit { get; set; }
+
+        public decimal TodayPhoneReward { get; set; }
+
+        public decimal TodayEmailReward { get; set; }
+
+        public decimal TodayDraw { get; set; }
+
+        public decimal TodayUpgradeAmount { get; set; }
+    }
+
+    public class CustDashBoardTodayResponse : CustDashBoardTodayBaseDto
+    {
+        public decimal TodayReward {get; set; }
     }
 
 
