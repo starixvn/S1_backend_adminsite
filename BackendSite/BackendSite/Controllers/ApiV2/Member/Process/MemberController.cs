@@ -38,6 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ICacheHelper _redisHelper;
         private readonly DateTimeHelper _dateTimeHelper;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly TpBLL _tpBll;
 
         public MemberController(IServiceProvider provider)
         {
@@ -60,6 +61,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _tpBll = provider.GetRequiredService<TpBLL>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -944,7 +946,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Lock(LockMemberRequest request)
         {
-            if (await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason, User.Identity.Name) > 0)
+            if (request.Status == CustomerStatusEnum.Suspend)
+            {
+                await _tpBll.TransferAllTpWalletAsync(request.CustId);
+            }
+            
+            var setResult = await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason, User.Identity.Name) > 0;
+            
+            if (setResult)
             {
                 return new ApiResult
                 {
