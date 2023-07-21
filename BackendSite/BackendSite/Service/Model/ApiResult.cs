@@ -95,24 +95,6 @@ namespace BackendSite.Service.Model
         public string PageRange { get; set; }
     }
 
-    public class ApiListResultTotalReferralAmount<TData> : ApiResult, IPageInfo
-    {
-        public ApiListResultTotalReferralAmount() : this(9000, "") { }
-        public ApiListResultTotalReferralAmount(ISelLang selLang) : this(9000, "") { SelLang = selLang; }
-        public ApiListResultTotalReferralAmount(int ErrorCode, string Message) : base(ErrorCode, Message) { }
-        public IEnumerable<TData> Data { get; set; }
-
-        public int TotalPages { get; set; }
-        public int PageNumber { get; set; }
-        public int RowCount { get; set; }
-        public decimal Referral_TotalRewardCount { get; set; }
-        public decimal DepositReferral_TotalRewardCount { get; set; }
-        public decimal DepositReferral__TotalRewardAmount { get; set; }
-        public decimal Referral_TotalPayoutAmount { get; set; }
-        public decimal DepositReferral_TotalPayoutAmount { get; set; }
-        public string PageRange { get; set; }
-    }
-
     public class ApiListResultCurrencyAmount<TData> : ApiResult, IPageInfo
     {
         public ApiListResultCurrencyAmount() : this(9000, "") { }

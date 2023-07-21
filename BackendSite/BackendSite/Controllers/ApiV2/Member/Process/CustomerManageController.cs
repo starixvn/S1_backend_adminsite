@@ -2714,7 +2714,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
         [HttpPost]
-        public async Task<ApiListResultTotalReferralAmount<DepositReferralReport_ReferralReferredDao>> GetDepositReferralListByCustId(CustIdWithPageRequest request)
+        public async Task<ApiListResult<GetDepositReferralListByCustIdResult>> GetDepositReferralListByCustId(CustIdWithPageRequest request)
         {
             var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
 
@@ -2722,17 +2722,22 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.PageNumber,
                 request.PageSize);
 
-            return new ApiListResultTotalReferralAmount<DepositReferralReport_ReferralReferredDao>
+            var result = new GetDepositReferralListByCustIdResult()
             {
-                Data = data.Data,
-                TotalPages = data.TotalPages,
-                PageNumber = request.PageNumber,
-                RowCount = data.ReferreCount,
+                Detail = data.Data,
                 Referral_TotalRewardCount = data.Referral_TotalRewardCount,
                 DepositReferral_TotalRewardCount = data.DepositReferral_TotalRewardCount,
                 DepositReferral__TotalRewardAmount = data.DepositReferral_TotalRewardAmount,
                 Referral_TotalPayoutAmount = data.Referral_TotalPayoutAmount,
-                DepositReferral_TotalPayoutAmount = data.DepositReferral_TotalPayoutAmount,
+                DepositReferral_TotalPayoutAmount = data.DepositReferral_TotalPayoutAmount
+            };
+
+            return new ApiListResult<GetDepositReferralListByCustIdResult>
+            {
+                Data = new List<GetDepositReferralListByCustIdResult>() { result },
+                TotalPages = data.TotalPages,
+                PageNumber = request.PageNumber,
+                RowCount = data.ReferreCount,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
