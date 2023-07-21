@@ -117,8 +117,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<ApiResult<IEnumerable<DepositReferralReport_ReferralReferredDao>>> GetDetailByCustId(GetDetailByCustIdRequest request)
         {
-            var apiResult = new ApiListResult<DepositReferralReport_ReferralReferredDao>();
-
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
 
@@ -142,13 +140,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 else
                     custId = -1;
             }
+            var timespan = request.StartDate.Offset;
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var result = await _depositReferralReportBll.Export(request.SiteId,
                 request.CurrencyIds,
                 startTime,
                 endTime,
-                custId);
+                custId,
+                timespan);
 
             var stream = _excelBll.ExportV2(
                 new Dictionary<string, IEnumerable<DepositReferralReportForExportDao>>() { { "Referrer", result.ReferrerResult } },

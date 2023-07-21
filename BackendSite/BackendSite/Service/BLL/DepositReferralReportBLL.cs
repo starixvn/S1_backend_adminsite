@@ -48,7 +48,8 @@ public class DepositReferralReportBLL
         IEnumerable<int> currencyIds,
         DateTime startDate,
         DateTime endDate,
-        int custId)
+        int custId,
+        TimeSpan timeSpan)
     {
         var referrerResult = await _referralManagementService.GetDepositReferralCustListForExport(siteId,
             JsonConvert.SerializeObject(currencyIds),
@@ -61,7 +62,7 @@ public class DepositReferralReportBLL
             startDate,
             endDate);
 
-        return (ReferrerResult: referrerResult, ReferredResult: referredResult);
+        return (ReferrerResult: referrerResult, ReferredResult: referredResult.Select(x => new DepositReferralReport_ReferralReferredForExportDao(x, timeSpan)));
     }
 
 }
