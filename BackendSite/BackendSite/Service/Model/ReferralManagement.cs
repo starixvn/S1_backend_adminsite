@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using OfficeOpenXml.Attributes;
 using System;
 using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
@@ -410,8 +411,9 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public decimal TotalDeposit { get; set; }
         public decimal ReferralAmount { get; set; }
-
+        [EpplusIgnore]
         public DateTimeOffset RegTime { get; set; }
+        public string Reg_Time { get; set; }
         public DepositReferralReport_ReferralReferredForExportDao()
         {
 
@@ -426,6 +428,7 @@ namespace BackendSite.Service.Model
             TotalDeposit = dao.TotalDeposit;
             ReferralAmount = dao.ReferralAmount;
             RegTime = new DateTimeOffset(dao.RegTime.DateTime, TimeSpan.Zero).ToOffset(timeSpan);
+            Reg_Time = RegTime.ToString("dd/MM/yyyy HH:mm:ss zzz");
         }
     }
 }
