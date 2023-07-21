@@ -1,7 +1,9 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using System;
 using System.Reflection.Metadata;
+using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.Model
 {
@@ -357,8 +359,19 @@ namespace BackendSite.Service.Model
         public decimal PayoutAmount { get; set; }
     }
 
+    public class GetDepositReferralListByCustIdResult
+    {
+        public IEnumerable<DepositReferralReport_ReferralReferredDao> Detail { get; set; }
+        public decimal Referral_TotalRewardCount { get; set; }
+        public decimal DepositReferral_TotalRewardCount { get; set; }
+        public decimal DepositReferral__TotalRewardAmount { get; set; }
+        public decimal Referral_TotalPayoutAmount { get; set; }
+        public decimal DepositReferral_TotalPayoutAmount { get; set; }
+    }
+
     public class DepositReferralReport_ReferralReferredDao
     {
+        private DateTimeOffset? _regTime { set; get; }
         public string DepositDate { get; set; }
         public string SiteName { get; set; }
         public int AgentId { get; set; }
@@ -366,9 +379,17 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public string UserName { get; set; }
         public string Currency { get; set; }
-        public DateTimeOffset RegTime { get; set; }
         public decimal TotalDeposit { get; set; }
         public decimal ReferralAmount { get; set; }
+        public DateTimeOffset? RegTime
+        {
+            get => _regTime;
+            set
+            {
+                if (value != null)
+                    _regTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
+            }
+        }
     }
     public class DepositReferralReportForExportDao
     {
@@ -387,8 +408,24 @@ namespace BackendSite.Service.Model
         public string AgentUserName { get; set; }
         public string UserName { get; set; }
         public string Currency { get; set; }
-        public DateTimeOffset RegTime { get; set; }
         public decimal TotalDeposit { get; set; }
         public decimal ReferralAmount { get; set; }
+
+        public DateTimeOffset RegTime { get; set; }
+        public DepositReferralReport_ReferralReferredForExportDao()
+        {
+
+        }
+
+        public DepositReferralReport_ReferralReferredForExportDao(DepositReferralReport_ReferralReferredForExportDao dao, TimeSpan timeSpan)
+        {
+            SiteName = dao.SiteName;
+            AgentUserName = dao.AgentUserName;
+            UserName = dao.UserName;
+            Currency = dao.Currency;
+            TotalDeposit = dao.TotalDeposit;
+            ReferralAmount = dao.ReferralAmount;
+            RegTime = new DateTimeOffset(dao.RegTime.DateTime, TimeSpan.Zero).ToOffset(timeSpan);
+        }
     }
 }
