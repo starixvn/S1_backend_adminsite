@@ -302,6 +302,7 @@ namespace BackendSite.Service.Model
         public int GameType { get; set; }
         public string TypeName { get; set; }
         public decimal ValidBet { get; set; }
+        public decimal ValidTurnover { get; set; }
         public decimal Percentage { get; set; }
         public decimal CalculatedAmount { get; set; }
     }
