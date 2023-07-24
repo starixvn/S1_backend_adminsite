@@ -180,7 +180,10 @@ namespace BackendSite
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
 
-            app.UseAllElasticApm(_configuration);
+            if (!env.IsEnvironment("Local"))
+            {
+                app.UseAllElasticApm(_configuration);
+            }
             if (!env.IsProduction())
             {
                 #region Swagger & Redoc Setting
