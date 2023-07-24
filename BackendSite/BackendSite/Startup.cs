@@ -13,6 +13,7 @@ using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Option;
+using Elastic.Apm.NetCoreAll;
 
 namespace BackendSite
 {
@@ -179,6 +180,7 @@ namespace BackendSite
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
 
+            app.UseAllElasticApm(_configuration);
             if (!env.IsProduction())
             {
                 #region Swagger & Redoc Setting
