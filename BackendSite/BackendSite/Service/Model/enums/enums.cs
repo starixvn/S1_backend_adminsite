@@ -881,6 +881,7 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
+        VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91
     }
 
@@ -1724,7 +1725,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Wrong Bank submitted")]
         WrongBankSubmitted = 5,
         [Description("Inactive Bank Account submission")]
-        InactiveBankAccountSubmission = 6
+        InactiveBankAccountSubmission = 6,
+        [Description("System Unstable")]
+        SystemUnstable = 7,
+        [Description("Bank Under Maintenance")]
+        BankUnderMaintenance = 8,
     }
 
     public enum WithdrawalMessageStatus
@@ -1860,5 +1865,17 @@ namespace BackendSite.Service.Model.enums
     {
         Daily = 1,
         Weekly = 2
+    }
+
+    public enum UpgradeSettingEnum 
+    {
+        [Description("Monthly Minimum Deposit")]
+        UpDeposit = 0,
+        [Description("Tier Upgrade Bonus")]
+        UpBonus = 1,
+        [Description("Minimum Deposit Within Validity Period")]
+        DownDeposit = 2,
+        [Description("Minimum Turnover Within Validity Period")]
+        DownTurnover = 3,
     }
 }

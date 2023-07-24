@@ -3,6 +3,7 @@ using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         #region Constructor
-        
+
 
         #endregion
 
@@ -45,6 +46,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             public IFormFile ExcelUpload { get; set; }
         }
 
+        public class GetUpgradeSettingRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+
+        public class SetUpgradeSettingRequest
+        {
+            public int Level { get; set; }
+            public decimal UpDeposit { get; set; }
+            public decimal UpBonus { get; set; }
+            public decimal DownDeposit { get; set; }
+            public decimal DownTurnover { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -174,5 +189,40 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
         }
 
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<VipUpgradeSetting>>> GetUpgradeSetting(GetUpgradeSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<VipUpgradeSetting>>
+            {
+                Data = await _vipLevelBll.GetUpgradeSetting(request.SiteId, request.CurrencyId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> SetUpgradeSetting(ApiRequestWithLog<VipUpgradeSetting> req)
+        {
+            var result = await _vipLevelBll.SetUpgradeSetting(
+                new ParamsWithLog<VipUpgradeSetting>(req, User.Identity.Name));
+            return new ApiResult
+            {
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<int>>> GetVipUpgradeSupportCurrency(GetUpgradeSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<int>>
+            {
+                Data = await _vipLevelBll.GetVipUpgradeSupportCurrency(request.SiteId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
     }
 }
