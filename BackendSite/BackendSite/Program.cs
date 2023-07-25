@@ -2,7 +2,6 @@ using Serilog;
 using Serilog.Exceptions;
 using BackendSite.Extensions;
 using BackendSite;
-using Elastic.Apm.SerilogEnricher;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddRemoteJsonConfig(builder.Configuration.GetSection("ConfigService").Get<string[]>());
@@ -13,7 +12,6 @@ builder.Host.UseSerilog((context, Configuration) =>
 {
     Configuration
         .ReadFrom.Configuration(builder.Configuration)
-        .Enrich.WithElasticApmCorrelationInfo()
         .Enrich.FromLogContext()
         .Filter.ByExcluding(c =>
             c.Properties.Any(p =>
