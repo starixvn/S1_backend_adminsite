@@ -1,6 +1,10 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using System.Collections;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 using StackExchange.Redis;
+using YamlDotNet.Core.Tokens;
 
 namespace BackendSite.Service.Library
 {
@@ -9,24 +13,24 @@ namespace BackendSite.Service.Library
         private readonly ILogger<ICacheHelper> _logger;
         private readonly IConnectionMultiplexer _multiplexer;
         private readonly string[] _charsToRemove = { "[", "]", "/", " ", ",", "\r\n" };
-        
+
         public RedisCacheHelper(IServiceProvider provider)
         {
             _logger = provider.GetRequiredService<ILogger<ICacheHelper>>();
             _multiplexer = provider.GetRequiredService<IConnectionMultiplexer>();
         }
 
-        public TItem TryGetOrCreate<TItem>(string key, TimeSpan? timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.Admin) 
+        public TItem TryGetOrCreate<TItem>(string key, TimeSpan? timeSpan, Func<TItem> factory, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
             try
-            {                      
+            {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
-                
+
                 if (!db.KeyExists(key))
                 {
                     var result = factory();
-                    if (result != null)
+                    if (HasData(result))
                     {
                         db.StringSet(key, JsonConvert.SerializeObject(result), timeSpan);
                     }
@@ -38,22 +42,22 @@ namespace BackendSite.Service.Library
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,$"{key} | {ex.Message}");
+                _logger.LogError(ex, $"{key} | {ex.Message}");
                 return factory();
             }
         }
-        
+
         public async Task<TItem> TryGetOrCreateAsync<TItem>(string key, TimeSpan? timeSpan, Func<Task<TItem>> factory, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
             try
-            {                      
+            {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
-                
+
                 if (!db.KeyExists(key))
                 {
                     var result = await factory();
-                    if (result != null)
+                    if (HasData(result))
                     {
                         await db.StringSetAsync(key, JsonConvert.SerializeObject(result), timeSpan);
                     }
@@ -74,7 +78,7 @@ namespace BackendSite.Service.Library
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
             try
-            {           
+            {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 return await db.StringSetAsync(key, value, timeSpan);
             }
@@ -82,7 +86,7 @@ namespace BackendSite.Service.Library
             {
                 _logger.LogError(ex, $"{key} | {ex.Message}");
                 return false;
-            }       
+            }
         }
 
         public bool KeyExists(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
@@ -92,6 +96,21 @@ namespace BackendSite.Service.Library
             {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 return db.KeyExists(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> KeyExistsAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                return await db.KeyExistsAsync(key);
             }
             catch (Exception ex)
             {
@@ -116,8 +135,24 @@ namespace BackendSite.Service.Library
             }
         }
 
-        public List<TItem> GetCacheList<TItem>(IEnumerable<string> keys, RedisDataBase redisDataBase = RedisDataBase.Admin)
-        {            
+        public async Task<string> StringGetAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                var json = await db.StringGetAsync(key);
+                return json.ToString();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return default;
+            }
+        }
+
+        public IEnumerable<TItem> GetCacheList<TItem>(IEnumerable<string> keys, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
             try
             {
                 var taskList = new List<Task<RedisValue>>();
@@ -132,13 +167,13 @@ namespace BackendSite.Service.Library
 
                 trans.Execute();
 
-                var reslstList = new List<TItem>();
+                var reslstList = Enumerable.Empty<TItem>();
                 foreach (var task in taskList)
                 {
                     if (task.Result.HasValue)
                     {
                         var data = JsonConvert.DeserializeObject<TItem>(task.Result);
-                        reslstList.Add(data);
+                        reslstList = reslstList.Concat(new[] { data });
                     }
                 }
                 return reslstList;
@@ -159,7 +194,7 @@ namespace BackendSite.Service.Library
                 var trans = db.CreateTransaction();
                 foreach (var data in dataList)
                 {
-                    var key = $"{redisDataBase}:{RemoveSpecialChars(data.Key)}";                
+                    var key = $"{redisDataBase}:{RemoveSpecialChars(data.Key)}";
                     var task = db.StringSetAsync(key, JsonConvert.SerializeObject(data.Value), timeSpan);
                     taskList.Add(task);
                 }
@@ -175,24 +210,21 @@ namespace BackendSite.Service.Library
         public bool InsertList<TItem>(string key, TimeSpan? timeSpan, IEnumerable<TItem> list, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             try
-            {        
+            {
                 if (list == null)
                 {
                     return false;
                 }
 
-                key = $"{redisDataBase}:{RemoveSpecialChars(key)}";          
-                var taskList = new List<Task<long>>();
+                key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
-                var trans = db.CreateTransaction();
-            
+
                 foreach (var item in list)
                 {
-                    var task = db.ListRightPushAsync(key, JsonConvert.SerializeObject(item));
-                    taskList.Add(task);
+                    db.ListRightPush(key, JsonConvert.SerializeObject(item), flags: CommandFlags.FireAndForget);
                 }
                 db.KeyExpire(key, timeSpan);
-                return trans.Execute();
+                return true;
             }
             catch (Exception ex)
             {
@@ -201,25 +233,56 @@ namespace BackendSite.Service.Library
             }
         }
 
-        public List<TItem> GetListByRange<TItem>(string key, long startIndex, long endIndex, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        public IEnumerable<TItem> GetListByRange<TItem>(string key, long startIndex, long endIndex, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             try
-            {      
-                var result = new List<TItem>();
+            {
+                var result = Enumerable.Empty<TItem>();
                 key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
-                var db = _multiplexer.GetDatabase((int)redisDataBase);           
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
                 if (!db.KeyExists(key))
                 {
                     return result;
                 }
 
-                var list = db.ListRange(key, startIndex, endIndex);        
+                var list = db.ListRange(key, startIndex, endIndex);
                 foreach (var item in list)
                 {
                     if (item.HasValue)
                     {
                         var data = JsonConvert.DeserializeObject<TItem>(item);
-                        result.Add(data);
+                        result = result.Concat(new[] { data });
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return default;
+            }
+        }
+
+        public async Task<IEnumerable<TItem>> GetListByRangeAsync<TItem>(string key, long startIndex, long endIndex,
+            RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            try
+            {
+                var result = Enumerable.Empty<TItem>();
+                key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                if (!db.KeyExists(key))
+                {
+                    return result;
+                }
+
+                var list = await db.ListRangeAsync(key, startIndex, endIndex);
+                foreach (var item in list)
+                {
+                    if (item.HasValue)
+                    {
+                        var data = JsonConvert.DeserializeObject<TItem>(item);
+                        result = result.Concat(new[] { data });
                     }
                 }
                 return result;
@@ -234,7 +297,7 @@ namespace BackendSite.Service.Library
         public long GetListLength(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             try
-            {           
+            {
                 key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 return db.ListLength(key);
@@ -261,6 +324,21 @@ namespace BackendSite.Service.Library
             }
         }
 
+        public async Task<bool> KeyDeleteAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                return await db.KeyDeleteAsync(key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return false;
+            }
+        }
+
         public long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
@@ -278,6 +356,64 @@ namespace BackendSite.Service.Library
             }
         }
 
+        public async Task<long> KeyDeleteByPatternAsync(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                var server = _multiplexer.GetServer(_multiplexer.GetEndPoints().First());
+                var keys = server.Keys((int)redisDataBase, keyPattern).ToArray();
+                return await db.KeyDeleteAsync(keys);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{keyPattern} | {ex.Message}");
+                return 0;
+            }
+        }
+
+        public async Task<RedisSetAndGetResult> StringSetAndGetAsync(string key, string value, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            var result = new RedisSetAndGetResult() { Success = true, Value = value };
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            RedisKey[] keys = { $"{key}" };
+            RedisValue[] values = { value };
+
+            // 如果 key 存在，回傳 Value，如果 Key 不存在，則 Set Key，並回傳該次 Set 的 Value
+            var LuaScript = @"
+            local value = redis.call(""GET"", KEYS[1])
+            if (not value) then
+                redis.call(""SET"", KEYS[1], ARGV[1])
+            return ARGV[1]
+            end
+            return value";
+
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            var returnValue = await db.ScriptEvaluateAsync(LuaScript, keys, values);
+
+            if (returnValue.ToString() != value)
+            {
+                result.Success = false;
+                result.Value = returnValue.ToString(); // redis origin value
+            }
+
+            return result;
+        }
+
+        public async Task<bool> ExecuteLuaScriptAsync(string script, string key, string value, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            RedisKey[] keys = { $"{key}" };
+            RedisValue[] values = { value };
+
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            var execResult = await db.ScriptEvaluateAsync(script, keys, values);
+
+            return (execResult.ToString() == "1");
+        }
+
+
         private string RemoveSpecialChars(string key)
         {
             foreach (var c in _charsToRemove)
@@ -286,6 +422,21 @@ namespace BackendSite.Service.Library
             }
 
             return key;
+        }
+
+        private bool HasData<T>(T obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            return obj switch
+            {
+                ICollection collection => collection.Count > 0,
+                string str => !string.IsNullOrEmpty(str),
+                _ => true
+            };
         }
     }
 }

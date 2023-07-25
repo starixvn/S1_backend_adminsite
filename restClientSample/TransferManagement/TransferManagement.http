@@ -1,0 +1,159 @@
+# localhost
+# @url=http://localhost:9158
+
+# AdminSite DEV
+@url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得轉帳帳戶列表
+# purposes | 搜尋全部時傳空陣列
+# sysIds | 因為sysId改為會有null值，搜尋全部時請傳空陣列
+POST {{url}}/apiV2/BankTransferAccount/GetList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyIds": [2, 4, 15, 51],
+    "channels": [1, 2, 3, 6],
+    "agent": "",
+    "status": [0, 1, 2, 3],
+    "purposes": [],
+    "sysIds": [],
+    "accountNo": ""
+}
+
+###
+# 匯出轉帳帳戶列表
+# purposes | 搜尋全部時傳空陣列
+# sysIds | 因為sysId改為會有null值，搜尋全部時請傳空陣列
+POST {{url}}/apiV2/BankTransferAccount/Export HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1,
+    "currencyIds": [2, 4, 15, 51],
+    "channels": [1, 2, 3, 6],
+    "agent": "",
+    "status": [0, 1, 2, 3],
+    "purposes": [],
+    "sysIds": [],
+    "accountNo": ""
+}
+
+###
+# 取得轉帳帳戶資訊
+POST {{url}}/apiV2/BankTransferAccount/GetById HTTP/1.1
+Content-Type: application/json
+
+{
+    "id": 511
+}
+
+###
+# 取得轉帳帳戶原因(?)
+POST {{url}}/apiV2/BankTransferAccount/GetTransferAccountReason HTTP/1.1
+Content-Type: application/json
+
+
+###
+# 新增(Id=0)/更新轉帳帳戶資訊
+# accountCode 現在只 for INR IFSC.使用
+# channel 為 LocalBank 時 accountNo 為必填且只能填入數字，其他 channel 不限制
+# purposes 在 channel 為 6(CryptoWallet) 時只能選擇 2(Withdrawal)、3(Transfer)
+# payId 在 channel 為 3(PSP) 時才必填
+# sysId 在 channel 為 1(LocalBank) 時才必填
+# cryptoCurrencyId、network在 channel 為 6(CryptoWallet)時必填
+POST {{url}}/apiV2/BankTransferAccount/Set HTTP/1.1
+Content-Type: application/json
+
+{
+    "id": 511,
+    "siteId": 1,
+    "currencyId": 2,
+    "sysId": null,
+    "purposes": [2,3],
+    "channel": 6,
+    "agent": "Billy",
+    "payId": null,
+    "cryptoCurrencyId": 96,
+    "network": "ETH",
+    "accountNo": "ETH-0x23E717D9401C96cD987fCc746Ed998de83f15Ccf",
+    "accountName": "ATest",
+    "accountCode": "",
+    "displayName": "Nova88-MYR-ATest-ETH-5Ccf",
+    "frontendDisplayName": "0x23E717D9401C96cD987fCc746Ed998de83f15Ccf",
+    "initialAmount": 0,
+    "initialTime": "2022-11-01T00:00:00+08:00",
+    "maxBalanceAlertAmount": 0,
+    "reason": 1,
+    "remark": null,
+    "status": 2,
+    "bankLoginUrl": "",
+    "bankLoginAccount": "",
+    "bankLoginPassword": "",
+    "transferPin": "",
+    "loginPin": "",
+    "mobilePin": "",
+    "corporateID": ""
+}
+
+###
+# 取得所有銀行
+POST {{url}}/apiV2/GetAllData/GetBankInfoSys HTTP/1.1
+Content-Type: application/json
+
+###
+# 取得渠道列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferChannelEnum"
+}
+
+###
+# 取得狀態列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferAccountStatusEnum"
+}
+
+###
+# 取得目的列表
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "TransferAccountPurposeEnum"
+}
+
+###
+# 取得加密貨幣列表
+POST {{url}}/apiV2/GetAllData/GetCryptoInfoData HTTP/1.1
+Content-Type: application/json
+
+###
+# 取得金流商列表
+POST {{url}}/apiV2/BankTransferAccount/GetPayList HTTP/1.1
+Content-Type: application/json
+
+###
+# 取得 Agent 列表
+POST {{url}}/apiV2/BankTransferAccount/GetAgentList HTTP/1.1
+Content-Type: application/json
+
+{
+    "siteId": 1
+}

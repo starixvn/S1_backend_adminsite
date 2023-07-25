@@ -31,13 +31,17 @@ namespace BackendSite.Service.DAL
         public async Task Commit()
         {
             await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
             await _connection.CloseAsync();
+            await _connection.DisposeAsync();
         }
 
         public async Task RollBack()
         {
             await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
             await _connection.CloseAsync();
+            await _connection.DisposeAsync();
         }
 
         /// <summary>
@@ -67,7 +71,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public Task<int> SetWorldCupPrediction()
         {
-            return _mainDbClient.ExecuteAsync("Admin_WorldCupPredictionSetting_Set", null, _connection, _transaction);
+            return _mainDbClient.ExecuteAsync("Admin_WorldCupPredictionSetting_Set", _transaction, null);
         }
 
         /// <summary>
@@ -81,7 +85,7 @@ namespace BackendSite.Service.DAL
             parameters.Add("_TeamId", setData.TeamId, dbType: DbType.Int64);
             parameters.Add("_LevelName", setData.LevelName, dbType: DbType.String);
             parameters.Add("_Sort", setData.Sort, dbType: DbType.Int64);
-            return _mainDbClient.ExecuteAsync("Admin_WorldCupPredictionSetting_Ins", parameters, _connection, _transaction);
+            return _mainDbClient.ExecuteAsync("Admin_WorldCupPredictionSetting_Ins", _transaction, parameters);
         }
 
         public IEnumerable<WorldCupMemberReportDto> GetMemberReport(GetWorldCupMemberReportRequest request, out int totalPages, out int rowCount)

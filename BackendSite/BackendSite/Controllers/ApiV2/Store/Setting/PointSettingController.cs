@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.PointSetting;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Store.Setting
@@ -21,14 +15,14 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
     {
         private readonly PointSettingBLL _pointSettingBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
-        private readonly UserBetLimitBLL _userBetLimitBll;
+        private readonly TpBLL _tpBLL;
         private readonly VipLevelBLL _vipLevelBll;
 
         public PointSettingController(IServiceProvider provider)
         {
             _pointSettingBll = provider.GetRequiredService<PointSettingBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
-            _userBetLimitBll = provider.GetRequiredService<UserBetLimitBLL>();
+            _tpBLL = provider.GetRequiredService<TpBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
         }
 
@@ -213,7 +207,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
 
             if (result.ErrorCode == (int) ErrorCodeEnum.Success)
             {
-                var typeList = await _userBetLimitBll.GetTpGameTypeListbyCategoryAsync(request.TpCategoryId);
+                var typeList = await _tpBLL.GetTpGameTypeListbyCategoryAsync(request.TpCategoryId);
                 var beforeData = before.Data.Any() 
                     ? JsonConvert.SerializeObject(new
                     {

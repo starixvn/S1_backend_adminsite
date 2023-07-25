@@ -10,6 +10,7 @@ namespace BackendSite.Service.Model
     public class DashBoard
     {
     }
+
     public class DashBoardData
     {
         public int OnlinePlayers { get; set; }

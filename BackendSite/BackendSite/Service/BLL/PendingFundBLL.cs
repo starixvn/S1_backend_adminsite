@@ -47,34 +47,7 @@ namespace BackendSite.Service.BLL
         {
             var serverInfo = serverInfoService.GetModel();
             return pendingFundService.PendingFundList(serverInfo.SiteId);
-        }
-
-        public async Task<ApiResult<TransferResult>> ProcessAsync(PendingFund pendingFund)
-        {
-            var serverInfo = serverInfoService.GetModel();
-            pendingFund.Balance = walletService.GetBalance(pendingFund.CustId);
-            var apiResult = new ApiResult<TransferResult>();
-
-            if (pendingFund.Balance > 0)
-            {
-                var tpTransfer = new TpTransfer
-                {
-                    TpId = 1,
-                    CustId = pendingFund.CustId,
-                    Amount = pendingFund.Balance,
-                    direction = TpDirection.ToTp,
-                    inputs = new Dictionary<string, string>()
-                };
-                var myUrl = $"{apiUrl}Transfer";
-                apiResult = await courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, tpTransfer);
-            }
-            else
-            {
-                apiResult.Message = "Balance less than 0";
-            }
-
-            return apiResult;
-        }
+        } 
 
         public class TpBonusTransfer
         {
@@ -106,25 +79,6 @@ namespace BackendSite.Service.BLL
 
             var myUrl = $"{apiUrl}BonusTransfer";
             var apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
-            return apiResult;
-        }
-
-        public ApiResult BonusCancel(int bonusId)
-        {
-            var apiResult = new ApiResult();
-
-            var result = _bonusInfoBLL.CancelBonusByBonusId(bonusId, out var custId);
-            if (result > 0)
-            {
-                var userData = _authorizeBLL.GetAuthData();
-                var Menu = "Pending Bonus/Cancel";
-                var Info = new Dictionary<string, dynamic>();
-                Info.Add("MenuName", "Customer Info");
-                Info.Add("Action", "Cancel Bonus");
-                _serverInfoBLL.AdminOperateLog(null, custId, Menu, ActionType.Update, Info, userData.UserName);
-                apiResult.ErrorCode = 0;
-            }
-
             return apiResult;
         }
 

@@ -16,7 +16,7 @@ using System.Net;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class WithdrawalAccountingController : ControllerBase
@@ -91,22 +91,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public class SetWithdrawalAccountingRequest
         {
             public int Id { get; set; }
-
             public string TransId { get; set; }
-
             public int Seq { get; set; }
-
             public string BankAccountNo { get; set; }
-
             public decimal Amount { get; set; }
-
             public decimal ChargeFee { get; set; }
-
             public string Memo { get; set; }
-
-
             public int UploadPicTimes { get; set; }
-
             public int Creator { get; set; }
         }
 
@@ -208,7 +199,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.UserName);
 
 
-            var stream = _excelBll.Export(data);
+            var stream = _excelBll.ExportV2(data);
 
             return _excelBll.ExcelFile(stream, "WithdrawalInfoAndAccountList");
         }
@@ -484,7 +475,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 out var newUploadPictureTimes);
             if (result)
             {
-                var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
+                var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
                 var bytes = Convert.FromBase64String(pictureBaseOnSixFour);
                 var stream = new MemoryStream(bytes);
 

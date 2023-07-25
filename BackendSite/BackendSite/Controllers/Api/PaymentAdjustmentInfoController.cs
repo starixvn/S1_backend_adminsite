@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Controllers.Api
 {
@@ -13,10 +14,13 @@ namespace BackendSite.Controllers.Api
     public class PaymentAdjustmentInfoController : Controller
     {
         private readonly PaymentAdjustmentReportBLL paymentAdjustmentBLL;
+        private readonly BankFinancialBLL bankFinancialBll;
 
-        public PaymentAdjustmentInfoController(PaymentAdjustmentReportBLL paymentAdjustmentBLL, ExcelBLL excelBLL)
+        public PaymentAdjustmentInfoController(PaymentAdjustmentReportBLL paymentAdjustmentBLL,BankFinancialBLL bankFinancialBll, ExcelBLL excelBLL)
         {
             this.paymentAdjustmentBLL = paymentAdjustmentBLL;
+            this.bankFinancialBll = bankFinancialBll;
+            
         }
         public class GetAdjustmentInfoReq
         {
@@ -25,6 +29,11 @@ namespace BackendSite.Controllers.Api
             public long? EndDate { get; set; }
             public string RefTransId { get; set; }
             public int PageNumber { get; set; }
+        }
+        
+        public class GetReasonByFuncKeyRequest
+        {
+            public string FuncKey { get; set; }
         }
         /// <summary>
         /// 
@@ -79,6 +88,22 @@ namespace BackendSite.Controllers.Api
             };
 
             return apiListResult;
+        }
+        
+        /// <summary>
+        /// PaymentAdjustmentInfo/GetReasonList 取得原因碼清單
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<BankFinancialReasonModel>> GetReasonList(GetReasonByFuncKeyRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<BankFinancialReasonModel>>();
+
+            apiResult.Data = bankFinancialBll.GetReason(request.FuncKey);
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
+            return apiResult;
         }
     }
 }

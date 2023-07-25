@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.Api
 {
@@ -19,6 +20,7 @@ namespace BackendSite.Controllers.Api
         private readonly CustInfoBLL _custInfoBLL;
         private readonly AuthorizeBLL _authorizeBLL;
         private readonly ExcelBLL _excelBLL;
+        private readonly ServerInfoBLL _serverInfoBLL;
 
         #endregion
 
@@ -27,12 +29,14 @@ namespace BackendSite.Controllers.Api
         public VipLevelController(VipLevelBLL vipLevelBLL,
             CustInfoBLL custInfoBLL,
             AuthorizeBLL authorizeBLL,
-            ExcelBLL excelBLL)
+            ExcelBLL excelBLL,
+            ServerInfoBLL serverInfoBLL)
         {
             _vipLevelBLL = vipLevelBLL;
             _custInfoBLL = custInfoBLL;
             _authorizeBLL = authorizeBLL;
             _excelBLL = excelBLL;
+            _serverInfoBLL = serverInfoBLL;
         }
 
         #endregion
@@ -248,12 +252,30 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<VipUpgradeReviewDetailModel> GetVipUpgradeReviewList(VipUpgradeReviewParameter request)
         {
+            var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x=> x.SiteId == request.SiteId);
+            var currencyIdList = new List<int>();
+            currencyIdList.AddRange(siteInfo.ICurrencyList);
+            var statusList = new List<int>();
+            if (request.Status == 0)
+            {
+                statusList.Add((int)VipStatus.Pending);
+                statusList.Add((int)VipStatus.Approved);
+                statusList.Add((int)VipStatus.Rejected);
+                statusList.Add((int)VipStatus.Settled);
+            }
+            else
+            {
+                statusList.Add((int)request.Status);
+            }
+
             var result = _vipLevelBLL.GetVipUpgradeReviewList(request.SiteId,
                 request.CalculateYearMonth,
-                request.Status,
+                JsonConvert.SerializeObject(statusList),
                 request.UserName,
                 request.PageNumber,
-                request.PageSize);
+                request.PageSize,
+                JsonConvert.SerializeObject(currencyIdList));
+
 
             foreach (var data in result.Data)
             {
@@ -279,10 +301,29 @@ namespace BackendSite.Controllers.Api
             int Status,
             string UserName)
         {
+            var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == SiteId);
+            var currencyIdList = new List<int>();
+            currencyIdList.AddRange(siteInfo.ICurrencyList);
+            var statusList = new List<int>();
+            if (Status == 0)
+            {
+                statusList.Add((int)VipStatus.Pending);
+                statusList.Add((int)VipStatus.Approved);
+                statusList.Add((int)VipStatus.Rejected);
+                statusList.Add((int)VipStatus.Settled);
+            }
+            else
+            {
+                statusList.Add(Status);
+            }
+
             var data = _vipLevelBLL.ExportVipUpgradeReviewList(SiteId,
                 YearMonth,
-                (VipStatus)Status,
-                UserName);
+                JsonConvert.SerializeObject(statusList),
+                UserName,
+                JsonConvert.SerializeObject(currencyIdList));
+
+
 
             var exportList = data.Select(d => new ExportVipUpgradeReviewModel
                 {
@@ -305,7 +346,7 @@ namespace BackendSite.Controllers.Api
                     QualifiedTime = d.QualifiedTime == null ? "First Time Upgrade" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
                     LastUpdateUser = d.LastUpdateUser
                 }).ToList();
-            var stream = _excelBLL.Export(exportList);
+            var stream = _excelBLL.ExportV2(exportList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipUpgrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -340,9 +381,26 @@ namespace BackendSite.Controllers.Api
         [HttpPost]
         public ApiListResult<VipDowngradeReviewDetailModel> GetVipDowngradeReviewList(VipDowngradeReviewParameter request)
         {
+            var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == request.SiteId);
+            var currencyIdList = new List<int>();
+            currencyIdList.AddRange(siteInfo.ICurrencyList);
+            var statusList = new List<int>();
+            if (request.Status == 0)
+            {
+                statusList.Add((int)VipStatus.Pending);
+                statusList.Add((int)VipStatus.Approved);
+                statusList.Add((int)VipStatus.Rejected);
+                statusList.Add((int)VipStatus.Settled);
+            }
+            else
+            {
+                statusList.Add((int)request.Status);
+            }
+
             var result = _vipLevelBLL.GetVipDowngradeReviewList(request.SiteId,
                 request.CalculateYearMonth,
-                request.Status,
+                JsonConvert.SerializeObject(statusList),
+                JsonConvert.SerializeObject(currencyIdList),
                 request.UserName,
                 request.PageNumber,
                 request.PageSize);
@@ -384,10 +442,28 @@ namespace BackendSite.Controllers.Api
             int Status,
             string UserName)
         {
+            var siteInfo = _serverInfoBLL.GetSiteList().FirstOrDefault(x => x.SiteId == SiteId);
+            var currencyIdList = new List<int>();
+            currencyIdList.AddRange(siteInfo.ICurrencyList);
+            var statusList = new List<int>();
+            if (Status == 0)
+            {
+                statusList.Add((int)VipStatus.Pending);
+                statusList.Add((int)VipStatus.Approved);
+                statusList.Add((int)VipStatus.Rejected);
+                statusList.Add((int)VipStatus.Settled);
+            }
+            else
+            {
+                statusList.Add(Status);
+            }
+
             var data = _vipLevelBLL.ExportVipDowngradeReviewList(SiteId,
                 CalculateYearMonth,
-                (VipStatus)Status,
+                JsonConvert.SerializeObject(statusList),
+                JsonConvert.SerializeObject(currencyIdList),
                 UserName);
+
 
             var exportList = data.Select(d => new ExportVipDowngradeReviewDataModel
             {
@@ -411,7 +487,7 @@ namespace BackendSite.Controllers.Api
                 QualifiedTime = d.QualifiedTime == null ? "" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, new TimeSpan(8, 0, 0)).AddHours(8).DateTime.ToString(),
                 LastUpdateUser = d.LastUpdateUser
             }).ToList();
-            var stream = _excelBLL.Export(exportList);
+            var stream = _excelBLL.ExportV2(exportList);
 
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipDowngrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");

@@ -1,9 +1,3 @@
-
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 ﻿using System.Text.RegularExpressions;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -13,6 +7,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
 
 namespace BackendSite.Service.BLL
 {
@@ -31,11 +26,11 @@ namespace BackendSite.Service.BLL
         private readonly BankDetailBLL _bankDetailBll;
         private readonly MySqlClient _mainDbClient;
         private readonly Common _common;
-        private readonly WalletService _walletService;
         private readonly ILogger<WithdrawalBLL> _logger;
         private readonly IConfiguration _configuration;
         private readonly string payApiUrl;
         private readonly CourierAdapter _courierAdapter;
+        private readonly PaymentManageService _paymentManageService;
 
         private readonly Dictionary<int, bool> _isConvert = new Dictionary<int, bool>()
         {
@@ -60,12 +55,12 @@ namespace BackendSite.Service.BLL
             _adjustmentLogReportBLL = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _logger = provider.GetRequiredService<ILogger<WithdrawalBLL>>();
             _common = provider.GetRequiredService<Common>();
-            _walletService = provider.GetRequiredService<WalletService>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _configuration = provider.GetRequiredService<IConfiguration>();
             payApiUrl = _configuration.GetValue<string>("PayService");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _paymentManageService = provider.GetRequiredService<PaymentManageService>();
         }
 
         #endregion
@@ -76,24 +71,29 @@ namespace BackendSite.Service.BLL
             IEnumerable<int> withdrawalType,
             DateTime startDate,
             DateTime endDate,
+            WithdrawalDateTypeEnum dateType,
             string withdrawalId,
             IEnumerable<string> userNames,
             IEnumerable<int> currencyId,
             IEnumerable<int> status,
             IEnumerable<int> levelStatus,
             int pageSize,
-            int amounttype,
-            string amount,
+            decimal startAmount,
+            decimal endAmount,
             int pageNumber,
             WithdrawalMethodEnum withdrawalMethod,
+            IEnumerable<string> selectBankCode,
+            IEnumerable<int> selectCalCode,
+            string agent,
             out int totalPages,
             out int rowCount,
-            ref List<string> currencyAmount)
+            ref List<TotalAmount> currencyAmount)
         {
             return _withdrawalService.GetWithdrawalRequestList(selectSite,
                 withdrawalType,
                 startDate,
                 endDate,
+                dateType,
                 withdrawalId,
                 userNames,
                 currencyId,
@@ -101,9 +101,12 @@ namespace BackendSite.Service.BLL
                 levelStatus,
                 Math.Abs(pageSize) * (Math.Abs(pageNumber) - 1),
                 pageSize,
-                amounttype,
-                amount,
+                startAmount,
+                endAmount,
                 withdrawalMethod,
+                selectBankCode, 
+                selectCalCode,
+                agent,
                 out totalPages,
                 out rowCount,
                 ref currencyAmount);
@@ -116,7 +119,7 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.GetWithdrawalRequest(withdrawalId);
         }
 
-        public IEnumerable<Comments> GetWithdrawalRequestComment(string transId)
+        public IEnumerable<WithdrawalComments> GetWithdrawalRequestComment(string transId)
         {
             var withdrawalRequest = GetWithdrawalRequest(transId);
             var results = _withdrawalService.GetWithdrawalRequestComment(withdrawalRequest.WithdrawalId,
@@ -124,204 +127,7 @@ namespace BackendSite.Service.BLL
             return results;
         }
 
-        public int WithdrawalApproved(string transId, string comment, string updater, int userId, bool hasPic)
-        {
-            var forStatus = new List<int> { (int)WithdrawalStatusEnum.Process };
-
-            var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-
-            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
-            {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
-                throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Process Can Set.");
-            }
-
-            var withdrawalInfo =
-                JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalRequest.WithdrawalInfo);
-            withdrawalInfo.CurrencyId = withdrawalRequest.CurrencyId;
-            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-                JsonConvert.SerializeObject(forStatus), updater,
-                WithdrawalStatusEnum.Approved, JsonConvert.SerializeObject(withdrawalInfo),
-                withdrawalRequest.WithdrawalType, out _, out _, userId, hasPic);
-        }
-
-        public int WithdrawalRejected(string transId, string comment, string updater)
-        {
-            var forStatus = new List<int>
-            {
-                (int) WithdrawalStatusEnum.OnHold,
-                (int) WithdrawalStatusEnum.Verify,
-                (int) WithdrawalStatusEnum.ToKyc,
-                (int) WithdrawalStatusEnum.Pending
-            };
-
-            var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-
-            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
-            {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
-                throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only OnHold, Verify, ToKyc, Pending Can Set.");
-            }
-
-            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-                JsonConvert.SerializeObject(forStatus), updater,
-                WithdrawalStatusEnum.Rejected, null, null, out _, out _);
-        }
-
-        public int WithdrawalVerify(string transId, string comment, string updater)
-        {
-            var forStatus = new List<int>
-            {
-                (int) WithdrawalStatusEnum.Pending,
-                (int) WithdrawalStatusEnum.OnHold,
-                (int) WithdrawalStatusEnum.Process
-                //(int)WithdrawalStatus.ToKyc
-            };
-
-            var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-
-            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
-            {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
-                throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending, OnHold, Process Can Set.");
-            }
-
-            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-                JsonConvert.SerializeObject(forStatus), updater,
-                WithdrawalStatusEnum.Verify, null, null, out _, out _);
-        }
-
-        public int WithdrawalProcess(string transId, string comment, string updater, string withdrawalInfo,
-            int? withdrawalType, out int custId, out decimal amount)
-        {
-            var forStatus = new List<int>
-            {
-                (int) WithdrawalStatusEnum.Verify
-            };
-
-            var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-
-            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
-            {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
-                throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Verify Can Set.");
-            }
-
-            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-                JsonConvert.SerializeObject(forStatus), updater,
-                WithdrawalStatusEnum.Process, withdrawalInfo, withdrawalType, out custId, out amount);
-        }
-
-        public int WithdrawalOnHold(string transId, string comment, string updater)
-        {
-            var forStatus = new List<int>
-            {
-                (int) WithdrawalStatusEnum.Pending
-                //(int)WithdrawalStatus.Verify
-                //(int)WithdrawalStatus.ToKyc
-            };
-
-            var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-
-            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
-            {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
-                throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending Can Set.");
-            }
-
-            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-                JsonConvert.SerializeObject(forStatus), updater,
-                WithdrawalStatusEnum.OnHold, null, null, out _, out _);
-        }
-
-        public int WithdrawalDraft(string transId, string comment, string updater)
-        {
-            var forStatus = new List<int>
-            {
-                (int) WithdrawalStatusEnum.Pending,
-                (int) WithdrawalStatusEnum.OnHold,
-                (int) WithdrawalStatusEnum.Verify,
-                (int) WithdrawalStatusEnum.Process,
-                (int) WithdrawalStatusEnum.ToKyc,
-                (int) WithdrawalStatusEnum.Cancelled,
-                (int) WithdrawalStatusEnum.Rejected,
-                (int) WithdrawalStatusEnum.Approved
-            };
-
-            var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-                JsonConvert.SerializeObject(forStatus),
-                updater,
-                WithdrawalStatusEnum.Draft, null, null, out _, out _);
-        }
-
-        public int WithdrawalPending(string transId, string comment, string updater)
-        {
-            var forStatus = new List<int>
-            {
-                (int) WithdrawalStatusEnum.Verify,
-                (int) WithdrawalStatusEnum.ToKyc
-                //(int)WithdrawalStatus.OnHold
-            };
-
-            var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-
-            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
-            {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
-                throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Verify, ToKyc Can Set.");
-            }
-
-            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-                JsonConvert.SerializeObject(forStatus),
-                updater,
-                WithdrawalStatusEnum.Pending, null, null, out _, out _);
-        }
-
-        public int WithdrawalToKyc(string transId, string comment, string updater)
-        {
-            var forStatus = new List<int>
-            {
-                (int) WithdrawalStatusEnum.Pending,
-                (int) WithdrawalStatusEnum.OnHold
-            };
-            var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var withdrawalId);
-            var withdrawalRequest = _withdrawalService.GetWithdrawalRequest(withdrawalId);
-
-            if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
-            {
-                var status = (WithdrawalStatusEnum)withdrawalRequest.Status;
-                throw new AdminException(ErrorCodeEnum.Fail,
-                    $"This Withdrawal Flow is Wrong.This Status is {status.ToString()} and Only Pending And OnHold Can Set.");
-            }
-
-            return _withdrawalService.SetWithdrawalInfoFlow(transId, withdrawalRequest.SiteId, comment,
-            JsonConvert.SerializeObject(forStatus),
-            updater,
-            WithdrawalStatusEnum.ToKyc, null, null, out _, out _);
-        }
-
+        
         public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int custId,
             string transId,
             int? status,
@@ -331,7 +137,9 @@ namespace BackendSite.Service.BLL
             int pageNumber,
             out int totalPages,
             out int rowCount,
-            ref List<string> currencyAmount)
+            out decimal totalAmount,
+            out decimal totalApproveAmount,
+            out int totalApproveRow)
         {
             return _withdrawalService.GetWithdrawalListByCust(custId,
                 transId,
@@ -339,19 +147,49 @@ namespace BackendSite.Service.BLL
                 startDate,
                 endDate,
                 Math.Abs(pageSize),
-                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                 out totalPages,
-                 out rowCount,
-                 ref currencyAmount);
+                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
+                out totalPages,
+                out rowCount,
+                out totalAmount,
+                out totalApproveAmount,
+                out totalApproveRow);
         }
 
-        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(string selectSite, string withdrawalType,
-            DateTime startDate, DateTime endDate, string withdrawalId, string userName, string currencyId, string status,
-            string levelStatus, int AmountType, string Amount,
+        public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(
+            string selectSite,
+            string withdrawalType,
+            DateTime startDate, 
+            DateTime endDate, 
+            WithdrawalDateTypeEnum dateType,
+            string withdrawalId, 
+            string userName, 
+            string currencyId,
+            string status,
+            string levelStatus,
+            decimal startAmount,
+            decimal endAmount,
+            string selectBankCode,
+            string selectCalCode,
+            string agent,
             WithdrawalMethodEnum withdrawalMethod)
         {
-            return _withdrawalService.GetWithdrawalExportList(selectSite, withdrawalType, startDate, endDate,
-                withdrawalId, userName, currencyId, status, levelStatus, AmountType, Amount, withdrawalMethod);
+            return _withdrawalService.GetWithdrawalExportList(
+                selectSite,
+                withdrawalType,
+                startDate, 
+                endDate,
+                dateType,
+                withdrawalId, 
+                userName, 
+                currencyId,
+                status,
+                levelStatus, 
+                startAmount,
+                endAmount,
+                selectBankCode, 
+                selectCalCode,
+                agent, 
+                withdrawalMethod);
         }
 
         public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(IEnumerable<int> siteId,
@@ -468,9 +306,9 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.DeleteWithdrawalLimit(siteId, currencyId);
         }
 
-        public bool UpdateWithdrawalPicCount(string transId)
+        public bool UpdateWithdrawalPicCount(string transId , int count)
         {
-            return _withdrawalService.UpdateWithdrawalPicCount(transId);
+            return _withdrawalService.UpdateWithdrawalPicCount(transId ,count);
         }
 
         public BankSlipPic GetWithdrawalPicCount(string transId)
@@ -478,9 +316,18 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.GetWithdrawalPicCount(transId);
         }
 
-        public WithdrawalTimeData WithdrawalTimeReportGet(WithdrawalTimeReportPara para)
+        public WithdrawalTimeData WithdrawalTimeReportGet(string selectSite,
+            string withdrawalId,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            string selectStatus,
+            string currencyIds,
+            int custId,
+            int pageNumber,
+            int pageSize,
+            out List<TotalAmount> currencyTotalAmount)
         {
-            var result = _withdrawalService.WithdrawalTimeReportGet(para);
+            var result = _withdrawalService.WithdrawalTimeReportGet(selectSite,withdrawalId, startDate, endDate, selectStatus, currencyIds, custId, pageNumber, pageSize, out currencyTotalAmount);
 
             result?.WithdrawalTimeList.ForEach(x =>
             {
@@ -505,14 +352,23 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<WithdrawalTimeExportData> WithdrawalTimeExportGet(string selectSite, string withdrawalId,
-            DateTime startDate, DateTime endDate, int status, int currencyId)
+        public async Task<IEnumerable<WithdrawalTimeExportData>> WithdrawalTimeExportGet(string selectSite, string withdrawalId,
+            DateTime startDate, DateTime endDate, string status, string currencyId, string memberId)
         {
             var exportDataToExcel = new List<WithdrawalTimeExportData>();
-            var siteList = JsonConvert.DeserializeObject<IEnumerable<int>>(selectSite);
+
+            int custId = 0;
+            if (!string.IsNullOrWhiteSpace(memberId))
+            {
+                var custSimpleInfo = await _custInfoBLL.GetCustId(null, memberId, JsonConvert.DeserializeObject<List<int>>(selectSite).FirstOrDefault());
+                if (custSimpleInfo != null)
+                    custId = custSimpleInfo.CustId;
+                else
+                    return exportDataToExcel;
+            }
 
             var result =
-                _withdrawalService.GetExportData(siteList, withdrawalId, startDate, endDate, status, currencyId);
+                _withdrawalService.GetExportData(selectSite, withdrawalId, startDate, endDate, status, currencyId, custId);
 
             if (result != null)
             {
@@ -707,15 +563,20 @@ namespace BackendSite.Service.BLL
         }
         
 
-        public CryptoInfoData GetCryptoInfoData()
+        public CryptoInfoData GetCryptoInfoData(int siteId)
         {
-            var infos = _withdrawalLimitService.GetCryptoInfoList();
+            var infos = _paymentManageService.GetCryptoInfoList(siteId);
             var cryptoCurrency = infos
-                .Select(x => new CryptoCurrency
+                .GroupBy(x => x.CurrencyId)
+                .Select(x =>
                 {
-                    CurrencyId = x.CurrencyId,
-                    CurrencyName = x.CurrencyName
-                }).Distinct(new CryptoCurrencyComparer());
+                    var d = x.First();
+                    return new CryptoCurrency
+                    {
+                        CurrencyId = d.CurrencyId,
+                        CurrencyName = d.CurrencyName
+                    };
+                });
 
             var cryptoNetwork = infos.Select(x => new CryptoNetwork
             {
@@ -735,12 +596,12 @@ namespace BackendSite.Service.BLL
             => _withdrawalService.GetWithdrawalAvailableBalance(custId);
 
         public async Task<(bool isSuccess, string TransId)> CreateWithdrawalAsync(int custId, ApplicationAccountTypeEnum paymentId, string cryptoNetwork, int cryptoCurrencyId,
-            bool isExistBankCard, int sysId, string accountNo, string accountHolderName, decimal amount, string memo, string updater)
+            bool isExistBankCard, int sysId, string accountNo, string accountHolderName, decimal amount, decimal exchangeRate, decimal exchangeAmount, string memo, string updater)
         {
             var IFSCCode = string.Empty;
             var cryptoAccountNickName = string.Empty;
 
-            CheckParameterForCreateWithdrawal(custId, paymentId, cryptoNetwork, cryptoCurrencyId, isExistBankCard, sysId, accountNo, accountHolderName, amount, memo);
+            CheckParameterForCreateWithdrawal(custId, paymentId, cryptoNetwork, cryptoCurrencyId, isExistBankCard, sysId, accountNo, accountHolderName, amount, exchangeRate, exchangeAmount, memo);
 
             var custInfo = _custInfoBLL.GetCustInfoWithCache(custId);
 
@@ -754,16 +615,16 @@ namespace BackendSite.Service.BLL
 
             CheckWithdrawalAmount(custId, custInfo.CurrencyId, amount);
 
-            var convertData = ConvertData(paymentId, sysId, accountNo, accountHolderName, IFSCCode, cryptoAccountNickName, cryptoCurrencyId, cryptoNetwork);
+            var convertData = ConvertData(paymentId, sysId, accountNo, accountHolderName, IFSCCode, cryptoAccountNickName, cryptoCurrencyId, cryptoNetwork, exchangeRate, exchangeAmount);
 
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!_withdrawalService.CreateWithdrawalInfo(custId, custInfo.UserName, custInfo.CurrencyId,
-            custInfo.SiteId, amount, memo, updater, convertData.WithdrawalInfo, _common.GetEnv(), conn, trans, out decimal afterAmount, out string transId))
+            custInfo.SiteId, amount, memo, updater, convertData.WithdrawalInfo, _common.GetEnv(), trans, out decimal afterAmount, out string transId))
             {
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return (false, string.Empty);
             }
 
@@ -790,10 +651,10 @@ namespace BackendSite.Service.BLL
 
             if (!logResult)
             {
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return (false, string.Empty);
             }
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return (true, transId);
         }
 
@@ -858,8 +719,8 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if (withdrawalInfo.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank
-                    && withdrawalInfo.Status == (int)WithdrawalStatusEnum.Approved)
+                if (withdrawalInfo.WithdrawalType == WithdrawalTypeEnum.LocalBank
+                    && withdrawalInfo.Status == WithdrawalStatusEnum.Approved)
                 {
                     var accountingList = GetAccountingList(transId, withdrawalInfo.SiteId, withdrawalInfo.CurrencyId);
                     var isoCode = _reportService.GetCurrencyList().Where(x => x.CurrencyId == withdrawalInfo.CurrencyId)
@@ -900,8 +761,8 @@ namespace BackendSite.Service.BLL
             }
             else
             {
-                if (withdrawalInfo.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank
-                    && withdrawalInfo.Status == (int)WithdrawalStatusEnum.Approved)
+                if (withdrawalInfo.WithdrawalType == WithdrawalTypeEnum.LocalBank
+                    && withdrawalInfo.Status == WithdrawalStatusEnum.Approved)
                 {
                     data = GetAccountingList(transId, withdrawalInfo.SiteId, withdrawalInfo.CurrencyId);
 
@@ -920,6 +781,12 @@ namespace BackendSite.Service.BLL
             return true;
         }
 
+        public IEnumerable<WithdrawalAccountingModel> GetWithdrawalAccountingByTransId(string transId)
+        {
+            var result = _withdrawalBankAccountingService.GetByTransId(transId);
+            return result;
+        }
+        
         public bool InsertWithdrawalAccounting(WithdrawalBankAccountingModel data, string @operator)
         {
             try
@@ -1136,18 +1003,51 @@ namespace BackendSite.Service.BLL
             var response = await _courierAdapter.MyPostAsync<WithdrawalManualResponse, WithdrawalManualRequest>(url, withdrawalManualRequest);
             return response;
         }
+
+        public int SetWithdrawalMessage(ParamsWithLog<WithdrawalMessageRequest> input)
+        {
+            var result = 1;
+
+            if (!_withdrawalService.SetWithdrawalMessage(input))
+            {
+                return 0;
+            }
+
+            var logParam = new CreateAdminAdjustmentInfoLogInput
+            {
+                Operator = input.Operator,
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                RefTransId = input.TransId,
+                ActionType = ActionType.Create,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SetWithdrawalMessage,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = JsonConvert.SerializeObject(input.After)
+            };
+
+            _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam);
+            _withdrawalService.SetWithdrawalLog(input.After.WithdrawalId, input.SiteId, $"SendMessage:{input.After.StatusName}", (int)input.After.Action, input.Operator);
+
+            return result;
+        }
+
+        public async Task<bool> SetWithdrawalProcessWay(string transId, WithdrawalInfoProcessWayEnum processWay)
+        {
+            var m = Regex.Match(transId, @"\d+");
+            int.TryParse(m.Value, out var withdrawalId);
+            return await _withdrawalService.SetWithdrawalProcessWay(withdrawalId, processWay);
+        }
+
+        
+        public IEnumerable<WithdrawalMessage> GetWithdrawalMessageByWithdrawalIds(IEnumerable<int> withdrawalIds)
+        {
+            return _withdrawalService.GetWithdrawalMessage(withdrawalIds);
+        }
+        
         #endregion
 
         #region Private Methods
 
-        private bool CheckWithdrawalFlow(IEnumerable<int> approvedStatusList, int status)
-        {
-            if (approvedStatusList.Contains(status))
-            {
-                return true;
-            }
-            return false;
-        }
 
         private string GetTimeString(TimeSpan ts)
         {
@@ -1264,20 +1164,22 @@ namespace BackendSite.Service.BLL
         private void CheckParameterForCreateWithdrawal(int csutId, ApplicationAccountTypeEnum paymentId,
             string cryptoNetwork, int cryptoCurrencyId, bool isExistBankCard,
             int sysId, string accountNo, string accountHolderName,
-            decimal amount, string memo)
+            decimal amount, decimal exchangeRate, decimal exchangeAmount, string memo)
         {
             if (csutId == 0)
-                throw new AdminException(ErrorCodeEnum.Fail, "CustId is Invaild.");
+                throw new AdminException(ErrorCodeEnum.Fail, "CustId is invalid.");
             if (paymentId == 0)
-                throw new AdminException(ErrorCodeEnum.Fail, "Payment is Invaild.");
+                throw new AdminException(ErrorCodeEnum.Fail, "Payment is invalid.");
             if (paymentId == ApplicationAccountTypeEnum.Crypto && (string.IsNullOrWhiteSpace(cryptoNetwork) || cryptoCurrencyId == 0))
-                throw new AdminException(ErrorCodeEnum.Fail, "Crypto Channel is Invaild.");
+                throw new AdminException(ErrorCodeEnum.Fail, "Crypto Channel is invalid.");
+            if (paymentId == ApplicationAccountTypeEnum.Crypto && (exchangeRate == 0 || exchangeAmount == 0))
+                throw new AdminException(ErrorCodeEnum.Fail, "Missing crypto exchange info.");
             if (paymentId != ApplicationAccountTypeEnum.Crypto && sysId == 0)
-                throw new AdminException(ErrorCodeEnum.Fail, "SysId is Invaild.");
+                throw new AdminException(ErrorCodeEnum.Fail, "SysId is invalid.");
             if (string.IsNullOrWhiteSpace(accountNo))
-                throw new AdminException(ErrorCodeEnum.Fail, "AccountNo is Invaild.");
+                throw new AdminException(ErrorCodeEnum.Fail, "AccountNo is invalid.");
             if (!isExistBankCard && string.IsNullOrWhiteSpace(accountHolderName))
-                throw new AdminException(ErrorCodeEnum.Fail, "AccountHolderName is Invaild.");
+                throw new AdminException(ErrorCodeEnum.Fail, "AccountHolderName is invalid.");
             if (amount <= 0)
                 throw new AdminException(ErrorCodeEnum.Fail, "Amount is Invaild.");
             if (string.IsNullOrWhiteSpace(memo))
@@ -1430,7 +1332,7 @@ namespace BackendSite.Service.BLL
 
         private (string WithdrawalInfo, object LogDetail) ConvertData(ApplicationAccountTypeEnum paymentId,
               int sysId, string accountNo, string accountName, string IFSCCode,
-            string accountNickName, int cryptoCurrencyId, string network)
+            string accountNickName, int cryptoCurrencyId, string network, decimal exchangeRate, decimal exchangeAmount)
         {
             Object data = new { };
             Object logDetail = new { };
@@ -1465,14 +1367,18 @@ namespace BackendSite.Service.BLL
                             Network = network,
                             AccountNo = accountNo,
                             AccountName = accountName,
-                            NickName = string.IsNullOrWhiteSpace(accountNickName) ? accountName : accountNickName
+                            NickName = string.IsNullOrWhiteSpace(accountNickName) ? accountName : accountNickName,
+                            TempExchangeRate = exchangeRate,
+                            TempExchangeAmount = exchangeAmount
                         };
                         logDetail = new
                         {
                             Channel = $"{cryptoCurrency}-{network}",
                             AccountNo = accountNo,
                             AccountName = accountName,
-                            NickName = string.IsNullOrWhiteSpace(accountNickName) ? accountName : accountNickName
+                            NickName = string.IsNullOrWhiteSpace(accountNickName) ? accountName : accountNickName,
+                            TempExchangeRate = exchangeRate,
+                            TempExchangeAmount = exchangeAmount
                         };
                         break;
                     }

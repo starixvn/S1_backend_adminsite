@@ -253,10 +253,10 @@ import DateTimePicker from 'react-datetime';
                             var channelName = result.data.cryptoCurrency === result.data.network
                                 ? result.data.network
                                 : `${result.data.cryptoCurrency}-${result.data.network}`;
-                            await this.onGetPayList(result.data.currencyId, result.data.sysId);
+                            await this.onGetPayList(result.data.currencyId, result.data.sysId, result.data.siteId, result.data.amount, result.data.custId);
                             await this.onGetEWalletPayList(result.data.currencyId);
                             await this.onGetBankInfoOffList(result.data.currencyId, result.data.sysId, result.data.siteId);
-                            await this.onGetCryptoPayList(result.data.currencyId, result.data.sysId, channelName);
+                            await this.onGetCryptoPayList(result.data.currencyId, channelName, result.data.siteId, result.data.amount, result.data.custId);
                         }
                         
                         let SelId = null;
@@ -406,9 +406,9 @@ import DateTimePicker from 'react-datetime';
                 }.bind(this));
         }
 
-        async onGetPayList(currencyId, sysId) {
+        async onGetPayList(currencyId, sysId, siteId, amount, custId) {
             let data = this.state.Data;
-            await axios.post('/api/Withdrawal/GetPayList', { CurrencyId: currencyId, SysId: sysId })
+            await axios.post('/api/Withdrawal/GetPayList', { CurrencyId: currencyId, SysId: sysId, SiteId: siteId, Amount: amount, CustId: custId })
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -439,9 +439,9 @@ import DateTimePicker from 'react-datetime';
                 }.bind(this));
         }
 
-        async onGetCryptoPayList(currencyId, sysId, channelName ) {
+        async onGetCryptoPayList(currencyId, channelName, siteId, amount, custId) {
             let data = this.state.Data;
-            await axios.post('/api/Withdrawal/GetCryptoPayList', { CurrencyId: currencyId, SysId: sysId, ChannelName: channelName})
+            await axios.post('/api/Withdrawal/GetCryptoPayList', { CurrencyId: currencyId, ChannelName: channelName, SiteId: siteId, Amount: amount, CustId: custId})
                 .then(function (response) {
                     //Loading.UnLoading();
                     let result = response.data;
@@ -618,7 +618,7 @@ import DateTimePicker from 'react-datetime';
                             this.state.SelId=this.state.PayList[0];
                         }*/
                     } else if (this.state.selectType == 2) {
-                        selectPay = this.state.BankInfoOffList.map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-" + row.accountName + "-" + row.accountNo}</option>);
+                        selectPay = this.state.BankInfoOffList.filter(x => x.settingStatus === 1).map(row => <option key={row.bankId} value={row.bankId}>{row.bankCode + "-" + row.accountName + "-" + row.accountNo}</option>);
                         /*if(this.state.BankInfoOffList.length>0) {
                             this.state.SelId=this.state.BankInfoOffList[0];
                         }*/
@@ -1286,7 +1286,7 @@ import DateTimePicker from 'react-datetime';
                                 <div className="input-item">
                                     <span className="label">From Date</span>
                                     <div className="date">
-                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-10, 'days').format('l')} />
+                                        <DateTimePicker ref={this.selectdate_start} timeFormat={false} defaultValue={StartDate != null ? moment.unix(StartDate).format("l") : moment().add(-2, 'days').format('l')} />
                                     </div>
                                 </div>
                                 <div className="input-item">

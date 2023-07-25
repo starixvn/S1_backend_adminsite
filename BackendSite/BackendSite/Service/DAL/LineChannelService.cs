@@ -4,7 +4,6 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 using System.Data;
 using BackendSite.Extensions;
-using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
@@ -43,7 +42,7 @@ namespace BackendSite.Service.DAL
 
         public bool Set(ParamsWithLog<SetLineChannel> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
@@ -65,30 +64,30 @@ namespace BackendSite.Service.DAL
             logParam.Add("_BeforeDetailInfo", isAdd ? null : input.Before.ToLog(), DbType.String);
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            var result = conn.Execute("Admin_LineChannel_Set", p, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_LineChannel_Set", tran, p) > 0;
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }
 
         public bool Delete(ParamsWithLog<DeleteLineChannel> input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
 
             using var tran = conn.BeginTransaction();
@@ -106,23 +105,23 @@ namespace BackendSite.Service.DAL
             logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
-            var logResult = conn.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam, tran, commandType: CommandType.StoredProcedure) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
             
             if (!logResult)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            var result = conn.Execute("Admin_LineChannel_Del", p, tran, commandType: CommandType.StoredProcedure) > 0;
+            var result = _mainDbClient.Execute("Admin_LineChannel_Del", tran, p) > 0;
 
             if (!result)
             {
-                tran.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
 
-            tran.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
         }

@@ -2,7 +2,6 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Data;
 using BackendSite.Extensions;
@@ -11,20 +10,16 @@ namespace BackendSite.Service.DAL
 {
     public class PermissionService
     {
-        private IConfiguration configuration;
         private readonly IWebHostEnvironment env;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        private readonly string _connectionString;
         private readonly Tools tools;
 
         public PermissionService(IWebHostEnvironment env, IConfiguration configuration, IServiceProvider provider, Tools tools)
         {
             this.env = env;
-            this.configuration = configuration;
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
-            _connectionString = configuration.GetConnectionString("ConnectionString");
             this.tools = tools;
         }
 
@@ -52,7 +47,7 @@ namespace BackendSite.Service.DAL
         public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission,int userId,string Operator)
         {
             var result = 1;
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -65,33 +60,33 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", Operator);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminRole_Ins_V2", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminRole_Ins_V2", trans, props);
 
             if(result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
             var SEQ = props.Get<int?>("@SEQ");
 
             if (SEQ == null)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 result = 0;
                 return result;
             }
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_RolePermission_Ins", new DynamicParameters(new { Role= SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList)}), conn, trans);
+                _mainDbClient.Execute("Admin_RolePermission_Ins", trans, new DynamicParameters(new { Role= SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList)}));
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
         public int UpdateAdminRole(int role, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -101,33 +96,32 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyList", JsonConvert.SerializeObject(currencyList));
             props.Add("Operator", Operator);
 
-            result = _mainDbClient.Execute("Admin_AdminRole_Set_V2", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminRole_Set_V2", trans, props);
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
 
-            _mainDbClient.Execute("Admin_RolePermission_Del", new DynamicParameters(new { Role = role }), conn, trans);
+            _mainDbClient.Execute("Admin_RolePermission_Del", trans, new DynamicParameters(new { Role = role }));
 
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_RolePermission_Ins", new DynamicParameters(new { Role = role, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+                _mainDbClient.Execute("Admin_RolePermission_Ins", trans, new DynamicParameters(new { Role = role, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
         public void DeleteAdminRole(int role)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var props = new DynamicParameters();
-            _mainDbClient.Execute("Admin_AdminRole_Del", new DynamicParameters(new { Id = role }), conn, trans);
-            _mainDbClient.Execute("Admin_RolePermission_Del", new DynamicParameters(new { Role = role }), conn, trans);
-            trans.Commit();
+            _mainDbClient.Execute("Admin_AdminRole_Del", trans, new DynamicParameters(new { Id = role }));
+            _mainDbClient.Execute("Admin_RolePermission_Del", trans, new DynamicParameters(new { Role = role }));
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
         }
 
         public IEnumerable<RoleList> GetRoleList(string roleName, int siteId)
@@ -144,7 +138,7 @@ namespace BackendSite.Service.DAL
         public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -155,77 +149,77 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", Operator);
             props.Add("SEQ", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result = _mainDbClient.Execute("Admin_AdminUser_Ins_V2", props, conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminUser_Ins_V2", trans, props);
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
             var SEQ = props.Get<int?>("@SEQ");
 
             if (SEQ == null)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 result = 0;
                 return result;
             }
 
-            result = _mainDbClient.Execute("Admin_AdminBrand_Ins", new DynamicParameters
-                (new { UserId = SEQ, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }), conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminBrand_Ins", trans, new DynamicParameters
+                (new { UserId = SEQ, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }));
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
 
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_UserPermission_Ins", new DynamicParameters(new { UserId = SEQ, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+                _mainDbClient.Execute("Admin_UserPermission_Ins", trans, new DynamicParameters(new { UserId = SEQ, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
 
         public int UpdateAdminUser(int siteId, int userId,int role, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             List<int> roleList = new List<int>();
             roleList.Add(role);
 
-            result = _mainDbClient.Execute("Admin_AdminBrandRole_Set", new DynamicParameters
-                (new { UserId = userId, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }), conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminBrandRole_Set", trans, new DynamicParameters
+                (new { UserId = userId, SiteId = siteId, CurrencyList = JsonConvert.SerializeObject(currencyList), Role = JsonConvert.SerializeObject(roleList) }));
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
 
-            result = _mainDbClient.Execute("Admin_AdminUser_Set", new DynamicParameters(new { UserId = userId, Operator = Operator }), conn, trans);
+            result = _mainDbClient.Execute("Admin_AdminUser_Set", trans, new DynamicParameters(new { UserId = userId, Operator = Operator }));
 
             if (result <= 0)
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
             }
 
-            _mainDbClient.Execute("Admin_UserPermission_Del", new DynamicParameters(new { UserId = userId, SiteId = siteId}), conn, trans);
+            _mainDbClient.Execute("Admin_UserPermission_Del", trans, new DynamicParameters(new { UserId = userId, SiteId = siteId}));
 
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_UserPermission_Ins", new DynamicParameters(new { UserId = userId, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }), conn, trans);
+                _mainDbClient.Execute("Admin_UserPermission_Ins", trans, new DynamicParameters(new { UserId = userId, SiteId = siteId, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
-            trans.Commit();
+            _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
         public bool SetAdminUserPassword(ParamsWithLog<SetAdminUserPasswordReq> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -246,21 +240,21 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var result = _mainDbClient.Execute("Admin_UserPassword_Set_V2", props, conn, trans) > 0;
-            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            var result = _mainDbClient.Execute("Admin_UserPassword_Set_V2", trans, props) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog) > 0;
             if (logResult & result)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return logResult & result;
         }
         public bool SetAdminUserStatus(ParamsWithLog<SetAdminUserStatusReq> input)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -283,15 +277,15 @@ namespace BackendSite.Service.DAL
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var r = _mainDbClient.Execute("Admin_UserStatus_Set_V2", props, conn, trans) > 0;
-            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", propsLog, conn, trans) > 0;
+            var r = _mainDbClient.Execute("Admin_UserStatus_Set_V2", trans, props) > 0;
+            var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog) > 0;
             if (r & result)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return r & result;
         }
@@ -318,7 +312,7 @@ namespace BackendSite.Service.DAL
 
         public bool SetAdminBrand(SetAdminBrandReq input, string userName, List<UserBrand> beforeUserBrands, List<UserBrand> afterUserBrands)
         {
-            using var conn = new MySqlConnection(_connectionString);
+            using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var props = new DynamicParameters();
@@ -335,15 +329,15 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", userName);
             #endregion
 
-            var result =  _mainDbClient.Execute("Admin_AdminBrand_Set", props, conn, trans) > 0;
-            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentBrandLog_Ins", propsLog, conn, trans) > 0;
+            var result =  _mainDbClient.Execute("Admin_AdminBrand_Set", trans, props) > 0;
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentBrandLog_Ins", trans, propsLog) > 0;
             if (logResult & result)
             {
-                trans.Commit();
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
             {
-                trans.Rollback();
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             }
             return logResult & result;
         }

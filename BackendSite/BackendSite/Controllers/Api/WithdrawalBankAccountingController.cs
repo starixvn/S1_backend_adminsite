@@ -197,7 +197,7 @@ namespace BackendSite.Controllers.Api
                 userName);
 
 
-            var stream = _excelBLL.Export(data);
+            var stream = _excelBLL.ExportV2(data);
 
             return _excelBLL.ExcelFile(stream, "WithdrawalInfoAndAccountList");
         }
@@ -360,7 +360,7 @@ namespace BackendSite.Controllers.Api
                     out var newUploadPictureTimes);
             if (result)
             {
-                var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "");
+                var pictureBaseOnSixFour = request.Picture.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
                 var bytes = Convert.FromBase64String(pictureBaseOnSixFour);
                 var stream = new MemoryStream(bytes);
 

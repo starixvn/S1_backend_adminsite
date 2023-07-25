@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.TpMaintain;
-using BackendSite.Service.Model.BankFinancial;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -23,15 +22,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly PaymentBLL _paymentBll;
         private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
-        private readonly AdminGroupBLL _adminGroupBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly PrizeBLL _prizeBll;
         private readonly PaymentManageBLL _paymentManageBll;
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
-        private readonly BankFinancialBLL _bankFinancialBll;
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly BonusManageBLL _bonusManageBll;
+        private readonly DeepLinkBLL _deepLinkBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -45,15 +45,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
-            _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
-            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
+            _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -90,40 +91,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-        }
-
-
-        /// <summary>
-        ///  GetAllData/GetGroupList 取得所有群組權限清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Administration > User Setting > Permission > Group > [Edit]
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<AdminGroupModel>> GetGroupList()
-        {
-            var result = new List<AdminGroupModel>();
-            var data = _adminGroupBll.GetGroupList(1, 1000, out _, out _);
-
-            foreach (var item in data)
-            {
-                result.Add(new AdminGroupModel()
-                {
-                    GroupId = (int)item.GroupSEQ,
-                    GroupName = item.GroupName,
-                    Remark = item.Remark
-                });
-            }
-
-            var apiResult = new ApiResult<IEnumerable<AdminGroupModel>>
-            {
-                Data = result,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-            return apiResult;
         }
 
         /// <summary>
@@ -188,7 +155,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// GetAllData/GetActionTypeList 取得調整資料記錄類型清單
         /// </summary>
@@ -217,9 +184,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayList>> GetPayList()
+        public ApiResult<IEnumerable<PayListInfo>> GetPayList()
         {
-            var data = _paymentManageBll.GetPayList();
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPayList(authData.SiteId);
 
             if (!data.Any())
             {
@@ -227,7 +195,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayList>>
+                return new ApiResult<IEnumerable<PayListInfo>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
@@ -243,9 +211,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayChannel>> GetPayChannel()
+        public ApiResult<IEnumerable<PayChannelInfo>> GetPayChannel()
         {
-            var data = _paymentManageBll.GetPayChannel();
+            
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPayChannel(authData.SiteId);
 
             if (!data.Any())
             {
@@ -253,7 +223,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayChannel>>
+                return new ApiResult<IEnumerable<PayChannelInfo>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
@@ -261,17 +231,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
         }
 
-        /// <summary>
-        /// GetAllData/GetPayCurrency 取得第三方支付廠商幣別資料清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PayCurrency>> GetPayCurrency()
+        public ApiResult<IEnumerable<PaySetting>> GetPaySetting()
         {
-            var data = _paymentManageBll.GetPayCurrency();
+            var authData = _authorizeBll.GetAuthData();
+            var data = _paymentManageBll.GetPaySetting(authData.SiteId);
 
             if (!data.Any())
             {
@@ -279,83 +243,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
             else
             {
-                return new ApiResult<IEnumerable<PayCurrency>>
+                return new ApiResult<IEnumerable<PaySetting>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-        }
-
-        /// <summary>
-        /// GetAllData/GetTransferAccountList 取得轉帳戶口清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult GetTransferAccountList()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccountDetailModel>>();
-
-            apiResult.Data = _bankFinancialBll.GetTransferAccountList();
-            foreach (var data in apiResult.Data.ToArray())
-            {
-                data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, TimeSpan.Zero);
-                data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
-            }
-
-            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// GetAllData/GetAllBankCodeList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<BankCodeModel>> GetAllBankCodeList()
-        {
-            var apiResult = new ApiResult<IEnumerable<BankCodeModel>>();
-            var bankInfoOff = _bankDetailBll.GetAllBankInfoOff();
-            var data = bankInfoOff
-                .Select(x => new BankCodeModel{BankCode = x.BankCode , BankName = x.BankName}).Distinct(new BankCodeModelComparer());
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-            return apiResult;
-        }
-        
-        /// <summary>
-        /// GetAllData/GetAllCalCodeList
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<CalCodeModel>> GetAllCalCodeList()
-        {
-            var apiResult = new ApiResult<IEnumerable<CalCodeModel>>();
-            var bankInfoOff = _bankDetailBll.GetAllBankInfoOff();
-            bankInfoOff = bankInfoOff.Where(x => (x.Purpose & 1) > 0).OrderBy(x => x.Id);
-            var data = bankInfoOff
-                .Select(x => new CalCodeModel
-                {
-                    Id = x.Id,
-                    SysId = x.SysId,
-                    AccountName = x.AccountName,
-                    AccountNo = x.AccountNo,
-                    BankCode = x.BankCode , 
-                    SiteName = x.SiteName
-                });
-            apiResult.Data = data;
-            apiResult.ErrorCode = 0;
-            return apiResult;
         }
 
         //==============================================================================================================================================
@@ -521,7 +414,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// GetAllData/GetCryptoInfoData 取得加密貨幣資訊
         /// </summary>
@@ -534,8 +427,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<CryptoInfoData> GetCryptoInfoData()
         {
-
-            var result = _withdrawalBll.GetCryptoInfoData();
+            var authData = _authorizeBll.GetAuthData();
+            var result = _withdrawalBll.GetCryptoInfoData(authData.SiteId);
 
             return new ApiResult<CryptoInfoData>((int)ErrorCodeEnum.Success, string.Empty, result);
         }
@@ -557,7 +450,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// GetAllData/GetPromotionType  取得PromotionType List
         /// </summary>
@@ -567,18 +460,93 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request )
+        public ApiResult<IEnumerable<PromotionType>> GetPromotionType(GetPromotionTypeRequest request)
         {
             return new ApiResult<IEnumerable<PromotionType>>
             {
-                Data = _bonusManageBll.GetPromotionType(request.isPayout),
+                Data = _bonusManageBll.GetPromotionType(request.isPayout, request.isNew),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
+        //==============================================================================================================================================
+        // CMS 相關
+        //==============================================================================================================================================
+
+        /// <summary>
+        /// GetAllData/GetDeepLinkList  取得DeepLink List
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<IEnumerable<DeepLink>> GetDeepLinkList()
+        {
+            var apiResult = new ApiResult<IEnumerable<DeepLink>>
+            {
+                Data = _deepLinkBll.GetDeepLinkList(),
+                ErrorCode = 0
+            };
+
+            return apiResult;
+        }
+
         public class GetPromotionTypeRequest
         {
+            /// <summary>
+            /// Bonus Payout使用
+            /// </summary>
             public bool isPayout { get; set; } = false;
+
+            /// <summary>
+            /// 新後台Bonus Manage使用，排除Rebate
+            /// </summary>
+            public bool isNew { get; set; } = true;
+        }
+
+        public class GetServerInfoReq
+        {
+            public int SiteId { get; set; }
+        }
+        /// <summary>
+        /// GetAllData/GetServerInfo  取得ServerInfo
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public ApiResult<ServerInfo> GetServerInfo(GetServerInfoReq req)
+        {
+            var apiResult = new ApiResult<ServerInfo>();
+            try
+            {
+                apiResult.Data = _serverInfoBll.GetServerInfo(req.SiteId);
+                apiResult.ErrorCode = 0;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = 999;
+                apiResult.Message = "something went wrong.";
+                apiResult.RawMessage = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<LocalPaySetting>>> GetLocalPaySettingAsync()
+        {
+            var result = await _bankDetailBll.GetLocalPaySettingAsync();
+
+            return new ApiResult<IEnumerable<LocalPaySetting>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         #endregion

@@ -34,12 +34,12 @@ namespace BackendSite.Controllers.Api
         }
 
         [HttpPost]
-        public ApiResult SetAppLink(SetAppLinkReq setAppLinkReq)
+        public async Task<ApiResult> SetAppLink(SetAppLinkReq setAppLinkReq)
         {
             var apiResult = new ApiResult();
             try
             {
-                if (appLinkTableBLL.SetAppLink(setAppLinkReq.SiteId, (int)setAppLinkReq.AppType, setAppLinkReq.Domain, (int)setAppLinkReq.ProtocolType, authorizeBLL.GetAuthData().UserName) > 0)
+                if (await appLinkTableBLL.SetAppLink(setAppLinkReq.SiteId, setAppLinkReq.AppType, setAppLinkReq.Domain, setAppLinkReq.ProtocolType, authorizeBLL.GetAuthData().UserName))
                 {
                     apiResult.ErrorCode = 0;
                     apiResult.Message = selLangBLL.GetMsg("msg_Updatesuccessful");
@@ -55,7 +55,7 @@ namespace BackendSite.Controllers.Api
                 apiResult.ErrorCode = 91;
                 apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
             }
-            
+
             return apiResult;
         }
     }

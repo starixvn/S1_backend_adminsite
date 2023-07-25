@@ -13,26 +13,30 @@ const defDateType = {
 
 const Filter = (props) => {
   const [DateRangeDatas, setDateRange] = React.useState({
-    StartTime: moment.utc(new Date()).add(8,'hour').add(-1, "days").format("l LTS"),
-    EndTime: moment.utc(new Date()).add(8,'hour').format("l LTS"),
-    DateQuickPicker: "0"
+    StartTime: moment
+      .utc(new Date())
+      .add(8, "hour")
+      .add(-1, "days")
+      .format("l LTS"),
+    EndTime: moment.utc(new Date()).add(8, "hour").format("l LTS"),
+    DateQuickPicker: "0",
   });
 
   const EditDateRangeFiled = (v, col) => {
-    console.log(v,col);
+    console.log(v, col);
     setDateRange({
       ...DateRangeDatas,
       [col]: v,
     });
   };
-  const EditDate = (v, col) =>{
+  const EditDate = (v, col) => {
     let _startDate = "";
     let _endDate = "";
 
     switch (v) {
       case "1":
-          _startDate = moment().startOf("day");
-          _endDate = moment().endOf("day");
+        _startDate = moment().startOf("day");
+        _endDate = moment().endOf("day");
         break;
       case "2":
         _startDate = moment().subtract(1, "days").startOf("days");
@@ -68,15 +72,15 @@ const Filter = (props) => {
         ...DateRangeDatas,
         ["StartTime"]: _startDate,
         ["EndTime"]: _endDate,
-        ["DateQuickPicker"]:v
+        ["DateQuickPicker"]: v,
       });
-    }else{
+    } else {
       setDateRange({
         ...DateRangeDatas,
-        ["DateQuickPicker"]:v
+        ["DateQuickPicker"]: v,
       });
     }
-  }
+  };
 
   const [GameListDatas, setGameList] = React.useState([]);
   React.useEffect(() => {
@@ -142,7 +146,7 @@ const Filter = (props) => {
         <DateTimePickerElem
           columnTitle="StartTime"
           dateTimePickerProps={{
-            value:DateRangeDatas.StartTime,
+            value: DateRangeDatas.StartTime,
             defaultValue: DateRangeDatas.StartTime,
             onChange: (e) => {
               try {
@@ -154,7 +158,7 @@ const Filter = (props) => {
         <DateTimePickerElem
           columnTitle="EndTime"
           dateTimePickerProps={{
-            value:DateRangeDatas.EndTime,
+            value: DateRangeDatas.EndTime,
             defaultValue: DateRangeDatas.EndTime,
             onChange: (e) => {
               try {
@@ -171,25 +175,40 @@ const Filter = (props) => {
           hasAll={false}
           value={DateRangeDatas.DateQuickPicker}
           dataColumn="DateQuickPicker"
-          onChange={(e)=>EditDate(e,"DateQuickPicker")}
+          onChange={(e) => EditDate(e, "DateQuickPicker")}
         />
       </div>
-      <div><label>※Allow search data up to 12 months</label></div>
+      <div>
+        <label>※Allow search data up to 12 months</label>
+      </div>
       <div className="row-flex">
         <GameList
           SelectedGames={SelectedGames}
           OnSelectGame={OnSelectGame}
           GameListDatas={GameListDatas}
         />
-        <div className="button-group">
-          <button
-            className="btn btn-search"
-            type="button"
-            onClick={ClickSubmit}
-          >
-            Submit
-          </button>
-        </div>
+        {props.Isloading === true ? (
+          <div className="button-group">
+            <button
+              type="button"
+              className="btn btn-refresh"
+              disabled={true}
+              onClick={null}
+            >
+              Loading
+            </button>
+          </div>
+        ) : (
+          <div className="button-group">
+            <button
+              className="btn btn-search"
+              type="button"
+              onClick={ClickSubmit}
+            >
+              Submit
+            </button>
+          </div>
+        )}
         <div>(Adjusted to GMT+8)</div>
       </div>
     </form>

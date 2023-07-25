@@ -1,31 +1,37 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
-using static BackendSite.Controllers.Api.TpController;
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Service.DAL
 {
     public class ThirdPartyService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
-        public ThirdPartyService(IConfiguration configuration, ILogger<MySqlClient> logger)
+        public ThirdPartyService(IEnumerable<MySqlClient> sqlClients)
         {
-            this._configuration = configuration;
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
         public IEnumerable<TpWallet> GetTpWallet(int custId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<TpWallet>("TpWallet_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<TpWallet>("TpWallet_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
+        
+        public async Task<IEnumerable<TpWallet>> GetTransferTpWallet(int custId)
+        {
+            var p = new DynamicParameters(new
+            {
+                _CustId = custId
+            }); 
+            return await _reportDbClient.QueryAsync<TpWallet>("Admin_TransferTpWalletInfo_Get", p);
+        }
+        
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
             string TransId,
             DateTimeOffset startDate,
@@ -44,8 +50,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", startIndex, dbType: DbType.Int32);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
-            var tpTransferInfoList = conn.Query<TpTransferInfo>("Admin_TpTransferInfoByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
+            var tpTransferInfoList = _reportDbClient.Query<TpTransferInfo>("Admin_TpTransferInfoByCust_Get_V4", p, commandType: CommandType.StoredProcedure);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
@@ -114,10 +119,33 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(TpDetailPara TpDetailPara)
+        public async Task<TpAdjustmentLogWrapper> GetCustTpAdjustmentLogV2(GetCustTpAdjustmentLogParamsV2 input)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = TpDetailPara.Currency, SiteId = TpDetailPara.Site }, commandType: CommandType.StoredProcedure);
+            var p = new DynamicParameters();
+            p.Add("_CustId", input.CustId, dbType: DbType.Int32);
+            p.Add("_SiteId", input.SiteId, dbType: DbType.Int32);
+            p.Add("_TpId", input.TpId, dbType: DbType.Int32);
+            p.Add("_Direction", input.Direction, dbType: DbType.Int16);
+            p.Add("_StartTime", input.StartTime.UtcDateTime, dbType: DbType.DateTime);
+            p.Add("_EndTime", input.EndTime.UtcDateTime, dbType: DbType.DateTime);
+            p.Add("_PageSize", input.PageSize, dbType: DbType.Int32);
+            p.Add("_StartIndex", input.StartIndex, dbType: DbType.Int32);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var result = new TpAdjustmentLogWrapper
+            {
+                Data = await _reportDbClient.QueryAsync<TpAdjustmentLogV2>("Admin_CustLogAdminAdjustWallet_Get_V2", p),
+                TotalPages = p.Get<int?>("_TotalPages") ?? 0,
+                RowCount = p.Get<int?>("_RowCount") ?? 0
+            };
+
+            return result;
+        }
+
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
+        {
+            return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = currency, SiteId = siteId }, commandType: CommandType.StoredProcedure);
         }
 
         public void SetAdjustmentTpCustInfoLog(string menu, int actionType, string detailInfo, string @operator)
@@ -138,7 +166,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<IEnumerable<TpCustInfo>> GetTpCustInfoListByCustId(int custId)
         {
-            return await _reportDbClient.QueryAsync<TpCustInfo>("Admin_TpCustInfo_GetListByCustId", new DynamicParameters(new { _CustId = custId }));
+            return await _reportDbClient.QueryAsync<TpCustInfo>("Admin_TpCustInfo_GetListByCustId_V2", new DynamicParameters(new { _CustId = custId }));
         }
 
         public async Task<IEnumerable<CommonTpInfo>> GetCommonTpList()
@@ -149,6 +177,24 @@ namespace BackendSite.Service.DAL
         public async Task<IEnumerable<TpGameType>> GetTpGameType()
         {
             return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameType_Get");
+        }
+        public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurrency()
+        {
+            return await _reportDbClient.QueryAsync<TpGameTypeCurrency>("Admin_TpGameTypeCurrency_Get");
+        }
+
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        {
+            var p = new DynamicParameters();
+            p.Add("CategoryId", categoryId);
+            return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", p);
+        }
+
+        public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CategoryId", categoryId);
+            return await _reportDbClient.QueryAsync<SiteTpListIfo>("Admin_TpListByCategory_Get", p);
         }
     }
 }

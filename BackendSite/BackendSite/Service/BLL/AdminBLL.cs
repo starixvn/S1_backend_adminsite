@@ -17,6 +17,7 @@ namespace BackendSite.Service.BLL
         private readonly NewAdminUserService newAdminUserService;
         private readonly PermissionBLL permissionBLL;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHostEnvironment environment;
 
         public AdminBLL(Tools tools,
             AdminService adminService,
@@ -24,7 +25,8 @@ namespace BackendSite.Service.BLL
             AdminUserService adminUserService,
             NewAdminUserService newAdminUserService,
             PermissionBLL permissionBLL,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IHostEnvironment environment)
         {
             this.tools = tools;
             this.adminService = adminService;
@@ -33,47 +35,8 @@ namespace BackendSite.Service.BLL
             this.newAdminUserService = newAdminUserService;
             this.permissionBLL = permissionBLL;
             this.httpContextAccessor = httpContextAccessor;
+            this.environment = environment;
         }
-
-        //暫無使用
-        //public bool AddAccount(AdminUser adminUser)
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    adminUser.Userpwd = tools.MD5Encrypt(adminUser.Userpwd);
-        //    return adminService.AddAccount(serverInfo.SiteId, adminUser);
-        //}
-
-        //暫無使用
-        //public IEnumerable<AdminUser> AccountList()
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    return adminService.AccountList(serverInfo.SiteId);
-        //}
-
-        //暫無使用
-        //public AdminUser GetAccount(int userId)
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    return adminService.GetAccount(serverInfo.SiteId, userId);
-        //}
-
-        //暫無使用
-        //public bool EditAccount(AdminUser adminUser)
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    return adminService.EditAccount(serverInfo.SiteId, adminUser);
-        //}
-
-        //暫無使用
-        //public bool ChangePwdAccount(AdminUser adminUser)
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    if (string.IsNullOrWhiteSpace(adminUser.Userpwd))
-        //        adminUser.Userpwd = tools.MD5Encrypt("123456");
-        //    else
-        //        adminUser.Userpwd = tools.MD5Encrypt(adminUser.Userpwd);
-        //    return adminService.ChangePwdAccount(serverInfo.SiteId, adminUser);
-        //}
 
         public AdminUser GetUser(int userId)
         {
@@ -116,12 +79,12 @@ namespace BackendSite.Service.BLL
         public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang, AdminUserV2 loginUser)
         {
             var result = new List<AdminMenuModel>();
-            var menuList =  adminService.GetAllAdminMenu();
-            var permissionList =  adminService.GetAllAdminPermission();
+            var menuList = adminService.GetAllAdminMenu().Where(x => x.Status == AdminFunctionStatusEnum.Enable);
+            var permissionList = adminService.GetAllAdminPermission().Where(x => x.Status == AdminPermissionStatusEnum.Enable); ;
 
-            //Enable & Sort
-            menuList = menuList.Where(x => x.Status == AdminFunctionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
-            permissionList = permissionList.Where(x => x.Status == AdminPermissionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            // Sort
+            menuList = menuList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            permissionList = permissionList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
 
             if (!string.IsNullOrWhiteSpace(lang))
             {
@@ -143,7 +106,7 @@ namespace BackendSite.Service.BLL
                 var userRole = JsonConvert.DeserializeObject<List<int>>(loginUser.Role).FirstOrDefault();
                 userAllPremission = permissionBLL.GetUserAllPremission(userRole, loginUser.UserId, loginUser.SiteId).ToList();
             }
-            
+
             foreach (var funcData in assignFuncDatas)
             {
                 var permissionData = new List<AdminPermissionModel>();
@@ -166,7 +129,7 @@ namespace BackendSite.Service.BLL
                         Name = funcData.Name,
                         Permission = permissionData
                     });
-                }          
+                }
             }
 
             result.AddRange(await GetAllMenu(0, loginUser, heirIdList, menuList, permissionList, userAllPremission));
@@ -255,7 +218,7 @@ namespace BackendSite.Service.BLL
                                     });
                                 }
                             }
-                        }                               
+                        }
                     }
                 }
 
@@ -288,14 +251,14 @@ namespace BackendSite.Service.BLL
         }
         public bool CheckAdminUserDuplicate(string userName)
         {
-            return  newAdminUserService.GetAdminUserByUserName(userName) != null;
+            return newAdminUserService.GetAdminUserByUserName(userName) != null;
         }
         public AdminUserData GetUserV2(int userId)
         {
             return newAdminUserService.GetUserV2(userId);
         }
 
-        public ErrorCodeEnum ChangePwdV2(int userId, string OldPwd,string NewPwd)
+        public ErrorCodeEnum ChangePwdV2(int userId, string OldPwd, string NewPwd)
         {
             string Md5Userpwd = null;
             OldPwd = tools.MD5Encrypt(OldPwd);

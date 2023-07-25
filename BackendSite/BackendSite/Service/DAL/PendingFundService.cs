@@ -1,23 +1,21 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using MySql.Data.MySqlClient;
-using System.Data;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
     public class PendingFundService
     {
-        private readonly IConfiguration configuration;
+        private readonly MySqlClient _reportDbClient;
 
-        public PendingFundService(IConfiguration configuration)
+        public PendingFundService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         public IEnumerable<PendingFund> PendingFundList(int siteId)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            return conn.Query<PendingFund>("TmpPendingFund_Get", new { SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<PendingFund>("TmpPendingFund_Get", new { SiteId = siteId });
         }
     }
 

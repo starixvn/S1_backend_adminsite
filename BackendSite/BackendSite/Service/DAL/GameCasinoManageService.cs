@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model;
 using Dapper;
-using MySql.Data.MySqlClient;
 using System.Data;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
@@ -59,6 +58,11 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_Get");
         }
 
+        public IEnumerable<SlotCategoryInfo> GetSlotCategoryList()
+        {
+            return _reportDbClient.Query<SlotCategoryInfo>("Admin_SlotGameCategory_All_Get");
+        }
+
         public GameCasinoResult GameCasinoByTPIdV2(GameCasinoPara gameCasinoPara)
         {
             var logResult = new GameCasinoResult();
@@ -99,18 +103,16 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<CurrencyDataV2> GetCurrency(GetGameCasinoDetailPara para)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport"));
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
-            return conn.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
         }
         public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para,int SiteId)
         {
-            using var conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString"));
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             props.Add("SiteId", SiteId);
-            return conn.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId", props, commandType: CommandType.StoredProcedure).ToList();
+            return _reportDbClient.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId", props, commandType: CommandType.StoredProcedure).ToList();
         }
     }
 }

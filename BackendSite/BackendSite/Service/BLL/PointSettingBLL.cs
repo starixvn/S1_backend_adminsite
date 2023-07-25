@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
-using Microsoft.Extensions.Configuration;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.PointSetting;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendSite.Service.BLL
 {

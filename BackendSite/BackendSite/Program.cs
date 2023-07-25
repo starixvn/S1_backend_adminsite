@@ -26,4 +26,8 @@ startup.ConfigureServices(builder.Services);
 var app = builder.Build();
 startup.Configure(app, builder.Environment);
 
+var minWorkers = 64;
+var minIOCPs = 4;
+ThreadPool.SetMinThreads(minWorkers, minIOCPs);
+
 app.Run();

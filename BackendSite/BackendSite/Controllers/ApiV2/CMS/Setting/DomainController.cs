@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class DomainController : ControllerBase
@@ -37,7 +37,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         public class GetListRequest : ApiRequestPageModel
         {
-            public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
         }
 
@@ -74,14 +74,18 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS >  Domain Management > Select [Site Name]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DomainManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 64, 1 })]
         [HttpPost]
         public ApiListResult<DomainTable> GetList(GetListRequest request)
         {
             var apiResult = new ApiListResult<DomainTable>
             {
-                Data = _domainTableBll.GetDomainListBySite(request.SiteIds, request.CurrencyIds, request.PageNumber,
-                request.PageSize, out int totalPages, out int rowCount),
+                Data = _domainTableBll.GetDomainListBySite(
+                    new List<int>{request.SiteId},
+                    request.CurrencyIds, 
+                    request.PageNumber, 
+                    request.PageSize, 
+                    out var totalPages, out var rowCount),
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 PageNumber = request.PageNumber,
                 TotalPages = totalPages,
@@ -100,7 +104,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS >  Domain Management > Select [Site Name] > [Add Domain] > [Save]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DomainManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 64, 5 })]
         [HttpPost]
         public ApiResult Create(CreateRequest request)
         {
@@ -150,7 +154,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS >  Domain Management > Select [Site Name] > [Delete]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DomainManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 64, 4 })]
         [HttpPost]
         public ApiResult Delete(DeleteRequest request)
         {
@@ -177,7 +181,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         /// Func Path：CMS >  Domain Management > Select [Site Name] > [Edit] > [Save]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CMS/DomainManage" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 64, 3 })]
         [HttpPost]
         public ApiResult Update(UpdateRequest request)
         {

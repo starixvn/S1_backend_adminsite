@@ -1,14 +1,17 @@
-﻿using BackendSite.Attributes;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Amazon.S3.Model;
+using BackendSite.Service.Library;
+using BackendSite.Extensions;
+using BackendSite.Service.Model.BankCardManagement;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class BankCardManagementController : ControllerBase
@@ -18,6 +21,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
         private readonly SelLangBLL _selLangBll;
         private readonly BankDetailBLL _bankDetailBll;
+        private readonly PaymentManageBLL _paymentManageBll;
+        private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly VipLevelBLL _vipLevelBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly AWSS3Helper _s3Helper;
+        private readonly string _folder;
+        private readonly string _bucketName;
+        private readonly ILogger<BankCardManagementController> _logger;
+        private readonly ICacheHelper _redisHelper;
 
         #endregion
 
@@ -27,19 +39,31 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
+            _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
+            _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
+            _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
+            _bucketName = configuration.GetValue<string>("AwsPaymentBucketName");
+            _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
         }
 
         #endregion
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetQrCodeUrlRequest
         {
-            public IEnumerable<int> SiteIds { get; set; }
-
-            public IEnumerable<int> CurrencyIds { get; set; }
-
-            public List<BankDetailOffStatusEnum> Statuses { get; set; }
+            public IFormFile File { get; set; }
+        }
+        
+        public class GetQrCodeUrlResult
+        {
+            public string QrCodeUrl { get; set; }
         }
 
         #endregion
@@ -47,103 +71,161 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         #region Actions
 
         /// <summary>
-        /// BankCardManagement/GetList 取得指定品牌銀行卡清單
+        /// BankCardManagement/GetList 取得Offline銀行卡設定清單
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List
+        /// Func Path：Finance > Setting > Bank Acc Management > Click [Currency Tab] > List
         /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiListResult<BankDetail> GetListBySiteId(GetListRequest request)
+        public async Task<ApiListResult<OfflineBankingSetting>> GetList(GetOfflineBankingSettingRequest request)
         {
-            var apiListResult = new ApiListResult<BankDetail>();
-            var statusList = request.Statuses.Select(x => (int)x).ToList();
-            var datas = _bankDetailBll.GetLoaclBankList(request.SiteIds, request.CurrencyIds, statusList,
-                request.PageNumber, request.PageSize, out int totalPages, out int rowCount);
-            apiListResult.Data = datas;
-            apiListResult.TotalPages = totalPages;
-            apiListResult.PageNumber = request.PageNumber;
-            apiListResult.RowCount = rowCount;
-            apiListResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            return apiListResult;
+            try
+            {
+                var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
+                    new GetOfflineBankingSettingParams(request));
+                
+                return new ApiListResult<OfflineBankingSetting>
+                {
+                    Data = datas,
+                    PageNumber = request.PageNumber,
+                    TotalPages = totalPages,
+                    RowCount = rowCount,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "BankCardManagement/GetList");
+                return new ApiListResult<OfflineBankingSetting>
+                {
+                    Data = new List<OfflineBankingSetting>(),
+                    PageNumber = request.PageNumber,
+                    TotalPages = 0,
+                    RowCount = 0,
+                    ErrorCode = (int)ErrorCodeEnum.Fail
+                };
+            }
+            
         }
 
         /// <summary>
-        /// BankCardManagement/Set 設定銀行卡(新增/更新)
+        /// BankCardManagement/Set Offline銀行卡設定
         /// </summary>
         /// <remarks>
         /// 
         /// Http Method：POST
         /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List > [Add Bank Card] / [Edit]
+        /// Func Path：Finance > Setting > Bank Acc Management > Click [Currency Tab] > List > [Edit]
         /// 
         /// </remarks>
         /// <param name="request"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
         [HttpPost]
-        public ApiResult Set(ApiRequestWithLog<SetBankCard> request)
+        public async Task<ApiResult> SetAsync(SetOfflineBankingSettingRequest request)
         {
-            // if (request.CurrencyId != 61)
-            // {
-            //     request.Before.IFSCCode = "";
-            //     request.After.IFSCCode = "";
-            // }
-            var result = _bankDetailBll.SetBankCardwithIFSC(
-                new ParamsWithLog<SetBankCard>(request, User.Identity.Name));
+            var updater = _newAuthorizeBll.GetAuthData().UserName;
+            var oldData = await _bankDetailBll.GetOfflineBankingSettingByIdAsync(request.FinancialAccountId);
+            var success = await _bankDetailBll.SetOfflineBankingSettingAsync(
+                new SetOfflineBankingSettingParams(request, updater));
 
-            var apiResult = new ApiResult();
-            if (result > 0)
+            if (success)
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
+                _ = await _redisHelper.KeyDeleteByPatternAsync("PaySetting:*", RedisDataBase.Member);
+                
+                var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
+                var localPaySettings = await _bankDetailBll.GetLocalPaySettingAsync();
+                var payGroups = await _paymentManageBll.GetPayGroupWithCache();
+                _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = request.SiteId,
+                    CurrencyId = request.CurrencyId,
+                    ActionType = ActionType.Update,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.BankCardManagement,
+                    BeforeDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        oldData.FinancialAccountId,
+                        oldData.BankName,
+                        oldData.AccountNo,
+                        oldData.AccountName,
+                        oldData.MinAmount,
+                        oldData.MaxAmount,
+                        oldData.DailyLimitAmount,
+                        PointLevels = string.Join(", ", oldData.PointLevels),
+                        VipLevels = string.Join(", ", vip
+                            .Where(x => oldData.VipLevels.Contains(x.Level))
+                            .Select(x => x.LevelName)),
+                        oldData.Sort,
+                        Status = oldData.Status.ToString(),
+                        SupportChannels = string.Join(", ", oldData.SupportChannels.Select(x => x.ToString())),
+                        oldData.QrCodeUrl,
+                        PayGroups = request.GroupIds == null
+                            ? string.Empty
+                            : string.Join(", ", payGroups.Join(oldData.GroupIds,
+                                pg => pg.GroupId,
+                                g => g,
+                                (pg, g) => pg.GroupName))
+                    }),
+                    AfterDetailInfo = JsonConvert.SerializeObject(new
+                    {
+                        request.MinAmount,
+                        request.MaxAmount,
+                        request.DailyLimitAmount,
+                        PointLevels = string.Join(", ", request.PointLevels),
+                        VipLevels = string.Join(", ", vip
+                            .Where(x => request.VipLevels.Contains(x.Level))
+                            .Select(x => x.LevelName)),
+                        request.Sort,
+                        Status = request.Status.ToString(),
+                        request.Memo,
+                        SupportChannels = string.Join(", ", request.SupportChannels.Select(x => x.ToString())),
+                        request.QrCodeUrl,
+                        PayGroups = request.GroupIds == null
+                            ? string.Empty
+                            : string.Join(", ", payGroups.Join(request.GroupIds,
+                                pg => pg.GroupId,
+                                g => g,
+                                (pg, g) => pg.GroupName))
+                    }),
+                    Operator = updater
+                });
             }
-            else
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
+            
+            return success
+                ? new ApiResult((int)ErrorCodeEnum.Success, _selLangBll.GetMsg("msg_Updatesuccessful"))
+                : new ApiResult((int)ErrorCodeEnum.UpdateFailed, _selLangBll.GetMsg("msg_UpdateFailed"));
         }
-
-        /// <summary>
-        /// BankCardManagement/Delete 刪除銀行卡
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：Finance > Bank Card Management > Click [Site Name] > List > [Delete]
-        /// 
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Finance/BankInfoList" })]
+        
         [HttpPost]
-        public ApiResult Delete(ApiRequestWithLog<DeleteBankCard> request)
+        public async Task<ApiResult<GetQrCodeUrlResult>> GetQrCodeUrl([FromForm] GetQrCodeUrlRequest request)
         {
-            var result = _bankDetailBll.DelBankCard(
-                new ParamsWithLog<DeleteBankCard>(request, User.Identity.Name));
-            var apiResult = new ApiResult();
-            if (result > 0)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
-            }
-            else
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-            }
-            return apiResult;
-        }
+            var result = await UploadToS3(request.File);
 
+
+            return new ApiResult<GetQrCodeUrlResult>
+            {
+                Data = new GetQrCodeUrlResult
+                {
+                    QrCodeUrl = result
+                },
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        private async Task<string> UploadToS3(IFormFile file)
+        {
+            var ext = Path.GetExtension(file.FileName);
+            var path = $"/pay-qrcode/{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}{ext}";
+            var key = _folder + path;
+            var success = await _s3Helper.UploadFileAsync(file, _bucketName, key);
+
+            return success ? path : string.Empty;
+        }
+        
         #endregion
 
     }

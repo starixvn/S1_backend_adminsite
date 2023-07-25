@@ -1,0 +1,87 @@
+# localhost
+@url=http://localhost:9158
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+# 取得客戶資料及主錢包餘額
+POST {{url}}/apiV2/CustomerManage/GetCustTPWallet HTTP/1.1
+Content-Type: application/json
+
+{
+    "custId": 643973
+}
+
+###
+# 取得客戶今日Dashboard
+POST {{url}}/apiV2/CustomerManage/GetTodayDashboard HTTP/1.1
+Content-Type: application/json
+
+{
+    "custId": 643973
+}
+
+###
+POST {{url}}/apiV2/customerManage/AddCustNote
+Content-Type: application/json
+
+{
+    "siteId":2,
+    "custId":645204,
+    "note":"test note2"
+}
+
+###
+POST {{url}}/apiV2/customerManage/GetCustNote
+Content-Type: application/json
+
+{
+    "custId":645204,
+    "pageNumber": 1,
+    "pageSize": 20
+}
+
+###
+POST {{url}}/apiV2/Member/CheckDuplicateName
+Content-Type: application/json
+
+{
+    "custId":648546,
+    "fullName": "Hồ thái nhật"
+}
+
+###
+POST {{url}}/apiV2/Member/EditFullName
+Content-Type: application/json
+
+{
+    "custId":648546,
+    "fullName": "Hồ thái nhật"
+}
+
+###
+POST {{url}}/apiV2/Member/GetBasicInfo
+Content-Type: application/json
+
+{
+    "custId":648546
+}
+
+###
+POST {{url}}/apiV2/Member/ResetOtpTimes
+Content-Type: application/json
+
+{
+    "custId":644082
+}

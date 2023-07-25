@@ -44,6 +44,11 @@ namespace BackendSite.Service.BLL
             return serverInfo;
         }
 
+        public ServerInfo GetServerInfo(int siteId)
+        {
+            return serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
+        }
+
         public IEnumerable<ServerInfo> GetSiteList()
         {
             var sServerInfoListKey = $"ServerInfoList";
@@ -87,10 +92,8 @@ namespace BackendSite.Service.BLL
                 }
                 return userSiteList;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public IEnumerable<int> GetCurrencyList()
@@ -193,6 +196,11 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
         {
+            if (currencyId == 0) 
+            {
+                var serverInfo = serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
+                return serverInfo.ILangList;
+            }
             return await serverInfoService.GetLanguageList(siteId, currencyId);
         }
 
@@ -214,7 +222,7 @@ namespace BackendSite.Service.BLL
                     else
                     {
                         assignSites = newAdminUserService.GetAssignSiteListV2(authData.UserId);
-                        if (assignSites !=  null)
+                        if (assignSites != null)
                         {
                             List<ServerInfo> tmepuserSiteList = new List<ServerInfo>();
                             assignSites.ToList().ForEach(z =>

@@ -1,7 +1,9 @@
 ﻿using System.Text.RegularExpressions;
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +11,7 @@ using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class VipLevelController : ControllerBase
@@ -19,17 +21,20 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         private readonly AuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly MessageBLL _messageBll;
+        private readonly IVipLevelBLL _vipLevelBll;
+
+        public VipLevelController(AuthorizeBLL authorizeBll, CustInfoBLL custInfoBll, MessageBLL messageBll, IVipLevelBLL vipLevelBll)
+        {
+            _authorizeBll = authorizeBll;
+            _custInfoBll = custInfoBll;
+            _messageBll = messageBll;
+            _vipLevelBll = vipLevelBll;
+        }
 
         #endregion
 
         #region Constructor
 
-        public VipLevelController(IServiceProvider provider)
-        {
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _messageBll = provider.GetRequiredService<MessageBLL>();
-        }
 
         #endregion
 
@@ -41,7 +46,44 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             public IFormFile ExcelUpload { get; set; }
         }
 
+        public class GetUpgradeSettingRequest
+        {
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+        }
+
+        public class SetUpgradeSettingRequest
+        {
+            public int Level { get; set; }
+            public decimal UpDeposit { get; set; }
+            public decimal UpBonus { get; set; }
+            public decimal DownDeposit { get; set; }
+            public decimal DownTurnover { get; set; }
+        }
         #endregion
+
+        /// <summary>
+        /// VipLevel/GetSetting 取得VIP等級設定資料
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Get Vip Level Setting
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<VipLevelSetting>>> GetSetting(GetVipLevelSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<VipLevelSetting>>
+            {
+                Data = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
 
         /// <summary>
         /// VipLevel/ChangeVipLevelBatch 批次更新會員VIP等級
@@ -55,7 +97,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// </remarks>
         /// <param name="siteId"></param>
         /// <param name="excelUpload"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Message/ChangeVipLevelBatch" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 51, 3 })]
         [HttpPost]
         public async Task<List<ApiResult>> ChangeVipLevelBatchAsync([FromForm] ChangeVipLevelBatchRequest request)
         {
@@ -147,5 +189,40 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
         }
 
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<VipUpgradeSetting>>> GetUpgradeSetting(GetUpgradeSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<VipUpgradeSetting>>
+            {
+                Data = await _vipLevelBll.GetUpgradeSetting(request.SiteId, request.CurrencyId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> SetUpgradeSetting(ApiRequestWithLog<VipUpgradeSetting> req)
+        {
+            var result = await _vipLevelBll.SetUpgradeSetting(
+                new ParamsWithLog<VipUpgradeSetting>(req, User.Identity.Name));
+            return new ApiResult
+            {
+                ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : result,
+            };
+        }
+
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 146, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<int>>> GetVipUpgradeSupportCurrency(GetUpgradeSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<int>>
+            {
+                Data = await _vipLevelBll.GetVipUpgradeSupportCurrency(request.SiteId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
     }
 }

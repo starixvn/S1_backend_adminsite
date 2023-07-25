@@ -19,29 +19,19 @@ namespace BackendSite.Controllers.Api
     {
         #region Fields
 
-        private readonly AuthorizeBLL _authorizeBLL;
         private readonly BankFinancialBLL _bankFinancialBLL;
         private readonly ExcelBLL _excelBLL;
-        private readonly ResponseSettingBLL _responseSettingBLL;
-        private readonly Common _common;
 
         #endregion
 
         #region Constructors
 
-        public BankFinancialReportController(IConfiguration configuration,
-                                AuthorizeBLL authorizeBLL,
-                                BankFinancialBLL bankFinancialBLL,
-                                ExcelBLL excelBLL,
-                                ResponseSettingBLL responseSettingBLL,
-                                Common common
+        public BankFinancialReportController(BankFinancialBLL bankFinancialBLL,
+                                ExcelBLL excelBLL
             )
         {
-            _authorizeBLL = authorizeBLL;
             _bankFinancialBLL = bankFinancialBLL;
             _excelBLL = excelBLL;
-            _responseSettingBLL = responseSettingBLL;
-            _common = common;
         }
 
         #endregion
@@ -191,84 +181,10 @@ namespace BackendSite.Controllers.Api
 
             data.ToList().ForEach(s => s.CreateTime = new DateTimeOffset(s.CreateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
             data.ToList().ForEach(s => s.UpdateTime = new DateTimeOffset(s.UpdateTime.DateTime.AddHours(8), TimeSpan.FromHours(8)));
-            
-            var stream = _excelBLL.Export(data);
+
+            var stream = _excelBLL.ExportV2(data);
 
             return _excelBLL.ExcelFile(stream, "TransferInfoReport");
-        }
-
-        #endregion
-
-        #region BankFinancial Report
-
-        /// <summary>
-        /// BankFinancialReport/GetBankFinancialReport 取得金融報表資料
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：BankFinancial > Bank Financial Report > [Submit]
-        /// 
-        /// </remarks>
-        /// <param name="request">參數</param>
-        /// <returns>結果</returns>
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "BankFinancialReport/BankFinancialReport" })]
-        public ApiResult GetBankFinancialReport(GetBankFinancialReportReq request)
-        {
-
-            var data = _bankFinancialBLL.GetBankFinancialReport(JsonConvert.SerializeObject(request.SiteIds),
-                                                              JsonConvert.SerializeObject(request.CurrencyIds),
-                                                              request.StartDate,
-                                                              request.EndDate,
-                                                              _common.TransferToTimeZoneFormat(8));
-
-            if (!data.Any())
-            {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            else
-            {
-                return new ApiResult<IEnumerable<BankFinancialDataModel>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
-        }
-
-        /// <summary>
-        /// BankFinancialReport/ExportBankFinancialReport 匯出金融報表資料
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：BankFinancial > Bank Financial Report > [Export]
-        /// 
-        /// </remarks>
-        /// <param name="SiteIds"></param>
-        /// <param name="CurrencyIds"></param>
-        /// <param name="StartDate"></param>
-        /// <param name="EndDate"></param>
-        /// <returns>檔案</returns>
-        [HttpPost]
-        public IActionResult ExportBankFinancialReport(string SiteIds,
-                                                       string CurrencyIds,
-                                                       string StartDate,
-                                                       string EndDate)
-        {
-            var data = _bankFinancialBLL.GetBankFinancialReport(SiteIds,
-                                                                CurrencyIds,
-                                                                StartDate,
-                                                                EndDate,
-                                                                _common.TransferToTimeZoneFormat(8));
-            var stream = _excelBLL.Export(data);
-
-            return File(stream,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        $"BankFinancialReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
 
         #endregion

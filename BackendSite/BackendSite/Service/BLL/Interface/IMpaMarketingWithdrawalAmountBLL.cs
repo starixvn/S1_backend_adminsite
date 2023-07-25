@@ -1,0 +1,26 @@
+﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.Mpa.Marketing;
+using System.Reflection;
+
+namespace BackendSite.Service.BLL.Interface
+{
+    public interface IMpaMarketingWithdrawalAmountBLL
+    {
+        Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request);
+
+        IEnumerable<WithdrawalAmountDetailData> GetWithdrawalAmountDetail(WithdrawalAmountRequest request ,out IPageInfo pageInfo);
+
+        byte[] ExportMpaWithdrawal(WithdrawalAmountSummaryResponse summaryData,
+            List<WithdrawalAmountDetailData> detailsData,
+            bool isCompare,
+            string summaryTitle,
+            string detailTitle,
+            IEnumerable<PropertyInfo> properties = null);
+
+        Task MultiplyExchangeRate<TEntity>(List<TEntity> source,
+            DateTimeOffset startDate,
+            DateTimeOffset endDate,
+            int baseCurrencyId)
+            where TEntity : class, IMpaMarketingWithdrawalAmountBaseDto;
+    }
+}

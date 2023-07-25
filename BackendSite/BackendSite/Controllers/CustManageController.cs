@@ -121,8 +121,8 @@ namespace BackendSite.Controllers
                     exportDatas.Add(exprotdata);
                 });
                 await Task.WhenAll(tasks);
-                //如果該名user的SabaWallet,PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
-                exportDatas.RemoveAll(x => x.SabaWallet == 0 && x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
+                //如果該名user的PtWallet,SeamlessWallet,BonusWallet 皆為0就不export該名user
+                exportDatas.RemoveAll(x => x.PTWallet == 0 && x.SeamlessWallet == 0 && x.BonusWallet == 0);
                 var stream = excelBLL.ExportV2(exportDatas);
                 return excelBLL.ExcelFile(stream, "CustInfoList");
             }
@@ -166,20 +166,8 @@ namespace BackendSite.Controllers
 
         #endregion
 
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TeleCSD" })]
-        public IActionResult TeleCSD()
-        {
-            return View();
-        }
-
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/TagManagement" })]
         public IActionResult TagManagement()
-        {
-            return View();
-        }
-
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/RegistrationManagement" })]
-        public IActionResult RegistrationManagement()
         {
             return View();
         }

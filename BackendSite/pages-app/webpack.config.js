@@ -40,13 +40,13 @@ module.exports = {
     // 	// '@babel/polyfill',
     // 	"./src/pages/Finance/PaymentManagement/index.js"
     // ],
-    //"CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
-    // "Finance/WithdrawalLimitAdjust.min": [
-    //   "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
-    // ],
-    "CSD/PersonalMsgBatch.min": [
-    	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    "CSD/Announcement.min": ["./src/pages/CSD/Announcement/index.js"],
+    "Finance/WithdrawalLimitAdjust.min": [
+      "./src/pages/Finance/WithdrawalLimitAdjust/index.js",
     ],
+    // "CSD/PersonalMsgBatch.min": [
+    // 	"./src/pages/CSD/PersonalMsgBatch/index.js"
+    // ],
     // "Marketing/PointLevelList.min": [
     // 	"./src/pages/Marketing/PointLevelManagement/index.js"
     // ],
@@ -70,10 +70,10 @@ module.exports = {
     // "CSD/ChangeVipLevelBatch.min": [
     // 	"./src/pages/CSD/ChangeVipLevelBatch/index.js"
     // ],
-    "Marketing/BonusManage.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/BonusManage/index.jsx",
-    ],
+    // "Marketing/BonusManage.min": [
+    //   "@babel/polyfill",
+    //   "./src/pages/Marketing/BonusManage/index.jsx",
+    // ],
     // "Marketing/PendingBonus.min": [
     // 	"./src/pages/Marketing/PendingBonus/index.jsx"
     // ],
@@ -113,10 +113,6 @@ module.exports = {
     // "CSD/TpFailRecordReport.min": [
     //     "./src/pages/CSD/TpFailRecordReport/index.js"
     // ],
-    // "Marketing/BonusImport.min": [
-    // 	"@babel/polyfill",
-    // 	"./src/pages/Marketing/BonusImport/index.js"
-    // ],
     // "Marketing/ReferralReport.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/ReferralReport/index.js"
@@ -136,11 +132,6 @@ module.exports = {
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/GameCasinoManagement/index.js"
     // ]
-    // "CSD/TeleCSD.min": ["@babel/polyfill", "./src/pages/CSD/TeleCSD/index.js"],
-    // "Marketing/VipUpgrade.min": [
-    // 	"@babel/polyfill",
-    // 	"./src/pages/Marketing/VipUpgrade/index.js"
-    // ],
     // "Marketing/LatestHighlightVideoManagement.min": [
     // 	"@babel/polyfill",
     // 	"./src/pages/Marketing/LatestHighlightVideoManagement/index.js"
@@ -157,10 +148,6 @@ module.exports = {
     //   "@babel/polyfill",
     //   "./src/pages/Marketing/VipRebateInfoReport/index.js",
     // ],
-    "Marketing/VipRebateMangetment.min": [
-      "@babel/polyfill",
-      "./src/pages/Marketing/VipRebateMangetment/index.jsx",
-    ],
     // "Finance/WithdrawalLimitManage.min": [
     //   // '@babel/polyfill',
     //   "./src/pages/Finance/WithdrawalLimitManage/index.js",
@@ -221,14 +208,6 @@ module.exports = {
     // "Finance/WithdrawalAccounting.min": [
     //   "@babel/polyfill",
     //   "./src/pages/Finance/WithdrawalAccounting/index.js",
-    // ],
-    // "CSD/RegistrationManagement.min": [
-    //   '@babel/polyfill',
-    // "./src/pages/CSD/RegistrationManagement/index.js",
-    // ],
-    // "Marketing/RegistrationForMarketing.min": [
-    //   '@babel/polyfill',
-    //   "./src/pages/Marketing/RegistrationForMarketing/index.js",
     // ],
     // "CSD/DisableUserForGame.min": [
     //   '@babel/polyfill',

@@ -90,5 +90,10 @@ namespace BackendSite.Service.BLL
             await originImage.SaveAsync(ms, new JpegEncoder());
             return ms.ToArray();
         }
+
+        public bool IsValidImageFormat(string contentType)
+        {
+            return string.Equals(contentType, "image/png") || string.Equals(contentType, "image/jpeg");
+        }
     }
 }

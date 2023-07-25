@@ -2,6 +2,9 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using Dapper;
+using BackendSite.Controllers.ApiV2.Finance.Deposit;
+using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
@@ -17,12 +20,10 @@ namespace BackendSite.Service.DAL
 
         #region Constructors
 
-        public DepositAccountingService(IServiceProvider provider)
+        public DepositAccountingService(IEnumerable<MySqlClient> sqlClients)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
-            var logger = provider.GetRequiredService<ILogger<MySqlClient>>();
-            _mainDbClient = new MySqlClient(_configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(_configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
         #endregion
@@ -70,17 +71,40 @@ namespace BackendSite.Service.DAL
             return data;
         }
         
-        public int EditDepositAccounting(string transId, string accountNo ,string memo ,string Operator)
+        public int EditDepositAccounting(ParamsWithLog<DepositAccountingController.EditRequest> input)
         {
+            using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            using var trans =  conn.BeginTransaction();
+            
             var parameter = new DynamicParameters();
-            parameter.Add("_TransId", transId);
-            parameter.Add("_AccountNo", accountNo);
-            parameter.Add("_Memo", memo);
-            parameter.Add("_Operator", Operator);
-            
-            var data = _mainDbClient.Execute("Admin_DepositAccounting_Set", parameter);
-            
-            return data;
+            parameter.Add("_TransId", input.TransId);
+            parameter.Add("_AccountNo", input.After.AccountNo);
+            parameter.Add("_Memo", input.After.Memo);
+            parameter.Add("_Operator", input.Operator);
+            var result = _mainDbClient.Execute("Admin_DepositAccounting_Set", trans, parameter);
+
+            if (result > 0)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BetLimit);
+                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog(), DbType.String);
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam);
+                if (logSuccess > 0)
+                {
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
+                    return result;
+                }
+            }
+            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            return result;
         }
         
         public IEnumerable<DepositAccountingModel> ExportDepositAccountingList(

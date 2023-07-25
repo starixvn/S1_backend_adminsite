@@ -1,29 +1,20 @@
 ﻿using BackendSite.Service.Model;
-using Dapper;
-using MySql.Data.MySqlClient;
-using System.Data;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.DAL
 {
     public class RollOverService
     {
-        private readonly IConfiguration configuration;
-        public RollOverService(IConfiguration configuration)
+        private readonly MySqlClient _mainDbClient;
+        public RollOverService(IEnumerable<MySqlClient> sqlClients)
         {
-            this.configuration = configuration;
+            _mainDbClient = sqlClients.FirstOrDefault(p => p.DataBase == DataBase.Main);
         }
-        public int SetRollOver(int custId, int siteId, string userName, string bonusCode, decimal rollOver, string Memo, string RefTransId, out decimal afterRollOver, MySqlConnection conn, MySqlTransaction trans)
-        {
-            var p = new DynamicParameters(new { CustId = custId, SiteId = siteId, UserName = userName, BonusCode = bonusCode, RollOver = rollOver, Memo = Memo, RefTransId = RefTransId });
-            p.Add("AfterRollOver", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            var result = conn.Execute("Common_RollOver_Set", p, transaction: trans, commandType: CommandType.StoredProcedure);
-            afterRollOver = p.Get<decimal?>("AfterRollOver") ?? 0;
-            return result;
-        }
+
         public CustRollOver GetCustRollOver(int custId, string bonusCode)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            var result = conn.QueryFirstOrDefault<CustRollOver>("Common_RollOver_Get", new { CustId = custId, BonusCode = bonusCode }, commandType: CommandType.StoredProcedure);
+            var result = _mainDbClient.QueryFirst<CustRollOver>("Common_RollOver_Get", new { CustId = custId, BonusCode = bonusCode });
             return result;
         }
     }

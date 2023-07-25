@@ -3,24 +3,25 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using Dapper;
 using Newtonsoft.Json;
 
 
 namespace BackendSite.Service.BLL
 {
-    public class BetListBLL
+    public class BetListService
     {
         private readonly PartitionService _partitionService;
         private readonly ICacheHelper _cacheHelper;
 
-        public BetListBLL(IServiceProvider provider)
+        public BetListService(IServiceProvider provider)
         {
             _partitionService = provider.GetRequiredService<PartitionService>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
-        public List<BetListReport> GetBetListReport(GetBetListRequest input, out IPageInfo pageInfo)
+        public IEnumerable<BetListReport> GetBetListReport(GetBetListRequest input, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var key = input.GetRedisKey();
@@ -39,9 +40,15 @@ namespace BackendSite.Service.BLL
                     if (_cacheHelper.KeyDeleteByPattern($"{masterKey}*") > 0)
                     {
                         AddCache(sortData, masterKey, sortKey, cacheTime, input.OrderBy);
-                    }                 
-                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count, input.PageNumber, input.PageSize);
-                    return sortData.GetRange(sortIndex, sortCount);
+                    }
+                    var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), input.PageNumber, input.PageSize);
+
+                    var sortResult = sortData.GetRange(sortIndex, sortCount);
+                    foreach (var item in sortData)
+                    {
+                        item.Dispose();
+                    }
+                    return sortResult;
                 }
 
                 //Export
@@ -68,26 +75,51 @@ namespace BackendSite.Service.BLL
                 TagJson = input.Tags.Any() ? JsonConvert.SerializeObject(input.Tags) : null,
                 StartDate,
                 EndDate,
+                MemberTypeJson = input.MemberTypes != null && input.MemberTypes.Any()
+                ? JsonConvert.SerializeObject(input.MemberTypes.Select(x => (int)x))
+                : JsonConvert.SerializeObject(((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x)),
             });
 
-            var data = _partitionService.Query<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V2", parameters);
+            var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V4", parameters);
 
             //Sort
-            var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.SettledTime).ToList();
+            var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.SettledTime).AsQueryable();
 
             AddCache(list, masterKey, sortKey, cacheTime, input.OrderBy);
 
             //Export
-            if (input.PageNumber == -1 || data.Count == 0)
+            if (input.PageNumber == -1 || !data.Any())
             {
                 return list;
             }
 
-            var (index, count) = pageInfo.ListPagination(list.Count, input.PageNumber, input.PageSize);
-            return list.GetRange(index, count);
+            var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
+            var result = list.AsEnumerable().GetRange(index, count);
+            foreach (var item in list)
+            {
+                item.Dispose();
+            }
+            return result;
         }
 
-        private void AddCache(List<BetListReport> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
+        public IEnumerable<TpBetRecord> GetTpBetRecord(int CustId, DateTime StartTime, DateTime EndTime)
+        {
+            return _cacheHelper.TryGetOrCreate<IEnumerable<TpBetRecord>>(
+                key: $"TpBetRecord:{CustId}:{StartTime:yyyyMMddHHmmssfff}:{EndTime:yyyyMMddHHmmssfff}",
+                timeSpan: TimeSpan.FromMinutes(1),
+                factory: () =>
+                {
+                    var data = _partitionService.GetTpBetRecord(StartTime, EndTime, "Admin_TpBetRecord_Get", new
+                    {
+                        CustId,
+                        StartTime,
+                        EndTime,
+                    });
+                    return data.OrderByDescending(i => i.SettledTime);
+                });
+        }
+
+        private void AddCache(IEnumerable<BetListReport> list, string masterKey, string sortKey, TimeSpan cacheTime, bool orderBy)
         {
             // Add Cache by List      
             _ = Task.Run(() =>

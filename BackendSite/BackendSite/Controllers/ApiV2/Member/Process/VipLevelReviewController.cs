@@ -6,10 +6,11 @@ using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
-    [Authorize(AuthenticationSchemes = "backend")]
+    [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class VipLevelReviewController : ControllerBase
@@ -18,6 +19,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         private readonly VipLevelBLL _vipLevelBll;
         private readonly ExcelBLL _excelBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBLL;
 
         #endregion
 
@@ -27,6 +29,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
         }
 
         #endregion
@@ -38,10 +41,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int SiteId { get; set; }
             public string CalculateYearMonth { get; set; }
             public VipSettingStatusEnum VipType { get; set; }
-            public VipStatus Status { get; set; }
+            public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
         }
-        
+
         public class UpdateVipUpgradeReviewReq
         {
             public IEnumerable<int> CustIdList { get; set; }
@@ -49,29 +53,33 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public int SiteId { get; set; }
             public VipStatus NewStatus { get; set; }
         }
-        
+
         public class VipDowngradeReviewReq : ApiRequestPageModel
         {
             public int SiteId { get; set; }
             public string CalculateYearMonth { get; set; }
-            public VipStatus Status { get; set; }
+            public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
         }
-        
+
         public class ExportVipUpgradeReviewListReq
         {
             public int SiteId { get; set; }
             public string YearMonth { get; set; }
-            public int Status { get; set; }
+            public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
+            public IEnumerable<int> VipLevel { get; set; }
         }
-        
+
         public class ExportVipDowngradeReviewListReq
         {
             public int SiteId { get; set; }
             public string CalculateYearMonth { get; set; }
-            public int Status { get; set; }
+            public IEnumerable<int> Status { get; set; }
             public string UserName { get; set; }
+            public IEnumerable<int> CurrencyId { get; set; }
         }
 
         #endregion
@@ -88,11 +96,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 1 })]
         [HttpPost]
         public ApiListResult<VipUpgradeReviewDetailModel> GetUpgradeList(VipUpgradeReviewReq req)
         {
-            var result = _vipLevelBll.GetVipUpgradeReviewList(req.SiteId, req.CalculateYearMonth, req.Status, req.UserName, req.PageNumber, req.PageSize);
+            var result = _vipLevelBll.GetVipUpgradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), req.UserName, req.PageNumber, req.PageSize, JsonConvert.SerializeObject(req.CurrencyId));
 
             foreach (var data in result.Data)
             {
@@ -102,7 +110,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 if (data.QualifiedTime != null)
                     data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.Value.DateTime, TimeSpan.Zero);
             }
-            
+
             return new ApiListResult<VipUpgradeReviewDetailModel>
             {
                 Data = result.Data,
@@ -123,11 +131,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_export_excel" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 2 })]
         [HttpPost]
         public IActionResult ExportUpgradeList(ExportVipUpgradeReviewListReq req)
         {
-            var data = _vipLevelBll.ExportVipUpgradeReviewList(req.SiteId, req.YearMonth, (VipStatus)req.Status, req.UserName);
+            var data = _vipLevelBll.ExportVipUpgradeReviewList(req.SiteId, req.YearMonth, JsonConvert.SerializeObject(req.Status), req.UserName, JsonConvert.SerializeObject(req.CurrencyId));
             var exportList = data.Select(d => new ExportVipUpgradeReviewModel
             {
                 SiteId = d.SiteId,
@@ -144,12 +152,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 DepositAmount = d.DepositAmount,
                 UpgradeBonus = d.UpgradeBonus,
                 Status = d.Status,
-                CalculateTime = new DateTimeOffset(d.CalculateTime.DateTime, TimeSpan.Zero ).DateTime.ToString(),
-                SettleTime = d.SettleTime == null ? "" : new DateTimeOffset(d.SettleTime.Value.DateTime, TimeSpan.Zero ).DateTime.ToString(),
-                QualifiedTime = d.QualifiedTime == null ? "First Time Upgrade" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, TimeSpan.Zero ).DateTime.ToString(),
+                CalculateTime = new DateTimeOffset(d.CalculateTime.DateTime, TimeSpan.Zero).DateTime.ToString(),
+                SettleTime = d.SettleTime == null ? "" : new DateTimeOffset(d.SettleTime.Value.DateTime, TimeSpan.Zero).DateTime.ToString(),
+                QualifiedTime = d.QualifiedTime == null ? "First Time Upgrade" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, TimeSpan.Zero).DateTime.ToString(),
                 LastUpdateUser = d.LastUpdateUser
             }).ToList();
-            var stream = _excelBll.Export(exportList);
+            var stream = _excelBll.ExportV2(exportList);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipUpgrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
@@ -164,7 +172,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_update" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 3 })]
         [HttpPost]
         public ApiResult UpdateUpgrade(UpdateVipUpgradeReviewReq req)
         {
@@ -198,11 +206,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 1 })]
         [HttpPost]
         public ApiListResult<VipDowngradeReviewDetailModel> GetDowngradeList(VipDowngradeReviewReq req)
         {
-            var result = _vipLevelBll.GetVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, req.Status, req.UserName, req.PageNumber, req.PageSize);
+            var result = _vipLevelBll.GetVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.UserName, req.PageNumber, req.PageSize);
             foreach (var data in result.Data)
             {
                 data.CalculateTime = new DateTimeOffset(data.CalculateTime.DateTime, TimeSpan.Zero);
@@ -211,7 +219,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 if (data.QualifiedTime != null)
                     data.QualifiedTime = new DateTimeOffset(data.QualifiedTime.Value.DateTime, TimeSpan.Zero);
             }
-            
+
             return new ApiListResult<VipDowngradeReviewDetailModel>
             {
                 Data = result.Data,
@@ -232,11 +240,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_export_excel" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 2 })]
         [HttpPost]
         public IActionResult ExportDowngradeList(ExportVipDowngradeReviewListReq req)
         {
-            var data = _vipLevelBll.ExportVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, (VipStatus)req.Status, req.UserName);
+            var data = _vipLevelBll.ExportVipDowngradeReviewList(req.SiteId, req.CalculateYearMonth, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.UserName);
             var exportList = data.Select(d => new ExportVipDowngradeReviewDataModel
             {
                 SiteId = d.SiteId,
@@ -254,13 +262,13 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ThresholdTurnOver = d.ThresholdTurnOver,
                 TurnOverAmount = d.TurnOverAmount,
                 Status = d.Status,
-                CalculateTime = new DateTimeOffset(d.CalculateTime.DateTime, TimeSpan.Zero ).DateTime.ToString(),
-                SettleTime = d.SettleTime == null ? "" : new DateTimeOffset(d.SettleTime.Value.DateTime, TimeSpan.Zero ).DateTime.ToString(),
-                QualifiedTime = d.QualifiedTime == null ? "" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, TimeSpan.Zero ).DateTime.ToString(),
+                CalculateTime = new DateTimeOffset(d.CalculateTime.DateTime, TimeSpan.Zero).DateTime.ToString(),
+                SettleTime = d.SettleTime == null ? "" : new DateTimeOffset(d.SettleTime.Value.DateTime, TimeSpan.Zero).DateTime.ToString(),
+                QualifiedTime = d.QualifiedTime == null ? "" : new DateTimeOffset(d.QualifiedTime.Value.DateTime, TimeSpan.Zero).DateTime.ToString(),
                 LastUpdateUser = d.LastUpdateUser
             }).ToList();
-            
-            var stream = _excelBll.Export(exportList);
+
+            var stream = _excelBll.ExportV2(exportList);
 
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"VipDowngrade_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
@@ -276,7 +284,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </remarks>
         /// <param name="req"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Marketing/VipLevelReview", "viplevelreview_update" })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 50, 3 })]
         [HttpPost]
         public ApiResult UpdateDowngrade(UpdateVipUpgradeReviewReq req)
         {
@@ -299,7 +307,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 };
             }
         }
-
         #endregion
     }
 }

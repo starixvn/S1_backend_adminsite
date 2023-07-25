@@ -96,10 +96,10 @@ namespace BackendSite.Controllers.Api
             try
             {
                 var siteList = serverInfoBLL.GetSiteList().ToDictionary(x => x.SiteId, y => y.SiteName);
-                if (!siteList.ContainsKey(0))
-                {
-                    siteList.Add(0, "All");
-                }
+                //if (!siteList.ContainsKey(0))
+                //{
+                //    siteList.Add(0, "All");
+                //}
 
                 if (para.StartDate > 2147483647)
                 {
@@ -110,10 +110,20 @@ namespace BackendSite.Controllers.Api
                 {
                     para.EndDate = 2147483647;
                 }
+                var statuses = new List<GeneralStatusEnum>();
+                if (para.Status == 0) //all
+                {
+                    statuses.Add(GeneralStatusEnum.Enable);
+                    statuses.Add(GeneralStatusEnum.Disable);
+                }
+                else if (para.Status == 1) //active
+                    statuses.Add(GeneralStatusEnum.Enable);
+                else //inactive
+                    statuses.Add(GeneralStatusEnum.Disable);
 
                 var startTime = DateTimeExtensions.UnixToDateTime(para.StartDate);
                 var endTime = DateTimeExtensions.UnixToDateTime(para.EndDate);
-                var result = messageBLL.GetAnnouncements(para.SelectSite, startTime, endTime, para.Status, PageNumber,
+                var result = messageBLL.GetAnnouncements(para.SelectSite, startTime, endTime, statuses, PageNumber,
                     PageSize, ref TotalPages, ref RowCount);
                 foreach (var r in result)
                 {
@@ -380,53 +390,6 @@ namespace BackendSite.Controllers.Api
         }
 
         /// <summary>
-        /// Message/SendPersonalMsg 送出指定客戶個人訊息
-        /// </summary>
-        /// <remarks>
-        /// 
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo  > Personal Message >  Click [Add] > Click [Send]
-        /// 
-        /// </remarks>
-        /// <param name="CustId"></param>
-        /// <param name="Title"></param>
-        /// <param name="Content"></param>
-        /// <param name="PageNumber"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
-        [HttpPost]
-        public ApiListResult<PersonalMsg> SendPersonalMsg([FromForm] int CustId, [FromForm] string Title,
-            [FromForm] string Content, [FromForm] int PageNumber)
-        {
-            var PageSize = 10;
-            var TotalPages = 0;
-            var RowCount = 0;
-            var apiResult = new ApiListResult<PersonalMsg>();
-            try
-            {
-                var authData = authorizeBLL.GetAuthData();
-                messageBLL.SendMessageToPlayer(authData.UserName, Title, Content, CustId, authData.UserId);
-                apiResult.Data =
-                    messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
-                apiResult.ErrorCode = 0;
-
-                apiResult.PageNumber = PageNumber;
-                apiResult.RowCount = RowCount;
-                apiResult.TotalPages = TotalPages;
-                apiResult.ErrorCode = 0;
-            }
-            catch (Exception ex)
-            {
-                apiResult.RawMessage = ex.ToString();
-                apiResult.ErrorCode = 999;
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
         /// Message/DeletePersonalMsg 刪除指定客戶個人訊息
         /// </summary>
         /// <remarks>
@@ -440,10 +403,9 @@ namespace BackendSite.Controllers.Api
         /// <param name="CustId"></param>
         /// <param name="PageNumber"></param>
         /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute),
-            Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
+        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/CustInfoList", "ca_personalMsg" })]
         [HttpPost]
-        public ApiListResult<PersonalMsg> DeletePersonalMsg([FromForm] int Id, [FromForm] bool IsBatch, [FromForm] int CustId,
+        public async Task<ApiListResult<PersonalMsg>> DeletePersonalMsg([FromForm] int Id, [FromForm] bool IsBatch, [FromForm] int CustId,
             [FromForm] int PageNumber)
         {
             var PageSize = 10;
@@ -452,7 +414,7 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<PersonalMsg>();
             try
             {
-                messageBLL.DeletePersonalMsg(Id,IsBatch);
+                await messageBLL.DeletePersonalMsg(Id, User.Identity.Name);
                 apiResult.Data = messageBLL.GetPersonalMsg(CustId, PageNumber, PageSize, ref TotalPages, ref RowCount);
                 apiResult.ErrorCode = 0;
 
@@ -509,7 +471,7 @@ namespace BackendSite.Controllers.Api
                     {
                         var custUsername = sheet.Cells[rowId, 1].Text.Trim();
                         var sabaId = sheet.Cells[rowId, 2].Text.Trim();
-                        var custId = common.TpIdToCustId(sabaId); 
+                        var custId = common.TpIdToCustId(sabaId);
 
                         if (string.IsNullOrEmpty(custUsername) && custId == null)
                         {
@@ -533,7 +495,7 @@ namespace BackendSite.Controllers.Api
                         var custInfosDetail = await custInfoBLL.GetCustInfoByCust(req.optSite, data.CustId, data.CustUserName);
                         await messageBLL.PreSendBatchMessage(data, custInfosDetail, req.personalMsg, authData, req.optSite, batchId, req.IsPopup);
                     }
-                    
+
                     messageBLL.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
                     _logger.LogInformation($@"MessageService-Read Excel And Send End At {DateTime.UtcNow}.");
 
@@ -549,15 +511,15 @@ namespace BackendSite.Controllers.Api
             }
             else
             {
-                
+
                 #region checkMsg
 
-                var (result , errorMsg) = messageBLL.CheckBatchMessage(req.currency, req.personalMsg);
+                var (result, errorMsg) = messageBLL.CheckBatchMessage(req.currency, req.personalMsg);
                 if (!result)
                 {
                     return new ApiResult<int>()
                     {
-                        ErrorCode = (int) ErrorCodeEnum.Fail,
+                        ErrorCode = (int)ErrorCodeEnum.Fail,
                         Message = errorMsg
                     };
                 }
@@ -565,7 +527,7 @@ namespace BackendSite.Controllers.Api
                 #endregion
 
                 messageBLL.NewBatchMessage(req.optSite, authData.UserName, req.IsPopup, req.personalMsg, ref batchId);
-              
+
                 _ = Task.Run(() =>
                 {
                     var userSiteList = serverInfoService.GetSiteList();
@@ -575,7 +537,7 @@ namespace BackendSite.Controllers.Api
                     {
                         langList.AddRange(b.Except(langList));
                     }
-                    
+
                     foreach (var lang in langList)
                     {
                         var msg = JObject.Parse(req.personalMsg)[lang];
@@ -596,12 +558,12 @@ namespace BackendSite.Controllers.Api
                     }
 
                     messageBLL.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
-                    
+
                     _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
                 });
-                
+
             }
-            
+
 
             return new ApiResult<int>()
             {
@@ -628,7 +590,7 @@ namespace BackendSite.Controllers.Api
         public IActionResult ExportSendMessageBatchResultReport(int BatchId)
         {
             var data = messageBLL.GetBatchMessageSendLog(BatchId);
-            var stream = _excelBLL.Export(data);
+            var stream = _excelBLL.ExportV2(data);
 
             return File(stream,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -662,7 +624,8 @@ namespace BackendSite.Controllers.Api
             var apiResult = new ApiListResult<BatchMsg>();
             try
             {
-                messageBLL.DeleteBatchMessage(batchId);
+                var siteId = SelectSite.First();
+                var result = messageBLL.DeleteBatchMessage(siteId, batchId, User.Identity.Name).Result;
                 var startTime = DateTimeExtensions.UnixToDateTime(StartDate);
                 var endTime = DateTimeExtensions.UnixToDateTime(EndDate);
                 apiResult.Data = messageBLL.GetBatchMessageList(SelectSite, startTime, endTime, PageSize,
@@ -701,10 +664,10 @@ namespace BackendSite.Controllers.Api
         {
             var result = new ApiResult();
             var authData = authorizeBLL.GetAuthData();
-            
+
             try
             {
-                if (messageBLL.UpdateBatchMessage(req.batchId, req.IsPopup, req.personalMsg , authData.UserName))
+                if (messageBLL.UpdateBatchMessage(req.batchId, req.IsPopup, req.personalMsg, authData.UserName))
                     result.ErrorCode = 0;
             }
             catch (Exception ex)

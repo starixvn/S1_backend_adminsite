@@ -1,7 +1,9 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +15,12 @@ namespace BackendSite.Controllers.ApiV2.Report
     [ApiController]
     public class BetListReportController : ControllerBase
     {
-        private readonly BetListBLL _betListBll;
+        private readonly BetListService _betListBll;
         private readonly ExcelBLL _excelBll;
 
         public BetListReportController(IServiceProvider provider)
         {
-            _betListBll = provider.GetRequiredService<BetListBLL>();
+            _betListBll = provider.GetRequiredService<BetListService>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
@@ -60,11 +62,18 @@ namespace BackendSite.Controllers.ApiV2.Report
         public IActionResult Export(GetBetListRequest request)
         {
             DateCheck(request);
+            var offset = request.StartTime.Offset;
 
             request.PageNumber = -1; //export all
-            var data = _betListBll.GetBetListReport(request, out var _);
+            var data = _betListBll.GetBetListReport(request, out var _);      
+            foreach (var item in data)
+            {
+                item.TransTime = item.TransTime.ToOffset(offset);
+                item.SettledTime = item.SettledTime.ToOffset(offset);
+                item.SetBetListTimeOffset(offset);
+            }
 
-            var stream = _excelBll.Export(data, offset: request.StartTime.Offset);
+            var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
 

@@ -29,13 +29,13 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 銀行ID
         /// </summary>
-        public int SysId { get; set; }
+        public int? SysId { get; set; }
 
         /// <summary>
         /// 讀寫 目的
         /// 1=Deposit,2=Withdrawal,3=Transfer
         /// </summary>
-        public string Purpose { get; set; }
+        public List<int> Purpose { get; set; }
 
         /// <summary>
         /// 讀寫 付款方式
@@ -51,6 +51,9 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 第三方支付ID
         /// </summary>
         public int? PayId { get; set; }
+        
+        public CryptoCurrencyEnum? CryptoCurrencyId { get; set; }
+        public NetworkTypeEnum? Network { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶帳號
@@ -61,16 +64,35 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶名稱
         /// </summary>
         public string AccountName { get; set; }
+        
+        /// <summary>
+        /// 目前只 for INR IFSC. 使用
+        /// </summary>
+        public string AccountCode { get; set; }
+        public string BankLoginUrl { get; set; }
+        public string BankLoginAccount { get; set; }
+        public string BankLoginPassword { get; set; }
+        public string TransferPin { get; set; }
+        public string LoginPin { get; set; }
+        public string MobilePin { get; set; }
+        public string CorporateID { get; set; }
 
         /// <summary>
         /// 讀寫 帳戶顯示名稱
         /// </summary>
         public string DisplayName { get; set; }
+        
+        public string FrontendDisplayName { get; set; }
 
         /// <summary>
         /// 讀寫 初始金額
         /// </summary>
         public decimal InitialAmount { get; set; }
+
+        /// <summary>
+        /// 讀寫 初始金額計算時間
+        /// </summary>
+        public DateTimeOffset InitialTime { get; set; }
 
         /// <summary>
         /// 讀寫 超過餘額警示
@@ -111,8 +133,8 @@ namespace BackendSite.Service.Model.BankFinancial
         /// </summary>
         public DateTimeOffset UpdateTime 
         {
-            get => _createTime;
-            set => _createTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+            get => _updateTime;
+            set => _updateTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
 
         /// <summary>
