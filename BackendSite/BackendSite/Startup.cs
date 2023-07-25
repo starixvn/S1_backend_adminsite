@@ -34,7 +34,7 @@ namespace BackendSite
         {
             services.AddMemoryCache();
             var redisConnection = ConnectionMultiplexer.Connect(_configuration.GetValue<string>("RedisConnection"));
-            redisConnection.UseElasticApm();
+            //redisConnection.UseElasticApm();
             services.AddSingleton<IConnectionMultiplexer>(redisConnection);
             services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
