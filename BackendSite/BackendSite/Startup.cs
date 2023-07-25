@@ -13,6 +13,11 @@ using BackendSite.Service.DAL.Interface;
 using StackExchange.Redis;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Option;
+using Elastic.Apm.NetCoreAll;
+using Elastic.Apm;
+using Elastic.Apm.SqlClient;
+using Elastic.Apm.StackExchange.Redis;
+using Elastic.Apm.AspNetCore;
 
 namespace BackendSite
 {
@@ -28,7 +33,9 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(_configuration.GetValue<string>("RedisConnection")));
+            var redisConnection = ConnectionMultiplexer.Connect(_configuration.GetValue<string>("RedisConnection"));
+            redisConnection.UseElasticApm();
+            services.AddSingleton<IConnectionMultiplexer>(redisConnection);
             services.AddSingleton<ICacheHelper, RedisCacheHelper>();
             /*Attributes*/
             services.AddSingleton<AuthorizeByFuncAttribute>();
@@ -178,6 +185,11 @@ namespace BackendSite
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
+
+            if (!env.IsEnvironment("Local"))
+            {
+                app.UseElasticApm(_configuration, new SqlClientDiagnosticSubscriber());
+            }
 
             if (!env.IsProduction())
             {
