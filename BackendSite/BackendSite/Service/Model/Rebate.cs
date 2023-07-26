@@ -56,4 +56,16 @@
         public string Operator { get; set; }
     }
 
+    public class RebateExcludeGame
+    {
+        public int TpId { get; set; }
+        public string TpName { get; set; }
+        public int GameType { get; set; }
+        public string GameTypeName { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public string GameId { get; set; }
+        public string GameName { get; set; }
+        public string AppId { get; set; }
+    }
 }
