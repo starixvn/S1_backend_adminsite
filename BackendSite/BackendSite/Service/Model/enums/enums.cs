@@ -1590,6 +1590,20 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1,
     }
+    
+    public enum DashboardOrderByPropertyEnum
+    {
+        Amount = 1,
+        Currency = 2,
+        Count = 3
+    }
+
+    public enum DashboardGameTopDataTypeEnum
+    {
+        TopBetTwenty = 1,
+        TopWinTwenty = 2,
+        TopLoseTwenty = 3
+    }
 
     public enum ShieldPlatform
     {
