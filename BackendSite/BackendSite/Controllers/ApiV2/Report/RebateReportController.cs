@@ -16,6 +16,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region Fields
 
         private readonly PaymentBLL _paymentBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly ExcelBLL _excelBll;
 
         #endregion
@@ -26,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -101,9 +103,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             var apiResult = new ApiResult<VipRebateReportResult>();
             try
             {
+                var multiSiteRequest = _serverInfoBll.ConvertToMultiSiteParam(request.SiteIds, request.CurrencyIds);
                 var currencyAmount = new List<string>();
-                var searchResult = _paymentBll.GetVipRebateInfoList(request.SiteIds,
-                    request.CurrencyIds,
+                var searchResult = _paymentBll.GetVipRebateInfoList(multiSiteRequest,
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
@@ -141,8 +143,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         [HttpPost]
         public IActionResult ExportForVip(ExportForVipRequest request)
         {
-            var searchResult = _paymentBll.GetVipRebateInfoListExport(request.SiteIds,
-                    request.CurrencyIds,
+            var multiSiteRequest = _serverInfoBll.ConvertToMultiSiteParam(request.SiteIds, request.CurrencyIds);
+            var searchResult = _paymentBll.GetVipRebateInfoListExport(multiSiteRequest,
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
