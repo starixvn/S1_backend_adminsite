@@ -76,6 +76,7 @@ namespace BackendSite.Service.Model
     public class CreateAdminAdjustmentInfoLogInput
     {
         public int SiteId { get; set; }
+        public int CustId { get; set; }
         public int CurrencyId { get; set; }
         public AdminAdjustmentLogMenuEnum MenuEnum { get; set; }
         public ActionType ActionType { get; set; }
