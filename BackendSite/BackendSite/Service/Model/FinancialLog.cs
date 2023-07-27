@@ -1,6 +1,5 @@
 
 using BackendSite.Extensions;
-using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
@@ -175,7 +174,7 @@ namespace BackendSite.Service.Model
 
     public class TpBetRecordByDate
     {
-        public DateTime SettledDate { get; set; }
+        public string SettledDate { get; set; }
         public decimal TotalTO { get; set; }
         public decimal ValidBet { get; set; }
         public decimal InvalidBet { get; set; }
@@ -199,7 +198,7 @@ namespace BackendSite.Service.Model
     }
     public class TpBetRecordListOneDayRes
     {
-        public DateTime SettledDate { get; set; }
+        public string SettledDate { get; set; }
         public string CategoryName { get; set; }
         public int CategoryId { get; set; }
         public decimal TotalTO { get; set; }
@@ -225,7 +224,7 @@ namespace BackendSite.Service.Model
     }
     public class TpBetRecordbyCategoryIdRes
     {
-        public DateTime SettledDate { get; set; }
+        public string SettledDate { get; set; }
         public string GameTypeName { get; set; }
         public int GameTypeID { get; set; }
         public decimal TotalTO { get; set; }
@@ -303,6 +302,7 @@ namespace BackendSite.Service.Model
         public int GameType { get; set; }
         public string TypeName { get; set; }
         public decimal ValidBet { get; set; }
+        public decimal ValidTurnover { get; set; }
         public decimal Percentage { get; set; }
         public decimal CalculatedAmount { get; set; }
     }

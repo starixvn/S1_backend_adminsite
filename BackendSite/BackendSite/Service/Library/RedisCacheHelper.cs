@@ -1,8 +1,10 @@
-﻿using BackendSite.Service.Model.enums;
-
+﻿using System.Collections;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
-
 using StackExchange.Redis;
+using YamlDotNet.Core.Tokens;
 
 namespace BackendSite.Service.Library
 {
@@ -28,7 +30,7 @@ namespace BackendSite.Service.Library
                 if (!db.KeyExists(key))
                 {
                     var result = factory();
-                    if (result != null)
+                    if (HasData(result))
                     {
                         db.StringSet(key, JsonConvert.SerializeObject(result), timeSpan);
                     }
@@ -55,7 +57,7 @@ namespace BackendSite.Service.Library
                 if (!db.KeyExists(key))
                 {
                     var result = await factory();
-                    if (result != null)
+                    if (HasData(result))
                     {
                         await db.StringSetAsync(key, JsonConvert.SerializeObject(result), timeSpan);
                     }
@@ -371,6 +373,47 @@ namespace BackendSite.Service.Library
             }
         }
 
+        public async Task<RedisSetAndGetResult> StringSetAndGetAsync(string key, string value, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            var result = new RedisSetAndGetResult() { Success = true, Value = value };
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            RedisKey[] keys = { $"{key}" };
+            RedisValue[] values = { value };
+
+            // 如果 key 存在，回傳 Value，如果 Key 不存在，則 Set Key，並回傳該次 Set 的 Value
+            var LuaScript = @"
+            local value = redis.call(""GET"", KEYS[1])
+            if (not value) then
+                redis.call(""SET"", KEYS[1], ARGV[1])
+            return ARGV[1]
+            end
+            return value";
+
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            var returnValue = await db.ScriptEvaluateAsync(LuaScript, keys, values);
+
+            if (returnValue.ToString() != value)
+            {
+                result.Success = false;
+                result.Value = returnValue.ToString(); // redis origin value
+            }
+
+            return result;
+        }
+
+        public async Task<bool> ExecuteLuaScriptAsync(string script, string key, string value, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        {
+            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            RedisKey[] keys = { $"{key}" };
+            RedisValue[] values = { value };
+
+            var db = _multiplexer.GetDatabase((int)redisDataBase);
+            var execResult = await db.ScriptEvaluateAsync(script, keys, values);
+
+            return (execResult.ToString() == "1");
+        }
+
+
         private string RemoveSpecialChars(string key)
         {
             foreach (var c in _charsToRemove)
@@ -379,6 +422,21 @@ namespace BackendSite.Service.Library
             }
 
             return key;
+        }
+
+        private bool HasData<T>(T obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            return obj switch
+            {
+                ICollection collection => collection.Count > 0,
+                string str => !string.IsNullOrEmpty(str),
+                _ => true
+            };
         }
     }
 }

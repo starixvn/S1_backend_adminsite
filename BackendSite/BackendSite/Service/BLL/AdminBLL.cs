@@ -3,9 +3,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using System.Linq;
 using System.Security.Claims;
 
 namespace BackendSite.Service.BLL
@@ -39,46 +37,6 @@ namespace BackendSite.Service.BLL
             this.httpContextAccessor = httpContextAccessor;
             this.environment = environment;
         }
-
-        //暫無使用
-        //public bool AddAccount(AdminUser adminUser)
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    adminUser.Userpwd = tools.MD5Encrypt(adminUser.Userpwd);
-        //    return adminService.AddAccount(serverInfo.SiteId, adminUser);
-        //}
-
-        //暫無使用
-        //public IEnumerable<AdminUser> AccountList()
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    return adminService.AccountList(serverInfo.SiteId);
-        //}
-
-        //暫無使用
-        //public AdminUser GetAccount(int userId)
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    return adminService.GetAccount(serverInfo.SiteId, userId);
-        //}
-
-        //暫無使用
-        //public bool EditAccount(AdminUser adminUser)
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    return adminService.EditAccount(serverInfo.SiteId, adminUser);
-        //}
-
-        //暫無使用
-        //public bool ChangePwdAccount(AdminUser adminUser)
-        //{
-        //    var serverInfo = serverInfoService.GetModel();
-        //    if (string.IsNullOrWhiteSpace(adminUser.Userpwd))
-        //        adminUser.Userpwd = tools.MD5Encrypt("123456");
-        //    else
-        //        adminUser.Userpwd = tools.MD5Encrypt(adminUser.Userpwd);
-        //    return adminService.ChangePwdAccount(serverInfo.SiteId, adminUser);
-        //}
 
         public AdminUser GetUser(int userId)
         {
@@ -121,12 +79,12 @@ namespace BackendSite.Service.BLL
         public async Task<List<AdminMenuModel>> GetAllAdminMenuAsync(string lang, AdminUserV2 loginUser)
         {
             var result = new List<AdminMenuModel>();
-            var menuList = adminService.GetAllAdminMenu();
-            var permissionList = adminService.GetAllAdminPermission();
+            var menuList = adminService.GetAllAdminMenu().Where(x => x.Status == AdminFunctionStatusEnum.Enable);
+            var permissionList = adminService.GetAllAdminPermission().Where(x => x.Status == AdminPermissionStatusEnum.Enable); ;
 
-            //Enable & Sort
-            menuList = menuList.Where(x => x.Status == AdminFunctionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
-            permissionList = permissionList.Where(x => x.Status == AdminPermissionStatusEnum.Enable).OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            // Sort
+            menuList = menuList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
+            permissionList = permissionList.OrderBy(x => x.Sort).ThenBy(x => x.Id);
 
             if (!string.IsNullOrWhiteSpace(lang))
             {

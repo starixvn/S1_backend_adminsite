@@ -26,6 +26,7 @@ namespace BackendSite.Service.Model
     public class ExportRegLiveStatusData
     {
         public string UserName { get; set; }
+        public string AffCode { get; set; }
         public int ActStatus { get; set; }
         public DateTime RegTime { get; set; }
         public DateTime LastActiveTime { get; set; }
@@ -36,6 +37,10 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public string DepositStatus { get; set; }
         public string ReferralUrl { get; set; }
+        public string BonusCode { get; set; }
+        public string PromotionCategory { get; set; }
+        public DateTime FTDDate { get; set; }
+        public decimal Amount { get; set; }
     }
     public class GetRegLiveStatusRequest : ApiRequestPageModel, IOrderBy
     {
@@ -75,12 +80,17 @@ namespace BackendSite.Service.Model
     {
         public string UserName { get; set; }
         public string FullName { get; set; }
+        public string AffCode { get; set; }
         public string DepositStatus { get; set; }
         public DateTimeOffset RegTime { get; set; }
         public DateTimeOffset LastActiveTime { get; set; }
         public string PhoneNo { get; set; }
         public string Note { get; set; }
         public string ReferralUrl { get; set; }
+        public string BonusCode { get; set; }
+        public string PromotionCategory { get; set; }
+        public DateTimeOffset FTDDate { get; set; }
+        public decimal Amount { get; set; }
         public List<string> CallRecord { get; set; }
     }
     public class RegLiveStatusPageResult

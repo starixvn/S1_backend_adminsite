@@ -2,20 +2,29 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System.Linq;
-using System.Threading.Tasks;
 using BackendSite.Service.Model.CustVipLevel;
 using Newtonsoft.Json;
+using BackendSite.Service.DAL.Interface;
+using BarcodeReader.ImageSharp;
+using System.Security.Policy;
+using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
+using BackendSite.Extensions;
 
 namespace BackendSite.Service.BLL
 {
     public class VipLevelBLL : IVipLevelBLL
     {
         private readonly VipLevelService _vipLevelService;
+        private readonly IMemberService _memberService;
+        private readonly IAdminLogService _adminLogService;
+        private readonly ILogger<VipLevelBLL> _logger;
 
-        public VipLevelBLL(VipLevelService vipLevelService)
+        public VipLevelBLL(VipLevelService vipLevelService, IMemberService memberService, IAdminLogService adminLogService, ILogger<VipLevelBLL> logger)
         {
             _vipLevelService = vipLevelService;
+            _memberService = memberService;
+            _adminLogService = adminLogService;
+            _logger = logger;
         }
 
         public IEnumerable<VipLevelSetting> GetVipLevelSetting(int siteId)
@@ -91,6 +100,27 @@ namespace BackendSite.Service.BLL
         {
             return await _vipLevelService.SetVipLevelManuallyAsync(siteId, custId, userName, manually, $"{updator} Update Manually", updator);
         }
+
+        public async Task<int> VipAutomationExclusion(int custId, bool enable, string updator) 
+        {
+            var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+            if (customer == null) return -1;
+
+            var beforeStatus = customer.Exclusive;
+            var isExclusive = enable ? 1 : 0;
+            if(beforeStatus == isExclusive) return -2;
+
+            var result = await _vipLevelService.SetAutoCustVipExclusionAsync(customer.SiteId, custId, customer.UserName, isExclusive);
+            if (result <= 0) return -3;
+
+            var afterStatus = isExclusive;
+            await CreateAdminLog(updator, customer.SiteId, customer.CurrencyId,
+                JsonConvert.SerializeObject(new { customer.UserName, VipAutomationExclusion = beforeStatus.ToString() }),
+                JsonConvert.SerializeObject(new { customer.UserName, VipAutomationExclusion = afterStatus.ToString() }), ActionType.Update,
+                custId, $"Edit Exclusive \"{afterStatus}\"");
+            return result;
+        }
+
         // public VipUpgradeReviewData GetVipUpgradeReview(string yearMonth, int siteId, int pageNumber, int pageSize,
         //     int status, string userName)
         // {
@@ -200,7 +230,8 @@ namespace BackendSite.Service.BLL
             {
                 details = details.Select(c =>
                 {
-                    c.CanUpdateStatus = true;
+                    // 排除名單才可以手動調整
+                    c.CanUpdateStatus = c.Exclusive;
                     return c;
                 }).ToList();
             }
@@ -233,6 +264,52 @@ namespace BackendSite.Service.BLL
             return CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Downgrade) && UpdateVipDowngradeReview(custIdList, calculateYearMonth, newStatus, updater);
         }
 
+        public async Task<IEnumerable<VipUpgradeSetting>> GetUpgradeSetting(int siteId, int currencyId)
+        {
+            var vipSystem = await _vipLevelService.GetVipSystem(siteId);
+            var currencyVipSystem = vipSystem.ToList().FindAll(x => x.CurrencyId == currencyId);
+            var result = new List<VipUpgradeSetting>();
+            var typeList = new List<UpgradeSettingEnum>();
+            typeList.Add(UpgradeSettingEnum.UpBonus);
+            typeList.Add(UpgradeSettingEnum.UpDeposit);
+            typeList.Add(UpgradeSettingEnum.DownDeposit);
+            typeList.Add(UpgradeSettingEnum.DownTurnover);
+
+            typeList.ForEach(x =>
+            {
+                var detail = x switch
+                {
+                    UpgradeSettingEnum.UpBonus => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.UpBonus.ToString() }).ToList(),
+                    UpgradeSettingEnum.UpDeposit => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.UpDeposit.ToString() }).ToList(),
+                    UpgradeSettingEnum.DownDeposit => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.DownDeposit is null ? null : o.DownDeposit.ToString() }).ToList(),
+                    UpgradeSettingEnum.DownTurnover => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.DownTurnover is null ? null : o.DownTurnover.ToString() }).ToList()
+                };
+                //Leve1跟6沒有提供設定,這邊寫死資料讓前端顯示用
+                detail.Add(new VipUpgradeSettingDetail() { Level = 1, LevelValue = null });
+                detail.Add(new VipUpgradeSettingDetail() { Level = 6, LevelValue = "By Invitation" });
+                result.Add(new VipUpgradeSetting()
+                {
+                    SiteId = siteId,
+                    CurrencyId = currencyId,
+                    Type = x,
+                    TypeName = x.GetDescription(),
+                    Detail = detail.OrderBy(y => y.Level)
+                });
+            });
+
+            return result.OrderBy(x=> x.Type);
+        }
+
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input)
+        {
+            return await _vipLevelService.SetUpgradeSetting(input);
+        }
+
+        public async Task<IEnumerable<int>> GetVipUpgradeSupportCurrency(int siteId)
+        {
+            var vipSystem = await _vipLevelService.GetVipSystem(siteId);
+            return vipSystem.GroupBy(y=> y.CurrencyId).Select(x => x.Key);
+        }
         #endregion
 
         #region Private Methods
@@ -246,7 +323,7 @@ namespace BackendSite.Service.BLL
         /// <returns></returns>
         private bool CheckCanUpdateStatus(string calculateYearMonth, int siteId, VipSettingStatusEnum vipType)
         {
-            var siteVipSetting = GetVipSettings(vipType).FirstOrDefault(x => x.SiteId == siteId);
+            var siteVipSetting = _vipLevelService.GetVipSetting((int)vipType, siteId);
             if (siteVipSetting == null)
                 return false;
 
@@ -273,16 +350,6 @@ namespace BackendSite.Service.BLL
                 default:
                     return false;
             }
-        }
-
-        /// <summary>
-        /// 取得VIP排程設定資料
-        /// </summary>
-        /// <param name="vipType"></param>
-        /// <returns></returns>
-        private IEnumerable<VipSettingModel> GetVipSettings(VipSettingStatusEnum vipType)
-        {
-            return _vipLevelService.GetVipSetting((int)vipType);
         }
 
         /// <summary>
@@ -377,6 +444,35 @@ namespace BackendSite.Service.BLL
             return _vipLevelService.UpdateVipDowngradeReviewFlow(JsonConvert.SerializeObject(custIdList), calculateYearMonth, (int)newStatus, updater);
         }
 
+        private async Task CreateAdminLog(string @operator, int siteId, int currencyId, string beforeLog, string afterLog, ActionType action, int custId, string message, AdminAdjustmentLogMenuEnum menuEnum = AdminAdjustmentLogMenuEnum.SetCustomerInfo)
+        {
+            var adminLog = new AdminLog()
+            {
+                Operator = @operator,
+                SiteId = siteId,
+                CurrencyId = currencyId,
+                BeforeDetailInfo = beforeLog,
+                AfterDetailInfo = afterLog,
+                ActionType = action,
+                MenuEnum = menuEnum,
+                CustId = custId,
+                Menu = "CustManage/CustInfoList",
+                Note = message,
+                DetailInfo = JsonConvert.SerializeObject(new
+                {
+                    Action = message,
+                    MenuName = "Member Setting",
+                })
+            };
+            try
+            {
+                await _adminLogService.Insert(adminLog);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "InsertAdminLog failed. params: " + JsonConvert.SerializeObject(adminLog));
+            }
+        }
         #endregion
     }
 }

@@ -1,239 +1,303 @@
-﻿using BackendSite.Service.DAL;
-using BackendSite.Service.DAL.BetLimit;
+﻿using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
+using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.TpMaintain;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
     public class UserBetLimitBLL
     {
+        private readonly CustInfoBLL _custInfoBll;
         private readonly UserBetLimitService _userBetLimitService;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly string _apiUrl;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly ILogger<UserBetLimitBLL> _logger;
+        private readonly List<int> CallApi = new() { (int)TpGameTypeEnum.SBO_Sports };
 
-        public UserBetLimitBLL(UserBetLimitService userBetLimitService)
+        public UserBetLimitBLL(CustInfoBLL custInfoBll, UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, IConfiguration configuration, CourierAdapter courierAdapter, ILogger<UserBetLimitBLL> logger)
         {
             _userBetLimitService = userBetLimitService;
+            _adjustmentLogReportService = adjustmentLogReportService;
+            _apiUrl = configuration.GetValue<string>("TpService");
+            _courierAdapter = courierAdapter;
+            _custInfoBll = custInfoBll;
+            _logger = logger;
+        }
+        public async Task<IEnumerable<BetLimitOption>> GetSettingList(int siteId, int currencyId)
+        {
+            var listSetting = new List<BetLimitOption>();
+            var dg = await _userBetLimitService.GetLimitGroup((int)TpGameTypeEnum.DG_LiveCasino, currencyId);
+            if (dg != null) 
+            {
+                var dgGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(dg.LimitGroup);
+                var dgOption = new BetLimitOption() { CategoryId = (int)TpCategoryEnum.LiveCasino, CategoryName = "Live Casino", GameType = (int)TpGameTypeEnum.DG_LiveCasino, GameTypeName = "DG L.Casino", IsGroup = true, LimitGroup = dgGroup, DefaultGroup = dg.DefaultGroup };
+                listSetting.Add(dgOption);
+            }
+
+            var sbo = await _userBetLimitService.GetLimitGroup((int)TpGameTypeEnum.SBO_Sports, currencyId);
+            if (sbo != null) 
+            {
+                var sboGroup = JsonConvert.DeserializeObject<LimitInput>(sbo.LimitGroup);
+                var sboOption = new BetLimitOption() { CategoryId = (int)TpCategoryEnum.Sports, CategoryName = "Sports", GameType = (int)TpGameTypeEnum.SBO_Sports, GameTypeName = "SBO Sports", IsGroup = false, LimitInput = new LimitInput() { Min = sboGroup.Min, Max = sboGroup.Max, MaxPerMatch = sboGroup.MaxPerMatch } };
+                listSetting.Add(sboOption);
+            }
+            return listSetting;
+        }
+        public async Task<int> SetUserBetLimit(dynamic req, string updateOperator)
+        {
+            try
+            {
+                var userName = (string)req["after"].userName;
+                var siteId = (int)req["siteId"];
+
+                var customer = await _custInfoBll.GetCustId(null, userName, siteId);
+                if (customer == null)
+                {
+                    throw new AdminException(ErrorCodeEnum.CustNotFound, "User Not Found");
+                }
+                var custId = customer.CustId;
+                var currencyId = customer.CurrencyId;
+                var custBetLimit = await _userBetLimitService.UserBetLimitGetByCustId(custId);
+
+                var setting = new List<BetLimitSetting>();
+                if (custBetLimit != null)
+                    setting = ToObject(custBetLimit.BetSetting);
+
+                List<BetLimitSetting> betSettings = await ToObject(currencyId, req["after"].betSetting);
+
+                foreach (var item in betSettings)
+                {
+                    if (CallApi.Contains(item.GameTypeId))
+                    {
+                        var before = setting.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
+                        var after = betSettings.FirstOrDefault(a => a.GameTypeId == item.GameTypeId) as SportsSetting;
+                        var betLimit = await Compare(custId, before, after);
+                        if (betLimit != null)
+                        {
+                            var apiResult = await SetBetLimit(betLimit);
+                            if (apiResult.ErrorCode != 0)
+                                return -1;
+                        }
+                    }
+                }
+
+                var result = await _userBetLimitService.SetBetLimit(siteId, custId, JsonConvert.SerializeObject(betSettings), updateOperator);
+                if (result > 0)
+                {
+                    var logParam = new CreateAdminAdjustmentInfoLogInput
+                    {
+                        SiteId = siteId,
+                        CurrencyId = currencyId,
+                        MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
+                        ActionType = result == 1 ? ActionType.Create : ActionType.Update,
+                        BeforeDetailInfo = custBetLimit.ToLog(),
+                        AfterDetailInfo = new AfterBetLimit()
+                        {
+                            UserName = userName,
+                            BetSetting = betSettings
+                        }.ToLog(),
+                        Operator = updateOperator
+                    };
+
+                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                    {
+                        _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return 0;
+            }
         }
 
-        public async Task<IEnumerable<TpCategoryBetLimit>> GetTpCategoryList()
+        public Task<DataWithPage<UserBetLimit>> GetUserBetLimit(int siteId, IEnumerable<int> currencyIds, string userName, DateTime startTime, DateTime endTime, int pageSize, int pageNumber)
         {
-            var tpCategories = await _userBetLimitService.GetTpCategoryList();
-
-            return tpCategories.Where(a => a.CategoryId == (int)TpCategoryEnum.LiveCasino)
-                .Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
+            return _userBetLimitService.GetUserBetLimit(siteId, currencyIds, userName, startTime, endTime, pageSize, pageNumber);
         }
-
-        public async Task<int> SetUserBetLimit(ParamsWithLog<CustBetLimit> input)
+        public async Task<CustBetLimitByCustIdV2> GetByCustIdV2(int custId)
         {
-            return await _userBetLimitService.InsertOrUpdate(input);
-        }
+            var betLimit = await _userBetLimitService.UserBetLimitGetByCustId(custId);
+            if (betLimit == null) return null;
 
-        public IEnumerable<UserBetLimit> GetUserBetLimit(IEnumerable<int> siteIds, IEnumerable<int> currencyIds, string userName, DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages, out int rowCount)
-        {
-            return _userBetLimitService.GetUserBetLimit(siteIds, currencyIds, userName, startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
+            var betSettings = ToObject(betLimit.BetSetting);
+
+            var resp = new CustBetLimitByCustIdV2()
+            {
+                custId = betLimit.CustId,
+                UserName = betLimit.UserName,
+                CurrencyId = betLimit.CurrencyId,
+                BetSetting = betSettings
+            };
+            return resp;
         }
 
         public async Task<int> Delete(ParamsWithLog<DeleteCustBetLimit> input)
         {
-            return await _userBetLimitService.Delete(input);
-        }
+            var betLimit = await _userBetLimitService.UserBetLimitGetByCustId(input.Before.CustId);
+            if (betLimit == null)
+                return -1;
 
-        public async Task<int> UpdateStatus(int custId, int status, string updateOperator)
-        {
-            return await _userBetLimitService.UpdateStatus(custId, status, updateOperator);
-        }
-
-        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
-        {
-            var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
-            var gameTypeWithBetLimit = tpGameType
-                .Select(a => new GameTypeBetLimit()
-                {
-                    TypeId = a.Type,
-                    TypeName = a.TypeName
-                });
-            return gameTypeWithBetLimit;
-        }
-
-        public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)
-        {
-            var tpGameType = await _userBetLimitService.GetTpListByCategoryAsync(categoryId);
-
-            return tpGameType;
-        }
-
-        public async Task<IEnumerable<TpBetLimitGroup>> GetTpBetLimitGroupAsync(int categoryId, int currencyId)
-        {
-            var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(categoryId);
-            var listTpLimitGroup = new List<TpBetLimitGroup>();
-            foreach (var type in tpGameType)
+            var betSettings = ToObject(betLimit.BetSetting);
+            foreach (var item in betSettings)
             {
-                var betLimit = BetLimitFactory.Create(_userBetLimitService.ReportDbClient, (TpGameTypeEnum)type.Type);
-                if (betLimit == null) continue;
-                var group = await betLimit.GetLimitGroup(currencyId);
-                var tpBetLimitGroup = new TpBetLimitGroup()
+                if (CallApi.Contains(item.GameTypeId))
                 {
-                    TypeId = type.Type,
-                    TypeName = type.TypeName,
-                    SelectedValue = group.DefaultGroup,
-                    LimitGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(group.LimitGroup)
+                    await ResetBetLimit(betLimit.CustId, item.GameTypeId, betLimit.CurrencyId);
+                }
+            }
+
+            var result = await _userBetLimitService.Delete(input);
+            if (result > 0)
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = input.SiteId,
+                    CurrencyId = input.CurrencyId,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.BetLimit,
+                    ActionType = ActionType.Delete,
+                    BeforeDetailInfo = betLimit.ToLog(),
+                    Operator = input.Operator
                 };
-                listTpLimitGroup.Add(tpBetLimitGroup);
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
             }
-            return listTpLimitGroup;
+            return result;
         }
 
-        public async Task<CustBetLimitByCustId> GetByCustId(int custId)
+        private async Task ResetBetLimit(int custId, int gameType, int currencyId) 
         {
-            var custBetSetting = await _userBetLimitService.UserBetLimitGetByCustId(custId);
-            var betSetting = JsonConvert.DeserializeObject<List<BetSetting>>(custBetSetting.BetSetting);
-
-            var tpCategories = await _userBetLimitService.GetTpCategoryList();
-            var listCategoryBetLimit = new List<TpCategoryBetLimit>();
-            foreach (var category in tpCategories.Where(a => a.CategoryId == (int)TpCategoryEnum.LiveCasino))
+            var defaultBetLimit = await _userBetLimitService.GetLimitGroup(gameType, currencyId);
+            var tpId = await _userBetLimitService.GetTpIdByGameType(gameType);
+            var betLimit = new SetBetLimit
             {
-                var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(category.CategoryId);
-                var limitGroups = new List<TpBetLimitGroup>();
-                var liveCasinoSetting = betSetting.FirstOrDefault(a => a.TpCategory == category.CategoryId);
-                foreach (var gameType in tpGameType)
-                {
-                    var betLimit = BetLimitFactory.Create(_userBetLimitService.ReportDbClient, (TpGameTypeEnum)gameType.Type);
-                    if (liveCasinoSetting == null || betLimit == null) continue;
-                    var group = await betLimit.GetLimitGroup(custBetSetting.CurrencyId, liveCasinoSetting.TpBetSetting);
-                    var tpGroup = new TpBetLimitGroup()
-                    {
-                        TypeId = gameType.Type,
-                        TypeName = gameType.TypeName,
-                        Checked = group.Checked,
-                        SelectedValue = group.DefaultGroup,
-                        LimitGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(group.LimitGroup)
-                    };
-                    limitGroups.Add(tpGroup);
-                }
-
-
-
-                var categoryBetLimit = new TpCategoryBetLimit()
-                {
-                    CategoryId = category.CategoryId,
-                    CategoryName = category.CategoryName,
-                    Checked = true,
-                    GameTypeBetLimit = limitGroups
-                };
-                listCategoryBetLimit.Add(categoryBetLimit);
-            }
-            var resp = new CustBetLimitByCustId()
-            {
-                SiteId = custBetSetting.SiteId,
-                SiteName = custBetSetting.SiteName,
-                custId = custBetSetting.CustId,
-                UserName = custBetSetting.UserName,
-                CurrencyId = custBetSetting.CurrencyId,
-                BetSetting = listCategoryBetLimit
+                TpId = tpId,
+                CustId = custId,
+                BetSetting = defaultBetLimit.LimitGroup
             };
-            return resp;
+            var apiResult = await SetBetLimit(betLimit);
+            if (apiResult.ErrorCode != 0)
+                throw new AdminException(ErrorCodeEnum.SystemException);
         }
 
-        public async Task<IEnumerable<TpBetLimitGroup>> GetTpBetLimitGroupAsync(int currencyId)
+        private async Task<ApiResult> SetBetLimit(SetBetLimit request) 
         {
-            var listTpLimitGroup = new List<TpBetLimitGroup>();
-            var tpCategories = await _userBetLimitService.GetTpCategoryList();
-            var tpCategoryBetLimitList = tpCategories.Where(a => a.CategoryId == (int)TpCategoryEnum.LiveCasino)
-                .Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
+            return await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_apiUrl}SetBetLimit", request);
+        }
 
-            tpCategoryBetLimitList.ForEach(async x =>
+        private async Task<SetBetLimit> Compare(int custId, SportsSetting before, SportsSetting after) 
+        {
+            var tpId = await _userBetLimitService.GetTpIdByGameType(after.GameTypeId);
+            var betLimit = new SetBetLimit
             {
-                var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(x.CategoryId);
-                foreach (var type in tpGameType)
+                TpId = tpId,
+                CustId = custId,
+                BetSetting = JsonConvert.SerializeObject(new
                 {
-                    var betLimit = BetLimitFactory.Create(_userBetLimitService.ReportDbClient, (TpGameTypeEnum)type.Type);
-                    if (betLimit == null) continue;
-                    var group = await betLimit.GetLimitGroup(currencyId);
-                    var tpBetLimitGroup = new TpBetLimitGroup()
+                    after.Min,
+                    after.Max,
+                    after.MaxPerMatch
+                })
+            };
+
+            return betLimit;
+        }
+        private async Task<List<BetLimitSetting>> ToObject(int currencyId, dynamic betSetting)
+        {
+            var betSettings = new List<BetLimitSetting>();
+            foreach (var item in betSetting)
+            {
+                var tpCategory = (int)item["tpCategory"];
+                var enable = (bool)item["checked"];
+                var gameTypeId = (int)item["gameTypeId"];
+                if (tpCategory == (int)TpCategoryEnum.Sports)
+                {
+                    TpBetLimitData spoDefault = await _userBetLimitService.GetLimitGroup(gameTypeId, currencyId);
+                    var input = JsonConvert.DeserializeObject<LimitInput>(spoDefault.LimitGroup);
+                    var sports = new SportsSetting
                     {
-                        TypeId = type.Type,
-                        TypeName = type.TypeName,
-                        SelectedValue = group.DefaultGroup,
-                        LimitGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(group.LimitGroup)
+                        Checked = enable,
+                        TpCategory = item["tpCategory"],
+                        TpCategoryName = item["tpCategoryName"],
+                        GameTypeId = item["gameTypeId"],
+                        GameTypeName = item["gameTypeName"],
+                        Min = enable ? item["min"] : input.Min,
+                        Max = enable ? item["max"] : input.Max,
+                        MaxPerMatch = enable ? item["maxPerMatch"] : input.MaxPerMatch
                     };
-                    listTpLimitGroup.Add(tpBetLimitGroup);
+                    if (sports.Min > sports.Max || sports.Max > sports.MaxPerMatch)
+                        throw new AdminException(ErrorCodeEnum.InvalidBetLimit);
+                    betSettings.Add(sports);
                 }
-            });
-
-            return listTpLimitGroup;
-        }
-
-        public async Task<CustBetLimitByCustIdV2> GetByCustIdV2(int custId)
-        {
-            var custBetSetting = await _userBetLimitService.UserBetLimitGetByCustId(custId);
-            var betSetting = JsonConvert.DeserializeObject<List<BetSetting>>(custBetSetting.BetSetting);
-
-            var tpCategories = await _userBetLimitService.GetTpCategoryList();
-            var limitGroups = new List<TpBetLimitGroupV2>();
-            foreach (var category in tpCategories.Where(a => a.CategoryId == (int)TpCategoryEnum.LiveCasino))
-            {
-                var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(category.CategoryId);
-                var liveCasinoSetting = betSetting.FirstOrDefault(a => a.TpCategory == category.CategoryId);
-                foreach (var gameType in tpGameType)
+                else if (tpCategory == (int)TpCategoryEnum.LiveCasino)
                 {
-                    var betLimit = BetLimitFactory.Create(_userBetLimitService.ReportDbClient, (TpGameTypeEnum)gameType.Type);
-                    if (liveCasinoSetting == null || betLimit == null) continue;
-                    var group = await betLimit.GetLimitGroup(custBetSetting.CurrencyId, liveCasinoSetting.TpBetSetting);
-                    var tpGroup = new TpBetLimitGroupV2()
+                    TpBetLimitData dgDefault = await _userBetLimitService.GetLimitGroup(gameTypeId, currencyId);
+                    var liveCasino = new LiveCasinoSetting
                     {
-                        CategoryId = category.CategoryId,
-                        CategoryName = category.CategoryName,
-                        TypeId = gameType.Type,
-                        TypeName = gameType.TypeName,
-                        Checked = group.Checked,
-                        SelectedValue = group.DefaultGroup,
-                        LimitGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(group.LimitGroup)
+                        Checked = enable,
+                        TpCategory = item["tpCategory"],
+                        TpCategoryName = item["tpCategoryName"],
+                        GameTypeId = item["gameTypeId"],
+                        GameTypeName = item["gameTypeName"],
+                        LimitGroup = enable ? item["limitGroup"] : dgDefault.DefaultGroup,
+                        LimitRange = item["limitRange"]
                     };
-                    limitGroups.Add(tpGroup);
+                    betSettings.Add(liveCasino);
                 }
             }
-            var resp = new CustBetLimitByCustIdV2()
-            {
-                SiteId = custBetSetting.SiteId,
-                SiteName = custBetSetting.SiteName,
-                custId = custBetSetting.CustId,
-                UserName = custBetSetting.UserName,
-                CurrencyId = custBetSetting.CurrencyId,
-                GameTypeBetLimit = limitGroups
-            };
-            return resp;
+            return betSettings;
         }
 
-        public async Task<IEnumerable<TpBetLimitGroupV2>> GetTpBetLimitGroupV2Async(int currencyId)
+        private List<BetLimitSetting> ToObject(string betLimit)
         {
-            var listTpLimitGroup = new List<TpBetLimitGroupV2>();
-            var tpCategories = await _userBetLimitService.GetTpCategoryList();
-            var tpCategoryBetLimitList = tpCategories.Where(a => a.CategoryId == (int)TpCategoryEnum.LiveCasino)
-                .Select(category => new TpCategoryBetLimit() { CategoryId = category.CategoryId, CategoryName = category.CategoryName }).ToList();
+            var betSettings = new List<BetLimitSetting>();
+            var setting = JsonConvert.DeserializeObject<dynamic>(betLimit);
 
-            tpCategoryBetLimitList.ForEach(async x =>
+            foreach (var item in setting)
             {
-                var tpGameType = await _userBetLimitService.GetTpGameTypeListbyCategoryAsync(x.CategoryId);
-                foreach (var type in tpGameType)
+                var tpCategory = (int)item["TpCategory"];
+                if (tpCategory == (int)TpCategoryEnum.Sports)
                 {
-                    var betLimit = BetLimitFactory.Create(_userBetLimitService.ReportDbClient, (TpGameTypeEnum)type.Type);
-                    if (betLimit == null) continue;
-                    var group = await betLimit.GetLimitGroup(currencyId);
-                    var tpBetLimitGroup = new TpBetLimitGroupV2()
+                    var sports = new SportsSetting
                     {
-                        CategoryId = x.CategoryId,
-                        CategoryName = x.CategoryName,
-                        TypeId = type.Type,
-                        TypeName = type.TypeName,
-                        SelectedValue = group.DefaultGroup,
-                        LimitGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(group.LimitGroup)
+                        Checked = item["Checked"],
+                        TpCategory = item["TpCategory"],
+                        TpCategoryName = item["TpCategoryName"],
+                        GameTypeId = item["GameTypeId"],
+                        GameTypeName = item["GameTypeName"],
+                        Min = item["Min"],
+                        Max = item["Max"],
+                        MaxPerMatch = item["MaxPerMatch"]
                     };
-                    listTpLimitGroup.Add(tpBetLimitGroup);
+                    if (sports.Min > sports.Max || sports.Max > sports.MaxPerMatch)
+                        throw new AdminException(ErrorCodeEnum.InvalidBetLimit);
+                    betSettings.Add(sports);
                 }
-            });
-
-            return listTpLimitGroup;
+                else if (tpCategory == (int)TpCategoryEnum.LiveCasino)
+                {
+                    var liveCasino = new LiveCasinoSetting
+                    {
+                        Checked = item["Checked"],
+                        TpCategory = item["TpCategory"],
+                        TpCategoryName = item["TpCategoryName"],
+                        GameTypeId = item["GameTypeId"],
+                        GameTypeName = item["GameTypeName"],
+                        LimitGroup = item["LimitGroup"],
+                        LimitRange = item["LimitRange"]
+                    };
+                    betSettings.Add(liveCasino);
+                }
+            }
+            return betSettings;
         }
     }
 }

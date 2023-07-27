@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using Google.Protobuf.WellKnownTypes;
+﻿using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -46,9 +43,11 @@ namespace BackendSite.Service.Model
         public string DisplayName { get; set; }
         public TransferAccountStatusEnum AccountStatus { get; set; }
         public BankCardManagementStatusEnum SettingStatus { get; set; }
+        
         public string Purpose { get; set; }
+
         public IEnumerable<TransferAccountPurposeEnum> Purposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>($"[{Purpose??string.Empty}]");
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(Purpose ?? "[]");
         
         public string JsonPointLevels { set; get; }
         public IEnumerable<int> PointLevels =>

@@ -1,6 +1,5 @@
 ﻿using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {

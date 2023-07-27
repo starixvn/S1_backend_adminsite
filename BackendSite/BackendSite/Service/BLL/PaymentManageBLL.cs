@@ -178,13 +178,27 @@ namespace BackendSite.Service.BLL
         
         public bool SetCryptoInfoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
         {
-            return _paymentManageService.SetCryptoStatus(siteId, currencyId, network, status, @operator);
+            var result = _paymentManageService.SetCryptoStatus(siteId, currencyId, network, status, @operator);
+
+            if (result)
+            {
+                _ = _redisHelper.KeyDeleteByPattern($"PaySetting:SupportCrypto:{siteId}", RedisDataBase.Member);
+            }
+            
+            return result;
         }
 
         private void ClearRedisPaySettingCache(string pattern, RedisDataBase db)
         {
             _ = Task.Run(() => _redisHelper.KeyDeleteByPattern(pattern, db))
                 .ConfigureAwait(false);
+        }
+        
+        public async Task<IEnumerable<PayGroup>> GetPayGroupWithCache()
+        {
+            var dbData = await _redisHelper.TryGetOrCreateAsync("PayGroupInfoList", TimeSpan.FromMinutes(5),
+                () => _paymentManageService.GetPayGroup(), RedisDataBase.Shared);
+            return dbData;
         }
     }
 }

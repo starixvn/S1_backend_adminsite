@@ -1,5 +1,4 @@
 ﻿using Amazon.S3.Model;
-using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
@@ -57,7 +56,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
             return 0;
         }
 
-        if (await _custPhotoIdService.GetCount(custId) >= 5)
+        if (await _custPhotoIdService.GetCount(custId) >= 10)
         {
             _logger.LogError("reach the upload photo limit");
             return 0;

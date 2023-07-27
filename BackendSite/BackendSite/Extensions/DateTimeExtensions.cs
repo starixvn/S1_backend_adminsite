@@ -23,12 +23,12 @@
             return new DateTimeOffset(new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(unixTime),TimeSpan.Zero) ;
         }
 
-        public static IEnumerable<string> GetDailyPartitionRange(this DateTime startDate, DateTime endDate)
+        public static IEnumerable<DateTime> GetDailyPartitionRange(this DateTime startDate, DateTime endDate)
         {
-            var result = new List<string>();
+            var result = new List<DateTime>();
             while (startDate.Date <= endDate.Date)
             {
-                result.Add(startDate.GetDailyPartitionKey());
+                result.Add(startDate);
                 startDate = startDate.AddDays(1);
             }
             return result;
@@ -73,6 +73,17 @@
         public static DateTimeOffset ToOffset(this DateTime time, string timeZone)
         {
             return DateTimeOffset.Parse(time.ToString() + timeZone);
+        }
+
+        public static DateTimeOffset? ToOffset(this DateTime? time, TimeSpan timeZone)
+        {
+            if (time.HasValue)
+                return new DateTimeOffset(time.Value, timeZone);
+            return null;
+        }
+        public static DateTimeOffset ToOffset(this DateTime time, TimeSpan timeZone)
+        {
+            return new DateTimeOffset(time, timeZone);
         }
 
         public static bool EarlierThan(this DateTime startMonth, DateTime endMonth)

@@ -7,7 +7,7 @@ public interface IMemberCommand
 {
     Task<int> AddCustTagAsync(int custId, int tagId, string @operator);
     Task<int> RemoveCustTagAsync(int custId, int tagId, string @operator);
-    Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, string accountName);
+    Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, int custId, string accountName);
     Task<bool> EditFullNameAsync(int custId, string fullName, string @operator);
     Task<int> EditEmailAsync(int custId, string email, string @operator);
     Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator);
@@ -26,4 +26,9 @@ public interface IMemberCommand
     Task<ApiResult> SetVerificationRewardAsync(int custId, OTPTypeEnum otpType, string @operator);
     Task<int> LineUnbind(int custId, string @operator);
     Task<int> DeleteOnUserAsync(int custId, string @operator);
+    Task<bool> SetCustPromotionWhiteListAsync(int custId, bool ipEnable, bool deviceEnable, bool realNameEnable, string @operator);
+    Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
+        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,
+        string @operator);
+    Task<bool> SetCustTpGameTypeSettingAsync(int custId, CustTpGameTypeSettingGetType setDataType, IEnumerable<int> tpGameTypes, string @operator);
 }

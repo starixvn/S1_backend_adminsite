@@ -46,7 +46,8 @@ Content-Type: application/json
     "loginAccount": "testaccount",
     "loginPassword": "testpw123wer",
     "transferPin": "",
-    "loginPin": ""
+    "loginPin": "",
+    "corporateId": ""
 }
 
 

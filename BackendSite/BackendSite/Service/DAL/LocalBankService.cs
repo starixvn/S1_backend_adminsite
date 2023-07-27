@@ -1,8 +1,7 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Dapper;
-using MySql.Data.MySqlClient;
-using System.Data;
 
 namespace BackendSite.Service.DAL
 {
@@ -12,11 +11,10 @@ namespace BackendSite.Service.DAL
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
-        public LocalBankService(IConfiguration configuration, ILogger<MySqlClient> logger)
+        public LocalBankService(IEnumerable<MySqlClient> sqlClients)
         {
-            this.configuration = configuration;
-             _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), logger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), logger);
+            _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
         
         /// <summary>
@@ -30,7 +28,7 @@ namespace BackendSite.Service.DAL
                 _CurrencyId = currencyId
             });
             
-            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get", p);
+            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get_V2", p);
 
             return a;
         }
@@ -52,9 +50,9 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V3", new { _SiteId = siteId });
         }
         
-        public IEnumerable<EWalletPay> GetEWalletPayList()
+        public IEnumerable<BankInfoPay> GetEWalletPayList(int siteId)
         {
-            return _reportDbClient.Query<EWalletPay>("Common_EWalletPayForPayout_Get");
+            return _reportDbClient.Query<BankInfoPay>("Common_EWalletPayForPayout_Get_V2", new { _SiteId = siteId });
         }
 
         public IEnumerable<BankInfoPay> GetCryptoPayList(int siteId)

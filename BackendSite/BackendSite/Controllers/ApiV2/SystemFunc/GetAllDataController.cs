@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.TpMaintain;
-using BackendSite.Service.Model.BankFinancial;
-using static BackendSite.Controllers.ApiV2.Member.Process.PersonalMessageController;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -24,13 +22,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly PaymentBLL _paymentBll;
         private readonly BankDetailBLL _bankDetailBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
-        private readonly AdminGroupBLL _adminGroupBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly PrizeBLL _prizeBll;
         private readonly PaymentManageBLL _paymentManageBll;
         private readonly ReasonManagementBLL _reasonManagementBll;
         private readonly TpMaintainBLL _tpMaintainBll;
-        private readonly BankFinancialBLL _bankFinancialBll;
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly BonusManageBLL _bonusManageBll;
         private readonly DeepLinkBLL _deepLinkBll;
@@ -49,13 +45,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
-            _adminGroupBll = provider.GetRequiredService<AdminGroupBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _prizeBll = provider.GetRequiredService<PrizeBLL>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
-            _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
             _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
@@ -97,40 +91,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-        }
-
-
-        /// <summary>
-        ///  GetAllData/GetGroupList 取得所有群組權限清單
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：Administration > User Setting > Permission > Group > [Edit]
-        /// </remarks>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult<IEnumerable<AdminGroupModel>> GetGroupList()
-        {
-            var result = new List<AdminGroupModel>();
-            var data = _adminGroupBll.GetGroupList(1, 1000, out _, out _);
-
-            foreach (var item in data)
-            {
-                result.Add(new AdminGroupModel()
-                {
-                    GroupId = (int)item.GroupSEQ,
-                    GroupName = item.GroupName,
-                    Remark = item.Remark
-                });
-            }
-
-            var apiResult = new ApiResult<IEnumerable<AdminGroupModel>>
-            {
-                Data = result,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-            return apiResult;
         }
 
         /// <summary>
@@ -316,6 +276,34 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             else
             {
                 return new ApiResult<IEnumerable<RiskTpListInfo>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        /// <summary>
+        /// GetAllData/GetTpList 取得Slot第三方品牌
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Show Slot Tp List
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<SlotGameDetail>>> GetSlotGame()
+        {
+            var data = await _gameCasinoBll.GetSlotGame();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<SlotGameDetail>>
                 {
                     Data = data,
                     ErrorCode = (int)ErrorCodeEnum.Success
@@ -575,6 +563,18 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             }
 
             return apiResult;
+        }
+        
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<LocalPaySetting>>> GetLocalPaySettingAsync()
+        {
+            var result = await _bankDetailBll.GetLocalPaySettingAsync();
+
+            return new ApiResult<IEnumerable<LocalPaySetting>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         #endregion

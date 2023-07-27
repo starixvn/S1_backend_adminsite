@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace BackendSite.Service.Model.Mpa.Marketing
+﻿namespace BackendSite.Service.Model.Mpa.Marketing
 {
     public interface IMpaMarketingDepositAmountBaseDto
     {
@@ -66,6 +64,8 @@ namespace BackendSite.Service.Model.Mpa.Marketing
         public decimal FirstDepositAmount { get; set; }
 
         public int DepositCount { get; set; }
+        
+        public int FirstDepositCount { get; set; }
 
         public string AffCode { get; set; }
 

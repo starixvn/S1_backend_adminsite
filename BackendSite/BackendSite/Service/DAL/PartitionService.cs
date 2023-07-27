@@ -20,10 +20,10 @@ namespace BackendSite.Service.DAL
         public IEnumerable<TResult> DailyQuery<TResult>(DateTime StartDate, DateTime endDate, string spName, object parameters, DataBase dataBase = DataBase.Report)
         {
             var tasks = new List<Task<IEnumerable<TResult>>>();
-            foreach (var partitionKey in StartDate.GetDailyPartitionRange(endDate))
+            foreach (var partitionDate in StartDate.GetDailyPartitionRange(endDate))
             {
                 var p = new DynamicParameters(parameters);
-                p.Add("YYYYMMDD", partitionKey);
+                p.Add("YYYYMMDD", partitionDate.GetDailyPartitionKey());
                 var task = dataBase switch
                 {
                     DataBase.Report => _reportDbClient.QueryAsync<TResult>(spName, p),

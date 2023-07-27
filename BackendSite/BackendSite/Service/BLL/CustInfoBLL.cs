@@ -6,10 +6,11 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 using System.Transactions;
-using System.Linq;
-using BarcodeReader.ImageSharp;
-using NPOI.SS.Formula.Functions;
-using NuGet.Protocol;
+using OfficeOpenXml;
+using System.Text.RegularExpressions;
+using Amazon.S3.Model;
+using BackendSite.Extensions;
+using Tag = BackendSite.Service.Model.Tag;
 
 namespace BackendSite.Service.BLL
 {
@@ -35,6 +36,11 @@ namespace BackendSite.Service.BLL
 
         private readonly WinLostReportService _winLostReportService;
         private readonly RebateManageService _rebateManageService;
+        private readonly ExcelBLL _excelBll;
+        private readonly AWSS3Helper _s3Helper;
+        private readonly string _backofficeS3Url;
+        private readonly string _environment;
+        private readonly TagBLL _tagll;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -57,6 +63,12 @@ namespace BackendSite.Service.BLL
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _winLostReportService = provider.GetRequiredService<WinLostReportService>();
             _rebateManageService = provider.GetRequiredService<RebateManageService>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _backofficeS3Url = configuration.GetValue<string>("AwsBackofficeUrl");
+            var env = provider.GetRequiredService<IWebHostEnvironment>();
+            _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
+            _tagll = provider.GetRequiredService<TagBLL>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -164,8 +176,8 @@ namespace BackendSite.Service.BLL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
-            return GetCustInfoDetail(custId, userName, siteList);
+            var siteList = _serverInfoBll.GetSiteListByLoginUser()?.SelectMany(x => new int[] { x.SiteId });
+            return siteList is null ? null : GetCustInfoDetail(custId, userName, siteList);
         }
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, int siteId)
@@ -185,7 +197,7 @@ namespace BackendSite.Service.BLL
                 {
                     foreach (var promotion in custInfoDetail.promotions)
                     {
-                        if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.Running || promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
+                        if (promotion.BonusInfoStatus is (int)BonusInfoStatusEnum.Running or (int)BonusInfoStatusEnum.TrasferOut)
                         {
                             promotion.custRollOver = _rolloverService.GetCustRollOver(custInfoDetail.CustId, promotion.BonusCode);
                             if (promotion.BonusInfoStatus == (int)BonusInfoStatusEnum.TrasferOut)
@@ -204,12 +216,12 @@ namespace BackendSite.Service.BLL
                     custInfoDetail.VerificationReward = GetRewardMessage(custInfoDetail);
                 }
                 custInfoDetail.ITagList = string.IsNullOrWhiteSpace(custInfoDetail.TagList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(custInfoDetail.TagList);
+                custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
+                custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
+                custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
+                custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             }
 
-            custInfoDetail.CustLineProfile = _custInfoService.GetCustLineProfile(custId, null);
-            custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
-            custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
-            custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
             return custInfoDetail;
         }
 
@@ -273,7 +285,7 @@ namespace BackendSite.Service.BLL
                 (int) BonusInfoStatusEnum.Running,
                 (int) BonusInfoStatusEnum.TrasferOut,
             };
-            return await _bonusInfoService.CancelBonusByBonusId(false, bonusId, JsonConvert.SerializeObject(statusList), @operator);
+            return await _bonusInfoService.CancelBonusByBonusId(bonusId, JsonConvert.SerializeObject(statusList), @operator);
         }
 
         public List<CustTurnoverRes> GetCustTurnover(int CustId,
@@ -428,13 +440,13 @@ namespace BackendSite.Service.BLL
         {
             var custSimpleInfo = await GetCustId(custId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!_custInfoService.AddCustNote(custId, note, @operator, canEdit: canEdit))
             {
                 _logger.LogError($"SetNote: Add Note Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
@@ -442,15 +454,15 @@ namespace BackendSite.Service.BLL
             {
                 var afterData = new { Note = note, CanEdit = false };
                 if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, null, afterData,
-                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, conn, trans))
+                    AdminAdjustmentLogMenuEnum.SetCustInfoNote, ActionType.Create, @operator, trans))
                 {
                     _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{custId} Note:{note} CanEdit:{canEdit} Operator:{@operator}.");
-                    trans.Rollback();
+                    await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                     return false;
                 }
             }
 
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
         public IEnumerable<CustNote> GetCustNotes(int custId,
@@ -470,13 +482,13 @@ namespace BackendSite.Service.BLL
             var noteBeforeInfo = await GetNoteById(noteId);
             var custSimpleInfo = await GetCustId(noteBeforeInfo.First().CustId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
             if (!_custInfoService.SetCustNotes(noteId, note, type, Operator))
             {
                 _logger.LogError($"SetNote: Set Note Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
             var actionType = type == (int)SetCustNoteTypeEnum.Delete ? ActionType.Delete : ActionType.Update;
@@ -485,14 +497,14 @@ namespace BackendSite.Service.BLL
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData,
                 actionType == ActionType.Delete ? null : afterData,
-                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.SetCustInfoNote, actionType, Operator, trans))
             {
                 _logger.LogError($"SetNote: Insert Operate Log Fail. CustId:{noteBeforeInfo.First().CustId} NoteId:{noteId} Note:{note} Type:{type} Operator:{Operator}..");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
 
@@ -732,33 +744,33 @@ namespace BackendSite.Service.BLL
         {
             var custSimpleInfo = await GetCustId(custId, null, null);
             await using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
+            await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
-            if (!await _custInfoService.SetEnableRebateAsync(custId, (int)status, conn, trans))
+            if (!await _custInfoService.SetEnableRebateAsync(custId, (int)status, trans))
             {
                 _logger.LogError($"SetEnableRebate: Update EnableRebate Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
-            if (!_custInfoService.AddCustNote(custId, status == EnableRebateEnum.Disable ? "Disable Rebate Payout" : "Enable Rebate Payout", Operator, conn, trans))
+            if (!_custInfoService.AddCustNote(custId, status == EnableRebateEnum.Disable ? "Disable Rebate Payout" : "Enable Rebate Payout", Operator, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert CustNote Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
             var beforeData = new { UserName = custSimpleInfo.UserName, EnableRebate = status == EnableRebateEnum.Disable ? EnableRebateEnum.Enable : EnableRebateEnum.Disable };
             var afterData = new { UserName = custSimpleInfo.UserName, EnableRebate = status };
 
             if (!await _custInfoService.InsertLogAsync(custSimpleInfo.SiteId, custSimpleInfo.CustId, custSimpleInfo.CurrencyId, beforeData, afterData,
-                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, conn, trans))
+                AdminAdjustmentLogMenuEnum.SetCustInfoEnableRebate, ActionType.Update, Operator, trans))
             {
                 _logger.LogError($"SetEnableRebate: Insert Operate Log Fail. CustId:{custId} EnableRebate:{status.ToString()}.");
-                trans.Rollback();
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 return false;
             }
 
-            trans.Commit();
+            await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
             return true;
         }
 
@@ -858,12 +870,7 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
-            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if (sabaWallet != null)
-            {
-                result.SabaWallet = sabaWallet.Balance;
-            }
             if (ptwallet != null)
             {
                 result.PTWallet = ptwallet.Balance;
@@ -874,12 +881,7 @@ namespace BackendSite.Service.BLL
         {
             var result = custInfoDetailForExport;
             var transferWallet = await _tpBll.GetTransferTpWalletWithCacheAsync(custInfoDetailForExport.CustId);
-            var sabaWallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.Saba);
             var ptwallet = transferWallet.ToList().Find(y => y.TpId == (int)TpEnum.PT);
-            if (sabaWallet != null)
-            {
-                result.SabaWallet = sabaWallet.Balance;
-            }
             if (ptwallet != null)
             {
                 result.PTWallet = ptwallet.Balance;
@@ -904,11 +906,7 @@ namespace BackendSite.Service.BLL
 
         public Task<IEnumerable<USDTDetail>> GetCustCryptoInfoListAsync(int custId)
         {
-            var custProfile = GetCustProfile(custId);
-            if (string.IsNullOrWhiteSpace(custProfile.USDTInfo))
-                return Task.FromResult(Enumerable.Empty<USDTDetail>());
-            else
-                return Task.FromResult(JsonConvert.DeserializeObject<IEnumerable<USDTDetail>>(custProfile.USDTInfo));
+            return _custInfoService.GetCustCryptoWalletDetailAsync(custId);
         }
 
         private bool IsWithdrawalInfoTransId(string transId)
@@ -1000,9 +998,21 @@ namespace BackendSite.Service.BLL
             return queryResult;
         }
 
-        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        public async Task<CustDashBoardTodayResponse> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
-            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+            var data = await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+            _logger.LogInformation($"GetCustDashBoardTodayAsyncResult：{JsonConvert.SerializeObject(data)} CsutId:{custId} and currencyId:{currencyId}");
+
+            return new CustDashBoardTodayResponse()
+            {
+                TodayDeposit = data.TodayDeposit,
+                TodayWithdrawal = data.TodayWithdrawal,
+                TodayWinLoss = data.TodayWinLoss,
+                TodayBetting = data.TodayBetting,
+                TodayBonus = data.TodayBonus,
+                TodayReward = data.TodayReferralAmount + data.TodayReferralFreeCredit + data.TodayPhoneReward +
+                              data.TodayEmailReward + data.TodayDraw + data.TodayUpgradeAmount
+            };
         }
 
         public IEnumerable<BlockBankAcc> GetBankList(int custId)
@@ -1092,6 +1102,182 @@ namespace BackendSite.Service.BLL
             }).ToList();
 
             return result;
+        }
+
+        public bool ImportByExcel(int siteId, IFormFile excel, string memo, string author)
+        {
+            List<string> userNameList = new List<string>();
+            List<int> custIdList = new List<int>();
+            var batchId = 0;
+
+            if (excel.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        StringComparison.OrdinalIgnoreCase) ||
+                    excel.ContentType.Equals("application/vnd.ms-excel", StringComparison.OrdinalIgnoreCase) ||
+                    excel.ContentType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase))
+            {
+                var excelPkg = new ExcelPackage(excel.OpenReadStream());
+                var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+                var isLastRow = false;
+                var RowId = 2; // 因為有標題列，所以從第2列開始讀起
+
+                do // 讀取資料，直到讀到空白列為止
+                {
+                    var custUsername = sheet.Cells[RowId, 1].Text.Trim();
+                    var sabaId = sheet.Cells[RowId, 2].Text.Trim();
+                    if (sabaId.IndexOf("_") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.LastIndexOf("_") + 1,
+                            sabaId.Length - sabaId.LastIndexOf("_") - 1);
+                    }
+                    else if (sabaId.IndexOf("x") > -1)
+                    {
+                        sabaId = sabaId.Substring(sabaId.LastIndexOf("x") + 1,
+                            sabaId.Length - sabaId.LastIndexOf("x") - 1);
+                    }
+                    var m = Regex.Match(sabaId, @"\d+");
+                    var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
+
+                    if (!string.IsNullOrWhiteSpace(custUsername))
+                    {
+                        userNameList.Add(custUsername);
+                    }
+                    if (_custId != null)
+                    {
+                        custIdList.Add(custId);
+                    }
+                    if (string.IsNullOrEmpty(custUsername) && _custId == null)
+                    {
+                        isLastRow = true;
+                    }
+                    RowId += 1;
+                } while (!isLastRow);
+
+                //新增BatchCustInfo
+                _custInfoService.NewBatchCustInfo(siteId, memo, author, ref batchId);
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList.Distinct()), UserNameList = JsonConvert.SerializeObject(userNameList.Distinct()) });
+                        var allTagList = await _tagll.GetAllTag();
+                        var data = custInfo.Select(a => new MemberExportData()
+                        {
+                            SiteName = a.SiteName,
+                            UserName = a.UserName,
+                            CustId = a.CustId,
+                            Currency = a.IsoCode,
+                            BirthDate = a.BirthDate,
+                            BirthMonth = a.BirthMonth,
+                            BirthYear = a.BirthYear,
+                            IsTest = a.IsTest,
+                            IsKyc = a.IsKyc,
+                            IsRisk = a.IsRisk,
+                            SeamlessWallet = a.SeamlessWallet,
+                            BonusWallet = a.BonusWallet,
+                            Email = a.Email,
+                            RealName = a.RealName,
+                            CountryCode = a.CountryCode,
+                            AreaCode = a.AreaCode,
+                            PhoneNo = a.PhoneNo,
+                            LevelName = a.LevelName,
+                            Agent = a.Agent,
+                            RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
+                            Status = ((CustomerStatusEnum)a.Status).ToString(),
+                            SabaId = a.SabaId,
+                            SignupUrl = a.SignupUrl,
+                            AffiliateId = a.AffiliateId,
+                            AffiliateCode = a.AffiliateCode,
+                            LastActivityIp = a.LastActivityIp,
+                            Tag = GetTag(allTagList, a.TagList)
+                        });
+                        var fileBytes = _excelBll.ExportV2(data);
+                        var stream = new MemoryStream(fileBytes);
+                        var site = (SiteEnum)siteId;
+                        var key = $"{_environment}/{site}/CustInfo/BatchMemberInfoReport_{batchId}.xlsx";
+                        var putRequest = new PutObjectRequest
+                        {
+                            BucketName = "ailab-backoffice",
+                            ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            InputStream = stream,
+                            Key = key
+                        };
+
+                        var result = await _s3Helper.PutObjectAsync(putRequest);
+
+                        if (result.HttpStatusCode.IsSuccess())
+                        {
+                            _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Finished, batchId);
+                        }
+                        else
+                        {
+                            _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Failed, batchId);
+                        }
+                    }
+                    catch
+                    {
+                        _custInfoService.UpdateBatchCustInfoStatus((int)BatchCustInfoStatus.Failed, batchId);
+                    }
+                });
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public IEnumerable<BatchCustInfo> GetCustinfoByImportData(int siteId)
+        {
+            var batchCustInfo = _custInfoService.GetBatchCustInfo(siteId).ToList();
+
+            batchCustInfo.ForEach(x =>
+            {
+                x.StatusName = ((BatchCustInfoStatus)x.Status).ToString();
+                x.Url = $"{_backofficeS3Url}/{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
+            });
+
+            return batchCustInfo;
+        }
+
+        private string GetTag(IEnumerable<Tag> allTagList, string tagList)
+        {
+            List<string> temp = new List<string>();
+            if (string.IsNullOrWhiteSpace(tagList))
+            {
+                return string.Empty;
+            }
+
+            JsonConvert.DeserializeObject<List<int>>(tagList).ToList().ForEach(x =>
+            {
+                var tagName = allTagList.FirstOrDefault(y => y.Id == x)?.TagName;
+                if (!string.IsNullOrWhiteSpace(tagName))
+                {
+                    temp.Add(tagName);
+                }
+            });
+
+            return string.Join(",", temp);
+        }
+
+        public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
+        {
+            return _custInfoService.GetCryptoList(custId);
+        }
+
+        public CustTpGameTypeSettingTypeEnum ConvertCustTpGameTypeSettingType(CustTpGameTypeSettingGetType type)
+        {
+            switch (type)
+            {
+                case CustTpGameTypeSettingGetType.IsShow:
+                case CustTpGameTypeSettingGetType.NoShow:
+                default:
+                    return CustTpGameTypeSettingTypeEnum.NoShow;
+                case CustTpGameTypeSettingGetType.IsPlay:
+                case CustTpGameTypeSettingGetType.NoPlay:
+                    return CustTpGameTypeSettingTypeEnum.NoPlay;
+            }
         }
     }
 }

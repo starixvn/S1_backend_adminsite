@@ -56,8 +56,9 @@ namespace BackendSite.Service.BLL
             };
         }
 
-        public async Task<IEnumerable<ExportLiveRegistration>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
+        public async Task<IEnumerable<Dictionary<string, object>>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
         {
+            var offset = request.StartDate.Offset;
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
@@ -68,21 +69,62 @@ namespace BackendSite.Service.BLL
                 request.DepositStatus, request.Status, request.UserName, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantFrequency, dormantType, request.CallOutStatus,
                 request.DateType);
-            
-            var list = result.Select(x => 
-                new ExportLiveRegistration() 
+
+            int maxCol = 0;
+            var liveRegs = new List<ExportLiveRegistration>();
+            foreach (var item in result)
+            {
+                var liveReg = new ExportLiveRegistration()
                 {
-                    UserName = x.UserName,
-                    FullName = x.AccountName,
-                    PhoneNo = x.PhoneNo,
-                    RegTime = new DateTimeOffset(x.RegTime, TimeSpan.Zero),
-                    LastActiveTime = new DateTimeOffset(x.LastActiveTime, TimeSpan.Zero),
-                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), x.ActStatus),
-                    Note = x.Note,
-                    CallRecord = ZipRemark(x.UpdateAt, x.Operator, x.DepositStatus, timezone),
-                    ReferralUrl = x.ReferralUrl
-                });
-            return list;
+                    UserName = item.UserName,
+                    FullName = item.AccountName,
+                    AffCode = item.AffCode,
+                    PhoneNo = item.PhoneNo,
+                    RegTime = new DateTimeOffset(item.RegTime, TimeSpan.Zero).ToOffset(offset),
+                    LastActiveTime = new DateTimeOffset(item.LastActiveTime, TimeSpan.Zero).ToOffset(offset),
+                    DepositStatus = Enum.GetName(typeof(ActStatusEnum), item.ActStatus),
+                    Note = item.Note,
+                    CallRecord = ZipRemark(item.UpdateAt, item.Operator, item.DepositStatus, timezone),
+                    ReferralUrl = item.ReferralUrl,
+                    BonusCode = item.BonusCode,
+                    PromotionCategory = item.PromotionCategory,
+                    FTDDate = new DateTimeOffset(item.FTDDate, TimeSpan.Zero).ToOffset(offset),
+                    Amount = item.Amount
+                };
+                if (liveReg.CallRecord?.Count > maxCol)
+                    maxCol = liveReg.CallRecord.Count;
+                liveRegs.Add(liveReg);
+            }
+
+            var exportData = liveRegs.Select(a =>
+            {
+                var liveReg = new Dictionary<string, object>()
+                {
+                    { "UserName", a.UserName },
+                    { "FullName", a.FullName },
+                    { "PhoneNo", a.PhoneNo },
+                    { "RegTime", a.RegTime },
+                    { "LastActiveTime", a.LastActiveTime },
+                    { "DepositStatus", a.DepositStatus },
+                    { "AffiliatesCode", a.AffCode },
+                    { "Note", a.Note },
+                    { "ReferralUrl", a.ReferralUrl },
+                    { "FTD Date", a.FTDDate.Equals(default) ? "" : a.FTDDate.ToString("yyyy-MM-dd HH:mm:ss") },
+                    { "BonusCode", a.BonusCode },
+                    { "Promotion Category", a.PromotionCategory },
+                    { "Locked Amount/FTD Amount", a.Amount }
+                };
+                for (int i = 0; i < maxCol; i++)
+                {
+                    if(i < a.CallRecord?.Count)
+                        liveReg.Add($"{i+1} CallRecord", a.CallRecord[i]);
+                    else
+                        liveReg.Add($"{i+1} CallRecord", "");
+                }
+                return liveReg;
+            });
+
+            return exportData;
         }
 
         public async Task<CustRegLiveStatus> GetRegLiveStatus(int custId)
