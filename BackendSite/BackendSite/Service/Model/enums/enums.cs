@@ -1098,7 +1098,9 @@ namespace BackendSite.Service.Model.enums
         [Description("UNDER CREDIT")]
         UnderCredit = 20,
         [Description("REFUND")]
-        Refund = 21
+        Refund = 21,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
