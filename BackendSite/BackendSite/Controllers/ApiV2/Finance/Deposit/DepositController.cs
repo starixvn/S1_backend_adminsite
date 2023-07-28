@@ -620,23 +620,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 
                 if (depositReceipt.Receipt != null)
                 {
-                    var receipts = _depositBll.GetDepositReceipt(depositReceipt.TransId);
-                    var receiptNo = receipts.Any() ? receipts.Max(x => x.ReceiptNo) + 1 : 1 ;
-                    
-                    var x = depositReceipt.Receipt.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
-                    var bytes = Convert.FromBase64String(x);
-                    var stream = new MemoryStream(bytes);
-
-                    var putRequest = new PutObjectRequest();
-                    var key = $"{_awsDepositFolder}/{depositReceipt.TransId}_{receiptNo}.png";
-                    putRequest.BucketName = _awsDepositBucketName; // Your bucket name
-                    putRequest.ContentType = "image/png";
-                    putRequest.InputStream = stream;
-                    putRequest.Key = key;
-                    await _s3Helper.PutObjectAsync(putRequest);
-                    
-                    var fileName = $"{depositReceipt.TransId}_{receiptNo}";
-                    var result = await _depositBll.InsertDepositReceipt(depositReceipt.SiteId, depositReceipt.CustId, depositReceipt.TransId, receiptNo , fileName, User.Identity.Name);
+                    var result = await _depositBll.SetDepositReceipt(depositReceipt.SiteId, depositReceipt.CustId, depositReceipt.Receipt, depositReceipt.TransId, User.Identity.Name);
                     
                     if (result > 0)
                     {
