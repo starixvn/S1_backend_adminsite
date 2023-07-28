@@ -25,18 +25,18 @@ public class DepositReferralReportBLL
         Math.Abs(pageSize),
         (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
 
-    public async Task<(IEnumerable<DepositReferralReportDao> Data, int TotalPages, int RowCount)> GetList(int siteId,
+    public async Task<(IEnumerable<DepositReferralReportDao> Data, int TotalPages, int RowCount)> GetList(IEnumerable<int> siteIds,
         IEnumerable<int> currencyIds,
         DateTime startDate,
         DateTime endDate,
-        int custId,
+        string userName,
         int pageNumber,
         int pageSize)
-    => await _referralManagementService.GetDepositReferralCustList(siteId,
+    => await _referralManagementService.GetDepositReferralCustList(JsonConvert.SerializeObject(siteIds),
             JsonConvert.SerializeObject(currencyIds),
             startDate,
             endDate,
-            custId,
+            userName,
             Math.Abs(pageSize),
             (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
 
@@ -44,18 +44,18 @@ public class DepositReferralReportBLL
     => await _referralManagementService.GetDepositReferralReferredList(JsonConvert.SerializeObject(custIds), startTime, endTime);
 
     public async Task<(IEnumerable<DepositReferralReportForExportDao> ReferrerResult, IEnumerable<DepositReferralReport_ReferralReferredForExportDao> ReferredResult)> Export(
-        int siteId,
+        IEnumerable<int> siteIds,
         IEnumerable<int> currencyIds,
         DateTime startDate,
         DateTime endDate,
-        int custId,
+        string userName,
         TimeSpan timeSpan)
     {
-        var referrerResult = await _referralManagementService.GetDepositReferralCustListForExport(siteId,
+        var referrerResult = await _referralManagementService.GetDepositReferralCustListForExport(JsonConvert.SerializeObject(siteIds),
             JsonConvert.SerializeObject(currencyIds),
             startDate,
             endDate,
-            custId);
+            userName);
 
         var referredResult = await _referralManagementService.GetDepositReferralReferredListForExport(
             JsonConvert.SerializeObject(referrerResult.Select(x => x.CustId).Distinct()),

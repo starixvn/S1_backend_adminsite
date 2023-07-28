@@ -36,7 +36,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         public class GetListRequest : ApiRequestPageModel
         {
-            public int SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate { get; set; }
@@ -52,7 +52,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
         public class ExportRequest
         {
-            public int SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
             public string UserName { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate { get; set; }
@@ -74,22 +74,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<ApiListResult<DepositReferralReportDao>> GetList(GetListRequest request)
         {
-            var custId = 0;
-            if (!string.IsNullOrWhiteSpace(request.UserName))
-            {
-                var custInfo = await _custInfoBll.GetCustInfosAsync(request.SiteId, new List<string>() { request.UserName });
-                if (custInfo.Any())
-                    custId = custInfo.First().CustId;
-                else
-                    custId = -1;
-            }
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
-            var data = await _depositReferralReportBll.GetList(request.SiteId,
+            var data = await _depositReferralReportBll.GetList(request.SiteIds,
                 request.CurrencyIds,
                 startTime,
                 endTime,
-                custId,
+                string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
                 request.PageNumber,
                 request.PageSize);
 
@@ -131,23 +122,14 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 147, 2 })]
         public async Task<IActionResult> Export(ExportRequest request)
         {
-            var custId = 0;
-            if (!string.IsNullOrWhiteSpace(request.UserName))
-            {
-                var custInfo = await _custInfoBll.GetCustInfosAsync(request.SiteId, new List<string>() { request.UserName });
-                if (custInfo.Any())
-                    custId = custInfo.First().CustId;
-                else
-                    custId = -1;
-            }
             var timespan = request.StartDate.Offset;
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
-            var result = await _depositReferralReportBll.Export(request.SiteId,
+            var result = await _depositReferralReportBll.Export(request.SiteIds,
                 request.CurrencyIds,
                 startTime,
                 endTime,
-                custId,
+                string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
                 timespan);
 
             var stream = _excelBll.ExportV2(

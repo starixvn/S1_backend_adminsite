@@ -220,20 +220,20 @@ namespace BackendSite.Service.DAL
         }
 
         public async Task<(IEnumerable<DepositReferralReportDao> Data, int TotalPages, int RowCount)> GetDepositReferralCustList(
-            int siteId,
-            string currencyId,
+            string siteIds,
+            string currencyIds,
             DateTime startDate,
             DateTime endDate,
-            int custId,
+            string userName,
             int pageSize,
             int startIndex)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId);
-            p.Add("_CurrencyIds", currencyId);
+            p.Add("_SiteIds", siteIds);
+            p.Add("_CurrencyIds", currencyIds);
             p.Add("_StartDate", startDate);
             p.Add("_EndDate", endDate);
-            p.Add("_CustId", custId);
+            p.Add("_UserName", userName);
             p.Add("_PageSize", pageSize);
             p.Add("_StartIndex", startIndex);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -246,18 +246,18 @@ namespace BackendSite.Service.DAL
         }
 
         public async Task<IEnumerable<DepositReferralReportForExportDao>> GetDepositReferralCustListForExport(
-            int siteId,
-            string currencyId,
+            string siteIds,
+            string currencyIds,
             DateTime startDate,
             DateTime endDate,
-            int custId)
+            string userName)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId);
-            p.Add("_CurrencyIds", currencyId);
+            p.Add("_SiteIds", siteIds);
+            p.Add("_CurrencyIds", currencyIds);
             p.Add("_StartDate", startDate);
             p.Add("_EndDate", endDate);
-            p.Add("_CustId", custId);
+            p.Add("_UserName", userName);
             return await _reportDbClient.QueryAsync<DepositReferralReportForExportDao>("Admin_DepositReferralCustList_Export", p);
         }
 
