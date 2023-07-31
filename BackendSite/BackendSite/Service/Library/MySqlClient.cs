@@ -180,7 +180,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{_connectionString}: {sql}");
+                _logger.LogError(e, sql);
                 throw;
             }
 
