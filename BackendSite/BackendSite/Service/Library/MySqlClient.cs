@@ -58,6 +58,38 @@ namespace BackendSite.Service.Library
             return result;
         }
 
+        public async Task<T> QueryFirstWithNoCacheAsync<T>(string name, object parameters)
+        {
+            T result;
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                await using var connection = new MySqlConnection(_connectionString);
+                var command = new CommandDefinition(name, parameters, // 使用 CommandDefinition 不讓 Dapper 用預設值建立
+                    commandType: CommandType.StoredProcedure,
+                    flags: CommandFlags.NoCache);
+
+                result = await connection.QueryFirstOrDefaultAsync<T>(command);
+                await connection.CloseAsync();
+                await connection.DisposeAsync();
+            }
+            catch (Exception e)
+            {
+                await Task.Run(() =>
+                {
+                    _logger.LogError(exception: e, message: name);
+                    return Task.CompletedTask;
+                });
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+
+
         public T QueryFirst<T>(string name, object parameters, int? commandTimeout = null)
         {
             T result;

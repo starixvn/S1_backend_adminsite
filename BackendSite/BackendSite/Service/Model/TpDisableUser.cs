@@ -115,4 +115,15 @@ namespace BackendSite.Service.Model
         public string en { get; set; }
         public string cs { get; set; }
     }
+
+    public class SlotGameDetail
+    {
+        public int TpId { get; set; }
+        public int GameType { get; set; }
+        public int CategoryId { get; set; }
+        public string Id { get; set; }
+        public string GameId { get; set; }
+        public string AppId { get; set; }
+        public string Name { get; set; }
+    }
 }

@@ -284,6 +284,34 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
 
         /// <summary>
+        /// GetAllData/GetTpList 取得Slot第三方品牌
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path： Show Slot Tp List
+        /// </remarks>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<SlotGameDetail>>> GetSlotGame()
+        {
+            var data = await _gameCasinoBll.GetSlotGame();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<SlotGameDetail>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        /// <summary>
         /// GetAllData/GetTpList 取得第三方品牌
         /// </summary>
         /// <remarks>
