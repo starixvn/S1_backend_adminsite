@@ -114,7 +114,7 @@ namespace BackendSite.Controllers.Api
             public string SpecialCode { get; set; }
             public int FilterType { get; set; }
         }
-        
+
         public class GetTpGameListReq
         {
             public int TpId { get; set; }
@@ -299,13 +299,13 @@ namespace BackendSite.Controllers.Api
             try
             {
                 duplicateRequest.NewSpecialCode = duplicateRequest.IsSpecial ? duplicateRequest.NewSpecialCode : null;
-                if (_bonusManageBLL.CheckPromotionExists(duplicateRequest.NewBonusCode ,duplicateRequest.NewSpecialCode))
+                if (_bonusManageBLL.CheckPromotionExists(duplicateRequest.NewBonusCode, duplicateRequest.NewSpecialCode))
                 {
                     apiResult.ErrorCode = 99;
                     apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
                     return apiResult;
                 }
-                
+
                 apiResult.ErrorCode = _bonusManageBLL.DuplicatePromotion(
                     duplicateRequest.BonusCode,
                     duplicateRequest.SiteId,
@@ -390,7 +390,7 @@ namespace BackendSite.Controllers.Api
                     ValidBet = referral == null ? string.Empty : referral.ValidBet.ToString(),
                     Deposit = referral == null ? string.Empty : referral.Deposit.ToString(),
                     IsoCode = currencyList.Find(x => x.CurrencyId == currencyId).IsoCode,
-                    Status = referral?.Status ?? false
+                    Status = referral.Status
                 });
             }
 
@@ -433,7 +433,7 @@ namespace BackendSite.Controllers.Api
                     return apiResult;
                 }
 
-                if (referral.Status)
+                if (referral.Status == Service.Model.enums.ReferralStatusEnum.ReferralEnable)
                 {
                     status = 0;
                 }

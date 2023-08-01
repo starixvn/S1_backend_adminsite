@@ -29,10 +29,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly SportsBLL _sportsBll;
         private readonly TpBLL _tpBll;
         private readonly BankFinancialBLL _bankFinancialBll;
-        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly MarketingBLL _marketingBll;
-        private readonly WinLostReportBLL _winLostReportBll;
+		private readonly WinLostReportBLL _winLostReportBll;
         private readonly ReportBLL _reportBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly PermissionBLL _permissionBll;
         private readonly Cryptor _cryptor;
         private readonly PaymentManageBLL _paymentManageBll;
@@ -53,7 +53,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _sportsBll = provider.GetRequiredService<SportsBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
             _marketingBll = provider.GetRequiredService<MarketingBLL>();
-            _winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
+			_winLostReportBll = provider.GetRequiredService<WinLostReportBLL>();
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
@@ -135,8 +135,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int CategoryId { get; set; }
         }
-        
-        public class GetTpGameTypeByCategoryAndTpIdReq
+		
+		public class GetTpGameTypeByCategoryAndTpIdReq
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
@@ -557,7 +557,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 .GetOfflineBankAccount(request.SiteId, custInfo.CurrencyId)
                 .Where(x => x.Purposes.Contains(request.Purpose) 
                             && x.AccountStatus == TransferAccountStatusEnum.Open
-                            && x.Channel == TransferChannelEnum.LocalBank);
+                            && x.Channel == TransferChannelEnum.LocalBank
+                            && x.Channel != TransferChannelEnum.CryptoWallet);
 
             return new ApiResult<IEnumerable<OfflineBankAccount>>
             {
@@ -991,6 +992,26 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         }
         
         /// <summary>
+        /// 取得第三方遊戲類型清單ByCategoryAndTpId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeByCategoryAndTpId(GetTpGameTypeByCategoryAndTpIdReq request)
+        {
+            var data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId);
+            var result = data.Where(x => x.TpId == request.TpId);
+            
+            var apiResult = new ApiResult<IEnumerable<TpGameType>>
+            {
+                Data = result,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+
+            return apiResult;
+        }
+        
+        /// <summary>
         /// Transfer Info Management > Filter > Acc. No.
         /// </summary>
         /// <param name="request"></param>
@@ -1015,27 +1036,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 Data = _bankFinancialBll.GetFinancialAccountList(request.SiteId, request.Purposes),
                 
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-
-            return apiResult;
-        }
-
-        
-        /// <summary>
-        /// 取得第三方遊戲類型清單ByCategoryAndTpId
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeByCategoryAndTpId(GetTpGameTypeByCategoryAndTpIdReq request)
-        {
-            var data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId);
-            var result = data.Where(x => x.TpId == request.TpId);
-            
-            var apiResult = new ApiResult<IEnumerable<TpGameType>>
-            {
-                Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 

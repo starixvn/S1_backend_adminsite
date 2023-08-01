@@ -269,7 +269,7 @@ namespace BackendSite.Service.DAL
                 props.Add("CustId", custId);
                 props.Add("DepositId", depositId);
                 props.Add("ReceiptNo", receiptNo);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans ,props );
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans, props);
 
                 if (result > 0)
                 {

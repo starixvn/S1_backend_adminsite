@@ -1,13 +1,13 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using BackendSite.Service.Library;
-using BackendSite.ExceptionHandling;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -37,6 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ICacheHelper _redisHelper;
         private readonly DateTimeHelper _dateTimeHelper;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly TpBLL _tpBll;
 
         public MemberController(IServiceProvider provider)
         {
@@ -59,6 +60,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _tpBll = provider.GetRequiredService<TpBLL>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -637,6 +639,28 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
+        /// 取得玩家在第三方遊戲帳號
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
+        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
+            try
+            {
+                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
         /// Member/EditFullName 修改用戶真實姓名
         /// </summary>
         /// <remarks>
@@ -943,7 +967,14 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Lock(LockMemberRequest request)
         {
-            if (await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason, User.Identity.Name) > 0)
+            if (request.Status == CustomerStatusEnum.Suspend)
+            {
+                await _tpBll.TransferAllTpWalletAsync(request.CustId);
+            }
+            
+            var setResult = await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason, User.Identity.Name) > 0;
+            
+            if (setResult)
             {
                 return new ApiResult
                 {
@@ -1020,6 +1051,32 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> SwitchRebatePayoutAsync(SwitchEnableRebateRequest request)
         {
             if (await _memberCommand.SwitchRebatePayoutAsync(request.CustId, (int)request.Status, User.Identity.Name) > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Success."
+                };
+            }
+
+            throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
+        }
+
+        /// <summary>
+        /// Member/SwitchRebatePayout 起停用派發Turnover Point
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 88 })]
+        [HttpPost]
+        public async Task<ApiResult> SwitchEnableTurnoverRewardPointAsync(SwitchEnableTurnoverRewardPointRequest request)
+        {
+            if (await _memberCommand.SwitchEnableTurnoverRewardPointAsync(request.CustId, (int)request.Status, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {
@@ -1243,29 +1300,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         }
 
         /// <summary>
-        /// 取得玩家在第三方遊戲帳號
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 24 })]
-        public async Task<ApiResult<IEnumerable<ThirdPartyAccountResponse>>> GetThirdPartyAccount(ThirdPartyAccountRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<ThirdPartyAccountResponse>>();
-            try
-            {
-                apiResult.Data = await _custInfoBll.GetThirdPartyAccountAsync(request);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
-        /// <summary>
         /// Member/GetCustomerBalanceInfo 取得客戶餘額資料
         /// </summary>
         /// <remarks>
@@ -1294,6 +1328,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// Http Method：POST
         /// 
         /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Login Log > [Search]
+        /// 
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
         public async Task<ApiListResult<MemberLoginLog>> GetLoginLog(GetLoginLogRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
@@ -1429,7 +1469,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     request.EndTime.ToUniversalTime().DateTime)
             };
         }
-
+        
         /// <summary>
         /// Member/RegisterMember 會員註冊
         /// </summary>

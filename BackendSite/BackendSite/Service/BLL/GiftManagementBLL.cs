@@ -1,6 +1,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.GiftManagement;
+using GetListRequest = BackendSite.Service.Model.Store.GiftManagement.GetListRequest;
 
 namespace BackendSite.Service.BLL
 {
