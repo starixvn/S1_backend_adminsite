@@ -13,7 +13,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                                    request.CurrencyIds.Contains(r.CurrencyId));
 
             // 過濾 UserName
-            if (string.IsNullOrEmpty(request.UserName)) return data;
+            if (string.IsNullOrEmpty(request.UserName))
             {
                 data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName);
             }
