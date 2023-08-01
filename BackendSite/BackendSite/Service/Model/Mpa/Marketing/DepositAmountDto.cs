@@ -12,6 +12,7 @@
         public DateTime Date { get; set; }
         public decimal DepositAmount { get; set; }
         public int CurrencyId { get; set; }
+        public int CustId { get; set; }
     }
 
 
