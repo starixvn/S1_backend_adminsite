@@ -37,6 +37,12 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 item.WinLossSummary -= item.ProgressiveWinSummary;
             }
 
+            if (!request.IncludeTest)
+            {
+                //istest = 0, test member
+                data = data.Where(x => x.IsTest == 0);
+            }
+
             return data;
         }
 

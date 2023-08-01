@@ -30,7 +30,7 @@ namespace BackendSite.Service.DAL
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
 
-            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V2", p);
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V3", p);
             
             return data;
         }
@@ -61,7 +61,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
 
-            var data = _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get_V2", p);
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get_V3", p);
             return data;
         }
 
@@ -95,7 +95,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
 
-            var data = _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get_V2", p);
+            var data = _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get_V3", p);
             
             return data;
         }

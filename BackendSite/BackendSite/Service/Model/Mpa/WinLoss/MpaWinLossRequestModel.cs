@@ -88,6 +88,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         /// </summary>
         public IEnumerable<MemberTypeEnum> MemberTypes { get; set; }
 
+        /// <summary>
+        /// 是否包含測試資料
+        /// </summary>
+        public bool IncludeTest { get; set; }
+
         public string MemberTypeJson()
         {
             var memberTypeJson = MemberTypes != null && MemberTypes.Any()
