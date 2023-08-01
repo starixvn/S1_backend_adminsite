@@ -2,9 +2,27 @@
 {
     #region MpaBonus
     
-    public class MpaBonusInfo : MpaBonusInfoSummary
+    public interface IMpaMarketingBonusGGRBaseDto
     {
-        public string RecordDate { get; set; }
+        public DateTime RecordDate { get; set; }
+        public decimal GGR { get; set; }
+        public int CurrencyId { get; set; }
+    }
+    
+    public interface IMpaMarketingBonusInfoAmountBaseDto
+    {
+        public DateTime RecordDate { get; set; }
+        public decimal BonusAmountClaim { get; set; }
+        public int CurrencyId { get; set; }
+    }
+    
+    public class MpaBonusInfo : MpaBonusInfoSummary , IMpaMarketingBonusInfoAmountBaseDto
+    {
+        public DateTime RecordDate { get; set; }
+        public int CustId { get; set; }
+        public string BonusId { get; set; }
+        public decimal BonusAmountClaim { get; set; }
+        public int CurrencyId { get; set; }
         public string BonusName { get; set; }
         public string BonusCode { get; set; }
         public int BonusType { get; set; }
@@ -12,6 +30,16 @@
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string BonusStatus { get; set; }
+        public int ClaimStatus { get; set; }
+    }
+    
+    public class MpaBonusGGR : IMpaMarketingBonusGGRBaseDto
+    {
+        public DateTime RecordDate { get; set; }
+        public int CustId { get; set; }
+        public string BonusId { get; set; }
+        public decimal GGR { get; set; }
+        public int CurrencyId { get; set; }
     }
     
     public class MpaBonusInfoSummary

@@ -692,6 +692,13 @@ namespace BackendSite.Service.Model.enums
         Deposit = 1
     }
     
+    public enum BonusGroupByType
+    {
+        BonusCode = 0,
+        Date = 1 ,
+        Month = 2
+    }
+    
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -883,7 +890,8 @@ namespace BackendSite.Service.Model.enums
         SetCustTpGameTypeSetting = 88,
         RebateExcludeGame = 89,
         VipUpgradeSetting = 90,
-        AutoWithdrawalRule = 91
+        AutoWithdrawalRule = 91,
+        AutoPaymentRule = 92
     }
 
     #region BankFinancialTransferInfoLog
@@ -1097,7 +1105,9 @@ namespace BackendSite.Service.Model.enums
         [Description("UNDER CREDIT")]
         UnderCredit = 20,
         [Description("REFUND")]
-        Refund = 21
+        Refund = 21,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
@@ -1575,20 +1585,6 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Able = 1,
     }
-    
-    public enum DashboardOrderByPropertyEnum
-    {
-        Amount = 1,
-        Currency = 2,
-        Count = 3
-    }
-
-    public enum DashboardGameTopDataTypeEnum
-    {
-        TopBetTwenty = 1,
-        TopWinTwenty = 2,
-        TopLoseTwenty = 3
-    }
 
     public enum ShieldPlatform
     {
@@ -1892,5 +1888,11 @@ namespace BackendSite.Service.Model.enums
         DownDeposit = 2,
         [Description("Minimum Turnover Within Validity Period")]
         DownTurnover = 3,
+    }
+    
+     public enum AutoType
+    {
+        AutoVerify = 1,
+        AutoApproved = 2
     }
 }
