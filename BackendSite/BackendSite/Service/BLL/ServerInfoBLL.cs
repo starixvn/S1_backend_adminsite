@@ -258,19 +258,5 @@ namespace BackendSite.Service.BLL
             }
         }
 
-        public IEnumerable<MultiSiteRequestDto> ConvertToMultiSiteParam(IEnumerable<int> siteIds, IEnumerable<int> currencyIds)
-        {
-            List<MultiSiteRequestDto> result = new List<MultiSiteRequestDto>();
-            var userPermission = GetSiteListByLoginUserV2().ToList();
-            siteIds.ToList().ForEach(z =>
-            {
-                var siteData = userPermission.Find(x => x.SiteId == z);
-                var currencyList = siteData.ICurrencyList.Intersect(currencyIds);
-                if (siteData != null)
-                    result.AddRange(currencyList.Select(c => new MultiSiteRequestDto() { SiteId = z, CurrencyId = c }));
-            });
-
-            return result;
-        }
     }
 }
