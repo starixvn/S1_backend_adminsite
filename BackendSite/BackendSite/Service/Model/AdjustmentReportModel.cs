@@ -88,8 +88,9 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public string WalletType { get; set; }
         public string CategoryName { get; set; }
-
         public string DepositId { get; set; }
+        [ExportIgnore]
+        public int AdjustType { get; set; }
     }
 
 

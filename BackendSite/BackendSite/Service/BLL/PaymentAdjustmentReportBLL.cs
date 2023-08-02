@@ -432,7 +432,8 @@ namespace BackendSite.Service.BLL
                 Operator = row.Operator,
                 WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
                 CategoryName = row.CategoryName,
-                DepositId = row.DepositId
+                DepositId = row.DepositId,
+                AdjustType = row.AdjustType
             };
         }
 

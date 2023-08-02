@@ -2548,6 +2548,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                         (int)AdminAdjustmentLogMenuEnum.DeleteSMSInfo,
                         (int)AdminAdjustmentLogMenuEnum.SetCustInfoNote,
                         (int)AdminAdjustmentLogMenuEnum.SetCustomerFullName,
+                        (int)AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes
                     },
                     ActionTypes = new List<int>
                     {
