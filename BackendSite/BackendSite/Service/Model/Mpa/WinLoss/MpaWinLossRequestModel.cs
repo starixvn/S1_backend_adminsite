@@ -93,6 +93,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         /// </summary>
         public bool IncludeTest { get; set; }
 
+        /// <summary>
+        /// 各個TpCategory
+        /// </summary>
+        public IEnumerable<int> TpCategorys { get; set; }
+
         public string MemberTypeJson()
         {
             var memberTypeJson = MemberTypes != null && MemberTypes.Any()

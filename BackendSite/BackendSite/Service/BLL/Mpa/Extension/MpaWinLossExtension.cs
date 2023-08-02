@@ -8,9 +8,9 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         public static IEnumerable<MpaTpBetRecordDto> Filter(this IEnumerable<MpaTpBetRecordDto> data, MpaWinLossRequest request)
         {
 
-            // 過濾 GameType、CurrencyId
+            // 過濾 GameType、CurrencyId、CategoryId
             data = data.Where(r => request.TpGameTypes.Contains(r.GameType) &&
-                                   request.CurrencyIds.Contains(r.CurrencyId));
+                                   request.CurrencyIds.Contains(r.CurrencyId) && request.TpCategorys.Contains(r.CategoryId));
 
             // 過濾 UserName
             if (string.IsNullOrEmpty(request.UserName))
