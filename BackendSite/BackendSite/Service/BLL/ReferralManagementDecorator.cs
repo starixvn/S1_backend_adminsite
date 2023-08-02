@@ -86,10 +86,13 @@ namespace BackendSite.Service.BLL
                 setReferral.ReferralFreeCredit = referral.ReferralFreeCredit;
                 setReferral.ValidBet = referral.ValidBet;
                 setReferral.Deposit = referral.Deposit;
-                setReferral.PeriodDays = referral.PeriodDays;
+                setReferral.PeriodDays = referral?.PeriodDays;
             }
-            setReferral.SpecificList = setReferral.SpecificList.Select(x => new ReferralContent(type, x))
-                    .Union(referral.SpecificList.Where(x => x.Type != type));
+            var joinSpecificList = referral?.SpecificList?.Where(x => x.Type != type);
+            if (joinSpecificList != null)
+                setReferral.SpecificList = setReferral.SpecificList.Select(x => new ReferralContent(type, x)).Union(joinSpecificList);
+            else
+                setReferral.SpecificList = setReferral.SpecificList.Select(x => new ReferralContent(type, x));
         }
 
         public int SetReferralStatus(int siteId, int currencyId, int status)
@@ -152,7 +155,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<ReferralFriendRresponse> GetRefFriendList(int custId, DateTime? StartDate, DateTime? EndDate, int PageSize, int PageNumber, out int TotalPages, out int RowCount)
         {
-            return _referralManagementBll.GetRefFriendList(custId, StartDate, EndDate, Math.Abs(PageSize), (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), out TotalPages, out RowCount);
+            return _referralManagementBll.GetRefFriendList(custId, StartDate, EndDate, PageSize, PageNumber, out TotalPages, out RowCount);
         }
 
         private Dictionary<string, object> ToDictionary(object source)
