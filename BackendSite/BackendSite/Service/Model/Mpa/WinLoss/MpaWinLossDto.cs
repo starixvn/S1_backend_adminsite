@@ -31,6 +31,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ProgressiveBetSummary { get; set; }
         public decimal ClosingBalance { get; set; }
         public int RowCount { get; set; }
+        public int IsTest { get; set; }
     }
 
     public class MpaTpBetRecordWrapper
@@ -66,6 +67,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public byte TransactionType { get; set; }
         public decimal Amount { get; set; }
         public int RowCount { get; set; }
+        public int IsTest { get; set; }
     }
 
     public class TransactionRelayWrapper
@@ -91,6 +93,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int CurrencyId { get; set; }
 
         public decimal BonusAmountClaim { get; set; }
+
+        public int IsTest { get; set; }
     }
 
     public class MpaWinLossBonusWrapper
