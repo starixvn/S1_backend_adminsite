@@ -19,7 +19,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly AdminBLL _adminBll;
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly RebateManageBLL _rebateManageBLL;
-        private readonly List<int> _RewardCurrencyList = new List<int> { 2, 4, 15 };  //商城目前只開放給MYR、THB、IDR使用
+        private readonly List<int> _RewardCurrencyList = new List<int> { 2, 4, 15, 51 };  //商城目前只開放給MYR、THB、IDR使用
         #endregion
 
         #region Constructors
