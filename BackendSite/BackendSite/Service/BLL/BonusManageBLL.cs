@@ -130,6 +130,11 @@ namespace BackendSite.Service.BLL
                 {
                     result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.TpId });
                 });
+
+                //因 SBO Sports、 SBO Virtual Sports 的 PromoCategoryId 相同造成前端元件Bind資料會有問題
+                //故HardCode 移除重複選項，只保留一組 SBO 選單內容
+                result = result.Where(r => r.Key != 42).ToList();
+                result.Add(new GetCashBackGamerep { GameName = "SBO Sports", Key = 42 });
             }
             else
             {
