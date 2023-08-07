@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
 using System.Transactions;
+using Amazon.S3.Model;
 using BackendSite.Extensions;
 using BackendSite.Controllers.ApiV2.Finance.Deposit;
 
@@ -26,9 +27,12 @@ namespace BackendSite.Service.BLL
         private readonly ICacheHelper _cacheHelper;
         private readonly string payApiUrl;
         private readonly ILogger<DepositBLL> _logger;
+        private readonly string _awsDepositFolder;
+        private readonly string _awsDepositBucketName;
+        private readonly AWSS3Helper _s3Helper;
 
 
-        public DepositBLL(IServiceProvider provider)
+        public DepositBLL(IServiceProvider provider ,IConfiguration configuration)
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
@@ -45,6 +49,9 @@ namespace BackendSite.Service.BLL
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
+            _awsDepositFolder = configuration.GetValue<string>("AwsDepositFolder");
+            _awsDepositBucketName = configuration.GetValue<string>("AwsDepositBucketName");
+            _s3Helper = provider.GetRequiredService<AWSS3Helper>();
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(IEnumerable<int> selectSite, IEnumerable<int> depositType, IEnumerable<string> selectBankCode,
@@ -124,15 +131,12 @@ namespace BackendSite.Service.BLL
 
             if (!string.IsNullOrEmpty(transId) && receipt != null)
             {
-                await using var fileStream = receipt.OpenReadStream();
-                using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
-                var fileBytes = await _imageEditorBll.Resize(uploadedImage);
-                var fileName = receipt.FileName;
-                fileName = fileName.Substring(fileName.LastIndexOf('\\') + 1);
-                fileName = $"{fileName.Substring(0, fileName.LastIndexOf('.'))}.jpg";
-
-                //搬移至AWS
-                // await InsertDepositReceipt(deposit.SiteId, deposit.CustId, transId, 1, fileName, fileBytes , creator.UserName);
+                using var memoryStream = new MemoryStream();
+                await receipt.CopyToAsync(memoryStream);
+                var bytes = memoryStream.ToArray();
+                var base64String = Convert.ToBase64String(bytes);
+                
+                await SetDepositReceipt(deposit.SiteId, deposit.CustId, base64String ,transId, deposit.Operator);
             }
 
             if (!string.IsNullOrEmpty(transId))
@@ -142,6 +146,29 @@ namespace BackendSite.Service.BLL
             return 0;
         }
 
+
+        public async Task<int> SetDepositReceipt(int siteId, int custId, string inputReceipt, string transId, string creator)
+        {
+            var receipts = GetDepositReceipt(transId);
+            var receiptNo = receipts.Any() ? receipts.Max(x => x.ReceiptNo) + 1 : 1 ;
+                    
+            var x = inputReceipt.Replace("data:image/png;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");
+            var bytes = Convert.FromBase64String(x);
+            var stream = new MemoryStream(bytes);
+
+            var putRequest = new PutObjectRequest();
+            var key = $"{_awsDepositFolder}/{transId}_{receiptNo}.png";
+            putRequest.BucketName = _awsDepositBucketName; // Your bucket name
+            putRequest.ContentType = "image/png";
+            putRequest.InputStream = stream;
+            putRequest.Key = key;
+            await _s3Helper.PutObjectAsync(putRequest);
+                    
+            var fileName = $"{transId}_{receiptNo}";
+            var result = await InsertDepositReceipt(siteId, custId, transId, receiptNo , fileName, creator);
+            
+            return result;
+        }
         public async Task<int> DelDepositReceiptPic(int siteId, int custId, string transId ,string picFileName , int receiptNo , string Operator)
         {
             var depositId = ValidateDepositReceiptPic(transId);
