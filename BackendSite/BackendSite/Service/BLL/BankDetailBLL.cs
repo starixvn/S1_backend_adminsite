@@ -142,6 +142,7 @@ namespace BackendSite.Service.BLL
                             && x.CurrencyId == currencyId
                             && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
                             && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .OrderBy(x => x.SSort)
                 .GroupBy(x => x.PayId)
                 .Select(g =>
                 {
@@ -181,6 +182,7 @@ namespace BackendSite.Service.BLL
                              && x.CurrencyId == currencyId
                              && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
                              && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .OrderBy(x => x.SSort)
                 .GroupBy(x => x.PayId)
                 .Select(g =>
                 {
@@ -214,6 +216,7 @@ namespace BackendSite.Service.BLL
                             && x.CurrencyId == currencyId
                             && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
                             && (pointLevel == -1 || pointLevel >= x.PointLevel))
+                .OrderBy(x => x.SSort)
                 .GroupBy(x => x.PayId)
                 .Select(g =>
                 {
