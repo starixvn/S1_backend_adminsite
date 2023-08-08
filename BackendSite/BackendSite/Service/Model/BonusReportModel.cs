@@ -5,7 +5,7 @@ namespace BackendSite.Service.Model
 {
     #region Request
 
-    public class BonusReportRequestV2 : ApiRequestPageModel
+    public class BonusReportRequestV2 : ApiRequestPageModel, IApiRequest
     {
         public int SiteId { get; set; }
         public string BonusCode { get; set; }
@@ -19,9 +19,12 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> PromotionCategoryIds { get; set; }
         public IEnumerable<int> Statuses { get; set; }
         public IEnumerable<BonusAtPageEnum> AtPages { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
     }
 
-    public class BonusReportExportRequestV2
+    public class BonusReportExportRequestV2 : IApiRequest
     {
         public int SiteId { get; set; }
         public string BonusCode { get; set; }
@@ -36,6 +39,9 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> PromotionCategoryIds { get; set; }
         public IEnumerable<int> Statuses { get; set; }
         public IEnumerable<BonusAtPageEnum> AtPages { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
     }
 
     #endregion
