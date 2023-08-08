@@ -268,14 +268,14 @@ namespace BackendSite.Service.BLL
             return result.GetRange(index, count);
         }
 
-        public VipRebateReportResult GetVipRebateInfoList(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,
+        public VipRebateReportResult GetVipRebateInfoList(IEnumerable<MultiSiteRequestDto> multiSiteRequest,
             DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses,
             int pageSize, int pageNumber,ref List<string> currencyAmount)
         {
             var spPayoutStatus = 2; //All
             if (payoutStatuses.Count() == 1)
                 spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
-            return walletService.GetVipRebateInfoList(JsonConvert.SerializeObject(siteIds), JsonConvert.SerializeObject(currencyIds),
+            return walletService.GetVipRebateInfoList(JsonConvert.SerializeObject(multiSiteRequest),
                 startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
                 baseCurrencyId, spPayoutStatus,
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
@@ -296,20 +296,15 @@ namespace BackendSite.Service.BLL
             return walletService.GetVipRebateDetail(custId, tpCategoryId, refId);
         }
 
-        public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<int> siteIds, IEnumerable<int> currencyIds,
+        public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<MultiSiteRequestDto> multiSiteRequest,
             DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses)
         {
             var spPayoutStatus = 2; //All
             if (payoutStatuses.Count() == 1)
                 spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
-            return walletService.GetVipRebateInfoListExport(JsonConvert.SerializeObject(siteIds),
-                JsonConvert.SerializeObject(currencyIds), startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
+            return walletService.GetVipRebateInfoListExport(JsonConvert.SerializeObject(multiSiteRequest),
+                startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
                 baseCurrencyId, spPayoutStatus);
-        }
-
-        public IEnumerable<VipTPCategory> GetTPCategoryList()
-        {
-            return walletService.GetTPCategoryList();
         }
 
         public IEnumerable<AdjustmentLimitData> GetAdjustmentData(IEnumerable<int> siteId, IEnumerable<int> currencyId,
