@@ -34,6 +34,7 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
+            services.AddHttpContextAccessor();
             var redisConnection = ConnectionMultiplexer.Connect(_configuration.GetValue<string>("RedisConnection"));
             redisConnection.UseElasticApm();
             services.AddSingleton<IConnectionMultiplexer>(redisConnection);
@@ -94,7 +95,6 @@ namespace BackendSite
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IIovationReportBLL, IovationReportBLL>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
-            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<IVipLevelBLL, VipLevelBLL>();
             services.AddTransient<ITagBLL, TagBLL>();
@@ -109,7 +109,7 @@ namespace BackendSite
             services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
 
             services.AddTransient<ReferralManagementDecorator>();
-            services.AddTransient<LiveRegistrationDecorator>();
+            services.DecoratorLiveRegistration();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
@@ -142,8 +142,7 @@ namespace BackendSite
             {
                 options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
             });
-
-            services.AddHttpContextAccessor();
+            
             services.AddAuthentication(option => 
             {
                 option.DefaultScheme = "backend";
