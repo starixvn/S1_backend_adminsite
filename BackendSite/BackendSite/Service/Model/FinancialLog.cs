@@ -253,6 +253,7 @@ namespace BackendSite.Service.Model
 
     public class VipRebateReportOverviewResult
     {
+        public string SiteName { get; set; }
         public int CurrencyId { get; set; }
         public string CurrencyName { get; set; }
         public int TotalRecord { get; set; }
