@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,14 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     public class BonusReportController : ControllerBase
     {
         private readonly BonusReportBLL _bonusReportBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly ExcelBLL _excelBll;
 
         public BonusReportController(IServiceProvider provider)
         {
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _bonusReportBll = provider.GetRequiredService<BonusReportBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         /// <summary>
@@ -37,7 +40,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var apiResult = new ApiListResultCurrencyAmount<BonusReportResponse>();
             try
             {
-                var result = await _bonusReportBll.GetBonusReportV2Async(request);
+                var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+                var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+                var result = await _bonusReportBll.GetBonusReportV2Async(multiSiteRequest, request);
                 apiResult.Data = result.Data;
                 apiResult.PageNumber = request.PageNumber;
                 apiResult.RowCount = result.RowCount;
@@ -67,7 +72,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<IActionResult> Export(BonusReportExportRequestV2 request)
         {
-            var exportData = await _bonusReportBll.GetBonusReportExportData(request);
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var exportData = await _bonusReportBll.GetBonusReportExportData(multiSiteRequest, request);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "BonusReport");
         }
