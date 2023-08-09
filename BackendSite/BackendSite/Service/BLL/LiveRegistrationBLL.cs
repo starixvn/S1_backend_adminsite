@@ -8,23 +8,43 @@ namespace BackendSite.Service.BLL
     public class LiveRegistrationBLL : ILiveRegistrationBLL
     {
         private readonly LiveRegistrationService _registrationService;
-        
-        public LiveRegistrationBLL(LiveRegistrationService registrationService)
+        private readonly CustInfoBLL _custInfoBll;
+
+        public LiveRegistrationBLL(LiveRegistrationService registrationService, CustInfoBLL custInfoBll)
         {
             _registrationService = registrationService;
+            _custInfoBll = custInfoBll;
         }
 
         public async Task<LiveRegistrationResponse> GetRegLiveStatusData(GetRegLiveStatusRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
+            var custList = new List<int>();
+            if (request.DateType == LiveRegistrationDateTypeEnum.CallRecordDate) 
+            {
+                var callRecord = await _registrationService.QueryCallingRecord(request.SiteId, startTime, endTime);
+                custList = callRecord.ToList();
+                if (custList.Count == 0) 
+                {
+                    return new LiveRegistrationResponse();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.UserName)) 
+            {
+                var cust = await _custInfoBll.GetCustId(null, request.UserName, request.SiteId);
+                if(cust != null)
+                    custList.Add(cust.CustId);
+            }
+
             var timezone = request.StartDate.Offset;
             var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
             
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 
             var searchResult = await _registrationService.GetRegLiveStatusData(request.SiteId, request.CurrencyId,
-                request.DepositStatus, request.Status, request.UserName, request.DateType, startTime, endTime,
+                request.DepositStatus, request.Status, custList, (int)request.DateType, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantType, dormantFrequency, request.CallOutStatus,
                 orderByProperty, (int)request.OrderByDirection, request.PageNumber, request.PageSize);
             

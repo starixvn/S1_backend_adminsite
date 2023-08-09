@@ -109,7 +109,6 @@ namespace BackendSite
             services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
 
             services.AddTransient<ReferralManagementDecorator>();
-            services.DecoratorLiveRegistration();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
@@ -132,8 +131,8 @@ namespace BackendSite
             services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
             services.AddTransient<IAutoWithdrawalRuleService, AutoWithdrawalRuleService>();
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
-            
-            
+            services.DecoratorLiveRegistration();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;

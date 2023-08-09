@@ -63,7 +63,7 @@ namespace BackendSite.Extensions
             var adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             var custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             var logger = provider.GetRequiredService<ILogger<LiveRegistrationDecorator>>();
-            services.AddTransient<ILiveRegistrationBLL>(a => new LiveRegistrationDecorator(custInfoBLL, new LiveRegistrationBLL(liveRegistrationService), adjustmentLogReportService, logger));
+            services.AddTransient<ILiveRegistrationBLL>(a => new LiveRegistrationDecorator(custInfoBLL, new LiveRegistrationBLL(liveRegistrationService, custInfoBLL), adjustmentLogReportService, logger));
         }
     }
 }

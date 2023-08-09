@@ -53,7 +53,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int CallOutStatus { get; set; }
         public int DormantUser { get; set; }
-        public int DateType { get; set; }
+        public LiveRegistrationDateTypeEnum DateType { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public bool OrderBy { get; set; }
