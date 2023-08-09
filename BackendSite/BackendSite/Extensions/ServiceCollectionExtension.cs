@@ -66,5 +66,15 @@ namespace BackendSite.Extensions
             services.AddTransient<IReferralManagementBLL>(a => new ReferralManagementDecorator(
                 new ReferralManagementBLL(referralManagementService), adjustmentLogReportService, reportService, logger));
         }
+        public static void DecoratorLiveRegistration(this IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var liveRegistrationService = provider.GetRequiredService<LiveRegistrationService>();
+            var adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            var custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
+            var logger = provider.GetRequiredService<ILogger<LiveRegistrationDecorator>>();
+            services.AddTransient<ILiveRegistrationBLL>(a => new LiveRegistrationDecorator(custInfoBLL, new LiveRegistrationBLL(liveRegistrationService, custInfoBLL), adjustmentLogReportService, logger));
+
+        }
     }
 }

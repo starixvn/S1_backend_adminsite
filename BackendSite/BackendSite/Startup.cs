@@ -34,6 +34,7 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
+            services.AddHttpContextAccessor();
             var redisConnection = ConnectionMultiplexer.Connect(_configuration.GetValue<string>("RedisConnection"));
             redisConnection.UseElasticApm();
             services.AddSingleton<IConnectionMultiplexer>(redisConnection);
@@ -94,7 +95,6 @@ namespace BackendSite
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IIovationReportBLL, IovationReportBLL>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
-            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<IVipLevelBLL, VipLevelBLL>();
             services.AddTransient<ITagBLL, TagBLL>();
             services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
@@ -110,7 +110,6 @@ namespace BackendSite
 
 
             services.AddTransient<ReferralManagementDecorator>();
-            services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
@@ -133,6 +132,7 @@ namespace BackendSite
             services.AddTransient<IAutoWithdrawalRuleService, AutoWithdrawalRuleService>();
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
             services.DecoratorReferralManagement();
+            services.DecoratorLiveRegistration();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
@@ -142,8 +142,7 @@ namespace BackendSite
             {
                 options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
             });
-
-            services.AddHttpContextAccessor();
+            
             services.AddAuthentication(option => 
             {
                 option.DefaultScheme = "backend";

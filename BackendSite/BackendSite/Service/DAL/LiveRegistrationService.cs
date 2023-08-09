@@ -11,7 +11,7 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _reportDbClient;
         private readonly MySqlClient _mainDbClient;
-        private readonly List<string> _creditSite = new List<string> { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" }; 
+        private readonly List<string> _creditSite = new() { "Nova88Ref01", "Nova88Ref02", "Nova88Ref03", "Nova88Ref04", "Nova88Ref05", "Nova88Ref06", "Nova88Ref07", "Nova88Ref08", "Goal123Ref01", "BwingRef01" };
         public LiveRegistrationService(IEnumerable<MySqlClient> mySqlClients)
         {
             _reportDbClient = mySqlClients.SingleOrDefault(a => a.DataBase == DataBase.Report);
@@ -19,14 +19,14 @@ namespace BackendSite.Service.DAL
         }
 
         public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currencyId, int depositStatus, 
-            int status, string username, int dateType, DateTime startDate, DateTime endDate, 
+            int status, List<int> custIdList, int dateType, DateTime startDate, DateTime endDate, 
             string affiliatesCode, int agentCodeType, int dormantType, int dormantFrequency, int callOutStatus, 
             string orderByProperty, int orderByDirection, int pageNumber, int pageSize)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_CurrencyId", currencyId);
-            props.Add("_UserName", username);
+            props.Add("_CustIdList", JsonConvert.SerializeObject(custIdList));
             props.Add("_DepositStatus", depositStatus);
             props.Add("_Status", status);
             props.Add("_DateType", dateType);
@@ -46,7 +46,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = await _reportDbClient.QueryAsync<RegLiveStatusData>("Admin_CustRegLiveStatus_Get_V7", props);
+            var result = await _reportDbClient.QueryAsync<RegLiveStatusData>("Admin_CustRegLiveStatus_Get_V8", props);
             var searchData = new RegLiveStatusPageResult
             {
                 RegLiveStatusData = result.ToList(),
@@ -57,12 +57,12 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
+        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, List<int> custIdList, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_Currency", currency);
-            props.Add("_UserName", userName);
+            props.Add("_CustIdList", JsonConvert.SerializeObject(custIdList));
             props.Add("_DepositStatus", depositStatus);
             props.Add("_Status", status);
             props.Add("_StartDate", startDate);
@@ -75,7 +75,7 @@ namespace BackendSite.Service.DAL
             props.Add("_CallOutStatus", callOutStatus);
             props.Add("_DateType", dateType);
 
-            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V7", props);
+            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V8", props);
 
             return result;
         }
@@ -102,6 +102,10 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_CustTele_Ins_V2", props);
         }
+        public Task<IEnumerable<int>> QueryCallingRecord(int siteId, DateTime startTime, DateTime endTime) 
+            => _reportDbClient.QueryAsync<int>("Admin_CustTele_Get", 
+                new { _SiteId  = siteId, _StartTime  = startTime, _EndTime  = endTime });
+
         public async Task<IEnumerable<CustRegLiveStatusNotesData>> GetRegLiveStatusNotesByCustId(int custId)
         {
             var props = new DynamicParameters();
