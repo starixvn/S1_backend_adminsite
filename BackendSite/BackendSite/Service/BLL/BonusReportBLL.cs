@@ -33,8 +33,10 @@ namespace BackendSite.Service.BLL
                 {
                     CustId = r.CustId,
                     TransId = r.TransId,
+                    CurrencyId = r.CurrencyId,
                     CurrencyName = _selLangBll.GetResourceValue($"Currency_{r.CurrencyId}"),
                     PromotionName = _selLangBll.GetResourceValue($"lbl_PromotionType{r.PromotionType}"),
+                    SiteId = r.SiteId,
                     SiteName = siteList.FirstOrDefault(x => x.SiteId == r.SiteId).SiteName,
                     UserName = r.UserName,
                     CreateTime = r.CreateTime,

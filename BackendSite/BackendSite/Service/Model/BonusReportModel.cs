@@ -58,12 +58,14 @@ namespace BackendSite.Service.Model
 
     public class BonusReportResponse
     {
+        public int SiteId { get; set; }
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string TransId { get; set; }
         public string PromotionName { get; set; }
         public string BonusCode { get; set; }
         public string UserName { get; set; }
+        public int CurrencyId { get; set; }
         public string CurrencyName { get; set; }
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }
