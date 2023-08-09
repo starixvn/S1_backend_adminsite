@@ -20,23 +20,15 @@ namespace BackendSite.Service.BLL
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
-            var custList = new List<int>();
-            if (request.DateType == LiveRegistrationDateTypeEnum.CallRecordDate) 
-            {
-                var callRecord = await _registrationService.QueryCallingRecord(request.SiteId, startTime, endTime);
-                custList = callRecord.ToList();
-                if (custList.Count == 0) 
+            var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
+            if (custList == null)
+                return new LiveRegistrationResponse()
                 {
-                    return new LiveRegistrationResponse();
-                }
-            }
-
-            if (!string.IsNullOrEmpty(request.UserName)) 
-            {
-                var cust = await _custInfoBll.GetCustId(null, request.UserName, request.SiteId);
-                if(cust != null)
-                    custList.Add(cust.CustId);
-            }
+                    LiveRegistration = new List<LiveRegistration>(),
+                    PageNumber = 1,
+                    TotalPages = 0,
+                    RowCount = 0
+                };
 
             var timezone = request.StartDate.Offset;
             var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
@@ -85,23 +77,9 @@ namespace BackendSite.Service.BLL
             
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 
-            var custList = new List<int>();
-            if (request.DateType == LiveRegistrationDateTypeEnum.CallRecordDate)
-            {
-                var callRecord = await _registrationService.QueryCallingRecord(request.SiteId, startTime, endTime);
-                custList = callRecord.ToList();
-                if (custList.Count == 0)
-                {
-                    return new List<Dictionary<string, object>>();
-                }
-            }
-
-            if (!string.IsNullOrEmpty(request.UserName))
-            {
-                var cust = await _custInfoBll.GetCustId(null, request.UserName, request.SiteId);
-                if (cust != null)
-                    custList.Add(cust.CustId);
-            }
+            var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
+            if (custList == null)
+                return new List<Dictionary<string, object>>();
 
 
             var result = await _registrationService.GetExportRegLiveStatus(request.SiteId, request.CurrencyId,
@@ -240,6 +218,32 @@ namespace BackendSite.Service.BLL
             var frequency = dormantUser / 10;
             var type = dormantUser % 10;
             return (frequency, type);
+        }
+
+        private async Task<List<int>> GetQueryCustId(LiveRegistrationDateTypeEnum dateType, int siteId, DateTime startTime, DateTime endTime, string userName) 
+        {
+            var custList = new List<int>();
+            if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate)
+            {
+                var callRecord = await _registrationService.QueryCallingRecord(siteId, startTime, endTime);
+                custList = callRecord.ToList();
+                if (custList.Count == 0)
+                {
+                    return null;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(userName))
+            {
+                var cust = await _custInfoBll.GetCustId(null, userName, siteId);
+                if (cust == null) return null;
+
+                if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate && (!custList.Any(c => c == cust.CustId)))
+                    return null;
+
+                custList = new List<int>() { cust.CustId };
+            }
+            return custList;
         }
     }
 }
