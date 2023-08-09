@@ -84,11 +84,30 @@ namespace BackendSite.Service.BLL
             var timezone = request.StartDate.Offset;
             
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
-            
+
+            var custList = new List<int>();
+            if (request.DateType == LiveRegistrationDateTypeEnum.CallRecordDate)
+            {
+                var callRecord = await _registrationService.QueryCallingRecord(request.SiteId, startTime, endTime);
+                custList = callRecord.ToList();
+                if (custList.Count == 0)
+                {
+                    return new List<Dictionary<string, object>>();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.UserName))
+            {
+                var cust = await _custInfoBll.GetCustId(null, request.UserName, request.SiteId);
+                if (cust != null)
+                    custList.Add(cust.CustId);
+            }
+
+
             var result = await _registrationService.GetExportRegLiveStatus(request.SiteId, request.CurrencyId,
-                request.DepositStatus, request.Status, request.UserName, startTime, endTime,
+                request.DepositStatus, request.Status, custList, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantFrequency, dormantType, request.CallOutStatus,
-                request.DateType);
+                (int)request.DateType);
 
             int maxCol = 0;
             var liveRegs = new List<ExportLiveRegistration>();

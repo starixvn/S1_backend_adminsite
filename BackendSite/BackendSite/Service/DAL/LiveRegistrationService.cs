@@ -57,12 +57,12 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, string userName, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
+        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, List<int> custIdList, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", siteId);
             props.Add("_Currency", currency);
-            props.Add("_UserName", userName);
+            props.Add("_CustIdList", JsonConvert.SerializeObject(custIdList));
             props.Add("_DepositStatus", depositStatus);
             props.Add("_Status", status);
             props.Add("_StartDate", startDate);
@@ -75,7 +75,7 @@ namespace BackendSite.Service.DAL
             props.Add("_CallOutStatus", callOutStatus);
             props.Add("_DateType", dateType);
 
-            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V7", props);
+            var result = await _reportDbClient.QueryAsync<ExportRegLiveStatusData>("Admin_CustRegLiveStatusExport_Get_V8", props);
 
             return result;
         }
