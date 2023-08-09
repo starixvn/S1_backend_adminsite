@@ -1895,4 +1895,11 @@ namespace BackendSite.Service.Model.enums
         AutoVerify = 1,
         AutoApproved = 2
     }
+
+    public enum MethodTypeIDEnum
+    {
+        MainWallet = 1,
+        MainWalletBatch = 2,
+        ThreeWallet = 3
+    }
 }

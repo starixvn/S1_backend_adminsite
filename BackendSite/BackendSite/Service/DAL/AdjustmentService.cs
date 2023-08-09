@@ -82,7 +82,7 @@ namespace BackendSite.Service.DAL
             try
             {
                 var sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
-                var p = new DynamicParameters(new { AdjustId = adjustId, SiteId = siteId, RefId = (string)null, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
+                var p = new DynamicParameters(new { AdjustId = adjustId, SiteId = siteId, RefId =adjustmentInfo.RefId , Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
                 result = _mainDbClient.Execute("Adjustment_Set", trans, p);
@@ -337,6 +337,8 @@ namespace BackendSite.Service.DAL
                 Prefix = $"A{common.GetEnv()}",
                 adjustmentAndWithdrawalLimit.Memo,
                 adjustmentAndWithdrawalLimit.Category,
+                adjustmentAndWithdrawalLimit.MethodType,
+                adjustmentAndWithdrawalLimit.RefId
             });
             adjustmentP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
@@ -352,9 +354,10 @@ namespace BackendSite.Service.DAL
                 {
                     Adjustment_transId = adjustmentP.Get<string>("TransId");
                     var isAdd = adjustmentAndWithdrawalLimit.AdjustType % 2 == 1; //1, 3(Add)2, 4(Deduct)
-                    
+
                     // 調帳類型為 Deposit(9) 時變更存款單實際存款金額
-                    if (adjustmentAndWithdrawalLimit.Category == 9)
+                    //調帳類型為Main Wallet且為Deposit(1)時變更存款單實際存款金額
+                    if (adjustmentAndWithdrawalLimit.Category == 1 && (adjustmentAndWithdrawalLimit.MethodType == 1 ||adjustmentAndWithdrawalLimit.MethodType == 3))
                     {
                         var adjustAmount = isAdd
                             ? adjustmentAndWithdrawalLimit.Amount
@@ -362,8 +365,6 @@ namespace BackendSite.Service.DAL
 
                         result = AdjustmentActualDeposit(adjustmentAndWithdrawalLimit, Adjustment_transId,
                             adjustAmount, trans);
-                        
-                        
                     }
 
                     if (result > 0

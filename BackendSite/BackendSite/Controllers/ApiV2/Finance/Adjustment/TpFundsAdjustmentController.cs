@@ -69,6 +69,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public string Memo { get; set; }
             public int ReasonId { get; set; }
             public string TransId { get; set; }
+            public MethodTypeIDEnum MethodType { get; set; }
         }
 
         public class GetLogRequest : ApiRequestPageModel
@@ -182,7 +183,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public async Task<ApiResult> Submit(SubmitRequest request)
         {
             var user = User.Identity.Name;
-            var isDeposit = request.ReasonId == 9; // 9: Deposit
+            var isDeposit = (request.ReasonId == 1 && request.MethodType ==MethodTypeIDEnum.ThreeWallet); // Methodtype為第3方且ReasonID=1(Deposit)
             var inTpTransfer = new AdminTpTransfer
             {
                 TpId = request.TpId,
