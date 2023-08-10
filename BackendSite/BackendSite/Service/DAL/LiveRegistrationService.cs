@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
-    public class LiveRegistrationService
+    public class LiveRegistrationService : ILiveRegistrationService
     {
         private readonly MySqlClient _reportDbClient;
         private readonly MySqlClient _mainDbClient;
@@ -18,9 +18,9 @@ namespace BackendSite.Service.DAL
             _mainDbClient = mySqlClients.SingleOrDefault(a => a.DataBase == DataBase.Main);
         }
 
-        public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currencyId, int depositStatus, 
-            int status, List<int> custIdList, int dateType, DateTime startDate, DateTime endDate, 
-            string affiliatesCode, int agentCodeType, int dormantType, int dormantFrequency, int callOutStatus, 
+        public async Task<RegLiveStatusPageResult> GetRegLiveStatusData(int siteId, int currencyId, int depositStatus,
+            int status, List<int> custIdList, int dateType, DateTime startDate, DateTime endDate,
+            string affiliatesCode, int agentCodeType, int dormantType, int dormantFrequency, int callOutStatus,
             string orderByProperty, int orderByDirection, int pageNumber, int pageSize)
         {
             var props = new DynamicParameters();
@@ -102,9 +102,9 @@ namespace BackendSite.Service.DAL
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_CustTele_Ins_V2", props);
         }
-        public Task<IEnumerable<int>> QueryCallingRecord(int siteId, DateTime startTime, DateTime endTime) 
-            => _reportDbClient.QueryAsync<int>("Admin_CustTele_Get", 
-                new { _SiteId  = siteId, _StartTime  = startTime, _EndTime  = endTime });
+        public Task<IEnumerable<int>> QueryCallingRecord(int siteId, DateTime startTime, DateTime endTime)
+            => _reportDbClient.QueryAsync<int>("Admin_CustTele_Get",
+                new { _SiteId = siteId, _StartTime = startTime, _EndTime = endTime });
 
         public async Task<IEnumerable<CustRegLiveStatusNotesData>> GetRegLiveStatusNotesByCustId(int custId)
         {
@@ -122,7 +122,7 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("CustId", custId);
-            props.Add("Note",  string.IsNullOrWhiteSpace(note) ? "" : note);
+            props.Add("Note", string.IsNullOrWhiteSpace(note) ? "" : note);
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_CustRegLiveStatusNotes_Ins", props);
         }
@@ -130,7 +130,7 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("CustId", custId);
-            props.Add("Id",  id);
+            props.Add("Id", id);
             return await _mainDbClient.ExecuteAsync("Admin_CustRegLiveStatusNotes_Del", props);
         }
         public async Task<int> EditRegLiveStatusNote(int custId, int id, string note, string @operator)
@@ -138,7 +138,7 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("CustId", custId);
             props.Add("Id", id);
-            props.Add("Note",  note);
+            props.Add("Note", note);
             props.Add("Operator", @operator);
             return await _mainDbClient.ExecuteAsync("Admin_CustRegLiveStatusNotes_Set", props);
         }

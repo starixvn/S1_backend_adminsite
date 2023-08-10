@@ -112,6 +112,7 @@ namespace BackendSite
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
+            services.AddTransient<ILiveRegistrationService, LiveRegistrationService>();
             services.AddTransient<IVipLevelService, VipLevelService>();
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
