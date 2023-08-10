@@ -1,5 +1,6 @@
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
@@ -7,19 +8,21 @@ namespace BackendSite.Service.BLL
 {
     public class LiveRegistrationBLL : ILiveRegistrationBLL
     {
-        private readonly LiveRegistrationService _registrationService;
-        private readonly CustInfoBLL _custInfoBll;
+        private readonly ILiveRegistrationService _registrationService;
+        private readonly IMemberService _memberService;
 
-        public LiveRegistrationBLL(LiveRegistrationService registrationService, CustInfoBLL custInfoBll)
+        public LiveRegistrationBLL(ILiveRegistrationService registrationService, IMemberService memberService)
         {
             _registrationService = registrationService;
-            _custInfoBll = custInfoBll;
+            _memberService = memberService;
         }
 
         public async Task<LiveRegistrationResponse> GetRegLiveStatusData(GetRegLiveStatusRequest request)
         {
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
+            var timezone = request.StartDate.Offset;
+
             var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
             if (custList == null)
                 return new LiveRegistrationResponse()
@@ -30,10 +33,9 @@ namespace BackendSite.Service.BLL
                     RowCount = 0
                 };
 
-            var timezone = request.StartDate.Offset;
-            var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
-            
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
+
+            var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
 
             var searchResult = await _registrationService.GetRegLiveStatusData(request.SiteId, request.CurrencyId,
                 request.DepositStatus, request.Status, custList, (int)request.DateType, startTime, endTime,
@@ -70,7 +72,6 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<Dictionary<string, object>>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
         {
-            var offset = request.StartDate.Offset;
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
@@ -80,7 +81,6 @@ namespace BackendSite.Service.BLL
             var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
             if (custList == null)
                 return new List<Dictionary<string, object>>();
-
 
             var result = await _registrationService.GetExportRegLiveStatus(request.SiteId, request.CurrencyId,
                 request.DepositStatus, request.Status, custList, startTime, endTime,
@@ -97,15 +97,15 @@ namespace BackendSite.Service.BLL
                     FullName = item.AccountName,
                     AffCode = item.AffCode,
                     PhoneNo = item.PhoneNo,
-                    RegTime = new DateTimeOffset(item.RegTime, TimeSpan.Zero).ToOffset(offset),
-                    LastActiveTime = new DateTimeOffset(item.LastActiveTime, TimeSpan.Zero).ToOffset(offset),
+                    RegTime = new DateTimeOffset(item.RegTime, TimeSpan.Zero).ToOffset(timezone),
+                    LastActiveTime = new DateTimeOffset(item.LastActiveTime, TimeSpan.Zero).ToOffset(timezone),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), item.ActStatus),
                     Note = item.Note,
                     CallRecord = ZipRemark(item.UpdateAt, item.Operator, item.DepositStatus, timezone),
                     ReferralUrl = item.ReferralUrl,
                     BonusCode = item.BonusCode,
                     PromotionCategory = item.PromotionCategory,
-                    FTDDate = new DateTimeOffset(item.FTDDate, TimeSpan.Zero).ToOffset(offset),
+                    FTDDate = new DateTimeOffset(item.FTDDate, TimeSpan.Zero).ToOffset(timezone),
                     Amount = item.Amount
                 };
                 if (liveReg.CallRecord?.Count > maxCol)
@@ -235,7 +235,7 @@ namespace BackendSite.Service.BLL
 
             if (!string.IsNullOrEmpty(userName))
             {
-                var cust = await _custInfoBll.GetCustId(null, userName, siteId);
+                var cust = await _memberService.GetCustId(null, userName, siteId);
                 if (cust == null) return null;
 
                 if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate && (!custList.Any(c => c == cust.CustId)))
