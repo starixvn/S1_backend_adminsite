@@ -342,7 +342,7 @@ namespace BackendSite.Service.DAL
             });
             adjustmentP.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
-            var result = _mainDbClient.Execute("Admin_Adjustment_Ins_V2", trans, adjustmentP);
+            var result = _mainDbClient.Execute("Admin_Adjustment_Ins_V3", trans, adjustmentP);
             Adjustment_transId = adjustmentP.Get<string>("TransId");
             if (result > 0)
             {
@@ -355,7 +355,6 @@ namespace BackendSite.Service.DAL
                     Adjustment_transId = adjustmentP.Get<string>("TransId");
                     var isAdd = adjustmentAndWithdrawalLimit.AdjustType % 2 == 1; //1, 3(Add)2, 4(Deduct)
 
-                    // 調帳類型為 Deposit(9) 時變更存款單實際存款金額
                     //調帳類型為Main Wallet且為Deposit(1)時變更存款單實際存款金額
                     if (adjustmentAndWithdrawalLimit.Category == 1 && (adjustmentAndWithdrawalLimit.MethodType == 1 ||adjustmentAndWithdrawalLimit.MethodType == 3))
                     {

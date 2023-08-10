@@ -1900,6 +1900,16 @@ namespace BackendSite.Service.Model.enums
     {
         MainWallet = 1,
         MainWalletBatch = 2,
-        ThreeWallet = 3
+        ThirdWallet = 3
+    }
+
+    public enum BalanceAdjustmentTypeIDEnum
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        Add = 5,
+        Minus = 6
     }
 }
