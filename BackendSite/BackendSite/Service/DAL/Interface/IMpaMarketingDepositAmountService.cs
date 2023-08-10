@@ -4,7 +4,7 @@ namespace BackendSite.Service.DAL.Interface
 {
     public interface IMpaMarketingDepositAmountService
     {
-        Task<IEnumerable<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryAsync(int siteId,
+        Task<IEnumerable<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryAsync(string siteList,
             DateTimeOffset startTime, DateTimeOffset endTime);
 
         Task<IEnumerable<MpaMarketingDepositSignUpSummaryDto>> GetDepositSignUpSummaryAsync(int siteId,

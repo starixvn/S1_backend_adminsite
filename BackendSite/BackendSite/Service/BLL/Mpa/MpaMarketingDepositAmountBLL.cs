@@ -8,6 +8,7 @@ using BackendSite.Service.Model.Mpa.Marketing;
 using BackendSite.Extensions;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -31,12 +32,12 @@ namespace BackendSite.Service.BLL.Mpa
 
         public async Task<DepositAmountSummaryResponse> GetDepositAmountSummaryAsync(DepositAmountRequest request)
         {
-            var depositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(request.SiteId,
+            var depositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
                 request.StartDate, request.EndDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRateAmountSummary(depositSummaryResult, request.StartDate, request.GetEndDate(), request.BaseCurrencyId);
 
-            var compareDepositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(request.SiteId,
+            var compareDepositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
                 request.CompareFromDate, request.CompareToDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRateAmountSummary(compareDepositSummaryResult, request.CompareFromDate, request.GetCompareEndDate(), request.BaseCurrencyId);
