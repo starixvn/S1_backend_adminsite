@@ -114,6 +114,7 @@ namespace BackendSite
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
+            services.AddTransient<ILiveRegistrationService, LiveRegistrationService>();
             services.AddTransient<IVipLevelService, VipLevelService>();
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
