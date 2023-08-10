@@ -7,6 +7,7 @@ using BackendSite.Service.Model.ApiModel;
 using OfficeOpenXml.Style;
 using OfficeOpenXml;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -86,8 +87,8 @@ namespace BackendSite.Service.BLL.Mpa
                 return _cacheHelper.GetListByRange<WithdrawalAmountDetailData>(masterKey, startIndex, endIndex);
             }
 
-            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(request.SiteId, request.StartDate,
-                request.EndDate).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.StartDate, request.EndDate).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             MultiplyExchangeRate(withDetails, request.StartDate, request.GetEndDate(), request.BaseCurrencyId).Wait();
 

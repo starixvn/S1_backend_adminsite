@@ -25,14 +25,14 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountSummaryDto>("Admin_MpaMarketingWithdrawalAmountSummary_Get", p);
         }
 
-        public Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(int siteId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(string siteList, DateTimeOffset startTime, DateTimeOffset endTime)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_SiteIds", siteList);
             p.Add("_StartTime", startTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
 
-            return _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountDetailDto>("Admin_MpaMarketingWithdrawalAmountDetail_Get", p);
+            return _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountDetailDto>("Admin_MpaMarketingWithdrawalAmountDetail_Get_V2", p);
         }
     }
 }

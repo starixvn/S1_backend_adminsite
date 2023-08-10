@@ -16,15 +16,15 @@ namespace BackendSite.Service.DAL
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
-        public Task<IEnumerable<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryAsync(int siteId,
+        public Task<IEnumerable<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryAsync(string siteList,
             DateTimeOffset startTime, DateTimeOffset endTime)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_SiteIds", siteList);
             p.Add("_StartTime", startTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
 
-            return _reportDbClient.QueryAsync<MpaMarketingDepositAmountSummaryDto>("Admin_MpaMarketingDepositAmountSummary_Get", p);
+            return _reportDbClient.QueryAsync<MpaMarketingDepositAmountSummaryDto>("Admin_MpaMarketingDepositAmountSummary_Get_V2", p);
         }
 
         public Task<IEnumerable<MpaMarketingDepositSignUpSummaryDto>> GetDepositSignUpSummaryAsync(int siteId, DateTimeOffset startTime, DateTimeOffset endTime)
