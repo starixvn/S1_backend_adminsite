@@ -363,11 +363,12 @@ namespace BackendSite.Service.Model
     public class GetDepositReferralListByCustIdResult
     {
         public IEnumerable<DepositReferralReport_ReferralReferredDao> Detail { get; set; }
-        public decimal Referral_TotalRewardCount { get; set; }
-        public decimal DepositReferral_TotalRewardCount { get; set; }
+        public int Referral_TotalRewardCount { get; set; }
+        public int DepositReferral_TotalRewardCount { get; set; }
         public decimal DepositReferral__TotalRewardAmount { get; set; }
         public decimal Referral_TotalPayoutAmount { get; set; }
         public decimal DepositReferral_TotalPayoutAmount { get; set; }
+        public int TotalRefereeWithPayoutCount { get; set; }
     }
 
     public class DepositReferralReport_ReferralReferredDao
