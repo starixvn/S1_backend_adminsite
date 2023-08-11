@@ -87,6 +87,7 @@
 
     public class MpaMarketingBonusInfo
     {
+        public int SiteId { get; set; }
         public MpaMarketingBonusGroupByCurrency GroupByCurrencySum { get; set; }
         public MpaMarketingBonusGroupByBonusCode GroupByBonusCodeSum { get; set; }
         public IEnumerable<MpaMarketingBonusGroupByCurrency> GroupByCurrency { get; set; }

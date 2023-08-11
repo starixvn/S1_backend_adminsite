@@ -203,7 +203,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             #endregion
         }
 
-        public class GetMarketingDataRequest
+        public class GetMarketingDataRequest : IApiRequest
         {
             private DateTimeOffset _comparedStartDate { get; set; }
             private DateTimeOffset _comparedendDate { get; set; }
@@ -233,6 +233,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
             public bool IsCompared { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
 
             public DateTimeOffset GetEndDate()
             {
@@ -392,7 +395,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiResult GetMpaMarketingBonus(GetMarketingDataRequest request)
         {
-            var result = _mpaBonusInfoBll.GetMpaMarketingBonus(request);
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var result = _mpaBonusInfoBll.GetMpaMarketingBonus(multiSiteRequest, request).First();
 
             return new ApiResult<MpaMarketingBonusInfo>
             {
@@ -416,7 +421,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             #region Get Data
 
-            var exportData = _mpaBonusInfoBll.GetMpaMarketingBonus(new GetMarketingDataRequest
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var exportData = _mpaBonusInfoBll.GetMpaMarketingBonus(multiSiteRequest, new GetMarketingDataRequest
             {
                 SiteId = request.SiteId,
                 StartDate = request.StartDate.DateTime,
@@ -426,7 +433,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 IsCompared = request.IsCompared,
                 ComparedStartDate = request.ComparedStartDate,
                 ComparedEndDate = request.ComparedEndDate
-            });
+            }).First();
 
             var detailResult = _mpaBonusInfoBll.GetMpaMarketingBonusDetail(new GetMarketingDetailRequest
             {

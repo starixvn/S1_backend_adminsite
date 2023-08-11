@@ -47,6 +47,31 @@ namespace BackendSite.Controllers.ApiV2.Report
                 var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
 
                 request.MultiSiteRequest = multiSiteRequest;
+                var data = _mpaMarketingDashboardBll.GetPerformanceHighlightData(request).First();
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
+        public ApiResult<IEnumerable<PerformanceHighlightData>> GetPerformanceHighlightDataForMultiSites(GetDataRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<PerformanceHighlightData>>();
+
+            try
+            {
+                var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+                var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+
+                request.MultiSiteRequest = multiSiteRequest;
                 var data = _mpaMarketingDashboardBll.GetPerformanceHighlightData(request);
                 apiResult.Data = data;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -59,6 +84,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             return apiResult;
         }
+
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
