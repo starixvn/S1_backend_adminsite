@@ -15,22 +15,22 @@ namespace BackendSite.Service.DAL
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
-        public Task<IEnumerable<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountSummaryAsync(int siteId, DateTimeOffset startTime, DateTimeOffset endTime)
-        {
-            var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_StartTime", startTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
-
-            return _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountSummaryDto>("Admin_MpaMarketingWithdrawalAmountSummary_Get", p);
-        }
-
-        public Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(string siteList, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Task<IEnumerable<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountSummaryAsync(string siteList, DateTime startTime, DateTime endTime)
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteList);
-            p.Add("_StartTime", startTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_StartTime", startTime);
+            p.Add("_EndTime", endTime);
+
+            return _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountSummaryDto>("Admin_MpaMarketingWithdrawalAmountSummary_Get_V2", p);
+        }
+
+        public Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(string siteList, DateTime startTime, DateTime endTime)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteList);
+            p.Add("_StartTime", startTime);
+            p.Add("_EndTime", endTime);
 
             return _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountDetailDto>("Admin_MpaMarketingWithdrawalAmountDetail_Get_V2", p);
         }

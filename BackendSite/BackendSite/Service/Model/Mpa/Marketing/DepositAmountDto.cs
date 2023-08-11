@@ -59,6 +59,8 @@
 
         public string UserName { get; set; }
 
+        public int SiteId { get; set; }
+
         public int CurrencyId { get; set; }
 
         public decimal DepositAmount { get; set; }

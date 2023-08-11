@@ -274,18 +274,16 @@ namespace BackendSite.Service.DAL
         }
         
         public IEnumerable<MpaMarketingBonus> GetMpaMarketingBonus(
-            int siteId,
-            string currencyIds,
+            string multiSiteRequest,
             DateTime startDate,
             DateTime endDate)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_MultiSiteRequest", multiSiteRequest);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
 
-            var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
+            var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get_V2", props);
 
             return result;
         }

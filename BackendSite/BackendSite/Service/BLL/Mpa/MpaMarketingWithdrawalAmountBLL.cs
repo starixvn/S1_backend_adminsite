@@ -28,13 +28,14 @@ namespace BackendSite.Service.BLL.Mpa
 
         public async Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request)
         {
-            var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.StartDate,
-                request.EndDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.StartDate.DateTime, request.EndDate.DateTime))
+                .Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRate(withSummaryResult, request.StartDate, request.GetEndDate(), request.BaseCurrencyId);
 
-            var compareWithSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.CompareFromDate,
-                request.CompareToDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var compareWithSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.CompareFromDate.DateTime, request.CompareToDate.DateTime)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRate(compareWithSummaryResult, request.CompareFromDate, request.GetCompareEndDate(), request.BaseCurrencyId);
 
@@ -88,7 +89,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
-                request.StartDate, request.EndDate).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+                request.StartDate.DateTime, request.EndDate.DateTime).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             MultiplyExchangeRate(withDetails, request.StartDate, request.GetEndDate(), request.BaseCurrencyId).Wait();
 
