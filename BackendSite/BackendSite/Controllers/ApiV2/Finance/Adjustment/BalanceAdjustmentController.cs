@@ -6,8 +6,10 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 {
@@ -59,6 +61,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public string Memo { set; get; }
             public string TransId { get; set; }
             public int ReasonId { get; set; }
+            public MethodTypeIDEnum MethodType { get; set; }
         }
 
         public class GetAdjustmentLimitInfoRequest
@@ -113,6 +116,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             }
             public int Id { get; set; }
             public string Name { get; set; }
+        }
+        public class AdjustmentType
+        {
+            public MethodTypeIDEnum MethodTypeID { get; set; }
+            public BalanceAdjustmentTypeIDEnum AdjustmentTypeID { get; set; }
         }
 
         #endregion
@@ -278,14 +286,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
                     Memo = request.Memo,
                     Category = request.ReasonId,
+                    MethodType = (int)request.MethodType,
+                    RefId = request.TransId 
                 };
 
                 if (!string.IsNullOrWhiteSpace(request.TransId))
                 {
-                    var m = Regex.Match(request.TransId, @"\d+");
-                    int.TryParse(m.Value, out var depositId);
-                    adjustmentAndWithdrawalLimit.DepositId = depositId;
-                    adjustmentAndWithdrawalLimit.TransId = request.TransId;
+                    if (request.MethodType == MethodTypeIDEnum.MainWallet && request.ReasonId == 1)
+                    {
+                        var m = Regex.Match(request.TransId, @"\d+");
+                        int.TryParse(m.Value, out var depositId);
+                        adjustmentAndWithdrawalLimit.DepositId = depositId;
+                        adjustmentAndWithdrawalLimit.TransId = request.TransId;
+                    }
                 }
 
                 if (_paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
@@ -600,20 +613,49 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             
             return apiResult;
         }
-        
+       
         [HttpPost]
-        public ApiResult<IEnumerable<SelectListItem>> GetReasonList()
+        public ApiResult<IEnumerable<SelectListItem>> GetReasonList(AdjustmentType adjustmentType)
         {
-            var result =
-                _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+            #region 判斷funckey
+            List<(MethodTypeIDEnum A, BalanceAdjustmentTypeIDEnum B)> MainAndBatch_Balance = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
+            {
+                (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BalancePlus),
+                (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BalanceMinus),
+                (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BalancePlus),
+                (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BalanceMinus),
+            };
+            List<(MethodTypeIDEnum A, BalanceAdjustmentTypeIDEnum B)> MainAndBatch_bonus = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
+            {
+                (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BonusPlus),
+                (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BonusMinus),
+                (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BonusPlus),
+                (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BonusMinus),
+            };
+
+            bool isBalance = MainAndBatch_Balance.Any(item => item.A == adjustmentType.MethodTypeID && item.B == adjustmentType.AdjustmentTypeID);
+            bool isBouns = MainAndBatch_bonus.Any(item => item.A == adjustmentType.MethodTypeID && item.B == adjustmentType.AdjustmentTypeID);
+            #endregion
+            string funckey;
+            if (isBalance)
+            {
+                funckey = "FunKey/Test1";
+            }
+            else if (isBouns)
+            {
+                funckey = "FunKey/Test2";
+            }else
+            {
+                funckey = "FunKey/Test3";
+            }
+           var result = _bankFinancialBll.GetReason(funckey);
             var data =
                 result.Select(x => new SelectListItem(x.ReasonId, x.Description));
-            var apiResult = 
+            var apiResult =
                 new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
-            
             return apiResult;
         }
-
+        
         #endregion
 
         #endregion

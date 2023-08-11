@@ -197,7 +197,7 @@ namespace BackendSite.Service.DAL
             props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
             props.Add("_MemberTypes", memberTypes);
 
-            var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V7", props);
+            var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V8", props);
             return result;
         }
 

@@ -1947,5 +1947,21 @@ namespace BackendSite.Service.Model.enums
     {
         Daily = 1,
         Weekly = 2
+    }    
+    public enum MethodTypeIDEnum
+    {
+        MainWallet = 1,
+        MainWalletBatch = 2,
+        ThirdWallet = 3
+    }
+
+    public enum BalanceAdjustmentTypeIDEnum
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        Add = 5,
+        Minus = 6
     }
 }
