@@ -206,7 +206,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             var result = await _tpBll.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
-                var reasonList = _bankFinancialBll.GetReason("FunKey/Test3");
+                var reasonList = _bankFinancialBll.GetReason("FunKey/3RDWallet");
                 var reason = reasonList.FirstOrDefault(x => x.ReasonId == request.ReasonId)?.Description;
                 var strDetail = string.Empty;
                 if (isDeposit)
