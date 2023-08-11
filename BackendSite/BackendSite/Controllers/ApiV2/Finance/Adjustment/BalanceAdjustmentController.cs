@@ -618,14 +618,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public ApiResult<IEnumerable<SelectListItem>> GetReasonList(AdjustmentType adjustmentType)
         {
             #region 判斷funckey
-            List<(MethodTypeIDEnum methodTypeIDEnumList, BalanceAdjustmentTypeIDEnum balanceAdjustmentTypeIDEnumList)> MainAndBatch_Balance = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
+            List<(MethodTypeIDEnum methodTypeID, BalanceAdjustmentTypeIDEnum balanceAdjustmentTypeID)> MainAndBatch_Balance = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
             {
                 (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BalancePlus),
                 (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BalanceMinus),
                 (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BalancePlus),
                 (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BalanceMinus),
             };
-            List<(MethodTypeIDEnum methodTypeIDEnumList, BalanceAdjustmentTypeIDEnum balanceAdjustmentTypeIDEnumList)> MainAndBatch_bonus = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
+            List<(MethodTypeIDEnum methodTypeID, BalanceAdjustmentTypeIDEnum balanceAdjustmentTypeID)> MainAndBatch_bonus = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
             {
                 (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BonusPlus),
                 (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BonusMinus),
@@ -633,8 +633,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BonusMinus),
             };
 
-            bool isBalance = MainAndBatch_Balance.Any(item => item.methodTypeIDEnumList == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeIDEnumList == adjustmentType.AdjustmentTypeID);
-            bool isBouns = MainAndBatch_bonus.Any(item => item.methodTypeIDEnumList == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeIDEnumList == adjustmentType.AdjustmentTypeID);
+            bool isBalance = MainAndBatch_Balance.Any(item => item.methodTypeID == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeID == adjustmentType.AdjustmentTypeID);
+            bool isBouns = MainAndBatch_bonus.Any(item => item.methodTypeID == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeID == adjustmentType.AdjustmentTypeID);
             #endregion
             string funckey;
             if (isBalance)

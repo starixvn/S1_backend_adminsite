@@ -1895,7 +1895,9 @@ namespace BackendSite.Service.Model.enums
         AutoVerify = 1,
         AutoApproved = 2
     }
-
+    /// <summary>
+    /// Balance Adjustment頁面 > MethodType
+    /// </summary>
     public enum MethodTypeIDEnum
     {
         MainWallet = 1,
@@ -1903,13 +1905,22 @@ namespace BackendSite.Service.Model.enums
         ThirdWallet = 3
     }
 
+    /// <summary>
+    ///  Balance Adjustment頁面 > Adjustment Type
+    /// </summary>
     public enum BalanceAdjustmentTypeIDEnum
     {
         BalancePlus = 1,
         BalanceMinus = 2,
         BonusPlus = 3,
         BonusMinus = 4,
+        /// <summary>
+        /// 3RD選項Add
+        /// </summary>
         Add = 5,
+        /// <summary>
+        /// 3RD選項Minus
+        /// </summary>
         Minus = 6
     }
 }
