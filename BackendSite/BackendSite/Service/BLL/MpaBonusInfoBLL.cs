@@ -200,8 +200,8 @@ namespace BackendSite.Service.BLL
             var data = _bonusInfoService.GetMpaBonusDetailList(
                 JsonConvert.SerializeObject(input.MultiSiteRequest),
                 input.BonusCode,
-                input.StartDate.ToUniversalTime().DateTime,
-                input.EndDate.ToUniversalTime().DateTime,
+                input.StartDate.DateTime,
+                input.EndDate.DateTime,
                 JsonConvert.SerializeObject(input.ClaimStatuses),
                 input.BaseCurrencyId,
                 input.TimeZone);
@@ -225,27 +225,27 @@ namespace BackendSite.Service.BLL
 
         #region MpaMarketingBonus
 
-        public MpaMarketingBonusInfo GetMpaMarketingBonus(MpaBonusInfoReportController.GetMarketingDataRequest input)
+        public IEnumerable<MpaMarketingBonusInfo> GetMpaMarketingBonus(IEnumerable<MultiSiteRequestDto> multiSiteRequest,
+            MpaBonusInfoReportController.GetMarketingDataRequest input)
         {
-            var key = $"MpaMarketingBonus:{input.SiteId}:" +
-                      $"{JsonConvert.SerializeObject(input.CurrencyIds)}:" +
+            var key = $"MpaMarketingBonus:{JsonConvert.SerializeObject(multiSiteRequest)}:" +
                       $"{input.StartDate.DateTime:yyyyMMddHHmmssfff}:" +
                       $"{input.EndDate.DateTime:yyyyMMddHHmmssfff}:" +
                       $"{input.BaseCurrencyId}";
 
             var originData = _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
                 () => _bonusInfoService.GetMpaMarketingBonus(
-                    input.SiteId,
-                    JsonConvert.SerializeObject(input.CurrencyIds),
+                    JsonConvert.SerializeObject(multiSiteRequest),
                     input.StartDate.DateTime,
                     input.EndDate.DateTime));
 
-            originData = originData.GroupBy(x => new { x.Date.Date, x.CustId, x.CurrencyId, x.Currency, x.BonusCode, x.BonusName })
+            originData = originData.GroupBy(x => new { x.Date.Date, x.CustId, x.SiteId, x.CurrencyId, x.Currency, x.BonusCode, x.BonusName })
                 .Select(x => new MpaMarketingBonus
                 {
                     BonusCode = x.Key.BonusCode,
                     BonusName = x.Key.BonusName,
                     CustId = x.Key.CustId,
+                    SiteId = x.Key.SiteId,
                     Currency = x.Key.Currency,
                     Date = x.Key.Date.Date,
                     NumberOfBonusUser = x.Select(y => y.CustId).Distinct().Count(),
@@ -253,106 +253,112 @@ namespace BackendSite.Service.BLL
                     CurrencyId = x.Key.CurrencyId
                 });
 
-            var baseCurrencyData = originData.ToList();
-            MultiplyExchangeRateAmountSummary(baseCurrencyData, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
+            var result = new List<MpaMarketingBonusInfo>();
+            var siteList = multiSiteRequest.Select(x => x.SiteId).Distinct();
 
-            #region GroupByCurrency
-
-            var groupCurrencyData = originData
-                .GroupBy(x => new { x.CurrencyId, x.Currency })
-                .Select(info => new MpaMarketingBonusGroupByCurrency
-                {
-                    Currency = info.Key.Currency,
-                    CurrencyId = info.Key.CurrencyId,
-                    BonusAmountClaim = info.Where(i => i.CurrencyId == info.Key.CurrencyId).Sum(i => i.BonusAmountClaim)
-                }).ToList();
-
-            var groupByCurrencySum = new MpaMarketingBonusGroupByCurrency
+            foreach (var site in siteList)
             {
-                BonusAmountClaim = baseCurrencyData.Sum(x => x.BonusAmountClaim)
-            };
+                var baseCurrencyData = originData.Where(x => x.SiteId == site).ToList();
+                MultiplyExchangeRateAmountSummary(baseCurrencyData, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
 
-            if (input.IsCompared)
-            {
-                var comparedKey = $"MpaMarketingBonus:{input.SiteId}:" +
-                                  $"{JsonConvert.SerializeObject(input.CurrencyIds)}:" +
-                                  $"{input.ComparedStartDate.DateTime:yyyyMMddHHmmssfff}:" +
-                                  $"{input.ComparedEndDate.DateTime:yyyyMMddHHmmssfff}:" +
-                                  $"{input.BaseCurrencyId}";
+                #region GroupByCurrency
 
-                var comparedData = _redisHelper.TryGetOrCreate(comparedKey, TimeSpan.FromMinutes(15),
-                    () => _bonusInfoService.GetMpaMarketingBonus(
-                        input.SiteId,
-                        JsonConvert.SerializeObject(input.CurrencyIds),
-                        input.ComparedStartDate.DateTime,
-                        input.ComparedEndDate.DateTime));
-
-                comparedData = comparedData.GroupBy(x => new { x.Date.Date, x.CurrencyId })
-                    .Select(x => new MpaMarketingBonus
+                var groupCurrencyData = originData.Where(x => x.SiteId == site)
+                    .GroupBy(x => new { x.CurrencyId, x.Currency })
+                    .Select(info => new MpaMarketingBonusGroupByCurrency
                     {
-                        Date = x.Key.Date.Date,
-                        BonusAmountClaim = x.Sum(y => y.BonusAmountClaim),
-                        CurrencyId = x.Key.CurrencyId
+                        Currency = info.Key.Currency,
+                        CurrencyId = info.Key.CurrencyId,
+                        BonusAmountClaim = info.Where(i => i.CurrencyId == info.Key.CurrencyId).Sum(i => i.BonusAmountClaim)
                     }).ToList();
 
-                //groupCurrencyData 為未轉換之匯率 ,用原始資料算Rate即可
-                //MultiplyExchangeRateAmountSummary(comparedData, input.ComparedStartDate, input.GetCompareEndDate(), input.BaseCurrencyId).Wait();
-
-                foreach (var datas in groupCurrencyData)
+                var groupByCurrencySum = new MpaMarketingBonusGroupByCurrency
                 {
-                    datas.ComparedBonusAmountClaim = comparedData.Where(i => i.CurrencyId == datas.CurrencyId).Sum(i => i.BonusAmountClaim);
-                    datas.ChangeRate = datas.ComparedBonusAmountClaim != 0 ? (datas.BonusAmountClaim / datas.ComparedBonusAmountClaim - 1) * 100 : 0;
+                    BonusAmountClaim = baseCurrencyData.Sum(x => x.BonusAmountClaim)
+                };
+
+                if (input.IsCompared)
+                {
+                    var comparedKey = $"MpaMarketingBonus:{input.SiteId}:" +
+                                      $"{JsonConvert.SerializeObject(input.CurrencyIds)}:" +
+                                      $"{input.ComparedStartDate.DateTime:yyyyMMddHHmmssfff}:" +
+                                      $"{input.ComparedEndDate.DateTime:yyyyMMddHHmmssfff}:" +
+                                      $"{input.BaseCurrencyId}";
+
+                    var comparedData = _redisHelper.TryGetOrCreate(comparedKey, TimeSpan.FromMinutes(15),
+                        () => _bonusInfoService.GetMpaMarketingBonus(
+                            JsonConvert.SerializeObject(multiSiteRequest),
+                            input.ComparedStartDate.DateTime,
+                            input.ComparedEndDate.DateTime));
+
+                    comparedData = comparedData.GroupBy(x => new { x.Date.Date, x.SiteId, x.CurrencyId })
+                        .Select(x => new MpaMarketingBonus
+                        {
+                            Date = x.Key.Date.Date,
+                            BonusAmountClaim = x.Sum(y => y.BonusAmountClaim),
+                            CurrencyId = x.Key.CurrencyId,
+                            SiteId = x.Key.SiteId
+                        }).ToList();
+
+                    //groupCurrencyData 為未轉換之匯率 ,用原始資料算Rate即可
+                    //MultiplyExchangeRateAmountSummary(comparedData, input.ComparedStartDate, input.GetCompareEndDate(), input.BaseCurrencyId).Wait();
+
+                    foreach (var datas in groupCurrencyData)
+                    {
+                        datas.ComparedBonusAmountClaim = comparedData.Where(i => i.CurrencyId == datas.CurrencyId).Sum(i => i.BonusAmountClaim);
+                        datas.ChangeRate = datas.ComparedBonusAmountClaim != 0 ? (datas.BonusAmountClaim / datas.ComparedBonusAmountClaim - 1) * 100 : 0;
+                    }
+
+                    groupByCurrencySum.ComparedBonusAmountClaim = groupCurrencyData.Sum(x => x.ComparedBonusAmountClaim);
+                    groupByCurrencySum.ChangeRate = groupByCurrencySum.ComparedBonusAmountClaim != 0 ? (groupByCurrencySum.BonusAmountClaim / groupByCurrencySum.ComparedBonusAmountClaim - 1) * 100 : 0;
                 }
 
-                groupByCurrencySum.ComparedBonusAmountClaim = groupCurrencyData.Sum(x => x.ComparedBonusAmountClaim);
-                groupByCurrencySum.ChangeRate = groupByCurrencySum.ComparedBonusAmountClaim != 0 ? (groupByCurrencySum.BonusAmountClaim / groupByCurrencySum.ComparedBonusAmountClaim - 1) * 100 : 0;
-            }
+                #endregion
 
-            #endregion
+                #region GroupByBonusCode
 
-            #region GroupByBonusCode
+                var groupBonusCodeData = baseCurrencyData
+                    .GroupBy(x => new { x.BonusCode, x.BonusName })
+                    .Select(info => new MpaMarketingBonusGroupByBonusCode
+                    {
+                        BonusCode = info.Key.BonusCode,
+                        BonusName = info.Key.BonusName,
+                        NumberOfBonusUser = info.Select(i => i.CustId).Distinct().Count(),
+                        BonusAmountClaim = info.Sum(i => i.BonusAmountClaim)
+                    }).ToList();
 
-            var groupBonusCodeData = baseCurrencyData
-                .GroupBy(x => new { x.BonusCode, x.BonusName })
-                .Select(info => new MpaMarketingBonusGroupByBonusCode
+                var list = groupBonusCodeData.Select(detailData => new MpaMarketingBonusGroupByBonusCodeInfo
                 {
-                    BonusCode = info.Key.BonusCode,
-                    BonusName = info.Key.BonusName,
-                    NumberOfBonusUser = info.Select(i => i.CustId).Distinct().Count(),
-                    BonusAmountClaim = info.Sum(i => i.BonusAmountClaim)
+                    GroupInfo = detailData,
+                    Children = baseCurrencyData.GroupBy(x => new { x.BonusCode, x.BonusName })
+                       .Where(y => y.Key.BonusCode == detailData.BonusCode)
+                       .Select(info => new MpaMarketingBonus
+                       {
+                           BonusCode = info.Key.BonusCode,
+                           BonusName = info.Key.BonusName,
+                           NumberOfBonusUser = info.Select(i => i.CustId).Distinct().Count(),
+                           BonusAmountClaim = info.Sum(i => i.BonusAmountClaim)
+                       })
                 }).ToList();
 
-            var list = groupBonusCodeData.Select(detailData => new MpaMarketingBonusGroupByBonusCodeInfo
-            {
-                GroupInfo = detailData,
-                Children = baseCurrencyData.GroupBy(x => new { x.BonusCode, x.BonusName })
-                   .Where(y => y.Key.BonusCode == detailData.BonusCode)
-                   .Select(info => new MpaMarketingBonus
-                   {
-                       BonusCode = info.Key.BonusCode,
-                       BonusName = info.Key.BonusName,
-                       NumberOfBonusUser = info.Select(i => i.CustId).Distinct().Count(),
-                       BonusAmountClaim = info.Sum(i => i.BonusAmountClaim)
-                   })
-            }).ToList();
+                var groupByBonusCodeSum = new MpaMarketingBonusGroupByBonusCode
+                {
+                    NumberOfBonusUser = groupBonusCodeData.Sum(x => x.NumberOfBonusUser),
+                    BonusAmountClaim = groupBonusCodeData.Sum(x => x.BonusAmountClaim)
+                };
 
-            var groupByBonusCodeSum = new MpaMarketingBonusGroupByBonusCode
-            {
-                NumberOfBonusUser = groupBonusCodeData.Sum(x => x.NumberOfBonusUser),
-                BonusAmountClaim = groupBonusCodeData.Sum(x => x.BonusAmountClaim)
-            };
+                #endregion
 
-            #endregion
-
-            var result = new MpaMarketingBonusInfo()
-            {
-                GroupByCurrency = groupCurrencyData,
-                GroupByCurrencySum = groupByCurrencySum,
-                GroupByBonusCode = list,
-                GroupByBonusCodeSum = groupByBonusCodeSum,
-                TotalBonusClaimants = originData.Count()
-            };
-
+                result.Add(new MpaMarketingBonusInfo()
+                {
+                    SiteId = site,
+                    GroupByCurrency = groupCurrencyData,
+                    GroupByCurrencySum = groupByCurrencySum,
+                    GroupByBonusCode = list,
+                    GroupByBonusCodeSum = groupByBonusCodeSum,
+                    TotalBonusClaimants = originData.Where(x => x.SiteId == site).Count()
+                });
+            }
             return result;
         }
 
@@ -434,13 +440,13 @@ namespace BackendSite.Service.BLL
             var getMpaBonusInfoListTask = Task.Run(() => GetMpaBonusInfoListTask(
                 JsonConvert.SerializeObject(multiSiteRequests),
                 bonusStatuses, bonusTypes, bonusCode,
-                startDate.ToUniversalTime().DateTime, endDate.ToUniversalTime().DateTime,
+                startDate.DateTime, endDate.DateTime,
                 claimStatuses, baseCurrencyId, timeZone)
             );
 
             var mpaBonusGgrListTask = Task.Run(() => GetMpaBonusGGRListTask(
                 JsonConvert.SerializeObject(multiSiteRequests),
-                startDate.ToUniversalTime().DateTime, endDate.ToUniversalTime().DateTime,
+                startDate.DateTime, endDate.DateTime,
                 baseCurrencyId, timeZone));
 
             var siteList = multiSiteRequests.Select(x => x.SiteId).Distinct();
@@ -693,7 +699,7 @@ namespace BackendSite.Service.BLL
         private async Task<List<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountDetailTask(
             IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
         {
-            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(siteList, startDate, endDate).Result
+            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(siteList, startDate.DateTime, endDate.DateTime).Result
                 .Where(x => multiSiteRequests.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId));
             var withData = withDetails.GroupBy(x => new { x.Date, x.CustId, x.CurrencyId })
                 .Select(x => new MpaMarketingWithdrawalAmountSummaryDto
@@ -714,7 +720,7 @@ namespace BackendSite.Service.BLL
         private async Task<List<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryTask(
             IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
         {
-            var depositDetails = _depositAmountService.GetDepositAmountSummaryAsync(siteList, startDate, endDate).Result
+            var depositDetails = _depositAmountService.GetDepositAmountSummaryAsync(siteList, startDate.DateTime, endDate.DateTime).Result
                 .Where(x => multiSiteRequests.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId));
             var depositData = depositDetails.GroupBy(x => new { x.Date, x.CustId, x.CurrencyId })
                 .Select(x => new MpaMarketingDepositAmountSummaryDto

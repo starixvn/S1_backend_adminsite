@@ -14,6 +14,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly MpaMarketingDashboardService _mpaMarketingDashboardService;
         private readonly MpaBonusInfoBLL _mpaBonusInfoBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly IMpaMarketingDepositAmountBLL _mpaMarketingDepositAmountBll;
         private readonly IMpaMarketingWithdrawalAmountBLL _mpaMarketingWithdrawalAmountBll;
         private readonly IMpaMarketingWithdrawalAmountService _withdrawalAmountService;
@@ -24,6 +25,7 @@ namespace BackendSite.Service.BLL
         {
             _mpaMarketingDashboardService = provider.GetRequiredService<MpaMarketingDashboardService>();
             _mpaBonusInfoBll = provider.GetRequiredService<MpaBonusInfoBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _withdrawalAmountService = provider.GetRequiredService<IMpaMarketingWithdrawalAmountService>();
             _depositAmountService = provider.GetRequiredService<IMpaMarketingDepositAmountService>();
             _mpaMarketingDepositAmountBll = provider.GetRequiredService<IMpaMarketingDepositAmountBLL>();
@@ -33,7 +35,7 @@ namespace BackendSite.Service.BLL
 
         #region MpaMarketingDashboard
 
-        public PerformanceHighlightData GetPerformanceHighlightData(GetDataRequest input)
+        public IEnumerable<PerformanceHighlightData> GetPerformanceHighlightData(GetDataRequest input)
         {
             var result = InitPerformanceHighlightData(input).Result;
             return result;
@@ -42,8 +44,8 @@ namespace BackendSite.Service.BLL
         public IEnumerable<PerformanceHighlightDataExport> GetPerformanceHighlightDataExport(GetDataRequest input)
         {
             var exportData = new List<PerformanceHighlightDataExport>();
-
-            var result = InitPerformanceHighlightData(input).Result;
+            var getDataResult = InitPerformanceHighlightData(input).Result;
+            var result = getDataResult.First();
 
             #region MTD
 
@@ -69,8 +71,8 @@ namespace BackendSite.Service.BLL
                 BaseCurrencyId = input.BaseCurrencyId,
                 IsCompared = false
             };
-            var MTDResult = InitPerformanceHighlightData(MTDRequest).Result;
-
+            var getMTDResult = InitPerformanceHighlightData(MTDRequest).Result;
+            var MTDResult = getMTDResult.First();
             #endregion
 
             exportData.Add(new PerformanceHighlightDataExport { Menu = "NRU - Newly Registered Users", Origin = result.NRU.ToString(), MTD = MTDResult.NRU.ToString() });
@@ -206,7 +208,7 @@ namespace BackendSite.Service.BLL
 
         #region private
 
-        private async Task<PerformanceHighlightData> InitPerformanceHighlightData(GetDataRequest input)
+        private async Task<IEnumerable<PerformanceHighlightData>> InitPerformanceHighlightData(GetDataRequest input)
         {
             var performanceHighlightTask = Task.Run(() => GetPerformanceHighlightDataTask(input, false));
             var withdrawalAmountSummaryTask = Task.Run(() => GetWithdrawalAmountSummaryTask(input, false));
@@ -215,7 +217,7 @@ namespace BackendSite.Service.BLL
             var depositSignUpDetailTask = Task.Run(() => GetDepositSignUpDetailTask(input));
             var mpaMarketingBonusTask = Task.Run(() => GetMpaMarketingBonusTask(input));
 
-            var comparedResult = new PerformanceHighlightData();
+            var comparedResult = new List<PerformanceHighlightData>();
             var comparedWithdrawalAmountSummaryResult = new List<MpaMarketingWithdrawalAmountSummaryDto>();
             var comparedDepositAmountSummaryResult = new List<MpaMarketingDepositAmountSummaryDto>();
 
@@ -230,7 +232,7 @@ namespace BackendSite.Service.BLL
                     comparedPerformanceHighlightTask, comparedWithdrawalAmountSummaryTask
                     , comparedDepositAmountSummaryTask);
 
-                comparedResult = comparedPerformanceHighlightTask.Result;
+                comparedResult = comparedPerformanceHighlightTask.Result.ToList();
                 comparedWithdrawalAmountSummaryResult = comparedWithdrawalAmountSummaryTask.Result.ToList();
                 comparedDepositAmountSummaryResult = comparedDepositAmountSummaryTask.Result.ToList();
             }
@@ -241,105 +243,112 @@ namespace BackendSite.Service.BLL
             }
 
             var result = performanceHighlightTask.Result;
+            var siteList = _serverInfoBll.GetSiteList();
 
-            #region Withdrawal Amount
 
-            result.WithdrawalAmount = withdrawalAmountSummaryTask.Result.Sum(x => x.WithdrawalAmount);
-            result.WithdrawalUsers = withdrawalAmountDetailTask.Result.Sum(x => x.WithdrawalCount);
-
-            #endregion
-
-            #region Deposit Amount
-
-            result.DepositAmount = depositAmountSummaryTask.Result.Sum(x => x.DepositAmount);
-            result.FirstDepositAmount = depositSignUpDetailTask.Result.Sum(x => x.FirstDepositAmount);
-            result.FirstDepositCount = depositSignUpDetailTask.Result.Sum(x => x.FirstDepositCount);
-
-            #endregion
-
-            #region NetCash Amount
-
-            result.NetCashAmount = result.DepositAmount - result.WithdrawalAmount;
-
-            #endregion
-
-            #region Bonus Amount Claimed
-
-            result.TotalBonusClaimants = mpaMarketingBonusTask.Result.TotalBonusClaimants;
-            result.BonusAmountClaimed = mpaMarketingBonusTask.Result.GroupByCurrencySum.BonusAmountClaim;
-
-            #endregion
-
-            #region Churn Rate
-
-            result.ChurnRate = result.BasedOnReportTotalUsers != 0 ? (decimal)result.NoBetUsers / result.BasedOnReportTotalUsers * 100 : 0;
-
-            #endregion
-
-            #region Retention Rate
-
-            result.RetentionRate = result.BasedOnReportTotalUsers != 0 ? (decimal)result.HasBetUsers / result.BasedOnReportTotalUsers * 100 : 0;
-
-            #endregion
-
-            if (input.IsCompared)
+            foreach (var data in result)
             {
-                result.DepositUsersComparedRate = comparedResult.DepositUsers != 0 ? ((decimal)result.DepositUsers / comparedResult.DepositUsers - 1) * 100 : 0;
-                result.ActiveUsersComparedRate = comparedResult.ActiveUsers != 0 ? ((decimal)result.ActiveUsers / comparedResult.ActiveUsers - 1) * 100 : 0;
-                result.NRUComparedRate = comparedResult.NRU != 0 ? ((decimal)result.NRU / comparedResult.NRU - 1) * 100 : 0;
-                result.ActiveNRUComparedRate = comparedResult.ActiveNRU != 0 ? ((decimal)result.ActiveNRU / comparedResult.ActiveNRU - 1) * 100 : 0;
+                data.SiteName = siteList.First(x => x.SiteId == data.SiteId).SiteName;
 
-                #region Withdrawal Amount Compared
+                #region Withdrawal Amount
 
-                var withdrawalAmountCompared = comparedWithdrawalAmountSummaryResult.Sum(x => x.WithdrawalAmount);
-                result.WithdrawalAmountComparedRate = withdrawalAmountCompared != 0 ? (result.WithdrawalAmount / withdrawalAmountCompared - 1) * 100 : 0;
+                data.WithdrawalAmount = withdrawalAmountSummaryTask.Result.Where(x => x.SiteId == data.SiteId).Sum(x => x.WithdrawalAmount);
+                data.WithdrawalUsers = withdrawalAmountDetailTask.Result.Where(x => x.SiteId == data.SiteId).Sum(x => x.WithdrawalCount);
 
                 #endregion
 
-                #region Deposit Amount Compared
+                #region Deposit Amount
 
-                var depositAmountCompared = comparedDepositAmountSummaryResult.Sum(x => x.DepositAmount);
-                result.DepositAmountComparedRate = depositAmountCompared != 0 ? (result.DepositAmount / depositAmountCompared - 1) * 100 : 0;
-
-                #endregion
-
-                #region NetCash Amount Compared
-
-                var netCashAmountCompared = depositAmountCompared - withdrawalAmountCompared;
-                result.NetCashAmountComparedRate = netCashAmountCompared != 0 ? (result.NetCashAmount / netCashAmountCompared - 1) * 100 : 0;
+                data.DepositAmount = depositAmountSummaryTask.Result.Where(x => x.SiteId == data.SiteId).Sum(x => x.DepositAmount);
+                data.FirstDepositAmount = depositSignUpDetailTask.Result.Where(x => x.SiteId == data.SiteId).Sum(x => x.FirstDepositAmount);
+                data.FirstDepositCount = depositSignUpDetailTask.Result.Where(x => x.SiteId == data.SiteId).Sum(x => x.FirstDepositCount);
 
                 #endregion
 
-                #region Bonus Amount Claimed Compared
+                #region NetCash Amount
 
-                result.BonusAmountClaimedComparedRate = mpaMarketingBonusTask.Result.GroupByCurrencySum.ChangeRate;
-
-                #endregion
-
-                #region Churn Rate Compared
-
-                result.ChurnComparedRate = result.BasedOnReportTotalUsers != 0 ? (decimal)(result.NoBetUsers - comparedResult.NoBetUsers) / result.BasedOnReportTotalUsers : 0;
+                data.NetCashAmount = data.DepositAmount - data.WithdrawalAmount;
 
                 #endregion
 
-                #region Retention Rate Compared
+                #region Bonus Amount Claimed
 
-                result.RetentionComparedRate = result.BasedOnReportTotalUsers != 0 ? (decimal)(result.HasBetUsers - comparedResult.HasBetUsers) / result.BasedOnReportTotalUsers : 0;
+                data.TotalBonusClaimants = mpaMarketingBonusTask.Result.First(x => x.SiteId == data.SiteId).TotalBonusClaimants;
+                data.BonusAmountClaimed = mpaMarketingBonusTask.Result.First(x => x.SiteId == data.SiteId).GroupByCurrencySum.BonusAmountClaim;
 
                 #endregion
+
+                #region Churn Rate
+
+                data.ChurnRate = data.BasedOnReportTotalUsers != 0 ? (decimal)data.NoBetUsers / data.BasedOnReportTotalUsers * 100 : 0;
+
+                #endregion
+
+                #region Retention Rate
+
+                data.RetentionRate = data.BasedOnReportTotalUsers != 0 ? (decimal)data.HasBetUsers / data.BasedOnReportTotalUsers * 100 : 0;
+
+                #endregion
+
+                if (input.IsCompared)
+                {
+                    data.DepositUsersComparedRate = comparedResult.First(x => x.SiteId == data.SiteId).DepositUsers != 0 ? ((decimal)data.DepositUsers / comparedResult.First(x => x.SiteId == data.SiteId).DepositUsers - 1) * 100 : 0;
+                    data.ActiveUsersComparedRate = comparedResult.First(x => x.SiteId == data.SiteId).ActiveUsers != 0 ? ((decimal)data.ActiveUsers / comparedResult.First(x => x.SiteId == data.SiteId).ActiveUsers - 1) * 100 : 0;
+                    data.NRUComparedRate = comparedResult.First(x => x.SiteId == data.SiteId).NRU != 0 ? ((decimal)data.NRU / comparedResult.First(x => x.SiteId == data.SiteId).NRU - 1) * 100 : 0;
+                    data.ActiveNRUComparedRate = comparedResult.First(x => x.SiteId == data.SiteId).ActiveNRU != 0 ? ((decimal)data.ActiveNRU / comparedResult.First(x => x.SiteId == data.SiteId).ActiveNRU - 1) * 100 : 0;
+
+                    #region Withdrawal Amount Compared
+
+                    var withdrawalAmountCompared = comparedWithdrawalAmountSummaryResult.Where(x => x.SiteId == data.SiteId).Sum(x => x.WithdrawalAmount);
+                    data.WithdrawalAmountComparedRate = withdrawalAmountCompared != 0 ? (data.WithdrawalAmount / withdrawalAmountCompared - 1) * 100 : 0;
+
+                    #endregion
+
+                    #region Deposit Amount Compared
+
+                    var depositAmountCompared = comparedDepositAmountSummaryResult.Where(x => x.SiteId == data.SiteId).Sum(x => x.DepositAmount);
+                    data.DepositAmountComparedRate = depositAmountCompared != 0 ? (data.DepositAmount / depositAmountCompared - 1) * 100 : 0;
+
+                    #endregion
+
+                    #region NetCash Amount Compared
+
+                    var netCashAmountCompared = depositAmountCompared - withdrawalAmountCompared;
+                    data.NetCashAmountComparedRate = netCashAmountCompared != 0 ? (data.NetCashAmount / netCashAmountCompared - 1) * 100 : 0;
+
+                    #endregion
+
+                    #region Bonus Amount Claimed Compared
+
+                    data.BonusAmountClaimedComparedRate = mpaMarketingBonusTask.Result.First(x => x.SiteId == data.SiteId).GroupByCurrencySum.ChangeRate;
+
+                    #endregion
+
+                    #region Churn Rate Compared
+
+                    data.ChurnComparedRate = data.BasedOnReportTotalUsers != 0 ? (decimal)(data.NoBetUsers - comparedResult.First(x => x.SiteId == data.SiteId).NoBetUsers) / data.BasedOnReportTotalUsers : 0;
+
+                    #endregion
+
+                    #region Retention Rate Compared
+
+                    data.RetentionComparedRate = data.BasedOnReportTotalUsers != 0 ? (decimal)(data.HasBetUsers - comparedResult.First(x => x.SiteId == data.SiteId).HasBetUsers) / data.BasedOnReportTotalUsers : 0;
+
+                    #endregion
+                }
+
             }
 
             return result;
         }
 
-        private async Task<PerformanceHighlightData> GetPerformanceHighlightDataTask(GetDataRequest input, bool isCompared)
+        private async Task<IEnumerable<PerformanceHighlightData>> GetPerformanceHighlightDataTask(GetDataRequest input, bool isCompared)
         {
             var sw = new Stopwatch();
             sw.Start();
 
             var result = _mpaMarketingDashboardService.GetPerformanceHighlightData(
-                input.SiteId,
-                JsonConvert.SerializeObject(input.CurrencyIds),
+                JsonConvert.SerializeObject(input.MultiSiteRequest),
                 isCompared ? input.StartDateCompared.DateTime : input.StartDate.DateTime,
                 isCompared ? input.EndDateCompared.DateTime : input.EndDate.DateTime
             );
@@ -355,16 +364,17 @@ namespace BackendSite.Service.BLL
             sw.Start();
 
             var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(
-                input.SiteId,
+                JsonConvert.SerializeObject(input.MultiSiteRequest.Select(x => x.SiteId).Distinct()),
                 isCompared ? input.StartDateCompared.DateTime : input.StartDate.DateTime,
                 isCompared ? input.EndDateCompared.DateTime : input.EndDate.DateTime
-                )).Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
-            withSummaryResult = withSummaryResult.GroupBy(x => new { x.Date, x.CurrencyId })
+                )).Where(x => input.MultiSiteRequest.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId)).ToList();
+            withSummaryResult = withSummaryResult.GroupBy(x => new { x.Date, x.SiteId, x.CurrencyId })
                 .Select(x => new MpaMarketingWithdrawalAmountSummaryDto
                 {
                     Date = x.Key.Date,
                     WithdrawalAmount = x.Sum(y => y.WithdrawalAmount),
-                    CurrencyId = x.Key.CurrencyId
+                    CurrencyId = x.Key.CurrencyId,
+                    SiteId = x.Key.SiteId
                 }).ToList();
             await _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(withSummaryResult,
                 isCompared ? input.StartDateCompared.DateTime : input.StartDate.DateTime,
@@ -381,9 +391,9 @@ namespace BackendSite.Service.BLL
         {
             var sw = new Stopwatch();
             sw.Start();
-            var withDetails = (await _withdrawalAmountService.GetWithdrawalAmountDetailAsync(JsonConvert.SerializeObject(new List<int>() { input.SiteId }),
-                input.StartDate, input.EndDate))
-                .Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var withDetails = (await _withdrawalAmountService.GetWithdrawalAmountDetailAsync(
+                JsonConvert.SerializeObject(input.MultiSiteRequest.Select(x => x.SiteId).Distinct()), input.StartDate.DateTime, input.EndDate.DateTime))
+                .Where(x => input.MultiSiteRequest.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId)).ToList();
 
             _logger.LogInformation($"GetWithdrawalAmountDetailAsync：{sw.Elapsed.TotalSeconds} （秒）");
             sw.Stop();
@@ -397,16 +407,17 @@ namespace BackendSite.Service.BLL
             sw.Start();
 
             var depositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(
-                JsonConvert.SerializeObject(new List<int>() { input.SiteId }),
+               JsonConvert.SerializeObject(input.MultiSiteRequest.Select(x => x.SiteId).Distinct()),
                 isCompared ? input.StartDateCompared.DateTime : input.StartDate.DateTime,
                 isCompared ? input.EndDateCompared.DateTime : input.EndDate.DateTime
-                )).Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
-            depositSummaryResult = depositSummaryResult.GroupBy(x => new { x.Date, x.CurrencyId })
+                )).Where(x => input.MultiSiteRequest.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId)).ToList();
+            depositSummaryResult = depositSummaryResult.GroupBy(x => new { x.Date, x.SiteId, x.CurrencyId })
                 .Select(x => new MpaMarketingDepositAmountSummaryDto
                 {
                     Date = x.Key.Date,
                     DepositAmount = x.Sum(y => y.DepositAmount),
-                    CurrencyId = x.Key.CurrencyId
+                    CurrencyId = x.Key.CurrencyId,
+                    SiteId = x.Key.SiteId
                 }).ToList();
             await _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(depositSummaryResult,
                 isCompared ? input.StartDateCompared.DateTime : input.StartDate.DateTime,
@@ -424,15 +435,17 @@ namespace BackendSite.Service.BLL
             var sw = new Stopwatch();
             sw.Start();
 
-            var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(input.SiteId, input.StartDate, input.EndDate)
-                .Where(x => input.CurrencyIds.Contains(x.CurrencyId)).ToList();
-            depositSignUpDetail = depositSignUpDetail.GroupBy(x => new { x.Date, x.CurrencyId })
+            var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(
+                JsonConvert.SerializeObject(input.MultiSiteRequest.Select(x => x.SiteId).Distinct()), input.StartDate.DateTime, input.EndDate.DateTime)
+                .Where(x => input.MultiSiteRequest.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId)).ToList();
+            depositSignUpDetail = depositSignUpDetail.GroupBy(x => new { x.Date, x.SiteId, x.CurrencyId })
                 .Select(x => new MpaMarketingDepositSignUpDetailDto
                 {
                     Date = x.Key.Date,
                     FirstDepositAmount = x.Sum(y => y.FirstDepositAmount),
                     FirstDepositCount = x.Sum(y => y.FirstDepositCount),
-                    CurrencyId = x.Key.CurrencyId
+                    CurrencyId = x.Key.CurrencyId,
+                    SiteId = x.Key.SiteId
                 }).ToList();
             _mpaMarketingDepositAmountBll.MultiplyExchangeRateSinUpSummary(depositSignUpDetail, input.StartDate, input.GetEndDate(), input.BaseCurrencyId).Wait();
 
@@ -442,7 +455,7 @@ namespace BackendSite.Service.BLL
             return depositSignUpDetail;
         }
 
-        private async Task<MpaMarketingBonusInfo> GetMpaMarketingBonusTask(GetDataRequest input)
+        private async Task<IEnumerable<MpaMarketingBonusInfo>> GetMpaMarketingBonusTask(GetDataRequest input)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -453,12 +466,10 @@ namespace BackendSite.Service.BLL
                 EndDate = input.EndDate,
                 ComparedStartDate = input.StartDateCompared,
                 ComparedEndDate = input.EndDateCompared,
-                SiteId = input.SiteId,
-                CurrencyIds = input.CurrencyIds,
                 BaseCurrencyId = input.BaseCurrencyId,
                 IsCompared = input.IsCompared
             };
-            var bonusResult = _mpaBonusInfoBll.GetMpaMarketingBonus(request);
+            var bonusResult = _mpaBonusInfoBll.GetMpaMarketingBonus(input.MultiSiteRequest, request);
 
             _logger.LogInformation($"GetMpaMarketingBonus：{sw.Elapsed.TotalSeconds} （秒）");
             sw.Stop();
