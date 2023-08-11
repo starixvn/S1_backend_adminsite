@@ -17,7 +17,8 @@ public class DepositReferralReportBLL
 
     public async Task<(IEnumerable<DepositReferralReport_ReferralReferredDao> Data, int TotalPages, int ReferreCount,
             int DepositReferral_TotalRewardCount, decimal DepositReferral_TotalRewardAmount, decimal DepositReferral_TotalPayoutAmount,
-            int Referral_TotalRewardCount, decimal Referral_TotalPayoutAmount)> GetListByCustId(int custId,
+            int Referral_TotalRewardCount, decimal Referral_TotalPayoutAmount,
+        int TotalRefereeWithPayoutCount)> GetListByCustId(int custId,
     int pageNumber,
     int pageSize)
 => await _referralManagementService.GetDepositReferralListByCustId(

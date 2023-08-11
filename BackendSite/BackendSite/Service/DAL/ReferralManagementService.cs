@@ -191,7 +191,7 @@ namespace BackendSite.Service.DAL
 
         public async Task<(IEnumerable<DepositReferralReport_ReferralReferredDao> Data, int TotalPages, int ReferreCount,
             int DepositReferral_TotalRewardCount,decimal DepositReferral_TotalRewardAmount, decimal DepositReferral_TotalPayoutAmount,
-            int Referral_TotalRewardCount, decimal Referral_TotalPayoutAmount)> GetDepositReferralListByCustId(
+            int Referral_TotalRewardCount, decimal Referral_TotalPayoutAmount,int TotalRefereeWithPayoutCount)> GetDepositReferralListByCustId(
     int custId,
     int pageSize,
     int startIndex)
@@ -207,6 +207,7 @@ namespace BackendSite.Service.DAL
             p.Add("_DepositReferral_TotalPayoutAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_Referral_TotalRewardCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_Referral_TotalPayoutAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_TotalRefereeWithPayoutCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var data = await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferrerList_Get_ByCustId", p);
 
             return (Data: data,
@@ -216,7 +217,8 @@ namespace BackendSite.Service.DAL
                 DepositReferral_TotalRewardAmount: p.Get<decimal?>("_DepositReferral_TotalRewardAmount") ?? 0,
                 DepositReferral_TotalPayoutAmount: p.Get<decimal?>("_DepositReferral_TotalPayoutAmount") ?? 0,
                 Referral_TotalRewardCount: p.Get<int?>("_Referral_TotalRewardCount") ?? 0,
-                Referral_TotalPayoutAmount: p.Get<decimal?>("_Referral_TotalPayoutAmount") ?? 0);
+                Referral_TotalPayoutAmount: p.Get<decimal?>("_Referral_TotalPayoutAmount") ?? 0,
+                TotalRefereeWithPayoutCount: p.Get<int?>("_TotalRefereeWithPayoutCount") ?? 0);
         }
 
         public async Task<(IEnumerable<DepositReferralReportDao> Data, int TotalPages, int RowCount)> GetDepositReferralCustList(

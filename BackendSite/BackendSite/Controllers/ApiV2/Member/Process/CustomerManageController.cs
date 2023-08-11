@@ -2718,8 +2718,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiListResult<GetDepositReferralListByCustIdResult>> GetDepositReferralListByCustId(CustIdWithPageRequest request)
         {
-            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
-
             var data = await _depositReferralReportBll.GetListByCustId(request.CustId,
                 request.PageNumber,
                 request.PageSize);
@@ -2731,7 +2729,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 DepositReferral_TotalRewardCount = data.DepositReferral_TotalRewardCount,
                 DepositReferral__TotalRewardAmount = data.DepositReferral_TotalRewardAmount,
                 Referral_TotalPayoutAmount = data.Referral_TotalPayoutAmount,
-                DepositReferral_TotalPayoutAmount = data.DepositReferral_TotalPayoutAmount
+                DepositReferral_TotalPayoutAmount = data.DepositReferral_TotalPayoutAmount,
+                TotalRefereeWithPayoutCount = data.TotalRefereeWithPayoutCount
             };
 
             return new ApiListResult<GetDepositReferralListByCustIdResult>
