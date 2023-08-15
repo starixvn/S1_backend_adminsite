@@ -409,6 +409,12 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Disable = 2
     }
+    
+    public enum BankInfoPayMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
 
     #endregion
 
