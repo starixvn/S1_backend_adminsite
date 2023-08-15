@@ -20,6 +20,8 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public string PhoneNo { get; set; }
     public string AccountName { get; set; }
     public string BankAccountNumber { get; set; }
+    public string EWalletAccountNumber { get; set; }
+    public string CryptoAddress { get; set; }
     public string AffiliateCode { get; set; }
     public IEnumerable<int> Tags { get; set; }
     public IEnumerable<int> VipLevel { get; set; }
@@ -118,6 +120,8 @@ public class ExportMemberRequest
     public string PhoneNo { get; set; }
     public string AccountName { get; set; }
     public string BankAccountNumber { get; set; }
+    public string EWalletAccountNumber { get; set; }
+    public string CryptoAddress { get; set; }
     public string AffiliateCode { get; set; }
     public IEnumerable<int> Tags { get; set; }
     public IEnumerable<int> VipLevel { get; set; }

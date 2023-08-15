@@ -56,7 +56,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public int BaseCurrencyId { get; set; }
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
-
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
 
         public class ExportForVipRequest : IApiRequest
@@ -81,6 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public int BaseCurrencyId { get; set; }
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
 
         public class GetVipRebateDetailRequest
