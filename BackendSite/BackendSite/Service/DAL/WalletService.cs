@@ -92,8 +92,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public VipRebateReportResult GetVipRebateInfoList(string SiteStr,
-            string currencyStr,
+        public VipRebateReportResult GetVipRebateInfoList(string multiSiteRequest,
             DateTime startDate,
             DateTime endDate,
             string userName,
@@ -104,8 +103,7 @@ namespace BackendSite.Service.DAL
             var tempCurrencyTotalAmount = new List<string>();
             var searchData = new VipRebateReportResult();
             var props = new DynamicParameters();
-            props.Add("_SiteIds", SiteStr);
-            props.Add("_CurrencyIds", currencyStr);
+            props.Add("_MultiSiteRequest", multiSiteRequest);
             props.Add("_UserName", userName);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
@@ -115,7 +113,7 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            searchData.CurrencyAmount = _reportDbClient.Query<VipRebateReportOverviewResult>("Admin_VipRebateTotalAmount_Get_V6", props);
+            searchData.CurrencyAmount = _reportDbClient.Query<VipRebateReportOverviewResult>("Admin_VipRebateTotalAmount_Get_V7", props);
 
             if (searchData.CurrencyAmount.Count() > 0)
             {
@@ -133,7 +131,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             
-            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V9", props).ToList();
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V10", props).ToList();
 
             searchData.VipRebateInfoList = result;
             searchData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
@@ -190,8 +188,7 @@ namespace BackendSite.Service.DAL
                    _RefId = refId
                }));
 
-        public VipRebateInfoData GetVipRebateInfoListExport(string SiteStr,
-            string currencyStr,
+        public VipRebateInfoData GetVipRebateInfoListExport(string multiSiteRequest,
             DateTime startDate,
             DateTime endDate, 
             string userName, 
@@ -201,25 +198,20 @@ namespace BackendSite.Service.DAL
         {
             var searchData = new VipRebateInfoData();
             var props = new DynamicParameters();
-            props.Add("_SiteIds", SiteStr);
-            props.Add("_CurrencyIds", currencyStr);
+            props.Add("_MultiSiteRequest", multiSiteRequest);
             props.Add("_UserName", userName);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_CategoryIds", categoryIdStr);
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_PayoutStatus", spPayoutStatus);
-            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V7", props).ToList();
+            var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportListExport_Get_V8", props).ToList();
 
             searchData.VipRebateInfoList = result;
             searchData.PageNumber = 0;
             searchData.TotalPages = 0;
             searchData.RowCount = 0;
             return searchData;
-        }
-        public IEnumerable<VipTPCategory> GetTPCategoryList()
-        {
-            return _mainDbClient.Query<VipTPCategory>("Admin_TPCategory_Get");
         }
     }
 }
