@@ -583,18 +583,18 @@ namespace BackendSite.Service.DAL
             return false;
         }
         
-        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int siteId, int payId)
+        public IEnumerable<BankInfoPayForSetting> GetBankInfoPayList(int siteId, int payId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPay_Get_V2", new
+            return _reportDbClient.Query<BankInfoPayForSetting>("Admin_BankInfoPay_Get_V2", new
             {
                 _PayId = payId,
                 _SiteId = siteId
             });
         }
         
-        public IEnumerable<PayListBankInfoSys> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
+        public IEnumerable<BankInfoPayForSetting> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPayForSetting_Get_V2", new
+            return _reportDbClient.Query<BankInfoPayForSetting>("Admin_BankInfoPayForSetting_Get_V2", new
             {
                 _SiteId = siteId,
                 _CurrencyId = currencyId,
@@ -608,7 +608,7 @@ namespace BackendSite.Service.DAL
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var bankSysInfo = GetBankSysInfoList(siteId, payId)
+            var bankSysInfo = GetBankInfoPayList(siteId, payId)
                 .First(x => x.Id == sysId && x.Method == method);
 
             #region props
