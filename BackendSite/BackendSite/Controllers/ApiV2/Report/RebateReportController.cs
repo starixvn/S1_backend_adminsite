@@ -16,6 +16,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region Fields
 
         private readonly PaymentBLL _paymentBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly ExcelBLL _excelBll;
 
         #endregion
@@ -26,13 +27,14 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
 
         #region API Model
 
-        public class GetListForVipRequest : ApiRequestPageModel
+        public class GetListForVipRequest : ApiRequestPageModel, IApiRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -52,9 +54,12 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> CategoryIds { get; set; }
             public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
             public int BaseCurrencyId { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+
         }
 
-        public class ExportForVipRequest
+        public class ExportForVipRequest : IApiRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -74,6 +79,8 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> CategoryIds { get; set; }
             public IEnumerable<VipRebatePayoutStatusEnum> PayoutStatuses { get; set; }
             public int BaseCurrencyId { get; set; }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
         }
 
         public class GetVipRebateDetailRequest
@@ -101,9 +108,10 @@ namespace BackendSite.Controllers.ApiV2.Report
             var apiResult = new ApiResult<VipRebateReportResult>();
             try
             {
+                var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+                var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
                 var currencyAmount = new List<string>();
-                var searchResult = _paymentBll.GetVipRebateInfoList(request.SiteIds,
-                    request.CurrencyIds,
+                var searchResult = _paymentBll.GetVipRebateInfoList(multiSiteRequest,
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
@@ -141,8 +149,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         [HttpPost]
         public IActionResult ExportForVip(ExportForVipRequest request)
         {
-            var searchResult = _paymentBll.GetVipRebateInfoListExport(request.SiteIds,
-                    request.CurrencyIds,
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var searchResult = _paymentBll.GetVipRebateInfoListExport(multiSiteRequest,
                     request.StartDate.DateTime,
                     request.EndDate.DateTime,
                     string.IsNullOrWhiteSpace(request.UserName) ? null : request.UserName,
@@ -175,6 +184,5 @@ namespace BackendSite.Controllers.ApiV2.Report
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-
     }
 }

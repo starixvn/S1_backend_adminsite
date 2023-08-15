@@ -14,6 +14,7 @@ namespace BackendSite.Service.BLL
         private readonly ThirdPartyService _thirdPartyService;
         private readonly ICacheHelper _redisHelper;
         private readonly int _balanceTimeoutSecond;
+        private readonly ILogger<TpBLL> _logger;
 
         public TpBLL(IServiceProvider provider)
         {
@@ -23,6 +24,7 @@ namespace BackendSite.Service.BLL
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
             _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
+            _logger = provider.GetRequiredService<ILogger<TpBLL>>();
         }
 
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
@@ -79,6 +81,53 @@ namespace BackendSite.Service.BLL
             return tpWalletList;
         }
 
+        public async Task<IEnumerable<TpWallet>> TransferAllTpWalletAsync(int custId)
+        {
+            var tpWalletList = await _thirdPartyService.GetTransferTpWallet(custId);
+
+            try
+            {
+                var tasks = tpWalletList
+                    .Where(x => !string.IsNullOrEmpty(x.TpUserName))
+                    .Select(async x =>
+                    {
+                        var tpInfo = new TpInfo
+                        {
+                            TpId = x.TpId,
+                            CustId = custId
+                        };
+                     
+                        var apiResult = await GetBalanceAsync(tpInfo);
+                    
+                        if(apiResult?.Data is {balance: > 0})
+                        {
+                            var tpTransfer = new TpTransfer
+                            {
+                                TpId = x.TpId,
+                                CustId = custId,
+                                Amount = apiResult.Data.balance,
+                                direction = TpDirection.ToMain,
+                                inputs = null
+                            };
+                            var result = await TransferAsync(tpTransfer);
+                            
+                            if(result.Data != null)
+                            {
+                                x.Balance = 0;
+                            }
+                        }
+                    });
+            
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "TransferAllTpWallet failed ");
+            }
+            
+            return tpWalletList;
+        }
+        
         public async Task<ApiResult<TransferResult>> TransferAsync(TpTransfer inTpTransfer)
         {
             var amount = inTpTransfer.Amount;

@@ -178,7 +178,13 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
-    public enum WithdrawalLimitLogCreateFromEnum
+    public enum WithdrawalLimitLogMainTypeEnum
+    {
+        Add = 1,
+        Deduct = 2
+    }
+
+    public enum WithdrawalLimitLogCreateFromEnum 
     {
         Default = 0,
         Deposit = 1,
@@ -891,7 +897,7 @@ namespace BackendSite.Service.Model.enums
         RebateExcludeGame = 89,
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
-        AutoPaymentRule = 92
+        AutoPaymentRule = 92,
     }
 
     #region BankFinancialTransferInfoLog
@@ -1520,7 +1526,6 @@ namespace BackendSite.Service.Model.enums
         N8G = 2,
         N8B = 3
     }
-
     public enum WithdrawalMethodEnum
     {
         All = 0,
@@ -1592,6 +1597,7 @@ namespace BackendSite.Service.Model.enums
         Ios = 2,
         Android = 3,
     }
+
 
     public enum ShieldRiskTagged
     {
@@ -1833,6 +1839,7 @@ namespace BackendSite.Service.Model.enums
         Open = 1,
         BoDelete = 2
     }
+    
     public enum ExchangeTypeEnum
     {
         /// <summary>
@@ -1890,7 +1897,7 @@ namespace BackendSite.Service.Model.enums
         DownTurnover = 3,
     }
     
-     public enum AutoType
+    public enum AutoType
     {
         AutoVerify = 1,
         AutoApproved = 2

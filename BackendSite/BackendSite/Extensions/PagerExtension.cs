@@ -1,12 +1,13 @@
-namespace BackendSite.Extensions;
-
-public static class PagerExtension
+﻿namespace BackendSite.Extensions
 {
-    public static (int StartIndex, int AbsPageSize) GetStartIndex(this int pageNumber, int pageSize)
+    public static class PagerExtension
     {
-        var absPageSize = Math.Abs(pageSize);
-        var startIndex = (Math.Abs(pageNumber) - 1) * absPageSize;
+        public static (int StartIndex, int AbsPageSize) GetStartIndexAndPageSize(this int pageNumber, int pageSize)
+        {
+            var absPageSize = Math.Abs(pageSize);
+            var startIndex = (Math.Abs(pageNumber) - 1) * absPageSize;
 
-        return (startIndex, absPageSize);
-    }   
+            return (startIndex, absPageSize);
+        }
+    }
 }
