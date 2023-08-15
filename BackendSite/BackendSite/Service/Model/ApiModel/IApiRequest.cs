@@ -6,21 +6,33 @@ public interface IApiRequest
     public IEnumerable<int> SiteIds { get; set; }
     public int CurrencyId { get; set; }
     public IEnumerable<int> CurrencyIds { get; set; }
+    public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
+
+
 
     public IEnumerable<MultiSiteRequestDto> ConvertToMultiSiteParam(IEnumerable<ServerInfo> serverInfos)
     {
         List<MultiSiteRequestDto> result = new List<MultiSiteRequestDto>();
-        ConvertSiteId(serverInfos);
-        ConvertCurrencyId(serverInfos);
-        SiteIds.ToList().ForEach(z =>
+        if (MultiSiteAndCurrencyIds == null)
         {
-            var siteData = serverInfos.ToList().Find(x => x.SiteId == z);
-            if (siteData != null)
+            //前端尚未調整：SiteId,SiteIds,CurrencyId,CurrenIds
+            ConvertSiteId(serverInfos);
+            ConvertCurrencyId(serverInfos);
+            SiteIds.ToList().ForEach(z =>
             {
-                var currencyList = siteData.ICurrencyList.Intersect(CurrencyIds);
-                result.AddRange(currencyList.Select(c => new MultiSiteRequestDto() { SiteId = z, CurrencyId = c }));
-            }
-        });
+                var siteData = serverInfos.ToList().Find(x => x.SiteId == z);
+                if (siteData != null)
+                {
+                    var currencyList = siteData.ICurrencyList.Intersect(CurrencyIds);
+                    result.AddRange(currencyList.Select(c => new MultiSiteRequestDto() { SiteId = z, CurrencyId = c }));
+                }
+            });
+        }
+        else
+        {
+            foreach (var site in MultiSiteAndCurrencyIds)
+                result.AddRange(site.CurrencyIds.Select(c => new MultiSiteRequestDto() { SiteId = site.SiteId, CurrencyId = c }));
+        }
 
         return result;
     }
@@ -42,5 +54,4 @@ public interface IApiRequest
             else
                 CurrencyIds = new List<int> { CurrencyId };
     }
-
 }
