@@ -238,9 +238,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BankInfoSys> GetSysBankList()
-        {
-            return _reportDbClient.Query<BankInfoSys>("BankInfoSysList_Get", new { SiteId = (int?)null }, commandType: CommandType.StoredProcedure);
-        }
+        public IEnumerable<BankInfoSys> GetBankSysInfoList()
+            => _reportDbClient.Query<BankInfoSys>("Admin_BankInfoSys_GetAll");
     }
 }

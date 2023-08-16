@@ -13,7 +13,6 @@ namespace BackendSite.Service.BLL
         private readonly LocalBankService _localBankService;
         private readonly VipLevelService _vipLevelService;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly IMemoryCache _cache;
         private readonly ICacheHelper _redisHelper;
 
         public BankDetailBLL(IServiceProvider provider)
@@ -21,7 +20,6 @@ namespace BackendSite.Service.BLL
             _bankDetailService = provider.GetRequiredService<BankDetailService>();
             _localBankService = provider.GetRequiredService<LocalBankService>();
             _vipLevelService = provider.GetRequiredService<VipLevelService>();
-            _cache = provider.GetRequiredService<IMemoryCache>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
@@ -91,24 +89,15 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankInfoSys> GetSysBankList()
         {
-            var sBankInfoSysListKey = $"SysBankList";
-
-            var sysBankList = _cache.Get<IEnumerable<BankInfoSys>>(sBankInfoSysListKey);
-            if (sysBankList == null)
-            {
-                sysBankList = _bankDetailService.GetSysBankList();
-                if (sysBankList != null)
-                {
-                    _cache.Set(sBankInfoSysListKey, sysBankList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromHours(10)));
-                }
-            }
-
-            return sysBankList;
+            const string key = "Admin:BankInfoSysList";
+            
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+                () => _bankDetailService.GetBankSysInfoList());
         }
         
         public IEnumerable<BankInfoSys> GetSysBankList(int currencyId)
         {
-            var sysBankList = GetSysBankList().Where(x => x.CurrencyId == currencyId);
+            var sysBankList = GetSysBankList().Where(x => (int)x.CurrencyId == currencyId);
 
             return sysBankList;
         }

@@ -1,13 +1,17 @@
-﻿namespace BackendSite.Service.Model
+﻿using BackendSite.Service.Model.enums;
+
+namespace BackendSite.Service.Model
 {
+    
+    
     public class BankInfoSys
     {
-        public int SysId { set; get; }
-        public int CurrencyId { set; get; }
-        public string BankCode { set; get; }
-        public string BankName { set; get; }
-        public string BankLogo { set; get; }
-        public string BankSite { set; get; }
+        public int SysId { get; set; }
+        public CurrencyEnum CurrencyId { get; set; }
+        public string IsoCode => CurrencyId.ToString();
+        public string BankCode { get; set; }
+        public string BankName { get; set; }
+        public GeneralStatusEnum Status { get; set; }
     }
 
     public class BankDetail
