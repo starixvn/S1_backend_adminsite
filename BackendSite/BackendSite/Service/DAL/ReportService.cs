@@ -218,8 +218,7 @@ namespace BackendSite.Service.DAL
             var parameters = new DynamicParameters(
                 new
                 {
-                    _SiteId = input.SiteId,
-                    _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
+                    _MultiSiteRequest = JsonConvert.SerializeObject(input.MultiSiteRequest),
                     _BaseCurrencyId = input.BaseCurrencyId,
                     _UserName = input.UserName,
                     _TpUserName = input.TpUserName,
@@ -235,7 +234,7 @@ namespace BackendSite.Service.DAL
             parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var spName = "Admin_RewardBonusReport_Get_V2";
+            var spName = "Admin_RewardBonusReport_Get_V3";
             var result = _reportDbClient.Query<RewardBonusReportModel>(spName, parameters);
             rowCount = parameters.Get<int>("_RowCount");
             totalPages = parameters.Get<int>("_TotalPages");
@@ -248,8 +247,7 @@ namespace BackendSite.Service.DAL
             var parameters = new DynamicParameters( 
                 new
                 {
-                    _SiteId = input.SiteId,
-                    _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
+                    _MultiSiteRequest = JsonConvert.SerializeObject(input.MultiSiteRequest),
                     _BaseCurrencyId = input.BaseCurrencyId,
                     _UserName = input.UserName,
                     _TpUserName = input.TpUserName,
@@ -261,10 +259,9 @@ namespace BackendSite.Service.DAL
                     _EndDate = input.EndDate,
                 });
             
-            var spName = "Admin_RewardBonusReport_Export_V2";
+            var spName = "Admin_RewardBonusReport_Export_V3";
             var result = _reportDbClient.Query<RewardBonusReportModel>(spName, parameters);
            
-
             return result;
         }
 
