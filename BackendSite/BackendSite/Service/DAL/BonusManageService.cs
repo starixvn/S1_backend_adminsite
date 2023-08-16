@@ -392,6 +392,13 @@ namespace BackendSite.Service.DAL
 
             foreach (var specific in promotion.Specific)
             {
+                var maxBonus = specific.BonusType == (int)BonusTypeEnum.Amount ? specific.Bonus : specific.MaxBonus;
+                if (promotion.PromotionType == (int)PromotionTypeEnum.SpecialBonus)
+                {
+                    // SpecialBonus不判斷BonusType，直接使用前端傳入的MaxBonus
+                    maxBonus = specific.MaxBonus;
+                }
+
                 specificList.Add(new PromotionSpecific
                 {
                     CurrencyId = specific.CurrencyId,
@@ -400,7 +407,7 @@ namespace BackendSite.Service.DAL
                     FullFillType = specific.WinOver > 0 ? (int)FullFillTypeEnum.WinOver : (int)FullFillTypeEnum.RollOver,
                     Bonus = specific.Bonus,
                     BonusType = specific.BonusType,
-                    MaxBonus = specific.BonusType == (int)BonusTypeEnum.Amount ? specific.Bonus : specific.MaxBonus,
+                    MaxBonus = maxBonus,
                     Status = specific.Status,
                     Usage = specific.Usage,
                     Details = specific.Details,
