@@ -13,6 +13,14 @@ namespace BackendSite.Service.Model
         public string BankName { get; set; }
         public GeneralStatusEnum Status { get; set; }
     }
+    
+    public class SetBankInfoSysModel
+    {
+        public int SysId { get; set; }
+        public string BankCode { get; set; }
+        public string BankName { get; set; }
+        public GeneralStatusEnum Status { get; set; }
+    }
 
     public class BankDetail
     {

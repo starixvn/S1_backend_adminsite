@@ -2,6 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 
@@ -93,6 +94,16 @@ namespace BackendSite.Service.BLL
             
             return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
                 () => _bankDetailService.GetBankSysInfoList());
+        }
+        
+        public bool SetBankInfoSys(SetBankInfoSysModel input, string @operator)
+        {
+            const string key = "Admin:BankInfoSysList";
+            
+            var before = GetSysBankList().First(x => x.SysId == input.SysId);
+            var result = _bankDetailService.SetBankSysInfo(input, before, @operator);
+
+            return result && _redisHelper.KeyDelete(key);
         }
         
         public IEnumerable<BankInfoSys> GetSysBankList(int currencyId)

@@ -891,7 +891,8 @@ namespace BackendSite.Service.Model.enums
         RebateExcludeGame = 89,
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
-        AutoPaymentRule = 92
+        AutoPaymentRule = 92,
+        EditSystemBankInfo = 93
     }
 
     #region BankFinancialTransferInfoLog
