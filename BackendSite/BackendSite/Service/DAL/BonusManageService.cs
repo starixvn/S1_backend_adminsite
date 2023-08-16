@@ -304,7 +304,7 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            return _reportDbClient.QueryFirst<PromotionInfo>("Admin_Promotion_Get_V3", p);
+            return _reportDbClient.QueryFirst<PromotionInfo>("Admin_Promotion_Get_V4", p);
         }
 
         /// <summary>
@@ -658,6 +658,7 @@ namespace BackendSite.Service.DAL
             p.Add("_PromotionDeviceType", promotion.PromotionDeviceType);
             p.Add("_PromotionAction", promotion.PromotionAction);
             p.Add("_AutoExtend", promotion.AutoExtend);
+            p.Add("_IsPopUp", promotion.IsPopUp);
             
             //啟用限制條件，可用次數下限為1
             var _sameDeviceIDAvailableCount = promotion.SameDeviceIDRestrict && promotion.SameDeviceIDAvailableCount < 1 ? 1 : promotion.SameDeviceIDAvailableCount;
@@ -674,7 +675,7 @@ namespace BackendSite.Service.DAL
             p.Add("_HideForUnlogin", promotion.HideForUnlogin);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_Promotion_Set_V7", transaction, p);
+            _mainDbClient.Execute("Admin_Promotion_Set_V8", transaction, p);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
