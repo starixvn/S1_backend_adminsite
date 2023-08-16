@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -9,12 +10,14 @@ namespace BackendSite.Service.BLL
 {
     public class LiveRegistrationBLL : ILiveRegistrationBLL
     {
-        private readonly LiveRegistrationService _registrationService;
+        private readonly ILiveRegistrationService _registrationService;
+        private readonly IMemberService _memberService;
         private readonly ServerInfoBLL _serverInfoBll;
 
-        public LiveRegistrationBLL(LiveRegistrationService registrationService, ServerInfoBLL serverInfoBll)
+        public LiveRegistrationBLL(ILiveRegistrationService registrationService, IMemberService memberService)
         {
             _registrationService = registrationService;
+            _memberService = memberService;
             _serverInfoBll = serverInfoBll;
         }
 
@@ -23,15 +26,25 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
-            var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
+
+            var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
+            if (custList == null)
+                return new LiveRegistrationResponse()
+                {
+                    LiveRegistration = new List<LiveRegistration>(),
+                    PageNumber = 1,
+                    TotalPages = 0,
+                    RowCount = 0
+                };
 
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 
+            var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
 
             var searchResult = await _registrationService.GetRegLiveStatusData(JsonConvert.SerializeObject(multiSiteRequest),
-                request.DepositStatus, request.Status, request.UserName, request.DateType, startTime, endTime,
+                request.DepositStatus, request.Status, custList, (int)request.DateType, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantType, dormantFrequency, request.CallOutStatus,
                 orderByProperty, (int)request.OrderByDirection, request.PageNumber, request.PageSize);
 
@@ -66,20 +79,22 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<Dictionary<string, object>>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
         {
-            var offset = request.StartDate.Offset;
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
 
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
-
-            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+			var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            //TODO 參數
+            var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
+            if (custList == null)
+                return new List<Dictionary<string, object>>();
 
             var result = await _registrationService.GetExportRegLiveStatus(JsonConvert.SerializeObject(multiSiteRequest),
-                request.DepositStatus, request.Status, request.UserName, startTime, endTime,
+                request.DepositStatus, request.Status, custList, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantFrequency, dormantType, request.CallOutStatus,
-                request.DateType);
+                (int)request.DateType);
 
             int maxCol = 0;
             var liveRegs = new List<ExportLiveRegistration>();
@@ -91,17 +106,17 @@ namespace BackendSite.Service.BLL
                     FullName = item.AccountName,
                     AffCode = item.AffCode,
                     PhoneNo = item.PhoneNo,
-                    RegTime = new DateTimeOffset(item.RegTime, TimeSpan.Zero).ToOffset(offset),
-                    LastActiveTime = new DateTimeOffset(item.LastActiveTime, TimeSpan.Zero).ToOffset(offset),
+                    RegTime = new DateTimeOffset(item.RegTime, TimeSpan.Zero).ToOffset(timezone),
+                    LastActiveTime = new DateTimeOffset(item.LastActiveTime, TimeSpan.Zero).ToOffset(timezone),
                     DepositStatus = Enum.GetName(typeof(ActStatusEnum), item.ActStatus),
                     Note = item.Note,
                     CallRecord = ZipRemark(item.UpdateAt, item.Operator, item.DepositStatus, timezone),
                     ReferralUrl = item.ReferralUrl,
                     BonusCode = item.BonusCode,
                     PromotionCategory = item.PromotionCategory,
-                    FTDDate = new DateTimeOffset(item.FTDDate, TimeSpan.Zero).ToOffset(offset),
+                    FTDDate = new DateTimeOffset(item.FTDDate, TimeSpan.Zero).ToOffset(timezone),
                     Amount = item.Amount,
-                    SiteName = item.SiteName,
+					SiteName = item.SiteName
                 };
                 if (liveReg.CallRecord?.Count > maxCol)
                     maxCol = liveReg.CallRecord.Count;
@@ -112,7 +127,6 @@ namespace BackendSite.Service.BLL
             {
                 var liveReg = new Dictionary<string, object>()
                 {
-                    //todo 新增平台欄位
                     { "UserName", a.UserName },
                     { "FullName", a.FullName },
                     { "SiteName", a.SiteName },
@@ -215,6 +229,32 @@ namespace BackendSite.Service.BLL
             var frequency = dormantUser / 10;
             var type = dormantUser % 10;
             return (frequency, type);
+        }
+
+        private async Task<List<int>> GetQueryCustId(LiveRegistrationDateTypeEnum dateType, int siteId, DateTime startTime, DateTime endTime, string userName) 
+        {
+            var custList = new List<int>();
+            if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate)
+            {
+                var callRecord = await _registrationService.QueryCallingRecord(siteId, startTime, endTime);
+                custList = callRecord.ToList();
+                if (custList.Count == 0)
+                {
+                    return null;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(userName))
+            {
+                var cust = await _memberService.GetCustId(null, userName, siteId);
+                if (cust == null) return null;
+
+                if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate && (!custList.Any(c => c == cust.CustId)))
+                    return null;
+
+                custList = new List<int>() { cust.CustId };
+            }
+            return custList;
         }
     }
 }

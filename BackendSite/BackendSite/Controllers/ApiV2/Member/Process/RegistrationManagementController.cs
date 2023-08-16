@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -15,9 +16,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
     public class RegistrationManagementController : ControllerBase
     {
         private readonly ExcelBLL _excelBll;
-        private readonly LiveRegistrationDecorator _registrationBll;
+        private readonly ILiveRegistrationBLL _registrationBll;
 
-        public RegistrationManagementController(ExcelBLL excelBll, LiveRegistrationDecorator registrationBll)
+        public RegistrationManagementController(ExcelBLL excelBll, ILiveRegistrationBLL registrationBll)
         {
             _excelBll = excelBll;
             _registrationBll = registrationBll;

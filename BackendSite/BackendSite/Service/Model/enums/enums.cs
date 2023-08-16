@@ -1147,6 +1147,13 @@ namespace BackendSite.Service.Model.enums
         Invalid = 3
     }
 
+    public enum LiveRegistrationDateTypeEnum 
+    {
+        RegisterDate = 1,
+        LastActiveDate = 2,
+        CallRecordDate = 3
+    }
+
     #endregion
 
     public enum SettlementType
