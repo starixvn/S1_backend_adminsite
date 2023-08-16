@@ -11,6 +11,7 @@
     {
         public DateTime Date { get; set; }
         public decimal DepositAmount { get; set; }
+        public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public int CustId { get; set; }
     }
@@ -57,6 +58,8 @@
         public DateTime Date { get; set; }
 
         public string UserName { get; set; }
+
+        public int SiteId { get; set; }
 
         public int CurrencyId { get; set; }
 
