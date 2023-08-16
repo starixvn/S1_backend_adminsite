@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using BackendSite.Service.Model.ApiModel;
+
+namespace BackendSite.Service.Model
 {
     public class RewardBonusReportModel
     {
@@ -23,11 +25,10 @@
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
-    
+
     public class GetListInput
     {
-        public int SiteId { get; set; }
-        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<MultiSiteRequestDto> MultiSiteRequest { get; set; }
         public int BaseCurrencyId { get; set; }
         public string UserName { get; set; }
         public string TpUserName { get; set; }
