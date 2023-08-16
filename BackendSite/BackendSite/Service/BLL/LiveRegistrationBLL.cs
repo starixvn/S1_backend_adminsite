@@ -14,7 +14,7 @@ namespace BackendSite.Service.BLL
         private readonly IMemberService _memberService;
         private readonly ServerInfoBLL _serverInfoBll;
 
-        public LiveRegistrationBLL(ILiveRegistrationService registrationService, IMemberService memberService)
+        public LiveRegistrationBLL(ILiveRegistrationService registrationService, IMemberService memberService,ServerInfoBLL serverInfoBll)
         {
             _registrationService = registrationService;
             _memberService = memberService;

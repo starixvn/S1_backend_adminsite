@@ -3,7 +3,6 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

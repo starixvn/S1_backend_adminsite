@@ -25,7 +25,6 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("_MultiSiteRequest", multiSiteRequest);
-            props.Add("_UserName", username);
             props.Add("_CustIdList", JsonConvert.SerializeObject(custIdList));
             props.Add("_DepositStatus", depositStatus);
             props.Add("_Status", status);
@@ -57,11 +56,10 @@ namespace BackendSite.Service.DAL
 
             return searchData;
         }
-        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(int siteId, int currency, int depositStatus, int status, List<int> custIdList, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
+        public async Task<IEnumerable<ExportRegLiveStatusData>> GetExportRegLiveStatus(string multiSiteRequest, int depositStatus, int status, List<int> custIdList, DateTime startDate, DateTime endDate, string affiliatesCode, int agentCodeType, int dormantFrequency, int dormantType, int callOutStatus, int dateType)
         {
             var props = new DynamicParameters();
             props.Add("_MultiSiteRequest", multiSiteRequest);
-            props.Add("_UserName", userName);
             props.Add("_CustIdList", JsonConvert.SerializeObject(custIdList));
             props.Add("_DepositStatus", depositStatus);
             props.Add("_Status", status);
