@@ -937,7 +937,8 @@ namespace BackendSite.Service.Model.enums
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
         AutoPaymentRule = 92,
-        DepositReferral = 93
+        DepositReferral = 93,
+        EditSystemBankInfo = 94
     }
 
     #region BankFinancialTransferInfoLog
