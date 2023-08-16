@@ -1,17 +1,21 @@
 ﻿using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
     public class LiveRegistrationBLL : ILiveRegistrationBLL
     {
         private readonly LiveRegistrationService _registrationService;
-        
-        public LiveRegistrationBLL(LiveRegistrationService registrationService)
+        private readonly ServerInfoBLL _serverInfoBll;
+
+        public LiveRegistrationBLL(LiveRegistrationService registrationService, ServerInfoBLL serverInfoBll)
         {
             _registrationService = registrationService;
+            _serverInfoBll = serverInfoBll;
         }
 
         public async Task<LiveRegistrationResponse> GetRegLiveStatusData(GetRegLiveStatusRequest request)
@@ -20,16 +24,19 @@ namespace BackendSite.Service.BLL
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
             var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
-            
+
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 
-            var searchResult = await _registrationService.GetRegLiveStatusData(request.SiteId, request.CurrencyId,
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+
+            var searchResult = await _registrationService.GetRegLiveStatusData(JsonConvert.SerializeObject(multiSiteRequest),
                 request.DepositStatus, request.Status, request.UserName, request.DateType, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantType, dormantFrequency, request.CallOutStatus,
                 orderByProperty, (int)request.OrderByDirection, request.PageNumber, request.PageSize);
-            
-            var regLiveStatus = searchResult.RegLiveStatusData.Select(a => 
-                new LiveRegistration() 
+
+            var regLiveStatus = searchResult.RegLiveStatusData.Select(a =>
+                new LiveRegistration()
                 {
                     SiteId = a.SiteId,
                     CustId = a.CustId,
@@ -45,7 +52,8 @@ namespace BackendSite.Service.BLL
                     RegTime = new DateTimeOffset(a.RegTime, TimeSpan.Zero),
                     LastActiveTime = new DateTimeOffset(a.LastActiveTime, TimeSpan.Zero),
                     UpdateRemark = ZipRemark(a.UpdateAt, a.Operator, a.DepositStatus, timezone),
-                    ReferralUrl = a.ReferralUrl
+                    ReferralUrl = a.ReferralUrl,
+                    SiteName = a.SiteName
                 });
             return new LiveRegistrationResponse()
             {
@@ -62,10 +70,13 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
-            
+
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
-            
-            var result = await _registrationService.GetExportRegLiveStatus(request.SiteId, request.CurrencyId,
+
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+
+            var result = await _registrationService.GetExportRegLiveStatus(JsonConvert.SerializeObject(multiSiteRequest),
                 request.DepositStatus, request.Status, request.UserName, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantFrequency, dormantType, request.CallOutStatus,
                 request.DateType);
@@ -89,7 +100,8 @@ namespace BackendSite.Service.BLL
                     BonusCode = item.BonusCode,
                     PromotionCategory = item.PromotionCategory,
                     FTDDate = new DateTimeOffset(item.FTDDate, TimeSpan.Zero).ToOffset(offset),
-                    Amount = item.Amount
+                    Amount = item.Amount,
+                    SiteName = item.SiteName,
                 };
                 if (liveReg.CallRecord?.Count > maxCol)
                     maxCol = liveReg.CallRecord.Count;
@@ -100,8 +112,10 @@ namespace BackendSite.Service.BLL
             {
                 var liveReg = new Dictionary<string, object>()
                 {
+                    //todo 新增平台欄位
                     { "UserName", a.UserName },
                     { "FullName", a.FullName },
+                    { "SiteName", a.SiteName },
                     { "PhoneNo", a.PhoneNo },
                     { "RegTime", a.RegTime },
                     { "LastActiveTime", a.LastActiveTime },
@@ -116,10 +130,10 @@ namespace BackendSite.Service.BLL
                 };
                 for (int i = 0; i < maxCol; i++)
                 {
-                    if(i < a.CallRecord?.Count)
-                        liveReg.Add($"{i+1} CallRecord", a.CallRecord[i]);
+                    if (i < a.CallRecord?.Count)
+                        liveReg.Add($"{i + 1} CallRecord", a.CallRecord[i]);
                     else
-                        liveReg.Add($"{i+1} CallRecord", "");
+                        liveReg.Add($"{i + 1} CallRecord", "");
                 }
                 return liveReg;
             });
@@ -131,7 +145,7 @@ namespace BackendSite.Service.BLL
         {
             return await _registrationService.GetRegLiveStatus(custId);
         }
-        
+
         public async Task<int> SetRegLiveStatus(SetRegLiveStatusRequest input, string @operator)
         {
             return await _registrationService.SetRegLiveStatus(input.CustId, input.SiteId, (int)input.Status, @operator);
@@ -170,7 +184,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<int> EditRegLiveStatusNote(int custId, int id, string note, string @operator)
         {
-            return await _registrationService.EditRegLiveStatusNote(custId, id ,note, @operator);
+            return await _registrationService.EditRegLiveStatusNote(custId, id, note, @operator);
         }
 
         private List<string> ZipRemark(string rawUpdateTime, string rawUpdateOperator, string rawDepositStatus, TimeSpan timezone)
