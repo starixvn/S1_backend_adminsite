@@ -16,19 +16,17 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public PerformanceHighlightData GetPerformanceHighlightData(
-            int siteId,
-            string currencyIds,
+        public IEnumerable<PerformanceHighlightData> GetPerformanceHighlightData(
+            string multiSiteRequest,
             DateTime startDate,
             DateTime endDate)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_MultiSiteRequest", multiSiteRequest);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             
-            var result = _reportDbClient.QueryFirst<PerformanceHighlightData>("Admin_MarketingPerformanceHighlight_Get", props);
+            var result = _reportDbClient.Query<PerformanceHighlightData>("Admin_MarketingPerformanceHighlight_Get_V2", props);
 
             return result;
         }

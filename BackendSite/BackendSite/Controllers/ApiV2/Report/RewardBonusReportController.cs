@@ -15,6 +15,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region Fields
 
         private readonly ReportBLL _reportBll;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly ExcelBLL _excelBll;
 
         #endregion
@@ -25,13 +26,14 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest : ApiRequestPageModel, IApiRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -54,9 +56,12 @@ namespace BackendSite.Controllers.ApiV2.Report
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
 
-        public class GetExportRequest
+        public class GetExportRequest : IApiRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -79,27 +84,31 @@ namespace BackendSite.Controllers.ApiV2.Report
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
-        
+
         #endregion
-        
+
         [HttpPost]
         public ApiListResult<RewardBonusReportModel> GetList(GetListRequest request)
         {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             var data =
                 _reportBll.GetRewardBonusReport(new GetListInput
                 {
-                    SiteId = request.SiteId,
-                    CurrencyIds = request.CurrencyIds,
+                    MultiSiteRequest = multiSiteRequest,
                     BaseCurrencyId = request.BaseCurrencyId,
                     UserName = request.UserName,
                     TpUserName = request.TpUserName,
                     TransId = request.TransId,
                     EventTypeId = request.EventTypeId,
                     BonusCode = request.BonusCode,
-                    EventNames = request.EventNames != null && request.EventNames.Any() ? request.EventNames : null ,
+                    EventNames = request.EventNames != null && request.EventNames.Any() ? request.EventNames : null,
                     StartDate = request.StartDate.DateTime,
-                    EndDate= request.EndDate.DateTime,
+                    EndDate = request.EndDate.DateTime,
                     PageSize = request.PageSize,
                     StartIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize)
                 }, out var totalPages, out var rowCount);
@@ -113,25 +122,26 @@ namespace BackendSite.Controllers.ApiV2.Report
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         public IActionResult Export(GetExportRequest request)
         {
-            var exportData =  _reportBll.GetRewardBonusReportExport(new GetListInput
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var exportData = _reportBll.GetRewardBonusReportExport(new GetListInput
             {
-                SiteId = request.SiteId,
-                CurrencyIds = request.CurrencyIds,
+                MultiSiteRequest = multiSiteRequest,
                 BaseCurrencyId = request.BaseCurrencyId,
                 UserName = request.UserName,
                 TpUserName = request.TpUserName,
                 TransId = request.TransId,
                 EventTypeId = request.EventTypeId,
                 BonusCode = request.BonusCode,
-                EventNames = request.EventNames != null && request.EventNames.Any() ? request.EventNames : null ,
+                EventNames = request.EventNames != null && request.EventNames.Any() ? request.EventNames : null,
                 StartDate = request.StartDate.DateTime,
-                EndDate= request.EndDate.DateTime,
+                EndDate = request.EndDate.DateTime,
             });
-            
+
             foreach (var data in exportData)
             {
                 data.CreateTime = new DateTimeOffset(data.CreateTime.DateTime, new TimeSpan(8, 0, 0)).AddHours(8);
