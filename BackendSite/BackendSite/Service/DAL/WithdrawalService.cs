@@ -401,7 +401,7 @@ namespace BackendSite.Service.DAL
                 commandType: CommandType.StoredProcedure).ToList();
         }
 
-        public int SetWithdrawalInfoFlow(string transId,
+        public int  SetWithdrawalInfoFlow(string transId,
             int siteId,
             string comment,
             string forStatus,

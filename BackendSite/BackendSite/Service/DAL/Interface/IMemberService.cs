@@ -8,13 +8,13 @@ public interface IMemberService
     Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList,
         IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
         string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
-        string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
+        string bankAccountNumber, string eWalletAccountNumber, string cryptoAddress, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
         string deviceId, IEnumerable<int> userTypes, int dateType, DateTime startDate, DateTime endDate, int pageNumber,
         int pageSize, bool excludeTag);
     Task<IEnumerable<MemberExportDataDto>> GetExportData(int siteId, IEnumerable<int> currencyList,
         IEnumerable<int> statusList, int identity, string userName, IEnumerable<int> tags, IEnumerable<int> vipList,
         string accountName, string affiliateName, string tpUserName, string loginIp, string email, string phoneNo,
-        string bankAccountNumber, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
+        string bankAccountNumber, string eWalletAccountNumber, string cryptoAddress, string affCode, int transType, string transId, int shieldLevel, int iovationLevel,
         string deviceId, IEnumerable<int> userTypes, int dateType, DateTime startDate, DateTime endDate, bool excludeTag);
     Task<CustomerDto> GetCustomerBasicInfoAsync(int custId);
     Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList);
@@ -42,8 +42,8 @@ public interface IMemberService
     Task<int> ResetBankInfoAsync(int custId);
     Task<int> ResetCryptoInfoAsync(int custId);
     Task<int> ResetEWalletAsync(int custId);
-    Task<int> DeleteLineProfileAsync(int custId);
     Task<CustomerBalanceInfo> GetCustomerBalanceInfoAsync(int custId);
+    Task<int> DeleteLineProfileAsync(int custId);
     Task<IEnumerable<CustomerAssociateBankInfo>> GetCustomerAssociateBankUserAsync(int custId);
     Task<IEnumerable<CustRealNameChangeLog>> GetCustRealNameChangeLogAsync(int custId);
     Task<CustPromotionWhiteList> GetCustPromotionWhiteListAsync(int custId);
@@ -53,4 +53,6 @@ public interface IMemberService
         string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl);
     Task<IEnumerable<CustTpGameTypeSettingDto>> GetCustTpGameTypeSettingAsync(int custId);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type);
+    Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status);
+    Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId);
 }

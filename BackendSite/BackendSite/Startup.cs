@@ -34,6 +34,7 @@ namespace BackendSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
+            services.AddHttpContextAccessor();
             var redisConnection = ConnectionMultiplexer.Connect(_configuration.GetValue<string>("RedisConnection"));
             redisConnection.UseElasticApm();
             services.AddSingleton<IConnectionMultiplexer>(redisConnection);
@@ -94,10 +95,9 @@ namespace BackendSite
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
             services.AddTransient<IIovationReportBLL, IovationReportBLL>();
             services.AddTransient<IReferralManagementBLL, ReferralManagementBLL>();
-            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
-            services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<IVipLevelBLL, VipLevelBLL>();
             services.AddTransient<ITagBLL, TagBLL>();
+            services.AddTransient<ICustPhotoIdBLL, CustPhotoIdBLL>();
             services.AddTransient<IMpaWinLossBLL, MpaWinLossBLL>();
             services.AddTransient<IMpaMarketingWithdrawalAmountBLL, MpaMarketingWithdrawalAmountBLL>();
             services.AddTransient<IMpaMarketingDepositAmountBLL, MpaMarketingDepositAmountBLL>();
@@ -108,23 +108,23 @@ namespace BackendSite
             services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
             services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
 
+
             services.AddTransient<ReferralManagementDecorator>();
-            services.AddTransient<LiveRegistrationDecorator>();
             services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
+            services.AddTransient<ILiveRegistrationService, LiveRegistrationService>();
             services.AddTransient<IVipLevelService, VipLevelService>();
             services.AddTransient<ITagService, TagService>();
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
-            services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
-            services.AddTransient<IIovationReportService, IovationReportService>();
             services.AddTransient<IDeviceService, DeviceService>();
             services.AddTransient<IAdminLogService, AdminLogService>();
             services.AddTransient<IMarketingService, MarketingService>();
             services.AddTransient<IAffiliateApiService, AffiliateApiService>();
             services.AddTransient<IBonusApiService, BonusApiService>();
+            services.AddTransient<IIovationReportService, IovationReportService>();
             services.AddTransient<BetListService>();
             services.AddTransient<IMpaWinLossService, MpaWinLossService>();
             services.AddTransient<IMpaCommonService, MpaCommonService>();
@@ -132,8 +132,9 @@ namespace BackendSite
             services.AddTransient<IMpaMarketingDepositAmountService, MpaMarketingDepositAmountService>();
             services.AddTransient<IAutoWithdrawalRuleService, AutoWithdrawalRuleService>();
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
-            
-            
+            services.DecoratorReferralManagement();
+            services.DecoratorLiveRegistration();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
@@ -142,8 +143,7 @@ namespace BackendSite
             {
                 options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
             });
-
-            services.AddHttpContextAccessor();
+            
             services.AddAuthentication(option => 
             {
                 option.DefaultScheme = "backend";

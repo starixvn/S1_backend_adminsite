@@ -101,10 +101,7 @@ namespace BackendSite.Service.DAL
         /// <param name="multiSiteRequest"></param>
         /// <param name="promotionTypes"></param>
         /// <param name="promotionCategoryIds"></param>
-        /// <param name="siteIds"></param>
         /// <param name="statuses"></param>
-        /// <param name="atPages"></param>
-
         private static void SetBonusReportExportRequest(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportExportRequestV2 request,
             out string multiSiteRequest,
             out string promotionTypes,

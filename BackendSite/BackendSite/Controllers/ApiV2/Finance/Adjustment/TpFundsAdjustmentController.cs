@@ -8,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 {
@@ -69,6 +70,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public string Memo { get; set; }
             public int ReasonId { get; set; }
             public string TransId { get; set; }
+            public MethodTypeIDEnum MethodType { get; set; }
         }
 
         public class GetLogRequest : ApiRequestPageModel
@@ -182,7 +184,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public async Task<ApiResult> Submit(SubmitRequest request)
         {
             var user = User.Identity.Name;
-            var isDeposit = request.ReasonId == 9; // 9: Deposit
+            var isDeposit = (request.ReasonId == 1 && request.MethodType == MethodTypeIDEnum.ThirdWallet); // Methodtype為第3方且ReasonID=1(Deposit)
             var inTpTransfer = new AdminTpTransfer
             {
                 TpId = request.TpId,
@@ -200,11 +202,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 int.TryParse(m.Value, out var depositId);
                 inTpTransfer.DepositId = depositId;
             }
-            
+
             var result = await _tpBll.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
-                var reasonList = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+                var reasonList = _bankFinancialBll.GetReason("FunKey/3RDWallet");
                 var reason = reasonList.FirstOrDefault(x => x.ReasonId == request.ReasonId)?.Description;
                 var strDetail = string.Empty;
                 if (isDeposit)

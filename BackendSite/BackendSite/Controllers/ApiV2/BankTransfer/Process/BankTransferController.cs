@@ -84,7 +84,7 @@ public class BankTransferController : ControllerBase
         var exportData = _bankFinancialBll.ExportFinancialTransferInfoList(
             new GetTransferInfoListParams(request));
 
-        var stream = _excelBll.Export(exportData, offset: offset);
+        var stream = _excelBll.ExportV2(exportData);
         return _excelBll.ExcelFile(stream, "TransferInfoList");
     }
 

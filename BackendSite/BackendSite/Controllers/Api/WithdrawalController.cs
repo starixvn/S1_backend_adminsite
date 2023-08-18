@@ -327,7 +327,8 @@ namespace BackendSite.Controllers.Api
                             AccountName = withdrawalInfo.AccountName,
                             AccountNo = withdrawalInfo.AccountNo,
                             IFSCCode = withdrawalInfo.IFSCCode,
-                            EWalletSysId = withdrawalInfo.EWalletSysId
+                            EWalletSysId = withdrawalInfo.EWalletSysId,
+                            WithdrawalType = (int)withdrawalReq.WithdrawalType.Value
                             //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
                         };
 
@@ -409,6 +410,7 @@ namespace BackendSite.Controllers.Api
             public string IFSCCode { set; get; }
             //public string ReturnUrl { set; get; }
             public int? EWalletSysId { get; set; }
+            public int WithdrawalType { set; get; }
         }
 
 

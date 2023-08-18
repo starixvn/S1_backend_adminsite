@@ -188,36 +188,6 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute(SpName, parameters);
         }
 
-        public int InsertTransferAccountLog(ActionType action, BankFinancialTransferAccountModel bankFinancialTransferAccount)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _SiteId = bankFinancialTransferAccount.SiteId,
-                    _SiteName = bankFinancialTransferAccount.SiteName,
-                    _CurrencyId = bankFinancialTransferAccount.CurrencyId,
-                    _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = bankFinancialTransferAccount.Purpose,
-                    _Channel = bankFinancialTransferAccount.Channel,
-                    _Agent = bankFinancialTransferAccount.Agent,
-                    _PayId = bankFinancialTransferAccount.PayId,
-                    _AccountNo = bankFinancialTransferAccount.AccountNo,
-                    _AccountName = bankFinancialTransferAccount.AccountName,
-                    _DisplayName = bankFinancialTransferAccount.DisplayName,
-                    _InitialAmount = bankFinancialTransferAccount.InitialAmount,
-                    _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
-                    _Reason = bankFinancialTransferAccount.Reason,
-                    _Remark = bankFinancialTransferAccount.Remark,
-                    _Status = bankFinancialTransferAccount.Status,
-                    _Operator = bankFinancialTransferAccount.Updator,
-                    _Action = action
-                });
-
-            var SpName = "Admin_BankFinancialTransferAccountLog_Ins_V2";
-
-            return _mainDbClient.Execute(SpName, parameters);
-        }
-
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
         {
             var SpName = "Admin_BankFinancialTransferAccount_GetForList";

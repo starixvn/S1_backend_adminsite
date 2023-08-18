@@ -20,6 +20,8 @@ public class GetTempMemberListRequest : ApiRequestPageModel
     public string PhoneNo { get; set; }
     public string AccountName { get; set; }
     public string BankAccountNumber { get; set; }
+    public string EWalletAccountNumber { get; set; }
+    public string CryptoAddress { get; set; }
     public string AffiliateCode { get; set; }
     public IEnumerable<int> Tags { get; set; }
     public IEnumerable<int> VipLevel { get; set; }
@@ -118,6 +120,8 @@ public class ExportMemberRequest
     public string PhoneNo { get; set; }
     public string AccountName { get; set; }
     public string BankAccountNumber { get; set; }
+    public string EWalletAccountNumber { get; set; }
+    public string CryptoAddress { get; set; }
     public string AffiliateCode { get; set; }
     public IEnumerable<int> Tags { get; set; }
     public IEnumerable<int> VipLevel { get; set; }
@@ -270,8 +274,8 @@ public class CustomerDto
     public DateTime? EmailRewardTime { get; set; }
     public DateTime? PhoneVerifyTime { get; set; }
     public DateTime? EmailVerifyTime { get; set; }
-    public int MemberType { get; set; }
     public int Exclusive { get; set; }
+    public int MemberType { get; set; }
 }
 
 public class CustomerTag
@@ -325,8 +329,8 @@ public class CustomerBasicInfo
     public DateTimeOffset? EmailRewardTime { get; set; }
     public DateTimeOffset? PhoneVerifyTime { get; set; }
     public DateTimeOffset? EmailVerifyTime { get; set; }
-    public int MemberType { get; set; }
     public int Exclusive { get; set; }
+    public int MemberType { get; set; }
 }
 
 public class AffInfo
@@ -509,6 +513,12 @@ public class SwitchEnableRebateRequest
     public EnableRebateEnum Status { get; set; }
 }
 
+public class SwitchEnableTurnoverRewardPointRequest
+{
+    public int CustId { get; set; }
+    public EnableTurnoverRewardPointEnum Status { get; set; }
+}
+
 public class ResetBankInfoRequest
 {
     public int CustId { get; set; }
@@ -574,7 +584,6 @@ public class CustomerBalanceInfo
     public int BonusCnt { get; set; }
     public decimal TotalAdjustment { get; set; }
     public decimal PaymentFee { get; set; }
-
     public decimal RemainingTurnOver
     {
         get
@@ -701,6 +710,12 @@ public class PromotionReceiveFailLog
     public int CustId { get; set; }
     public int CurrencyId { get; set; }
 }
+
+public class ResetOtpTimesRequest
+{
+    public int CustId { get; set; }
+}
+
 public class RegisterCustomerRequest
 {
     public int SiteId { get; set; }
@@ -742,9 +757,3 @@ public class SetTpGameTypeSettingRequest
     public CustTpGameTypeSettingGetType SetDataType { get; set; }
     public IEnumerable<int> TpGameTypes { get; set; }
 }
-
-public class ResetOtpTimesRequest
-{
-    public int CustId { get; set; }
-}
-

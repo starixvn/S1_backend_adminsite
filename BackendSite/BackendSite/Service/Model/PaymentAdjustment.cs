@@ -49,6 +49,7 @@ namespace BackendSite.Service.Model
         public string CategoryName { get; set; }
         public string DepositId { get; set; }
         public MemberTypeEnum UserType { get; set; }
+        public string RefId { get; set; }
     }
 
     public class PaymentAdjustmentWrapper

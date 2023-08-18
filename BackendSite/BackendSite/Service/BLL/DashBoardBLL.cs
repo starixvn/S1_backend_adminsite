@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using Newtonsoft.Json;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL
 {
