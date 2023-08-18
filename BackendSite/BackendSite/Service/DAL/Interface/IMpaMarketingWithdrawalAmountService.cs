@@ -4,10 +4,10 @@ namespace BackendSite.Service.DAL.Interface
 {
     public interface IMpaMarketingWithdrawalAmountService
     {
-        Task<IEnumerable<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountSummaryAsync(int siteId,
-            DateTimeOffset startTime, DateTimeOffset endTime);
+        Task<IEnumerable<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountSummaryAsync(string siteList,
+            DateTime startTime, DateTime endTime);
 
-        Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(int siteId,
-            DateTimeOffset startTime, DateTimeOffset endTime);
+        Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(string siteList,
+            DateTime startTime, DateTime endTime);
     }
 }
