@@ -7,15 +7,15 @@ namespace BackendSite.Service.Model
 {
     public class PromotionInfo
     {
-        private DateTimeOffset? _lastUpdateTime{ get; set; }
+        private DateTimeOffset? _lastUpdateTime { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
         public int PromotionType { get; set; }
         public string CategoryName { get; set; }
-        
+
         [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
         public int? CategoryId { get; set; }
-        
+
         public DateTimeOffset? PeriodFrom
         {
             get
@@ -29,7 +29,7 @@ namespace BackendSite.Service.Model
         }
         public long? UnixPeriodFrom { get; set; }
 
-        public DateTimeOffset? PeriodTo 
+        public DateTimeOffset? PeriodTo
         {
             get
             {
@@ -74,7 +74,7 @@ namespace BackendSite.Service.Model
             get => _lastUpdateTime;
             set
             {
-                if (value != null) 
+                if (value != null)
                     _lastUpdateTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
@@ -126,6 +126,9 @@ namespace BackendSite.Service.Model
 
         [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
         public bool HideForUnlogin { get; set; }
+
+        [Description("前台是否會以PopUp的方式顯示: 0.不會 1.會")]
+        public bool IsPopUp { get; set; }
     }
 
     public class PromotionInfoReq 
@@ -239,8 +242,11 @@ namespace BackendSite.Service.Model
 
         [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
         public bool HideForUnlogin { get; set; }
+
+        [Description("前台是否會以PopUp的方式顯示: 0.不會 1.會")]
+        public bool IsPopUp { get; set; }
     }
-    
+
     public class PromotionSpecific
     {
         public string BonusCode { get; set; }
