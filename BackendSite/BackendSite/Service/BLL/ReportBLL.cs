@@ -1302,5 +1302,16 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
+
+        #region Confiscated Summary Report
+
+        public IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(GetConfiscatedSummaryReportRequest request)
+        {
+            var data = reportService.GetConfiscatedSummaryReport(request);
+            
+            return data;
+        }
+
+        #endregion
     }
 }
