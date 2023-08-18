@@ -314,5 +314,24 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<PaymentReportWithdrawalDetail>("Admin_PaymentReport_Withdrawal_Get_V2", parameters);
         }
+        
+        public IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(GetConfiscatedSummaryReportRequest input)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("_SiteIds", JsonConvert.SerializeObject(input.SiteIds));
+            parameters.Add("_CurrencyIds", JsonConvert.SerializeObject(input.CurrencyIds));
+            parameters.Add("_UserName", input.UserName);
+            parameters.Add("_StartDate", input.StartDate.UtcDateTime);
+            parameters.Add("_EndDate", input.EndDate.UtcDateTime);
+            parameters.Add("_TimeZone", input.TimeZone);
+            parameters.Add("_PageSize", Math.Abs(input.PageSize));
+            parameters.Add("_StartIndex", (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize));
+            parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            var data = _reportDbClient.Query<ConfiscatedSummaryReportDetail>("Admin_ConfiscatedSummaryReport_Get" ,parameters);
+            
+            return data;
+        }
     }
 }
