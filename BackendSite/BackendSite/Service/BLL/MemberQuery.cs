@@ -6,7 +6,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
 
 namespace BackendSite.Service.BLL
 {
