@@ -14,8 +14,7 @@ namespace BackendSite.Service.DAL
     public class ReportService
     {
         #region Fields
-
-        private readonly IConfiguration _configuration;
+        
         private readonly MySqlClient _reportDbClient;
 
         #endregion
@@ -24,7 +23,6 @@ namespace BackendSite.Service.DAL
 
         public ReportService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
@@ -310,6 +308,21 @@ namespace BackendSite.Service.DAL
                 });
 
             return _reportDbClient.Query<PaymentReportWithdrawalDetail>("Admin_PaymentReport_Withdrawal_Get_V2", parameters);
+        }
+        
+        public IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(GetConfiscatedSummaryReportRequest input)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("_SiteIds", JsonConvert.SerializeObject(input.SiteIds));
+            parameters.Add("_CurrencyIds", JsonConvert.SerializeObject(input.CurrencyIds));
+            parameters.Add("_UserName", input.UserName);
+            parameters.Add("_StartDate", input.StartDate.UtcDateTime);
+            parameters.Add("_EndDate", input.EndDate.UtcDateTime);
+            parameters.Add("_TimeZone", input.TimeZone);
+            
+            var data = _reportDbClient.Query<ConfiscatedSummaryReportDetail>("Admin_ConfiscatedSummaryReport_Get" ,parameters);
+            
+            return data;
         }
     }
 }
