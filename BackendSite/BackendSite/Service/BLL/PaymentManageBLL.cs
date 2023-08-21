@@ -148,7 +148,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
-        public IEnumerable<PayListBankInfoSys> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
+        public IEnumerable<BankInfoPayForSetting> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
         {
             return _paymentManageService.GetBankInfoPayForSetting(siteId, currencyId, channelId);
         }
@@ -161,9 +161,10 @@ namespace BackendSite.Service.BLL
             _paymentManageService.UpdateBankInfo(PayId, SysId, Status, Operator);
         }
         
-        public bool UpdateBankInfo(int siteId, int payId, int sysId, BankInfoPayStatusEnum status, string  @operator)
+        public bool UpdateBankInfo(int siteId, int payId, int sysId,
+            BankInfoPayStatusEnum status, BankInfoPayMethodEnum method, string  @operator)
         {
-            var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status,  @operator);
+            var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status, method,  @operator);
 
             if (result)
             {
