@@ -17,7 +17,6 @@ namespace BackendSite.Controllers.ApiV2.Report
         
         private readonly ReportBLL _reportBll;
         private readonly ExcelBLL _excelBll;
-        private readonly ReportExcelBLL _reportExcelBll;
 
         #endregion
 
@@ -27,7 +26,6 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             _reportBll = provider.GetRequiredService<ReportBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
-            _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
         }
 
         #endregion
