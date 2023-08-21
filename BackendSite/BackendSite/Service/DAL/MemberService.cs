@@ -574,4 +574,9 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId });
         return await _sqlClienct.QueryAsync<CustTpGameTypeSettingDto>("Admin_CustTpGameTypeSetting_Get", p);
     }
+
+    public async Task<CurrencyPrefix> GetCurrencyPrefixAsync(int currencyId)
+    {
+        return await _sqlClienct.QueryFirstAsync<CurrencyPrefix>("Service_CurrencyPrefix_ByCurrencyId_Get", new { _CurrencyId = currencyId });
+    }
 }

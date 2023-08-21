@@ -1,5 +1,7 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model.Option;
+using Microsoft.Extensions.Hosting;
+using System;
 using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.Library
@@ -24,7 +26,7 @@ namespace BackendSite.Service.Library
         }
         public string GetEnv()
         {
-            if (_environment.EnvironmentName == "Development")
+            if (_environment.EnvironmentName == "Development" || _environment.EnvironmentName == "Local")
             {
                 return "D";
             }
@@ -42,6 +44,7 @@ namespace BackendSite.Service.Library
             }
             return "X";
         }
+
         public int? TpIdToCustId(string TpId)
         {
             TpId = TpId.Trim();
