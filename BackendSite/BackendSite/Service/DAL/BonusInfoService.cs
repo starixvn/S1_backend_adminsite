@@ -210,8 +210,7 @@ namespace BackendSite.Service.DAL
         }
         
         public List<MpaBonusInfo> GetMpaBonusInfoList(
-            int siteId,
-            string currencyIds,
+            string multiSiteRequests,
             string bonusStatuses,
             string bonusTypes,
             string bonusCode,
@@ -221,8 +220,7 @@ namespace BackendSite.Service.DAL
             string timeZone)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_MultiSiteRequest", multiSiteRequests);
             props.Add("_Statuses", bonusStatuses);
             props.Add("_BonusTypes", bonusTypes);
             props.Add("_BonusCode", bonusCode);
@@ -231,33 +229,30 @@ namespace BackendSite.Service.DAL
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_TimeZone", timeZone);
             
-            var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get_V2", props);
+            var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get_V3", props);
 
             return result.ToList();
         }
         
         public List<MpaBonusGGR> GetMpaBonusGGRList(
-            int siteId,
-            string currencyIds,
+            string multiSiteRequests,
             DateTime startDate,
             DateTime endDate,
             string timeZone)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_MultiSiteRequest", multiSiteRequests);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_TimeZone", timeZone);
             
-            var result = _reportDbClient.Query<MpaBonusGGR>("Admin_BonusSummaryGGR_Get", props);
+            var result = _reportDbClient.Query<MpaBonusGGR>("Admin_BonusSummaryGGR_Get_V2", props);
 
             return result.ToList();
         }
         
         public List<MpaBonusDetail> GetMpaBonusDetailList(
-            int siteId,
-            string currencyIds,
+            string multiSiteRequest,
             string bonusCode,
             DateTime startDate,
             DateTime endDate,
@@ -266,8 +261,7 @@ namespace BackendSite.Service.DAL
             string timeZone)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_MultiSiteRequest", multiSiteRequest);
             props.Add("_BonusCode", bonusCode);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
@@ -275,23 +269,21 @@ namespace BackendSite.Service.DAL
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_TimeZone", timeZone);
             
-            var result = _reportDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get", props);
+            var result = _reportDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get_V2", props);
             return result.ToList();
         }
         
         public IEnumerable<MpaMarketingBonus> GetMpaMarketingBonus(
-            int siteId,
-            string currencyIds,
+            string multiSiteRequest,
             DateTime startDate,
             DateTime endDate)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyIds", currencyIds);
+            props.Add("_MultiSiteRequest", multiSiteRequest);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
 
-            var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get", props);
+            var result = _reportDbClient.Query<MpaMarketingBonus>("Admin_MarketingBonusSummary_Get_V2", props);
 
             return result;
         }

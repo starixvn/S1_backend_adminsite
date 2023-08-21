@@ -16,9 +16,9 @@ namespace BackendSite.Service.BLL
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
         }
 
-        public async Task<BonusReportResponseWrapper> GetBonusReportV2Async(BonusReportRequestV2 request)
+        public async Task<BonusReportResponseWrapper> GetBonusReportV2Async(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportRequestV2 request)
         {
-            var queryResult = await _bonusReportService.GetBonusReportV2Async(request);
+            var queryResult = await _bonusReportService.GetBonusReportV2Async(multiSiteRequests, request);
 
             if (queryResult == null || !queryResult.Data.Any())
                 return new BonusReportResponseWrapper()
@@ -33,8 +33,10 @@ namespace BackendSite.Service.BLL
                 {
                     CustId = r.CustId,
                     TransId = r.TransId,
+                    CurrencyId = r.CurrencyId,
                     CurrencyName = _selLangBll.GetResourceValue($"Currency_{r.CurrencyId}"),
                     PromotionName = _selLangBll.GetResourceValue($"lbl_PromotionType{r.PromotionType}"),
+                    SiteId = r.SiteId,
                     SiteName = siteList.FirstOrDefault(x => x.SiteId == r.SiteId).SiteName,
                     UserName = r.UserName,
                     CreateTime = r.CreateTime,
@@ -62,10 +64,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<IEnumerable<BonusReportExportExcelResponse>> GetBonusReportExportData(BonusReportExportRequestV2 request)
+        public async Task<IEnumerable<BonusReportExportExcelResponse>> GetBonusReportExportData(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportExportRequestV2 request)
         {
 
-            var queryResult = (await _bonusReportService.GetBonusReportExportData(request)).ToList();
+            var queryResult = (await _bonusReportService.GetBonusReportExportData(multiSiteRequests, request)).ToList();
             if (!queryResult.Any()) return new List<BonusReportExportExcelResponse>();
 
             var siteList = _serverInfoBll.GetSiteList();
@@ -96,7 +98,7 @@ namespace BackendSite.Service.BLL
                 CategoryName = r.CategoryName,
                 AtPage = r.AtPage.ToString()
             });
-            
+
 
 
             return result;

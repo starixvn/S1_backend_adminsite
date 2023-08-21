@@ -17,15 +17,14 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public async Task<BonusReportDtoWrapper> GetBonusReportV2Async(BonusReportRequestV2 request)
+        public async Task<BonusReportDtoWrapper> GetBonusReportV2Async(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportRequestV2 request)
         {
-            SetBonusReportRequest(request, out var siteId, out var promotionTypes, out var promotionCategoryIds,
+            SetBonusReportRequest(multiSiteRequests, request, out var multiSiteRequest, out var promotionTypes, out var promotionCategoryIds,
                 out var statuses, out var atPages, out var pageSize, out var startIndex);
             var p = new DynamicParameters();
-            p.Add("_SiteIds", siteId);
+            p.Add("_MultiSiteRequest", multiSiteRequest);
             p.Add("_BonusCode", request.BonusCode);
             p.Add("_TransId", request.TransId);
-            p.Add("_CurrencyId", request.CurrencyId);
             p.Add("_UserName", request.UserName);
             p.Add("_PromotionTypes", promotionTypes);
             p.Add("_StartDate", request.StartDate.ToUniversalTime().DateTime);
@@ -37,7 +36,7 @@ namespace BackendSite.Service.DAL
 
             #region totalAmountSummary
 
-            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V7", p)).ToList();
+            var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_BonusInfoTotalAmount_Get_V8", p)).ToList();
             if (currencyTotalAmount.Count > 0)
             {
                 currencyTotalAmount.Add(new TotalAmount()
@@ -57,7 +56,7 @@ namespace BackendSite.Service.DAL
 
             var result = new BonusReportDtoWrapper
             {
-                Data = await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfo_Get_V11", p),
+                Data = await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfo_Get_V12", p),
                 TotalPages = p.Get<int?>("_TotalPages") ?? 0,
                 RowCount = p.Get<int?>("_RowCount") ?? 0,
                 TotalAmountSummary = currencyTotalAmount
@@ -66,16 +65,15 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public async Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequestV2 request)
+        public async Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportExportRequestV2 request)
         {
-            SetBonusReportExportRequest(request, out var siteIds, out var promotionTypes,
+            SetBonusReportExportRequest(multiSiteRequests, request, out var multiSiteRequest, out var promotionTypes,
                 out var promotionCategoryIds, out var statuses, out var atPages);
 
             var p = new DynamicParameters();
-            p.Add("_SiteIds", siteIds);
+            p.Add("_MultiSiteRequest", multiSiteRequest);
             p.Add("_BonusCode", request.BonusCode);
             p.Add("_TransId", request.TransId);
-            p.Add("_CurrencyId", request.CurrencyId);
             p.Add("_UserName", request.UserName);
             p.Add("_PromotionTypes", promotionTypes);
             p.Add("_StartDate", request.StartDate.ToUniversalTime().DateTime);
@@ -85,7 +83,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Statuses", statuses);
             p.Add("_AtPages", atPages);
 
-            return await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfoExport_Get_V11", p);
+            return await _reportDbClient.QueryAsync<BonusReportDto>("Admin_BonusInfoExport_Get_V12", p);
         }
 
         public Task<IEnumerable<PromotionCategoryOptionDto>> GetPromotionCategoryOption()
@@ -98,18 +96,23 @@ namespace BackendSite.Service.DAL
         /// <summary>
         /// Set Request 參數
         /// </summary>
+        /// <param name="multiSiteRequests"></param>
         /// <param name="request"></param>
+        /// <param name="multiSiteRequest"></param>
+        /// <param name="promotionTypes"></param>
+        /// <param name="promotionCategoryIds"></param>
         /// <param name="siteIds"></param>
         /// <param name="statuses"></param>
+        /// <param name="atPages"></param>
 
-        private static void SetBonusReportExportRequest(BonusReportExportRequestV2 request, 
-            out string siteIds,
+        private static void SetBonusReportExportRequest(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportExportRequestV2 request,
+            out string multiSiteRequest,
             out string promotionTypes,
             out string promotionCategoryIds,
             out string statuses,
             out string atPages)
         {
-            siteIds = JsonConvert.SerializeObject(new List<int>() { request.SiteId });
+            multiSiteRequest = JsonConvert.SerializeObject(multiSiteRequests);
             promotionTypes = JsonConvert.SerializeObject(request.PromotionTypes.Select(x => (int)x));
             promotionCategoryIds = JsonConvert.SerializeObject(request.PromotionCategoryIds);
             statuses = JsonConvert.SerializeObject(request.Statuses);
@@ -119,13 +122,17 @@ namespace BackendSite.Service.DAL
         /// <summary>
         /// Set Request 參數
         /// </summary>
+        /// <param name="multiSiteRequests"></param>
         /// <param name="request"></param>
-        /// <param name="siteIds"></param>
+        /// <param name="multiSiteRequest"></param>
+        /// <param name="promotionTypes"></param>
+        /// <param name="promotionCategoryIds"></param>
         /// <param name="statuses"></param>
+        /// <param name="atPages"></param>
         /// <param name="pageSize"></param>
         /// <param name="startIndex"></param>
-        private static void SetBonusReportRequest(BonusReportRequestV2 request,
-            out string siteIds,
+        private static void SetBonusReportRequest(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportRequestV2 request,
+            out string multiSiteRequest,
             out string promotionTypes,
             out string promotionCategoryIds,
             out string statuses,
@@ -133,7 +140,7 @@ namespace BackendSite.Service.DAL
             out int pageSize,
             out int startIndex)
         {
-            siteIds = JsonConvert.SerializeObject(new List<int>() { request.SiteId });
+            multiSiteRequest = JsonConvert.SerializeObject(multiSiteRequests);
             promotionTypes = JsonConvert.SerializeObject(request.PromotionTypes.Select(x => (int)x));
             promotionCategoryIds = JsonConvert.SerializeObject(request.PromotionCategoryIds);
             statuses = JsonConvert.SerializeObject(request.Statuses);
