@@ -22,8 +22,9 @@ namespace BackendSite.Service.BLL
         private readonly AdminBLL _adminBll;
         private readonly Tools _tools;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly Library.Common _common;
 
-        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IMarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools, CustInfoBLL custInfoBll, ITagBLL tagBll)
+        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IMarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools, CustInfoBLL custInfoBll, ITagBLL tagBll, Library.Common common)
         {
             _memberService = memberService;
             _deviceService = deviceService;
@@ -36,6 +37,7 @@ namespace BackendSite.Service.BLL
             _siteConfig = siteConfig.Value;
             _custInfoBll = custInfoBll;
             _tagBll = tagBll;
+            _common = common;
         }
 
         public async Task<GetMemberListPageData<MemberList>> GetListAsync(GetTempMemberListRequest request)
@@ -116,7 +118,7 @@ namespace BackendSite.Service.BLL
             // 先全部用UserName排序
             var result = source.OrderBy(i => i.UserName).ToList();
             // 檢查是否有完全符合的UserName
-            var index = result.FindIndex(x => x.UserName == userName);           
+            var index = result.FindIndex(x => x.UserName == userName);
             if (index != -1)
             {
                 var item = result[index];
@@ -254,7 +256,7 @@ namespace BackendSite.Service.BLL
                 UserName = customer.UserName,
                 UserLang = customer.UserLang,
                 AccountName = customer.AccountName,
-                SabaId = customer.SabaId,
+                SabaId = customer.SabaId ?? GenTpUserName(customer.SiteName, customer.CustId, customer.CurrencyId),
                 PhoneVerified = customer.PhoneVerified,
                 EmailVerified = customer.EmailVerified,
                 ActStatus = customer.ActStatus,
@@ -466,5 +468,18 @@ namespace BackendSite.Service.BLL
             return settingResult;
         }
 
+
+        private string GenTpUserName(string siteName, int custId, int currencyId)
+        {
+            // 特殊幣別TpUserName前綴
+            var currencyPrefixCode = "";
+            var currencyPrefix = _memberService.GetCurrencyPrefixAsync(currencyId).Result;
+            if (currencyPrefix != null)
+            {
+                currencyPrefixCode = $"_{currencyPrefix.PrefixCode}";
+            }
+
+            return $"{_common.GetEnv()}{siteName}{currencyPrefixCode}_{custId}";
+        }
     }
 }

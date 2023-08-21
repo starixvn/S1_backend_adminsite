@@ -757,3 +757,9 @@ public class SetTpGameTypeSettingRequest
     public CustTpGameTypeSettingGetType SetDataType { get; set; }
     public IEnumerable<int> TpGameTypes { get; set; }
 }
+
+public class CurrencyPrefix
+{
+    public int CurrencyId { set; get; }
+    public string PrefixCode { set; get; }
+}
