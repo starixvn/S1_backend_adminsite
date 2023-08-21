@@ -55,4 +55,6 @@ public interface IMemberService
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type);
     Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status);
     Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId);
+    Task<CurrencyPrefix> GetCurrencyPrefixAsync(int currencyId);
+
 }

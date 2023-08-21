@@ -573,6 +573,7 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId });
         return await _sqlClienct.QueryAsync<CustTpGameTypeSettingDto>("Admin_CustTpGameTypeSetting_Get", p);
     }
+
     public async Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status)
     {
         var p = new DynamicParameters(new { _CustId = custId, _EnableTurnoverRewardPoint = status });
@@ -582,5 +583,10 @@ public class MemberService : IMemberService
     {
         return await _sqlClienct.QueryFirstAsync<CustomerForRisk>("Admin_CustInfo_Get",
             new { CustId = custId, UserName = userName, SiteId = siteId });
+    }
+
+    public async Task<CurrencyPrefix> GetCurrencyPrefixAsync(int currencyId)
+    {
+        return await _sqlClienct.QueryFirstAsync<CurrencyPrefix>("Service_CurrencyPrefix_ByCurrencyId_Get", new { _CurrencyId = currencyId });
     }
 }
