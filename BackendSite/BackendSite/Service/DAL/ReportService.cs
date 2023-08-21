@@ -12,8 +12,7 @@ namespace BackendSite.Service.DAL
     public class ReportService
     {
         #region Fields
-
-        private readonly IConfiguration _configuration;
+        
         private readonly MySqlClient _reportDbClient;
 
         #endregion
@@ -22,7 +21,6 @@ namespace BackendSite.Service.DAL
 
         public ReportService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
@@ -322,11 +320,7 @@ namespace BackendSite.Service.DAL
             parameters.Add("_StartDate", input.StartDate.UtcDateTime);
             parameters.Add("_EndDate", input.EndDate.UtcDateTime);
             parameters.Add("_TimeZone", input.TimeZone);
-            // parameters.Add("_PageSize", Math.Abs(input.PageSize));
-            // parameters.Add("_StartIndex", (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize));
-            // parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            // parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
+            
             var data = _reportDbClient.Query<ConfiscatedSummaryReportDetail>("Admin_ConfiscatedSummaryReport_Get" ,parameters);
             
             return data;
