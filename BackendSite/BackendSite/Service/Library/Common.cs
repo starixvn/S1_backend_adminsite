@@ -1,7 +1,5 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model.Option;
-using Microsoft.Extensions.Hosting;
-using System;
 using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.Library
