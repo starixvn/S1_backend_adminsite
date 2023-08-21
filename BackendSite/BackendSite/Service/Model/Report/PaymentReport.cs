@@ -20,6 +20,7 @@ public class DepositPaymentReportDetail
     public decimal AverageDepositAmount { get; set; }
     public int FirstDepositCount { get; set; }
     public string AverageProcessingTime { get; set; }
+    public string SiteName { get; set; }
 }
 
 public class DepositPaymentReportSummary : DepositPaymentReportDetail, IPaymentReportSummary<DepositPaymentReportDetail>
@@ -35,6 +36,7 @@ public class WithdrawalPaymentReportDetail
     public decimal TotalWithdrawalAmount { get; set; }
     public decimal AverageWithdrawalAmount { get; set; }
     public string  AverageProcessingTime { get; set; }
+    public string SiteName { get; set; }
 }
 
 public class WithdrawalPaymentReportSummary : WithdrawalPaymentReportDetail, IPaymentReportSummary<WithdrawalPaymentReportDetail>
@@ -128,6 +130,7 @@ public interface IPaymentReportDetail
 
 public class PaymentReportDepositDetail : IPaymentReportDetail
 {
+    public string SiteName { get; set; }
     public CurrencyEnum CurrencyId { get; set; }
     public string TransId { get; set; }
     public int PayId { get; set; }
@@ -142,6 +145,7 @@ public class PaymentReportDepositDetail : IPaymentReportDetail
 public class PaymentReportWithdrawalDetail : IPaymentReportDetail
 {
     public CurrencyEnum CurrencyId { get; set; }
+    public string SiteName { get; set; }
     public string TransId { get; set; }
     public int PayId { get; set; }
     public string PayName { get; set; }
