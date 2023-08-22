@@ -98,12 +98,12 @@ namespace BackendSite.Service.BLL
         
         public bool SetBankInfoSys(SetBankInfoSysModel input, string @operator)
         {
-            const string key = "Admin:BankInfoSysList";
-            
             var before = GetSysBankList().First(x => x.SysId == input.SysId);
             var result = _bankDetailService.SetBankSysInfo(input, before, @operator);
+            _ = _redisHelper.KeyDeleteByPattern("BankInfoSysList", RedisDataBase.Member);
 
-            return result && _redisHelper.KeyDelete(key);
+            return result 
+                   && _redisHelper.KeyDelete("Admin:BankInfoSysList");
         }
         
         public IEnumerable<BankInfoSys> GetSysBankList(int currencyId)
