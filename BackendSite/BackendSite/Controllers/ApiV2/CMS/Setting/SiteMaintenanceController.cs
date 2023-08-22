@@ -1,5 +1,4 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -15,12 +14,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting.SiteMaintenance
     public class SiteMaintenanceController : ControllerBase
     {
         private readonly SiteMaintainBLL _siteMaintainBll;
-        private readonly ILogger<TpMaintainController> _logger;
+        private readonly ILogger<SiteMaintenanceController> _logger;
 
         public SiteMaintenanceController(IServiceProvider provider)
         {
             _siteMaintainBll = provider.GetRequiredService<SiteMaintainBLL>();
-            _logger = provider.GetRequiredService<ILogger<TpMaintainController>>();
+            _logger = provider.GetRequiredService<ILogger<SiteMaintenanceController>>();
         }
 
 

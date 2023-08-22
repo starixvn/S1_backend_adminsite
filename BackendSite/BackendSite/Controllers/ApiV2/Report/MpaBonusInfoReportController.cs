@@ -457,9 +457,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             var summaryBonusCodeTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
             var detailTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
 
-            var summaryTitles = new Dictionary<string, Api.ReportController.TitleModel>();
-            var summaryBonusCodeTitles = new Dictionary<string, Api.ReportController.TitleModel>();
-            var detailTitles = new Dictionary<string, Api.ReportController.TitleModel>();
+            var summaryTitles = new Dictionary<string, TitleModel>();
+            var summaryBonusCodeTitles = new Dictionary<string, TitleModel>();
+            var detailTitles = new Dictionary<string, TitleModel>();
 
             var summaryContent = new List<Dictionary<string, dynamic>>();
             var summaryBonusCodeContent = new List<Dictionary<string, dynamic>>();
@@ -493,30 +493,30 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             #region Title
 
-            summaryTitles.Add("Currency", new Api.ReportController.TitleModel { Name = "Currency", SortId = 2 });
-            summaryTitles.Add("TotalBonusAmountClaimed", new Api.ReportController.TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 1 });
+            summaryTitles.Add("Currency", new TitleModel { Name = "Currency", SortId = 2 });
+            summaryTitles.Add("TotalBonusAmountClaimed", new TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 1 });
             if (request.IsCompared)
             {
-                summaryTitles.Add("CompareTotalBonusAmountClaimed", new Api.ReportController.TitleModel { Name = "  Compare Total Bonus Amount Claimed  ", SortId = 3 });
-                summaryTitles.Add("%Change", new Api.ReportController.TitleModel { Name = "  % Change  ", SortId = 4 });
+                summaryTitles.Add("CompareTotalBonusAmountClaimed", new TitleModel { Name = "  Compare Total Bonus Amount Claimed  ", SortId = 3 });
+                summaryTitles.Add("%Change", new TitleModel { Name = "  % Change  ", SortId = 4 });
             }
 
-            summaryBonusCodeTitles.Add("BonusCode", new Api.ReportController.TitleModel { Name = "  Bonus Code  ", SortId = 1 });
-            summaryBonusCodeTitles.Add("Currency", new Api.ReportController.TitleModel { Name = "  Currency  ", SortId = 2 });
-            summaryBonusCodeTitles.Add("BonusName", new Api.ReportController.TitleModel { Name = "  Bonus Name  ", SortId = 3 });
-            summaryBonusCodeTitles.Add("NoOfUsersClaimingBonus", new Api.ReportController.TitleModel { Name = "  No. of Users Claiming Bonus  ", SortId = 4 });
-            summaryBonusCodeTitles.Add("TotalBonusAmountClaimed_Detail", new Api.ReportController.TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 5 });
-            summaryBonusCodeTitles.Add("TotalBonusAmountClaimed_Base", new Api.ReportController.TitleModel { Name = "  Total Bonus Amount Claimed (Base)  ", SortId = 6 });
+            summaryBonusCodeTitles.Add("BonusCode", new TitleModel { Name = "  Bonus Code  ", SortId = 1 });
+            summaryBonusCodeTitles.Add("Currency", new TitleModel { Name = "  Currency  ", SortId = 2 });
+            summaryBonusCodeTitles.Add("BonusName", new TitleModel { Name = "  Bonus Name  ", SortId = 3 });
+            summaryBonusCodeTitles.Add("NoOfUsersClaimingBonus", new TitleModel { Name = "  No. of Users Claiming Bonus  ", SortId = 4 });
+            summaryBonusCodeTitles.Add("TotalBonusAmountClaimed_Detail", new TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 5 });
+            summaryBonusCodeTitles.Add("TotalBonusAmountClaimed_Base", new TitleModel { Name = "  Total Bonus Amount Claimed (Base)  ", SortId = 6 });
 
-            detailTitles.Add("BonusCode", new Api.ReportController.TitleModel { Name = "Bonus Code  ", SortId = 1 });
-            detailTitles.Add("UserName", new Api.ReportController.TitleModel { Name = "  UserName  ", SortId = 2 });
-            detailTitles.Add("Currency", new Api.ReportController.TitleModel { Name = "  Currency  ", SortId = 3 });
-            detailTitles.Add("RegisteredDate", new Api.ReportController.TitleModel { Name = "  Registered Date  ", SortId = 4 });
-            detailTitles.Add("SignupUrl", new Api.ReportController.TitleModel { Name = "  Signup Url  ", SortId = 5 });
-            detailTitles.Add("AffCode", new Api.ReportController.TitleModel { Name = "  AFF Code  ", SortId = 6 });
-            detailTitles.Add("TotalDepositAmount", new Api.ReportController.TitleModel { Name = "  Total Deposit Amount  ", SortId = 7 });
-            detailTitles.Add("TotalWithdrawalAmount", new Api.ReportController.TitleModel { Name = "  Total Withdrawal Amount  ", SortId = 8 });
-            detailTitles.Add("TotalBonusAmountClaimed", new Api.ReportController.TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 9 });
+            detailTitles.Add("BonusCode", new TitleModel { Name = "Bonus Code  ", SortId = 1 });
+            detailTitles.Add("UserName", new TitleModel { Name = "  UserName  ", SortId = 2 });
+            detailTitles.Add("Currency", new TitleModel { Name = "  Currency  ", SortId = 3 });
+            detailTitles.Add("RegisteredDate", new TitleModel { Name = "  Registered Date  ", SortId = 4 });
+            detailTitles.Add("SignupUrl", new TitleModel { Name = "  Signup Url  ", SortId = 5 });
+            detailTitles.Add("AffCode", new TitleModel { Name = "  AFF Code  ", SortId = 6 });
+            detailTitles.Add("TotalDepositAmount", new TitleModel { Name = "  Total Deposit Amount  ", SortId = 7 });
+            detailTitles.Add("TotalWithdrawalAmount", new TitleModel { Name = "  Total Withdrawal Amount  ", SortId = 8 });
+            detailTitles.Add("TotalBonusAmountClaimed", new TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 9 });
 
             #endregion
 

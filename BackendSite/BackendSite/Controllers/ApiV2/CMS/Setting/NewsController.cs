@@ -1,5 +1,4 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -19,7 +18,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         private readonly NewsBLL _newsBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly AuthorizeBLL _authorizeBll;
-        private readonly ILogger<BonusManageController> _logger;
+        private readonly ILogger<NewsController> _logger;
 
         #endregion
 
@@ -30,7 +29,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             _newsBll = provider.GetRequiredService<NewsBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            _logger = provider.GetRequiredService<ILogger<NewsController>>();
         }
 
         #endregion

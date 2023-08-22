@@ -1,7 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Attributes;
-using BackendSite.Controllers.Api;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
@@ -24,7 +23,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         #region Fields
 
-        private readonly ILogger<WithdrawalBankAccountingController> _logger;
+        private readonly ILogger<WithdrawalAccountingController> _logger;
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly AuthorizeBLL _authorizeBll;
         private readonly ExcelBLL _excelBll;
@@ -42,7 +41,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             _withdrawalBll = provider.GetRequiredService<WithdrawalBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _logger = provider.GetRequiredService<ILogger<WithdrawalBankAccountingController>>();
+            _logger = provider.GetRequiredService<ILogger<WithdrawalAccountingController>>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
 

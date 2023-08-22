@@ -1,5 +1,4 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -20,7 +19,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         private readonly RiskBLL _riskBll;
         private readonly GameCasinoBLL _gameCasinoBll;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly ILogger<RiskController> _logger;
+        private readonly ILogger<TpDisableController> _logger;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
@@ -33,7 +32,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             _riskBll = provider.GetRequiredService<RiskBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _logger = provider.GetRequiredService<ILogger<RiskController>>();
+            _logger = provider.GetRequiredService<ILogger<TpDisableController>>();
             _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }

@@ -23,21 +23,23 @@
   
   <ItemGroup>
     <Compile Remove="Controllers\ApiV2\Report\OtherReport\**" />
+    <Compile Remove="wwwroot\**" />
     <Content Remove="Controllers\ApiV2\Report\OtherReport\**" />
+    <Content Remove="wwwroot\**" />
     <EmbeddedResource Remove="Controllers\ApiV2\Report\OtherReport\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
     <None Remove="Controllers\ApiV2\Report\OtherReport\**" />
+    <None Remove="wwwroot\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Controllers\ApiV2\Marketing\Setting\VerificationRewardController.cs" />
-    <Compile Remove="Controllers\Api\PendingFund.cs" />
     <Compile Remove="Service\Model\Payment.cs" />
     <Compile Remove="Views\Message\Index.cshtml.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Remove="Views\Message\Index.cshtml" />
-    <Content Remove="wwwroot\js\component\CSD\VipUpgrade.min.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,42 +50,6 @@
     <Content Include="CookieKeys\key-65b62d1a-3dd2-4487-bb78-3482ab6c080c.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\css\fonts\fonts\icomoon.svg" />
-    <None Include="wwwroot\css\fonts\icomoon.svg" />
-    <None Include="wwwroot\css\main.css.map" />
-    <None Include="wwwroot\js\site.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar-setup.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar-setup_stripped.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar_stripped.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\doc\reference.pdf" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-br.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ca.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-cs-win.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-da.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-du.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-el.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-en.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-es.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-fr.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hr-utf8.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hr.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hu.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-it.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-nl.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-no.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-pl.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-pt.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ro.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ru.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-sp.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-sw.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-tr.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-zh.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\README" />
   </ItemGroup>
 
   <ItemGroup>
@@ -117,28 +83,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\js\component\CustManage\CustInfo.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\component\CustManage\CustInfoList.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\component\Deposit\DepositList.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\component\Finance\PaymentAdjustment.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\component\Payment\BankInfoList.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Controllers\ApiV2\Admin\Permission\" />
     <Folder Include="Controllers\ApiV2\Admin\Setting\" />
     <Folder Include="Controllers\ApiV2\Finance\DepositSetting\" />
     <Folder Include="Controllers\ApiV2\Marketing\Setting\" />
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

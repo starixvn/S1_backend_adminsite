@@ -1,5 +1,4 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Controllers.Api;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
@@ -26,7 +25,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         private readonly CustInfoBLL _custInfoBll;
         private readonly Common _common;
         private readonly ExcelBLL _excelBll;
-        private readonly ILogger<BonusManageController> _logger;
+        private readonly ILogger<BonusController> _logger;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
 
         #endregion
@@ -40,7 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _common = provider.GetRequiredService<Common>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
-            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            _logger = provider.GetRequiredService<ILogger<BonusController>>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
