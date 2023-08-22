@@ -95,14 +95,12 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public IEnumerable<CustVerificationReward> GetCustVerificationRewardV2(int siteId, IEnumerable<int> currencyIds, int custId,
+        public IEnumerable<CustVerificationReward> GetCustVerificationRewardV2(string multiSiteRequest,
             DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
             out int rowCount)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId);
-            p.Add("_CurrencyIds", currencyIds == null || !currencyIds.Any() ? null : JsonConvert.SerializeObject(currencyIds), DbType.String);
-            p.Add("_CustId", custId);
+            p.Add("_MultiSiteAndCuurency", multiSiteRequest);
             p.Add("_StartDate", startDate.DateTime);
             p.Add("_EndDate", endDate.DateTime);
             p.Add("_PageSize", Math.Abs(pageSize));
@@ -110,22 +108,20 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<CustVerificationReward>("Admin_CustVerificationReward_Get_V2", p);
+            var result = _reportDbClient.Query<CustVerificationReward>("Admin_CustVerificationReward_Get_V3", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
         }
         
-        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExportV2(int siteId, IEnumerable<int> currencyIds, int custId, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExportV2(string multiSiteRequest, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId);
-            p.Add("_CurrencyIds", currencyIds == null || !currencyIds.Any() ? null : JsonConvert.SerializeObject(currencyIds), DbType.String);
-            p.Add("_CustId", custId);
+            p.Add("_MultiSiteAndCuurency", multiSiteRequest);
             p.Add("_StartDate", startDate.DateTime);
             p.Add("_EndDate", endDate.DateTime);
 
-            var result = await _reportDbClient.QueryAsync<CustVerificationReward>("Admin_CustVerificationRewardExport_Get_V2", p);
+            var result = await _reportDbClient.QueryAsync<CustVerificationReward>("Admin_CustVerificationRewardExport_Get_V3", p);
             return result;
         }
     }
