@@ -584,9 +584,4 @@ public class MemberService : IMemberService
         return await _sqlClienct.QueryFirstAsync<CustomerForRisk>("Admin_CustInfo_Get",
             new { CustId = custId, UserName = userName, SiteId = siteId });
     }
-
-    public async Task<CurrencyPrefix> GetCurrencyPrefixAsync(int currencyId)
-    {
-        return await _sqlClienct.QueryFirstAsync<CurrencyPrefix>("Service_CurrencyPrefix_ByCurrencyId_Get", new { _CurrencyId = currencyId });
-    }
 }

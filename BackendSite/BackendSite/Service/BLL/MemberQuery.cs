@@ -256,7 +256,7 @@ namespace BackendSite.Service.BLL
                 UserName = customer.UserName,
                 UserLang = customer.UserLang,
                 AccountName = customer.AccountName,
-                SabaId = customer.SabaId ?? GenTpUserName(customer.SiteName, customer.CustId, customer.CurrencyId),
+                SabaId = customer.SabaId,
                 PhoneVerified = customer.PhoneVerified,
                 EmailVerified = customer.EmailVerified,
                 ActStatus = customer.ActStatus,
@@ -466,20 +466,6 @@ namespace BackendSite.Service.BLL
                 }
             }
             return settingResult;
-        }
-
-
-        private string GenTpUserName(string siteName, int custId, int currencyId)
-        {
-            // 特殊幣別TpUserName前綴
-            var currencyPrefixCode = "";
-            var currencyPrefix = _memberService.GetCurrencyPrefixAsync(currencyId).Result;
-            if (currencyPrefix != null)
-            {
-                currencyPrefixCode = $"_{currencyPrefix.PrefixCode}";
-            }
-
-            return $"{_common.GetEnv()}{siteName}{currencyPrefixCode}_{custId}";
         }
     }
 }
