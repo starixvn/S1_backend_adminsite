@@ -752,9 +752,3 @@ public class ResetOtpTimesRequest
     public int CustId { get; set; }
 }
 
-public class CurrencyPrefix
-{
-    public int CurrencyId { set; get; }
-    public string PrefixCode { set; get; }
-}
-

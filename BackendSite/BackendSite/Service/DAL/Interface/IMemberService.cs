@@ -53,5 +53,4 @@ public interface IMemberService
         string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl);
     Task<IEnumerable<CustTpGameTypeSettingDto>> GetCustTpGameTypeSettingAsync(int custId);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type);
-    Task<CurrencyPrefix> GetCurrencyPrefixAsync(int currencyId);
 }
