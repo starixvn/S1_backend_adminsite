@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -144,11 +145,12 @@ namespace BackendSite.Service.BLL
             return listRewardModels;
         }
         
-        public IEnumerable<CustVerificationRewardModel> GetVerificationRewardReportV2(int siteId, IEnumerable<int> currencyIds, int custId,
+        public IEnumerable<CustVerificationRewardModel> GetVerificationRewardReportV2(IEnumerable<MultiSiteRequestDto> multiSiteRequest,
             DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
             out int rowCount)
         {
-            var custVerificationReward =  _verificationRewardService.GetCustVerificationRewardV2(siteId, currencyIds, custId, 
+
+            var custVerificationReward =  _verificationRewardService.GetCustVerificationRewardV2(JsonConvert.SerializeObject(multiSiteRequest),
                 startDate, endDate, pageSize, pageNumber, out totalPages, out rowCount);
 
             return custVerificationReward.Select(data => new CustVerificationRewardModel
@@ -171,9 +173,9 @@ namespace BackendSite.Service.BLL
                 });
         }
         
-        public async Task<IEnumerable<ExportVerificationRewardModel>> GetVerificationRewardWithoutPageV2(int siteId, IEnumerable<int> currencyIds, int custId, DateTimeOffset startDate, DateTimeOffset endDate, int timezone = 8)
+        public async Task<IEnumerable<ExportVerificationRewardModel>> GetVerificationRewardWithoutPageV2(IEnumerable<MultiSiteRequestDto> multiSiteRequest, DateTimeOffset startDate, DateTimeOffset endDate, int timezone = 8)
         {
-            var custVerificationReward = await _verificationRewardService.GetCustVerificationRewardExportV2(siteId, currencyIds, custId, startDate, endDate);
+            var custVerificationReward = await _verificationRewardService.GetCustVerificationRewardExportV2(JsonConvert.SerializeObject(multiSiteRequest), startDate, endDate);
             var listRewardModels = new List<ExportVerificationRewardModel>();
             foreach (var data in custVerificationReward)
             {
