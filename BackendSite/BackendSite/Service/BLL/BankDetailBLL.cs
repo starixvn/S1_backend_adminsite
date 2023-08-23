@@ -100,7 +100,7 @@ namespace BackendSite.Service.BLL
         {
             var before = GetSysBankList().First(x => x.SysId == input.SysId);
             var result = _bankDetailService.SetBankSysInfo(input, before, @operator);
-            _ = _redisHelper.KeyDeleteByPattern("BankInfoSysList", RedisDataBase.Member);
+            _ = _redisHelper.KeyDeleteByPattern("BankInfoSysList:*", RedisDataBase.Member);
 
             return result 
                    && _redisHelper.KeyDelete("Admin:BankInfoSysList");
