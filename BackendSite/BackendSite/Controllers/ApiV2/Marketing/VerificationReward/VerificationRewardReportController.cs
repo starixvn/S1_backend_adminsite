@@ -96,16 +96,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<ApiListResult<CustVerificationRewardModel>> Get(GetRequest request)
         {
-            //var siteId = _authorizeBll.CheckBrand();
-            //var custId = await GetCustId(request.UserName, request.SabaId, siteId);
-            //if (custId == null)
-            //{
-            //    return new ApiListResult<CustVerificationRewardModel>
-            //    {
-            //        Data = Array.Empty<CustVerificationRewardModel>(),
-            //        ErrorCode = (int)ErrorCodeEnum.Success
-            //    };
-            //}
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
 
@@ -140,17 +130,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<IActionResult> Export(ExportRequest request)
         {
-            //var siteId = _authorizeBll.CheckBrand();
-            //var custId = await GetCustId(request.UserName, request.SabaId, siteId);
-
-            //var exportData = custId == null
-            //    ? Array.Empty<ExportVerificationRewardModel>()
-            //    : await _verificationRewardBll.GetVerificationRewardWithoutPageV2(siteId,
-            //        request.CurrencyIds,
-            //        custId.Value,
-            //        request.StartDate,
-            //        request.EndDate);
-
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
 
