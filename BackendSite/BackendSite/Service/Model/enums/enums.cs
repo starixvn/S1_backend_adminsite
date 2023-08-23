@@ -1960,9 +1960,9 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum MethodTypeIDEnum
     {
-        MainWallet = 1,
-        MainWalletBatch = 2,
-        ThirdWallet = 3
+        MainWallet = 5,
+        MainWalletBatch = 10,
+        ThirdWallet = 60
     }
 
     /// <summary>
