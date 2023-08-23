@@ -632,9 +632,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BonusPlus),
                 (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BonusMinus),
             };
+            List<(MethodTypeIDEnum methodTypeID, BalanceAdjustmentTypeIDEnum balanceAdjustmentTypeID)> ThirdWallet_AddMiuns = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
+            {
+                (MethodTypeIDEnum.ThirdWallet,BalanceAdjustmentTypeIDEnum.Add),
+                (MethodTypeIDEnum.ThirdWallet,BalanceAdjustmentTypeIDEnum.Minus),
+            };
 
             bool isBalance = MainAndBatch_Balance.Any(item => item.methodTypeID == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeID == adjustmentType.AdjustmentTypeID);
             bool isBouns = MainAndBatch_bonus.Any(item => item.methodTypeID == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeID == adjustmentType.AdjustmentTypeID);
+            bool isThird = ThirdWallet_AddMiuns.Any(item => item.methodTypeID == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeID == adjustmentType.AdjustmentTypeID);
             #endregion
             string funckey;
             if (isBalance)
@@ -644,11 +650,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             else if (isBouns)
             {
                 funckey = "FunKey/MainWalletBatch";
-            }else
+            }
+            else if (isThird)
             {
                 funckey = "FunKey/3RDWallet";
             }
-           var result = _bankFinancialBll.GetReason(funckey);
+            else
+            {
+                funckey = "";
+            }
+
+            var result = _bankFinancialBll.GetReason(funckey);
             var data =
                 result.Select(x => new SelectListItem(x.ReasonId, x.Description));
             var apiResult =
