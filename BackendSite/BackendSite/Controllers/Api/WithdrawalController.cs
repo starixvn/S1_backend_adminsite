@@ -269,95 +269,98 @@ namespace BackendSite.Controllers.Api
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.Process)
             {
                 var withdrawalInfo =
-                    Newtonsoft.Json.JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalReq.WithdrawalInfo);
-                if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.OnlinePayment)
+                    JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalReq.WithdrawalInfo);
+                
+                withdrawalInfo.ChannelId = withdrawalReq.ChannelId;
+                switch (withdrawalReq.WithdrawalType)
                 {
-                    withdrawalInfo.PayId = withdrawalReq.SelId;
-                }
-                else if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.LocalBank)
-                {
-                    var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
-                    var bankInfoOff = bankDetailBLL
-                        .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
-                        .FirstOrDefault(x => x.BankId == withdrawalReq.SelId);
-
-                    if (bankInfoOff != null)
+                    case (int)WithdrawalTypeEnum.OnlineBanking:
+                    case (int)WithdrawalTypeEnum.EWalletPayment:
+                    case (int)WithdrawalTypeEnum.CryptoPay:
+                        withdrawalInfo.PayId = withdrawalReq.SelId;
+                        
+                        break;
+                    
+                    case (int)WithdrawalTypeEnum.LocalBank:
                     {
-                        withdrawalInfo.PayId = null;
-                        withdrawalInfo.FromAccountNo = bankInfoOff.AccountNo;
-                        withdrawalInfo.FromAccountName = bankInfoOff.AccountName;
-                        withdrawalInfo.FromSysId = bankInfoOff.SysId;
-                        withdrawalInfo.BankId = bankInfoOff.BankId;
+                        var withdrawalRequest = withdrawalBLL.GetWithdrawalRequest(withdrawalReq.TransId);
+                        var bankInfoOff = bankDetailBLL
+                            .GetOfflineBankAccount(withdrawalRequest.SiteId, withdrawalRequest.CurrencyId)
+                            .FirstOrDefault(x => x.BankId == withdrawalReq.SelId);
+
+                        if (bankInfoOff != null)
+                        {
+                            withdrawalInfo.PayId = null;
+                            withdrawalInfo.FromAccountNo = bankInfoOff.AccountNo;
+                            withdrawalInfo.FromAccountName = bankInfoOff.AccountName;
+                            withdrawalInfo.FromSysId = bankInfoOff.SysId;
+                            withdrawalInfo.BankId = bankInfoOff.BankId;
+                        }
+                        
+                        break;
+                    }
+                    
+                    case null:
+                    case (int)WithdrawalTypeEnum.Undefined:
+                        apiResult.ErrorCode = 1101;
+                        apiResult.Message = "Select 1 Type of Withdrawal Please.";
+                        return apiResult;
+                }
+
+                var custId = 0;
+                var amount = 0m;
+                withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalProcess(withdrawalReq.TransId,
+                    withdrawalReq.Comment, User.Identity.Name,authData.UserId,
+                    Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType,
+                    null,out custId, out amount);
+
+                if (withdrawConfirmReuslt > 0 &&
+                    (withdrawalReq.WithdrawalType is ((int)WithdrawalTypeEnum.OnlineBanking 
+                        or (int)WithdrawalTypeEnum.EWalletPayment 
+                        or (int)WithdrawalTypeEnum.CryptoPay)))
+                {
+                    var reqWithdrawalOnline = new ReqWithdrawalOnline
+                    {
+                        SysId = withdrawalInfo.SysId,
+                        TransId = withdrawalReq.TransId,
+                        CustId = custId,
+                        Amount = amount,
+                        PayId = withdrawalInfo.PayId ?? 0,
+                        ChannelId = withdrawalInfo.ChannelId ?? 0,
+                        AccountName = withdrawalInfo.AccountName,
+                        AccountNo = withdrawalInfo.AccountNo,
+                        IFSCCode = withdrawalInfo.IFSCCode,
+                        EWalletSysId = withdrawalInfo.EWalletSysId
+                        //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
+                    };
+
+
+                    var myUrl = "";
+                    if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)
+                        myUrl = $"{payApiUrl}CryptoWithdrawal";
+                    else if (withdrawalInfo.EWalletSysId != null)
+                        myUrl = $"{payApiUrl}EWalletWithdrawal";
+                    else
+                        myUrl = $"{payApiUrl}Withdrawal";
+
+                    var apiOnlineResult =
+                        await courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
+                    if (apiOnlineResult == null)
+                    {
+                        withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalVerify(withdrawalReq.TransId,
+                            apiResult.Message, User.Identity.Name);
+                        apiResult.ErrorCode = 1101;
+                        apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
+                        return apiResult;
+                    }
+                    else if (apiOnlineResult.ErrorCode != 0)
+                    {
+                        withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalVerify(withdrawalReq.TransId,
+                            apiOnlineResult.Message, User.Identity.Name);
+                        return apiOnlineResult;
                     }
                 }
-                else if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)
-                {
-                    withdrawalInfo.PayId = withdrawalReq.SelId;
-                    withdrawalInfo.ChannelId = withdrawalReq.ChannelId;
-                }
-
-                if (withdrawalReq.WithdrawalType == null ||
-                    withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.Undefined)
-                {
-                    apiResult.ErrorCode = 1101;
-                    apiResult.Message = "Select 1 Type of Withdrawal Please.";
-                    return apiResult;
-                }
-                else
-                {
-                    var custId = 0;
-                    var amount = 0m;
-                    withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalProcess(withdrawalReq.TransId,
-                        withdrawalReq.Comment, User.Identity.Name,authData.UserId,
-                        Newtonsoft.Json.JsonConvert.SerializeObject(withdrawalInfo), withdrawalReq.WithdrawalType,
-                        null,out custId, out amount);
-
-                    if (withdrawConfirmReuslt > 0 &&
-                        ((withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.OnlinePayment) ||
-                         (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)))
-                    {
-                        var reqWithdrawalOnline = new ReqWithdrawalOnline
-                        {
-                            SysId = withdrawalInfo.SysId,
-                            TransId = withdrawalReq.TransId,
-                            CustId = custId,
-                            Amount = amount,
-                            PayId = withdrawalInfo.PayId ?? 0,
-                            ChannelId = withdrawalInfo.ChannelId ?? 0,
-                            AccountName = withdrawalInfo.AccountName,
-                            AccountNo = withdrawalInfo.AccountNo,
-                            IFSCCode = withdrawalInfo.IFSCCode,
-                            EWalletSysId = withdrawalInfo.EWalletSysId
-                            //ReturnUrl = Url.RouteUrl("desktop", new { action = "Deposit", controller = "Cashier", authData.LangId }, protocol: Request.Scheme, host: Request.Host.Port == 80 ? Request.Host.Host : $"{Request.Host.Host}:{Request.Host.Port}")
-                        };
-
-
-                        var myUrl = "";
-                        if (withdrawalReq.WithdrawalType == (int)WithdrawalTypeEnum.CryptoPay)
-                            myUrl = $"{payApiUrl}CryptoWithdrawal";
-                        else if (withdrawalInfo.EWalletSysId != null)
-                            myUrl = $"{payApiUrl}EWalletWithdrawal";
-                        else
-                            myUrl = $"{payApiUrl}Withdrawal";
-
-                        var apiOnlineResult =
-                            await courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
-                        if (apiOnlineResult == null)
-                        {
-                            withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalVerify(withdrawalReq.TransId,
-                                apiResult.Message, User.Identity.Name);
-                            apiResult.ErrorCode = 1101;
-                            apiResult.Message = selLangBLL.GetMsg("msg_UpdateFailed");
-                            return apiResult;
-                        }
-                        else if (apiOnlineResult.ErrorCode != 0)
-                        {
-                            withdrawConfirmReuslt = _withdrawalStateTransferBll.WithdrawalVerify(withdrawalReq.TransId,
-                                apiOnlineResult.Message, User.Identity.Name);
-                            return apiOnlineResult;
-                        }
-                    }
-                }
+                
             }
             else if (withdrawalReq.Action == (int)WithdrawalStatusEnum.OnHold)
             {
@@ -441,11 +444,6 @@ namespace BackendSite.Controllers.Api
                 Data = result,
                 ErrorCode = 0
             };
-        }
-        
-        public class WithdrawalEWalletReq
-        {
-            public int CurrencyId { get; set; }
         }
         
         [HttpPost]

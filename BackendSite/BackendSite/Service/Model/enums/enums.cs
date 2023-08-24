@@ -415,8 +415,9 @@ namespace BackendSite.Service.Model.enums
     public enum WithdrawalTypeEnum
     {
         Undefined = 0,
-        OnlinePayment = 1,
+        OnlineBanking = 1,
         LocalBank = 2,
+        EWalletPayment = 3,
         CryptoPay = 4,
         CryptoWallet = 5 // Local
     }

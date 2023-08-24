@@ -879,7 +879,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 usableActionButton.Remove(DepositActionEnum.ManualApproved);
             }
-            else if (depositRequest.DepositType is not DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
+            else if (depositRequest.DepositType is not (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet))
             {
                 usableActionButton.Remove(DepositActionEnum.Approved);
             }

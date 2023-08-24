@@ -57,7 +57,7 @@ namespace BackendSite.Service.BLL
 
                     if (bankInfo != null)
                     {
-                        return new AutoWithdrawalPaymentGateWayDto(bankInfo.PayId, bankInfo.ChannelId, bankInfo.PayName, WithdrawalTypeEnum.OnlinePayment);
+                        return new AutoWithdrawalPaymentGateWayDto(bankInfo.PayId, bankInfo.ChannelId, bankInfo.PayName, WithdrawalTypeEnum.OnlineBanking);
                     }
 
                     break;
@@ -93,7 +93,7 @@ namespace BackendSite.Service.BLL
                     var eWalletInfo = eWalletOnline.FirstOrDefault();
                     if (eWalletInfo != null)
                     {
-                        return new AutoWithdrawalPaymentGateWayDto(eWalletInfo.PayId, eWalletInfo.ChannelId, eWalletInfo.PayName, WithdrawalTypeEnum.OnlinePayment);
+                        return new AutoWithdrawalPaymentGateWayDto(eWalletInfo.PayId, eWalletInfo.ChannelId, eWalletInfo.PayName, WithdrawalTypeEnum.EWalletPayment);
                     }
 
                     break;
