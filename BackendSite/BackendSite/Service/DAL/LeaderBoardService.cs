@@ -17,15 +17,14 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<LeaderboardReportModel> GetLeaderboardReport(int siteId, int currencyId, int categoryId, DateTime startDate, DateTime endDate)
+        public IEnumerable<LeaderboardReportModel> GetLeaderboardReport(string MultiSiteAndCurrencyIds, int categoryId, DateTime startDate, DateTime endDate)
         {
             var props = new DynamicParameters();
-            props.Add("_SiteId", siteId);
-            props.Add("_CurrencyId", currencyId);
+            props.Add("_MultiSiteAndCurrencyIds", MultiSiteAndCurrencyIds);
             props.Add("_CategoryId", categoryId);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V2", props);
+            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V3", props);
             
             return result;
         }

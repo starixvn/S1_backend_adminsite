@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.Report;
 using Newtonsoft.Json;
 using NPOI.SS.Formula.Functions;
@@ -9,17 +10,21 @@ namespace BackendSite.Service.BLL
     public class LeaderBoardBLL
     {
         private readonly LeaderBoardService _leaderBoardService;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         public LeaderBoardBLL(IServiceProvider provider)
         {
             _leaderBoardService = provider.GetRequiredService<LeaderBoardService>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         public IEnumerable<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+
             var data = _leaderBoardService.GetLeaderboardReport(
-                request.SiteId,
-                request.CurrencyId,
+                JsonConvert.SerializeObject(multiSiteRequest),
                 request.CategoryId,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime );
@@ -29,9 +34,10 @@ namespace BackendSite.Service.BLL
                 .Select( (r, index) => new GetLeaderboardReportResponse
                 {
                     Ranking = $"TOP {index + 1}",
-                    SiteId = request.SiteId,
+                    SiteId = (int)(r.FirstOrDefault()?.SiteId),
+                    SiteName = r.FirstOrDefault()?.SiteName,
                     UserName = r.FirstOrDefault()?.UserName,
-                    CurrencyId = request.CurrencyId,
+                    CurrencyId = (int)(r.FirstOrDefault()?.CurrencyId),
                     IsoCode = r.FirstOrDefault()?.IsoCode,
                     CustId = r.Key,
                     TurnOver = r.Sum(i => i.TurnOver),
