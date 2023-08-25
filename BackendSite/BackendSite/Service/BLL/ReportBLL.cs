@@ -12,7 +12,7 @@ using BackendSite.Service.Model.Report;
 using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.BLL
 {
@@ -1025,7 +1025,9 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<DepositPaymentReportSummary>> GetDepositPaymentReportAsync(
             GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
         {
-            var detailList = reportService.GetPaymentReportDepositDetail(input)
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)input).ConvertToMultiSiteParam(userServerInfo);
+            var detailList = reportService.GetPaymentReportDepositDetail(input, JsonConvert.SerializeObject(multiSiteRequest))
                 .ToList();
 
             if (groupBy is PaymentReportGroupByEnum.Date or PaymentReportGroupByEnum.Month)
