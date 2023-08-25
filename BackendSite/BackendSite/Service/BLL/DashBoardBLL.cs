@@ -1,6 +1,8 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
-using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
