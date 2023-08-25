@@ -20,31 +20,6 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>disable</Nullable>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <Compile Remove="Controllers\ApiV2\Admin\Setting\**" />
-    <Compile Remove="Controllers\ApiV2\Report\OtherReport\**" />
-    <Compile Remove="wwwroot\**" />
-    <Content Remove="Controllers\ApiV2\Admin\Setting\**" />
-    <Content Remove="Controllers\ApiV2\Report\OtherReport\**" />
-    <Content Remove="wwwroot\**" />
-    <EmbeddedResource Remove="Controllers\ApiV2\Admin\Setting\**" />
-    <EmbeddedResource Remove="Controllers\ApiV2\Report\OtherReport\**" />
-    <EmbeddedResource Remove="wwwroot\**" />
-    <None Remove="Controllers\ApiV2\Admin\Setting\**" />
-    <None Remove="Controllers\ApiV2\Report\OtherReport\**" />
-    <None Remove="wwwroot\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Controllers\ApiV2\Marketing\Setting\VerificationRewardController.cs" />
-    <Compile Remove="Service\Model\Payment.cs" />
-    <Compile Remove="Views\Message\Index.cshtml.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Views\Message\Index.cshtml" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Remove="CookieKeys\key-65b62d1a-3dd2-4487-bb78-3482ab6c080c.xml" />
@@ -87,6 +62,6 @@
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

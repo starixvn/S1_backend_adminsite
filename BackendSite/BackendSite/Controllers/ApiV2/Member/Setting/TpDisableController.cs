@@ -243,28 +243,5 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
-
-        /// <summary>
-        /// TpDisable/Delete 刪除會員第三方被禁止的資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > Disable User For Game > [Submit] >Click [Delete]
-        /// </remarks>
-        /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
-        [HttpPost]
-        public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteDisableUser> req)
-        {
-            var result = await _riskBll.DeleteTpDisableUser(
-                new ParamsWithLog<DeleteDisableUser>(req, User.Identity.Name));
-            return new ApiResult
-            {
-                ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
-            };
-
-        }
-
     }
 }
