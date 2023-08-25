@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using System.Reflection;
+﻿using System.Reflection;
+
 using BackendSite.Attributes;
 using BackendSite.Service.Model;
+
+using Microsoft.AspNetCore.Mvc;
+
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace BackendSite.Service.BLL
 {
@@ -33,7 +36,7 @@ namespace BackendSite.Service.BLL
             return _excelContentType.Exists(a => a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
         }
 
-        public List<ExcelData> Read(IFormFile formFile) 
+        public List<ExcelData> Read(IFormFile formFile)
         {
             var excelList = new List<ExcelData>();
             var excelPkg = new ExcelPackage(formFile.OpenReadStream());
@@ -186,7 +189,7 @@ namespace BackendSite.Service.BLL
             return ms.ToArray();
         }
 
-        public virtual byte[] ExportV2<T>(IEnumerable<T> t, int ignoreColumnCount ,IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        public virtual byte[] ExportV2<T>(IEnumerable<T> t, int ignoreColumnCount, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var ms = new MemoryStream();
@@ -250,7 +253,7 @@ namespace BackendSite.Service.BLL
             return ms.ToArray();
         }
 
-        public byte[] ExportV2<T>(Dictionary<string,IEnumerable<T>> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        public byte[] ExportV2<T>(Dictionary<string, IEnumerable<T>> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -354,8 +357,8 @@ namespace BackendSite.Service.BLL
                 FileDownloadName = $"{fileName}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx"
             };
         }
-        
-        public FileContentResult ExcelFileDateRange(byte[] data, DateTime from , DateTime to ,string fileName)
+
+        public FileContentResult ExcelFileDateRange(byte[] data, DateTime from, DateTime to, string fileName)
         {
             return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {

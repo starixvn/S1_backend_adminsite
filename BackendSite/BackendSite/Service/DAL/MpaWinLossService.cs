@@ -1,13 +1,15 @@
 ﻿using System.Data;
+
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+
 using Dapper;
 
 namespace BackendSite.Service.DAL
 {
-    public class MpaWinLossService: IMpaWinLossService
+    public class MpaWinLossService : IMpaWinLossService
     {
         private readonly MySqlClient _reportDbClient;
         private readonly ILogger<MpaWinLossService> _logger;
@@ -31,7 +33,7 @@ namespace BackendSite.Service.DAL
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
 
             var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V3", p);
-            
+
             return data;
         }
 
@@ -81,7 +83,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<Commission9WDto>("Admin_9WCommission_Get", p);
         }
 
-        public  Task<IEnumerable<TpCategoryDto>> GetTpCategory()
+        public Task<IEnumerable<TpCategoryDto>> GetTpCategory()
         {
             return _reportDbClient.QueryAsync<TpCategoryDto>("Admin_TPCategory_Get");
         }
@@ -96,7 +98,7 @@ namespace BackendSite.Service.DAL
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
 
             var data = _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get_V3", p);
-            
+
             return data;
         }
     }

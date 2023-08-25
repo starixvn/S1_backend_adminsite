@@ -1,12 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
@@ -49,7 +52,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
-        
+
         public class GetDetailRequest
         {
             public int CustId { get; set; }
@@ -116,7 +119,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
 
             #region Get Data
-            
+
             var exportData = _reportBll.GetCustomerStatisticalReport(
                 request.CurrencyIds,
                 JsonConvert.SerializeObject(request.SiteIds),
@@ -635,8 +638,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
         public ApiResult GetDetail(GetDetailRequest request)
         {
-            var data = _reportBll.GetCustomerDetail(request.CustId, request.GameId, request.Date ,_common.TransferToTimeZoneFormat(request.TimeZone));
-            
+            var data = _reportBll.GetCustomerDetail(request.CustId, request.GameId, request.Date, _common.TransferToTimeZoneFormat(request.TimeZone));
+
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);

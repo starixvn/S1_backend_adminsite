@@ -4,6 +4,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -13,7 +14,7 @@ namespace BackendSite.Service.BLL
         private readonly IReferralManagementBLL _referralManagementBll;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<ReferralManagementDecorator> _logger;
-        
+
         private readonly Dictionary<int, string> _statusDescription = new Dictionary<int, string>()
         {
             { 0, "Disable" },
@@ -49,7 +50,7 @@ namespace BackendSite.Service.BLL
         public async Task<int> SetReferralAsync(SetReferralRequest setReferral)
         {
             var referral = await _referralManagementBll.GetReferralDetail(setReferral.SiteId, setReferral.CurrencyId);
-            
+
             var result = await _referralManagementBll.SetReferralAsync(setReferral);
             var logParam = new CreateAdminAdjustmentInfoLogInput
             {
@@ -67,7 +68,7 @@ namespace BackendSite.Service.BLL
             }
             return result;
         }
-        public int SetReferralStatus(int siteId, int currencyId,int status)
+        public int SetReferralStatus(int siteId, int currencyId, int status)
         {
             return _referralManagementBll.SetReferralStatus(siteId, currencyId, status);
         }
@@ -80,7 +81,7 @@ namespace BackendSite.Service.BLL
                 throw new AdminException(ErrorCodeEnum.Fail);
             }
             var result = await _referralManagementBll.SetReferralStatusAsync(siteId, currencyId, status);
-            
+
             var logParam = new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = Operator,
@@ -107,15 +108,15 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return _referralManagementBll.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate , pageSize, ref pageNumber, out totalPages, out rowCount);
+            return _referralManagementBll.GetReferralCustList(selectSite, userName, currencyId, startDate, endDate, pageSize, ref pageNumber, out totalPages, out rowCount);
         }
 
         public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, bool isOrder, string orderByProperty, OrderByDirection orderByDirection)
         {
-            return await _referralManagementBll.GetReferralCustList(siteId, userName, currencyId, startDate, endDate , pageSize, pageNumber, isOrder, orderByProperty, orderByDirection);
+            return await _referralManagementBll.GetReferralCustList(siteId, userName, currencyId, startDate, endDate, pageSize, pageNumber, isOrder, orderByProperty, orderByDirection);
         }
 
-        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+        public IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate)
         {
             return _referralManagementBll.GetReferralCustListExport(selectSite, userName, currencyId, startDate, endDate);
         }
@@ -143,7 +144,7 @@ namespace BackendSite.Service.BLL
                 }
                 else if (string.Equals(prop.Name, "SiteId")) { }
                 else if (string.Equals(prop.Name, "Status")) { }
-                else if(string.Equals(prop.Name, "SpecificList")) { }
+                else if (string.Equals(prop.Name, "SpecificList")) { }
                 else
                 {
                     target.Add(prop.Name, prop.GetValue(source));

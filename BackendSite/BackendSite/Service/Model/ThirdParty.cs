@@ -44,13 +44,13 @@ namespace BackendSite.Service.Model
         public string Memo { get; set; }
         public int Status { get; set; }
         public int TpId { get; set; }
-        public string DirectionName 
+        public string DirectionName
         {
             get
             {
-                if(Direction == (int)TpTransferDirectionEnum.ToTP)
+                if (Direction == (int)TpTransferDirectionEnum.ToTP)
                 {
-                    if(TpId == (int)TpEnum.Saba)
+                    if (TpId == (int)TpEnum.Saba)
                     {
                         return "Main Wallet -> Sportsbook Wallet";
                     }
@@ -91,12 +91,12 @@ namespace BackendSite.Service.Model
         public string ThirdId { get; set; }
         public decimal Difference { get; set; }
     }
-    
-    public class AdjustWalletResult:TransferResult
+
+    public class AdjustWalletResult : TransferResult
     {
         public string TransId { get; set; }
     }
-    
+
     public enum TransferStatus
     {
         Success = 0, Fail = 1, Pending = 2, PendingD = 3

@@ -3,8 +3,10 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
@@ -18,7 +20,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         private readonly VerificationRewardBLL _verificationRewardBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         #endregion
-        
+
         #region Constructor
         public VerificationRewardController(IServiceProvider provider)
         {
@@ -26,9 +28,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
             _adjustmentLogReportBll = provider.GetService<AdjustmentLogReportBLL>();
         }
         #endregion
-        
+
         #region Marketing > VerificationReward
-        
+
         /// <summary>
         /// VerificationReward/Get 取得驗證獎勵設定
         /// </summary>
@@ -43,10 +45,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         {
             var apiResult = new ApiResult<IEnumerable<VerificationRewardModel>>
             {
-                ErrorCode = 0, 
+                ErrorCode = 0,
                 Data = await _verificationRewardBll.GetVerificationRewardBySiteId(request.SiteId)
             };
-            
+
             return apiResult;
         }
 
@@ -62,7 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<ApiResult> Set(ApiRequestWithLog<SetVerificationRewardParams> request)
         {
-            
+
             var updateOperator = User.Identity.Name;
             var success = await _verificationRewardBll.SetVerificationReward(request.SiteId, request.CurrencyId,
                 request.After, updateOperator);
@@ -92,12 +94,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                     })
                 });
             }
-            
+
             return success
-                ? new ApiResult((int) ErrorCodeEnum.Success, string.Empty)
-                : new ApiResult((int) ErrorCodeEnum.UpdateFailed, ErrorCodeEnum.UpdateFailed.GetDescription());
+                ? new ApiResult((int)ErrorCodeEnum.Success, string.Empty)
+                : new ApiResult((int)ErrorCodeEnum.UpdateFailed, ErrorCodeEnum.UpdateFailed.GetDescription());
         }
-        
+
         /// <summary>
         /// VerificationReward/UpdateStatus 變更狀態
         /// </summary>
@@ -111,7 +113,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         public async Task<ApiResult> UpdateStatus(ApiRequestWithLog<UpdateVerificationRewardStatusParams> request)
         {
             var updateOperator = User.Identity.Name;
-            var result = await _verificationRewardBll.UpdateStatus(request.SiteId, request.CurrencyId,(int)request.After.Status, updateOperator);
+            var result = await _verificationRewardBll.UpdateStatus(request.SiteId, request.CurrencyId, (int)request.After.Status, updateOperator);
             var success = result == 1 || result == 2;
             if (success)
             {
@@ -132,10 +134,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                     })
                 });
             }
-            
+
             return success
-                ? new ApiResult((int) ErrorCodeEnum.Success, string.Empty)
-                : new ApiResult((int) ErrorCodeEnum.UpdateFailed, ErrorCodeEnum.UpdateFailed.GetDescription());
+                ? new ApiResult((int)ErrorCodeEnum.Success, string.Empty)
+                : new ApiResult((int)ErrorCodeEnum.UpdateFailed, ErrorCodeEnum.UpdateFailed.GetDescription());
         }
         #endregion
     }

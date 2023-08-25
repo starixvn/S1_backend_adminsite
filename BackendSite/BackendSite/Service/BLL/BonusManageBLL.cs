@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -221,20 +222,20 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.GetPromotionType(isPayout, isNew);
         }
-        
-        public int SetBonusCustUsingInfo(int siteId ,string bonusCode ,string creator)
+
+        public int SetBonusCustUsingInfo(int siteId, string bonusCode, string creator)
         {
             return _bonusManageService.SetBonusCustUsingInfo(siteId, bonusCode, creator);
         }
-        
+
         public bool SetBonusCustUsingDetail(List<BonusCustUsing> list)
         {
             return _bonusManageService.SetBonusCustUsingDetail(list);
         }
-        
+
         public IEnumerable<BonusCustUsingList> GetBonusCustUsingDetail(int siteId, string bonusCode)
         {
-            return _bonusManageService.GetBonusCustUsingDetail(siteId , bonusCode);
+            return _bonusManageService.GetBonusCustUsingDetail(siteId, bonusCode);
         }
     }
 

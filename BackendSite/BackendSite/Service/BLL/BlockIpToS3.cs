@@ -1,4 +1,5 @@
 ﻿using Amazon.S3.Model;
+
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
@@ -33,7 +34,7 @@ public class BlockIpToS3
                                                "{ \r\n" +
                                                "default -1;\r\n");
         await File.AppendAllLinesAsync(filePath, ipLines);
-        await File.AppendAllTextAsync(filePath, "}\r\n" + 
+        await File.AppendAllTextAsync(filePath, "}\r\n" +
                                                 "\r\n" +
                                                 "map $ip_geoblock:$ipcheck $geoblock {\r\n" +
                                                 "default $default_geoblock;\r\n" +

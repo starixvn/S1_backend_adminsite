@@ -13,7 +13,7 @@ namespace BackendSite.Service.Model
         public string TpName { get; set; }
         public string TpLogo { get; set; }
     }
-    
+
     public class GetHotGameListRequest
     {
         public int SiteId { get; set; }
@@ -78,7 +78,7 @@ namespace BackendSite.Service.Model
     {
         public int Id { get; set; }
     }
-    
+
     public class GetHotGameDetailDto
     {
         public int Id { get; set; }
@@ -94,7 +94,7 @@ namespace BackendSite.Service.Model
         public string TpLogo { get; set; }
         public string GameLogo { get; set; }
     }
-    
+
     public class GetHotGameDetailResponse
     {
         public int Id { get; set; }
@@ -116,7 +116,7 @@ namespace BackendSite.Service.Model
     {
         public int Id { get; set; }
     }
-    
+
     public class HotGameSortingRequest
     {
         public int Id { get; set; }
@@ -202,7 +202,7 @@ namespace BackendSite.Service.Model
 
         public int RowCount { get; set; }
     }
- 
+
     public class GetHotGameListResponseV2
     {
         public int Id { get; set; }
@@ -215,7 +215,7 @@ namespace BackendSite.Service.Model
         public string TpName { get; set; }
 
         public string TpGameType { get; set; }
-        
+
         public string GameName { get; set; }
 
         public string GameId { get; set; }

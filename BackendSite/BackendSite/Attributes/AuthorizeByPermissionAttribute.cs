@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.BLL;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -24,7 +25,7 @@ namespace BackendSite.Attributes
         }
         public void OnAuthorization(AuthorizationFilterContext filterContext)
         {
-            if(MenuId != 0 && PermissionId != 0)
+            if (MenuId != 0 && PermissionId != 0)
             {
                 var brand = _newAuthorizeBll.CheckBrand();
                 if (brand != 0)
@@ -43,7 +44,7 @@ namespace BackendSite.Attributes
                             else
                             {
                                 var permissions = _permissionBll.GetUserPermissionByMenuId(MenuId);
-                                
+
                                 if (permissions == null)
                                 {
                                     filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");

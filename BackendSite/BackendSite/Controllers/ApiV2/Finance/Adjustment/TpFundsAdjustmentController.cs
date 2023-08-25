@@ -1,12 +1,15 @@
 ﻿using System.Text.RegularExpressions;
+
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
@@ -193,14 +196,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 Remarks = request.Memo,
                 Category = request.ReasonId
             };
-            
+
             if (isDeposit && !string.IsNullOrWhiteSpace(request.TransId))
             {
                 var m = Regex.Match(request.TransId, @"\d+");
                 int.TryParse(m.Value, out var depositId);
                 inTpTransfer.DepositId = depositId;
             }
-            
+
             var result = await _tpBll.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
@@ -248,7 +251,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     RefTransId = result.Data.TransId
                 });
             }
-            
+
             return new ApiResult
             {
                 ErrorCode = result.ErrorCode,
@@ -284,7 +287,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
                 request.CustId = custInfo.CustId;
             }
-            
+
             try
             {
                 result.Data = _tpBll.GetAdjustmentTpLog(request.SiteId, request.TpId, request.CustId, request.PageSize, ref pageNumber, ref totalPages, ref rowCount);

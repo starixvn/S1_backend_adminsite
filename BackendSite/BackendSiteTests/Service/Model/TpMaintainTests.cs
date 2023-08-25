@@ -70,6 +70,6 @@ namespace BackendSite.Service.Model.TpMaintain.Tests
         public bool ExpiredFilterTest(bool IsExpired) => _tpMaintain.ExpiredFilter(new FilterInfo
         {
             IsExpired = IsExpired
-        });      
+        });
     }
 }

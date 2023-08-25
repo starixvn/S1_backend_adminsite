@@ -2,6 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -27,10 +28,10 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _logger = provider.GetRequiredService<ILogger<IAutoWithdrawalPaymentGateWayBLL>>();
-            
+
             var configuration = provider.GetRequiredService<IConfiguration>();
             _payApiUrl = configuration.GetValue<string>("PayService");
-            
+
         }
 
         public AutoWithdrawalPaymentGateWayDto GetPaymentGateWay(WithdrawalRequest withdrawalData, int siteId)
@@ -101,8 +102,8 @@ namespace BackendSite.Service.BLL
 
             return null;
         }
-        
-        public ApiResult AutoWithdrawalProcessWay(SendToNextRequest request ,WithdrawalRequest withdrawalData ,AuthData authData ,ApiResult apiResult , out int withdrawConfirmResult)
+
+        public ApiResult AutoWithdrawalProcessWay(SendToNextRequest request, WithdrawalRequest withdrawalData, AuthData authData, ApiResult apiResult, out int withdrawConfirmResult)
         {
             var paymentGateWay = GetPaymentGateWay(withdrawalData, withdrawalData.SiteId);
             if (paymentGateWay == null)
@@ -123,7 +124,7 @@ namespace BackendSite.Service.BLL
             withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalProcess(
                 request.TransId,
                 request.Comment,
-                updater:paymentGateWay.PayName,
+                updater: paymentGateWay.PayName,
                 authData.UserId,
                 JsonConvert.SerializeObject(withdrawalInfo),
                 (int)request.WithdrawalType,
@@ -132,7 +133,7 @@ namespace BackendSite.Service.BLL
 
             if (withdrawConfirmResult > 0)
             {
-                var createFailResult = PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData, systemOperation: "system" ).Result;
+                var createFailResult = PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData, systemOperation: "system").Result;
                 if (createFailResult != null)
                 {
                     // 自動出款失敗，狀態改回 AutoFailBackManual
@@ -143,7 +144,7 @@ namespace BackendSite.Service.BLL
 
             return apiResult;
         }
-        
+
         public async Task<ApiResult> PaymentOnlineCreate(SendToNextRequest request, WithdrawalInfo withdrawalInfo, int custId,
         decimal amount, ApiResult apiResult, AuthData authData, string systemOperation = "")
         {

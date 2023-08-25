@@ -1,5 +1,6 @@
 using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Store.PointSetting
@@ -17,7 +18,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public DateTimeOffset PromotionStartTime { get; set; }
         public DateTimeOffset PromotionEndTime { get; set; }
     }
-    
+
     public class TurnoverPointSetting
     {
         public int TpCategoryId { get; set; }
@@ -33,13 +34,13 @@ namespace BackendSite.Service.Model.Store.PointSetting
         [LogIgnore]
         public DateTimeOffset LastUpdateTime { get; set; }
     }
-    
+
     public class TurnoverPointSettingForLog
     {
         public TurnoverPointSettingForLog()
         {
         }
-        
+
         public TurnoverPointSettingForLog(TurnoverPointSetting setting, string vipLevel)
         {
             TpCategory = setting.TpCategoryName;
@@ -49,7 +50,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
             PromotionStartTime = setting.PromotionStartTime;
             PromotionEndTime = setting.PromotionEndTime;
         }
-        
+
         public string TpCategory { get; set; }
         public decimal Turnover { get; set; }
         public string PromotionStatus { get; set; }
@@ -57,7 +58,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public DateTimeOffset? PromotionStartTime { get; set; }
         public DateTimeOffset? PromotionEndTime { get; set; }
     }
-    
+
     public class TurnoverPointStatusSetting : LastUpdateModel
     {
         public int TpCategoryId { get; set; }
@@ -66,7 +67,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
         public string TpGameTypeName { get; set; }
         public GeneralStatusEnum Status { get; set; }
     }
-    
+
     public class InactivePointExpirySetting : LastUpdateModel
     {
         public int SiteId { get; set; }

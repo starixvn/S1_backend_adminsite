@@ -18,7 +18,7 @@
         public string Cname { get; set; }
         public int Site { get; set; }
         public int Currency { get; set; }
-        public string HasDetail { get; set;  }
+        public string HasDetail { get; set; }
         public string TpName { get; set; }
 
         //NEW
@@ -45,8 +45,8 @@
         }
     }
 
-    public class GameCasinoDetail 
-    { 
+    public class GameCasinoDetail
+    {
 
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
@@ -104,7 +104,7 @@
         public int Tpid { get; set; }
         public string IsoCode { get; set; }
     }
-    public class GameCasinoDetailData 
+    public class GameCasinoDetailData
     {
         public bool HasDetail { get; set; }
         public int SiteId { get; set; }

@@ -1,7 +1,9 @@
-﻿using BackendSite.Service.Model;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -19,7 +21,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate, DateTime EndDate, IEnumerable<int> SiteList, int Currency)
         {
-            return _reportDbClient.Query<WinLostReport>("Report_WinLostV2_Get", new { StartDate, EndDate, SiteIds=JsonConvert.SerializeObject(SiteList), Currency}, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<WinLostReport>("Report_WinLostV2_Get", new { StartDate, EndDate, SiteIds = JsonConvert.SerializeObject(SiteList), Currency }, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<GameType> GetAllGameType()

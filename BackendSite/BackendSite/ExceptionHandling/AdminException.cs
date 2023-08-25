@@ -1,5 +1,6 @@
-﻿using BackendSite.Service.Model.enums;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
+
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.ExceptionHandling
 {
@@ -16,7 +17,7 @@ namespace BackendSite.ExceptionHandling
         {
             get
             {
-                    return _Message;
+                return _Message;
             }
             set
             {
@@ -33,8 +34,8 @@ namespace BackendSite.ExceptionHandling
         {
         }
 
-        public AdminException(ErrorCodeEnum ErrorCode, 
-                              string Message = "", 
+        public AdminException(ErrorCodeEnum ErrorCode,
+                              string Message = "",
                               string Lang = "en")
         {
             this.ErrorCode = ErrorCode;

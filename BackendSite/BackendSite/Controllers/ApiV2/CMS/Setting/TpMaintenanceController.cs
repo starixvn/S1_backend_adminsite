@@ -4,8 +4,10 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
@@ -264,7 +266,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
 
         [HttpPost]
-        public  ApiResult<IEnumerable<TpGameType>> GetTpGameType(GetTpGameTypeRequest req)
+        public ApiResult<IEnumerable<TpGameType>> GetTpGameType(GetTpGameTypeRequest req)
         {
             return new ApiResult<IEnumerable<TpGameType>>()
             {

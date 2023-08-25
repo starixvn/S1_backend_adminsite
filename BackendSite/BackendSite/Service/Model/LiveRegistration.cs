@@ -140,7 +140,7 @@ namespace BackendSite.Service.Model
     {
         public CustomerRegLiveStatusStatusEnum Status { get; set; }
     }
-    
+
     public class CustRegLiveStatusNotesData
     {
         public int Id { get; set; }
@@ -149,7 +149,7 @@ namespace BackendSite.Service.Model
         public DateTime UpdateTime { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class CustRegLiveStatusNotes
     {
         public int Id { get; set; }

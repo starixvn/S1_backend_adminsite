@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +15,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     public class VideoController : ControllerBase
     {
         #region Fields
-        
+
         private readonly VideoManagementBLL _videoManagementBll;
         private readonly SelLangBLL _selLangBll;
 
@@ -45,7 +46,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public string Title { get; set; }
             public string Link { get; set; }
         }
-        
+
         #endregion
 
         #region Action
@@ -65,7 +66,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             var apiResult = new ApiListResult<VideoData>();
 
-            var langList = request.LangIds.Select(landId => ((LangType) landId).ToString()).ToList();
+            var langList = request.LangIds.Select(landId => ((LangType)landId).ToString()).ToList();
 
             var param = new GetVideoDataPara
             {
@@ -119,8 +120,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                         Link = request.After.Link
                     }
                 };
-                var result = _videoManagementBll.SetVideoInfo(new ParamsWithLog<SetVideoPara>( param , User.Identity.Name));
-                
+                var result = _videoManagementBll.SetVideoInfo(new ParamsWithLog<SetVideoPara>(param, User.Identity.Name));
+
                 if (result)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

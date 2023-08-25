@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -86,7 +87,7 @@ namespace BackendSite.Service.Model
         public int PeriodDays { get; set; }
         public bool Status { get; set; }
     }
-    
+
     public class ReferralDetail
     {
         public int SiteId { get; set; }
@@ -102,7 +103,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<ReferralContent> SpecificList { get; set; }
         public int Status { get; set; }
     }
-    
+
     public class ReferralDetailData
     {
         public int SiteId { get; set; }
@@ -118,7 +119,7 @@ namespace BackendSite.Service.Model
         public string Details { get; set; }
         public int Status { get; set; }
     }
-    
+
     public class ReferralCustList
     {
         public int SiteId { get; set; }

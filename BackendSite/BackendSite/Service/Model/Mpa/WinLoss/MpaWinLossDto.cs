@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel;
+
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
+
 using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss

@@ -3,8 +3,10 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
@@ -238,7 +240,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
             return new ApiResult
             {
-                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
 
@@ -259,7 +261,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 new ParamsWithLog<DeleteDisableUser>(req, User.Identity.Name));
             return new ApiResult
             {
-                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
 
         }

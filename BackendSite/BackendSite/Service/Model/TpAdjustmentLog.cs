@@ -35,7 +35,7 @@ public class GetCustTpAdjustmentLogParamsV2
 }
 
 
-public class TpAdjustmentLog: TpTransferInfo
+public class TpAdjustmentLog : TpTransferInfo
 {
     public string SiteName { set; get; }
     public string UserName { set; get; }
@@ -59,10 +59,10 @@ public class TpAdjustmentLogV2 : TpTransferInfo
 
 
 
-public class TpAdjustmentLogWrapper 
+public class TpAdjustmentLogWrapper
 {
     public IEnumerable<TpAdjustmentLogV2> Data { get; set; }
-    public int TotalPages { get; set;}
+    public int TotalPages { get; set; }
     public int RowCount { get; set; }
 }
 

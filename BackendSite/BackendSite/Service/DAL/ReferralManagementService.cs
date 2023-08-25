@@ -1,10 +1,13 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using Newtonsoft.Json;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -23,13 +26,13 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
         }
-        
+
         public async Task<ReferralDetailData> GetReferralDetail(int siteId, int currencyId)
         {
             return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get",
                 new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId }));
         }
-        
+
         public void SetReferral(List<ReferralManagement> referralList)
         {
             var para = new List<ReferralList>();
@@ -68,12 +71,12 @@ namespace BackendSite.Service.DAL
 
             return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
         }
-        
+
         public int SetReferralStatus(int siteId, int currencyId, int status)
         {
             return _mainDbClient.Execute("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
         }
-        
+
         public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
         {
             return await _mainDbClient.ExecuteAsync("Admin_Referral_Status_Set_V2", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId, _Status = status }));
@@ -101,8 +104,8 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return result;
         }
-        
-        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, string orderByProperty, OrderByDirection orderByDirection )
+
+        public async Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, string orderByProperty, OrderByDirection orderByDirection)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
@@ -128,8 +131,8 @@ namespace BackendSite.Service.DAL
             };
             return referralCustData;
         }
-        
-        public IEnumerable<ReferralExcel> GetReferralCustListExport(string selectSite, string userName, int currencyId , DateTime? startDate, DateTime? endDate)
+
+        public IEnumerable<ReferralExcel> GetReferralCustListExport(string selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate)
         {
             var p = new DynamicParameters(new { selectSite, UserName = userName, CurrencyId = currencyId, StartDate = startDate, EndDate = endDate });
 

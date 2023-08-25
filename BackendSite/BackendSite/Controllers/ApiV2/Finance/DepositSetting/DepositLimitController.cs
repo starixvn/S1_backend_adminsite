@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +32,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
 
         #region API Model
 
-        public class GetListRequest 
+        public class GetListRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
@@ -57,7 +58,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
             var depositLimitInfos = _depositBll.GetDepositLimitInfos(request.SiteId, request.CurrencyId);
             apiResult.Data = depositLimitInfos;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            
+
             return apiResult;
         }
 
@@ -74,7 +75,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
         public ApiResult Create(ApiRequestWithLog<IEnumerable<DepositLimitModel>> req)
         {
             var apiResult = new ApiResult();
-            
+
             foreach (var input in req.After)
             {
                 var currentUpperPoint = _depositBll.GetDepositLimitInfo(req.SiteId, (int)input.DepositType, req.CurrencyId, (int)input.VipLevel);
@@ -85,10 +86,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.DepositSetting
                     return apiResult;
                 }
             }
-           
+
             var result =
                 _depositBll.AddDepositLimit(new ParamsWithLog<IEnumerable<DepositLimitModel>>(req, User.Identity.Name));
-           
+
             if (result)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

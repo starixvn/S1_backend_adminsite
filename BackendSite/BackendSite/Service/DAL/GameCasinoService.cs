@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
 
 namespace BackendSite.Service.DAL
@@ -28,8 +29,8 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
-        public async Task<IEnumerable<GameCasinoDataV3>> GetGameIdByTpIdAndCategoryId(int tpId,int categoryId)
+
+        public async Task<IEnumerable<GameCasinoDataV3>> GetGameIdByTpIdAndCategoryId(int tpId, int categoryId)
         {
             var props = new DynamicParameters();
             props.Add("_TpId", tpId);

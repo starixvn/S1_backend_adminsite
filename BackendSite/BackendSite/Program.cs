@@ -1,8 +1,10 @@
+using BackendSite;
+using BackendSite.Extensions;
+
+using Elastic.Apm.SerilogEnricher;
+
 using Serilog;
 using Serilog.Exceptions;
-using BackendSite.Extensions;
-using BackendSite;
-using Elastic.Apm.SerilogEnricher;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddRemoteJsonConfig(builder.Configuration.GetSection("ConfigService").Get<string[]>());

@@ -1,16 +1,19 @@
-﻿using BackendSite.Attributes;
+﻿using System.Text.RegularExpressions;
+
+using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text.RegularExpressions;
-using BackendSite.Extensions;
-using BackendSite.Service.Library;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
@@ -431,7 +434,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
-            public List<int> FinancialTypeList { get; set; } = new ();
+            public List<int> FinancialTypeList { get; set; } = new();
         }
 
         public class GetFinancialLogExportRequest
@@ -441,7 +444,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
             public string RefTransId { get; set; }
             public int FinancialType { get; set; }
-            public List<int> FinancialTypeList { get; set; } = new ();
+            public List<int> FinancialTypeList { get; set; } = new();
         }
 
         public class GetVipRebateLogRequest : CustIdWithDateRangeNullAndPageRequest
@@ -484,7 +487,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public DateTimeOffset EndDate { get; set; }
         }
 
-        public class CustTpBetRecordDetailListbyGameTypeExportReq 
+        public class CustTpBetRecordDetailListbyGameTypeExportReq
         {
             public DateTime SelDate { get; set; }
             public int GameTypeId { get; set; }
@@ -1825,7 +1828,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-        
+
         public IActionResult GetCustTpBetRecordExport(CustIdWithDateRangeRequest request)
         {
             var apiResult = _paymentBll.GetCustTpBetRecordList(
@@ -1834,7 +1837,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.EndDate.ToUniversalTime().DateTime,
                 request.GameTypes,
                 request.StartDate.Offset);
-            
+
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecord");
         }
@@ -1878,11 +1881,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 req.StartDate.ToUniversalTime().DateTime,
                 req.EndDate.ToUniversalTime().DateTime,
                 req.GameTypes);
-            
+
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecordByDay");
         }
-        
+
         /// <summary>
         /// CustomerManage/GetCustTpBetRecordByCategoryId 取得指定客戶指定第三方分類下注紀錄
         /// </summary>
@@ -1912,7 +1915,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public IActionResult GetCustTpBetRecordByCategoryIdExport(CustTpBetRecordListbyCategoryIdReq req)
@@ -1924,7 +1927,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 req.StartDate.ToUniversalTime().DateTime,
                 req.EndDate.ToUniversalTime().DateTime,
                 req.GameTypes);
-            
+
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecordListByCategoryId");
         }
@@ -1968,7 +1971,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             apiResult.TotalPages = totalPages;
             return apiResult;
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
         public IActionResult GetCustTpBetRecordDetailByGameTypeExport(CustTpBetRecordDetailListbyGameTypeExportReq req)
@@ -1977,7 +1980,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var totalPages = 0;
             var rowCount = 0;
             var pageNumber = 0;
-            
+
             var apiResult = _paymentBll.GetCustTpBetRecordDetailListbyGameType(
                 req.CustId,
                 req.GameTypeId,
@@ -1989,7 +1992,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 ref rowCount,
                 req.StartDate.Offset,
                 true);
-            
+
             var stream = _excelBll.ExportV2(apiResult);
             return _excelBll.ExcelFile(stream, "CustTpBetRecordDetailByGameType");
         }
@@ -3109,7 +3112,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             return result;
         }
-        
+
         /// <summary>
         /// CustomerManage/GetAdjustmentWithdrawalLimitLog 取得手動調整提款額度限額的log
         /// </summary>
@@ -3128,10 +3131,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
 
             var searchResult = _custInfoBll.GetWithdrawalLimitLog(request.CustId, request.StartDate.DateTime, request.EndDate.DateTime, 1, 1000);
-            
+
             foreach (var model in searchResult.WithdrawalLimitLogList)
             {
-                if (model.CreateFrom == (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment)
+                if (model.CreateFrom == (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment)
                 {
                     var modelResult = new AdjustmentWithdrawalLimitLog
                     {
@@ -3146,12 +3149,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     result.AdjustmentWithdrawalLimitLogList.Add(modelResult);
                 }
             }
-            
+
             result.TotalAmount = result.AdjustmentWithdrawalLimitLogList.Sum(x => x.MainType == (int)DirectionEnum.Add ? x.Amount : x.Amount * -1);
-            
+
             return result;
         }
-        
+
         #endregion
 
         #region CSD > Customer Administration > CustInfo [Get TPWallet]

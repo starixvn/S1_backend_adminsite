@@ -2,8 +2,10 @@
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using MySql.Data.MySqlClient;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
@@ -102,6 +104,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             return apiResult;
         }
-        
+
     }
 }

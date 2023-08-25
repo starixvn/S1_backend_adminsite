@@ -5,10 +5,10 @@ namespace BackendSite.Service.Model
 {
     public class Announcement
     {
-        private DateTimeOffset _startDate { get;set;}
-        private DateTimeOffset _endDate { get;set;}
-        private DateTimeOffset _createTime { get;set;}
-        private DateTimeOffset _lastUpdateTime { get;set;}
+        private DateTimeOffset _startDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        private DateTimeOffset _createTime { get; set; }
+        private DateTimeOffset _lastUpdateTime { get; set; }
         [LogIgnore]
         public int Id { get; set; }
         [LogIgnore]
@@ -20,7 +20,7 @@ namespace BackendSite.Service.Model
             get => _startDate;
             set => _startDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-        
+
         public DateTimeOffset EndTime
         {
             get => _endDate;
@@ -34,7 +34,8 @@ namespace BackendSite.Service.Model
         [LogIgnore]
         public string Creator { get; set; }
         [LogIgnore]
-        public DateTimeOffset CreateTime { 
+        public DateTimeOffset CreateTime
+        {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
@@ -63,7 +64,7 @@ namespace BackendSite.Service.Model
         [LogIgnore]
         public int Seq { get; set; }
     }
-    
+
     public class UpdateAnnouncementModel
     {
         [LogIgnore]
@@ -79,7 +80,7 @@ namespace BackendSite.Service.Model
         [LogIgnore]
         public int Seq { get; set; }
     }
-    
+
     public class CustLang
     {
         public string UserLang { get; set; }
@@ -100,7 +101,7 @@ namespace BackendSite.Service.Model
         public string ContentRemoveTag { get; set; }
         public bool IsBatch { get; set; }
     }
-    
+
     public class BatchPersonalMsg : PersonalMsgBase
     {
         public int BatchId { get; set; }
@@ -110,7 +111,7 @@ namespace BackendSite.Service.Model
         public int AccountStatus { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class PersonalMsgBase
     {
         public bool IsPopup { get; set; }
@@ -150,7 +151,7 @@ namespace BackendSite.Service.Model
         public string UserLang { get; set; }
         public CustomerStatusEnum Status { get; set; }
     }
-    
+
     public class SendMessageBatchRequest
     {
         public int optSite { get; set; }
@@ -160,7 +161,7 @@ namespace BackendSite.Service.Model
         public IFormFile excelUpload { get; set; }
         public string personalMsg { get; set; }
     }
-    
+
     public class UpdateBatchMessageRequest
     {
         public int batchId { get; set; }

@@ -6,7 +6,7 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
     {
         private DateTimeOffset _createTime { get; set; }
         private DateTimeOffset _operateTime { get; set; }
-        
+
         [LogIgnore]
         public string BankCode
         {
@@ -27,14 +27,14 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
         {
             get; set;
         }
-        
+
         [LogIgnore]
         public int Operator
         {
             get;
             set;
         }
-        
+
         public DateTimeOffset CreateTime
         {
             get => _createTime;

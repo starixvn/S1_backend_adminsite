@@ -25,7 +25,7 @@
             QualifiedTime = data.QualifiedTime;
             LastUpdateUser = data.LastUpdateUser;
 
-            CanUpdateStatus = false; 
+            CanUpdateStatus = false;
         }
 
         public bool CanUpdateStatus

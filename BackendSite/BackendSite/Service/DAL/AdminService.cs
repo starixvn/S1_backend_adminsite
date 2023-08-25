@@ -1,8 +1,10 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
 
 namespace BackendSite.Service.DAL
 {
@@ -16,7 +18,7 @@ namespace BackendSite.Service.DAL
             _mainDbClient = sqlClients.FirstOrDefault(p => p.DataBase == DataBase.Main);
             _reportDbClient = sqlClients.FirstOrDefault(p => p.DataBase == DataBase.Report);
         }
-        
+
         public bool ChangePwd(int siteId, int userId, ChangePwd changePwd, out string Md5Userpwd)
         {
             Md5Userpwd = null;
@@ -44,12 +46,12 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<AdminMenuDto> GetAllAdminMenu()
         {
-            return  _reportDbClient.Query<AdminMenuDto>("Admin_AdminMenu_GetAll");
+            return _reportDbClient.Query<AdminMenuDto>("Admin_AdminMenu_GetAll");
         }
 
         public IEnumerable<AdminPermissionDto> GetAllAdminPermission()
         {
-            return  _reportDbClient.Query<AdminPermissionDto>("Admin_AdminPermission_GetAll");
+            return _reportDbClient.Query<AdminPermissionDto>("Admin_AdminPermission_GetAll");
         }
     }
 }

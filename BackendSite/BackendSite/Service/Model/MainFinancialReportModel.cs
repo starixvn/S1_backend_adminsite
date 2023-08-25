@@ -2,7 +2,7 @@
 {
     public class MainFinancialModel
     {
-        public string Date { get;set; }
+        public string Date { get; set; }
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
         public decimal ActualRate { get; set; }
@@ -18,7 +18,7 @@
         public decimal RebateInMYR { get; set; }
         public decimal Adjustment { get; set; }
         public decimal AdjustmentInMYR { get; set; }
-        public decimal TurnOverStake { get; set; } 
+        public decimal TurnOverStake { get; set; }
         public decimal TurnOverStakeInMYR { get; set; }
         public decimal TurnOverValidBet { get; set; }
         public decimal TurnOverValidBetInMYR { get; set; }

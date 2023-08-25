@@ -2,8 +2,10 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using static BackendSite.Service.BLL.SiteMaintainBLL;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting.SiteMaintenance
@@ -55,7 +57,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting.SiteMaintenance
             {
                 return new ApiResult
                 {
-                    ErrorCode = await _siteMaintainBll.UpdateSiteMaintain(request, User.Identity.Name) 
+                    ErrorCode = await _siteMaintainBll.UpdateSiteMaintain(request, User.Identity.Name)
                     ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.SystemException,
                 };
             }
@@ -71,7 +73,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting.SiteMaintenance
             }
         }
 
-        
+
 
     }
 }

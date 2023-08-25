@@ -1,10 +1,11 @@
-﻿using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+
 using RabbitMQ.Client;
-using BackendSite.Service.DAL.Interface;
 
 namespace BackendSite.Extensions
 {

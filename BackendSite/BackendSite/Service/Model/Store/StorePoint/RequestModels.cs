@@ -12,14 +12,14 @@ namespace BackendSite.Service.Model.Store.StorePoint
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
     }
-    
+
     public class GetMemberRewardPointLogRequest : ApiRequestPageModel
     {
         public int CustId { get; set; }
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
     }
-    
+
     public class CreateManualRewardPointInfoRequest
     {
         public int SiteId { get; set; }
@@ -28,7 +28,7 @@ namespace BackendSite.Service.Model.Store.StorePoint
         public int CategoryId { get; set; }
         public string Memo { get; set; }
     }
-    
+
     public class CreateManualRewardPointInfoBatchRequest
     {
         public int SiteId { get; set; }

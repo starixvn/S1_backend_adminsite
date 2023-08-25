@@ -11,7 +11,7 @@ namespace BackendSite.Service.Model.enums
         //4XXX:Adjustment
         //5XXX:Customer相關代碼
         //9XXX:System常使用代碼
-        
+
         #region In Common Use
 
         [Description("msg_Success")]

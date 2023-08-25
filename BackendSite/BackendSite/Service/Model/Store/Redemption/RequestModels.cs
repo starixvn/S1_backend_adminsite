@@ -15,8 +15,8 @@ namespace BackendSite.Service.Model.Store.Redemption
         public string SabaId { get; set; }
     }
 
-    
-    public class ExportRedemptionListRequest 
+
+    public class ExportRedemptionListRequest
     {
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
@@ -28,24 +28,24 @@ namespace BackendSite.Service.Model.Store.Redemption
         public string UserName { get; set; }
         public string SabaId { get; set; }
     }
-    
-    public class GetRedemptionDetailRequest 
+
+    public class GetRedemptionDetailRequest
     {
         public int RedemptionId { get; set; }
     }
-    
-    public class SetRedemptionInfoRequest 
+
+    public class SetRedemptionInfoRequest
     {
         public int SiteId { get; set; }
         public string TransId { get; set; }
         public int Action { get; set; }
         public string Comment { get; set; }
         public decimal? ActualCost { get; set; }
-        public IEnumerable<string> ReceiptUrls { get; set; } 
+        public IEnumerable<string> ReceiptUrls { get; set; }
         public string Operator { get; set; }
     }
-    
-    public class GetRedemptionLogRequest 
+
+    public class GetRedemptionLogRequest
     {
         public string TransId { get; set; }
     }

@@ -22,12 +22,16 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <Compile Remove="Controllers\ApiV2\Admin\Setting\**" />
     <Compile Remove="Controllers\ApiV2\Report\OtherReport\**" />
     <Compile Remove="wwwroot\**" />
+    <Content Remove="Controllers\ApiV2\Admin\Setting\**" />
     <Content Remove="Controllers\ApiV2\Report\OtherReport\**" />
     <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="Controllers\ApiV2\Admin\Setting\**" />
     <EmbeddedResource Remove="Controllers\ApiV2\Report\OtherReport\**" />
     <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="Controllers\ApiV2\Admin\Setting\**" />
     <None Remove="Controllers\ApiV2\Report\OtherReport\**" />
     <None Remove="wwwroot\**" />
   </ItemGroup>
@@ -78,7 +82,6 @@
 
   <ItemGroup>
     <Folder Include="Controllers\ApiV2\Admin\Permission\" />
-    <Folder Include="Controllers\ApiV2\Admin\Setting\" />
     <Folder Include="Controllers\ApiV2\Finance\DepositSetting\" />
     <Folder Include="Controllers\ApiV2\Marketing\Setting\" />
     <Folder Include="Properties\PublishProfiles\" />

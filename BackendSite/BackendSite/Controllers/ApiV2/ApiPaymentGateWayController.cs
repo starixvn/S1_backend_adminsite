@@ -3,9 +3,10 @@ using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Mvc;
 
-namespace BackendSite.Controllers
+namespace BackendSite.Controllers.ApiV2
 {
     [Route("apiV2/[controller]/[action]")]
     [ApiController]

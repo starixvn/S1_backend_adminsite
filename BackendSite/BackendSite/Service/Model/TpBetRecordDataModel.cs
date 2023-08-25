@@ -14,7 +14,7 @@
         /// 讀寫 第三方名稱
         /// </summary>
         public string TpName { get; set; }
-        
+
         /// <summary>
         /// 讀寫 交易ID
         /// </summary>

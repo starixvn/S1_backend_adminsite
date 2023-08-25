@@ -1,5 +1,8 @@
-﻿using Amazon.S3;
+﻿using System.Net;
+
+using Amazon.S3;
 using Amazon.S3.Model;
+
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
@@ -8,10 +11,11 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
-using System.Net;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 {
@@ -45,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
 
-            var configuration = provider.GetRequiredService<IConfiguration>();         
+            var configuration = provider.GetRequiredService<IConfiguration>();
             _awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
             _awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
             _awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
@@ -438,7 +442,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var result = _withdrawalBll.DeleteWithdrawalAccounting(request.Id, authData.UserName,
                 out var transId, out var seq,
                 out var uploadPicTimes, out var details);
-           
+
             if (!result)
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "delete fail.");
@@ -486,7 +490,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     };
                 }
             }
-            
+
             return new ApiResult()
             {
                 ErrorCode = (int)ErrorCodeEnum.Fail,
@@ -538,7 +542,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     Message = "Delete Fail."
                 };
             }
-            
+
             return new ApiResult()
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
@@ -615,7 +619,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     BucketName = _awsWithdrawalBucketName,
                     Key = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_{uploadPicTimes}.png"
                 };
-              
+
                 await _s3Helper.DeleteObjectAsync(deleteRequest);
 
                 return !await CheckAccountingPictureAsync(transId, seq,

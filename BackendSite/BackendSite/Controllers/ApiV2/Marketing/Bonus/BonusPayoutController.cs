@@ -3,10 +3,14 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
+
 using OfficeOpenXml;
+
 using Common = BackendSite.Service.Library.Common;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
@@ -108,7 +112,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     apiResult.Message = "Amount can't be zero or less than zero";
                     return apiResult;
                 }
-                
+
                 var authData = _authorizeBll.GetAuthData();
                 var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
 
