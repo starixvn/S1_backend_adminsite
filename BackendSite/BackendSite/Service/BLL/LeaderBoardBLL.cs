@@ -1,8 +1,6 @@
 ﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.Report;
 using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
 
 
 namespace BackendSite.Service.BLL
@@ -10,21 +8,17 @@ namespace BackendSite.Service.BLL
     public class LeaderBoardBLL
     {
         private readonly LeaderBoardService _leaderBoardService;
-        private readonly ServerInfoBLL _serverInfoBll;
 
         public LeaderBoardBLL(IServiceProvider provider)
         {
             _leaderBoardService = provider.GetRequiredService<LeaderBoardService>();
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         public IEnumerable<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
-            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
-            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-
             var data = _leaderBoardService.GetLeaderboardReport(
-                JsonConvert.SerializeObject(multiSiteRequest),
+                JsonConvert.SerializeObject(request.SiteIds),
+                request.CurrencyId,
                 request.CategoryId,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime );
