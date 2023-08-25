@@ -39,7 +39,7 @@ namespace BackendSite.Attributes
                         {
                             if (loginUser.Status == 0)
                             {
-                                filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                                filterContext.Result = RedirectToLogin();
                             }
                             else
                             {
@@ -47,13 +47,13 @@ namespace BackendSite.Attributes
 
                                 if (permissions == null)
                                 {
-                                    filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                                    filterContext.Result = RedirectToLogin();
                                 }
                                 else
                                 {
                                     if (!permissions.Contains(PermissionId))
                                     {
-                                        filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                                        filterContext.Result = RedirectToLogin();
                                     }
                                 }
                             }
@@ -61,19 +61,24 @@ namespace BackendSite.Attributes
                     }
                     else
                     {
-                        filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                        filterContext.Result = RedirectToLogin();
                     }
                 }
                 else
                 {
-                    filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                    filterContext.Result = RedirectToLogin();
                 }
 
             }
             else
             {
-                filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                filterContext.Result = RedirectToLogin();
             }
+        }
+
+        private RedirectResult RedirectToLogin()
+        {
+            return new RedirectResult("/login");
         }
     }
 }
