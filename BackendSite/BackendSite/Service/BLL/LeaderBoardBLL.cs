@@ -18,7 +18,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
             var data = _leaderBoardService.GetLeaderboardReport(
-                request.SiteId,
+                JsonConvert.SerializeObject(request.SiteIds),
                 request.CurrencyId,
                 request.CategoryId,
                 request.StartDate.DateTime,
@@ -29,9 +29,10 @@ namespace BackendSite.Service.BLL
                 .Select((r, index) => new GetLeaderboardReportResponse
                 {
                     Ranking = $"TOP {index + 1}",
-                    SiteId = request.SiteId,
+                    SiteId = (int)(r.FirstOrDefault()?.SiteId),
+                    SiteName = r.FirstOrDefault()?.SiteName,
                     UserName = r.FirstOrDefault()?.UserName,
-                    CurrencyId = request.CurrencyId,
+                    CurrencyId = (int)(r.FirstOrDefault()?.CurrencyId),
                     IsoCode = r.FirstOrDefault()?.IsoCode,
                     CustId = r.Key,
                     TurnOver = r.Sum(i => i.TurnOver),
