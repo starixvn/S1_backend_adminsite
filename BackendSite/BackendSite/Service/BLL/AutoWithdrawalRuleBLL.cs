@@ -98,7 +98,6 @@ namespace BackendSite.Service.BLL
             var beforeLog = GetBeforeChangeLog(originData);
 
             var afterLog = GetActivityLogObj(
-                autoType:originData.AutoType,
                 siteId: originData.SiteId,
                 currencyId: originData.CurrencyId,
                 withdrawalAmount: request.WithdrawalAmount,
