@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
-using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.ApiModel;
-using Microsoft.AspNetCore.Mvc;
+using BackendSite.Service.Model.enums;
+
+using Newtonsoft.Json;
+
 using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model
@@ -330,9 +331,9 @@ namespace BackendSite.Service.Model
         public string Creator { get; set; }
         public DateTime DepositTime { get; set; }
         public DateTime CreateTime { get; set; }
-       
+
     }
-    
+
     public class DepositReceiptModel
     {
         public string Receipt { get; set; }
@@ -364,7 +365,7 @@ namespace BackendSite.Service.Model
 
         public int DepositStatus { get; set; }
     }
-    
+
     public class DepositLimitModel
     {
         public int VipLevel { get; set; }
@@ -408,7 +409,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? StatementTime { get; set; }
         public string Operator { get; set; }
         public string DepositMessage { get; set; }
-        
+
         public IEnumerable<DepositMessage> DepositMessageList { set; get; }
     }
 
@@ -483,7 +484,7 @@ namespace BackendSite.Service.Model
 
         public decimal Amount { get; set; }
     }
-    
+
     public class DepositCalCodeSetRequest
     {
         public int? BankId { get; set; }
@@ -500,7 +501,7 @@ namespace BackendSite.Service.Model
         public DepositStatusEnum Action { get; set; }
         public string ActionName { get; set; }
     }
-    
+
     public class DepositReceiptFile
     {
         public int SiteId { get; set; }
@@ -509,12 +510,12 @@ namespace BackendSite.Service.Model
         public string TransId { get; set; }
         public string Receipt { get; set; }
     }
-    
+
     public class CheckDepositReceiptRequest
     {
         public string TransId { get; set; }
     }
-    
+
     public class DeleteReceiptRequest
     {
         public int SiteId { get; set; }
@@ -522,7 +523,7 @@ namespace BackendSite.Service.Model
         public int ReceiptNo { get; set; }
         public string TransId { get; set; }
     }
-    
+
     public class DepositMessage
     {
         private DateTimeOffset _createTime { set; get; }

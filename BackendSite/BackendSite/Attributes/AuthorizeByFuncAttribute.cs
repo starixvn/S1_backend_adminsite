@@ -1,10 +1,13 @@
 ﻿using System.Collections;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc;
+
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
-using Microsoft.AspNetCore.Authentication.Cookies;
+
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Attributes
@@ -17,8 +20,8 @@ namespace BackendSite.Attributes
         private readonly AuthorizeBLL authorizeBLL;
         private readonly AdminUserService adminUserService;
         private readonly PermissionBLL permissionBLL;
-        
-        public AuthorizeByFuncAttribute(AuthorizeBLL authorizeBLL, AdminUserService adminUserService, PermissionBLL permissionBLL, object FuncKey = null, string SubFuncKey=null)
+
+        public AuthorizeByFuncAttribute(AuthorizeBLL authorizeBLL, AdminUserService adminUserService, PermissionBLL permissionBLL, object FuncKey = null, string SubFuncKey = null)
         {
             this.authorizeBLL = authorizeBLL;
             this.adminUserService = adminUserService;
@@ -36,9 +39,9 @@ namespace BackendSite.Attributes
         {
             if (FuncKey != null)
             {
-                var funkeyList = FuncKey is string funcKey ? 
-                    new List<string> {funcKey} : ((IEnumerable)FuncKey).Cast<string>().ToList();
-                
+                var funkeyList = FuncKey is string funcKey ?
+                    new List<string> { funcKey } : ((IEnumerable)FuncKey).Cast<string>().ToList();
+
                 var pageStatus = PageStatus.Allow;
                 if (filterContext.HttpContext.User.Identity.IsAuthenticated)
                 {
@@ -73,10 +76,10 @@ namespace BackendSite.Attributes
                             {
                                 foreach (var key in funkeyList)
                                 {
-                                    pageStatus = !permissions.Any(x => 
-                                        string.Equals(x.FuncKey, key, StringComparison.OrdinalIgnoreCase) 
-                                        && !string.IsNullOrEmpty(x.SubFuncKeys) 
-                                        && JsonConvert.DeserializeObject<string[]>(x.SubFuncKeys).Any(s=> string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase))
+                                    pageStatus = !permissions.Any(x =>
+                                        string.Equals(x.FuncKey, key, StringComparison.OrdinalIgnoreCase)
+                                        && !string.IsNullOrEmpty(x.SubFuncKeys)
+                                        && JsonConvert.DeserializeObject<string[]>(x.SubFuncKeys).Any(s => string.Equals(s, SubFuncKey, StringComparison.OrdinalIgnoreCase))
                                     ) ? PageStatus.DeniedReturnResult : PageStatus.Allow;
                                     if (pageStatus == PageStatus.Allow)
                                     {

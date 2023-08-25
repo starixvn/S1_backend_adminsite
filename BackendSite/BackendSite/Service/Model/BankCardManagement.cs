@@ -25,7 +25,7 @@ namespace BackendSite.Service.Model
         public string StatusName => Status.ToString();
         public int Sort { get; set; }
     }
-    
+
     public class DeleteBankCard
     {
         [LogIgnore]
@@ -33,6 +33,6 @@ namespace BackendSite.Service.Model
         // Log記錄用
         public string BankName { get; set; }
         public string BankAccountNo { get; set; }
-        
+
     }
 }

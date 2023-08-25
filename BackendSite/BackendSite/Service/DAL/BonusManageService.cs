@@ -1,10 +1,14 @@
 ﻿using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+
 using Dapper;
+
 using MySql.Data.MySqlClient;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -40,7 +44,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
         {
-            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new { isPayout, isNew });
+            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get", new { isPayout, isNew });
         }
 
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
@@ -113,7 +117,7 @@ namespace BackendSite.Service.DAL
         /// <param name="siteId"></param>
         /// <param name="creator"></param>
         /// <returns></returns>
-        public int SetBonusCustUsingInfo(int siteId ,string bonusCode, string creator )
+        public int SetBonusCustUsingInfo(int siteId, string bonusCode, string creator)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
@@ -135,7 +139,7 @@ namespace BackendSite.Service.DAL
         public bool SetBonusCustUsingDetail(List<BonusCustUsing> list)
         {
             var result = _mainDbClient.Execute("Admin_BonusCustUsingDetail_Set", list);
-            
+
             return result > 0;
         }
 
@@ -149,8 +153,8 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             p.Add("_BonusCode", bonusCode);
             var result = _reportDbClient.Query<BonusCustUsingList>("Service_BonusCustUsingDetail_Get", p);
-            
-            return result ;
+
+            return result;
         }
 
         #region Public Method
@@ -175,7 +179,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
             string currencyIds,
-            string promotionTypes,         
+            string promotionTypes,
             int status,
             long startDate,
             long endDate,
@@ -234,21 +238,21 @@ namespace BackendSite.Service.DAL
                         var cashBackList = GetPromotionCashBack(bonusCode, siteId);
                         var tempCashBackList = cashBackList
                             .GroupBy(x => new
-                                { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x =>
-                                new PromotionCashBack1
-                                {
-                                    CurrencyId = x.Key.CurrencyId,
-                                    GameType = x.Key.GameType,
-                                    LossAmount = x.Key.LossAmount,
-                                    Percentage = x.Key.Percentage,
-                                    Status = x.Key.Status,
-                                    TpId = x.Key.TpId
-                                }).ToList();
+                            { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x =>
+                            new PromotionCashBack1
+                            {
+                                CurrencyId = x.Key.CurrencyId,
+                                GameType = x.Key.GameType,
+                                LossAmount = x.Key.LossAmount,
+                                Percentage = x.Key.Percentage,
+                                Status = x.Key.Status,
+                                TpId = x.Key.TpId
+                            }).ToList();
 
                         foreach (var specific in promotion.Specific)
                         {
                             specific.CashBackList = tempCashBackList.Where(x => x.CurrencyId == specific.CurrencyId);
-                        
+
                             var cashBack = specific.CashBackList.FirstOrDefault();
                             if (cashBack != null)
                             {
@@ -353,7 +357,7 @@ namespace BackendSite.Service.DAL
         /// <param name="expectedDelRebateRow"></param>
         /// <param name="expectedDelConditionRow"></param>
         /// <returns></returns>
-        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition, 
+        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition,
             string Operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -374,7 +378,7 @@ namespace BackendSite.Service.DAL
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return false;
             }
-            
+
             var isUpdate = setAffectCount == 2;
 
             //Setp:inset AdjustmentinfoLog
@@ -446,7 +450,7 @@ namespace BackendSite.Service.DAL
                     Description = new VipLevelCondictionModel() { VipLevel = vipLevelCondition.SelectedVipLevel }
                 });
             }
-            
+
             if (promotionDisplayConditionList.Any())
             {
                 if (!SetPromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList, trans))
@@ -843,7 +847,7 @@ namespace BackendSite.Service.DAL
 
             return affectCount == expectedRow;
         }
-        
+
         #endregion
 
         #region

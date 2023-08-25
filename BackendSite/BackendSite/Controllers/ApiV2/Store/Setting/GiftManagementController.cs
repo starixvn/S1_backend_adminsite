@@ -2,8 +2,10 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.GiftManagement;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 using GetListRequest = BackendSite.Service.Model.Store.GiftManagement.GetListRequest;
 
@@ -54,7 +56,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
 
             return result;
         }
-        
+
         [HttpPost]
         public Task<ApiResult<IEnumerable<GiftInfo>>> GetAsync(GetGiftRequest req)
         {
@@ -81,8 +83,8 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                 GiftId = request.GiftId
             });
             var result = await _giftManagementBll.UpdateGiftAsync(request, user);
-            
-            if (result.ErrorCode == (int) ErrorCodeEnum.Success)
+
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 var b = before.Data.First(x => x.Lang == "en");
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
@@ -105,7 +107,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                     })
                 });
             }
-            
+
             return result;
         }
 
@@ -150,9 +152,9 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                 {
                     SiteId = request.SiteId
                 });
-            
+
             var result = await _giftManagementBll.SetRedemptionLimitAsync(request, user);
-            if (result.ErrorCode == (int) ErrorCodeEnum.Success)
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
@@ -185,10 +187,10 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
             return new ApiResult<UploadPictureResult>
             {
                 Data = new UploadPictureResult(result),
-                ErrorCode = (int) (string.IsNullOrEmpty(result) ? ErrorCodeEnum.Fail : ErrorCodeEnum.Success)
+                ErrorCode = (int)(string.IsNullOrEmpty(result) ? ErrorCodeEnum.Fail : ErrorCodeEnum.Success)
             };
         }
-        
+
         [HttpPost]
         public async Task<ApiResult> SetSortAsync(SetSortRequest request)
         {

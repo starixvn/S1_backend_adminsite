@@ -5,8 +5,10 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Permission
@@ -490,7 +492,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var loginUser = _adminBll.GetUserV2(authInfo.UserId,request.SiteId);
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
 
             if (loginUser == null)
             {
@@ -557,11 +559,11 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            var result = _permissionBll.GetUpdateRolePermission(request.Role,loginUser);
+            var result = _permissionBll.GetUpdateRolePermission(request.Role, loginUser);
             result.Name = roleData.RoleName;
             result.Mark = roleData.Remark;
 
-            if(roleData.CurrencyList != null)
+            if (roleData.CurrencyList != null)
             {
                 result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(roleData.CurrencyList);
             }
@@ -678,7 +680,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
             var adminBrandRole = _permissionBll.GetAdminBrandRole(request.Role).ToList();
-            if(adminBrandRole.Count > 0)
+            if (adminBrandRole.Count > 0)
             {
                 return new ApiResult
                 {
@@ -707,7 +709,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         {
             var result = _permissionBll.GetAdminRole().ToList();
             var authInfo = _newAuthorizeBLL.GetAuthData();
-            if (result.Exists(x => x.RoleName == request.Name && x.Role != request.Role) )
+            if (result.Exists(x => x.RoleName == request.Name && x.Role != request.Role))
             {
                 return new ApiResult
                 {
@@ -723,7 +725,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Role is not exists"
                 };
             }
-            if (_permissionBll.UpdateAdminRole(request.Role.Value,request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserName) > 0)
+            if (_permissionBll.UpdateAdminRole(request.Role.Value, request.Name, request.Mark, request.CurrencyList, request.Permission, authInfo.UserName) > 0)
             {
                 return new ApiResult
                 {
@@ -820,7 +822,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
 
-            if(User.Role != null)
+            if (User.Role != null)
             {
                 roleList = JsonConvert.DeserializeObject<List<int>>(User.Role);
             }
@@ -833,12 +835,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 result.Role = roleList.FirstOrDefault();
                 var allRoleData = _permissionBll.GetAdminRole().ToList();
                 var roleData = allRoleData.Find(x => x.Role == result.Role);
-                if(roleData != null)
+                if (roleData != null)
                 {
                     result.RoleName = roleData.RoleName;
                 }
             }
-            if(User.CurrencyList != null)
+            if (User.CurrencyList != null)
             {
                 result.SelectCurrencyList = JsonConvert.DeserializeObject<List<int>>(User.CurrencyList);
             }
@@ -846,7 +848,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             {
                 result.SelectCurrencyList = new List<int>();
             }
- 
+
             return new ApiResult<UpdateUserPermission>
             {
                 Data = result,
@@ -992,7 +994,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 3 })]
         [HttpPost]
         public ApiResult SetAdminUserPassword(ApiRequestWithLog<SetAdminUserPasswordReq> request)
         {
@@ -1020,7 +1022,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         /// <remarks>
         /// Http Method：POST
         /// </remarks>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91,3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 91, 3 })]
         [HttpPost]
         public ApiResult SetAdminUserStatus(ApiRequestWithLog<SetAdminUserStatusReq> request)
         {
@@ -1114,14 +1116,14 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 }
                 afterUserBrands = beforeUserBrands.FindAll(x => x.SiteId != request.SiteId);
             }
-            else if(AdminBrandTypeEnum.Enable == request.Status)
+            else if (AdminBrandTypeEnum.Enable == request.Status)
             {
                 var data = _serverInfoBll.GetSiteList().ToList();
                 afterUserBrands.AddRange(beforeUserBrands);
-                afterUserBrands.Add(new UserBrand() 
-                { 
+                afterUserBrands.Add(new UserBrand()
+                {
                     SiteId = request.SiteId,
-                    SiteName = data.Find(x=> x.SiteId == request.SiteId)?.SiteName 
+                    SiteName = data.Find(x => x.SiteId == request.SiteId)?.SiteName
                 });
             }
 

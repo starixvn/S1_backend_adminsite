@@ -1,10 +1,9 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
-using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,7 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             var offset = request.StartTime.Offset;
 
             request.PageNumber = -1; //export all
-            var data = _betListBll.GetBetListReport(request, out var _);      
+            var data = _betListBll.GetBetListReport(request, out var _);
             foreach (var item in data)
             {
                 item.TransTime = item.TransTime.ToOffset(offset);

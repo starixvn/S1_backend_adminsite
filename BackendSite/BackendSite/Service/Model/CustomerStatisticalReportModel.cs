@@ -94,7 +94,7 @@
 
     public class CustomerStatisticalPartcialSummeryModel
     {
-        public int SiteId {get; set; }
+        public int SiteId { get; set; }
         public string SiteName { get; set; }
         public DateTime Date { get; set; }
         public int CustId { get; set; }

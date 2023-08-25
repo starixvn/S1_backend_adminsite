@@ -1,10 +1,14 @@
 ﻿using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
+
 using MySql.Data.MySqlClient;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -146,7 +150,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             var result = await _reportDbClient.QueryAsync<PersonalMsg>("Admin_PersonalMessage_Get_V5", props);
-            return new DataWithPage<PersonalMsg>() 
+            return new DataWithPage<PersonalMsg>()
             {
                 Data = result,
                 PageNumber = startIndex,
@@ -345,9 +349,9 @@ namespace BackendSite.Service.DAL
             props.Add("_Creator", updator);
             return await _mainDbClient.ExecuteAsync("Admin_BatchMessageSendLog_Ins_V2", _transaction, props);
         }
-        public async Task<int> UpdateBatchMessage(int status,int batchId)
+        public async Task<int> UpdateBatchMessage(int status, int batchId)
             => await _mainDbClient.ExecuteAsync("Admin_BatchMessageUpdateStatus_Set",
-                _transaction, 
+                _transaction,
                 new { _BatchId = batchId, _Status = status });
 
         public async Task BeginTransaction()

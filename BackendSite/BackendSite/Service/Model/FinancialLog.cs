@@ -1,5 +1,6 @@
 using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -21,7 +22,7 @@ namespace BackendSite.Service.Model
         public decimal AfterAmount { get; set; }
         public string RefTransId { get; set; }
         public string Memo { get; set; }
-        public FinancialType FinancialType 
+        public FinancialType FinancialType
         {
             get
             {
@@ -45,7 +46,7 @@ namespace BackendSite.Service.Model
                     return FinancialType.LockedAmount;
                 }
 
-                if (Type == (int)FinancialType.CancelledBonus && !Memo.Contains("Payment Adjustment", StringComparison.OrdinalIgnoreCase) )
+                if (Type == (int)FinancialType.CancelledBonus && !Memo.Contains("Payment Adjustment", StringComparison.OrdinalIgnoreCase))
                 {
                     return FinancialType.CancelledBonus;
                 }
@@ -404,7 +405,7 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public decimal Bonus { get; set; }
         public int RollOver { get; set; }
-        public int WinOver { get; set; } 
+        public int WinOver { get; set; }
         public int WalletType { get; set; }
         public int TpId { get; set; }
         public int CategoryId { get; set; }

@@ -8,7 +8,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
         {
             SiteId = req.SiteId;
             Days = req.Days;
-            Status = (int) req.Status;
+            Status = (int)req.Status;
             Operator = userName;
         }
 
@@ -42,7 +42,7 @@ namespace BackendSite.Service.Model.Store.PointSetting
             CurrencyId = req.CurrencyId;
             DepositAmount = req.DepositAmount;
             //PointRate = req.PointRate;
-            PromotionStatus = (int) req.PromotionStatus;
+            PromotionStatus = (int)req.PromotionStatus;
             PromotionPointRate = req.PromotionPointRate;
             PromotionStartTime = req.PromotionStartTime;
             PromotionEndTime = req.PromotionEndTime;

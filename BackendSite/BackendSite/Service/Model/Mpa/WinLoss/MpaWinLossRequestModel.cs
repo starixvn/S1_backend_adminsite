@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss

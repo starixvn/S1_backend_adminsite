@@ -1,6 +1,9 @@
 ﻿using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Library;
@@ -44,7 +47,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
-            
+
             var configuration = provider.GetRequiredService<IConfiguration>();
             _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
             _bucketName = configuration.GetValue<string>("AwsPaymentBucketName");
@@ -58,7 +61,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             public IFormFile File { get; set; }
         }
-        
+
         public class GetQrCodeUrlResult
         {
             public string QrCodeUrl { get; set; }
@@ -87,7 +90,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             {
                 var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
                     new GetOfflineBankingSettingParams(request));
-                
+
                 return new ApiListResult<OfflineBankingSetting>
                 {
                     Data = datas,
@@ -109,7 +112,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                     ErrorCode = (int)ErrorCodeEnum.Fail
                 };
             }
-            
+
         }
 
         /// <summary>
@@ -193,12 +196,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                     Operator = updater
                 });
             }
-            
+
             return success
                 ? new ApiResult((int)ErrorCodeEnum.Success, _selLangBll.GetMsg("msg_Updatesuccessful"))
                 : new ApiResult((int)ErrorCodeEnum.UpdateFailed, _selLangBll.GetMsg("msg_UpdateFailed"));
         }
-        
+
         [HttpPost]
         public async Task<ApiResult<GetQrCodeUrlResult>> GetQrCodeUrl([FromForm] GetQrCodeUrlRequest request)
         {
@@ -223,7 +226,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             return success ? path : string.Empty;
         }
-        
+
         #endregion
 
     }

@@ -1,11 +1,12 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
@@ -20,7 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         private readonly RiskBLL _riskBll;
         private readonly GameCasinoBLL _gameCasinoBll;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly ILogger<RiskController> _logger;
+        private readonly ILogger<TpDisableController> _logger;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
@@ -33,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             _riskBll = provider.GetRequiredService<RiskBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _logger = provider.GetRequiredService<ILogger<RiskController>>();
+            _logger = provider.GetRequiredService<ILogger<TpDisableController>>();
             _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
@@ -239,7 +240,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
             return new ApiResult
             {
-                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
 
@@ -260,7 +261,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                 new ParamsWithLog<DeleteDisableUser>(req, User.Identity.Name));
             return new ApiResult
             {
-                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
 
         }

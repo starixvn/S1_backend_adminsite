@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,12 +49,12 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             var data = await _reportBll.GetDepositPaymentReportAsync(
                 new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-            
+
             var result = ReportBLL.ExportPaymentReport<DepositPaymentReportSummary, DepositPaymentReportDetail>(data);
-        
+
             return _excelBll.ExcelFile(result, "DepositReport");
         }
-        
+
         [HttpPost]
         public async Task<ApiResult> GetWithdrawalReport(GetWithdrawalPaymentReportRequest request)
         {
@@ -66,23 +67,23 @@ namespace BackendSite.Controllers.ApiV2.Report
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> ExportWithdrawalReport(GetWithdrawalPaymentReportRequest request)
         {
             var data = await _reportBll.GetWithdrawalPaymentReportAsync(
                 new GetPaymentReportParams(request), request.StartTime.Offset, request.GroupBy);
-            
+
             var result = ReportBLL.ExportPaymentReport<WithdrawalPaymentReportSummary, WithdrawalPaymentReportDetail>(data);
-        
+
             return _excelBll.ExcelFile(result, "WithdrawalReport");
         }
-        
+
         [HttpPost]
         public ApiResult GetDepositType()
         {
             var data = EnumExtension
-                .EnumToSelectListItem(new []{DepositTypeEnum.LocalBanking});
+                .EnumToSelectListItem(new[] { DepositTypeEnum.LocalBanking });
 
             return new ApiResult<IEnumerable<SelectListItem>>
             {
@@ -90,12 +91,12 @@ namespace BackendSite.Controllers.ApiV2.Report
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         public ApiResult GetWithdrawalType()
         {
             var data = EnumExtension
-                .EnumToSelectListItem(new []{WithdrawalTypeEnum.Undefined, WithdrawalTypeEnum.LocalBank});
+                .EnumToSelectListItem(new[] { WithdrawalTypeEnum.Undefined, WithdrawalTypeEnum.LocalBank });
 
             return new ApiResult<IEnumerable<SelectListItem>>
             {

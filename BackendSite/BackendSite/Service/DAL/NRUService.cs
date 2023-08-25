@@ -1,7 +1,8 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using BackendSite.Service.Library;
+﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
 
 namespace BackendSite.Service.DAL
 {
@@ -19,7 +20,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        
+
         public List<MpaMarketingNRUInfo> GetMpaMarketingNRUInfo(
             int siteId,
             string currencyIds,
@@ -33,12 +34,12 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
-            
+
             var result = _mainDbClient.Query<MpaMarketingNRUInfo>("Admin_MarketingNRUList_Get", props);
 
             return result.ToList();
         }
-        
+
         public List<MpaMarketingNRUBonus> GetMpaMarketingNRUBonusInfo(
             int siteId,
             string currencyIds,
@@ -52,12 +53,12 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
-            
+
             var result = _reportDbClient.Query<MpaMarketingNRUBonus>("Admin_MarketingNRUBonusList_Get", props);
 
             return result.ToList();
         }
-        
+
         public List<MpaMarketingNRUBonusDetail> GetMpaMarketingNRUBonusDetailInfo(
             int siteId,
             string currencyIds,
@@ -71,7 +72,7 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_BaseCurrencyId", baseCurrencyId);
-            
+
             var result = _reportDbClient.Query<MpaMarketingNRUBonusDetail>("Admin_MarketingNRUBonusDetailList_Get", props);
 
             return result.ToList();

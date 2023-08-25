@@ -115,24 +115,24 @@ namespace BackendSite.Service.Model
     {
         public int CustId { set; get; }
     }
-    
+
     public class GetPromotionCashbackResponse
     {
         public string BonusCode { set; get; }
         public string Description { set; get; }
     }
-    
+
     public class GetPromotionDetailRequest
     {
         public string BonusCode { set; get; }
         public int CustId { set; get; }
     }
-    
+
     public class GetPromotionDetailResponse
     {
         public CashBackDetails CashBackDetails { get; set; }
     }
-    
+
     public class CashBackDetails
     {
         public decimal TotalBonus { get; set; }
@@ -160,9 +160,9 @@ namespace BackendSite.Service.Model
         public bool IsLogin { set; get; }
         public string LangId { set; get; }
         public string DefLang { set; get; }
-        public int PromotionType { set; get; } 
+        public int PromotionType { set; get; }
     }
-    
+
     public class PromotionDetailRequest
     {
         public int SiteId { set; get; }

@@ -4,6 +4,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -37,13 +38,13 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages, out rowCount);
         }
-        
+
         public async Task<(IEnumerable<OfflineBankingSetting> Datas, int TotalPages, int RowCount)> GetOfflineBankingSettingList
             (GetOfflineBankingSettingParams input)
         {
             var result = await _bankDetailService.GetOfflineBankingSettingListAsync(input);
             var vip = await _vipLevelService.GetVipLevelSettingAsync(input.SiteId);
-            
+
             foreach (var item in result.Datas)
             {
                 item.VipLevelNames = vip
@@ -53,18 +54,18 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public async Task<OfflineBankingSetting> GetOfflineBankingSettingByIdAsync(int id)
         {
             var result = await _bankDetailService.GetOfflineBankingSettingByIdAsync(id);
-            
+
             return result;
         }
-        
+
         public async Task<bool> SetOfflineBankingSettingAsync(SetOfflineBankingSettingParams input)
         {
             var result = await _bankDetailService.SetOfflineBankingSettingAsync(input);
-            
+
             return result > 0;
         }
 
@@ -105,30 +106,30 @@ namespace BackendSite.Service.BLL
             return result 
                    && _redisHelper.KeyDelete("Admin:BankInfoSysList");
         }
-        
+
         public IEnumerable<BankInfoSys> GetSysBankList(int currencyId)
         {
             var sysBankList = GetSysBankList().Where(x => (int)x.CurrencyId == currencyId);
 
             return sysBankList;
         }
-        
+
         /// <summary>
         /// 取代 GetAllBankInfoOff，GetBankInfoOff，GetBankAccountOffByCurrency
         /// </summary>
         public IEnumerable<OfflineBankAccount> GetOfflineBankAccount(int siteId = 0, int currencyId = 0)
         {
             var key = $"OfflineBankAccount:Site{siteId}:Currency{currencyId}";
-            
+
             return _redisHelper.TryGetOrCreate(key, TimeSpan.FromSeconds(30),
                 () => _localBankService.GetOfflineBankAccount(siteId, currencyId));
         }
-        
+
         public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
         {
             return _localBankService.GetBankCodeList(siteId);
         }
-        
+
         public IEnumerable<PayInfo> GetBankInfoPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
             var pointLevel = -1;
@@ -136,7 +137,7 @@ namespace BackendSite.Service.BLL
             {
                 pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
             }
-            
+
             var result = _localBankService.GetBankInfoPayList(siteId)
                 .Where(x => x.SysId == sysId
                             && x.CurrencyId == currencyId
@@ -159,16 +160,16 @@ namespace BackendSite.Service.BLL
                         TransferPin = d.TransferPin
                     };
                 });
-            
+
             return result;
         }
-        
+
         public IEnumerable<BankInfoPay> GetBankInfoPay(int siteId)
         {
             var bankInfoPayList = _localBankService.GetBankInfoPayList(siteId);
             return bankInfoPayList;
         }
-        
+
         public IEnumerable<PayInfo> GetEWalletPayList(int siteId, int currencyId, int sysId, decimal? amount, int? custId)
         {
             var pointLevel = -1;
@@ -176,9 +177,9 @@ namespace BackendSite.Service.BLL
             {
                 pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
             }
-            
+
             var eWalletPayList = _localBankService.GetEWalletPayList(siteId)
-                .Where(x =>  x.SysId == sysId
+                .Where(x => x.SysId == sysId
                              && x.CurrencyId == currencyId
                              && (amount == null || (x.MaxAmount == 0 || amount <= x.MaxAmount) && amount >= x.MinAmount)
                              && (pointLevel == -1 || pointLevel >= x.PointLevel))
@@ -199,10 +200,10 @@ namespace BackendSite.Service.BLL
                         TransferPin = d.TransferPin
                     };
                 });
-            
+
             return eWalletPayList;
         }
-        
+
         public IEnumerable<PayInfo> GetCryptoPayList(int siteId, int currencyId, string channelName, decimal? amount, int? custId)
         {
             var pointLevel = -1;
@@ -210,7 +211,7 @@ namespace BackendSite.Service.BLL
             {
                 pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
             }
-            
+
             var result = _localBankService.GetCryptoPayList(siteId)
                 .Where(x => x.ChannelName.Equals(channelName, StringComparison.OrdinalIgnoreCase)
                             && x.CurrencyId == currencyId
@@ -233,7 +234,7 @@ namespace BackendSite.Service.BLL
                         TransferPin = d.TransferPin
                     };
                 });
-            
+
             return result;
         }
 

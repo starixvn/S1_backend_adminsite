@@ -3,8 +3,10 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
@@ -130,8 +132,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var result = await _hotGame.SortingV2(request);
             return new ApiResult
             {
-                ErrorCode = result == 1 
-                    ? (int)ErrorCodeEnum.Success 
+                ErrorCode = result == 1
+                    ? (int)ErrorCodeEnum.Success
                     : (int)ErrorCodeEnum.SystemException
             };
         }

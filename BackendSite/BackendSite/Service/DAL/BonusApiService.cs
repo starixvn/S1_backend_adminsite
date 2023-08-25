@@ -14,7 +14,7 @@ public class BonusApiService : IBonusApiService
         _courierAdapter = courierAdapter;
         _bonusApiUrl = configuration.GetValue<string>("BonusService");
     }
-    
+
     public async Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType)
     {
         var rewardUrl = $"{_bonusApiUrl}SetVerificationReward";

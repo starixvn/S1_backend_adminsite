@@ -1,11 +1,12 @@
 ﻿using System.Text.RegularExpressions;
-using BackendSite.ExceptionHandling;
+
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -160,14 +161,14 @@ namespace BackendSite.Service.BLL
         public async Task<bool> DeletePersonalMsg(int id, string @operator)
         {
             var personalMsg = await messageService.GetMessageById(id);
-            if (personalMsg == null) 
+            if (personalMsg == null)
             {
                 _logger.LogError("message not found");
                 return false;
             }
 
             var customer = custInfoBLL.GetCustInfoWithCache(personalMsg.CustId);
-            if (customer == null) 
+            if (customer == null)
             {
                 _logger.LogError("customer not found");
                 return false;
@@ -401,7 +402,7 @@ namespace BackendSite.Service.BLL
             var result = true;
             var errorMsg = "";
 
-            if(JObject.Parse(personalMsg)["en"] == null)
+            if (JObject.Parse(personalMsg)["en"] == null)
             {
                 errorMsg = "Missing 'en' Msg";
                 return (false, errorMsg);

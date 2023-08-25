@@ -47,7 +47,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public VerificationRewardStatusEnum Status { get; set; }
     }
-    
+
     public class UpdateVerificationRewardStatusParams
     {
         public VerificationRewardStatusEnum Status { get; set; }
@@ -61,7 +61,7 @@ namespace BackendSite.Service.Model
         public decimal PhoneReward { get; set; }
         public decimal EmailReward { get; set; }
     }
-    
+
     public class SetVerificationRewardParams
     {
         public VerificationTypeEnum VerificationType { get; set; }

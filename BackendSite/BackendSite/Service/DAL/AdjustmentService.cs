@@ -1,11 +1,15 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+using System.Text.RegularExpressions;
+
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
+
 using MySql.Data.MySqlClient;
+
 using Newtonsoft.Json;
-using System.Data;
-using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.DAL
 {
@@ -168,7 +172,7 @@ namespace BackendSite.Service.DAL
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             var p = new DynamicParameters(new
             {
                 _SiteId = input.SiteId,
@@ -186,7 +190,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             _ = _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins_V2", trans, p);
-            
+
             var transId = p.Get<string>("_TransId") ?? string.Empty;
             var resultCode = p.Get<int>("_Result");
 
@@ -195,22 +199,22 @@ namespace BackendSite.Service.DAL
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return (resultCode, string.Empty);
             }
-            
+
             var amount = input.AdjustType == WithdrawalLimitAdjustmentAdjustTypeEnum.Debit ? input.Amount * -1 : input.Amount;
             var result = withdrawalLimitService.SetWithdrawalLimit(input.CustId, input.UserName, input.SiteId,
-                amount, (int)input.ReasonId, input.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.LimitAdjustment , input.Operator, out var afterAmount, trans);
+                amount, (int)input.ReasonId, input.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment, input.Operator, out var afterAmount, trans);
 
             if (result < 1)
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return (-2, string.Empty);
             }
-            
+
             p = new DynamicParameters();
             p.Add("_SiteId", input.SiteId);
             p.Add("_CurrencyId", input.CurrencyId);
-            p.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalLimitAdjustment);
-            p.Add("_ActionType", (int) ActionType.Create);
+            p.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.WithdrawalLimitAdjustment);
+            p.Add("_ActionType", (int)ActionType.Create);
             p.Add("_RefTransId", transId);
             p.Add("_BeforeDetailInfo", null, DbType.String);
             p.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
@@ -222,15 +226,15 @@ namespace BackendSite.Service.DAL
                 input.Memo
             }), DbType.String);
             p.Add("_Operator", input.Operator);
-            
+
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, p);
-            
+
             if (logResult < 1)
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return (-3, string.Empty);
             }
-            
+
             _mainDbClient.CommitAndDisposeConnection(conn, trans);
 
             return (resultCode, transId);
@@ -248,7 +252,7 @@ namespace BackendSite.Service.DAL
 
             var props = new DynamicParameters();
             props.Add("CustId", withdrawalLimitInfo.CustId);
-            var walletInfo = _mainDbClient.Query<WithdrawalLimitInfo>("Member_CustWithdrawalLimit_Get",props).FirstOrDefault();
+            var walletInfo = _mainDbClient.Query<WithdrawalLimitInfo>("Member_CustWithdrawalLimit_Get", props).FirstOrDefault();
             decimal deduction = 0;
             if (walletInfo != null)
             {
@@ -288,7 +292,7 @@ namespace BackendSite.Service.DAL
                 else
                 {
                     var amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
-                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, (int)WithdrawalLimitAdjustmentReasonEnum.None ,withdrawalLimitInfo.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment , Operator ,out var AfterAmount, trans);
+                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, (int)WithdrawalLimitAdjustmentReasonEnum.None, withdrawalLimitInfo.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment, Operator, out var AfterAmount, trans);
 
                     #region propsLog
                     var propsLog = new DynamicParameters();
@@ -321,7 +325,7 @@ namespace BackendSite.Service.DAL
         public int SetAdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string Adjustment_transId)
         {
             Adjustment_transId = null;
-            
+
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -405,7 +409,7 @@ namespace BackendSite.Service.DAL
                             p.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
                             _ = _mainDbClient.Execute("Admin_AdjustWithdrawalLimitInfo_Ins_V2", trans, p);
-            
+
                             var transId = p.Get<string>("_TransId") ?? string.Empty;
                             var resultCode = p.Get<int>("_Result");
 
@@ -417,7 +421,7 @@ namespace BackendSite.Service.DAL
                             else
                             {
                                 var amount = adjustmentAndWithdrawalLimit.WithdrawalLimitAmountAdjustType == 2 ? adjustmentAndWithdrawalLimit.WithdrawalLimitAmount * -1 : adjustmentAndWithdrawalLimit.WithdrawalLimitAmount;
-                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Category ,adjustmentAndWithdrawalLimit.Memo, transId, (int) WithdrawalLimitLogCreateFromEnum.BalanceAdjustment , Operator ,out _, trans);
+                                result = withdrawalLimitService.SetWithdrawalLimit(adjustmentAndWithdrawalLimit.CustId, adjustmentAndWithdrawalLimit.UserName, adjustmentAndWithdrawalLimit.SiteId, amount, adjustmentAndWithdrawalLimit.Category, adjustmentAndWithdrawalLimit.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.BalanceAdjustment, Operator, out _, trans);
                                 //return 0;
                             }
                         }
@@ -440,7 +444,7 @@ namespace BackendSite.Service.DAL
             }
             return result;
         }
-        
+
         public int AdjustmentActualDeposit(AdjustmentAndWithdrawalLimit input, string transId, decimal adjustAmount, MySqlTransaction trans)
         {
             var props = new DynamicParameters();
@@ -456,31 +460,31 @@ namespace BackendSite.Service.DAL
             var afterAmount = props.Get<decimal>("_AfterAmount");
             var resultCode = props.Get<int>("_Result");
 
-            if (resultCode != (int) ErrorCodeEnum.Success)
+            if (resultCode != (int)ErrorCodeEnum.Success)
             {
                 _logger.LogError($"AdjustmentActualDeposit update ActualDeposit failed, resultCode: {resultCode}, depositId: {input.DepositId}");
-                
+
                 return resultCode;
             }
-            
+
             props = new DynamicParameters();
             props.Add("_TransId", transId);
             props.Add("_DepositId", input.DepositId);
-            props.Add("_AdjustType", (int) AdjustWalletTypeEnum.Main);
+            props.Add("_AdjustType", (int)AdjustWalletTypeEnum.Main);
             props.Add("_BeforeAmount", beforeAmount);
             props.Add("_AfterAmount", afterAmount);
 
             if (_mainDbClient.Execute("Admin_AdjustmentDepositLog_Ins", trans, props) < 1)
             {
                 _logger.LogError($"AdjustmentDepositLog insert failed, depositId: {input.DepositId}");
-                
+
                 return -1;
             }
-            
+
             props.Add("_SiteId", input.SiteId);
             props.Add("_CurrencyId", input.CurrencyId);
-            props.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BalanceAdjustment);
-            props.Add("_ActionType", (int) ActionType.Create);
+            props.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BalanceAdjustment);
+            props.Add("_ActionType", (int)ActionType.Create);
             props.Add("_RefTransId", transId);
             props.Add("_BeforeDetailInfo", null, DbType.String);
             props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
@@ -493,7 +497,7 @@ namespace BackendSite.Service.DAL
                 AfterActualDeposit = afterAmount
             }), DbType.String);
             props.Add("_Operator", input.Operator);
-            
+
             return _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, props);
         }
 
@@ -578,23 +582,24 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyId", 0);
             return _reportDbClient.Query<CheckBalanceAdjustData>("Admin_CheckBalanceAdjust_Get_V2", props);
         }
-        
+
         public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
         {
             var props = new DynamicParameters();
             props.Add("_TransId", transId);
-            
+
             return _reportDbClient.Query<AdjustmentDepositLog>("Admin_AdjustmentDepositLog_GetByTransId", props)
                 .FirstOrDefault();
         }
 
         public CheckPayoutBonusCodeData CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
         {
-            var props = new DynamicParameters(new {
+            var props = new DynamicParameters(new
+            {
                 BonusCode = bonusCode,
                 SiteId = siteId,
                 CurrencyId = currencyId,
-            }); 
+            });
             return _reportDbClient.QueryFirst<CheckPayoutBonusCodeData>("Admin_CheckPayoutBonusCode_Get", props);
         }
     }

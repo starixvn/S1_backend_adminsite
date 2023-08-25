@@ -2,6 +2,7 @@ using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Report;
@@ -50,7 +51,7 @@ public class GetPaymentReportParams : IApiRequest
     {
         SiteId = req.SiteId;
         CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
-        BaseCurrencyId = (int) req.BaseCurrencyId;
+        BaseCurrencyId = (int)req.BaseCurrencyId;
         PayIds = JsonConvert.SerializeObject(req.PayIds);
         Types = JsonConvert.SerializeObject(req.Types);
         UserNames = req.UserNameList.Any() ? JsonConvert.SerializeObject(req.UserNames) : null;
@@ -58,12 +59,12 @@ public class GetPaymentReportParams : IApiRequest
         EndTime = req.EndTime.UtcDateTime;
         MultiSiteAndCurrencyIds = req.MultiSiteAndCurrencyIds;
     }
-    
+
     public GetPaymentReportParams(GetWithdrawalPaymentReportRequest req)
     {
         SiteId = req.SiteId;
         CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
-        BaseCurrencyId = (int) req.BaseCurrencyId;
+        BaseCurrencyId = (int)req.BaseCurrencyId;
         PayIds = JsonConvert.SerializeObject(req.PayIds);
         Types = JsonConvert.SerializeObject(req.Types);
         UserNames = req.UserNameList.Any() ? JsonConvert.SerializeObject(req.UserNames) : null;
@@ -71,7 +72,7 @@ public class GetPaymentReportParams : IApiRequest
         EndTime = req.EndTime.UtcDateTime;
         MultiSiteAndCurrencyIds = req.MultiSiteAndCurrencyIds;
     }
-    
+
     public int SiteId { get; set; }
     public string CurrencyIds { get; set; }
     public int BaseCurrencyId { get; set; }

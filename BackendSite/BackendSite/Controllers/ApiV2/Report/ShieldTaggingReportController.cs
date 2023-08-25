@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -77,19 +78,19 @@ namespace BackendSite.Controllers.ApiV2.Report
             public List<string> PlatformSting => Platform.Select(x => x.ToString()).ToList();
             public List<int> Tags { get; set; }
         }
-        
+
         public class GetAssociateAccountReq
         {
             public string ShieldId { get; set; }
         }
 
         #endregion
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 137, 1 })]
         [HttpPost]
         public ApiListResult<ShieldTaggingReport> GetList(GetListReq request)
         {
-            var datas = _shieldBll.GetList(request ,out var totalPages, out var rowCount );
+            var datas = _shieldBll.GetList(request, out var totalPages, out var rowCount);
 
             if (datas.Any())
             {
@@ -104,15 +105,15 @@ namespace BackendSite.Controllers.ApiV2.Report
                         if (isContains)
                         {
                             var propertyValue = data.GetType().GetProperty(property.Name)?.GetValue(data, null);
-                            if ( propertyValue != null && (int)propertyValue > 0)
+                            if (propertyValue != null && (int)propertyValue > 0)
                             {
-                                data.Tags.Add((int) Enum.Parse(typeof(ShieldRiskTagged), property.Name));
+                                data.Tags.Add((int)Enum.Parse(typeof(ShieldRiskTagged), property.Name));
                             }
                         }
                     }
                 }
             }
-            
+
             return new ApiListResult<ShieldTaggingReport>
             {
                 Data = datas,
@@ -122,24 +123,24 @@ namespace BackendSite.Controllers.ApiV2.Report
                 RowCount = rowCount
             };
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 137, 2 })]
         [HttpPost]
         public IActionResult GetExport(GetExportReq request)
         {
             var datas = _shieldBll.GetExport(request);
-            
+
             var stream = _excelBll.ExportV2(datas);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"ShieldTaggingReport_{DateTime.Now.ToString("yyyyMMdd")}.xlsx");
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 137, 1 })]
         [HttpPost]
         public ApiResult GetAssociateAccount(GetAssociateAccountReq request)
         {
             var datas = _shieldBll.GetAssociateAccount(request);
-            
+
             return new ApiResult<IEnumerable<ShieldAssociateAccountResult>>
             {
                 Data = datas,

@@ -1,9 +1,10 @@
-﻿using BackendSite.Service.BLL.Interface;
+﻿using System.Text.RegularExpressions;
+
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System.Text.RegularExpressions;
 
 namespace BackendSite.Service.BLL
 {
@@ -58,7 +59,7 @@ namespace BackendSite.Service.BLL
                 unLockResult = _redisHelper.KeyDelete(key);
                 var _ = await _withdrawalService.SetWithdrawalInfoOnUser(transId, onUser: "");
             }
-            
+
             return unLockResult;
         }
 

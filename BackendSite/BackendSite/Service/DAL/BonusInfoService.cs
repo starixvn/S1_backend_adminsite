@@ -1,8 +1,11 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -223,12 +226,12 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_TimeZone", timeZone);
-            
+
             var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get_V3", props);
 
             return result.ToList();
         }
-        
+
         public List<MpaBonusGGR> GetMpaBonusGGRList(
             string multiSiteRequests,
             DateTime startDate,
@@ -240,7 +243,7 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_TimeZone", timeZone);
-            
+
             var result = _reportDbClient.Query<MpaBonusGGR>("Admin_BonusSummaryGGR_Get_V2", props);
 
             return result.ToList();
@@ -263,11 +266,11 @@ namespace BackendSite.Service.DAL
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_BaseCurrencyId", baseCurrencyId);
             props.Add("_TimeZone", timeZone);
-            
+
             var result = _reportDbClient.Query<MpaBonusDetail>("Admin_BonusSummaryDetail_Get_V2", props);
             return result.ToList();
         }
-        
+
         public IEnumerable<MpaMarketingBonus> GetMpaMarketingBonus(
             string multiSiteRequest,
             DateTime startDate,
@@ -288,7 +291,7 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_CustId", custId);
             props.Add("_RewardPoint", dbType: DbType.Decimal, direction: ParameterDirection.Output);
-            
+
             var data =
                 _reportDbClient.Query<CustBonusTypeBonusAmount>("Admin_CustBonusSum_Get_V2", props);
 
@@ -311,7 +314,7 @@ namespace BackendSite.Service.DAL
                 CancelBonusAmount = data.Sum(x => x.CancelBonus),
                 RewardPoint = props.Get<decimal?>("_RewardPoint") ?? 0
             };
-            
+
             return result;
         }
 

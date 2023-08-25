@@ -4,6 +4,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,7 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiListResult<LiveRegistration>> GetList(GetRegLiveStatusRequest request)
         {
             var searchResult = await _registrationBll.GetRegLiveStatusData(request);
-            
+
             var apiResult = new ApiListResult<LiveRegistration>
             {
                 Data = searchResult.LiveRegistration,

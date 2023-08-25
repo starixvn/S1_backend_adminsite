@@ -6,6 +6,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,7 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #region Model
 
-        public class GetListRequest: ApiRequestPageModel
+        public class GetListRequest : ApiRequestPageModel
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }

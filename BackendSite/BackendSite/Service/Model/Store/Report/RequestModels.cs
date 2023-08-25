@@ -15,8 +15,8 @@ namespace BackendSite.Service.Model.Store.Report
         public string UserName { get; set; }
         public string SabaId { get; set; }
     }
-    
-    public class ExportDepositPointReportRequest 
+
+    public class ExportDepositPointReportRequest
     {
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
@@ -29,7 +29,7 @@ namespace BackendSite.Service.Model.Store.Report
     }
 
     #endregion
-    
+
     #region AdjustmentPoint
 
     public class GetAdjustmentPointReportRequest : ApiRequestPageModel
@@ -44,8 +44,8 @@ namespace BackendSite.Service.Model.Store.Report
         public string UserName { get; set; }
         public string SabaId { get; set; }
     }
-    
-    public class ExportAdjustmentPointReportRequest 
+
+    public class ExportAdjustmentPointReportRequest
     {
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }

@@ -8,5 +8,5 @@ public static class PagerExtension
         var startIndex = (Math.Abs(pageNumber) - 1) * absPageSize;
 
         return (startIndex, absPageSize);
-    }   
+    }
 }

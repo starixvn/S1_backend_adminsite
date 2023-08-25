@@ -81,7 +81,7 @@ namespace BackendSite.Service.Model
         public string TypeName { get; set; }
         public IEnumerable<VipUpgradeSettingDetail> Detail { get; set; }
     }
-    public class VipUpgradeSettingDetail 
+    public class VipUpgradeSettingDetail
     {
         public int Level { get; set; }
         public string LevelValue { get; set; }

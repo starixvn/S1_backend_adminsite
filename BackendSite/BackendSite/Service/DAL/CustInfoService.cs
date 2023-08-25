@@ -1,12 +1,16 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+
+using BackendSite.Extensions;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
-using Dapper;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using System.Data;
-using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -229,7 +233,7 @@ namespace BackendSite.Service.DAL
                 SelectStatus = SelectStatus,
                 SelectTagList = jsonSelectTagList
             });
-            
+
             var custInfoDetailList = _reportDbClient.Query<T>("Admin_CustInfoSearchForExport_Get_V9", p);
             return custInfoDetailList;
         }

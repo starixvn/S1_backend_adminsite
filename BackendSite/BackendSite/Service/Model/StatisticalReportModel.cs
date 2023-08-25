@@ -11,7 +11,7 @@
         public string CategoryName { get; set; }
         public decimal TurnOverValidBetTodaySummary { get; set; }
         public decimal TurnOverValidBetTodaySummaryInMYR { get; set; }
-        public decimal TurnOverValidBetYesterdaySummary {get; set; }
+        public decimal TurnOverValidBetYesterdaySummary { get; set; }
         public decimal TurnOverValidBetYesterdaySummaryInMYR { get; set; }
         public decimal TurnOverValidBetLastTwoDaysSummary { get; set; }
         public decimal TurnOverValidBetLastTwoDaysSummaryInMYR { get; set; }
@@ -19,10 +19,10 @@
         public decimal TurnOverValidBetThisMonthSummaryInMYR { get; set; }
         public decimal TurnOverValidBetLastMonthSummary { get; set; }
         public decimal TurnOverValidBetLastMonthSummaryInMYR { get; set; }
-        public decimal WinLossTodaySummary { get; set;}
+        public decimal WinLossTodaySummary { get; set; }
         public decimal WinLossTodaySummaryInMYR { get; set; }
         public decimal WinLossYesterdaySummary { get; set; }
-        public decimal WinLossYesterdaySummaryInMYR { get;set; }
+        public decimal WinLossYesterdaySummaryInMYR { get; set; }
         public decimal WinLossLastTwoDaysSummary { get; set; }
         public decimal WinLossLastTwoDaysSummaryInMYR { get; set; }
         public decimal WinLossThisMonthSummary { get; set; }

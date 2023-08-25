@@ -6,7 +6,7 @@ namespace BackendSite.Service.Model
     {
         private DateTimeOffset _startTime { set; get; }
         private DateTimeOffset _endTime { set; get; }
-        public DateTimeOffset? StartTime 
+        public DateTimeOffset? StartTime
         {
             get => _startTime;
             set
@@ -15,7 +15,7 @@ namespace BackendSite.Service.Model
                     _startTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
-        public DateTimeOffset? EndTime 
+        public DateTimeOffset? EndTime
         {
             get => _endTime;
             set
@@ -38,7 +38,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<BannerDetails> Specific { get; set; }
         public int Sort { get; set; }
     }
-    
+
     public class SetRequest
     {
         private DateTimeOffset? _startTime;
@@ -81,14 +81,14 @@ namespace BackendSite.Service.Model
         public string BannerName { get; set; }
         public BannerStatusEnum Status { get; set; }
     }
-    
+
     public class GetBannerRequest
     {
         public int SiteId { get; set; }
         public string BannerName { get; set; }
         public int CurrencyId { get; set; }
     }
-    
+
     public class BannerDetails
     {
         public int CurrencyId { get; set; }
@@ -99,7 +99,7 @@ namespace BackendSite.Service.Model
     {
         private DateTimeOffset? _lastUpdateTime { set; get; }
         public int Status { get; set; }
-        public DateTimeOffset? LastUpdateTime 
+        public DateTimeOffset? LastUpdateTime
         {
             get => _lastUpdateTime;
             set

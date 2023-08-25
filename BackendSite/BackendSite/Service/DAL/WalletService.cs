@@ -1,9 +1,12 @@
-﻿using MySql.Data.MySqlClient;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
@@ -67,8 +70,9 @@ namespace BackendSite.Service.DAL
         {
             totalPages = 0;
             var p = new DynamicParameters(
-
-                new { CustId = custId, 
+                new
+                {
+                    CustId = custId,
                     PromoCategoryIds = promoCategoryIds,
                     StartDate = startDate,
                     EndDate = endDate,
@@ -99,7 +103,7 @@ namespace BackendSite.Service.DAL
             DateTime endDate,
             string userName,
             string categoryIdStr,
-            int baseCurrencyId, int payoutStatuses,int startIndex, int pageSize,
+            int baseCurrencyId, int payoutStatuses, int startIndex, int pageSize,
             ref List<string> currencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
@@ -132,7 +136,7 @@ namespace BackendSite.Service.DAL
             props.Add("_PageSize", pageSize);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V10", props).ToList();
 
             searchData.VipRebateInfoList = result;
@@ -192,8 +196,8 @@ namespace BackendSite.Service.DAL
 
         public VipRebateInfoData GetVipRebateInfoListExport(string multiSiteRequest,
             DateTime startDate,
-            DateTime endDate, 
-            string userName, 
+            DateTime endDate,
+            string userName,
             string categoryIdStr,
             int baseCurrencyId,
             int spPayoutStatus)

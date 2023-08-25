@@ -3,6 +3,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -107,7 +108,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                 request.PageNumber,
                 out var totalPages,
                 out var rowCount);
-            
+
             return new ApiListResult<CustVerificationRewardModel>
             {
                 Data = data,
@@ -147,12 +148,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         {
             if (string.IsNullOrWhiteSpace(userName) && string.IsNullOrWhiteSpace(sabaId))
                 return 0;
-            
+
             if (!string.IsNullOrWhiteSpace(sabaId))
                 return _common.TpIdToCustId(sabaId);
-            
+
             var cust = await _custInfoBll.GetCustId(null, userName, siteId);
-            
+
             return cust?.CustId;
         }
     }

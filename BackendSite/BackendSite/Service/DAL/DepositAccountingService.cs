@@ -1,10 +1,12 @@
 ﻿using System.Data;
-using BackendSite.Service.Library;
-using BackendSite.Service.Model;
-using Dapper;
+
 using BackendSite.Controllers.ApiV2.Finance.Deposit;
 using BackendSite.Extensions;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
 
 namespace BackendSite.Service.DAL
 {
@@ -27,7 +29,7 @@ namespace BackendSite.Service.DAL
         }
 
         #endregion
-        
+
         public IEnumerable<DepositAccountingModel> GetDepositAccountingList(string siteIds,
             string currencyIds,
             DateTime startDate,
@@ -61,22 +63,22 @@ namespace BackendSite.Service.DAL
 
             return data;
         }
-        
+
         public DepositAccountingModel GetDepositAccountingByTransId(string transId)
         {
             var parameter = new DynamicParameters();
             parameter.Add("_TransId", transId);
             var data = _reportDbClient.QueryFirst<DepositAccountingModel>("Admin_DepositAccountingByTransId_Get", parameter);
-            
+
             return data;
         }
-        
+
         public int EditDepositAccounting(ParamsWithLog<DepositAccountingController.EditRequest> input)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
-            using var trans =  conn.BeginTransaction();
-            
+            using var trans = conn.BeginTransaction();
+
             var parameter = new DynamicParameters();
             parameter.Add("_TransId", input.TransId);
             parameter.Add("_AccountNo", input.After.AccountNo);
@@ -89,8 +91,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BetLimit);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BetLimit);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog(), DbType.String);
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -106,7 +108,7 @@ namespace BackendSite.Service.DAL
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return result;
         }
-        
+
         public IEnumerable<DepositAccountingModel> ExportDepositAccountingList(
             string siteIds,
             string currencyIds,
@@ -126,7 +128,7 @@ namespace BackendSite.Service.DAL
 
             var data = _reportDbClient.Query<DepositAccountingModel>(
                 "Admin_DepositAccountingExport_Get", parameter);
-            
+
             return data;
         }
     }

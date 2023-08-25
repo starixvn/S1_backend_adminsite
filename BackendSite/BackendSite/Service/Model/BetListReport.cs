@@ -1,10 +1,12 @@
-﻿using BackendSite.Service.Model.ApiModel;
-using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using System.Text;
+
+using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Service.Model
 {
@@ -39,7 +41,7 @@ namespace BackendSite.Service.Model
         public string MatchID { get; set; } = string.Empty;
         public string BetType { get; set; } = string.Empty;
         public string IP { get; set; } = string.Empty;
-        public DateTimeOffset StartTime { get; set; } 
+        public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
         public decimal Stake { get; set; } = 0;
         public decimal WinlostAmount { get; set; } = 0;
@@ -60,7 +62,7 @@ namespace BackendSite.Service.Model
         public OrderByDirection OrderByDirection { get; set; }
 
         public string GetRedisKey()
-        {         
+        {
             var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
             jObject["StartTime"] = StartTime.ToString("yyyyMMddHHmmssfff");
             jObject["EndTime"] = EndTime.ToString("yyyyMMddHHmmssfff");
@@ -71,7 +73,7 @@ namespace BackendSite.Service.Model
             jObject.Remove("OrderByProperty");
             jObject.Remove("OrderByDirection");
 
-            var key = new StringBuilder();          
+            var key = new StringBuilder();
             foreach (var item in jObject.Properties())
             {
                 key.Append($"{item.Name}:{item.Value}:");
@@ -85,7 +87,7 @@ namespace BackendSite.Service.Model
     {
         private bool _isDisposed;
         private IntPtr _nativeResource = Marshal.AllocHGlobal(100);
-        
+
         public string SiteId { get; set; }
         public string CurrencyId { get; set; }
         public string UserName { get; set; }
@@ -93,7 +95,7 @@ namespace BackendSite.Service.Model
         public int TpId { get; set; }
         public string TransId { get; set; }
         public int GameType { get; set; }
-        public DateTimeOffset TransTime 
+        public DateTimeOffset TransTime
         {
             get
             {
@@ -105,7 +107,7 @@ namespace BackendSite.Service.Model
             }
         }
         private DateTime _transTime { get; set; }
-        public DateTimeOffset SettledTime 
+        public DateTimeOffset SettledTime
         {
             get
             {
@@ -145,11 +147,11 @@ namespace BackendSite.Service.Model
         public string Live { get; set; }
         public string IP { get; set; }
         public string TagList { get; set; }
-        public IEnumerable<int> Tags 
+        public IEnumerable<int> Tags
         {
-            get 
+            get
             {
-                if (TagList?.Length > 0 )
+                if (TagList?.Length > 0)
                 {
                     return JsonConvert.DeserializeObject<IEnumerable<int>>(TagList);
                 }
@@ -158,7 +160,7 @@ namespace BackendSite.Service.Model
         }
         public int VipLevel { get; set; }
         public string LevelName { get; set; }
-        
+
         public void Dispose()
         {
             Dispose(disposing: true);
@@ -169,7 +171,7 @@ namespace BackendSite.Service.Model
         protected virtual void Dispose(bool disposing)
         {
             if (_isDisposed) return;
-            
+
             if (disposing)
             {
                 // free managed resources

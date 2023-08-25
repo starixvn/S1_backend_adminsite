@@ -9,10 +9,10 @@ namespace BackendSite.Service.BLL
     public class ExchangeUSDRateBLL
     {
         private readonly MySqlClient _mainDbClient;
-       
+
         public ExchangeUSDRateBLL(IServiceProvider provider)
         {
-            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);        
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
         public IEnumerable<CurrencyUSDRate> GetExchangeUSDRate()

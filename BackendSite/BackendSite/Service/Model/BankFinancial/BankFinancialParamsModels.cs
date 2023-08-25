@@ -28,7 +28,7 @@ namespace BackendSite.Service.Model.BankFinancial
             Agent = req.Agent ?? string.Empty;
             AccountNo = req.AccountNo ?? string.Empty;
         }
-        
+
         public bool IsSetting { get; set; }
         public int SiteId { get; set; }
         public string StrCurrencyIds { get; set; }
@@ -40,7 +40,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public string AccountNo { get; set; }
         public int Id { get; set; }
     }
-    
+
     public class GetTransferInfoListParams
     {
         public GetTransferInfoListParams(GetTransferInfoListRequest req)
@@ -59,7 +59,7 @@ namespace BackendSite.Service.Model.BankFinancial
             ToAgent = string.IsNullOrWhiteSpace(req.ToAgent) ? null : req.ToAgent;
             Reason = req.Reason;
         }
-        
+
         public GetTransferInfoListParams(ExportTransferInfoListRequest req)
         {
             IsExport = true;
@@ -77,7 +77,7 @@ namespace BackendSite.Service.Model.BankFinancial
             ToAgent = string.IsNullOrWhiteSpace(req.ToAgent) ? null : req.ToAgent;
             Reason = req.Reason;
         }
-        
+
         public bool IsExport { get; set; }
         public int SiteId { get; set; }
         public DateTimeOffset StartTime { get; set; }

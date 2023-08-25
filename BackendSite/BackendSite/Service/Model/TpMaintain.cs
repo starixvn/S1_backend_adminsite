@@ -159,7 +159,7 @@ namespace BackendSite.Service.Model.TpMaintain
         public int CategoryId { set; get; }
         public string CategoryName { set; get; }
     }
-    
+
     public class TpCategoryComparer : IEqualityComparer<TpCategory>
     {
         public bool Equals(TpCategory t1, TpCategory t2)

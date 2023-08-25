@@ -1,16 +1,19 @@
-﻿using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using Dapper;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using System.Data;
+﻿using System.Data;
 using System.Text.RegularExpressions;
+
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
-using Org.BouncyCastle.Bcpg.OpenPgp;
+using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
+
+using Newtonsoft.Json;
+
 using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
-using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Service.DAL
 {
@@ -728,7 +731,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
             return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
-        
+
         public IEnumerable<WithdrawalMessage> GetWithdrawalMessage(IEnumerable<int> withdrawalIds)
         {
             var props = new DynamicParameters();
@@ -745,7 +748,7 @@ namespace BackendSite.Service.DAL
             p.Add("_WithdrawalId", withdrawalId);
             p.Add("_OnUser", onUser);
             var result = await _mainDbClient.ExecuteAsync("Admin_WithdrawalInfoOnUser_Set", p) > 0;
-            
+
             return result;
         }
 

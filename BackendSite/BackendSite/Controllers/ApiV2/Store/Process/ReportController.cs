@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Store.Report;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,17 +30,17 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
 
             return result;
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> ExportDepositPointReportAsync(ExportDepositPointReportRequest req)
         {
             var result = await _storeReportBLL.ExportDepositPointReportAsync(req);
-            
+
             return _excelBll.ExcelFile(result, "DepositPointReport");
         }
 
         #endregion
-        
+
         #region AdjustmentPoint
 
         [HttpPost]
@@ -49,12 +50,12 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
 
             return result;
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> ExportAdjustmentPointReportAsync(ExportAdjustmentPointReportRequest req)
         {
             var result = await _storeReportBLL.ExportAdjustmentPointReportAsync(req);
-            
+
             return _excelBll.ExcelFile(result, "AdjustmentPointReport");
         }
 

@@ -33,7 +33,7 @@ namespace BackendSite.Service.Model
         public decimal DifferenceAmount { get; set; }
         public decimal AvailableBalance { get; set; }
     }
-    
+
     public class SetAdjustWithdrawalLimitParams
     {
         public int SiteId { get; set; }

@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.ApiModel;
+
 using NUnit.Framework;
 
 namespace BackendSite.Service.Model.TpMaintain.Tests
@@ -11,7 +12,7 @@ namespace BackendSite.Service.Model.TpMaintain.Tests
         [SetUp]
         public void Setup()
         {
-             _pageInfo = new PageInfo();
+            _pageInfo = new PageInfo();
         }
 
         [TestCase(10, 1, 5, 2, "1-5")]

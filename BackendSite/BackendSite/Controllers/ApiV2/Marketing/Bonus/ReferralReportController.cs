@@ -4,8 +4,10 @@ using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
@@ -80,7 +82,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "referralCount" : request.OrderByProperty;
             var data = await _referralManagementBll.GetReferralCustList(siteId, request.UserName, request.CurrencyId, startTime, endTime, request.PageSize, request.PageNumber, request.OrderBy, orderByProperty, request.OrderByDirection);
-            
+
             var apiResult = new ApiListResult<ReferralCustList>
             {
                 Data = data.ReferralCustList,
@@ -113,7 +115,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 var startTime = request.StartDate.ToUniversalTime().DateTime;
                 var endTime = request.EndDate.ToUniversalTime().DateTime;
                 var data = _referralManagementBll.GetRefFriendList(
-                    request.CustId, startTime, endTime, request.PageSize, request.PageNumber, 
+                    request.CustId, startTime, endTime, request.PageSize, request.PageNumber,
                     out var totalPages, out var rowCount);
                 apiResult.Data = data;
                 apiResult.PageNumber = request.PageNumber;

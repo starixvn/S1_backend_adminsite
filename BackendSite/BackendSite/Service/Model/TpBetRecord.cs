@@ -1,5 +1,5 @@
 ﻿namespace BackendSite.Service.Model
-{    
+{
     public class GetTpBetRecordRequest
     {
         public int CustId { get; set; }

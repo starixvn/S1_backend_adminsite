@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -28,7 +29,7 @@ namespace BackendSite.Service.Model
         public int Sort { get; set; }
         public int Ver { get; set; }
     }
-    
+
     public class OfflineBankAccount
     {
         public int BankId { get; set; }
@@ -43,22 +44,22 @@ namespace BackendSite.Service.Model
         public string DisplayName { get; set; }
         public TransferAccountStatusEnum AccountStatus { get; set; }
         public BankCardManagementStatusEnum SettingStatus { get; set; }
-        
+
         public string Purpose { get; set; }
 
         public IEnumerable<TransferAccountPurposeEnum> Purposes =>
             JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(Purpose ?? "[]");
-        
+
         public string JsonPointLevels { set; get; }
         public IEnumerable<int> PointLevels =>
             JsonConvert.DeserializeObject<IEnumerable<int>>(JsonPointLevels ?? "[]");
         public string JsonVipLevels { set; get; }
         public IEnumerable<int> VipLevels =>
             JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels ?? "[]");
-        
+
         public decimal MinAmount { set; get; }
         public decimal MaxAmount { set; get; }
-        
+
         public int SysId { get; set; }
         public string BankCode { get; set; }
         public string BankName { get; set; }
@@ -70,7 +71,7 @@ namespace BackendSite.Service.Model
         public string MobilePin { get; set; }
         public string CorporateID { get; set; }
     }
-    
+
     public class BankCodeModel
     {
         public int SysId { get; set; }
@@ -78,7 +79,7 @@ namespace BackendSite.Service.Model
         public string BankCode { get; set; }
         public string BankName { get; set; }
     }
-    
+
     public class CalCodeModel
     {
         public int BankId { set; get; }
@@ -86,7 +87,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { set; get; }
         public int SysId { set; get; }
     }
-    
+
     public class BankCodeModelComparer : IEqualityComparer<BankCodeModel>
     {
         public bool Equals(BankCodeModel t1, BankCodeModel t2)

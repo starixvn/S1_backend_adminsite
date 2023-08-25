@@ -29,18 +29,18 @@ namespace BackendSite.Service.BLL
                 currencyIds,
                 tpIds,
                 categoryIds,
-                gameTypes, 
+                gameTypes,
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
         }
-        
+
         public bool SetSetting(ParamsWithLog<BettingMonitorController.SetRequest> input)
         {
             return _bettingMonitorService.SetSetting(input);
         }
-        
+
         public bool DelSetting(ParamsWithLog<BettingMonitorController.BaseSetting> input)
         {
             return _bettingMonitorService.DelSetting(input);

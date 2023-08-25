@@ -4,11 +4,11 @@ namespace BackendSite.Extensions
 {
     public static class CommonExtension
     {
-        private static IEnumerable<int> _canRewardPointSiteIds = new []
+        private static IEnumerable<int> _canRewardPointSiteIds = new[]
         {
             (int) SiteEnum.NOVA88
         };
-        private static IEnumerable<int> _canRewardPointCurrencyIds = new []
+        private static IEnumerable<int> _canRewardPointCurrencyIds = new[]
         {
             (int) CurrencyEnum.MYR,
             (int) CurrencyEnum.THB,

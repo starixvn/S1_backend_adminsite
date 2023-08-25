@@ -409,7 +409,7 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Disable = 2
     }
-    
+
     public enum BankInfoPayMethodEnum
     {
         Deposit = 1,
@@ -725,14 +725,14 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-    
+
     public enum BonusGroupByType
     {
         BonusCode = 0,
-        Date = 1 ,
+        Date = 1,
         Month = 2
     }
-    
+
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -1194,7 +1194,7 @@ namespace BackendSite.Service.Model.enums
         Invalid = 3
     }
 
-    public enum LiveRegistrationDateTypeEnum 
+    public enum LiveRegistrationDateTypeEnum
     {
         RegisterDate = 1,
         LastActiveDate = 2,

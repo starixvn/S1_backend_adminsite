@@ -11,12 +11,12 @@ namespace BackendSite.Service.Model.PromotionDisplayCondition
         public int SiteId { get; set; }
         public PromotionDisplayConditionType ConditionType { get; set; }
         public dynamic Description { get; set; }
-        public DateTimeOffset CreateTime 
+        public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-        public DateTimeOffset UpdateTime 
+        public DateTimeOffset UpdateTime
         {
             get => _updateTime;
             set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);

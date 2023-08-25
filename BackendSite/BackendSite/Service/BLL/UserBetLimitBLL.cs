@@ -4,6 +4,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -31,7 +32,7 @@ namespace BackendSite.Service.BLL
         {
             var listSetting = new List<BetLimitOption>();
             var dg = await _userBetLimitService.GetLimitGroup((int)TpGameTypeEnum.DG_LiveCasino, currencyId);
-            if (dg != null) 
+            if (dg != null)
             {
                 var dgGroup = JsonConvert.DeserializeObject<List<LimitGroup>>(dg.LimitGroup);
                 var dgOption = new BetLimitOption() { CategoryId = (int)TpCategoryEnum.LiveCasino, CategoryName = "Live Casino", GameType = (int)TpGameTypeEnum.DG_LiveCasino, GameTypeName = "DG L.Casino", IsGroup = true, LimitGroup = dgGroup, DefaultGroup = dg.DefaultGroup };
@@ -39,7 +40,7 @@ namespace BackendSite.Service.BLL
             }
 
             var sbo = await _userBetLimitService.GetLimitGroup((int)TpGameTypeEnum.SBO_Sports, currencyId);
-            if (sbo != null) 
+            if (sbo != null)
             {
                 var sboGroup = JsonConvert.DeserializeObject<LimitInput>(sbo.LimitGroup);
                 var sboOption = new BetLimitOption() { CategoryId = (int)TpCategoryEnum.Sports, CategoryName = "Sports", GameType = (int)TpGameTypeEnum.SBO_Sports, GameTypeName = "SBO Sports", IsGroup = false, LimitInput = new LimitInput() { Min = sboGroup.Min, Max = sboGroup.Max, MaxPerMatch = sboGroup.MaxPerMatch } };
@@ -174,7 +175,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        private async Task ResetBetLimit(int custId, int gameType, int currencyId) 
+        private async Task ResetBetLimit(int custId, int gameType, int currencyId)
         {
             var defaultBetLimit = await _userBetLimitService.GetLimitGroup(gameType, currencyId);
             var tpId = await _userBetLimitService.GetTpIdByGameType(gameType);
@@ -189,12 +190,12 @@ namespace BackendSite.Service.BLL
                 throw new AdminException(ErrorCodeEnum.SystemException);
         }
 
-        private async Task<ApiResult> SetBetLimit(SetBetLimit request) 
+        private async Task<ApiResult> SetBetLimit(SetBetLimit request)
         {
             return await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_apiUrl}SetBetLimit", request);
         }
 
-        private async Task<SetBetLimit> Compare(int custId, SportsSetting before, SportsSetting after) 
+        private async Task<SetBetLimit> Compare(int custId, SportsSetting before, SportsSetting after)
         {
             var tpId = await _userBetLimitService.GetTpIdByGameType(after.GameTypeId);
             var betLimit = new SetBetLimit

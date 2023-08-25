@@ -1,7 +1,9 @@
 ﻿using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
+
 using Dapper;
 
 namespace BackendSite.Service.DAL
@@ -26,10 +28,10 @@ namespace BackendSite.Service.DAL
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V2", props);
-            
+
             return result;
         }
-        
+
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(
             int siteId,
             string categoryIds,
@@ -60,7 +62,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointListExport(int siteId, string categoryIds, string currencyIds, DateTime startDate, DateTime endDate)
         {
             var p = new DynamicParameters();
@@ -70,10 +72,10 @@ namespace BackendSite.Service.DAL
             p.Add("_StartDate", startDate);
             p.Add("_EndDate", endDate);
             var result = _reportDbClient.Query<LeaderboardExtraPointList>("Admin_LeaderboardExtraPointExport_Get", p);
-            
+
             return result;
         }
-        
+
         public int SetLeaderboardExtraPoint(DateTime activeDate, int siteId, int categoryId, string userName, decimal extraPoint, string lastUpdateUser)
         {
             var p = new DynamicParameters();
@@ -85,17 +87,17 @@ namespace BackendSite.Service.DAL
             p.Add("_LastUpdateUser", lastUpdateUser);
             p.Add("RTN", dbType: DbType.Int32, direction: ParameterDirection.Output);
             _mainDbClient.Execute("Admin_LeaderboardExtraPoint_Set_V2", p);
-            
+
             var rtn = p.Get<int?>("RTN") ?? -1;
 
             return rtn;
         }
-        
+
         public bool SetBatchLeaderboardExtraPoint(IEnumerable<SetLeaderboardExtraPointModel> input)
         {
-            var result = _mainDbClient.Execute("Admin_LeaderboardExtraPointBatch_Set", input) ;
-            
+            var result = _mainDbClient.Execute("Admin_LeaderboardExtraPointBatch_Set", input);
+
             return result > 0;
         }
-   }
+    }
 }

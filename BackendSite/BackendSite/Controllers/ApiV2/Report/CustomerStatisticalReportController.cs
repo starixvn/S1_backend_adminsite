@@ -1,12 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Report
@@ -49,7 +52,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             [Range(-12, 14)]
             public int TimeZone { get; set; }
         }
-        
+
         public class GetDetailRequest
         {
             public int CustId { get; set; }
@@ -116,7 +119,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
 
             #region Get Data
-            
+
             var exportData = _reportBll.GetCustomerStatisticalReport(
                 request.CurrencyIds,
                 JsonConvert.SerializeObject(request.SiteIds),
@@ -136,8 +139,8 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
             var byDateTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
-            var summaryTitles = new Dictionary<string, Api.ReportController.TitleModel>();
-            var byDateTitles = new Dictionary<string, Api.ReportController.TitleModel>();
+            var summaryTitles = new Dictionary<string, TitleModel>();
+            var byDateTitles = new Dictionary<string, TitleModel>();
 
             var summaryContent = new List<Dictionary<string, dynamic>>();
             var byDateContent = new List<Dictionary<string, dynamic>>();
@@ -169,18 +172,18 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             #region Title
 
-            summaryTitles.Add("UserName", new Api.ReportController.TitleModel { Name = "User Name", SortId = 1 });
-            summaryTitles.Add("CategoryName", new Api.ReportController.TitleModel { Name = "Category Name", SortId = 2 });
-            summaryTitles.Add("GameName", new Api.ReportController.TitleModel { Name = "Game Name", SortId = 3 });
-            summaryTitles.Add("TurnOverValidBetInMYR", new Api.ReportController.TitleModel { Name = "Total in MYR", SortId = 200 });
-            summaryTitles.Add("WinLossInMYR", new Api.ReportController.TitleModel { Name = "Total in MYR", SortId = 400 });
+            summaryTitles.Add("UserName", new TitleModel { Name = "User Name", SortId = 1 });
+            summaryTitles.Add("CategoryName", new TitleModel { Name = "Category Name", SortId = 2 });
+            summaryTitles.Add("GameName", new TitleModel { Name = "Game Name", SortId = 3 });
+            summaryTitles.Add("TurnOverValidBetInMYR", new TitleModel { Name = "Total in MYR", SortId = 200 });
+            summaryTitles.Add("WinLossInMYR", new TitleModel { Name = "Total in MYR", SortId = 400 });
 
-            byDateTitles.Add("UserName", new Api.ReportController.TitleModel { Name = "User Name", SortId = 1 });
-            byDateTitles.Add("Date", new Api.ReportController.TitleModel { Name = "Date", SortId = 2 });
-            byDateTitles.Add("CategoryName", new Api.ReportController.TitleModel { Name = "Category Name", SortId = 3 });
-            byDateTitles.Add("GameName", new Api.ReportController.TitleModel { Name = "Game Name", SortId = 4 });
-            byDateTitles.Add("TurnOverValidBetInMYR", new Api.ReportController.TitleModel { Name = "Total in MYR", SortId = 200 });
-            byDateTitles.Add("WinLossInMYR", new Api.ReportController.TitleModel { Name = "Total in MYR", SortId = 400 });
+            byDateTitles.Add("UserName", new TitleModel { Name = "User Name", SortId = 1 });
+            byDateTitles.Add("Date", new TitleModel { Name = "Date", SortId = 2 });
+            byDateTitles.Add("CategoryName", new TitleModel { Name = "Category Name", SortId = 3 });
+            byDateTitles.Add("GameName", new TitleModel { Name = "Game Name", SortId = 4 });
+            byDateTitles.Add("TurnOverValidBetInMYR", new TitleModel { Name = "Total in MYR", SortId = 200 });
+            byDateTitles.Add("WinLossInMYR", new TitleModel { Name = "Total in MYR", SortId = 400 });
 
             foreach (var curr in currencyList)
             {
@@ -192,11 +195,11 @@ namespace BackendSite.Controllers.ApiV2.Report
                 var turnOverValidBetSortId = 100 + curr;
                 var winLossSortId = 300 + curr;
 
-                summaryTitles.Add(TurnOverValidBetPropName, new Api.ReportController.TitleModel { Name = isoCode, SortId = turnOverValidBetSortId });
-                summaryTitles.Add(WinLossPropName, new Api.ReportController.TitleModel { Name = isoCode, SortId = winLossSortId });
+                summaryTitles.Add(TurnOverValidBetPropName, new TitleModel { Name = isoCode, SortId = turnOverValidBetSortId });
+                summaryTitles.Add(WinLossPropName, new TitleModel { Name = isoCode, SortId = winLossSortId });
 
-                byDateTitles.Add(TurnOverValidBetPropName, new Api.ReportController.TitleModel { Name = isoCode, SortId = turnOverValidBetSortId });
-                byDateTitles.Add(WinLossPropName, new Api.ReportController.TitleModel { Name = isoCode, SortId = winLossSortId });
+                byDateTitles.Add(TurnOverValidBetPropName, new TitleModel { Name = isoCode, SortId = turnOverValidBetSortId });
+                byDateTitles.Add(WinLossPropName, new TitleModel { Name = isoCode, SortId = winLossSortId });
             }
 
             #endregion
@@ -635,8 +638,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "Report/CustomerStatisticalReport" })]
         public ApiResult GetDetail(GetDetailRequest request)
         {
-            var data = _reportBll.GetCustomerDetail(request.CustId, request.GameId, request.Date ,_common.TransferToTimeZoneFormat(request.TimeZone));
-            
+            var data = _reportBll.GetCustomerDetail(request.CustId, request.GameId, request.Date, _common.TransferToTimeZoneFormat(request.TimeZone));
+
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
