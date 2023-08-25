@@ -45,6 +45,7 @@ namespace BackendSite.Service.BLL
                     : JsonConvert.DeserializeObject<List<string>>(item.DeviceLevelStr),
                 
                 DeviceScores = item.DeviceScores,
+                WithdrawalType = item.WithdrawalType,
                 CreateUser = item.CreateUser,
                 CreateTime = item.CreateTime,
                 LastUpdateUser = item.LastUpdateUser,
@@ -53,6 +54,7 @@ namespace BackendSite.Service.BLL
         }
 
         #region Create
+        
         public async Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest request, string userName)
         {
             await _autoPaymentRuleService.CreateAutoPaymentRuleAsync(request, userName);
@@ -71,6 +73,7 @@ namespace BackendSite.Service.BLL
                 tags: request.Tags,
                 deviceScores : request.DeviceScores,
                 deviceLevel: request.DeviceLevel,
+                withdrawalType: request.WithdrawalType,
                 status: true);
     
             await _autoPaymentRuleService.InsertLogAsync(
@@ -110,6 +113,7 @@ namespace BackendSite.Service.BLL
                 tags: request.Tags,
                 deviceScores : request.DeviceScores,
                 deviceLevel:request.DeviceLevel,
+                withdrawalType: request.WithdrawalType,
                 status: GetStatus(request.Status));
 
             await _autoPaymentRuleService.InsertLogAsync(siteId: originData.SiteId,
@@ -125,6 +129,7 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region Delete
+        
         public async Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, string userName)
         {
             var originData = await _autoPaymentRuleService.GetDataByIdAsync(request.Id);
@@ -170,6 +175,7 @@ namespace BackendSite.Service.BLL
                 tags: tags,
                 deviceScores : originData.DeviceScores,
                 deviceLevel: deviceLevel,
+                withdrawalType: originData.WithdrawalType,
                 status: GetStatus(originData.Status));
             
             return beforeLog;
@@ -181,6 +187,7 @@ namespace BackendSite.Service.BLL
             List<int> tags,
             int deviceScores,
             List<string> deviceLevel,
+            WithdrawalMethodEnum withdrawalType,
             bool status)
         {
             return new
@@ -193,6 +200,7 @@ namespace BackendSite.Service.BLL
                 Tagging = GetTagNames(tags),
                 DeviceScores = deviceScores,
                 DeviceLevel = deviceLevel.Any() ? string.Join(",", deviceLevel) : null ,
+                WithdrawalType = withdrawalType.ToString(),
                 Status = status
             };
         }
@@ -223,6 +231,28 @@ namespace BackendSite.Service.BLL
         {
             if (status == 0) return false;
             return true;
+        }
+        
+        public List<WithdrawalOptionDto> GetWithdrawalOption()
+        {
+            return new List<WithdrawalOptionDto>()
+            {
+                new()
+                {
+                    Name = WithdrawalMethodEnum.EWallet.ToString(),
+                    Value = (int)WithdrawalMethodEnum.EWallet
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.BankCard.ToString(),
+                    Value = (int)WithdrawalMethodEnum.BankCard
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.Crypto.ToString(),
+                    Value = (int)WithdrawalMethodEnum.Crypto
+                }
+            };
         }
 
         #endregion

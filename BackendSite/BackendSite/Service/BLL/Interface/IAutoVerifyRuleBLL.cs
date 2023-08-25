@@ -12,5 +12,6 @@ namespace BackendSite.Service.BLL.Interface
 
         Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, string userName);
         
+        List<WithdrawalOptionDto> GetWithdrawalOption();
     }
 }

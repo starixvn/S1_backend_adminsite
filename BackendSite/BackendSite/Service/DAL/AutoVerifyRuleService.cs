@@ -47,8 +47,9 @@ namespace BackendSite.Service.DAL
             p.Add("_Tag", JsonConvert.SerializeObject(req.Tags));
             p.Add("_DeviceScores", req.DeviceScores);
             p.Add("_DeviceLevel", JsonConvert.SerializeObject(req.DeviceLevel));
+            p.Add("_WithdrawalType", (int)req.WithdrawalType);
             p.Add("_CreateUser", userName);
-            return _mainDbClient.ExecuteAsync("Admin_AutoPaymentRuleSetting_Ins", p);
+            return _mainDbClient.ExecuteAsync("Admin_AutoPaymentRuleSetting_Ins_V2", p);
         }
 
         public Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest req, string userName)
@@ -62,8 +63,9 @@ namespace BackendSite.Service.DAL
             p.Add("_Tag", JsonConvert.SerializeObject(req.Tags));
             p.Add("_DeviceScores", req.DeviceScores);
             p.Add("_DeviceLevel", JsonConvert.SerializeObject(req.DeviceLevel));
+            p.Add("_WithdrawalType", (int)req.WithdrawalType);
             p.Add("_LastUpdateUser", userName);
-            return _mainDbClient.ExecuteAsync("Admin_AutoPaymentRuleSetting_Set", p);
+            return _mainDbClient.ExecuteAsync("Admin_AutoPaymentRuleSetting_Set_V2", p);
         }
 
         public Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest req)

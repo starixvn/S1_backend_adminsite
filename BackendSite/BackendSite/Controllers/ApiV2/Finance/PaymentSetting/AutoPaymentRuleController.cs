@@ -103,5 +103,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             return apiResult;
         }
         
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 82 })]
+        public ApiResult<IEnumerable<WithdrawalOptionDto>> WithdrawalTypeAsync()
+        {
+            return new ApiResult<IEnumerable<WithdrawalOptionDto>>
+            {
+                Data = _autoPaymentRuleBll.GetWithdrawalOption(),
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
     }
 }
