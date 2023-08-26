@@ -8,12 +8,12 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         public static IEnumerable<MpaTpBetRecordDto> Filter(this IEnumerable<MpaTpBetRecordDto> data, MpaWinLossRequest request)
         {
 
-            // 過濾 GameType、CurrencyId
+            // 過濾 GameType、CurrencyId、CategoryId
             data = data.Where(r => request.TpGameTypes.Contains(r.GameType) &&
-                                   request.CurrencyIds.Contains(r.CurrencyId));
+                                   request.CurrencyIds.Contains(r.CurrencyId) && request.TpCategorys.Contains(r.CategoryId));
 
             // 過濾 UserName
-            if (string.IsNullOrEmpty(request.UserName)) return data;
+            if (!string.IsNullOrEmpty(request.UserName))
             {
                 data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName);
             }
@@ -35,6 +35,12 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             foreach (var item in data)
             {
                 item.WinLossSummary -= item.ProgressiveWinSummary;
+            }
+
+            if (!request.IncludeTest)
+            {
+                //istest = 0, test member
+                data = data.Where(x => x.IsTest == 0);
             }
 
             return data;

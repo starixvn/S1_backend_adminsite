@@ -583,18 +583,18 @@ namespace BackendSite.Service.DAL
             return false;
         }
         
-        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int siteId, int payId)
+        public IEnumerable<BankInfoPayForSetting> GetBankInfoPayList(int siteId, int payId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPay_Get", new
+            return _reportDbClient.Query<BankInfoPayForSetting>("Admin_BankInfoPay_Get_V2", new
             {
                 _PayId = payId,
                 _SiteId = siteId
             });
         }
         
-        public IEnumerable<PayListBankInfoSys> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
+        public IEnumerable<BankInfoPayForSetting> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPayForSetting_Get", new
+            return _reportDbClient.Query<BankInfoPayForSetting>("Admin_BankInfoPayForSetting_Get_V2", new
             {
                 _SiteId = siteId,
                 _CurrencyId = currencyId,
@@ -602,13 +602,14 @@ namespace BackendSite.Service.DAL
             });
         }
         
-        public bool UpdateBankInfo(int siteId, int payId, int sysId, BankInfoPayStatusEnum status, string @operator)
+        public bool UpdateBankInfo(int siteId, int payId, int sysId,
+            BankInfoPayStatusEnum status, BankInfoPayMethodEnum method, string @operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var bankSysInfo = GetBankSysInfoList(siteId, payId)
-                .First(x => x.Id == sysId);
+            var bankSysInfo = GetBankInfoPayList(siteId, payId)
+                .First(x => x.Id == sysId && x.Method == method);
 
             #region props
             var props = new DynamicParameters();
@@ -616,6 +617,7 @@ namespace BackendSite.Service.DAL
             props.Add("_PayId", payId);
             props.Add("_SysId", sysId);
             props.Add("_Status", status);
+            props.Add("_Method", method);
             #endregion
 
             #region propsLog
@@ -628,17 +630,19 @@ namespace BackendSite.Service.DAL
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
                 bankSysInfo.BankName,
+                Method = method.ToString(),
                 Status = bankSysInfo.Status.ToString()
             }));
             logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
             {
                 bankSysInfo.BankName,
+                Method = method.ToString(),
                 Status = status.ToString()
             }));
             logParam.Add("_Operator", @operator);
             #endregion
 
-            var setResult = _mainDbClient.Execute("Admin_BankInfoPay_Set_V2", trans, props);
+            var setResult = _mainDbClient.Execute("Admin_BankInfoPay_Set_V3", trans, props);
             if (setResult > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam);

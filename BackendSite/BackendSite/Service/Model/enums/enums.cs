@@ -397,6 +397,12 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Disable = 2
     }
+    
+    public enum BankInfoPayMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
 
     #endregion
 
@@ -1157,6 +1163,13 @@ namespace BackendSite.Service.Model.enums
         Pending = 1,
         Done = 2,
         Invalid = 3
+    }
+
+    public enum LiveRegistrationDateTypeEnum 
+    {
+        RegisterDate = 1,
+        LastActiveDate = 2,
+        CallRecordDate = 3
     }
 
     #endregion
