@@ -58,6 +58,7 @@ namespace BackendSite.Extensions
             services.AddSingleton(typeof(IEnumerable<T>), p => option);
             return services;
         }
+
         public static void DecoratorReferralManagement(this IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();
@@ -68,6 +69,7 @@ namespace BackendSite.Extensions
             services.AddTransient<IReferralManagementBLL>(a => new ReferralManagementDecorator(
                 new ReferralManagementBLL(referralManagementService), adjustmentLogReportService, reportService, logger));
         }
+
         public static void DecoratorLiveRegistration(this IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();
