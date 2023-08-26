@@ -134,7 +134,6 @@ namespace BackendSite
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
             services.DecoratorReferralManagement();
             services.DecoratorLiveRegistration();
-
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
