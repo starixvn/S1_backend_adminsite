@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -96,10 +97,20 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<ApiListResult<CustVerificationRewardModel>> Get(GetRequest request)
         {
+            request.SiteId = _authorizeBll.CheckBrand(); 
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-
+            var custId = await GetCustId(request.UserName, request.SabaId, null);
+            if (custId == null)
+            {
+                return new ApiListResult<CustVerificationRewardModel>
+                {
+                    Data = Array.Empty<CustVerificationRewardModel>(),
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
             var data = _verificationRewardBll.GetVerificationRewardReportV2(
+                custId.Value,
                 multiSiteRequest,
                 request.StartDate,
                 request.EndDate,
@@ -130,20 +141,23 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<IActionResult> Export(ExportRequest request)
         {
+            request.SiteId = _authorizeBll.CheckBrand();
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var custId = await GetCustId(request.UserName, request.SabaId, null);
 
-            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPageV2(
-                multiSiteRequest,
-                request.StartDate,
-                request.EndDate);
-
+            var exportData = custId == null
+                ? Array.Empty<ExportVerificationRewardModel>()
+                : await _verificationRewardBll.GetVerificationRewardWithoutPageV2(custId.Value,
+                    multiSiteRequest,
+                    request.StartDate,
+                    request.EndDate);
 
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "VerificationRewardReport");
         }
 
-        private async Task<int?> GetCustId(string userName, string sabaId, int siteId)
+        private async Task<int?> GetCustId(string userName, string sabaId,int? siteId)
         {
             if (string.IsNullOrWhiteSpace(userName) && string.IsNullOrWhiteSpace(sabaId))
                 return 0;
