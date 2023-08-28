@@ -98,8 +98,17 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-
+            var custId = await GetCustId(request.UserName, request.SabaId, null);
+            if (custId == null)
+            {
+                return new ApiListResult<CustVerificationRewardModel>
+                {
+                    Data = Array.Empty<CustVerificationRewardModel>(),
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
             var data = _verificationRewardBll.GetVerificationRewardReportV2(
+                custId.Value,
                 multiSiteRequest,
                 request.StartDate,
                 request.EndDate,
@@ -132,18 +141,20 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var custId = await GetCustId(request.UserName, request.SabaId, null);
 
-            var exportData = await _verificationRewardBll.GetVerificationRewardWithoutPageV2(
-                multiSiteRequest,
-                request.StartDate,
-                request.EndDate);
-
+            var exportData = custId == null
+                ? Array.Empty<ExportVerificationRewardModel>()
+                : await _verificationRewardBll.GetVerificationRewardWithoutPageV2(custId.Value,
+                    multiSiteRequest,
+                    request.StartDate,
+                    request.EndDate);
 
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "VerificationRewardReport");
         }
 
-        private async Task<int?> GetCustId(string userName, string sabaId, int siteId)
+        private async Task<int?> GetCustId(string userName, string sabaId,int? siteId)
         {
             if (string.IsNullOrWhiteSpace(userName) && string.IsNullOrWhiteSpace(sabaId))
                 return 0;
