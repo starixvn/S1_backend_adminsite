@@ -1058,7 +1058,7 @@ namespace BackendSite.Service.BLL
             {
                 var count = g.Count();
                 var details = g
-                    .GroupBy(x => x.CurrencyId)
+                    .GroupBy(x => new{ x.CurrencyId,x.SiteName})
                     .Select(gg =>
                     {
                         var gCount = gg.Count();
@@ -1066,7 +1066,8 @@ namespace BackendSite.Service.BLL
 
                         return new DepositPaymentReportDetail
                         {
-                            Key = gg.Key.ToString(),
+                            Key = gg.Key.CurrencyId.ToString(),
+                            SiteName = gg.Key.SiteName,
                             TotalDepositCount = gCount,
                             AverageDepositAmount = decimal.Round(gTotalDepositAmount / gCount, 4),
                             FirstDepositCount = gg.Count(x => x.FirstDeposit),

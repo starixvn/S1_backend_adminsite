@@ -15,6 +15,7 @@ public class DepositPaymentReportDetail
 {
     [ExportIgnore]
     public string Key { get; set; }
+    public string SiteName { get; set; }
     public int TotalDepositCount { get; set; }
     public decimal TotalDepositAmount { get; set; }
     public decimal AverageDepositAmount { get; set; }
@@ -124,6 +125,7 @@ public interface IPaymentReportDetail
 
 public class PaymentReportDepositDetail : IPaymentReportDetail
 {
+    public string SiteName { get; set; }
     public CurrencyEnum CurrencyId { get; set; }
     public string TransId { get; set; }
     public int PayId { get; set; }
