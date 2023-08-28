@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -96,6 +97,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<ApiListResult<CustVerificationRewardModel>> Get(GetRequest request)
         {
+            request.SiteId = _authorizeBll.CheckBrand(); 
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             var custId = await GetCustId(request.UserName, request.SabaId, null);
@@ -139,6 +141,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<IActionResult> Export(ExportRequest request)
         {
+            request.SiteId = _authorizeBll.CheckBrand();
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             var custId = await GetCustId(request.UserName, request.SabaId, null);
