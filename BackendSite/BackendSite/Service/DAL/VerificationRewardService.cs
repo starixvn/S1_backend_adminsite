@@ -109,11 +109,12 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public IEnumerable<CustVerificationReward> GetCustVerificationRewardV2(string multiSiteRequest,
+        public IEnumerable<CustVerificationReward> GetCustVerificationRewardV2(int? custId,string multiSiteRequest,
             DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
             out int rowCount)
         {
             var p = new DynamicParameters();
+            p.Add("_CustId", custId);
             p.Add("_MultiSiteAndCuurency", multiSiteRequest);
             p.Add("_StartDate", startDate.DateTime);
             p.Add("_EndDate", endDate.DateTime);
@@ -128,9 +129,10 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExportV2(string multiSiteRequest, DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExportV2(int? custId, string multiSiteRequest, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var p = new DynamicParameters();
+            p.Add("_CustId", custId);
             p.Add("_MultiSiteAndCuurency", multiSiteRequest);
             p.Add("_StartDate", startDate.DateTime);
             p.Add("_EndDate", endDate.DateTime);
