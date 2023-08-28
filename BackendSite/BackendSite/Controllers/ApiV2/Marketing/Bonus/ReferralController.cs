@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -12,8 +13,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     [ApiController]
     public class ReferralController : ControllerBase
     {
-        private readonly ReferralManagementDecorator _managementDecorator;
-        public ReferralController(ReferralManagementDecorator managementDecorator)
+        private readonly IReferralManagementBLL _managementDecorator;
+        public ReferralController(IReferralManagementBLL managementDecorator)
         {
             _managementDecorator = managementDecorator;
         }
@@ -52,10 +53,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<ApiResult<ReferralDetail>> Get(GetReferralRequest request)
         {
+            var data = await _managementDecorator.GetReferralDetail(request.SiteId, request.CurrencyId);
+            data.SpecificList = data.SpecificList.Where(x => x.Type == ReferralTypeEnum.Referral);
+
             var apiResult = new ApiResult<ReferralDetail>
             {
                 ErrorCode = (int)ErrorCodeEnum.Success,
-                Data = await _managementDecorator.GetReferralDetail(request.SiteId, request.CurrencyId)
+                Data = data
             };
             return apiResult;
         }
@@ -74,7 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public async Task<ApiResult> UpdateStatus(SetReferralStatusRequest request)
         {
             _managementDecorator.Operator = User.Identity.Name;
-            var result = await _managementDecorator.SetReferralStatusAsync(request.SiteId, request.CurrencyId, (int)request.Status);
+            var result = await _managementDecorator.SetReferralStatusAsync(request.SiteId, request.CurrencyId, request.Status);
             var apiResult = new ApiResult
             {
                 ErrorCode = result > 0 ? (int)ErrorCodeEnum.Success : result
@@ -96,12 +100,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public async Task<ApiResult> Set(SetReferralRequest setReferral)
         {
             _managementDecorator.Operator = User.Identity.Name;
-            var result = await _managementDecorator.SetReferralAsync(setReferral);
+            var result = await _managementDecorator.SetReferralAsync(ReferralTypeEnum.Referral, setReferral);
             var apiResult = new ApiResult
             {
                 ErrorCode = (result == 1 || result == 2) ? (int)ErrorCodeEnum.Success : result
             };
             return apiResult;
         }
+
     }
 }
