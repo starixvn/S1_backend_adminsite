@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
 using Microsoft.AspNetCore.Authorization;
@@ -15,19 +16,22 @@ namespace BackendSite.Controllers.ApiV2.Report
     {
         private readonly LeaderBoardBLL _leaderBoardBll;
         private readonly ExcelBLL _excelBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         public LeaderBoardReportController(IServiceProvider provider)
         {
             _leaderBoardBll = provider.GetRequiredService<LeaderBoardBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
         public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
             var apiResult = new ApiListResult<GetLeaderboardReportResponse>();
-
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             try
             {
                 var data = _leaderBoardBll.GetLeaderboardReport(request);
