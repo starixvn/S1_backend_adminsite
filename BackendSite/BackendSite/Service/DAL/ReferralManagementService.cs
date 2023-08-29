@@ -24,12 +24,12 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<ReferralList> GetReferralBySiteId(int siteId)
         {
-            return _mainDbClient.Query<ReferralList>("Admin_Referral_Get", new DynamicParameters(new { SiteId = siteId }));
+            return _mainDbClient.Query<ReferralList>("Admin_Referral_Get_V2", new DynamicParameters(new { SiteId = siteId }));
         }
 
         public async Task<ReferralDetailData> GetReferralDetail(int siteId, int currencyId)
         {
-            return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get",
+            return await _reportDbClient.QueryFirstAsync<ReferralDetailData>("Admin_ReferralDetail_Get_V2",
                 new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId }));
         }
 
@@ -54,9 +54,10 @@ namespace BackendSite.Service.DAL
                 }
             });
         }
-        public async Task<int> SetReferralAsync(SetReferralRequest setReferralRequest)
+        public async Task<int> SetReferralAsync(int type, SetReferralRequest setReferralRequest)
         {
             var p = new DynamicParameters();
+            p.Add("_Type", type);
             p.Add("_SiteId", setReferralRequest.SiteId);
             p.Add("_CurrencyId", setReferralRequest.CurrencyId);
             p.Add("_BonusAmount", setReferralRequest.BonusAmount);
@@ -67,10 +68,27 @@ namespace BackendSite.Service.DAL
             p.Add("_ValidBet", setReferralRequest.ValidBet);
             p.Add("_Deposit", setReferralRequest.Deposit);
             p.Add("_PeriodDays", setReferralRequest.PeriodDays);
+            p.Add("_DepositRewardPercentage", setReferralRequest.DepositRewardPercentage);
+            p.Add("_MinPayout", setReferralRequest.MinPayout);
+            p.Add("_MaxPayout", setReferralRequest.MaxPayout);
+            p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));
+
+            return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V3", p);
+        }
+
+        public async Task<int> SetNewReferralAsync(SetReferralRequest setReferralRequest)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", setReferralRequest.SiteId);
+            p.Add("_CurrencyId", setReferralRequest.CurrencyId);
+            p.Add("_DepositRewardPercentage", setReferralRequest.DepositRewardPercentage);
+            p.Add("_MinPayout", setReferralRequest.MinPayout);
+            p.Add("_MaxPayout", setReferralRequest.MaxPayout);
             p.Add("_SpecificList", JsonConvert.SerializeObject(setReferralRequest.SpecificList));
 
             return await _mainDbClient.ExecuteAsync("Admin_Referral_Set_V2", p);
         }
+
 
         public int SetReferralStatus(int siteId, int currencyId, int status)
         {
@@ -172,6 +190,98 @@ namespace BackendSite.Service.DAL
             RowCount = props.Get<int?>("_RowCount") ?? 0;
 
             return result;
+        }
+
+        public async Task<(IEnumerable<DepositReferralReport_ReferralReferredDao> Data, int TotalPages, int ReferreCount,
+            int DepositReferral_TotalRewardCount,decimal DepositReferral_TotalRewardAmount, decimal DepositReferral_TotalPayoutAmount,
+            int Referral_TotalRewardCount, decimal Referral_TotalPayoutAmount,int TotalRefereeWithPayoutCount)> GetDepositReferralListByCustId(
+    int custId,
+    int pageSize,
+    int startIndex)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_PageSize", pageSize);
+            p.Add("_StartIndex", startIndex);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_DepositReferral_TotalRewardCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_DepositReferral_TotalRewardAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_DepositReferral_TotalPayoutAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_Referral_TotalRewardCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_Referral_TotalPayoutAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            p.Add("_TotalRefereeWithPayoutCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferrerList_Get_ByCustId", p);
+
+            return (Data: data,
+                TotalPages: p.Get<int?>("_TotalPages") ?? 0,
+                ReferreCount: p.Get<int?>("_RowCount") ?? 0,
+                DepositReferral_TotalRewardCount: p.Get<int?>("_DepositReferral_TotalRewardCount") ?? 0,
+                DepositReferral_TotalRewardAmount: p.Get<decimal?>("_DepositReferral_TotalRewardAmount") ?? 0,
+                DepositReferral_TotalPayoutAmount: p.Get<decimal?>("_DepositReferral_TotalPayoutAmount") ?? 0,
+                Referral_TotalRewardCount: p.Get<int?>("_Referral_TotalRewardCount") ?? 0,
+                Referral_TotalPayoutAmount: p.Get<decimal?>("_Referral_TotalPayoutAmount") ?? 0,
+                TotalRefereeWithPayoutCount: p.Get<int?>("_TotalRefereeWithPayoutCount") ?? 0);
+        }
+
+        public async Task<(IEnumerable<DepositReferralReportDao> Data, int TotalPages, int RowCount)> GetDepositReferralCustList(
+            string siteIds,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            string userName,
+            int pageSize,
+            int startIndex)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteIds);
+            p.Add("_CurrencyIds", currencyIds);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            p.Add("_UserName", userName);
+            p.Add("_PageSize", pageSize);
+            p.Add("_StartIndex", startIndex);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            var data = await _reportDbClient.QueryAsync<DepositReferralReportDao>("Admin_DepositReferralCustList_Get", p);
+
+            return (Data: data,
+                TotalPages: p.Get<int?>("_TotalPages") ?? 0,
+                RowCount: p.Get<int?>("_RowCount") ?? 0);
+        }
+
+        public async Task<IEnumerable<DepositReferralReportForExportDao>> GetDepositReferralCustListForExport(
+            string siteIds,
+            string currencyIds,
+            DateTime startDate,
+            DateTime endDate,
+            string userName)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteIds);
+            p.Add("_CurrencyIds", currencyIds);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            p.Add("_UserName", userName);
+            return await _reportDbClient.QueryAsync<DepositReferralReportForExportDao>("Admin_DepositReferralCustList_Export", p);
+        }
+
+        public async Task<IEnumerable<DepositReferralReport_ReferralReferredDao>> GetDepositReferralReferredList(string custIds, DateTime startDate, DateTime endDate)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustIds", custIds);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferralReferredList_Get", p);
+        }
+
+        public async Task<IEnumerable<DepositReferralReport_ReferralReferredForExportDao>> GetDepositReferralReferredListForExport(string custIds, DateTime startDate, DateTime endDate)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustIds", custIds);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredForExportDao>("Admin_DepositReferralReferredList_Export", p);
         }
     }
 }

@@ -47,6 +47,9 @@ namespace BackendSite.Service.BLL
                 ValidBet = data.ValidBet,
                 Deposit = data.Deposit,
                 PeriodDays = data.PeriodDays,
+                DepositRewardPercentage = data.DepositRewardPercentage,
+                MinPayout = data.MinPayout,
+                MaxPayout = data.MaxPayout,
                 SpecificList = data.Details == null ? null : JsonConvert.DeserializeObject<IEnumerable<ReferralContent>>(data.Details),
                 Status = data.Status
             };
@@ -57,18 +60,18 @@ namespace BackendSite.Service.BLL
         {
             referralManagementService.SetReferral(referralList);
         }
-        public async Task<int> SetReferralAsync(SetReferralRequest setReferral)
+        public async Task<int> SetReferralAsync(ReferralTypeEnum type, SetReferralRequest setReferral)
         {
-            return await referralManagementService.SetReferralAsync(setReferral);
+                return await referralManagementService.SetReferralAsync((int)type,setReferral);
         }
         public int SetReferralStatus(int siteId, int currencyId, int status)
         {
             return referralManagementService.SetReferralStatus(siteId, currencyId, status);
         }
 
-        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, ReferralStatusEnum status)
         {
-            return await referralManagementService.SetReferralStatusAsync(siteId, currencyId, status);
+            return await referralManagementService.SetReferralStatusAsync(siteId, currencyId, (int)status);
         }
 
         public IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)

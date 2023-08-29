@@ -43,6 +43,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly Common _common;
         private readonly AdminBLL _adminBll;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
+        private readonly DepositReferralReportBLL _depositReferralReportBll;
 
         /// <summary>
         /// 確認圖檔檔案類型
@@ -81,6 +82,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _common = provider.GetRequiredService<Common>();
             _adminBll = provider.GetRequiredService<AdminBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
+            _depositReferralReportBll = provider.GetRequiredService<DepositReferralReportBLL>();
         }
 
         #endregion
@@ -112,7 +114,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
-            public IEnumerable<int> GameTypes { get; set; }
         }
 
         /// <summary>
@@ -185,6 +186,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             public string sabaId { get; set; }
             public int SiteId { get; set; }
         }
+
         #endregion
 
         public class CustInfoListRequest : ApiRequestPageModel
@@ -463,6 +465,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         {
             public IEnumerable<int> PromoCategoryIds { get; set; }
             public string RefTransId { get; set; }
+        }
+
+        public class CustTpBetRecordReq : CustIdWithDateRangeRequest
+        {
+            public IEnumerable<int> GameTypes { get; set; }
         }
 
         public class CustTpBetRecordListOneDayReq : CustIdWithDateRangeRequest
@@ -1443,7 +1450,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 28 })]
         [HttpPost]
-        public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecord(CustIdWithDateRangeRequest request)
+        public ApiResult<IEnumerable<TpBetRecordByDate>> GetCustTpBetRecord(CustTpBetRecordReq request)
         {
             var apiResult = new ApiResult<IEnumerable<TpBetRecordByDate>>
             {
@@ -1458,7 +1465,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             return apiResult;
         }
 
-        public IActionResult GetCustTpBetRecordExport(CustIdWithDateRangeRequest request)
+        public IActionResult GetCustTpBetRecordExport(CustTpBetRecordReq request)
         {
             var apiResult = _paymentBll.GetCustTpBetRecordList(
                 request.CustId,
@@ -2236,7 +2243,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #endregion
 
-        #region CSD > Customer Administration > CustInfo > Referral History
+        #region CSD > Customer Administration > CustInfo > Referral History (舊制)
 
         /// <summary>
         /// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料
@@ -2284,6 +2291,49 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
+        }
+
+        #endregion
+
+        #region CSD > Customer Administration > CustInfo > Referral History (新制-DepositReferral)
+
+        /// <summary>
+        /// CustomerManage/GetRefFriendByCustId 取得指定客戶推薦朋友資料
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > Referral History
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 40 })]
+        [HttpPost]
+        public async Task<ApiListResult<GetDepositReferralListByCustIdResult>> GetDepositReferralListByCustId(CustIdWithPageRequest request)
+        {
+            var data = await _depositReferralReportBll.GetListByCustId(request.CustId,
+                request.PageNumber,
+                request.PageSize);
+
+            var result = new GetDepositReferralListByCustIdResult()
+            {
+                Detail = data.Data,
+                Referral_TotalRewardCount = data.Referral_TotalRewardCount,
+                DepositReferral_TotalRewardCount = data.DepositReferral_TotalRewardCount,
+                DepositReferral__TotalRewardAmount = data.DepositReferral_TotalRewardAmount,
+                Referral_TotalPayoutAmount = data.Referral_TotalPayoutAmount,
+                DepositReferral_TotalPayoutAmount = data.DepositReferral_TotalPayoutAmount,
+                TotalRefereeWithPayoutCount = data.TotalRefereeWithPayoutCount
+            };
+
+            return new ApiListResult<GetDepositReferralListByCustIdResult>
+            {
+                Data = new List<GetDepositReferralListByCustIdResult>() { result },
+                TotalPages = data.TotalPages,
+                PageNumber = request.PageNumber,
+                RowCount = data.ReferreCount,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         #endregion

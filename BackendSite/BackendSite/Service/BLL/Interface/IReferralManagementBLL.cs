@@ -1,5 +1,6 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL.Interface
 {
@@ -9,9 +10,9 @@ namespace BackendSite.Service.BLL.Interface
         IEnumerable<ReferralList> GetReferralBySiteId(int siteId);
         Task<ReferralDetail> GetReferralDetail(int siteId, int currencyId);
         void SetReferral(List<ReferralManagement> referralList);
-        Task<int> SetReferralAsync(SetReferralRequest setReferral);
+        Task<int> SetReferralAsync(ReferralTypeEnum type, SetReferralRequest setReferral);
         int SetReferralStatus(int siteId, int currencyId, int status);
-        Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status);
+        Task<int> SetReferralStatusAsync(int siteId, int currencyId, ReferralStatusEnum status);
         IEnumerable<ReferralCustList> GetReferralCustList(IEnumerable<int> selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate, int pageSize, ref int pageNumber, out int totalPages, out int rowCount);
         Task<ReferralCustListPageData> GetReferralCustList(int siteId, string userName, int currencyId, DateTime startDate, DateTime endDate, int pageSize, int pageNumber, bool isOrder, string orderByProperty, OrderByDirection orderByDirection);
         IEnumerable<ReferralExcelData> GetReferralCustListExport(string selectSite, string userName, int currencyId, DateTime? startDate, DateTime? endDate);

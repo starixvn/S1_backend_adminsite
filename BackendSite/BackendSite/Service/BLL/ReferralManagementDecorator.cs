@@ -47,20 +47,22 @@ namespace BackendSite.Service.BLL
         {
             _referralManagementBll.SetReferral(referralList);
         }
-        public async Task<int> SetReferralAsync(SetReferralRequest setReferral)
+        public async Task<int> SetReferralAsync(ReferralTypeEnum type, SetReferralRequest setReferral)
         {
             var referral = await _referralManagementBll.GetReferralDetail(setReferral.SiteId, setReferral.CurrencyId);
 
-            var result = await _referralManagementBll.SetReferralAsync(setReferral);
+            TransferAfterReferral(referral, type, setReferral);
+            var result = await _referralManagementBll.SetReferralAsync(type, setReferral);
+
             var logParam = new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = Operator,
                 SiteId = setReferral.SiteId,
                 CurrencyId = setReferral.CurrencyId,
                 BeforeDetailInfo = referral == null ? null : JsonConvert.SerializeObject(ToDictionary(referral)),
-                AfterDetailInfo = JsonConvert.SerializeObject(ToDictionary(setReferral)),
+                AfterDetailInfo = JsonConvert.SerializeObject(ToDictionary(new SetNewReferralRequest(setReferral))),
                 ActionType = ActionType.Update,
-                MenuEnum = AdminAdjustmentLogMenuEnum.Referral
+                MenuEnum = type == ReferralTypeEnum.Referral ? AdminAdjustmentLogMenuEnum.Referral : AdminAdjustmentLogMenuEnum.DepositReferral
             };
             if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
             {
@@ -68,12 +70,38 @@ namespace BackendSite.Service.BLL
             }
             return result;
         }
+        private void TransferAfterReferral(ReferralDetail referral, ReferralTypeEnum type, SetReferralRequest setReferral)
+        {
+            if (type == ReferralTypeEnum.Referral)
+            {
+                setReferral.DepositRewardPercentage = referral.DepositRewardPercentage;
+                setReferral.MinPayout = referral.MinPayout;
+                setReferral.MaxPayout = referral.MaxPayout;
+            }
+            else
+            {
+                setReferral.BonusAmount = referral.BonusAmount;
+                setReferral.InvitationLimit = referral.InvitationLimit;
+                setReferral.AgentValidBet = referral.AgentValidBet;
+                setReferral.AgentDeposit = referral.AgentDeposit;
+                setReferral.ReferralFreeCredit = referral.ReferralFreeCredit;
+                setReferral.ValidBet = referral.ValidBet;
+                setReferral.Deposit = referral.Deposit;
+                setReferral.PeriodDays = referral?.PeriodDays;
+            }
+            var joinSpecificList = referral?.SpecificList?.Where(x => x.Type != type);
+            if (joinSpecificList != null)
+                setReferral.SpecificList = setReferral.SpecificList.Select(x => new ReferralContent(type, x)).Union(joinSpecificList);
+            else
+                setReferral.SpecificList = setReferral.SpecificList.Select(x => new ReferralContent(type, x));
+        }
+
         public int SetReferralStatus(int siteId, int currencyId, int status)
         {
             return _referralManagementBll.SetReferralStatus(siteId, currencyId, status);
         }
 
-        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, int status)
+        public async Task<int> SetReferralStatusAsync(int siteId, int currencyId, ReferralStatusEnum status)
         {
             var referral = await _referralManagementBll.GetReferralDetail(siteId, currencyId);
             if (referral == null)
@@ -89,11 +117,11 @@ namespace BackendSite.Service.BLL
                 CurrencyId = currencyId,
                 BeforeDetailInfo = JsonConvert.SerializeObject(new
                 {
-                    Status = _statusDescription[referral.Status]
+                    Status = referral.Status.ToString()
                 }),
                 AfterDetailInfo = JsonConvert.SerializeObject(new
                 {
-                    Stauts = _statusDescription[status]
+                    Stauts = status.ToString()
                 }),
                 ActionType = ActionType.Update,
                 MenuEnum = AdminAdjustmentLogMenuEnum.Referral
@@ -128,7 +156,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<ReferralFriendRresponse> GetRefFriendList(int custId, DateTime? StartDate, DateTime? EndDate, int PageSize, int PageNumber, out int TotalPages, out int RowCount)
         {
-            return _referralManagementBll.GetRefFriendList(custId, StartDate, EndDate, Math.Abs(PageSize), (Math.Abs(PageNumber) - 1) * Math.Abs(PageSize), out TotalPages, out RowCount);
+            return _referralManagementBll.GetRefFriendList(custId, StartDate, EndDate, PageSize, PageNumber, out TotalPages, out RowCount);
         }
 
         private Dictionary<string, object> ToDictionary(object source)

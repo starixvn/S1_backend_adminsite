@@ -94,6 +94,7 @@ namespace BackendSite.Service.Model
         public int TotalApproveRow { get; set; }
         public string PageRange { get; set; }
     }
+
     public class ApiListResultCurrencyAmount<TData> : ApiResult, IPageInfo
     {
         public ApiListResultCurrencyAmount() : this(9000, "") { }
