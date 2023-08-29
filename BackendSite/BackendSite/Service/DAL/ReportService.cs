@@ -264,7 +264,7 @@ namespace BackendSite.Service.DAL
 
             var spName = "Admin_RewardBonusReport_Export_V3";
             var result = _reportDbClient.Query<RewardBonusReportModel>(spName, parameters);
-
+           
             return result;
         }
 
