@@ -27,9 +27,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
-        public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
+        public ApiListResult<LeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
-            var apiResult = new ApiListResult<GetLeaderboardReportResponse>();
+            var apiResult = new ApiListResult<LeaderboardReportResponse>();
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             try
