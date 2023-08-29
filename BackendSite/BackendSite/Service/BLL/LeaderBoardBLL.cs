@@ -14,30 +14,35 @@ namespace BackendSite.Service.BLL
             _leaderBoardService = provider.GetRequiredService<LeaderBoardService>();
         }
 
-        public IEnumerable<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
+        public IEnumerable<LeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
             var data = _leaderBoardService.GetLeaderboardReport(
                 JsonConvert.SerializeObject(request.SiteIds),
                 request.CurrencyId,
                 request.CategoryId,
                 request.StartDate.DateTime,
-                request.EndDate.DateTime );
-            
-            var groupData = data.GroupBy(x => x.CustId)
-                .OrderByDescending(x => x.Sum(i => i.Points))
-                .Select( (r, index) => new GetLeaderboardReportResponse
-                {
-                    Ranking = $"TOP {index + 1}",
-                    SiteId = (int)(r.FirstOrDefault()?.SiteId),
-                    SiteName = r.FirstOrDefault()?.SiteName,
-                    UserName = r.FirstOrDefault()?.UserName,
-                    CurrencyId = (int)(r.FirstOrDefault()?.CurrencyId),
-                    IsoCode = r.FirstOrDefault()?.IsoCode,
-                    CustId = r.Key,
-                    TurnOver = r.Sum(i => i.TurnOver),
-                    Points = r.Sum(i => i.Points)
-                }).Take(30);
-            
+                request.EndDate.DateTime);
+
+            var groupData = data.GroupBy(x => x.SiteId)
+               .Select( x => new LeaderboardReportResponse
+               {
+                   detail = x.GroupBy(x => x.CustId)
+                                        .OrderByDescending(x => x.Sum(i => i.Points))
+                                        .Select((r, index) => new GetLeaderboardReportResponse
+                                        {
+                                            Ranking = $"TOP {index + 1}",
+                                            SiteId = (int)(r.FirstOrDefault()?.SiteId),
+                                            SiteName = r.FirstOrDefault()?.SiteName,
+                                            UserName = r.FirstOrDefault()?.UserName,
+                                            CurrencyId = (int)(r.FirstOrDefault()?.CurrencyId),
+                                            IsoCode = r.FirstOrDefault()?.IsoCode,
+                                            CustId = r.Key,
+                                            TurnOver = r.Sum(i => i.TurnOver),
+                                            Points = r.Sum(i => i.Points)
+                                        }).Take(30).ToList(),
+                   SiteId =x.FirstOrDefault().SiteId,
+               });
+
             return groupData;
         }
 
