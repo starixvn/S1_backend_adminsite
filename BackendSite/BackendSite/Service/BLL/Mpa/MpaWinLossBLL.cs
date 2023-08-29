@@ -1,10 +1,10 @@
-﻿using BackendSite.Service.DAL.Interface;
-using BackendSite.Service.Model.enums;
-using BackendSite.Extensions;
-using BackendSite.Service.Library;
-using BackendSite.Service.BLL.Mpa.Extension;
-using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.BLL.Mpa.Extension;
+using BackendSite.Service.DAL.Interface;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
 
 namespace BackendSite.Service.BLL.Mpa

@@ -11,6 +11,6 @@ namespace BackendSite.Service.BLL.Interface
         Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest request, string userName);
 
         Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, string userName);
-        
+
     }
 }

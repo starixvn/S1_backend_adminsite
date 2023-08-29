@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             _leaderBoardBll = provider.GetRequiredService<LeaderBoardBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
         public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
@@ -42,16 +43,16 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             return apiResult;
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 2 })]
         public IActionResult GetLeaderboardReportExport(GetLeaderboardReportRequest request)
         {
             var data = _leaderBoardBll.GetLeaderboardReport(request);
-            
+
             var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "LeaderboardReport");
         }
-        
+
     }
 }

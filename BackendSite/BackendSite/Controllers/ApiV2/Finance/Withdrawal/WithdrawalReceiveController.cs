@@ -2,6 +2,7 @@
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -72,7 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             return apiResult;
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 28, 83 })]
         public async Task<ApiResult> SetLockWithdrawalUserAsync(WithdrawalReceiveReq req)

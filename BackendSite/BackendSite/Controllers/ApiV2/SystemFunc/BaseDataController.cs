@@ -1,13 +1,16 @@
 ﻿using System.ComponentModel;
+
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.TpMaintain;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.ExceptionHandling;
-using BackendSite.Service.Library;
-using BackendSite.Service.Model.BankFinancial;
-using BackendSite.Service.Model.TpMaintain;
+
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
@@ -97,7 +100,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int? CustId { get; set; }
         }
-        
+
         public class GetPaymentListRequest
         {
             /// <summary>
@@ -149,13 +152,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int TpId { get; set; }
         }
-        
+
         public class GetGameIdByTpIdAndCategoryIdReq
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
         }
-        
+
 
         public class GetTagRequest
         {
@@ -179,7 +182,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             [Description("tpId = 0 WalletType is Seamless, tpId > 0 WalletType is Transfer")]
             public int TpId { get; set; }
-            
+
             [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
             public int CategoryId { get; set; }
         }
@@ -229,7 +232,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public string FuncKey { get; set; }
         }
-        
+
         public class WithdrawalEWalletReq
         {
             /// <summary>
@@ -246,7 +249,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int? CustId { get; set; }
         }
-        
+
         public class GetPointLevelListRequest
         {
             /// <summary>
@@ -258,7 +261,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int CurrencyId { get; set; }
         }
-        
+
         public class GetBankInfoSysRequest
         {
             /// <summary>
@@ -266,7 +269,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// </summary>
             public int CurrencyId { get; set; }
         }
-        
+
         public class GetBankCodeListRequest
         {
             /// <summary>
@@ -280,7 +283,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
-        
+
         #endregion
 
         /// <summary>
@@ -309,8 +312,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 .OrderBy(x => x.SettingStatus);
 
             // 有 withdrawal / deposit approved 權限才顯示密碼
-            if ((request.Purpose == TransferAccountPurposeEnum.Withdrawal && _permissionBll.CheckPermission(28, new []{65}))
-                || (request.Purpose == TransferAccountPurposeEnum.Deposit && _permissionBll.CheckPermission(27, new []{65})))
+            if ((request.Purpose == TransferAccountPurposeEnum.Withdrawal && _permissionBll.CheckPermission(28, new[] { 65 }))
+                || (request.Purpose == TransferAccountPurposeEnum.Deposit && _permissionBll.CheckPermission(27, new[] { 65 })))
             {
                 foreach (var d in data)
                 {
@@ -322,14 +325,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     d.CorporateID = _cryptor.Decrypt(d.CorporateID);
                 }
             }
-            
+
             return new ApiResult<IEnumerable<OfflineBankAccount>>
             {
                 Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// 取得 Local Crypto Wallet 列表
         /// </summary>
@@ -346,7 +349,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 .OrderBy(x => x.SettingStatus);
 
             // 有 withdrawal approved 權限才顯示密碼
-            if (request.Purpose == TransferAccountPurposeEnum.Withdrawal && _permissionBll.CheckPermission(28, new []{65}))
+            if (request.Purpose == TransferAccountPurposeEnum.Withdrawal && _permissionBll.CheckPermission(28, new[] { 65 }))
             {
                 foreach (var d in data)
                 {
@@ -358,7 +361,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     d.CorporateID = _cryptor.Decrypt(d.CorporateID);
                 }
             }
-            
+
             return new ApiResult<IEnumerable<OfflineBankAccount>>
             {
                 Data = data,
@@ -381,13 +384,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult GetOnlinePayList(GetOnlinePayListRequest request)
         {
-            
+
             var authData = _authorizeBll.GetAuthData();
             var result = _bankDetailBll
                 .GetBankInfoPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount, request.CustId)
                 .ToList();
-            
-            if (_permissionBll.CheckPermission(28, new []{70})) // Withdrawal Operator => Process
+
+            if (_permissionBll.CheckPermission(28, new[] { 70 })) // Withdrawal Operator => Process
             {
                 result.ForEach(d =>
                 {
@@ -397,14 +400,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     d.LoginPin = _cryptor.Decrypt(d.LoginPin);
                 });
             }
-            
+
             return new ApiResult<IEnumerable<PayInfo>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// 取得金流商資訊列表
         /// </summary>
@@ -418,7 +421,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 .Where(x => x.PayStatus == PayListStatusEnum.Enable
                     && (request.PayId == null || x.PayId == request.PayId));
 
-            if (_permissionBll.CheckPermission(27, new []{67})) // Deposit Operator => Manual Approved
+            if (_permissionBll.CheckPermission(27, new[] { 67 })) // Deposit Operator => Manual Approved
             {
                 foreach (var d in data)
                 {
@@ -443,7 +446,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             return new ApiResult<IEnumerable<PayInfo>>
             {
                 Data = result,
-                ErrorCode = (int) ErrorCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
@@ -464,10 +467,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var authData = _authorizeBll.GetAuthData();
             var apiResult = new ApiResult<IEnumerable<PayInfo>>();
-            
-            var eWalletPay = _bankDetailBll.GetEWalletPayList(authData.SiteId, request.CurrencyId, request.SysId , request.Amount, request.CustId).ToList();
-            
-            if (_permissionBll.CheckPermission(28, new []{70})) // Withdrawal Operator => Process
+
+            var eWalletPay = _bankDetailBll.GetEWalletPayList(authData.SiteId, request.CurrencyId, request.SysId, request.Amount, request.CustId).ToList();
+
+            if (_permissionBll.CheckPermission(28, new[] { 70 })) // Withdrawal Operator => Process
             {
                 eWalletPay.ForEach(d =>
                 {
@@ -477,12 +480,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     d.LoginPin = _cryptor.Decrypt(d.LoginPin);
                 });
             }
-            
+
             apiResult.Data = eWalletPay;
             apiResult.ErrorCode = 0;
             return apiResult;
         }
-        
+
         /// <summary>
         /// BaseData/GetCryptoPayList 取得指定加密支付清單
         /// </summary>
@@ -505,8 +508,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var result = _bankDetailBll
                 .GetCryptoPayList(authData.SiteId, request.CurrencyId, request.ChannelName, request.Amount, request.CustId)
                 .ToList();
-            
-            if (_permissionBll.CheckPermission(28, new []{70})) // Withdrawal Operator => Process
+
+            if (_permissionBll.CheckPermission(28, new[] { 70 })) // Withdrawal Operator => Process
             {
                 result.ForEach(d =>
                 {
@@ -554,10 +557,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     Message = "Player not found."
                 };
             }
-                
+
             var bankInfoOff = _bankDetailBll
                 .GetOfflineBankAccount(request.SiteId, custInfo.CurrencyId)
-                .Where(x => x.Purposes.Contains(request.Purpose) 
+                .Where(x => x.Purposes.Contains(request.Purpose)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
                             && x.Channel == TransferChannelEnum.LocalBank);
 
@@ -607,7 +610,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             };
             return apiResult;
         }
-        
+
         /// <summary>
         /// BaseData/GetGameCasinoByTpId 取得Slot第三方品牌的遊戲
         /// </summary>
@@ -636,7 +639,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// BaseData/GetGameIdByTpIdAndCategoryId 取得第三方全部遊戲類型GameId
         /// </summary>
@@ -653,7 +656,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<GameCasinoDataV3>>();
             try
             {
-                var gameIdData = await _gameCasinoBll.GetGameIdByTpIdAndCategoryId(request.TpId,request.CategoryId);
+                var gameIdData = await _gameCasinoBll.GetGameIdByTpIdAndCategoryId(request.TpId, request.CategoryId);
                 apiResult.Data = gameIdData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -829,8 +832,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
-        
+
+
         /// <summary>
         /// BaseData/GetPointLevelList 取得績分等級資訊清單
         /// </summary>
@@ -844,17 +847,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var pointLevelInfos = _marketingBll
                 .GetPointLevelInfos(request.SiteId, request.CurrencyId)
                 .Select(x => x.PointLevel)
-                .Union(new []{ 0, 1 })
+                .Union(new[] { 0, 1 })
                 .Distinct()
                 .OrderBy(x => x);
-            
+
             return new ApiResult<IEnumerable<int>>
             {
                 Data = pointLevelInfos,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// BaseData/BankInfoSys 取得銀行系統資訊
         /// </summary>
@@ -868,14 +871,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<BankInfoSys>> GetBankInfoSys(GetBankInfoSysRequest request)
         {
             var sysBankList = _bankDetailBll.GetSysBankList(request.CurrencyId);
-            
+
             return new ApiResult<IEnumerable<BankInfoSys>>
             {
                 Data = sysBankList,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// BaseData/GetBankCodeList
         /// </summary>
@@ -889,14 +892,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var authData = _authorizeBll.GetAuthData();
             var data = _bankDetailBll.GetBankCodeList(authData.SiteId)
                 .Where(x => request.CurrencyId == 0 || x.CurrencyId == request.CurrencyId);
-         
+
             return new ApiResult<IEnumerable<BankCodeModel>>
             {
                 Data = data,
                 ErrorCode = 0
             };
         }
-        
+
         /// <summary>
         /// BaseData/GetCalCodeList
         /// </summary>
@@ -909,14 +912,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult GetCalCodeList(GetBankInfoOffListRequest request)
         {
             var authData = _authorizeBll.GetAuthData();
-            
+
             var accountList = _bankDetailBll.GetOfflineBankAccount(authData.SiteId, request.CurrencyId)
                 .Where(x => x.Purposes.Contains(request.Purpose)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
                             && x.Channel != TransferChannelEnum.PSP
                             && x.Channel != TransferChannelEnum.CryptoWallet)
                 .OrderBy(x => x.SettingStatus);
-            
+
             var data = accountList
                 .Select(x => new CalCodeModel
                 {
@@ -925,14 +928,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     CurrencyId = x.CurrencyId,
                     SysId = x.SysId
                 });
-            
+
             return new ApiResult<IEnumerable<CalCodeModel>>
             {
                 Data = data,
                 ErrorCode = 0
             };
         }
-        
+
         /// <summary>
         /// 取得第三方遊戲分類清單
         /// </summary>
@@ -949,7 +952,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// 取得第三方遊戲分類清單ByTpId
         /// </summary>
@@ -958,14 +961,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<TpCategory>>> GetTpCategoryByTpId(TpCategoryByTpIdRequest request)
         {
-            var gameTypeList = _winLostReportBll.GetTpGameType().Where(x=>x.TpId == request.TpId);
+            var gameTypeList = _winLostReportBll.GetTpGameType().Where(x => x.TpId == request.TpId);
             var categories = gameTypeList.DistinctBy(x => x.CategoryId).Select(x => x.CategoryId);
-            
+
             var categoryList = await _reportBll.GetTpCategoryList();
-            
+
             var query = categoryList.Join(categories, a => a.CategoryId, b => b,
-                (a, b) => new TpCategory {CategoryId = a.CategoryId, CategoryName = a.CategoryName});
-            
+                (a, b) => new TpCategory { CategoryId = a.CategoryId, CategoryName = a.CategoryName });
+
             var apiResult = new ApiResult<IEnumerable<TpCategory>>
             {
                 Data = query,
@@ -974,7 +977,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// 取得第三方遊戲類型清單
         /// </summary>
@@ -991,7 +994,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// Transfer Info Management > Filter > Acc. No.
         /// </summary>
@@ -1003,27 +1006,27 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
             {
                 Data = _bankFinancialBll.GetTransferAccountList(request.SiteId),
-                
+
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
         }
-        
+
         [HttpPost]
         public ApiResult GetFinancialAccountList(GetFinancialAccountListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<BankFinancialTransferAccount>>
             {
                 Data = _bankFinancialBll.GetFinancialAccountList(request.SiteId, request.Purposes),
-                
+
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
             return apiResult;
         }
 
-        
+
         /// <summary>
         /// 取得第三方遊戲類型清單ByCategoryAndTpId
         /// </summary>
@@ -1034,7 +1037,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId);
             var result = data.Where(x => x.TpId == request.TpId);
-            
+
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
             {
                 Data = result,
@@ -1043,7 +1046,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// 取得該幣別支援的tpList
         /// </summary>
@@ -1054,7 +1057,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiListResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
 
-            var tpList = _tpBll.GetTpBySiteAndCurrency(request.SiteId,request.CurrencyId);
+            var tpList = _tpBll.GetTpBySiteAndCurrency(request.SiteId, request.CurrencyId);
             apiListResult.Data = tpList;
             apiListResult.ErrorCode = 0;
             return apiListResult;

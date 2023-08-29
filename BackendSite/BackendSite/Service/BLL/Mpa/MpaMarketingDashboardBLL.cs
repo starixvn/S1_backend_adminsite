@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+
 using BackendSite.Controllers.ApiV2.Report;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
@@ -6,6 +7,7 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL

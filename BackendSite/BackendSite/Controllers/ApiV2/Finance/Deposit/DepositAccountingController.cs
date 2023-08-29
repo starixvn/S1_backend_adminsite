@@ -5,8 +5,10 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
@@ -17,7 +19,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
     public class DepositAccountingController : ControllerBase
     {
         #region Fields
-        
+
         private readonly SelLangBLL _selLangBll;
         private readonly DepositBLL _depositBll;
         private readonly ExcelBLL _excelBll;
@@ -34,7 +36,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
 
         #endregion
-        
+
         #region API Model
 
         public class GetListRequest : ApiRequestPageModel
@@ -46,19 +48,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public string TransId { get; set; }
             public string UserName { get; set; }
         }
-        
-        public class GetByTransIdRequest 
+
+        public class GetByTransIdRequest
         {
             public string TransId { get; set; }
         }
-        
-        public class EditRequest 
+
+        public class EditRequest
         {
-            public string AccountNo{ get; set; }
-            public string Memo{ get; set; }
+            public string AccountNo { get; set; }
+            public string Memo { get; set; }
         }
-        
-        public class ExportListRequest 
+
+        public class ExportListRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -79,7 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         }
 
         #endregion
-        
+
         /// <summary>
         /// DepositAccounting/GetList 取得帳務清單
         /// </summary>
@@ -135,7 +137,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         /// <summary>
         /// DepositAccounting/Edit 編輯帳務
         /// </summary>
@@ -150,7 +152,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public ApiResult Edit(ApiRequestWithLog<EditRequest> request)
         {
             var apiResult = new ApiResult();
-            
+
             var beforeData = _depositBll.GetDepositAccountingByTransId(request.TransId);
             if (beforeData == null)
             {
@@ -163,10 +165,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 AccountNo = beforeData.AccountNo,
                 Memo = beforeData.Memo
             };
-            
+
             var result = _depositBll.EditDepositAccounting(
                 new ParamsWithLog<EditRequest>(request, User.Identity.Name));
-            
+
             if (result > 0)
             {
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -179,7 +181,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             }
             return apiResult;
         }
-        
+
         /// <summary>
         /// DepositAccounting/ExportList 匯出帳務清單
         /// </summary>
@@ -202,7 +204,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.EndDate.DateTime,
                 request.TransId,
                 request.UserName);
-            
+
             var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "DepositAccountList");
         }

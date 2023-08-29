@@ -1,9 +1,11 @@
 using BackendSite.Service.BLL;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.PointSetting;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Store.Setting
@@ -45,7 +47,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                 });
             var result = await _pointSettingBll.SetInactivePointExpirySettingAsync(request, user);
 
-            if (result.ErrorCode == (int) ErrorCodeEnum.Success)
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 var vip = _vipLevelBll.GetVipLevelSetting(request.SiteId);
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
@@ -98,8 +100,8 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                     VipLevel = request.Infos.First().VipLevel
                 });
             var result = await _pointSettingBll.SetTurnoverPointSettingAsync(request, user);
-            
-            if (result.ErrorCode == (int) ErrorCodeEnum.Success)
+
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 var vip = _vipLevelBll.GetVipLevelSetting(request.SiteId);
                 var vipLevel = vip.First(x => x.Level == request.Infos.First().VipLevel).LevelName;
@@ -129,7 +131,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                     })
                 });
             }
-            
+
             return result;
         }
 
@@ -152,7 +154,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                 });
             var result = await _pointSettingBll.SetDepositPointSettingAsync(request, user);
 
-            if (result.ErrorCode == (int) ErrorCodeEnum.Success)
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 var b = before.Data.FirstOrDefault(x => x.CurrencyId == request.CurrencyId);
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
@@ -162,7 +164,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                     CurrencyId = b.CurrencyId,
                     ActionType = ActionType.Update,
                     MenuEnum = AdminAdjustmentLogMenuEnum.DepositRewardPointSetting,
-                    BeforeDetailInfo = b == null ? string.Empty: JsonConvert.SerializeObject(new
+                    BeforeDetailInfo = b == null ? string.Empty : JsonConvert.SerializeObject(new
                     {
                         b.DepositAmount,
                         PromotionStatus = b.PromotionStatus.ToString(),
@@ -180,7 +182,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                     })
                 });
             }
-            
+
             return result;
         }
 
@@ -205,10 +207,10 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                 });
             var result = await _pointSettingBll.SetTurnoverPointStatusSettingAsync(request, user);
 
-            if (result.ErrorCode == (int) ErrorCodeEnum.Success)
+            if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 var typeList = await _tpBLL.GetTpGameTypeListbyCategoryAsync(request.TpCategoryId);
-                var beforeData = before.Data.Any() 
+                var beforeData = before.Data.Any()
                     ? JsonConvert.SerializeObject(new
                     {
                         Enabled = string.Join(", ", before.Data
@@ -216,7 +218,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                             .Select(x => x.TpGameTypeName))
                     })
                     : null;
-                
+
                 _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                 {
                     Operator = user,
@@ -228,12 +230,12 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
                     AfterDetailInfo = JsonConvert.SerializeObject(new
                     {
                         Enabled = string.Join(", ", request.Infos
-                            .Where(x => x.Status == GeneralStatusEnum.Enable) 
+                            .Where(x => x.Status == GeneralStatusEnum.Enable)
                             .Select(x => typeList.FirstOrDefault(y => y.TypeId == x.TpGameTypeId)?.TypeName))
                     })
                 });
             }
-            
+
             return result;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+
 using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
 
@@ -11,7 +12,7 @@ namespace BackendSite.Service.Model.Store.Report
         public IEnumerable<DepositPointOverviewResult> Overview { get; set; }
         public IEnumerable<DepositPointReportResult> List { get; set; }
     }
-    
+
     public class DepositPointReportResult
     {
         private DateTimeOffset _createTime { get; set; }
@@ -36,7 +37,7 @@ namespace BackendSite.Service.Model.Store.Report
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
-    
+
     public class DepositPointOverviewResult
     {
         [ExportIgnore]
@@ -48,7 +49,7 @@ namespace BackendSite.Service.Model.Store.Report
     }
 
     #endregion
-    
+
     #region AdjustmentPoint
 
     public class ExportAdjustmentPointReportResult
@@ -56,7 +57,7 @@ namespace BackendSite.Service.Model.Store.Report
         public IEnumerable<AdjustmentPointOverviewResult> Overview { get; set; }
         public IEnumerable<AdjustmentPointReportResult> List { get; set; }
     }
-    
+
     public class AdjustmentPointReportResult
     {
         private DateTimeOffset _createTime { get; set; }
@@ -83,7 +84,7 @@ namespace BackendSite.Service.Model.Store.Report
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
-    
+
     public class AdjustmentPointOverviewResult
     {
         [ExportIgnore]

@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +15,7 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class BankFinancialReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly ExcelBLL _excelBll;
 
@@ -42,20 +43,20 @@ namespace BackendSite.Controllers.ApiV2.Report
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
-            
+
             return new ApiResult<IEnumerable<BankFinancialReportCurrencySummary>>
             {
                 Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> Export(GetFinancialReportRequest request)
         {
             var stream = await _bankFinancialBll
                 .ExportBankFinancialReportAsync(new GetFinancialReportParams(request));
-            
+
             return _excelBll.ExcelFile(stream, "BankFinancialReport");
         }
 

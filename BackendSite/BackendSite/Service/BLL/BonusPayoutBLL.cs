@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model.enums;
+
 using static BackendSite.Controllers.ApiV2.Marketing.Bonus.BonusPayoutController;
 
 namespace BackendSite.Service.BLL
@@ -29,7 +30,7 @@ namespace BackendSite.Service.BLL
             {
                 return result;
             }
-            
+
             //check deposit
             var checkResult = _bonusPayoutService.CheckTierRedepositBonus(request, tierRedepositBonus.PromotionType);
             if (checkResult == null || !checkResult.IsSuccess)

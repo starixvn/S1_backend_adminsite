@@ -2,8 +2,10 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using MySql.Data.MySqlClient;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
@@ -57,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult<BannerInfo>();
             try
             {
-                var result = _bannerManageBll.GetBanner(request.SiteId, request.BannerName , request.CurrencyId);
+                var result = _bannerManageBll.GetBanner(request.SiteId, request.BannerName, request.CurrencyId);
                 if (result != null)
                 {
                     apiResult.Data = result;
@@ -97,10 +99,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 var statusList = request.Statuses.Select(x => (int)x);
 
                 var data = _bannerManageBll.GetBannerList(
-                    new List<int>{request.SiteId},
+                    new List<int> { request.SiteId },
                     bannerTypeList,
                     statusList,
-                    new List<int>{request.CurrencyId},
+                    new List<int> { request.CurrencyId },
                     request.PageNumber,
                     request.PageSize,
                     out var totalPages, out var rowCount);
@@ -133,7 +135,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public ApiResult SetBanner(ApiRequestWithLog<SetRequest> request)
         {
             var apiResult = new ApiResult();
-            
+
             var urlRouter = new Dictionary<string, string>()
             {
                 {"0_1","eSport"},
@@ -156,22 +158,22 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 {"0_12","deposit"},
                 {"0_13","rewards"}
             };
-            
-            var router = string.IsNullOrEmpty(request.After.UrlRouter) ? 
-                null : urlRouter.ContainsKey($"{request.SiteId}_{request.After.UrlRouter}") ? 
-                    urlRouter[$"{request.SiteId}_{request.After.UrlRouter}"] : urlRouter[$"0_{request.After.UrlRouter}"] ;
+
+            var router = string.IsNullOrEmpty(request.After.UrlRouter) ?
+                null : urlRouter.ContainsKey($"{request.SiteId}_{request.After.UrlRouter}") ?
+                    urlRouter[$"{request.SiteId}_{request.After.UrlRouter}"] : urlRouter[$"0_{request.After.UrlRouter}"];
             request.After.UrlRouter = router;
-            
-            var beforeRouter = string.IsNullOrEmpty(request.Before.UrlRouter) ? 
-                null : urlRouter.ContainsKey($"{request.SiteId}_{request.Before.UrlRouter}") ? 
-                    urlRouter[$"{request.SiteId}_{request.Before.UrlRouter}"] : urlRouter[$"0_{request.Before.UrlRouter}"] ;
+
+            var beforeRouter = string.IsNullOrEmpty(request.Before.UrlRouter) ?
+                null : urlRouter.ContainsKey($"{request.SiteId}_{request.Before.UrlRouter}") ?
+                    urlRouter[$"{request.SiteId}_{request.Before.UrlRouter}"] : urlRouter[$"0_{request.Before.UrlRouter}"];
             request.Before.UrlRouter = beforeRouter;
 
             try
             {
                 var errorCode = _bannerManageBll.SetBanner(new ParamsWithLog<SetRequest>(request, User.Identity.Name));
                 apiResult.ErrorCode = errorCode >= 0 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
-                
+
             }
             catch (MySqlException sqlException)
             {
@@ -205,7 +207,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             try
             {
                 var result = _bannerManageBll.UpdateBannerStatus(new ParamsWithLog<UpdateStatusRequest>(request, User.Identity.Name)) >= 0;
-                
+
                 if (result)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -214,7 +216,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -241,7 +243,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                var result =  _bannerManageBll.DeleteBanner(
+                var result = _bannerManageBll.DeleteBanner(
                     new ParamsWithLog<GetBannerRequest>(request, User.Identity.Name)) >= 0;
 
                 if (result)
@@ -262,8 +264,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
-        
-        
+
+
         #endregion
     }
 }

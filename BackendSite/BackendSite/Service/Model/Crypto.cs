@@ -1,6 +1,5 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -13,7 +12,7 @@ namespace BackendSite.Service.Model
         public NetworkTypeEnum NetworkType { get; set; }
         public CryptoCurrencyEnum CryptoCurrency { get; set; }
     }
-    
+
     public class CryptoWithdrawalLimitInfo
     {
         public int SiteId { get; set; }
@@ -24,10 +23,10 @@ namespace BackendSite.Service.Model
         public decimal WithdrawalMin { get; set; }
         public decimal WithdrawalMax { get; set; }
         public NetworkTypeEnum Network { get; set; }
-        public int NetworkType => (int) Network;
+        public int NetworkType => (int)Network;
         public int CryptoCurrencyId { get; set; }
     }
-    
+
     public class CreateCryptoWithdrawalLimitInfo
     {
         public double WithdrawalMin { get; set; }
@@ -39,7 +38,7 @@ namespace BackendSite.Service.Model
         public CryptoCurrencyEnum CryptoCurrency { get; set; }
         public string CryptoCurrencyName => CryptoCurrency.ToString();
     }
-    
+
     public class DeleteCryptoWithdrawalLimitInfo
     {
         [LogIgnore]
@@ -49,14 +48,14 @@ namespace BackendSite.Service.Model
         public NetworkTypeEnum NetworkType { get; set; }
         public CryptoCurrencyEnum CryptoCurrency { get; set; }
     }
-    
+
     public class UpdateCryptoWithdrawalLimitInfo
     {
         [LogIgnore]
         public int VipLevel { get; set; }
         //log用
         public string VipLevelName { get; set; }
-        
+
         [LogPropertyName("WithdrawalFrequency")]
         public int Times { get; set; }
         public double WithdrawalMin { get; set; }
@@ -68,7 +67,7 @@ namespace BackendSite.Service.Model
         public CryptoCurrencyEnum CryptoCurrency { get; set; }
         public string CryptoCurrencyName => CryptoCurrency.ToString();
     }
-    
+
     public class CryptoInfo
     {
         public int CurrencyId { get; set; }
@@ -108,7 +107,7 @@ namespace BackendSite.Service.Model
         public string Network { get; set; }
         public int NetworkType;
     }
-    
+
     public class CryptoExchangeReq
     {
         public int SiteId { get; set; }
@@ -117,7 +116,7 @@ namespace BackendSite.Service.Model
         public decimal Amount { get; set; }
         public ExchangeTypeEnum Type { get; set; }
     }
-    
+
     public class CryptoExchangeInfo
     {
         public decimal Rate { get; set; }

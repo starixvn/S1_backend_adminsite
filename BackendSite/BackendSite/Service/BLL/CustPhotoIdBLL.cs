@@ -1,4 +1,5 @@
 ﻿using Amazon.S3.Model;
+
 using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
@@ -33,7 +34,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         var photos = await _custPhotoIdService.Get(custId);
         var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
         var site = (SiteEnum)custInfo.SiteId;
-        
+
         var data = photos.Select(sq => new GetCustPhotoIdResponse()
         {
             Id = sq,

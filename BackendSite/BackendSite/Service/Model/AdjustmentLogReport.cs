@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -69,10 +70,10 @@ namespace BackendSite.Service.Model
             base.After = request.After;
             Operator = @operator;
         }
-        
+
         public string Operator { get; set; }
     }
-    
+
     public class CreateAdminAdjustmentInfoLogInput
     {
         public int SiteId { get; set; }
@@ -85,7 +86,7 @@ namespace BackendSite.Service.Model
         public string AfterDetailInfo { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class GetAdminAdjustmentInfoLogInput : ApiRequestPageModel
     {
         private DateTimeOffset _startDate { get; set; }
@@ -108,7 +109,7 @@ namespace BackendSite.Service.Model
         public string TransId { get; set; }
         public int CustId { get; set; } = 0;
     }
-    
+
     public class AdminAdjustmentLogReportResult
     {
         public IEnumerable<AdminAdjustmentLogReport> AdminAdjustmentLogReport { get; set; }
@@ -116,7 +117,7 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
-    
+
     public class AdminAdjustmentLogReport
     {
         private DateTimeOffset _createTime { get; set; }
@@ -139,15 +140,15 @@ namespace BackendSite.Service.Model
         public string BeforeDetailInfo { get; set; }
         [JsonIgnore]
         public string AfterDetailInfo { get; set; }
-        public object BeforeDetailInfoObject => 
+        public object BeforeDetailInfoObject =>
             string.IsNullOrEmpty(BeforeDetailInfo)
                 ? null : JsonConvert.DeserializeObject(BeforeDetailInfo);
-        public object AfterDetailInfoObject => 
+        public object AfterDetailInfoObject =>
             string.IsNullOrEmpty(AfterDetailInfo)
                 ? null : JsonConvert.DeserializeObject(AfterDetailInfo);
         public string Operator { get; set; }
     }
-    
+
     public class SelectListItem
     {
         public string Name { get; set; }

@@ -1,9 +1,11 @@
-﻿using BackendSite.Service.DAL.Interface;
+﻿using System.Data;
+
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
+
 using Dapper;
-using System.Data;
 
 namespace BackendSite.Service.DAL
 {

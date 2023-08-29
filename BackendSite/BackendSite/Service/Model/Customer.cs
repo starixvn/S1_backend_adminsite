@@ -191,7 +191,7 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public decimal CancelBonus { get; set; }
     }
-    
+
     public class CustBonusSum
     {
         public decimal FirstDeposit { get; set; }
@@ -506,7 +506,7 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
-    
+
     public class AdjustmentWithdrawalLimitLog
     {
         public int MainType { get; set; }
@@ -517,7 +517,7 @@ namespace BackendSite.Service.Model
         public string Creator { get; set; }
         public DateTimeOffset CreateTime { get; set; }
     }
-    
+
     public class AdjustmentWithdrawalLimitLogData
     {
         public List<AdjustmentWithdrawalLimitLog> AdjustmentWithdrawalLimitLogList { get; set; }
@@ -629,7 +629,7 @@ namespace BackendSite.Service.Model
 
     public class CustDashBoardTodayResponse : CustDashBoardTodayBaseDto
     {
-        public decimal TodayReward {get; set; }
+        public decimal TodayReward { get; set; }
     }
 
 

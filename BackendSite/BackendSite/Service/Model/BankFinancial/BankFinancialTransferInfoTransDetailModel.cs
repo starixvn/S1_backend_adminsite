@@ -237,10 +237,10 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料更新者名稱
         /// </summary>
         public string UpdatorName { get; set; }
-        
+
         public string ReceiptUrl { get; set; }
     }
-    
+
     public class BankTransferInfoSetRequest
     {
         private DateTimeOffset _transDate;
@@ -251,7 +251,7 @@ namespace BackendSite.Service.Model.BankFinancial
         {
             get => _transDate;
             set => _transDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-            
+
         }
         public SiteEnum SiteId { get; set; }
 

@@ -4,7 +4,9 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.Extensions.Options;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -116,7 +118,7 @@ namespace BackendSite.Service.BLL
             // 先全部用UserName排序
             var result = source.OrderBy(i => i.UserName).ToList();
             // 檢查是否有完全符合的UserName
-            var index = result.FindIndex(x => x.UserName == userName);           
+            var index = result.FindIndex(x => x.UserName == userName);
             if (index != -1)
             {
                 var item = result[index];

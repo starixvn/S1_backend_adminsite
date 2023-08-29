@@ -16,6 +16,6 @@ namespace BackendSite.Service.Model
         public string Menu { get; set; }
         public string Note { get; set; }
         public string DetailInfo { get; set; }
-    } 
+    }
 }
 

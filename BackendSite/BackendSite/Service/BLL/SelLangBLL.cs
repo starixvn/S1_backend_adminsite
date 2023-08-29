@@ -1,7 +1,8 @@
-﻿using BackendSite.Service.Model;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Reflection;
 using System.Resources;
+
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL
 {
@@ -66,7 +67,7 @@ namespace BackendSite.Service.BLL
             {
                 labelString = rm[sKey].GetString(key);
             }
-            catch(MissingManifestResourceException mme)
+            catch (MissingManifestResourceException mme)
             {
 
             }
@@ -90,13 +91,13 @@ namespace BackendSite.Service.BLL
 
             return labelString;
         }
-        public string GetResourceValue(string key,string lang)
+        public string GetResourceValue(string key, string lang)
         {
             var labelString = GetResourceValue(key, "lan", lang);
 
             return labelString;
         }
-        public string GetMsg(string key,string lang)
+        public string GetMsg(string key, string lang)
         {
             var labelString = GetResourceValue(key, "msg", lang);
 

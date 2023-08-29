@@ -1,9 +1,12 @@
 ﻿using System.Data;
+
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
+
 using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
@@ -129,7 +132,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             return await _reportDbClient.QueryAsync<WorldCupPredictiveStatisticsDto>("Admin_WorldCupPredictiveStatistics_Get", p);
         }
-        
+
         public async Task<IEnumerable<WorldCupPredictDetailDto>> GetPredictDetail(int siteId, int teamId)
         {
             var p = new DynamicParameters();

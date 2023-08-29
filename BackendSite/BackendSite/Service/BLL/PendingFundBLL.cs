@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
         {
             var serverInfo = serverInfoService.GetModel();
             return pendingFundService.PendingFundList(serverInfo.SiteId);
-        } 
+        }
 
         public class TpBonusTransfer
         {

@@ -1,9 +1,11 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+
+using BackendSite.Extensions;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
-using System.Data;
-using BackendSite.Extensions;
 
 namespace BackendSite.Service.DAL
 {
@@ -19,7 +21,7 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<LineChannelViewModel> GetList(bool isList,int id,int siteId, string currencyIds,
+        public IEnumerable<LineChannelViewModel> GetList(bool isList, int id, int siteId, string currencyIds,
             int startIndex, int pageSize,
             out int totalPages, out int rowCount)
         {
@@ -58,14 +60,14 @@ namespace BackendSite.Service.DAL
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LineDepositChannel);
-            logParam.Add("_ActionType", (int) (isAdd ? ActionType.Create : ActionType.Update));
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.LineDepositChannel);
+            logParam.Add("_ActionType", (int)(isAdd ? ActionType.Create : ActionType.Update));
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", isAdd ? null : input.Before.ToLog(), DbType.String);
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
-            
+
             if (!logResult)
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, tran);
@@ -91,22 +93,22 @@ namespace BackendSite.Service.DAL
             conn.Open();
 
             using var tran = conn.BeginTransaction();
-            
+
             var p = new DynamicParameters();
             p.Add("_Id", input.Before.Id);
-            
+
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.LineDepositChannel);
-            logParam.Add("_ActionType", (int) ActionType.Delete);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.LineDepositChannel);
+            logParam.Add("_ActionType", (int)ActionType.Delete);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
-            
+
             if (!logResult)
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, tran);

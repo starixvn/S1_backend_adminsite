@@ -1,8 +1,10 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
 
 namespace BackendSite.Service.DAL
 {
@@ -44,7 +46,7 @@ namespace BackendSite.Service.DAL
 
         public News GetNewsById(int newsId)
         {
-            return _mainDbClient.QueryFirst<News>("Admin_News_GetById_V2", new DynamicParameters(new {NewsId = newsId }));
+            return _mainDbClient.QueryFirst<News>("Admin_News_GetById_V2", new DynamicParameters(new { NewsId = newsId }));
         }
 
         public int? SetNews(bool isAdd, News newsDatas)
@@ -67,7 +69,7 @@ namespace BackendSite.Service.DAL
 
         public void SetStatus(int newsId, int status, string lastUpdateUser)
         {
-            _mainDbClient.Execute("Admin_News_SetStatus", new DynamicParameters(new {NewsId = newsId, Status = status, LastUpdateUser = lastUpdateUser }));
+            _mainDbClient.Execute("Admin_News_SetStatus", new DynamicParameters(new { NewsId = newsId, Status = status, LastUpdateUser = lastUpdateUser }));
         }
     }
 }

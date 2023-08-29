@@ -1,9 +1,13 @@
-﻿using Dapper;
-using MySql.Data.MySqlClient;
-using Serilog.Context;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
+
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
+
+using Serilog.Context;
 
 namespace BackendSite.Service.Library
 {
@@ -476,7 +480,7 @@ namespace BackendSite.Service.Library
             _logger.LogInformation($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         public async Task<IEnumerable<T>> QueryAsync<T>(string name, SqlMapper.IDynamicParameters parameters)
         {
             IEnumerable<T> result;

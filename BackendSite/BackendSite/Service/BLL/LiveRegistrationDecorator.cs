@@ -2,6 +2,7 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -13,7 +14,7 @@ namespace BackendSite.Service.BLL
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<LiveRegistrationDecorator> _logger;
 
-        public LiveRegistrationDecorator( CustInfoBLL custInfoBll, ILiveRegistrationBLL liveRegistration, AdjustmentLogReportService adjustmentLogReportService, ILogger<LiveRegistrationDecorator> logger)
+        public LiveRegistrationDecorator(CustInfoBLL custInfoBll, ILiveRegistrationBLL liveRegistration, AdjustmentLogReportService adjustmentLogReportService, ILogger<LiveRegistrationDecorator> logger)
         {
             _custInfoBll = custInfoBll;
             _liveRegistration = liveRegistration;
@@ -38,10 +39,10 @@ namespace BackendSite.Service.BLL
             if (customer == null) return 0;
 
             var regLiveStatus = await _liveRegistration.GetRegLiveStatus(input.CustId);
-            
-            var result= await _liveRegistration.SetRegLiveStatus(input, @operator);
+
+            var result = await _liveRegistration.SetRegLiveStatus(input, @operator);
             if (result <= 0) return result;
-            
+
             var logParam = new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = @operator,
@@ -86,10 +87,10 @@ namespace BackendSite.Service.BLL
         {
             var customer = _custInfoBll.GetCustInfoWithCache(custId);
             if (customer == null) return 0;
-            
+
             var addResult = await _liveRegistration.AddRegLiveStatusNote(custId, note, @operator);
             if (addResult <= 0) return addResult;
-            
+
             var logParam = new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = @operator,
@@ -114,13 +115,13 @@ namespace BackendSite.Service.BLL
         {
             var customer = _custInfoBll.GetCustInfoWithCache(custId);
             if (customer == null) return 0;
-            
+
             var note = await _liveRegistration.GetRegLiveStatusNotesById(id);
             if (note == null) return 0;
 
             var deleteResult = await _liveRegistration.DeleteRegLiveStatusNote(custId, id, @operator);
             if (deleteResult <= 0) return deleteResult;
-            
+
             var logParam = new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = @operator,
@@ -146,13 +147,13 @@ namespace BackendSite.Service.BLL
         {
             var customer = _custInfoBll.GetCustInfoWithCache(custId);
             if (customer == null) return 0;
-            
+
             var noteData = await _liveRegistration.GetRegLiveStatusNotesById(id);
             if (noteData == null) return 0;
-            
-            var editResult = await _liveRegistration.EditRegLiveStatusNote(custId, id ,note, @operator);
+
+            var editResult = await _liveRegistration.EditRegLiveStatusNote(custId, id, note, @operator);
             if (editResult <= 0) return editResult;
-            
+
             var logParam = new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = @operator,

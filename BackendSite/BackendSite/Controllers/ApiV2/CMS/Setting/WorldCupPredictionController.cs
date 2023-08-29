@@ -2,6 +2,7 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -70,7 +71,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             {
                 apiResult.Data = _worldCupPredictionBll.GetMemberReport(request,
                     out var totalPages,
-                    out var rowCount);;
+                    out var rowCount); ;
                 apiResult.TotalPages = totalPages;
                 apiResult.PageNumber = request.PageNumber;
                 apiResult.RowCount = rowCount;
@@ -83,7 +84,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
             return apiResult;
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 115, 2 })]
         public async Task<IActionResult> ExportMemberReport(ExportWorldCupMemberReportRequest request)
@@ -97,7 +98,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WorldCupMemberReport");
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 1 })]
         public async Task<ApiResult<IEnumerable<GetWorldCupEventReportResponse>>> GetEventReport(GetWorldCupEventReportRequest request)
@@ -105,7 +106,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult<IEnumerable<GetWorldCupEventReportResponse>>();
             try
             {
-                apiResult.Data = await _worldCupPredictionBll.GetPredictiveStatistics(request.SiteId);;
+                apiResult.Data = await _worldCupPredictionBll.GetPredictiveStatistics(request.SiteId); ;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -115,21 +116,21 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
             return apiResult;
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 2 })]
         public async Task<IActionResult> ExportEventReport(ExportWorldCupEventReportRequest request)
         {
             var ts = TimeSpan.Parse(request.Timezone.TrimStart('+'));
             var exportData = await _worldCupPredictionBll.GetPredictDetail(request.SiteId, request.TeamId);
-            foreach(var item in exportData)
+            foreach (var item in exportData)
             {
                 item.SelectTime = item.SelectTime.ToOffset(ts);
             }
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WorldCupEventReport");
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 3 })]
         public async Task<ApiResult> SetPayoutDone(SetPayoutDoneRequest request)

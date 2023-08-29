@@ -31,7 +31,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
 
         [Required]
-        public decimal USDRate { get; set; } 
+        public decimal USDRate { get; set; }
     }
 
 }

@@ -1,10 +1,13 @@
-﻿using BackendSite.Service.Model.TpMaintain;
-using Dapper;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.TpMaintain;
+
+using Dapper;
+
 using TpCategory = BackendSite.Service.Model.TpMaintain.TpCategory;
 using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
-using System.Data;
 
 namespace BackendSite.Service.DAL
 {

@@ -1,8 +1,9 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Security.Claims;
+
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System.Security.Claims;
 
 namespace BackendSite.Service.BLL
 {
@@ -19,18 +20,18 @@ namespace BackendSite.Service.BLL
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public ErrorCodeEnum UserLogin(string userName, 
-                                              string pwd, 
-                                              string ip, 
-                                              string fromUrl, 
-                                              string userAgent, 
+        public ErrorCodeEnum UserLogin(string userName,
+                                              string pwd,
+                                              string ip,
+                                              string fromUrl,
+                                              string userAgent,
                                               ref AdminUser adminUser)
         {
-            if(string.IsNullOrEmpty(userName))
+            if (string.IsNullOrEmpty(userName))
             {
                 return ErrorCodeEnum.AccountInvalid;
             }
-            if(string.IsNullOrEmpty(pwd))
+            if (string.IsNullOrEmpty(pwd))
             {
                 return ErrorCodeEnum.PasswordInvalid;
             }

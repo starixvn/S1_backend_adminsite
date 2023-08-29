@@ -1,13 +1,16 @@
-﻿using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.DAL.Interface;
-using BackendSite.Service.Model.Mpa.Marketing;
+﻿using System.Reflection;
+
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
-using OfficeOpenXml.Style;
-using OfficeOpenXml;
-using System.Reflection;
+using BackendSite.Service.Model.Mpa.Marketing;
+
 using Newtonsoft.Json;
+
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace BackendSite.Service.BLL.Mpa
 {

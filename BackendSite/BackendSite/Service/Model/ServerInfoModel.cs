@@ -5,17 +5,17 @@ namespace BackendSite.Service.Model
     public class ServerInfoModel
     {
         public int SiteId { set; get; }
-        
+
         public string SiteName { set; get; }
-        
+
         public string LangList { set; get; }
-        
+
         public string CurrencyList { set; get; }
-        
+
         public string DefLang { set; get; }
 
         public string DefCurrency { set; get; }
-        
+
         public IEnumerable<int> ICurrencyList
         {
             get

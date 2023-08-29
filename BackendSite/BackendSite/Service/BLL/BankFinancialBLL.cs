@@ -1,13 +1,17 @@
 ﻿using System.Transactions;
+
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
-using BackendSite.Service.Model.ApiModel;
+
 using NPOI.XSSF.UserModel;
+
 using NuGet.Packaging;
 
 namespace BackendSite.Service.BLL
@@ -53,7 +57,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BankFinancialReasonModel> GetReason(string funcKey)
         {
             var key = $"Reason:{funcKey}";
-            
+
             return _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
                 () => _bankFinancialService.GetReason(funcKey));
         }
@@ -72,17 +76,17 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
         {
-            return _bankFinancialService.GetTransferAccountList(siteId, new []
+            return _bankFinancialService.GetTransferAccountList(siteId, new[]
             {
                 TransferAccountPurposeEnum.Transfer
             });
         }
-        
+
         public IEnumerable<BankFinancialTransferAccount> GetFinancialAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
         {
             return _bankFinancialService.GetTransferAccountList(siteId, purposes);
         }
-        
+
         #endregion
 
         #region Transfer Account Management
@@ -91,7 +95,7 @@ namespace BackendSite.Service.BLL
         {
             return _bankFinancialService.GetTransferAccountInfoListV2(input);
         }
-        
+
         public IEnumerable<string> GetTransferAccountAgentList(int siteId)
         {
             return _bankFinancialService.GetTransferAccountAgentList(siteId)
@@ -214,7 +218,7 @@ namespace BackendSite.Service.BLL
                 {
                     return (false, count, $"AccountNo: {transferAccountModel.AccountNo} already exists.");
                 }
-                
+
                 using (var scope = new TransactionScope())
                 {
                     if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)
@@ -257,7 +261,7 @@ namespace BackendSite.Service.BLL
                             return (false, count, "Update Transfer Data Fail.");
                         }
                     }
-                    
+
                     if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
                     {
                         scope.Dispose();
@@ -271,12 +275,12 @@ namespace BackendSite.Service.BLL
                 count = 1;
                 message = "Update Transfer Account And Insert Log Success.";
             }
-            
+
             _ = _cacheHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member);
 
             return (true, count, message);
         }
-        
+
         #region Private Methods For GetTransferAccountInfoList
 
         private string GetTransferId()
@@ -478,7 +482,7 @@ namespace BackendSite.Service.BLL
             pageInfo.SetPageInfo(rowCount, pageNumber, pageSize);
             return result;
         }
-        
+
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> ExportFinancialTransferInfoList(GetTransferInfoListParams input)
         {
             input.IsExport = true;
@@ -487,7 +491,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public BankFinancialTransferInfoTransDetailModel GetFinancialTransferInfoById(string transferId)
         {
             var result =
@@ -613,7 +617,7 @@ namespace BackendSite.Service.BLL
                             return (false, count, "Update Transfer Receipt Fail.");
                         }
                     }
-                    
+
                     var after = GetFinancialTransferInfoById(bankFinancialTransferInfoDetail.TransferId);
 
                     #region logParams
@@ -691,7 +695,7 @@ namespace BackendSite.Service.BLL
                     };
 
                     #endregion
-                    
+
                     if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
                     {
                         scope.Dispose();
@@ -794,7 +798,7 @@ namespace BackendSite.Service.BLL
                         }),
                         AfterDetailInfo = null
                     };
-                    
+
                     if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
                     {
                         scope.Dispose();
@@ -1383,12 +1387,12 @@ namespace BackendSite.Service.BLL
         public BankFinancialTransferInfoReceiptModel GetTransferIngoReceipt(string transferId)
         {
             var result = _bankFinancialService.GetTransferInfoReceipt(transferId);
-            
+
             if (result != null)
             {
                 result.PicFileName = _bucketUrl + result.PicFileName;
             }
-            
+
             return result;
         }
 
@@ -1643,12 +1647,12 @@ namespace BackendSite.Service.BLL
 
             return Data;
         }
-        
+
         public async Task<IEnumerable<BankFinancialReportCurrencySummary>> GetBankFinancialReportSummaryAsync(
             GetFinancialReportParams input)
         {
             var report = await GetBankFinancialReportWithCacheAsync(input);
-            
+
             if (!report.Data.Any())
             {
                 return Array.Empty<BankFinancialReportCurrencySummary>();
@@ -1658,15 +1662,15 @@ namespace BackendSite.Service.BLL
             var agentSummary = GetBankFinancialReportAgentSummaryAsync(accountSummary);
             var channelSummary = GetBankFinancialReportChannelSummaryAsync(agentSummary);
             var result = GetBankFinancialReportCurrencySummaryAsync(channelSummary);
-            
+
             return result;
         }
-        
+
         private IEnumerable<BankFinancialReportAccountSummary> GetBankFinancialReportAccountSummaryAsync(
             BankFinancialReportResult report)
         {
             var result = report.Data
-                .GroupBy(x => new {x.FinancialId, x.AccountNo, x.Agent, x.Channel, x.CurrencyId})
+                .GroupBy(x => new { x.FinancialId, x.AccountNo, x.Agent, x.Channel, x.CurrencyId })
                 .Select(g =>
                 {
                     var transferTypes = GetTransferTypeToDisplay();
@@ -1675,14 +1679,14 @@ namespace BackendSite.Service.BLL
                         var sum = g
                             .Where(y => y.TransferType == x)
                             .Sum(y => y.Summary);
-                        
+
                         return sum;
                     });
 
                     var accountInfo = report.AccountInfoList.FirstOrDefault(x => x.FinancialId == g.Key.FinancialId);
                     var openBalance = accountInfo?.OpenBalance;
                     var netBalance = g.Sum(x => x.Summary);
-                    
+
                     return new BankFinancialReportAccountSummary
                     {
                         CurrencyId = g.Key.CurrencyId,
@@ -1696,15 +1700,15 @@ namespace BackendSite.Service.BLL
                         ClosingBalance = openBalance + netBalance
                     };
                 });
-            
+
             return result;
         }
-        
+
         private IEnumerable<BankFinancialReportAgentSummary> GetBankFinancialReportAgentSummaryAsync(
             IEnumerable<BankFinancialReportAccountSummary> accountSummary)
         {
             var result = accountSummary
-                .GroupBy(x => new {x.Agent, x.Channel, x.CurrencyId})
+                .GroupBy(x => new { x.Agent, x.Channel, x.CurrencyId })
                 .Select(g =>
                 {
                     var transferTypes = GetTransferTypeToDisplay();
@@ -1712,10 +1716,10 @@ namespace BackendSite.Service.BLL
                         transferTypes.ToDictionary(x => x.ToString(), x =>
                         {
                             var sum = g.Sum(y => y.Details[x.ToString()]);
-                            
+
                             return sum;
                         });
-                    
+
                     return new BankFinancialReportAgentSummary
                     {
                         CurrencyId = g.Key.CurrencyId,
@@ -1729,15 +1733,15 @@ namespace BackendSite.Service.BLL
                         Children = g
                     };
                 });
-            
+
             return result;
         }
-        
+
         private IEnumerable<BankFinancialReportChannelSummary> GetBankFinancialReportChannelSummaryAsync(
             IEnumerable<BankFinancialReportAgentSummary> agentSummary)
         {
             var result = agentSummary
-                .GroupBy(x => new {x.Channel, x.CurrencyId})
+                .GroupBy(x => new { x.Channel, x.CurrencyId })
                 .Select(g =>
                 {
                     var transferTypes = GetTransferTypeToDisplay();
@@ -1745,10 +1749,10 @@ namespace BackendSite.Service.BLL
                         transferTypes.ToDictionary(x => x.ToString(), x =>
                         {
                             var sum = g.Sum(y => y.Details[x.ToString()]);
-                            
+
                             return sum;
                         });
-                    
+
                     return new BankFinancialReportChannelSummary
                     {
                         CurrencyId = g.Key.CurrencyId,
@@ -1761,10 +1765,10 @@ namespace BackendSite.Service.BLL
                         Children = g
                     };
                 });
-            
+
             return result;
         }
-        
+
         private IEnumerable<BankFinancialReportCurrencySummary> GetBankFinancialReportCurrencySummaryAsync(
             IEnumerable<BankFinancialReportChannelSummary> channelSummary)
         {
@@ -1778,10 +1782,10 @@ namespace BackendSite.Service.BLL
                         transferTypes.ToDictionary(x => x.ToString(), x =>
                         {
                             var sum = g.Sum(y => y.Details[x.ToString()]);
-                            
+
                             return sum;
                         });
-                    
+
                     var d = g.First();
                     return new BankFinancialReportCurrencySummary
                     {
@@ -1795,25 +1799,25 @@ namespace BackendSite.Service.BLL
                         Children = g
                     };
                 });
-            
+
             return result;
         }
 
         public async Task<byte[]> ExportBankFinancialReportAsync(GetFinancialReportParams input)
         {
             var report = await GetBankFinancialReportWithCacheAsync(input);
-            
+
             if (!report.Data.Any())
             {
                 return Array.Empty<byte>();
             }
-            
+
             var transferTypes = GetTransferTypeToDisplay();
             var data = report.Data
                 .OrderBy(x => x.CurrencyId)
                 .ThenBy(x => x.Channel)
                 .ThenBy(x => x.Agent)
-                .GroupBy(x => new {x.FinancialId, x.AccountNo, x.Agent, x.Channel, x.CurrencyId})
+                .GroupBy(x => new { x.FinancialId, x.AccountNo, x.Agent, x.Channel, x.CurrencyId })
                 .Select(g =>
                 {
                     var details = transferTypes.ToDictionary(x => x.ToString(), x =>
@@ -1821,7 +1825,7 @@ namespace BackendSite.Service.BLL
                         var sum = g
                             .Where(y => y.TransferType == x)
                             .Sum(y => y.Summary);
-                        
+
                         return sum.ToString();
                     });
 
@@ -1829,7 +1833,7 @@ namespace BackendSite.Service.BLL
                     var openBalance = accountInfo?.OpenBalance;
                     var netBalance = g.Sum(x => x.Summary);
                     var fee = g.Sum(x => x.FeeSummary);
-                    
+
                     var item = new Dictionary<string, string>
                     {
                         {"Open Balance", openBalance.ToString()},
@@ -1840,21 +1844,21 @@ namespace BackendSite.Service.BLL
                         {"Agent", g.Key.Agent},
                         {"Account Name", accountInfo?.DisplayName ?? g.Key.AccountNo}
                     };
-                    
+
                     item.AddRange(details);
                     item.Add("Fee", fee.ToString());
 
                     return item;
                 });
-            
+
             var workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("BankFinancialReport");
             sheet.WriteDictionaryListToSheet(data, true);
-            
+
             await using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             var result = memoryStream.ToArray();
-            
+
             return result;
         }
 
@@ -1863,11 +1867,11 @@ namespace BackendSite.Service.BLL
         {
             var key = $"FinancialReport:{input.SiteId}:{input.CurrencyIds}:{input.Channel}:{input.Agents}" +
                       $":{input.FinancialAccountIds}:{input.StartTime:yyyyMMddHHmmss}:{input.EndTime:yyyyMMddHHmmss}:{input.TimeZone}";
-            
+
             return await _cacheHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(30),
                 () => GetBankFinancialReportAsync(input));
         }
-        
+
         private async Task<BankFinancialReportResult> GetBankFinancialReportAsync(GetFinancialReportParams input)
         {
             var deposit = await _bankFinancialService.GetFinancialReportDepositAsync(input);
@@ -1875,7 +1879,7 @@ namespace BackendSite.Service.BLL
             var transfer = await _bankFinancialService.GetFinancialReportTransferAsync(input);
             var data = deposit.Union(withdrawal).Union(transfer);
             var ids = data.Select(x => x.FinancialId).Distinct();
-            
+
             var openBalanceList = await _bankFinancialService.GetFinancialAccountOpenBalanceAsync(
                 new GetFinancialAccountOpenBalanceParams
                 {
@@ -1890,7 +1894,7 @@ namespace BackendSite.Service.BLL
                 AccountInfoList = openBalanceList
             };
         }
-        
+
         private static IEnumerable<TransferTypeEnum> GetTransferTypeToDisplay()
         {
             var except = new[]
@@ -1899,14 +1903,14 @@ namespace BackendSite.Service.BLL
                 TransferTypeEnum.Deposit,
                 TransferTypeEnum.Withdrawal
             };
-            
+
             var result = EnumExtension.EnumToIEnumerable(except).ToList();
             result.Insert(0, TransferTypeEnum.Deposit);
             result.Insert(1, TransferTypeEnum.Withdrawal);
-            
+
             return result;
         }
-        
+
         #endregion
     }
 }

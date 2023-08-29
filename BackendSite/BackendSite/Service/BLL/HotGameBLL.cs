@@ -3,8 +3,11 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
+
 using Microsoft.Extensions.Options;
+
 using Newtonsoft.Json;
+
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Service.BLL
@@ -28,7 +31,7 @@ namespace BackendSite.Service.BLL
             { 15, "id" },
             { 51, "vn" },
             { 61, "hi" },
-            { 72, "kh" },  
+            { 72, "kh" },
             { 74, "bn" },
         };
         private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
