@@ -15,6 +15,7 @@ public class DepositPaymentReportDetail
 {
     [ExportIgnore]
     public string Key { get; set; }
+    public string SiteName { get; set; }
     public int TotalDepositCount { get; set; }
     public decimal TotalDepositAmount { get; set; }
     public decimal AverageDepositAmount { get; set; }
