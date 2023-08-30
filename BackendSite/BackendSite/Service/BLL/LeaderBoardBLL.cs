@@ -17,7 +17,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
             var data = _leaderBoardService.GetLeaderboardReport(
-                request.SiteId,
+                JsonConvert.SerializeObject(request.SiteIds),
                 request.CurrencyId,
                 request.CategoryId,
                 request.StartDate.DateTime,
@@ -41,7 +41,7 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<LeaderboardReportResponse> GetLeaderboardReportBySiteIds(GetLeaderboardReportRequest request)
         {
-            var data = _leaderBoardService.GetLeaderboardReportBySiteIds(
+            var data = _leaderBoardService.GetLeaderboardReport(
                 JsonConvert.SerializeObject(request.SiteIds),
                 request.CurrencyId,
                 request.CategoryId,
