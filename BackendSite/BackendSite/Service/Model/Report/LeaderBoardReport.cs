@@ -37,7 +37,11 @@ public class LeaderboardReportModel
     public decimal Points { get; set; }
     public string SiteName { get; set; }
 }
-
+public class LeaderboardReportResponse
+{
+    public List<GetLeaderboardReportResponse> detail { get; set; }
+    public int SiteId { get; set; }
+}
 public class GetLeaderboardReportResponse
 {
     public string Ranking { get; set; }
