@@ -27,14 +27,34 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
-        public ApiListResult<LeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
+        public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
+        {
+            var apiResult = new ApiListResult<GetLeaderboardReportResponse>();
+
+            try
+            {
+                var data = _leaderBoardBll.GetLeaderboardReport(request);
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
+        public ApiListResult<LeaderboardReportResponse> GetLeaderboardReportBySiteIds(GetLeaderboardReportRequest request)
         {
             var apiResult = new ApiListResult<LeaderboardReportResponse>();
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             try
             {
-                var data = _leaderBoardBll.GetLeaderboardReport(request);
+                var data = _leaderBoardBll.GetLeaderboardReportBySiteIds(request);
                 apiResult.Data = data;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
