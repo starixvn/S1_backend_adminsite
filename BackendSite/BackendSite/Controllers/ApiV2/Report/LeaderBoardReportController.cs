@@ -31,7 +31,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
             var apiResult = new ApiListResult<GetLeaderboardReportResponse>();
-
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             try
             {
                 var data = _leaderBoardBll.GetLeaderboardReport(request);
