@@ -50,6 +50,7 @@ namespace BackendSite.Service.Model
         public string DepositId { get; set; }
         public MemberTypeEnum UserType { get; set; }
         public string RefId { get; set; }
+        public MethodTypeIDEnum MethodType { get;set; }
     }
 
     public class PaymentAdjustmentWrapper

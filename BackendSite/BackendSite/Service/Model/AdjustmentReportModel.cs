@@ -91,6 +91,7 @@ namespace BackendSite.Service.Model
         public string DepositId { get; set; }
         [ExportIgnore]
         public int AdjustType { get; set; }
+        public int MethodType { get; set; } 
     }
 
 
