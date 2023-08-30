@@ -356,7 +356,7 @@ namespace BackendSite.Service.DAL
                     var isAdd = adjustmentAndWithdrawalLimit.AdjustType % 2 == 1; //1, 3(Add)2, 4(Deduct)
 
                     //調帳類型為Main Wallet且為Deposit(1)時變更存款單實際存款金額
-                    if (adjustmentAndWithdrawalLimit.Category == 1 && (adjustmentAndWithdrawalLimit.MethodType == 1 ||adjustmentAndWithdrawalLimit.MethodType == 3))
+                    if (adjustmentAndWithdrawalLimit.Category == 1 && adjustmentAndWithdrawalLimit.MethodType == 5 )
                     {
                         var adjustAmount = isAdd
                             ? adjustmentAndWithdrawalLimit.Amount
