@@ -259,17 +259,12 @@ namespace BackendSite.Service.DAL
         }
 
         #region PaymentGateway Setting Renew
-
-        public IEnumerable<PayListInfo> GetPayList(int siteId)
-        {
-            return _reportDbClient
-                .Query<PayListInfo>("Admin_SitePayList_Get", new DynamicParameters(new { _SiteId = siteId }));
-        }
+        
         public IEnumerable<PayListInfo> GetPayList(IEnumerable<int> siteIds)
         {
             var _siteIds = JsonConvert.SerializeObject(siteIds);
             return _reportDbClient
-                .Query<PayListInfo>("Admin_SitePayList_GetV2", new DynamicParameters(new { _SiteId = _siteIds }));
+                .Query<PayListInfo>("Admin_SitePayList_Get_V2", new DynamicParameters(new { _SiteId = _siteIds }));
         }
 
         public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)
