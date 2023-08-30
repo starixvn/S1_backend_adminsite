@@ -435,7 +435,8 @@ namespace BackendSite.Service.BLL
                 WalletType = string.IsNullOrWhiteSpace(row.WalletType) ? string.Empty : row.WalletType,
                 CategoryName = row.CategoryName,
                 DepositId = row.DepositId,
-                AdjustType = row.AdjustType
+                AdjustType = row.AdjustType,
+                MethodType =(int)row.MethodType
             };
         }
 

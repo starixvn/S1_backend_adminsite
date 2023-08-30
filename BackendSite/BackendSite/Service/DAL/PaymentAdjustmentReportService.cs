@@ -133,7 +133,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V7", props);
+            result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V8", props);
             result.CurrencyAmount = currencyTotalAmount;
             result.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = props.Get<int?>("_RowCount") ?? 0;
