@@ -211,10 +211,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<IEnumerable<PayListInfo>> GetUserAllPayList()
         {
-            GetSite getSite = new GetSite();
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
-            ((IApiRequest)getSite).ConvertToMultiSiteParam(userServerInfo);
-            var data = _paymentManageBll.GetPayListByMultiSite(getSite.SiteIds);
+            var data = _paymentManageBll.GetPayListByMultiSite(userServerInfo.Select(x=>x.SiteId));
 
             if (!data.Any())
             {
@@ -228,15 +226,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-        }
-
-        public class GetSite : IApiRequest
-        {
-            public int SiteId { get; set; }
-            public IEnumerable<int> SiteIds { get; set; }
-            public int CurrencyId { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
 
         /// <summary>
