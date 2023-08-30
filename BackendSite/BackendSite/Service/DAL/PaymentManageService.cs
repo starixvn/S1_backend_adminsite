@@ -4,6 +4,7 @@ using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using System.Security.Policy;
 
 using Dapper;
 
@@ -264,13 +265,20 @@ namespace BackendSite.Service.DAL
             return _reportDbClient
                 .Query<PayListInfo>("Admin_SitePayList_Get", new DynamicParameters(new { _SiteId = siteId }));
         }
+        public IEnumerable<PayListInfo> GetPayList(IEnumerable<int> siteIds)
+        {
+            var _siteIds = JsonConvert.SerializeObject(siteIds);
+            return _reportDbClient
+                .Query<PayListInfo>("Admin_SitePayList_GetV2", new DynamicParameters(new { _SiteId = _siteIds }));
+        }
 
         public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var pay = GetPayList(siteId)
+            var siteIds = Enumerable.Repeat(siteId, 1);
+            var pay = GetPayList(siteIds)
                 .First(x => x.PayId == payId);
 
             #region props
@@ -322,7 +330,8 @@ namespace BackendSite.Service.DAL
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var pay = GetPayList(input.SiteId)
+            var siteIds = Enumerable.Repeat(input.SiteId, 1);
+            var pay = GetPayList(siteIds)
                 .First(x => x.PayId == input.PayId);
 
             #region props

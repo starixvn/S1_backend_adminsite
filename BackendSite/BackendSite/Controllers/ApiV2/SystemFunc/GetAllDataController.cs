@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.TpMaintain;
-using BackendSite.Service.Model.BankFinancial;
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -205,6 +205,41 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
+        }
+        /// <summary>
+        /// GetAllData/GetUserAllPayList 驗證登入者權限可見第三方支付廠商清單
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        public ApiResult<IEnumerable<PayListInfo>> GetUserAllPayList()
+        {
+            GetSite getSite = new GetSite();
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            ((IApiRequest)getSite).ConvertToMultiSiteParam(userServerInfo);
+            var data = _paymentManageBll.GetPayListByMultiSite(getSite.SiteIds);
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<PayListInfo>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
+
+        public class GetSite : IApiRequest
+        {
+            public int SiteId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
 
         /// <summary>

@@ -16,12 +16,12 @@ public class DepositPaymentReportDetail
 {
     [ExportIgnore]
     public string Key { get; set; }
+    public string SiteName { get; set; }
     public int TotalDepositCount { get; set; }
     public decimal TotalDepositAmount { get; set; }
     public decimal AverageDepositAmount { get; set; }
     public int FirstDepositCount { get; set; }
     public string AverageProcessingTime { get; set; }
-    public string SiteName { get; set; }
 }
 
 public class DepositPaymentReportSummary : DepositPaymentReportDetail, IPaymentReportSummary<DepositPaymentReportDetail>
