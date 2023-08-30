@@ -119,7 +119,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             }
 
 
-            //_newAuthorizeBLL.SetLoginTime(adminUser.UserId);
+            _newAuthorizeBLL.SetLoginTime(adminUser.UserId);
 
             await HttpContext.SignOutAsync("backendV2");
 
