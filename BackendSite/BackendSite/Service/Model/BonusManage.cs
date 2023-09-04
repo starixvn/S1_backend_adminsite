@@ -128,6 +128,9 @@ namespace BackendSite.Service.Model
 
         [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
         public bool HideForUnlogin { get; set; }
+
+        [Description("前台是否會以PopUp的方式顯示: 0.不會 1.會")]
+        public bool IsPopUp { get; set; }
     }
 
     public class PromotionInfoReq
@@ -241,6 +244,9 @@ namespace BackendSite.Service.Model
 
         [Description("未登入隱藏: 0.不隱藏 1.隱藏")]
         public bool HideForUnlogin { get; set; }
+
+        [Description("前台是否會以PopUp的方式顯示: 0.不會 1.會")]
+        public bool IsPopUp { get; set; }
     }
 
     public class PromotionSpecific
