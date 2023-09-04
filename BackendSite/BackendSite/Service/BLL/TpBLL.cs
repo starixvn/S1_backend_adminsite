@@ -215,7 +215,8 @@ namespace BackendSite.Service.BLL
                 Operator = inAdminTpTransfer.Operator,
                 Remarks = inAdminTpTransfer.Remarks,
                 Category = inAdminTpTransfer.Category,
-                DepositId = inAdminTpTransfer.DepositId
+                DepositId = inAdminTpTransfer.DepositId,
+                IsDepositId = inAdminTpTransfer.IsDepositId,
             };
             var myUrl = $"{_apiUrl}AdjustWallet";
             var data = await _courierAdapter.MyPostAsync<AdjustWalletResult, TpTransfer>(myUrl, adminTpTransfer);
