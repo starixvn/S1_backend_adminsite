@@ -196,7 +196,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 direction = (TpDirection)(int)request.Option,
                 Operator = user,
                 Remarks = request.Memo,
-                Category = request.ReasonId
+                Category = request.ReasonId,
+                IsDepositId = isDeposit
             };
 
             if (isDeposit && !string.IsNullOrWhiteSpace(request.TransId))
