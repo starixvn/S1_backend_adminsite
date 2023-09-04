@@ -2,12 +2,12 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
+
 using Dapper;
-using System.Data;
 
 namespace BackendSite.Service.DAL
 {
-    public class MpaMarketingWithdrawalAmountService: IMpaMarketingWithdrawalAmountService
+    public class MpaMarketingWithdrawalAmountService : IMpaMarketingWithdrawalAmountService
     {
         private readonly MySqlClient _reportDbClient;
         public MpaMarketingWithdrawalAmountService(IEnumerable<MySqlClient> sqlClients)

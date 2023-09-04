@@ -8,7 +8,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly AdjustmentService _adjustmentService;
         private readonly ILogger<AdjustWithdrawalLimitBLL> _logger;
-        
+
 
         public AdjustWithdrawalLimitBLL(IServiceProvider provider)
         {
@@ -35,8 +35,8 @@ namespace BackendSite.Service.BLL
             return new WalletInfo
             {
                 DifferenceAmount = DifferenceAmount,
-                Balance= Balance,
-                AvailableBalance= AvailableBalance
+                Balance = Balance,
+                AvailableBalance = AvailableBalance
             };
         }
 
@@ -70,12 +70,12 @@ namespace BackendSite.Service.BLL
         public (bool Success, string Message) SetAdjustWithdrawalLimitV2(SetAdjustWithdrawalLimitParams input)
         {
             var (resultCode, transId) = _adjustmentService.SetAdjustWithdrawalLimitV2(input);
-            
-            if (resultCode == (int) ErrorCodeEnum.Success)
+
+            if (resultCode == (int)ErrorCodeEnum.Success)
             {
                 return (true, $"TransId: {transId}");
             }
-            
+
             var msg = resultCode switch
             {
                 -21 => "Debit amount can not more then difference amount",
@@ -84,7 +84,7 @@ namespace BackendSite.Service.BLL
                 -3 => "CreateAdminAdjustmentInfoLog failed.",
                 _ => $"Unknown error, resultCode: {resultCode}"
             };
-                
+
             _logger.LogError(msg);
             return (false, msg);
         }

@@ -1,9 +1,11 @@
-﻿using BackendSite.Service.BLL;
-using Microsoft.AspNetCore.Mvc.Filters;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
-using BackendSite.Service.Model.enums;
+
 using BackendSite.Extensions;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model.enums;
+
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BackendSite.ExceptionHandling
 {

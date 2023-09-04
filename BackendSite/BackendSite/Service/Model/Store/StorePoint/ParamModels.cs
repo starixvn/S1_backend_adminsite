@@ -11,7 +11,7 @@ namespace BackendSite.Service.Model.Store.StorePoint
             Memo = req.Memo;
             Operator = @operator;
         }
-    
+
         public int SiteId { get; set; }
         public string UserName { get; set; }
         public decimal Point { get; set; }
@@ -19,7 +19,7 @@ namespace BackendSite.Service.Model.Store.StorePoint
         public string Memo { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class CreateManualRewardPointInfoBatchParams
     {
         public CreateManualRewardPointInfoBatchParams(int siteId, IEnumerable<ManualRewardPointInfo> infos, string @operator)
@@ -28,12 +28,12 @@ namespace BackendSite.Service.Model.Store.StorePoint
             Infos = infos;
             Operator = @operator;
         }
-    
+
         public int SiteId { get; set; }
         public IEnumerable<ManualRewardPointInfo> Infos { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class ManualRewardPointInfo
     {
         public int CustId { get; set; }
@@ -43,7 +43,7 @@ namespace BackendSite.Service.Model.Store.StorePoint
         public decimal Point { get; set; }
         public string Memo { get; set; }
     }
-    
+
     public class ManualRewardPointItem
     {
         public string MemberId { get; set; }

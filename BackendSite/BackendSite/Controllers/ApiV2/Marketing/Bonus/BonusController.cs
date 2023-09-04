@@ -1,5 +1,4 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Controllers.Api;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
@@ -7,9 +6,12 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using MySql.Data.MySqlClient;
+
 using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
@@ -26,7 +28,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         private readonly CustInfoBLL _custInfoBll;
         private readonly Common _common;
         private readonly ExcelBLL _excelBll;
-        private readonly ILogger<BonusManageController> _logger;
+        private readonly ILogger<BonusController> _logger;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
 
         #endregion
@@ -40,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _common = provider.GetRequiredService<Common>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
-            _logger = provider.GetRequiredService<ILogger<BonusManageController>>();
+            _logger = provider.GetRequiredService<ILogger<BonusController>>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
@@ -282,16 +284,16 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     case (int)PromotionTypeEnum.FstDeposit
                         or (int)PromotionTypeEnum.FreeBet or (int)PromotionTypeEnum.Cashback
                         or (int)PromotionTypeEnum.RetentionFreeBet:
-                    {
-                        if (request.PromotionInfo.Specific.Any(specific =>
-                                specific.Status == (int)PromotionSpecificStatusEnum.Active &&
-                                CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
                         {
-                            return apiResult;
-                        }
+                            if (request.PromotionInfo.Specific.Any(specific =>
+                                    specific.Status == (int)PromotionSpecificStatusEnum.Active &&
+                                    CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
+                            {
+                                return apiResult;
+                            }
 
-                        break;
-                    }
+                            break;
+                        }
                     case (int)PromotionTypeEnum.ReDeposit:
                         if (request.PromotionInfo.Specific.Any(specific =>
                                 specific.Status == (int)PromotionSpecificStatusEnum.Active &&
@@ -300,7 +302,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         {
                             return apiResult;
                         }
-                        
+
                         if (request.PromotionInfo.Specific.Any(specific => specific.TierAmountList.Count() > 10))
                         {
                             apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
@@ -372,7 +374,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     apiResult.Message = "Duplicate Bonus Code or Scratch Code.";
                     return apiResult;
                 }
-                
+
                 apiResult.ErrorCode = _bonusManageBll.DuplicatePromotion(
                     request.BonusCode,
                     request.SiteId,
@@ -394,7 +396,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// BonusManagement/SendBonusUsingList 發送Bonus允許名單
         /// </summary>
@@ -423,8 +425,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     var isLastRow = false;
                     var rowId = 2; // 因為有標題列，所以從第2列開始讀起
 
-                    var id = _bonusManageBll.SetBonusCustUsingInfo(req.SiteId, req.BonusCode , authData.UserName);
-                    
+                    var id = _bonusManageBll.SetBonusCustUsingInfo(req.SiteId, req.BonusCode, authData.UserName);
+
                     do // 讀取資料，直到讀到空白列為止
                     {
                         var sabaId = sheet.Cells[rowId, 1].Text.Trim();
@@ -433,10 +435,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
                         if (custId is null)
                         {
-                            var custInfo = _custInfoBll.GetCustInfoDetails( null , userName, req.SiteId);
+                            var custInfo = _custInfoBll.GetCustInfoDetails(null, userName, req.SiteId);
                             custId = custInfo?.CustId;
                         }
-                        
+
                         if (string.IsNullOrEmpty(sabaId) && string.IsNullOrEmpty(userName))
                         {
                             isLastRow = true;
@@ -457,7 +459,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     } while (!isLastRow);
 
                     result = _bonusManageBll.SetBonusCustUsingDetail(excelList);
-                    
+
                     _logger.LogInformation($@"SendBonusUsingList-Read Excel And Send End At {DateTime.UtcNow}.");
                 }
                 else
@@ -488,7 +490,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             }
         }
 
-         /// <summary>
+        /// <summary>
         /// BonusManagement/GetBonusUsingList 取得 Bonus允許名單
         /// </summary>
         /// <remarks>
@@ -502,11 +504,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public List<BonusCustUsingList> GetBonusUsingList(GetBonusUsingListRequest req)
         {
-            var result = _bonusManageBll.GetBonusCustUsingDetail(req.SiteId ,req.BonusCode).ToList();
+            var result = _bonusManageBll.GetBonusCustUsingDetail(req.SiteId, req.BonusCode).ToList();
 
             return result;
         }
-         
+
         #region ScratchCard
 
         /// <summary>

@@ -1,6 +1,7 @@
 using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Report;
@@ -33,7 +34,7 @@ public class WithdrawalPaymentReportDetail
     public int TotalWithdrawalCount { get; set; }
     public decimal TotalWithdrawalAmount { get; set; }
     public decimal AverageWithdrawalAmount { get; set; }
-    public string  AverageProcessingTime { get; set; }
+    public string AverageProcessingTime { get; set; }
 }
 
 public class WithdrawalPaymentReportSummary : WithdrawalPaymentReportDetail, IPaymentReportSummary<WithdrawalPaymentReportDetail>
@@ -47,26 +48,26 @@ public class GetPaymentReportParams
     {
         SiteId = req.SiteId;
         CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
-        BaseCurrencyId = (int) req.BaseCurrencyId;
+        BaseCurrencyId = (int)req.BaseCurrencyId;
         PayIds = JsonConvert.SerializeObject(req.PayIds);
         Types = JsonConvert.SerializeObject(req.Types);
         UserNames = req.UserNameList.Any() ? JsonConvert.SerializeObject(req.UserNames) : null;
         StartTime = req.StartTime.UtcDateTime;
         EndTime = req.EndTime.UtcDateTime;
     }
-    
+
     public GetPaymentReportParams(GetWithdrawalPaymentReportRequest req)
     {
         SiteId = req.SiteId;
         CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
-        BaseCurrencyId = (int) req.BaseCurrencyId;
+        BaseCurrencyId = (int)req.BaseCurrencyId;
         PayIds = JsonConvert.SerializeObject(req.PayIds);
         Types = JsonConvert.SerializeObject(req.Types);
         UserNames = req.UserNameList.Any() ? JsonConvert.SerializeObject(req.UserNames) : null;
         StartTime = req.StartTime.UtcDateTime;
         EndTime = req.EndTime.UtcDateTime;
     }
-    
+
     public int SiteId { get; set; }
     public string CurrencyIds { get; set; }
     public int BaseCurrencyId { get; set; }

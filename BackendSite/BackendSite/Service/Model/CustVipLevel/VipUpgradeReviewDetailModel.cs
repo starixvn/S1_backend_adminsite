@@ -1,6 +1,6 @@
 ﻿namespace BackendSite.Service.Model.CustVipLevel
 {
-    public class VipUpgradeReviewDetailModel: VipUpgradeReviewDataModel
+    public class VipUpgradeReviewDetailModel : VipUpgradeReviewDataModel
     {
         public VipUpgradeReviewDetailModel(VipUpgradeReviewDataModel data)
         {
@@ -23,7 +23,7 @@
             QualifiedTime = data.QualifiedTime;
             LastUpdateUser = data.LastUpdateUser;
 
-            CanUpdateStatus = false; 
+            CanUpdateStatus = false;
         }
 
         public bool CanUpdateStatus

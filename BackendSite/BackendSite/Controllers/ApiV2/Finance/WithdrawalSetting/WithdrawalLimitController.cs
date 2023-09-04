@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,13 +31,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.WithdrawalSetting
         #endregion
 
         #region API Model
-        
-        public class GetListRequest 
+
+        public class GetListRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
-        
+
         #endregion
 
         #region Action

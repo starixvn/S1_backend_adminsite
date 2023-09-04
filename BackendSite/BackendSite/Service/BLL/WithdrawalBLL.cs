@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
@@ -6,7 +7,9 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.WithdrawalBankAccounting;
+
 using Newtonsoft.Json;
+
 using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
 
 namespace BackendSite.Service.BLL
@@ -104,7 +107,7 @@ namespace BackendSite.Service.BLL
                 startAmount,
                 endAmount,
                 withdrawalMethod,
-                selectBankCode, 
+                selectBankCode,
                 selectCalCode,
                 agent,
                 out totalPages,
@@ -127,7 +130,7 @@ namespace BackendSite.Service.BLL
             return results;
         }
 
-        
+
         public IEnumerable<WithdrawalRequest> GetWithdrawalListByCust(int custId,
             string transId,
             int? status,
@@ -158,11 +161,11 @@ namespace BackendSite.Service.BLL
         public IEnumerable<WithdrawalInfoForExport> GetWithdrawalExportList(
             string selectSite,
             string withdrawalType,
-            DateTime startDate, 
-            DateTime endDate, 
+            DateTime startDate,
+            DateTime endDate,
             WithdrawalDateTypeEnum dateType,
-            string withdrawalId, 
-            string userName, 
+            string withdrawalId,
+            string userName,
             string currencyId,
             string status,
             string levelStatus,
@@ -176,19 +179,19 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.GetWithdrawalExportList(
                 selectSite,
                 withdrawalType,
-                startDate, 
+                startDate,
                 endDate,
                 dateType,
-                withdrawalId, 
-                userName, 
+                withdrawalId,
+                userName,
                 currencyId,
                 status,
-                levelStatus, 
+                levelStatus,
                 startAmount,
                 endAmount,
-                selectBankCode, 
+                selectBankCode,
                 selectCalCode,
-                agent, 
+                agent,
                 withdrawalMethod);
         }
 
@@ -204,8 +207,8 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize),
                 out totalPages,
                 out rowCount);
-        
-        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId) 
+
+        public IEnumerable<WithdrawalLimitInfoManage> GetWithdrawalLimitInfos(int siteId, int currencyId)
             => _withdrawalLimitService.GetWithdrawalLimitInfos(siteId, currencyId);
 
         public bool AddWithdrawalLimit(ParamsWithLog<SetWithdrawalLimitInfo> input)
@@ -231,7 +234,7 @@ namespace BackendSite.Service.BLL
 
             return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
         }
-        
+
         public bool EditWithdrawalLimit(ParamsWithLog<IEnumerable<SetWithdrawalLimitInfo>> input)
         {
             return _withdrawalLimitService.EditWithdrawalLimitInfo(input);
@@ -306,9 +309,9 @@ namespace BackendSite.Service.BLL
             return _withdrawalService.DeleteWithdrawalLimit(siteId, currencyId);
         }
 
-        public bool UpdateWithdrawalPicCount(string transId , int count)
+        public bool UpdateWithdrawalPicCount(string transId, int count)
         {
-            return _withdrawalService.UpdateWithdrawalPicCount(transId ,count);
+            return _withdrawalService.UpdateWithdrawalPicCount(transId, count);
         }
 
         public BankSlipPic GetWithdrawalPicCount(string transId)
@@ -327,7 +330,7 @@ namespace BackendSite.Service.BLL
             int pageSize,
             out List<TotalAmount> currencyTotalAmount)
         {
-            var result = _withdrawalService.WithdrawalTimeReportGet(selectSite,withdrawalId, startDate, endDate, selectStatus, currencyIds, custId, pageNumber, pageSize, out currencyTotalAmount);
+            var result = _withdrawalService.WithdrawalTimeReportGet(selectSite, withdrawalId, startDate, endDate, selectStatus, currencyIds, custId, pageNumber, pageSize, out currencyTotalAmount);
 
             result?.WithdrawalTimeList.ForEach(x =>
             {
@@ -507,10 +510,10 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public IEnumerable<CryptoWithdrawalLimitInfo> GetCryptoWithdrawalLimitInfos(int siteId, int currencyId)
         {
-            var result = _withdrawalLimitService.GetCryptoWithdrawalLimitInfos(siteId,currencyId);
+            var result = _withdrawalLimitService.GetCryptoWithdrawalLimitInfos(siteId, currencyId);
             return result;
         }
 
@@ -556,12 +559,12 @@ namespace BackendSite.Service.BLL
 
             return _withdrawalLimitService.EditCryptoWithdrawalLimitInfo(input);
         }
-        
+
         public bool EditCryptoWithdrawalLimit(ParamsWithLog<IEnumerable<UpdateCryptoWithdrawalLimitInfo>> input)
         {
             return _withdrawalLimitService.EditCryptoWithdrawalLimitInfo(input);
         }
-        
+
 
         public CryptoInfoData GetCryptoInfoData(int siteId)
         {
@@ -786,7 +789,7 @@ namespace BackendSite.Service.BLL
             var result = _withdrawalBankAccountingService.GetByTransId(transId);
             return result;
         }
-        
+
         public bool InsertWithdrawalAccounting(WithdrawalBankAccountingModel data, string @operator)
         {
             try
@@ -1038,12 +1041,12 @@ namespace BackendSite.Service.BLL
             return await _withdrawalService.SetWithdrawalProcessWay(withdrawalId, processWay);
         }
 
-        
+
         public IEnumerable<WithdrawalMessage> GetWithdrawalMessageByWithdrawalIds(IEnumerable<int> withdrawalIds)
         {
             return _withdrawalService.GetWithdrawalMessage(withdrawalIds);
         }
-        
+
         #endregion
 
         #region Private Methods

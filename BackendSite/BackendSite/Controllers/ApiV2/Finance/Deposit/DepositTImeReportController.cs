@@ -2,8 +2,10 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
@@ -65,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         {
             var apiListResult = new ApiListResultCurrencyAmount<DepositTimeList>();
 
-            if(!string.IsNullOrWhiteSpace(req.MemberId))
+            if (!string.IsNullOrWhiteSpace(req.MemberId))
             {
                 var custSimpleInfo = await _custInfoBll.GetCustId(null, req.MemberId, req.SiteIds.FirstOrDefault());
                 if (custSimpleInfo != null)
@@ -73,8 +75,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 else
                     return apiListResult;
             }
-            
-            var result = _depositBll.DepositTimeReportGet(req, out int totalPages, out int rowCount, out List<TotalAmount>  currencyTotalAmount);
+
+            var result = _depositBll.DepositTimeReportGet(req, out int totalPages, out int rowCount, out List<TotalAmount> currencyTotalAmount);
 
             if (result.Any())
             {
@@ -115,16 +117,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         [HttpPost]
         public async Task<IActionResult> Export(ExportDepositTimeReq req)
         {
-            
+
             var exportData = await _depositBll.DepositTimeExportGet(JsonConvert.SerializeObject(req.SiteIds)
                 , req.DepositId
                 , new DateTimeOffset(req.StartDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
                 , new DateTimeOffset(req.EndDate.ToUniversalTime().DateTime, TimeSpan.Zero).DateTime
                 , JsonConvert.SerializeObject(req.Statuses)
                 , JsonConvert.SerializeObject(req.CurrencyIds)
-                ,req.MemberId);
+                , req.MemberId);
             var offset = req.StartDate.Offset;
-            
+
             if (exportData.Any())
             {
                 var msgs = _depositBll.GetDepositMessageByDepositIds(exportData.Select(x => x.DepositId));
@@ -143,7 +145,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         .Select(x => x.Message));
                 }
             }
-            
+
 
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "DepositTimeReport");

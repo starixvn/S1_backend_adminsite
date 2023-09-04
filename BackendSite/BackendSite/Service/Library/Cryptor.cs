@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+
 using BackendSite.Service.Model;
 
 namespace BackendSite.Service.Library;
@@ -40,7 +41,7 @@ public class Cryptor
         {
             return string.Empty;
         }
-        
+
         var key = Encoding.ASCII.GetBytes(_key);
         var iv = Encoding.ASCII.GetBytes(_iv);
         var bytes = Convert.FromBase64String(text);

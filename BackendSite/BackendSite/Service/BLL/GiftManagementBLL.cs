@@ -53,7 +53,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public Task<ApiResult<IEnumerable<GiftInfo>>> GetGiftAsync(GetGiftRequest req)
         {
             var url = _storeSiteUrl + "/api/GiftManagement/Get";
@@ -120,23 +120,23 @@ namespace BackendSite.Service.BLL
 
             return new ApiResult(result.ErrorCode, result.Message);
         }
-        
+
         public async Task<string> UploadPictureAsync(IFormFile file)
         {
             if (!CheckIsImage(file))
             {
                 return string.Empty;
             }
-            
+
             var ext = Path.GetExtension(file.FileName);
             var path = $"/store/gift/{DateTime.Now:yyyyMMddHHmmssfff}{ext}";
             var key = _folder + path;
             var success = await _awsS3Helper.UploadFileAsync(file, _bucketName, key);
             var result = success ? path : string.Empty;
-            
+
             return result;
         }
-    
+
         public async Task<ApiResult> SetGiftSortAsync(SetSortRequest req, string userName)
         {
             var index = 1;
@@ -145,7 +145,7 @@ namespace BackendSite.Service.BLL
                 Sort = index++,
                 GiftId = x
             });
-            
+
             var param = new SetSortParams(sortInfos, userName);
             var url = _storeSiteUrl + "/api/GiftManagement/SetSort";
             var result = await _courierAdapter.MyPostAsync<object, SetSortParams>(url, param);

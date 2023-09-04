@@ -1,8 +1,10 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Text.Json;
+
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.Extensions.Caching.Memory;
-using System.Text.Json;
 
 namespace BackendSite.Service.BLL
 {

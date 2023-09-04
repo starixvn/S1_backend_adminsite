@@ -2,10 +2,10 @@
 {
     public class SystemEnumBLL
     {
-     
+
         public IEnumerable<int> GetEnumItemByEnumName(string enumName)
         {
-            var result=new List<int>();
+            var result = new List<int>();
             var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
             var getType = allTypes.FirstOrDefault(t => string.Equals(t.Name, enumName, StringComparison.OrdinalIgnoreCase));
             if (getType != null)

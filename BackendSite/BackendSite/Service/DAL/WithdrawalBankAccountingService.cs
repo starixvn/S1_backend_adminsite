@@ -1,10 +1,13 @@
-﻿using BackendSite.Service.Library;
-using BackendSite.Service.Model.WithdrawalBankAccounting;
-using Dapper;
-using MySql.Data.MySqlClient;
-using System.Data;
+﻿using System.Data;
+
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.WithdrawalBankAccounting;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
@@ -85,7 +88,7 @@ namespace BackendSite.Service.DAL
                 "Admin_WithdrawalInfoAndAccountingForExport_Get_V3", parameter);
         }
 
-        public IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingListByTransId(string transId, int siteId,int currencyId)
+        public IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingListByTransId(string transId, int siteId, int currencyId)
         {
             var parameter = new DynamicParameters();
 
@@ -114,7 +117,7 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<WithdrawalAccountingModel>("Admin_WithdrawalBankAccountingByTransId_Get", parameter);
         }
-        
+
         public bool SetFlow(ActionType action, WithdrawalBankAccountingModel model)
         {
             using var connection = _mainDbClient.GetMySqlConnection();
@@ -152,7 +155,7 @@ namespace BackendSite.Service.DAL
                     throw new ArgumentOutOfRangeException(nameof(action), action, null);
             }
 
-            if (InsertLog((int) action, model, transaction) == 0)
+            if (InsertLog((int)action, model, transaction) == 0)
             {
                 _mainDbClient.RollbackAndDisposeConnection(connection, transaction);
                 return false;
@@ -175,7 +178,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_UploadPicTimes", model.UploadPicTimes);
             parameter.Add("_Memo", model.Memo);
             parameter.Add("_Creator", model.Creator);
-            
+
             const string spName = "Admin_WithdrawalBankAccounting_Ins";
             return transaction != null
                 ? _mainDbClient.Execute(spName, transaction, parameter)
@@ -196,7 +199,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("_Memo", model.Memo);
             parameter.Add("_Mode", action);
             parameter.Add("_Creator", model.Creator);
-            
+
             const string spName = "Admin_WithdrawalBankAccountingLog_Ins";
             return transaction != null
                 ? _mainDbClient.Execute(spName, transaction, parameter)
@@ -228,7 +231,7 @@ namespace BackendSite.Service.DAL
         {
             var parameter = new DynamicParameters();
             parameter.Add("_Id", model.Id);
-            
+
             const string spName = "Admin_WithdrawalBankAccounting_Del";
             return transaction != null
                 ? _mainDbClient.Execute(spName, transaction, parameter)

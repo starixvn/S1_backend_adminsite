@@ -2,6 +2,7 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -103,7 +104,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             }
 
             var walletInfo = _adjustWithdrawalLimitBLL.GetCustWalletInfo(custInfo.CustId);
-            var status = (CustomerStatusEnum) custInfo.Status;
+            var status = (CustomerStatusEnum)custInfo.Status;
 
             return status switch
             {
@@ -121,7 +122,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                             differenceAmount = walletInfo.DifferenceAmount,
                             eligibleWithdrawalAmount = walletInfo.AvailableBalance
                         },
-                        ErrorCode = (int) ErrorCodeEnum.Success
+                        ErrorCode = (int)ErrorCodeEnum.Success
                     },
 
                 CustomerStatusEnum.Suspend
@@ -164,11 +165,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
             return new ApiResult
             {
-                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+                ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
                 Message = msg
             };
         }
-        
+
         [HttpPost]
         public ApiResult<IEnumerable<SelectListItem>> GetReasonList()
         {
@@ -180,9 +181,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     Value = x.ReasonId,
                     Name = x.Description
                 });
-            var apiResult = 
+            var apiResult =
                 new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
-            
+
             return apiResult;
         }
     }

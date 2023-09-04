@@ -4,6 +4,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.Redemption;
+
 using NPOI.XSSF.UserModel;
 
 namespace BackendSite.Service.BLL
@@ -43,7 +44,7 @@ namespace BackendSite.Service.BLL
             var exportResult =
                 await _courierAdapter.PostAsync<ApiResult<ExportRedemptionListResult>, ExportRedemptionListRequest>(url, req);
 
-            if (exportResult.ErrorCode != (int) ErrorCodeEnum.Success)
+            if (exportResult.ErrorCode != (int)ErrorCodeEnum.Success)
             {
                 _logger.LogError($"StoreService ExportRedemptionList Failed. ErrorCode: {exportResult.ErrorCode}");
                 throw new AdminException("ExportRedemptionList Failed.");
@@ -56,7 +57,7 @@ namespace BackendSite.Service.BLL
 
             sheet1.WriteToSheet(exportResult.Data.List, true, offset);
             sheet2.WriteToSheet(exportResult.Data.Overview, true);
-            
+
             await using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             var result = memoryStream.ToArray();

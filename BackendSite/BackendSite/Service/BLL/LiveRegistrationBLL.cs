@@ -41,9 +41,9 @@ namespace BackendSite.Service.BLL
                 request.DepositStatus, request.Status, custList, (int)request.DateType, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantType, dormantFrequency, request.CallOutStatus,
                 orderByProperty, (int)request.OrderByDirection, request.PageNumber, request.PageSize);
-            
-            var regLiveStatus = searchResult.RegLiveStatusData.Select(a => 
-                new LiveRegistration() 
+
+            var regLiveStatus = searchResult.RegLiveStatusData.Select(a =>
+                new LiveRegistration()
                 {
                     SiteId = a.SiteId,
                     CustId = a.CustId,
@@ -75,7 +75,7 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
-            
+
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 
             var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
@@ -133,10 +133,10 @@ namespace BackendSite.Service.BLL
                 };
                 for (int i = 0; i < maxCol; i++)
                 {
-                    if(i < a.CallRecord?.Count)
-                        liveReg.Add($"{i+1} CallRecord", a.CallRecord[i]);
+                    if (i < a.CallRecord?.Count)
+                        liveReg.Add($"{i + 1} CallRecord", a.CallRecord[i]);
                     else
-                        liveReg.Add($"{i+1} CallRecord", "");
+                        liveReg.Add($"{i + 1} CallRecord", "");
                 }
                 return liveReg;
             });
@@ -148,7 +148,7 @@ namespace BackendSite.Service.BLL
         {
             return await _registrationService.GetRegLiveStatus(custId);
         }
-        
+
         public async Task<int> SetRegLiveStatus(SetRegLiveStatusRequest input, string @operator)
         {
             return await _registrationService.SetRegLiveStatus(input.CustId, input.SiteId, (int)input.Status, @operator);
@@ -187,7 +187,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<int> EditRegLiveStatusNote(int custId, int id, string note, string @operator)
         {
-            return await _registrationService.EditRegLiveStatusNote(custId, id ,note, @operator);
+            return await _registrationService.EditRegLiveStatusNote(custId, id, note, @operator);
         }
 
         private List<string> ZipRemark(string rawUpdateTime, string rawUpdateOperator, string rawDepositStatus, TimeSpan timezone)
@@ -220,7 +220,7 @@ namespace BackendSite.Service.BLL
             return (frequency, type);
         }
 
-        private async Task<List<int>> GetQueryCustId(LiveRegistrationDateTypeEnum dateType, int siteId, DateTime startTime, DateTime endTime, string userName) 
+        private async Task<List<int>> GetQueryCustId(LiveRegistrationDateTypeEnum dateType, int siteId, DateTime startTime, DateTime endTime, string userName)
         {
             var custList = new List<int>();
             if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate)

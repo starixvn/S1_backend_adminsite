@@ -5,11 +5,13 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Mpa.WinLoss;
 using BackendSite.Service.Model.GameStatisticalReport;
+using BackendSite.Service.Model.Mpa.WinLoss;
 using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Report;
+
 using Newtonsoft.Json;
+
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
@@ -985,14 +987,14 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
             => reportService.GetRewardBonusReportExport(input);
-        
+
         private decimal GetBaseCurrencyTotalAmount(IList<MpaRateDto> rateList,
             IEnumerable<IPaymentReportDetail> source,
             int baseCurrencyId)
         {
             var result = source.Sum(x =>
             {
-                var rate = _mpaCommonService.MapperExchangeRate(rateList, x.FlowEndTime.UtcDateTime, (int) x.CurrencyId,
+                var rate = _mpaCommonService.MapperExchangeRate(rateList, x.FlowEndTime.UtcDateTime, (int)x.CurrencyId,
                     baseCurrencyId);
                 var amount = x.Amount * rate;
 
@@ -1015,13 +1017,13 @@ namespace BackendSite.Service.BLL
             {
                 return now;
             }
-            
+
             // 該月最後一天
             var lastDate = new DateTime(endTime.Year, endTime.Month, DateTime.DaysInMonth(endTime.Year, endTime.Month));
-            
+
             return new DateTimeOffset(lastDate, TimeSpan.Zero);
         }
-        
+
         public async Task<IEnumerable<DepositPaymentReportSummary>> GetDepositPaymentReportAsync(
             GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
         {
@@ -1036,7 +1038,7 @@ namespace BackendSite.Service.BLL
                     x.FlowEndTime = x.FlowEndTime.ToOffset(offset);
                 });
             }
-            
+
             var rateList = (await _mpaCommonService.GetMpaExchangeRate(input.StartTime, GetEndDateForExchangeRate(input.EndTime))).ToList();
             var gData = detailList.GroupBy(x =>
             {
@@ -1092,16 +1094,16 @@ namespace BackendSite.Service.BLL
                             .ToString(@"d\.hh\:mm\:ss")
                 };
             });
-                
+
             return result;
         }
-        
+
         public async Task<IEnumerable<WithdrawalPaymentReportSummary>> GetWithdrawalPaymentReportAsync(
             GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
         {
             var detailList = reportService.GetPaymentReportWithdrawalDetail(input)
                 .ToList();
-            
+
             if (groupBy is PaymentReportGroupByEnum.Date or PaymentReportGroupByEnum.Month)
             {
                 detailList.ForEach(x =>
@@ -1110,7 +1112,7 @@ namespace BackendSite.Service.BLL
                     x.FlowEndTime = x.FlowEndTime.ToOffset(offset);
                 });
             }
-            
+
             var rateList = (await _mpaCommonService.GetMpaExchangeRate(input.StartTime, input.EndTime)).ToList();
             var gData = detailList.GroupBy(x =>
             {
@@ -1125,7 +1127,7 @@ namespace BackendSite.Service.BLL
                         $"Group by {groupBy.ToString()} not support")
                 };
             });
-            
+
             var result = gData.Select(g =>
             {
                 var count = g.Count();
@@ -1164,35 +1166,35 @@ namespace BackendSite.Service.BLL
                             .ToString(@"d\.hh\:mm\:ss")
                 };
             });
-                
+
             return result;
         }
 
         public static byte[] ExportPaymentReport<TSummary, TDetail>(IEnumerable<TSummary> data)
-            where TSummary: class, IPaymentReportSummary<TDetail>
-            where TDetail: class
+            where TSummary : class, IPaymentReportSummary<TDetail>
+            where TDetail : class
         {
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
-            
+
             var workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("Report");
 
             sheet.CreateHeaders<TDetail>(freeze: true, index: 1);
-            
+
             var gCellStyle = workbook.CreateCellStyle();
             gCellStyle.BorderBottom = BorderStyle.Medium;
             gCellStyle.FillForegroundColor = IndexedColors.LightCornflowerBlue.Index;
             gCellStyle.FillPattern = FillPattern.SolidForeground;
-            
+
             var subCellStyle = workbook.CreateCellStyle();
             subCellStyle.BorderBottom = BorderStyle.Thin;
             subCellStyle.FillForegroundColor = IndexedColors.LightTurquoise.Index;
             subCellStyle.FillPattern = FillPattern.SolidForeground;
 
-            var skipSProps = new[] {"Children"};
+            var skipSProps = new[] { "Children" };
             var dProps = typeof(TDetail).GetProperties();
             var sProps = typeof(TSummary).GetProperties()
                 .Where(x => !skipSProps.Contains(x.Name));
@@ -1200,7 +1202,7 @@ namespace BackendSite.Service.BLL
             foreach (var gData in data)
             {
                 var groupRow = sheet.CreateRow(index);
-                
+
                 var idx = 0;
                 foreach (var prop in sProps)
                 {
@@ -1208,42 +1210,42 @@ namespace BackendSite.Service.BLL
                     var val = typeof(TSummary).GetProperty(prop.Name)?.GetValue(gData);
                     groupRow.CreateCell(idx).SetCellValue(val?.ToString());
                     groupCell.CellStyle = gCellStyle;
-                    
+
                     idx++;
                 }
-                
+
                 index++;
 
                 var children = typeof(TSummary).GetProperty("Children")?.GetValue(gData) as IEnumerable<TDetail>;
                 foreach (var detail in children)
                 {
                     var row = sheet.CreateRow(index);
-                    
+
                     var i = 0;
                     foreach (var prop in dProps)
                     {
                         var subGroupCell = row.CreateCell(i);
                         var val = typeof(TDetail).GetProperty(prop.Name)?.GetValue(detail);
                         row.CreateCell(i).SetCellValue(val?.ToString());
-                   
+
                         if (i == 0)
                             subGroupCell.CellStyle = subCellStyle;
-                        
+
                         i++;
                     }
                     index++;
                 }
             }
-            
+
             sheet.AutoSizeColumn(0);
 
             using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             var result = memoryStream.ToArray();
-            
+
             return result;
         }
-        
+
         #region Game Statistical Report
 
         public IEnumerable<GameStatisticalByCurrencyDto> GetGameStatisticalReport(GetListInputModel getListInput)
@@ -1262,7 +1264,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         private IEnumerable<GameStatisticalDao> GetGameStatisticalSource(GetListInputModel getListInput)
             => reportService.GetGameStatisticalReport(getListInput);
 

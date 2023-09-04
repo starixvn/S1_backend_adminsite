@@ -1,11 +1,15 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using MySql.Data.MySqlClient;
+﻿using BackendSite.Extensions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Extensions;
-using static BackendSite.Controllers.ApiV2.Marketing.Bonus.RebateExcludeGameController;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
+
 using Newtonsoft.Json;
+
+using static BackendSite.Controllers.ApiV2.Marketing.Bonus.RebateExcludeGameController;
 
 namespace BackendSite.Service.DAL
 {

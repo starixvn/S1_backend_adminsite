@@ -1,12 +1,14 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+using System.Text.RegularExpressions;
+
+using BackendSite.Extensions;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
-using MySql.Data.MySqlClient;
+
 using Newtonsoft.Json;
-using System.Data;
-using System.Text.RegularExpressions;
-using BackendSite.Extensions;
 
 namespace BackendSite.Service.DAL
 {
@@ -37,22 +39,22 @@ namespace BackendSite.Service.DAL
         public IEnumerable<DepositRequest> GetDepositRequestList(
             IEnumerable<int> selectSite,
             IEnumerable<int> depositType,
-            IEnumerable<string> selectBankCode, 
-            IEnumerable<int> selectCalCode, 
+            IEnumerable<string> selectBankCode,
+            IEnumerable<int> selectCalCode,
             DateTime startDate,
-            DateTime endDate, 
+            DateTime endDate,
             DepositDateTypeEnum dateType,
-            string DepositId, 
-            IEnumerable<string> userNames, 
-            string agent ,
+            string DepositId,
+            IEnumerable<string> userNames,
+            string agent,
             IEnumerable<int> currencyId,
-            IEnumerable<int> status, 
+            IEnumerable<int> status,
             IEnumerable<int> levelStatus,
             int pageSize,
             decimal startAmount,
-            decimal endAmount, 
+            decimal endAmount,
             IEnumerable<int> payIds,
-            int pageNumber, out int totalPages, out int rowCount ,
+            int pageNumber, out int totalPages, out int rowCount,
             ref List<TotalAmount> currencyAmountRecord)
         {
             var depositId = 0;
@@ -73,10 +75,10 @@ namespace BackendSite.Service.DAL
                 EndDate = endDate,
                 DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int)dateType,
                 DepositId = depositId,
-                TransId = string.IsNullOrEmpty(DepositId) ? null : DepositId ,
-                UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
-                Agent = string.IsNullOrEmpty(agent) ? null : agent ,
-                CurrencyId = currencyId.Any() ? JsonConvert.SerializeObject(currencyId): null,
+                TransId = string.IsNullOrEmpty(DepositId) ? null : DepositId,
+                UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
+                Agent = string.IsNullOrEmpty(agent) ? null : agent,
+                CurrencyId = currencyId.Any() ? JsonConvert.SerializeObject(currencyId) : null,
                 Status = JsonConvert.SerializeObject(status),
                 VipStatus = levelStatus.Any() ? JsonConvert.SerializeObject(levelStatus) : null,
                 StartAmount = startAmount,
@@ -87,7 +89,7 @@ namespace BackendSite.Service.DAL
             #region GetCurrencyTotalAmount
 
             currencyAmountRecord = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
-            
+
             #endregion
 
             p.Add("PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
@@ -134,7 +136,7 @@ namespace BackendSite.Service.DAL
             totalAmount = p.Get<decimal?>("_TotalAmount") ?? 0;
             totalApproveAmount = p.Get<decimal?>("_TotalApproveAmount") ?? 0;
             totalApproveRow = p.Get<int?>("_TotalApproveRow") ?? 0;
-            
+
             return depositList;
         }
 
@@ -209,17 +211,17 @@ namespace BackendSite.Service.DAL
 
             return transId;
         }
-        
-        public async Task<int> SetDepositReceiptPic(int siteId ,int custId, int depositId, int receiptNo ,string picFileName ,string creator)
+
+        public async Task<int> SetDepositReceiptPic(int siteId, int custId, int depositId, int receiptNo, string picFileName, string creator)
         {
             var result = 0;
-            
+
             try
             {
                 await using var conn = _mainDbClient.GetMySqlConnection();
                 await conn.OpenAsync();
                 await using var trans = await conn.BeginTransactionAsync();
-            
+
                 var props = new DynamicParameters();
                 props.Add("CustId", custId);
                 props.Add("DepositId", depositId);
@@ -234,7 +236,7 @@ namespace BackendSite.Service.DAL
                 {
                     result = SetDepositLog(depositId, siteId, $"Upload Receipt , picFileName:{picFileName}  ", (int)DepositStatusEnum.UploadReceipt, 0, creator);
                 }
-                
+
                 if (result > 0)
                 {
                     await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
@@ -243,7 +245,7 @@ namespace BackendSite.Service.DAL
                 {
                     await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
                 }
-                
+
                 return result;
             }
             catch (Exception ex)
@@ -251,31 +253,31 @@ namespace BackendSite.Service.DAL
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, creator);
             }
-            
+
             return result;
         }
 
-        public async Task<int> DelDepositReceiptPic(int siteId ,int custId, int depositId, string picFileName , int receiptNo ,string Operator)
+        public async Task<int> DelDepositReceiptPic(int siteId, int custId, int depositId, string picFileName, int receiptNo, string Operator)
         {
             var result = 0;
-            
+
             try
             {
                 await using var conn = _mainDbClient.GetMySqlConnection();
                 await conn.OpenAsync();
                 await using var trans = await conn.BeginTransactionAsync();
-                
+
                 var props = new DynamicParameters();
                 props.Add("CustId", custId);
                 props.Add("DepositId", depositId);
                 props.Add("ReceiptNo", receiptNo);
-                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans ,props );
+                result = await _mainDbClient.ExecuteAsync("Admin_DepositReceiptPic_Del", trans, props);
 
                 if (result > 0)
                 {
                     result = SetDepositLog(depositId, siteId, $"Delete Receipt, picFileName:{picFileName}", (int)DepositStatusEnum.DeleteReceipt, 0, Operator);
                 }
-                
+
                 if (result > 0)
                 {
                     await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
@@ -290,20 +292,20 @@ namespace BackendSite.Service.DAL
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, Operator);
             }
-            
+
             return result;
         }
 
-        public int CheckDepositReceipt(int siteId ,int depositId, bool status, string Operator)
+        public int CheckDepositReceipt(int siteId, int depositId, bool status, string Operator)
         {
             var result = 0;
-            
+
             try
             {
                 using var conn = _mainDbClient.GetMySqlConnection();
                 conn.Open();
                 using var trans = conn.BeginTransaction();
-                
+
                 var props = new DynamicParameters();
                 props.Add("_DepositId", depositId);
                 props.Add("_Status", status);
@@ -315,12 +317,12 @@ namespace BackendSite.Service.DAL
                     if (status)
                     {
                         result = SetDepositLog(depositId, siteId, "Check DepositReceipt",
-                            (int) DepositStatusEnum.CheckDepositReceipt, 0, Operator);
+                            (int)DepositStatusEnum.CheckDepositReceipt, 0, Operator);
                     }
                     else
                     {
                         result = SetDepositLog(depositId, siteId, "UnCheck DepositReceipt",
-                            (int) DepositStatusEnum.UnCheckDepositReceipt, 0, Operator);
+                            (int)DepositStatusEnum.UnCheckDepositReceipt, 0, Operator);
                     }
                 }
 
@@ -338,11 +340,11 @@ namespace BackendSite.Service.DAL
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
                 SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, 0, Operator);
             }
-            
+
             return result;
         }
-        
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest ,DepositCalCodeSetRequest calCodeInfo ,bool canReward = false, string depositInfo = null)
+
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest, DepositCalCodeSetRequest calCodeInfo, bool canReward = false, string depositInfo = null)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
@@ -352,20 +354,20 @@ namespace BackendSite.Service.DAL
             try
             {
                 var beforeDepositData = GetDepositRequest(depositId, siteId);
-                
+
                 using var conn = _mainDbClient.GetMySqlConnection();
                 conn.Open();
                 using var trans = conn.BeginTransaction();
                 var sForStatus = JsonConvert.SerializeObject(forStatus);
                 var p = new DynamicParameters(new
                 {
-                    DepositId = depositId, 
-                    SiteId = siteId, 
+                    DepositId = depositId,
+                    SiteId = siteId,
                     ActualDeposit = actualDeposit,
-                    Comment = comment, 
-                    ForStatus = sForStatus, 
+                    Comment = comment,
+                    ForStatus = sForStatus,
                     Status = (int)status,
-                    ThirdId = (string)null, 
+                    ThirdId = (string)null,
                     Operator = Operator
                 });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -388,7 +390,7 @@ namespace BackendSite.Service.DAL
                             comment = $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName}, After:{calCodeInfo.DisplayName}] ";
                         }
                     }
-                    
+
                     SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, Operator);
 
                     if (status == DepositStatusEnum.Approved)
@@ -405,7 +407,7 @@ namespace BackendSite.Service.DAL
 
                         if (result >= 0)
                         {
-                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, (int)WithdrawalLimitAdjustmentReasonEnum.Deposit,$"WithdrawalLimit: {actualDeposit}", transId, (int)WithdrawalLimitLogCreateFromEnum.Deposit , Operator, out _, trans);
+                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, (int)WithdrawalLimitAdjustmentReasonEnum.Deposit, $"WithdrawalLimit: {actualDeposit}", transId, (int)WithdrawalLimitLogCreateFromEnum.Deposit, Operator, out _, trans);
                         }
 
                         if (is1stDepoist == 1 && result > 0)
@@ -450,13 +452,13 @@ namespace BackendSite.Service.DAL
                         }
                     }
 
-                    if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null )
+                    if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null)
                     {
                         var p2 = new DynamicParameters(new
                         {
-                            DepositId = depositId, 
+                            DepositId = depositId,
                             SiteId = siteId,
-                            StatementTime = status == DepositStatusEnum.Draft ? calCodeInfo.StatementTime?.DateTime : null ,
+                            StatementTime = status == DepositStatusEnum.Draft ? calCodeInfo.StatementTime?.DateTime : null,
                             BankId = calCodeInfo.BankId,
                             Operator = Operator
                         });
@@ -482,7 +484,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         private int UpdateDepositInfo(string transId, string depositInfo, IDbTransaction trans)
         {
             return _mainDbClient.Execute("Service_DepositInfoDepositInfo_Set",
@@ -528,8 +530,8 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.QueryFirst<DepositReceipt>("Admin_DepositReceiptByNo_Get", new DynamicParameters(new { DepositId = depositId, ReceiptNo = receiptNo, SiteId = siteId }));
         }
-        
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string DepositId, IEnumerable<string> userNames, string agent,string currencyId, string status, string levelStatus,decimal startAmount, decimal endAmount,string payIds)
+
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string DepositId, IEnumerable<string> userNames, string agent, string currencyId, string status, string levelStatus, decimal startAmount, decimal endAmount, string payIds)
         {
             var depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -546,10 +548,10 @@ namespace BackendSite.Service.DAL
                 DepositType = depositType,
                 StartDate = startDate,
                 EndDate = endDate,
-                DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int) dateType,
+                DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int)dateType,
                 DepositId = depositId,
                 TransId = DepositId,
-                UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames): null,
+                UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
                 Agent = agent,
                 CurrencyId = currencyId,
                 Status = status,
@@ -855,7 +857,7 @@ namespace BackendSite.Service.DAL
             props.Add("_Statuses", statuses);
             props.Add("_CurrencyIds", currencyIds);
             props.Add("_CustId", custId);
-            
+
 
             #region totalSummary
 
@@ -934,7 +936,7 @@ namespace BackendSite.Service.DAL
 
             return _mainDbClient.Execute("Admin_DepositMessage_Set", props) > 0;
         }
-        
+
         public IEnumerable<DepositMessage> GetDepositMessage(IEnumerable<int> depositIds)
         {
             var props = new DynamicParameters();

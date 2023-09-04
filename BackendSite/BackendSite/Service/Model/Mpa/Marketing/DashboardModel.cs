@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Service.Model.ApiModel;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa.Marketing
 {

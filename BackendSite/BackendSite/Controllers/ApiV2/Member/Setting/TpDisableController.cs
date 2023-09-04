@@ -1,11 +1,12 @@
 ﻿using BackendSite.Attributes;
-using BackendSite.Controllers.Api;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
@@ -20,7 +21,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         private readonly RiskBLL _riskBll;
         private readonly GameCasinoBLL _gameCasinoBll;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly ILogger<RiskController> _logger;
+        private readonly ILogger<TpDisableController> _logger;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
@@ -33,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             _riskBll = provider.GetRequiredService<RiskBLL>();
             _gameCasinoBll = provider.GetRequiredService<GameCasinoBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _logger = provider.GetRequiredService<ILogger<RiskController>>();
+            _logger = provider.GetRequiredService<ILogger<TpDisableController>>();
             _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }
@@ -239,31 +240,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
             return new ApiResult
             {
-                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
-
-        /// <summary>
-        /// TpDisable/Delete 刪除會員第三方被禁止的資料
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD > Disable User For Game > [Submit] >Click [Delete]
-        /// </remarks>
-        /// <param name="req"></param>
-        [TypeFilter(typeof(AuthorizeByFuncAttribute), Arguments = new object[] { "CustManage/DisableUserForGame" })]
-        [HttpPost]
-        public async Task<ApiResult> Delete(ApiRequestWithLog<DeleteDisableUser> req)
-        {
-            var result = await _riskBll.DeleteTpDisableUser(
-                new ParamsWithLog<DeleteDisableUser>(req, User.Identity.Name));
-            return new ApiResult
-            {
-                ErrorCode = (int) (result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
-            };
-
-        }
-
     }
 }

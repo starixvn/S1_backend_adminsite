@@ -1,6 +1,7 @@
-﻿using BackendSite.Service.Model.ApiModel;
+﻿using System.Reflection;
+
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.Mpa.Marketing;
-using System.Reflection;
 
 namespace BackendSite.Service.BLL.Interface
 {
@@ -8,7 +9,7 @@ namespace BackendSite.Service.BLL.Interface
     {
         Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request);
 
-        IEnumerable<WithdrawalAmountDetailData> GetWithdrawalAmountDetail(WithdrawalAmountRequest request ,out IPageInfo pageInfo);
+        IEnumerable<WithdrawalAmountDetailData> GetWithdrawalAmountDetail(WithdrawalAmountRequest request, out IPageInfo pageInfo);
 
         byte[] ExportMpaWithdrawal(WithdrawalAmountSummaryResponse summaryData,
             List<WithdrawalAmountDetailData> detailsData,

@@ -14,7 +14,7 @@ namespace BackendSite.Service.Model.WithdrawalBankAccounting
         public decimal ChargeFee { get; set; }
         public int UploadPicTimes { get; set; }
         public string Memo { get; set; }
-        [LogIgnore] 
+        [LogIgnore]
         public int Creator { get; set; }
     }
 }

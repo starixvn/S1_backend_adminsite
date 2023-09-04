@@ -2,9 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
-using NPOI.SS.Formula.Functions;
-using Org.BouncyCastle.Ocsp;
+
 using static BackendSite.Controllers.ApiV2.Marketing.Bonus.RebateExcludeGameController;
 
 namespace BackendSite.Service.BLL

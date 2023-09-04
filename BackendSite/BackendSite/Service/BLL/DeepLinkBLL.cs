@@ -49,7 +49,7 @@ namespace BackendSite.Service.BLL
                 out totalPages, out rowCount);
         }
 
-        public  async Task<bool> SetDeepLink(int siteId, DeepLinkTableTypeEnum type, string domain, DeepLinkTableProtocolTypeEnum protocolType, int deepLinkId, string lastUpdateUser)
+        public async Task<bool> SetDeepLink(int siteId, DeepLinkTableTypeEnum type, string domain, DeepLinkTableProtocolTypeEnum protocolType, int deepLinkId, string lastUpdateUser)
         {
             return await _deepLinkService.SetDeepLink(siteId, type, domain, protocolType, deepLinkId, lastUpdateUser);
         }

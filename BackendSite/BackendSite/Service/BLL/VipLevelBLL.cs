@@ -1,14 +1,12 @@
-﻿using BackendSite.Service.BLL.Interface;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.CustVipLevel;
-using Newtonsoft.Json;
 using BackendSite.Service.DAL.Interface;
-using BarcodeReader.ImageSharp;
-using System.Security.Policy;
-using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
-using BackendSite.Extensions;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.CustVipLevel;
+using BackendSite.Service.Model.enums;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -41,18 +39,18 @@ namespace BackendSite.Service.BLL
         {
             return _vipLevelService.GetVipLevelInfo(custId);
         }
-        
+
         public async Task<MemberVipLevelInfo> GetVipLevelInfoAsync(int custId)
         {
             var data = await _vipLevelService.GetVipLevelInfoAsync(custId);
             if (data == null) return null;
-            
+
             return new MemberVipLevelInfo()
             {
                 Manually = data.Manually,
                 VipLevel = data.VipLevel,
                 QualifiedTime = data.QualifiedTime
-            };;
+            }; ;
 
         }
 
@@ -84,7 +82,7 @@ namespace BackendSite.Service.BLL
             return _vipLevelService.SetVipLevel(siteId, custId, userName, vipLevel, $"{updator} Update VipLevel",
                 updator);
         }
-        
+
         public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string updator)
         {
             return await _vipLevelService.SetVipLevelAsync(siteId, custId, userName, vipLevel, $"{updator} Update VipLevel", updator);
@@ -101,14 +99,14 @@ namespace BackendSite.Service.BLL
             return await _vipLevelService.SetVipLevelManuallyAsync(siteId, custId, userName, manually, $"{updator} Update Manually", updator);
         }
 
-        public async Task<int> VipAutomationExclusion(int custId, bool enable, string updator) 
+        public async Task<int> VipAutomationExclusion(int custId, bool enable, string updator)
         {
             var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
             if (customer == null) return -1;
 
             var beforeStatus = customer.Exclusive;
             var isExclusive = enable ? 1 : 0;
-            if(beforeStatus == isExclusive) return -2;
+            if (beforeStatus == isExclusive) return -2;
 
             var result = await _vipLevelService.SetAutoCustVipExclusionAsync(customer.SiteId, custId, customer.UserName, isExclusive);
             if (result <= 0) return -3;
@@ -297,7 +295,7 @@ namespace BackendSite.Service.BLL
                 });
             });
 
-            return result.OrderBy(x=> x.Type);
+            return result.OrderBy(x => x.Type);
         }
 
         public async Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input)
@@ -308,7 +306,7 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<int>> GetVipUpgradeSupportCurrency(int siteId)
         {
             var vipSystem = await _vipLevelService.GetVipSystem(siteId);
-            return vipSystem.GroupBy(y=> y.CurrencyId).Select(x => x.Key);
+            return vipSystem.GroupBy(y => y.CurrencyId).Select(x => x.Key);
         }
         #endregion
 
@@ -370,7 +368,7 @@ namespace BackendSite.Service.BLL
             string userName,
             int pageNumber,
             int pageSize,
-            string currencyIds,           
+            string currencyIds,
             out int totalPages,
             out int rowCount)
         {

@@ -2,6 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.TpMaintain;
+
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Service.BLL
@@ -45,19 +46,19 @@ namespace BackendSite.Service.BLL
                 out totalPages,
                 out rowCount);
         }
-        
+
         public async Task<IEnumerable<TpWallet>> GetTransferTpWalletWithCacheAsync(int custId)
         {
             var key = $"TransferTpWallet_{custId}";
-            
+
             return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromSeconds(10),
                 () => GetTransferTpWalletAsync(custId));
         }
-        
+
         private async Task<IEnumerable<TpWallet>> GetTransferTpWalletAsync(int custId)
         {
             var tpWalletList = await _thirdPartyService.GetTransferTpWallet(custId);
-            
+
             var tasks = tpWalletList
                 .Where(x => !string.IsNullOrEmpty(x.TpUserName))
                 .Select(async x =>
@@ -67,15 +68,15 @@ namespace BackendSite.Service.BLL
                         TpId = x.TpId,
                         CustId = custId,
                     };
-                    
+
                     var apiResult = await GetBalanceAsync(tpInfo);
-                    
-                    if(apiResult.Data != null)
+
+                    if (apiResult.Data != null)
                     {
                         x.Balance = apiResult.Data.balance;
                     }
                 });
-            
+
             await Task.WhenAll(tasks);
 
             return tpWalletList;
@@ -96,10 +97,10 @@ namespace BackendSite.Service.BLL
                             TpId = x.TpId,
                             CustId = custId
                         };
-                     
+
                         var apiResult = await GetBalanceAsync(tpInfo);
-                    
-                        if(apiResult?.Data is {balance: > 0})
+
+                        if (apiResult?.Data is { balance: > 0 })
                         {
                             var tpTransfer = new TpTransfer
                             {
@@ -110,24 +111,24 @@ namespace BackendSite.Service.BLL
                                 inputs = null
                             };
                             var result = await TransferAsync(tpTransfer);
-                            
-                            if(result.Data != null)
+
+                            if (result.Data != null)
                             {
                                 x.Balance = 0;
                             }
                         }
                     });
-            
+
                 await Task.WhenAll(tasks);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "TransferAllTpWallet failed ");
             }
-            
+
             return tpWalletList;
         }
-        
+
         public async Task<ApiResult<TransferResult>> TransferAsync(TpTransfer inTpTransfer)
         {
             var amount = inTpTransfer.Amount;
@@ -244,7 +245,7 @@ namespace BackendSite.Service.BLL
             IEnumerable<SiteTpListIfo> result = null;
             if (UserSiteList.Where(x => x.SiteId == siteId).Select(x => x).ToList().FirstOrDefault().ICurrencyList.Contains(currency))
             {
-                result = _thirdPartyService.GetTpBySiteAndCurrency(siteId,currency);
+                result = _thirdPartyService.GetTpBySiteAndCurrency(siteId, currency);
             }
             return result;
         }
@@ -283,7 +284,7 @@ namespace BackendSite.Service.BLL
             return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
                 () => GetSiteTpCategoryListAsync(siteId));
         }
-        
+
         private async Task<IEnumerable<TpCategory>> GetSiteTpCategoryListAsync(int siteId)
         {
             var tpList = await _thirdPartyService.GetSiteTpListAllAsync(siteId);

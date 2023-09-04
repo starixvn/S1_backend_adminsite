@@ -1,10 +1,11 @@
-﻿using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
+
 using RabbitMQ.Client;
-using BackendSite.Service.DAL.Interface;
 
 namespace BackendSite.Extensions
 {
@@ -57,6 +58,18 @@ namespace BackendSite.Extensions
             services.AddSingleton(typeof(IEnumerable<T>), p => option);
             return services;
         }
+
+        public static void DecoratorReferralManagement(this IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var referralManagementService = provider.GetRequiredService<ReferralManagementService>();
+            var adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            var reportService = provider.GetRequiredService<ReportService>();
+            var logger = provider.GetRequiredService<ILogger<ReferralManagementDecorator>>();
+            services.AddTransient<IReferralManagementBLL>(a => new ReferralManagementDecorator(
+                new ReferralManagementBLL(referralManagementService), adjustmentLogReportService, reportService, logger));
+        }
+
         public static void DecoratorLiveRegistration(this IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();

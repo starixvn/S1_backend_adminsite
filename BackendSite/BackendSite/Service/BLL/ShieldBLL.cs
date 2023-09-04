@@ -22,17 +22,17 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
-        
-        public IEnumerable<ShieldTaggingReport> GetList(ShieldTaggingReportController.GetListReq request ,out int totalPages, out int rowCount)
+
+        public IEnumerable<ShieldTaggingReport> GetList(ShieldTaggingReportController.GetListReq request, out int totalPages, out int rowCount)
         {
-            return _shieldService.GetList(request,out totalPages, out rowCount);
+            return _shieldService.GetList(request, out totalPages, out rowCount);
         }
-        
+
         public IEnumerable<ShieldTaggingReportExport> GetExport(ShieldTaggingReportController.GetExportReq request)
         {
             return _shieldService.GetExport(request);
         }
-        
+
         public IEnumerable<ShieldAssociateAccountResult> GetAssociateAccount(ShieldTaggingReportController.GetAssociateAccountReq request)
         {
             return _shieldService.GetAssociateAccount(request);
