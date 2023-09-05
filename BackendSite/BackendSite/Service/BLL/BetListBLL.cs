@@ -1,4 +1,5 @@
-﻿using System.Runtime;
+﻿using System.Drawing.Drawing2D;
+using System.Runtime;
 
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
@@ -11,6 +12,8 @@ using Dapper;
 
 using Newtonsoft.Json;
 
+using Serilog;
+using Serilog.Context;
 
 namespace BackendSite.Service.BLL
 {
@@ -144,12 +147,12 @@ namespace BackendSite.Service.BLL
 
             // 取得當前記憶體用量
             var currentMemory = GC.GetTotalMemory(false);
-            _logger.LogInformation($"Current Total Memory: {currentMemory} bytes");
+            _logger.LogInformation($"GarbageCollectCheck: Current Total Memory: {currentMemory} bytes");
 
             // 如果當前記憶體使用量超過 2GB，執行垃圾回收
             if (currentMemory > threshold)
             {
-                _logger.LogInformation("Memory usage exceeded 2GB. Performing full garbage collection...");
+                _logger.LogInformation("GarbageCollectCheck: Memory usage exceeded 2GB. Performing full garbage collection...");
 
                 // 強制執行垃圾回收
                 GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
@@ -157,7 +160,7 @@ namespace BackendSite.Service.BLL
 
                 // 取得GC後記憶體用量
                 var memoryAfterGC = GC.GetTotalMemory(false);
-                _logger.LogInformation($"Total Memory after forcing full GC: {memoryAfterGC} bytes");
+                _logger.LogInformation($"GarbageCollectCheck: Total Memory after forcing full GC: {memoryAfterGC} bytes");
             }
         }
     }
