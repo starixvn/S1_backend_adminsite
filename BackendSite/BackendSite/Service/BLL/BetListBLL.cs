@@ -1,5 +1,4 @@
-﻿using System.Drawing.Drawing2D;
-using System.Runtime;
+﻿using System.Runtime;
 
 using BackendSite.Extensions;
 using BackendSite.Service.DAL;
@@ -11,9 +10,6 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 
 using Newtonsoft.Json;
-
-using Serilog;
-using Serilog.Context;
 
 namespace BackendSite.Service.BLL
 {
