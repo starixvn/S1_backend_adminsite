@@ -942,7 +942,7 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_DepositIds", JsonConvert.SerializeObject(depositIds));
 
-            return _mainDbClient.Query<DepositMessage>("Admin_DepositMessage_Get", props);
+            return _reportDbClient.Query<DepositMessage>("Admin_DepositMessage_Get", props);
         }
     }
 }
