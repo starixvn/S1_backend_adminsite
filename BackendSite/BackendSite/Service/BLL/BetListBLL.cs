@@ -17,13 +17,11 @@ namespace BackendSite.Service.BLL
     {
         private readonly PartitionService _partitionService;
         private readonly ICacheHelper _cacheHelper;
-        private readonly ILogger<BetListService> _logger;
 
         public BetListService(IServiceProvider provider)
         {
             _partitionService = provider.GetRequiredService<PartitionService>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
-            _logger = provider.GetRequiredService<ILogger<BetListService>>();
         }
 
         public IEnumerable<BetListReport> GetBetListReport(GetBetListRequest input, out IPageInfo pageInfo)
