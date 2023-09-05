@@ -4,6 +4,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
 namespace BackendSite.Service.BLL
 {
@@ -338,15 +339,24 @@ namespace BackendSite.Service.BLL
 
         public bool SetAdjustment(ParamsWithLog<SetAdjustment> input)
         {
-            var reasons = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
-
-            if (reasons == null || !reasons.Any())
+            var reasonsbefore = _bankFinancialBll.GetReasonByAdjustmentType(new AdjustmentType
             {
-                _logger.LogError("FuncKey: Finance/PaymentAdjustment, GetReason has no data.");
+                AdjustmentTypeID = (BalanceAdjustmentTypeIDEnum)input.Before.AdjustType,
+                MethodTypeID = input.Before.MethodType
+            });
+            var reasonsafter = _bankFinancialBll.GetReasonByAdjustmentType(new AdjustmentType
+            {
+                AdjustmentTypeID = (BalanceAdjustmentTypeIDEnum)input.After.AdjustType,
+                MethodTypeID = input.After.MethodType
+            });
+
+            if (reasonsafter == null || !reasonsafter.Any())
+            {
+                _logger.LogError("GetReason has no data.");
                 return false;
             }
-            input.Before.CategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.Before.Category)?.Description;
-            input.After.CategoryName = reasons.FirstOrDefault(x => x.ReasonId == input.After.Category)?.Description;
+            input.Before.CategoryName = reasonsbefore.FirstOrDefault(x => x.ReasonId == input.Before.Category)?.Description;
+            input.After.CategoryName = reasonsafter.FirstOrDefault(x => x.ReasonId == input.After.Category)?.Description;
 
             var m = Regex.Match(input.TransId, @"\d+");
             int.TryParse(m.Value, out var id);

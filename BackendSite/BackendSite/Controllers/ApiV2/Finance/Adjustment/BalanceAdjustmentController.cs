@@ -8,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NPOI.POIFS.Crypt.Dsig;
 using OfficeOpenXml;
 using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
@@ -689,7 +690,31 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
             return apiResult;
         }
-
+        [HttpPost]
+        public ApiResult<IEnumerable<SelectListItem>> GetReasonListV2(AdjustmentType adjustmentType)
+        {
+            var result = _bankFinancialBll.GetReasonByAdjustmentType(adjustmentType);
+            var data =
+                    result.Select(x =>
+                    {
+                        //多回傳一個type給前端做判斷，Deposit=1，Withdrawal=2
+                        switch (x.Description)
+                        {
+                            case "Deposit":
+                                x.Type = 1;
+                                break;
+                            case "Withdrawal":
+                                x.Type = 2;
+                                break;
+                            default:
+                                break;
+                        };
+                        return new SelectListItem(x.ReasonId, x.Description, x.Type);
+                    });
+            var apiResult =
+                new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
+            return apiResult;
+        }
         #endregion
 
         #endregion

@@ -57,6 +57,7 @@ namespace BackendSite.Service.Model
         public string CategoryName { get; set; }
         public string Memo { get; set; }
         public AdjustTypeEnum AdjustType { get; set; }
+        public MethodTypeIDEnum MethodType { get; set; }
     }
     
     public class AdjustmentDepositLog

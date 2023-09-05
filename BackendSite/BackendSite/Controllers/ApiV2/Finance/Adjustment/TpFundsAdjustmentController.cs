@@ -185,6 +185,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         {
             var user = User.Identity.Name;
             var isDeposit = (request.ReasonId == 1 && request.MethodType == MethodTypeIDEnum.ThirdWallet); // Methodtype為第3方且ReasonID=1(Deposit)
+            #region option轉換
+            if ((int)request.Option == 5) { request.Option = TpAdjustmentOptionEnum.Add; }
+            else if((int)request.Option == 6) { request.Option = TpAdjustmentOptionEnum.Minus; }
+            #endregion
             var inTpTransfer = new AdminTpTransfer
             {
                 TpId = request.TpId,
