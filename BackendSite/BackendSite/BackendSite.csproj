@@ -20,6 +20,14 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>disable</Nullable>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Properties\PublishProfiles\**" />
+    <Content Remove="Properties\PublishProfiles\**" />
+    <EmbeddedResource Remove="Properties\PublishProfiles\**" />
+    <None Remove="Properties\PublishProfiles\**" />
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="CookieKeys\key-65b62d1a-3dd2-4487-bb78-3482ab6c080c.xml" />
@@ -59,7 +67,6 @@
     <Folder Include="Controllers\ApiV2\Admin\Permission\" />
     <Folder Include="Controllers\ApiV2\Finance\DepositSetting\" />
     <Folder Include="Controllers\ApiV2\Marketing\Setting\" />
-    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
