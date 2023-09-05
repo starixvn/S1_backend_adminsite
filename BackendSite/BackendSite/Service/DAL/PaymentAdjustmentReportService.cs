@@ -343,9 +343,10 @@ namespace BackendSite.Service.DAL
             p.Add("_Category", input.After.Category);
             p.Add("_Memo", input.After.Memo);
             p.Add("_AdjustType", (int)input.After.AdjustType);
+            p.Add("_MethodType",input.After.MethodType);
 
             var success = _mainDbClient
-                .Execute("Admin_AdjustmentInfo_Set_V2", trans, p) > 0;
+                .Execute("Admin_AdjustmentInfo_Set_V3", trans, p) > 0;
 
             if (success)
             {

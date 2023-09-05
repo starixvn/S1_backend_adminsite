@@ -627,50 +627,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         [HttpPost]
         public ApiResult<IEnumerable<SelectListItem>> GetReasonList(AdjustmentType adjustmentType)
         {
-            #region 判斷funckey
-            List<(MethodTypeIDEnum methodTypeID, BalanceAdjustmentTypeIDEnum balanceAdjustmentTypeID)> MainAndBatch_Balance = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
-            {
-                (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BalancePlus),
-                (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BalanceMinus),
-                (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BalancePlus),
-                (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BalanceMinus),
-            };
-            List<(MethodTypeIDEnum methodTypeID, BalanceAdjustmentTypeIDEnum balanceAdjustmentTypeID)> MainAndBatch_bonus = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
-            {
-                (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BonusPlus),
-                (MethodTypeIDEnum.MainWallet,BalanceAdjustmentTypeIDEnum.BonusMinus),
-                (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BonusPlus),
-                (MethodTypeIDEnum.MainWalletBatch,BalanceAdjustmentTypeIDEnum.BonusMinus),
-            };
-            List<(MethodTypeIDEnum methodTypeID, BalanceAdjustmentTypeIDEnum balanceAdjustmentTypeID)> ThirdWallet_AddMiuns = new List<(MethodTypeIDEnum, BalanceAdjustmentTypeIDEnum)>
-            {
-                (MethodTypeIDEnum.ThirdWallet,BalanceAdjustmentTypeIDEnum.Add),
-                (MethodTypeIDEnum.ThirdWallet,BalanceAdjustmentTypeIDEnum.Minus),
-            };
-
-            bool isBalance = MainAndBatch_Balance.Any(item => item.methodTypeID == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeID == adjustmentType.AdjustmentTypeID);
-            bool isBouns = MainAndBatch_bonus.Any(item => item.methodTypeID == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeID == adjustmentType.AdjustmentTypeID);
-            bool isThird = ThirdWallet_AddMiuns.Any(item => item.methodTypeID == adjustmentType.MethodTypeID && item.balanceAdjustmentTypeID == adjustmentType.AdjustmentTypeID);
-            #endregion
-            string funckey;
-            if (isBalance)
-            {
-                funckey = "FunKey/MainWallet";
-            }
-            else if (isBouns)
-            {
-                funckey = "FunKey/MainWalletBatch";
-            }
-            else if (isThird)
-            {
-                funckey = "FunKey/3RDWallet";
-            }
-            else
-            {
-                funckey = "";
-            }
-
-            var result = _bankFinancialBll.GetReason(funckey);
+            var result = _bankFinancialBll.GetReasonByAdjustmentType(adjustmentType);
             var data =
                     result.Select(x =>
                     {
@@ -692,7 +649,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
             return apiResult;
         }
-
         #endregion
 
         #endregion
