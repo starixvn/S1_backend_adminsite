@@ -905,7 +905,7 @@ namespace BackendSite.Service.Model.enums
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
         AutoPaymentRule = 92,
-        WithdrawalBlockSetting = 93
+        WithdrawalBlockSetting = 95
     }
 
     #region BankFinancialTransferInfoLog
