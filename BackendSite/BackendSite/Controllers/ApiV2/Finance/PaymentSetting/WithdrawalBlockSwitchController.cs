@@ -1,4 +1,5 @@
 using System.Security.Principal;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -26,6 +27,7 @@ public class WithdrawalBlockSwitchController : ControllerBase
 
 
     [HttpPost]
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 1 })]
     public ApiResult GetList()
     {
         var authData = _authorizeBll.GetAuthData();
@@ -40,6 +42,7 @@ public class WithdrawalBlockSwitchController : ControllerBase
     }
     
     [HttpPost]
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 91 })]
     public ApiResult Set(WithdrawalBlockSetting request)
     {
         var authData = _authorizeBll.GetAuthData();
