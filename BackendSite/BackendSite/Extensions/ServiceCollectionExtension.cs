@@ -75,10 +75,11 @@ namespace BackendSite.Extensions
             var provider = services.BuildServiceProvider();
             var liveRegistrationService = provider.GetRequiredService<ILiveRegistrationService>();
             var memberService = provider.GetRequiredService<IMemberService>();
+            var serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             var adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             var custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             var logger = provider.GetRequiredService<ILogger<LiveRegistrationDecorator>>();
-            services.AddTransient<ILiveRegistrationBLL>(a => new LiveRegistrationDecorator(custInfoBLL, new LiveRegistrationBLL(liveRegistrationService, memberService), adjustmentLogReportService, logger));
+            services.AddTransient<ILiveRegistrationBLL>(a => new LiveRegistrationDecorator(custInfoBLL, new LiveRegistrationBLL(liveRegistrationService, memberService,serverInfoBll), adjustmentLogReportService, logger));
         }
     }
 }

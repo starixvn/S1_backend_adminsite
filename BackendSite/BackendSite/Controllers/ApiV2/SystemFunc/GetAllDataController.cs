@@ -203,6 +203,30 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 };
             }
         }
+        /// <summary>
+        /// GetAllData/GetUserAllPayList 驗證登入者權限可見第三方支付廠商清單
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="AdminException"></exception>
+        [HttpPost]
+        public ApiResult<IEnumerable<PayListInfo>> GetUserAllPayList()
+        {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var data = _paymentManageBll.GetPayListByMultiSite(userServerInfo.Select(x=>x.SiteId));
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<PayListInfo>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
 
         /// <summary>
         /// GetAllData/GetPayChannel 取得第三方支付廠商通道清單

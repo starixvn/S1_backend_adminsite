@@ -1,5 +1,6 @@
 using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ public class DepositPaymentReportDetail
 {
     [ExportIgnore]
     public string Key { get; set; }
+    public string SiteName { get; set; }
     public int TotalDepositCount { get; set; }
     public decimal TotalDepositAmount { get; set; }
     public decimal AverageDepositAmount { get; set; }
@@ -34,7 +36,8 @@ public class WithdrawalPaymentReportDetail
     public int TotalWithdrawalCount { get; set; }
     public decimal TotalWithdrawalAmount { get; set; }
     public decimal AverageWithdrawalAmount { get; set; }
-    public string AverageProcessingTime { get; set; }
+    public string  AverageProcessingTime { get; set; }
+    public string SiteName { get; set; }
 }
 
 public class WithdrawalPaymentReportSummary : WithdrawalPaymentReportDetail, IPaymentReportSummary<WithdrawalPaymentReportDetail>
@@ -42,7 +45,7 @@ public class WithdrawalPaymentReportSummary : WithdrawalPaymentReportDetail, IPa
     public IEnumerable<WithdrawalPaymentReportDetail> Children { get; set; }
 }
 
-public class GetPaymentReportParams
+public class GetPaymentReportParams : IApiRequest
 {
     public GetPaymentReportParams(GetDepositPaymentReportRequest req)
     {
@@ -54,6 +57,7 @@ public class GetPaymentReportParams
         UserNames = req.UserNameList.Any() ? JsonConvert.SerializeObject(req.UserNames) : null;
         StartTime = req.StartTime.UtcDateTime;
         EndTime = req.EndTime.UtcDateTime;
+        MultiSiteAndCurrencyIds = req.MultiSiteAndCurrencyIds;
     }
 
     public GetPaymentReportParams(GetWithdrawalPaymentReportRequest req)
@@ -66,6 +70,7 @@ public class GetPaymentReportParams
         UserNames = req.UserNameList.Any() ? JsonConvert.SerializeObject(req.UserNames) : null;
         StartTime = req.StartTime.UtcDateTime;
         EndTime = req.EndTime.UtcDateTime;
+        MultiSiteAndCurrencyIds = req.MultiSiteAndCurrencyIds;
     }
 
     public int SiteId { get; set; }
@@ -76,12 +81,16 @@ public class GetPaymentReportParams
     public string UserNames { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
+    public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
+    public IEnumerable<int> SiteIds { get; set; }
+    public int CurrencyId { get; set; }
+    IEnumerable<int> IApiRequest.CurrencyIds { get; set; }
 }
 
-public class GetDepositPaymentReportRequest
+public class GetDepositPaymentReportRequest : IApiRequest
 {
     public int SiteId { get; set; }
-    public IEnumerable<CurrencyEnum> CurrencyIds { get; set; }
+    public IEnumerable<int> CurrencyIds { get; set; }
     public CurrencyEnum BaseCurrencyId { get; set; }
     public IEnumerable<int> PayIds { get; set; }
     public IEnumerable<DepositTypeEnum> Types { get; set; }
@@ -90,12 +99,16 @@ public class GetDepositPaymentReportRequest
     public DateTimeOffset StartTime { get; set; }
     public DateTimeOffset EndTime { get; set; }
     public PaymentReportGroupByEnum GroupBy { get; set; }
+    public IEnumerable<int> SiteIds { get; set; }
+    public int CurrencyId { get; set; }
+    public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
+    
 }
 
-public class GetWithdrawalPaymentReportRequest
+public class GetWithdrawalPaymentReportRequest : IApiRequest
 {
     public int SiteId { get; set; }
-    public IEnumerable<CurrencyEnum> CurrencyIds { get; set; }
+    public IEnumerable<int> CurrencyIds { get; set; }
     public CurrencyEnum BaseCurrencyId { get; set; }
     public IEnumerable<int> PayIds { get; set; }
     public IEnumerable<WithdrawalTypeEnum> Types { get; set; }
@@ -104,6 +117,9 @@ public class GetWithdrawalPaymentReportRequest
     public DateTimeOffset StartTime { get; set; }
     public DateTimeOffset EndTime { get; set; }
     public PaymentReportGroupByEnum GroupBy { get; set; }
+    public IEnumerable<int> SiteIds { get; set; }
+    public int CurrencyId { get; set; }
+    public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
 }
 
 public interface IPaymentReportDetail
@@ -115,6 +131,7 @@ public interface IPaymentReportDetail
 
 public class PaymentReportDepositDetail : IPaymentReportDetail
 {
+    public string SiteName { get; set; }
     public CurrencyEnum CurrencyId { get; set; }
     public string TransId { get; set; }
     public int PayId { get; set; }
@@ -129,6 +146,7 @@ public class PaymentReportDepositDetail : IPaymentReportDetail
 public class PaymentReportWithdrawalDetail : IPaymentReportDetail
 {
     public CurrencyEnum CurrencyId { get; set; }
+    public string SiteName { get; set; }
     public string TransId { get; set; }
     public int PayId { get; set; }
     public string PayName { get; set; }

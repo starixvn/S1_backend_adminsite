@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -19,6 +20,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         private readonly NewAuthorizeBLL _authorizeBll;
         private readonly Common _common;
         private readonly CustInfoBLL _custInfoBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         public VerificationRewardReportController(IServiceProvider provider)
         {
@@ -27,11 +29,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
             _excelBll = provider.GetService<ExcelBLL>();
             _common = provider.GetService<Common>();
             _custInfoBll = provider.GetService<CustInfoBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #region API Model
-
-        public class GetRequest : ApiRequestPageModel
+        
+        public class GetRequest : ApiRequestPageModel , IApiRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -50,9 +53,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
 
-        public class ExportRequest
+        public class ExportRequest :IApiRequest
         {
             private DateTimeOffset _startDate { get; set; }
             private DateTimeOffset _endDate { get; set; }
@@ -71,6 +78,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                 get => _endDate;
                 set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
             }
+            public int SiteId { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
 
         #endregion
@@ -87,8 +98,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<ApiListResult<CustVerificationRewardModel>> Get(GetRequest request)
         {
-            var siteId = _authorizeBll.CheckBrand();
-            var custId = await GetCustId(request.UserName, request.SabaId, siteId);
+            request.SiteId = _authorizeBll.CheckBrand(); 
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var custId = await GetCustId(request.UserName, request.SabaId, null);
             if (custId == null)
             {
                 return new ApiListResult<CustVerificationRewardModel>
@@ -97,11 +110,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
-
             var data = _verificationRewardBll.GetVerificationRewardReportV2(
-                siteId,
-                request.CurrencyIds,
                 custId.Value,
+                multiSiteRequest,
                 request.StartDate,
                 request.EndDate,
                 request.PageSize,
@@ -131,14 +142,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
         [HttpPost]
         public async Task<IActionResult> Export(ExportRequest request)
         {
-            var siteId = _authorizeBll.CheckBrand();
-            var custId = await GetCustId(request.UserName, request.SabaId, siteId);
+            request.SiteId = _authorizeBll.CheckBrand();
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var custId = await GetCustId(request.UserName, request.SabaId, null);
 
             var exportData = custId == null
                 ? Array.Empty<ExportVerificationRewardModel>()
-                : await _verificationRewardBll.GetVerificationRewardWithoutPageV2(siteId,
-                    request.CurrencyIds,
-                    custId.Value,
+                : await _verificationRewardBll.GetVerificationRewardWithoutPageV2(custId.Value,
+                    multiSiteRequest,
                     request.StartDate,
                     request.EndDate);
 
@@ -146,7 +158,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.VerificationReward
             return _excelBll.ExcelFile(stream, "VerificationRewardReport");
         }
 
-        private async Task<int?> GetCustId(string userName, string sabaId, int siteId)
+        private async Task<int?> GetCustId(string userName, string sabaId,int? siteId)
         {
             if (string.IsNullOrWhiteSpace(userName) && string.IsNullOrWhiteSpace(sabaId))
                 return 0;
