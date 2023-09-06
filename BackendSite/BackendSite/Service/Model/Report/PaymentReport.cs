@@ -21,7 +21,6 @@ public class DepositPaymentReportDetail
     public decimal AverageDepositAmount { get; set; }
     public int FirstDepositCount { get; set; }
     public string AverageProcessingTime { get; set; }
-    public string SiteName { get; set; }
 }
 
 public class DepositPaymentReportSummary : DepositPaymentReportDetail, IPaymentReportSummary<DepositPaymentReportDetail>
