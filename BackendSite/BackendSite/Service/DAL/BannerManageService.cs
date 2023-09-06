@@ -1,10 +1,13 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using Newtonsoft.Json;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -25,7 +28,7 @@ namespace BackendSite.Service.DAL
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             #region propsLog
 
             var logParam = new DynamicParameters();
@@ -36,17 +39,17 @@ namespace BackendSite.Service.DAL
             logParam.Add("_RefTransId", string.Empty);
             if (string.IsNullOrEmpty(input.Before.BannerName))
             {
-                logParam.Add("_BeforeDetailInfo",null ,DbType.String);
+                logParam.Add("_BeforeDetailInfo", null, DbType.String);
             }
             else
             {
-                logParam.Add("_BeforeDetailInfo",input.Before.ToLog());
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             }
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             #endregion
-            
+
             var p = new DynamicParameters();
             p.Add("SiteId", input.SiteId);
             p.Add("BannerName", input.After.BannerName);
@@ -63,10 +66,10 @@ namespace BackendSite.Service.DAL
             p.Add("SpecificList", JsonConvert.SerializeObject(input.After.Specific));
             p.Add("Sort", input.After.Sort);
             p.Add("AdminUser", input.Operator);
-            
+
             var result = _mainDbClient.Execute("Admin_Banner_Set_V3", trans, p);
-            
-            if(result > 0)
+
+            if (result > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
@@ -83,10 +86,10 @@ namespace BackendSite.Service.DAL
             _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
-            
+
         public IEnumerable<BannerInfoList> GetBannerList(string siteIds, string bannerTypes,
-            string status,string currencies ,int startIndex,
-            int pageSize,out int totalPages,out int rowCount)
+            string status, string currencies, int startIndex,
+            int pageSize, out int totalPages, out int rowCount)
         {
 
             var props = new DynamicParameters();
@@ -108,10 +111,10 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public BannerInfo GetBanner(int siteId, string bannerName , int currency)
+        public BannerInfo GetBanner(int siteId, string bannerName, int currency)
         {
             var result = new BannerInfo();
-            var queryResult = _reportDbClient.QueryFirst<dynamic>("Admin_Banner_Get_V3", new {SiteId = siteId, BannerName = bannerName , CurrencyId = currency });
+            var queryResult = _reportDbClient.QueryFirst<dynamic>("Admin_Banner_Get_V3", new { SiteId = siteId, BannerName = bannerName, CurrencyId = currency });
 
             if (queryResult != null)
             {
@@ -146,7 +149,7 @@ namespace BackendSite.Service.DAL
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             #region propsLog
 
             var logParam = new DynamicParameters();
@@ -155,21 +158,21 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetBanner);
             logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo",input.Before.ToLog());
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
             logParam.Add("_Operator", input.Operator);
 
             #endregion
-            
+
             var p = new DynamicParameters();
             p.Add("SiteId", input.SiteId);
             p.Add("BannerName", input.After.BannerName);
             p.Add("Status", (int)input.After.Status);
             p.Add("AdminUser", input.Operator);
-            
+
             var result = _mainDbClient.Execute("Admin_BannerStatus_Set", trans, p);
-            
-            if(result > 0)
+
+            if (result > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
@@ -186,13 +189,13 @@ namespace BackendSite.Service.DAL
             _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
-        
+
         public int DeleteBanner(ParamsWithLog<GetBannerRequest> input)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             #region propsLog
 
             var logParam = new DynamicParameters();
@@ -201,20 +204,20 @@ namespace BackendSite.Service.DAL
             logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetBanner);
             logParam.Add("_ActionType", (int)ActionType.Delete);
             logParam.Add("_RefTransId", string.Empty);
-            logParam.Add("_BeforeDetailInfo",input.Before.ToLog());
-            logParam.Add("_AfterDetailInfo", null ,DbType.String);
+            logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+            logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
             #endregion
-            
+
             var p = new DynamicParameters();
             p.Add("_SiteId", input.SiteId);
             p.Add("_CurrencyId", input.CurrencyId);
             p.Add("_BannerName", input.Before.BannerName);
 
             var result = _mainDbClient.Execute("Admin_Banner_Del", trans, p);
-            
-            if(result > 0)
+
+            if (result > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
                 if (!logResult)
@@ -231,7 +234,7 @@ namespace BackendSite.Service.DAL
             _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
         }
-        
+
         public IEnumerable<HotEventList> GetHotEventList(string siteIds,
             string status, int startIndex,
             int pageSize, out int totalPages, out int rowCount)

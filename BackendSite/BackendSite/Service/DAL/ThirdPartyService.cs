@@ -1,9 +1,12 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
+
+using Dapper;
+
 using TpGameType = BackendSite.Service.Model.TpGameType;
 
 namespace BackendSite.Service.DAL
@@ -22,16 +25,16 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<TpWallet>("TpWallet_Get", new { CustId = custId }, commandType: CommandType.StoredProcedure);
         }
-        
+
         public async Task<IEnumerable<TpWallet>> GetTransferTpWallet(int custId)
         {
             var p = new DynamicParameters(new
             {
                 _CustId = custId
-            }); 
+            });
             return await _reportDbClient.QueryAsync<TpWallet>("Admin_TransferTpWalletInfo_Get", p);
         }
-        
+
         public IEnumerable<TpTransferInfo> GetTpTransferInfoByCust(int CustId,
             string TransId,
             DateTimeOffset startDate,
@@ -60,23 +63,23 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.Query<SiteTpListIfo>("Admin_SiteTpList_Get", new DynamicParameters(new { SiteId = siteId }));
         }
-        
+
         public Task<IEnumerable<SiteTpListIfo>> GetSiteTpListAllAsync(int siteId)
         {
             var para = new DynamicParameters();
             para.Add("_SiteId", siteId);
-        
+
             return _reportDbClient.QueryAsync<SiteTpListIfo>("Admin_SiteTpList_GetAll", para);
         }
-        
+
         public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategory(int categoryId)
         {
             var para = new DynamicParameters();
             para.Add("CategoryId", categoryId);
-            
+
             return _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", para);
         }
-        
+
         public IEnumerable<AdminTpTransferInfo> GetAdjustmentTpLog(int siteId, int tpId, int custId, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
         {
             var props = new DynamicParameters();
@@ -96,7 +99,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public IEnumerable<TpAdjustmentLog> GetCustTpAdjustmentLog(GetCustTpAdjustmentLogParams input,
             int pageSize,
             int startIndex,
@@ -173,7 +176,7 @@ namespace BackendSite.Service.DAL
         {
             return await _reportDbClient.QueryAsync<CommonTpInfo>("Common_TpList_Get");
         }
-        
+
         public async Task<IEnumerable<TpGameType>> GetTpGameType()
         {
             return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameType_Get");

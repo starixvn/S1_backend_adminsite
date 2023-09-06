@@ -1,8 +1,11 @@
+using BackendSite;
+using BackendSite.Extensions;
+using BackendSite.Service;
+
+using Elastic.Apm.SerilogEnricher;
+
 using Serilog;
 using Serilog.Exceptions;
-using BackendSite.Extensions;
-using BackendSite;
-using Elastic.Apm.SerilogEnricher;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddRemoteJsonConfig(builder.Configuration.GetSection("ConfigService").Get<string[]>());
@@ -24,6 +27,8 @@ builder.Host.UseSerilog((context, Configuration) =>
 
 var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
+
+builder.Services.AddHostedService<GarbageCollectCheckWorker>();
 
 var app = builder.Build();
 startup.Configure(app, builder.Environment);

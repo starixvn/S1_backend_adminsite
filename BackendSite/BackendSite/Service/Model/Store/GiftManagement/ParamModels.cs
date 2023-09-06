@@ -6,12 +6,12 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         {
             SiteId = req.SiteId;
             CurrencyId = req.CurrencyId;
-            Status = (int) req.Status;
+            Status = (int)req.Status;
             CategoryId = req.CategoryId;
             Tags = req.Tags;
             Point = req.Point;
             PriceWorth = req.PriceWorth;
-            ShowStock = (int) req.ShowStock;
+            ShowStock = (int)req.ShowStock;
             Stock = req.Stock;
             Infos = req.Infos;
             Operator = userName;
@@ -35,12 +35,12 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public UpdateGiftParams(UpdateGiftRequest req, string userName)
         {
             GiftId = req.GiftId;
-            Status = (int) req.Status;
+            Status = (int)req.Status;
             CategoryId = req.CategoryId;
             Tags = req.Tags;
             Point = req.Point;
             PriceWorth = req.PriceWorth;
-            ShowStock = (int) req.ShowStock;
+            ShowStock = (int)req.ShowStock;
             Stock = req.Stock;
             Infos = req.Infos;
             Operator = userName;
@@ -63,7 +63,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public SetRedemptionLimitParams(SetRedemptionLimitRequest req, string userName)
         {
             SiteId = req.SiteId;
-            Status = (int) req.Status;
+            Status = (int)req.Status;
             Limit = req.Limit;
             Operator = userName;
         }
@@ -73,14 +73,14 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int Limit { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class CreateGiftInfo : LangNameModel
     {
         public string Description { get; set; }
-    
+
         public string PictureUrl { get; set; }
     }
-    
+
     public class SetSortParams
     {
         public SetSortParams(IEnumerable<SortItem> infos, string userName)
@@ -91,7 +91,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public IEnumerable<SortItem> Infos { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class SortItem
     {
         public int GiftId { get; set; }

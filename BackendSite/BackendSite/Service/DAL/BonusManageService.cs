@@ -1,10 +1,14 @@
 ﻿using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+
 using Dapper;
+
 using MySql.Data.MySqlClient;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -40,7 +44,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
         {
-            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get",new { isPayout, isNew });
+            return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get", new { isPayout, isNew });
         }
 
         public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
@@ -113,7 +117,7 @@ namespace BackendSite.Service.DAL
         /// <param name="siteId"></param>
         /// <param name="creator"></param>
         /// <returns></returns>
-        public int SetBonusCustUsingInfo(int siteId ,string bonusCode, string creator )
+        public int SetBonusCustUsingInfo(int siteId, string bonusCode, string creator)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
@@ -135,7 +139,7 @@ namespace BackendSite.Service.DAL
         public bool SetBonusCustUsingDetail(List<BonusCustUsing> list)
         {
             var result = _mainDbClient.Execute("Admin_BonusCustUsingDetail_Set", list);
-            
+
             return result > 0;
         }
 
@@ -149,8 +153,8 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             p.Add("_BonusCode", bonusCode);
             var result = _reportDbClient.Query<BonusCustUsingList>("Service_BonusCustUsingDetail_Get", p);
-            
-            return result ;
+
+            return result;
         }
 
         #region Public Method
@@ -175,7 +179,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
             string currencyIds,
-            string promotionTypes,         
+            string promotionTypes,
             int status,
             long startDate,
             long endDate,
@@ -234,21 +238,21 @@ namespace BackendSite.Service.DAL
                         var cashBackList = GetPromotionCashBack(bonusCode, siteId);
                         var tempCashBackList = cashBackList
                             .GroupBy(x => new
-                                { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x =>
-                                new PromotionCashBack1
-                                {
-                                    CurrencyId = x.Key.CurrencyId,
-                                    GameType = x.Key.GameType,
-                                    LossAmount = x.Key.LossAmount,
-                                    Percentage = x.Key.Percentage,
-                                    Status = x.Key.Status,
-                                    TpId = x.Key.TpId
-                                }).ToList();
+                            { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x =>
+                            new PromotionCashBack1
+                            {
+                                CurrencyId = x.Key.CurrencyId,
+                                GameType = x.Key.GameType,
+                                LossAmount = x.Key.LossAmount,
+                                Percentage = x.Key.Percentage,
+                                Status = x.Key.Status,
+                                TpId = x.Key.TpId
+                            }).ToList();
 
                         foreach (var specific in promotion.Specific)
                         {
                             specific.CashBackList = tempCashBackList.Where(x => x.CurrencyId == specific.CurrencyId);
-                        
+
                             var cashBack = specific.CashBackList.FirstOrDefault();
                             if (cashBack != null)
                             {
@@ -304,7 +308,7 @@ namespace BackendSite.Service.DAL
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            return _reportDbClient.QueryFirst<PromotionInfo>("Admin_Promotion_Get_V3", p);
+            return _reportDbClient.QueryFirst<PromotionInfo>("Admin_Promotion_Get_V4", p);
         }
 
         /// <summary>
@@ -353,7 +357,7 @@ namespace BackendSite.Service.DAL
         /// <param name="expectedDelRebateRow"></param>
         /// <param name="expectedDelConditionRow"></param>
         /// <returns></returns>
-        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition, 
+        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition,
             string Operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -374,7 +378,7 @@ namespace BackendSite.Service.DAL
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return false;
             }
-            
+
             var isUpdate = setAffectCount == 2;
 
             //Setp:inset AdjustmentinfoLog
@@ -446,7 +450,7 @@ namespace BackendSite.Service.DAL
                     Description = new VipLevelCondictionModel() { VipLevel = vipLevelCondition.SelectedVipLevel }
                 });
             }
-            
+
             if (promotionDisplayConditionList.Any())
             {
                 if (!SetPromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList, trans))
@@ -465,8 +469,7 @@ namespace BackendSite.Service.DAL
             if (promotion.PromotionType == (int)PromotionTypeEnum.Cashback)
             {
                 var cashBackList = new List<PromotionCashBackSetting>();
-                var cashBackGameList = GetCashBackGameList(promotion.TpId, promotion.CategoryId).ToList();
-                
+
                 if (!vipLevelCondition.SelectedVipLevel.Any())
                 {
                     vipLevelCondition.SelectedVipLevel = new List<int>
@@ -477,69 +480,45 @@ namespace BackendSite.Service.DAL
 
                 foreach (var specific in promotion.Specific)
                 {
-                    if (specific.CashBackSetting.CashBackTpInfos != null)
+                    foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
                     {
-                        foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
+                        var tpCategoryId = 0;
+                        if (promotion.WalletType == (int)PromotionWalletTypeEnum.Transfer || tpInfo.TpId == (int)TpEnum.SBSW)
                         {
-                            var tpCategoryId = 0;
-                            if (promotion.WalletType == (int)PromotionWalletTypeEnum.Transfer || tpInfo.TpId == (int)TpEnum.SBSW)
+                            tpCategoryId = tpInfo.CategoryId;
+                        }
+                        else if (promotion.TpId == (int)TpEnum.SBSW)
+                        {
+                            tpCategoryId = tpInfo.TpId;
+                        }
+                        else
+                        {
+                            tpCategoryId = tpInfo.CategoryId switch
                             {
-                                tpCategoryId = tpInfo.CategoryId;
-                            }
-                            else if (promotion.TpId == (int)TpEnum.SBSW)
-                            {
-                                tpCategoryId = tpInfo.TpId;
-                            }
-                            else
-                            {
-                                tpCategoryId = tpInfo.CategoryId switch
-                                {
-                                    (int)PromotionCategoryEnum.SlotsGame => (int)TpCategoryEnum.Casino,
-                                    (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
-                                    (int)PromotionCategoryEnum.Fish => (int)TpCategoryEnum.Fishing,
-                                    (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
-                                    (int)PromotionCategoryEnum.ESports => (int)TpCategoryEnum.ESports,
-                                    _ => 0
-                                };
-                            }
+                                (int)PromotionCategoryEnum.SlotsGame => (int)TpCategoryEnum.Casino,
+                                (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
+                                (int)PromotionCategoryEnum.Fish => (int)TpCategoryEnum.Fishing,
+                                (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
+                                (int)PromotionCategoryEnum.ESports => (int)TpCategoryEnum.ESports,
+                                _ => 0
+                            };
+                        }
 
-                            vipLevelCondition.SelectedVipLevel.ToList().ForEach(vipLevel =>
-                            {
-                                cashBackList.Add(new PromotionCashBackSetting
-                                {
-                                    CurrencyId = specific.CurrencyId,
-                                    TpId = (promotion.TpId == (int)TpEnum.SBSW)
-                                        ? promotion.TpId
-                                        : tpInfo.TpId,
-                                    CategoryId = tpCategoryId,
-                                    Level = vipLevel,
-                                    Percentage = specific.CashBackSetting.Percentage,
-                                    LossAmount = specific.CashBackSetting.LossAmount,
-                                    Status = (int)PromotionCashBackSettingStatusEnum.Enable
-                                });
-                            });
-                        }
-                    }
-                    else
-                    {
-                        //V1 版本，V2 上線後可移除
-                        foreach (var cashBack in specific.CashBackList.Where(i => i.LossAmount != 0 && i.Percentage != 0))
+                        vipLevelCondition.SelectedVipLevel.ToList().ForEach(vipLevel =>
                         {
-                            var tempCategoryId = promotion.TpId == 0 ? cashBackGameList.FirstOrDefault(x => x.TpId == cashBack.GameType).CategoryId : cashBack.GameType;
-                            vipLevelCondition.SelectedVipLevel.ToList().ForEach(vipLevel =>
+                            cashBackList.Add(new PromotionCashBackSetting
                             {
-                                cashBackList.Add(new PromotionCashBackSetting
-                                {
-                                    CurrencyId = specific.CurrencyId,
-                                    CategoryId = tempCategoryId,
-                                    Level = vipLevel,
-                                    Percentage = cashBack.Percentage,
-                                    LossAmount = cashBack.LossAmount,
-                                    Status = cashBack.Status,
-                                    TpId = promotion.TpId == 0 ? cashBack.GameType : promotion.TpId
-                                });
+                                CurrencyId = specific.CurrencyId,
+                                TpId = (promotion.TpId == (int)TpEnum.SBSW)
+                                    ? promotion.TpId
+                                    : tpInfo.TpId,
+                                CategoryId = tpCategoryId,
+                                Level = vipLevel,
+                                Percentage = specific.CashBackSetting.Percentage,
+                                LossAmount = specific.CashBackSetting.LossAmount,
+                                Status = (int)PromotionCashBackSettingStatusEnum.Enable
                             });
-                        }
+                        });
                     }
                 }
 
@@ -665,6 +644,7 @@ namespace BackendSite.Service.DAL
             p.Add("_PromotionDeviceType", promotion.PromotionDeviceType);
             p.Add("_PromotionAction", promotion.PromotionAction);
             p.Add("_AutoExtend", promotion.AutoExtend);
+            p.Add("_IsPopUp", promotion.IsPopUp);
             
             //啟用限制條件，可用次數下限為1
             var _sameDeviceIDAvailableCount = promotion.SameDeviceIDRestrict && promotion.SameDeviceIDAvailableCount < 1 ? 1 : promotion.SameDeviceIDAvailableCount;
@@ -681,7 +661,7 @@ namespace BackendSite.Service.DAL
             p.Add("_HideForUnlogin", promotion.HideForUnlogin);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_Promotion_Set_V7", transaction, p);
+            _mainDbClient.Execute("Admin_Promotion_Set_V8", transaction, p);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
@@ -867,7 +847,7 @@ namespace BackendSite.Service.DAL
 
             return affectCount == expectedRow;
         }
-        
+
         #endregion
 
         #region

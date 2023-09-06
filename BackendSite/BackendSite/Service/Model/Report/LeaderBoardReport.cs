@@ -61,8 +61,8 @@ public class LeaderboardExtraPointReq
     public int SiteId { get; set; }
     public IEnumerable<int> CategoryIds { get; set; }
     public IEnumerable<int> CurrencyIds { get; set; }
-    public DateTime StartDate{ get; set; }
-    public DateTime EndDate{ get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
     public int PageNumber { get; set; }
     public int PageSize { get; set; }
 }

@@ -23,7 +23,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
     {
         public IEnumerable<string> LangCodes { get; set; }
     }
-    
+
     public class GetGiftRequest
     {
         public int GiftId { get; set; }
@@ -91,17 +91,17 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public GeneralStatusEnum Status { get; set; }
         public int Limit { get; set; }
     }
-    
+
     public class UploadImageRequest
     {
         public IFormFile File { get; set; }
     }
-    
+
     public class UploadMultiImagesRequest
     {
         public IEnumerable<IFormFile> File { get; set; }
     }
-    
+
     public class SetSortRequest
     {
         public IEnumerable<int> SortedIdList { get; set; }

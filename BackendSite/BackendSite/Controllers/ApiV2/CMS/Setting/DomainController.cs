@@ -3,8 +3,10 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using MySql.Data.MySqlClient;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
@@ -81,10 +83,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiListResult<DomainTable>
             {
                 Data = _domainTableBll.GetDomainListBySite(
-                    new List<int>{request.SiteId},
-                    request.CurrencyIds, 
-                    request.PageNumber, 
-                    request.PageSize, 
+                    new List<int> { request.SiteId },
+                    request.CurrencyIds,
+                    request.PageNumber,
+                    request.PageSize,
                     out var totalPages, out var rowCount),
                 ErrorCode = (int)ErrorCodeEnum.Success,
                 PageNumber = request.PageNumber,

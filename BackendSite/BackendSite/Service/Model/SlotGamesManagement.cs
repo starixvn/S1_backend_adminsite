@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -38,11 +39,11 @@ namespace BackendSite.Service.Model
         public string Status { get; set; }
         public string Operator { get; set; }
 
-        public SlotGameData GetSlotGameData( ServerInfo userSiteData)
+        public SlotGameData GetSlotGameData(ServerInfo userSiteData)
         {
             var slotGameStatusList = string.IsNullOrWhiteSpace(Status)
                 ? new List<SlotGameStatus>() : JsonConvert.DeserializeObject<List<SlotGameStatus>>(Status);
-            
+
             var currencyStatusList = new List<CurrencyStatus>();
             foreach (var currencyId in userSiteData.ICurrencyList)
             {
@@ -92,7 +93,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
     }
     public class SetSlotGameReq
-    { 
+    {
         public int CurrencyId { get; set; }
         public int SlotGameId { get; set; }
         public int SiteId { get; set; }

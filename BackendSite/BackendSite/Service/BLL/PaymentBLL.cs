@@ -5,6 +5,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -51,7 +52,7 @@ namespace BackendSite.Service.BLL
                 key += $":{refTransId}";
             }
 
-            if (financialType != 0  || financialTypeList.Any())
+            if (financialType != 0 || financialTypeList.Any())
             {
                 financialTypeList.Add(financialType);
                 financialTypeList = financialTypeList.Distinct().ToList();
@@ -116,8 +117,8 @@ namespace BackendSite.Service.BLL
                 {
                     var tpId = financialLog.Type - 2000;
                     var tpName = _common.GetTpName(tpId);
-                    financialLog.Memo = financialLog.Direction == DirectionEnum.Add ? 
-                        $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";            
+                    financialLog.Memo = financialLog.Direction == DirectionEnum.Add ?
+                        $"{tpName} Wallet -> Main Wallet" : $"Main Wallet -> {tpName} Wallet";
                 }
             }
         }
@@ -184,7 +185,7 @@ namespace BackendSite.Service.BLL
         }
 
         public IEnumerable<TpBetRecordbyCategoryIdRes> GetCustTpBetRecordListbyCategoryId(int custId, DateTime selDate,
-            int categoryId, DateTime startDate, DateTime endDate ,IEnumerable<int> gameTypes)
+            int categoryId, DateTime startDate, DateTime endDate, IEnumerable<int> gameTypes)
         {
             var betList = _betListBll.GetTpBetRecord(custId, startDate, endDate);
             var result = betList
@@ -260,7 +261,7 @@ namespace BackendSite.Service.BLL
                 pageNumber = 1;
                 pageSize = result.Count;
             }
-            
+
             var (index, count) = pageInfo.ListPagination(result.Count, pageNumber, pageSize);
             pageNumber = pageInfo.PageNumber;
             totalPages = pageInfo.TotalPages;
@@ -270,7 +271,7 @@ namespace BackendSite.Service.BLL
 
         public VipRebateReportResult GetVipRebateInfoList(IEnumerable<MultiSiteRequestDto> multiSiteRequest,
             DateTime startDate, DateTime endDate, string userName, IEnumerable<int> categoryIds, int baseCurrencyId, IEnumerable<VipRebatePayoutStatusEnum> payoutStatuses,
-            int pageSize, int pageNumber,ref List<string> currencyAmount)
+            int pageSize, int pageNumber, ref List<string> currencyAmount)
         {
             var spPayoutStatus = 2; //All
             if (payoutStatuses.Count() == 1)

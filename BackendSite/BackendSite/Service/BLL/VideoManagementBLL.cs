@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -25,10 +26,10 @@ namespace BackendSite.Service.BLL
         }
         public IEnumerable<GetSiteLangData> GetSiteLangData(int siteId)
         {
-            var serverInfo = serverInfoService.GetSiteList().ToList().Find(x=> x.SiteId == siteId);
+            var serverInfo = serverInfoService.GetSiteList().ToList().Find(x => x.SiteId == siteId);
             var langList = JsonConvert.DeserializeObject<List<string>>(serverInfo?.LangList);
             var result = new List<GetSiteLangData>();
-            langList.ForEach(x => result.Add(new GetSiteLangData() { LangId = x,Link= string.Empty,Title = string.Empty}));
+            langList.ForEach(x => result.Add(new GetSiteLangData() { LangId = x, Link = string.Empty, Title = string.Empty }));
             return result;
         }
         public void InsertLatestHighlightVideo(InsertVideoPara para, string user)

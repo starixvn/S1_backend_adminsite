@@ -1,8 +1,11 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -11,7 +14,7 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        
+
         public ReasonManagementService(IServiceProvider provider)
         {
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
@@ -26,7 +29,7 @@ namespace BackendSite.Service.DAL
         public GetReasonManagementDataResult GetReasonManagementData(GetReasonManagementDataPara para)
         {
             var searchResult = new GetReasonManagementDataResult();
-            
+
             var props = new DynamicParameters();
             props.Add("_FuncKeys", JsonConvert.SerializeObject(para.FuncKeys));
             props.Add("_PageSize", Math.Abs(para.PageSize));
@@ -51,7 +54,7 @@ namespace BackendSite.Service.DAL
             props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             _ = _mainDbClient.Execute("Admin_BankFinancialReason_Upd_V2", props);
-            
+
             return props.Get<int>("_Result");
         }
         public int InsertReasonManagement(InsertReasonManagementPara para, int userId)
@@ -63,9 +66,9 @@ namespace BackendSite.Service.DAL
             props.Add("_Updator", userId);
             props.Add("_Creator", userId);
             props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             _ = _mainDbClient.Execute("Admin_BankFinancialReason_Ins_V2", props);
-            
+
             return props.Get<int>("_Result");
         }
     }

@@ -3,6 +3,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,7 +47,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             public int TpId { get; set; }
             public int GameType { get; set; }
         }
-        
+
         public class SetRequest : BaseSetting
         {
             public int Frequency { get; set; }
@@ -56,7 +57,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #endregion
 
         #region API
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 135, 1 })]
         public ApiListResult<BettingMonitorModel> GetList(GetRequest request)
@@ -74,7 +75,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     request.PageSize,
                     out var totalPages,
                     out var rowCount);
-                
+
                 apiResult.PageNumber = request.PageNumber;
                 apiResult.RowCount = rowCount;
                 apiResult.TotalPages = totalPages;
@@ -88,13 +89,13 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
             return apiResult;
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 135, 3 })]
         public ApiResult SetSetting(ApiRequestWithLog<SetRequest> request)
         {
             var result = _bettingMonitorBll.SetSetting(new ParamsWithLog<SetRequest>(request, User.Identity.Name));
-            
+
             var apiResult = new ApiResult();
             if (result)
             {
@@ -114,7 +115,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public ApiResult DelSetting(ApiRequestWithLog<BaseSetting> request)
         {
             var result = _bettingMonitorBll.DelSetting(new ParamsWithLog<BaseSetting>(request, User.Identity.Name));
-            
+
             var apiResult = new ApiResult();
             if (result)
             {

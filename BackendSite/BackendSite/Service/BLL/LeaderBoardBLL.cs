@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model.Report;
+
 using Newtonsoft.Json;
 
 
@@ -89,27 +90,27 @@ namespace BackendSite.Service.BLL
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize), out totalPages, out rowCount);
         }
-        
+
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointListExport(int siteId, IEnumerable<int> categoryIds, IEnumerable<int> currencyIds, DateTime startDate, DateTime endDate)
         {
             return _leaderBoardService.GetLeaderboardExtraPointListExport(siteId, JsonConvert.SerializeObject(categoryIds), JsonConvert.SerializeObject(currencyIds), startDate, endDate);
         }
-        
+
         public int SetLeaderboardExtraPoint(
-            DateTime activeDate, 
-            int siteId, 
+            DateTime activeDate,
+            int siteId,
             int categoryId,
-            string userName, 
-            decimal extraPoint, 
+            string userName,
+            decimal extraPoint,
             string lastUpdateUser)
         {
             return _leaderBoardService.SetLeaderboardExtraPoint(activeDate, siteId, categoryId, userName, extraPoint, lastUpdateUser);
         }
-        
+
         public bool SetLeaderboardExtraPoint(IEnumerable<SetLeaderboardExtraPointModel> input)
         {
             return _leaderBoardService.SetBatchLeaderboardExtraPoint(input);
         }
-        
+
     }
 }

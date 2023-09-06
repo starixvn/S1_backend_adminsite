@@ -1,14 +1,19 @@
-﻿using Newtonsoft.Json;
-using BackendSite.Service.Library;
-using Amazon.S3.Model;
+﻿using System.Data;
 using System.Text;
-using BackendSite.Service.Model.enums;
+
 using Amazon.CloudFront.Model;
-using Microsoft.Extensions.Options;
-using BackendSite.Service.Model;
+using Amazon.S3.Model;
+
 using BackendSite.Extensions;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+
 using Dapper;
-using System.Data;
+
+using Microsoft.Extensions.Options;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -48,10 +53,10 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
-            var siteMaintainObject = new 
+            var siteMaintainObject = new
             {
                 request.Maintain,
-                DateTimeStart = request.BeginTime.ToOffset(new TimeSpan(8,0,0)).ToString("yyyy-MM-dd HH:mm:ss"),
+                DateTimeStart = request.BeginTime.ToOffset(new TimeSpan(8, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss"),
                 UTCTimeStart = request.BeginTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
                 DateTimeEnd = request.EndTime.ToOffset(new TimeSpan(8, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss"),
                 UTCTimeEnd = request.EndTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
@@ -65,7 +70,7 @@ namespace BackendSite.Service.BLL
                 InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
                 Key = $"{request.SiteId}/{_fileName}"
             };
-            var putResponse = await _s3Helper.PutObjectAsync(putRequest);      
+            var putResponse = await _s3Helper.PutObjectAsync(putRequest);
             if (!putResponse.HttpStatusCode.IsSuccess())
             {
                 return false;
@@ -123,13 +128,13 @@ namespace BackendSite.Service.BLL
             /// <summary>
             /// 維護開始時間(+8)
             /// </summary>
-            public DateTimeOffset DateTimeStart 
+            public DateTimeOffset DateTimeStart
             {
                 get
                 {
                     return new DateTimeOffset(_dateTimeStart, new TimeSpan(8, 0, 0));
                 }
-                set 
+                set
                 {
                     _dateTimeStart = value.DateTime;
                 }

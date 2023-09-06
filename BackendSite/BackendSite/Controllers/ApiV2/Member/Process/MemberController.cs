@@ -1,14 +1,17 @@
-﻿using BackendSite.Attributes;
+﻿using System.Text;
+
+using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Library;
-using BackendSite.ExceptionHandling;
-using System.Text;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
@@ -949,9 +952,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 await _tpBll.TransferAllTpWalletAsync(request.CustId);
             }
-            
+
             var setResult = await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason, User.Identity.Name) > 0;
-            
+
             if (setResult)
             {
                 return new ApiResult
@@ -1539,7 +1542,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
 
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 87 })]
         [HttpPost]
         public async Task<ApiResult> ResetOtpTimesAsync(ResetOtpTimesRequest request)
@@ -1548,7 +1551,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
             var time = _dateTimeHelper.ToCurrencyZone(DateTime.UtcNow, custInfo.CurrencyId);
             var key = $"SendOTPSMS:{time:yyyyMMdd}:{request.CustId}";
-            
+
             if (_redisHelper.KeyExists(key, RedisDataBase.Shared))
             {
                 times = await _redisHelper.StringGetAsync(key, RedisDataBase.Shared);
@@ -1563,7 +1566,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     };
                 }
             }
-            
+
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
             {
                 Operator = User.Identity.Name,
@@ -1572,10 +1575,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 CurrencyId = custInfo.CurrencyId,
                 ActionType = ActionType.Update,
                 MenuEnum = AdminAdjustmentLogMenuEnum.ResetSmsOtpTimes,
-                BeforeDetailInfo = JsonConvert.SerializeObject(new {Times = times, custInfo.UserName}),
-                AfterDetailInfo = JsonConvert.SerializeObject(new {Times = "0", custInfo.UserName})
+                BeforeDetailInfo = JsonConvert.SerializeObject(new { Times = times, custInfo.UserName }),
+                AfterDetailInfo = JsonConvert.SerializeObject(new { Times = "0", custInfo.UserName })
             });
-            
+
             return new ApiResult
             {
                 ErrorCode = (int)ErrorCodeEnum.Success

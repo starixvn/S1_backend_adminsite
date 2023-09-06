@@ -1,12 +1,12 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.TpMaintain;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.Service.Model.CustVipLevel;
-using BackendSite.Service.Model.TpMaintain;
-using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -238,7 +238,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public ApiResult<IEnumerable<PayChannelInfo>> GetPayChannel()
         {
-            
+
             var authData = _authorizeBll.GetAuthData();
             var data = _paymentManageBll.GetPayChannel(authData.SiteId);
 
@@ -589,7 +589,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return apiResult;
         }
-        
+
         [HttpPost]
         public async Task<ApiResult<IEnumerable<LocalPaySetting>>> GetLocalPaySettingAsync()
         {

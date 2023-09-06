@@ -18,13 +18,13 @@ namespace BackendSite.Service.Model
         public string FuncKey { get; set; }
         public int ReasonId { get; set; }
         public string Description { get; set; }
-        public DateTimeOffset CreateTime 
+        public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
         public string Creator { get; set; }
-        public DateTimeOffset UpdateTime 
+        public DateTimeOffset UpdateTime
         {
             get => _updateTime;
             set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);

@@ -231,7 +231,7 @@ namespace BackendSite.Service.BLL
             return (frequency, type);
         }
 
-        private async Task<List<int>> GetQueryCustId(LiveRegistrationDateTypeEnum dateType, int siteId, DateTime startTime, DateTime endTime, string userName) 
+        private async Task<List<int>> GetQueryCustId(LiveRegistrationDateTypeEnum dateType, int siteId, DateTime startTime, DateTime endTime, string userName)
         {
             var custList = new List<int>();
             if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate)

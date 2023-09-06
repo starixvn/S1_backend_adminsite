@@ -1,9 +1,12 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -259,7 +262,7 @@ namespace BackendSite.Service.DAL
             p.Add("_AdjustType", adjustType, dbType: DbType.Int32);
             p.Add("_StartDate", startDate, dbType: DbType.DateTime);
             p.Add("_EndDate", endDate, dbType: DbType.DateTime);
-            
+
             #region GetCurrencyTotalAmount
 
             var currencyTotalAmount = (await _reportDbClient.QueryAsync<TotalAmount>("Admin_AdjustmentTotalAmountByCust_Get_V4", p)).ToList();
@@ -315,7 +318,7 @@ namespace BackendSite.Service.DAL
                 logParam.Add("_Operator", input.Operator);
 
                 var logSuccess = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
-            
+
                 if (logSuccess)
                 {
                     _mainDbClient.CommitAndDisposeConnection(conn, trans);

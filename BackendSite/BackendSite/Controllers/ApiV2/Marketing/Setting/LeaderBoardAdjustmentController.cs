@@ -4,9 +4,12 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using OfficeOpenXml;
+
 using ExcelData = BackendSite.Service.Model.Report.ExcelData;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Setting
@@ -61,7 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             apiResult.TotalPages = totalPages;
             apiResult.PageNumber = request.PageNumber;
             apiResult.RowCount = rowCount;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
         }
@@ -76,11 +79,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                 request.CurrencyIds,
                 request.StartDate,
                 request.EndDate);
-            
+
             var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "LeaderboardExtraPoint");
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 144, 5 })]
         public ApiResult SetExtraPoint(SetLeaderboardExtraPointReq request)
@@ -98,7 +101,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             switch (result)
             {
                 case 0:
-                    apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = "";
                     break;
                 case -2:
@@ -124,11 +127,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             var apiResult = new List<ApiResult>();
             var excelList = new List<ExcelData>();
             var result = false;
-            
+
             if (request.excelUpload != null && _excelBll.IsValidFile(request.excelUpload.ContentType))
             {
                 _logger.LogInformation($@"SetBatchExtraPoint-Read Excel And Send Start At {DateTime.UtcNow}.");
-                
+
                 var excelPkg = new ExcelPackage(request.excelUpload.OpenReadStream());
                 var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
                 var isLastRow = false;
@@ -140,7 +143,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                     var categoryId = sheet.Cells[rowId, 2].Text.Trim();
                     var username = sheet.Cells[rowId, 3].Text.Trim();
                     var extraPoint = sheet.Cells[rowId, 4].Text.Trim();
-                   
+
                     if (string.IsNullOrEmpty(username))
                     {
                         isLastRow = true;
@@ -149,11 +152,11 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                     {
                         if (Convert.ToDateTime(activeDate) < DateTime.UtcNow.AddHours(8).Date)
                         {
-                            apiResult.Add(new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail , Message = $"Username: {username} , ActiveDate only can be selected for today or after today " });
+                            apiResult.Add(new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = $"Username: {username} , ActiveDate only can be selected for today or after today " });
                         }
-                        else if (  _custInfoBll.GetCustInfoByCust(request.SiteId, null, username).Result == null)
+                        else if (_custInfoBll.GetCustInfoByCust(request.SiteId, null, username).Result == null)
                         {
-                            apiResult.Add(new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail , Message = $"Username: {username} , doesn't exist " });
+                            apiResult.Add(new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = $"Username: {username} , doesn't exist " });
                         }
                         else
                         {
@@ -169,7 +172,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                     }
                 } while (!isLastRow);
 
-                
+
                 if (excelList.Any())
                 {
                     var insertList = excelList.Select(x =>
@@ -184,22 +187,22 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                         }).ToList();
                     result = _leaderBoardBll.SetLeaderboardExtraPoint(insertList);
                 }
-                
+
                 if (result)
                 {
-                    apiResult.Add(new ApiResult { ErrorCode = (int)ErrorCodeEnum.Success , Message = $"Set Batch ExtraPoint Success" });
+                    apiResult.Add(new ApiResult { ErrorCode = (int)ErrorCodeEnum.Success, Message = $"Set Batch ExtraPoint Success" });
                 }
-                
+
                 _logger.LogInformation($@"SetBatchExtraPoint-Read Excel And Send End At {DateTime.UtcNow}.");
             }
             else
             {
-                apiResult.Add(new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail , Message = "Wrong Excel File" });
+                apiResult.Add(new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Wrong Excel File" });
             }
 
             return apiResult;
         }
-        
+
         #endregion
     }
 }

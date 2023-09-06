@@ -1,6 +1,8 @@
 ﻿using System.Net;
+
 using Amazon.S3;
 using Amazon.S3.Model;
+
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -10,8 +12,10 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
@@ -201,7 +205,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public decimal EndAmount { get; set; }
 
         }
-        
+
         public class UploadPictureRequest : GetByTransIdRequest
         {
             public IEnumerable<string> Pic { get; set; }
@@ -268,7 +272,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.SelectCalCode,
                 request.Agent,
                 out var totalPages, out var rowCount, ref currencyAmount);
-            
+
             var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(
                 withdrawalRequestList.Select(x => x.WithdrawalId));
             foreach (var data in withdrawalRequestList)
@@ -523,7 +527,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                     if (withdrawalData.ProcessWay == WithdrawalInfoProcessWayEnum.Auto) // 自動出款要走 Verify + Process 流程
                     {
-                        apiResult =  _autoWithdrawalPaymentGateWayBll.AutoWithdrawalProcessWay(request, withdrawalData, authData, apiResult, out withdrawConfirmResult);
+                        apiResult = _autoWithdrawalPaymentGateWayBll.AutoWithdrawalProcessWay(request, withdrawalData, authData, apiResult, out withdrawConfirmResult);
                     }
                     else
                     {
@@ -550,7 +554,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                         if (withdrawConfirmResult > 0 && request.WithdrawalType is WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.CryptoPay)
                         {
-                            var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData );
+                            var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData);
                             if (createFailResult != null) return createFailResult;
                         }
                         break;
@@ -635,7 +639,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             return apiResult;
         }
-        
+
         /// <summary>
         /// Withdrawal/ManualApproval
         /// </summary>
@@ -1118,7 +1122,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         #endregion
 
         #region Withdrawal to Process
-        
+
         private ApiResult CheckWithdrawalTypeAndSetObject(SendToNextRequest request, ApiResult apiResult, WithdrawalInfo withdrawalInfo)
         {
             switch (request.WithdrawalType)
@@ -1178,7 +1182,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             return null;
         }
-        
+
         #endregion
 
         #endregion

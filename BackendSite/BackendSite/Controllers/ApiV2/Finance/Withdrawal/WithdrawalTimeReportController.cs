@@ -2,8 +2,10 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
@@ -76,7 +78,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 }
 
                 var searchResult = _withdrawalBll.WithdrawalTimeReportGet(JsonConvert.SerializeObject(req.SiteIds),
-                req.WithdrawalId,req.StartDate,req.EndDate, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.CustId, req.PageNumber,req.PageSize, out List<TotalAmount> currencyTotalAmount);
+                req.WithdrawalId, req.StartDate, req.EndDate, JsonConvert.SerializeObject(req.Status), JsonConvert.SerializeObject(req.CurrencyId), req.CustId, req.PageNumber, req.PageSize, out List<TotalAmount> currencyTotalAmount);
                 var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(
                     searchResult.WithdrawalTimeList.Select(x => x.WithdrawalId));
 

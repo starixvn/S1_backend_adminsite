@@ -39,18 +39,18 @@ namespace BackendSite.Extensions.Middlewares
             //}
             //else
             //{
-                var bodyStream = context.Response.Body;
+            var bodyStream = context.Response.Body;
 
-                var responseBodyStream = new MemoryStream();
-                context.Response.Body = responseBodyStream;
+            var responseBodyStream = new MemoryStream();
+            context.Response.Body = responseBodyStream;
 
-                await _next(context);
+            await _next(context);
 
-                responseBodyStream.Seek(0, SeekOrigin.Begin);
-                var recordContent = await new StreamReader(responseBodyStream, Encoding.UTF8, true, 1024, true)
-                    .ReadToEndAsync();
-                using (LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds))
-                {
+            responseBodyStream.Seek(0, SeekOrigin.Begin);
+            var recordContent = await new StreamReader(responseBodyStream, Encoding.UTF8, true, 1024, true)
+                .ReadToEndAsync();
+            using (LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds))
+            {
                 if (path.Contains("ResetPassword", StringComparison.OrdinalIgnoreCase) ||
                     path.Contains("ResetPwd", StringComparison.OrdinalIgnoreCase))
                 {
@@ -70,10 +70,10 @@ namespace BackendSite.Extensions.Middlewares
                     }
                 }
                 _logger.LogInformation($"RESPONSE: {recordContent}");
-                }
+            }
 
-                responseBodyStream.Seek(0, SeekOrigin.Begin);
-                await responseBodyStream.CopyToAsync(bodyStream);
+            responseBodyStream.Seek(0, SeekOrigin.Begin);
+            await responseBodyStream.CopyToAsync(bodyStream);
             //}
         }
 

@@ -1,9 +1,12 @@
 ﻿using System.Data;
+
 using BackendSite.Controllers.ApiV2.Report;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -26,26 +29,26 @@ namespace BackendSite.Service.DAL
         }
 
         #endregion
-        
+
         public IEnumerable<ShieldTaggingReport> GetList(
             ShieldTaggingReportController.GetListReq request
-            ,out int totalPages
-            ,out int rowCount)
+            , out int totalPages
+            , out int rowCount)
         {
             var tagList = Enum.GetNames(typeof(ShieldRiskTagged)).ToList();
             var props = new DynamicParameters();
             foreach (var shield in tagList)
             {
-                if (request.Tags.Exists(x => x == (int) Enum.Parse(typeof(ShieldRiskTagged), shield)))
+                if (request.Tags.Exists(x => x == (int)Enum.Parse(typeof(ShieldRiskTagged), shield)))
                 {
-                    props.Add($"_{shield}", 1 );
+                    props.Add($"_{shield}", 1);
                 }
                 else
                 {
-                    props.Add($"_{shield}" );
+                    props.Add($"_{shield}");
                 }
             }
-            
+
             props.Add("_SiteId", request.SiteId);
             props.Add("_ShieldId", string.IsNullOrWhiteSpace(request.ShieldId) ? "" : request.ShieldId);
             props.Add("_UserName", string.IsNullOrWhiteSpace(request.UserName) ? "" : request.UserName);
@@ -60,10 +63,10 @@ namespace BackendSite.Service.DAL
             var result = _reportDbClient.Query<ShieldTaggingReport>("Admin_ShieldTaggingReport_Get", props).ToList();
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;
-            
+
             return result;
         }
-        
+
         public IEnumerable<ShieldTaggingReportExport> GetExport(
             ShieldTaggingReportController.GetExportReq request)
         {
@@ -71,16 +74,16 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             foreach (var shield in tagList)
             {
-                if (request.Tags.Exists(x => x == (int) Enum.Parse(typeof(ShieldRiskTagged), shield)))
+                if (request.Tags.Exists(x => x == (int)Enum.Parse(typeof(ShieldRiskTagged), shield)))
                 {
-                    props.Add($"_{shield}", 1 );
+                    props.Add($"_{shield}", 1);
                 }
                 else
                 {
-                    props.Add($"_{shield}" );
+                    props.Add($"_{shield}");
                 }
             }
-            
+
             props.Add("_SiteId", request.SiteId);
             props.Add("_ShieldId", string.IsNullOrWhiteSpace(request.ShieldId) ? "" : request.ShieldId);
             props.Add("_UserName", string.IsNullOrWhiteSpace(request.UserName) ? "" : request.UserName);
@@ -89,11 +92,11 @@ namespace BackendSite.Service.DAL
             props.Add("_TriggeredPoint", JsonConvert.SerializeObject(request.TriggeredPoints));
             props.Add("_Platform", JsonConvert.SerializeObject(request.PlatformSting));
             var result = _reportDbClient.Query<ShieldTaggingReportExport>("Admin_ShieldTaggingReportExport_Get", props).ToList();
-          
-            
+
+
             return result;
         }
-        
+
         public IEnumerable<ShieldAssociateAccountResult> GetAssociateAccount(
             ShieldTaggingReportController.GetAssociateAccountReq request)
         {

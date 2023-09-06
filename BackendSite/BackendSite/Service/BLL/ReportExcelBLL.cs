@@ -661,7 +661,7 @@ namespace BackendSite.Service.BLL
                     {
                         var a = totaldata["TotalBonusAmountClaimed"];
                         var b = totaldata["CompareTotalBonusAmountClaimed"];
-                        ws.Cells[currentRow, colIdx].Value = $"{ decimal.ToInt32(b != 0 ? (a / b - 1) * 100 : 0)}%";
+                        ws.Cells[currentRow, colIdx].Value = $"{decimal.ToInt32(b != 0 ? (a / b - 1) * 100 : 0)}%";
                     }
                     else
                     {
@@ -672,7 +672,7 @@ namespace BackendSite.Service.BLL
                         else if (item.Value is not string)
                         {
                             ws.Cells[currentRow, colIdx].Value = value;
-                        } 
+                        }
                     }
 
                     ws.Cells[currentRow, colIdx].Style.Border.Bottom.Style = ExcelBorderStyle.Double;

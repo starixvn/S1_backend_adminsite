@@ -33,7 +33,7 @@ namespace BackendSite.Service.Model.BankFinancial
         {
             get;
             set;
-        } 
+        }
 
         public string Agent
         {

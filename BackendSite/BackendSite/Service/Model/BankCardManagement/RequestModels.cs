@@ -16,7 +16,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public string AccountNo { get; set; }
         public string Agent { get; set; }
     }
-    
+
     public class SetOfflineBankingSettingRequest
     {
         public int SiteId { get; set; }

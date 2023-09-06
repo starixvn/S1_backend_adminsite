@@ -2,6 +2,7 @@
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -39,11 +40,11 @@ namespace BackendSite.Service.BLL
                 Tags = string.IsNullOrEmpty(item.TagStr)
                     ? defaultList
                     : JsonConvert.DeserializeObject<List<int>>(item.TagStr),
-                
+
                 DeviceLevel = string.IsNullOrEmpty(item.DeviceLevelStr)
                     ? new List<string>()
                     : JsonConvert.DeserializeObject<List<string>>(item.DeviceLevelStr),
-                
+
                 DeviceScores = item.DeviceScores,
                 CreateUser = item.CreateUser,
                 CreateTime = item.CreateTime,
@@ -62,17 +63,17 @@ namespace BackendSite.Service.BLL
         private async Task CreateActivityLog(AutoPaymentRuleCreateRequest request, string userName)
         {
             var afterLog = GetActivityLogObj(
-                autoType:request.AutoType,
+                autoType: request.AutoType,
                 siteId: request.SiteId,
                 currencyId: request.CurrencyId,
                 withdrawalAmount: request.WithdrawalAmount,
                 accountWithdrawalCount: request.AccountWithdrawalCount,
                 vipLevels: request.VipLevels,
                 tags: request.Tags,
-                deviceScores : request.DeviceScores,
+                deviceScores: request.DeviceScores,
                 deviceLevel: request.DeviceLevel,
                 status: true);
-    
+
             await _autoPaymentRuleService.InsertLogAsync(
                 siteId: request.SiteId,
                 custId: 0,
@@ -101,15 +102,15 @@ namespace BackendSite.Service.BLL
             var beforeLog = GetBeforeChangeLog(originData);
 
             var afterLog = GetActivityLogObj(
-                autoType:originData.AutoType,
+                autoType: originData.AutoType,
                 siteId: originData.SiteId,
                 currencyId: originData.CurrencyId,
                 withdrawalAmount: request.WithdrawalAmount,
                 accountWithdrawalCount: request.AccountWithdrawalCount,
                 vipLevels: request.VipLevels,
                 tags: request.Tags,
-                deviceScores : request.DeviceScores,
-                deviceLevel:request.DeviceLevel,
+                deviceScores: request.DeviceScores,
+                deviceLevel: request.DeviceLevel,
                 status: GetStatus(request.Status));
 
             await _autoPaymentRuleService.InsertLogAsync(siteId: originData.SiteId,
@@ -142,7 +143,7 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
-        
+
         #region private common method
 
         private object GetBeforeChangeLog(AutoPaymentRuleDataListDto originData)
@@ -159,23 +160,23 @@ namespace BackendSite.Service.BLL
             var deviceLevel = string.IsNullOrEmpty(originData.DeviceLevelStr)
                 ? new List<string>()
                 : JsonConvert.DeserializeObject<List<string>>(originData.DeviceLevelStr);
-                
+
             var beforeLog = GetActivityLogObj(
-                autoType:originData.AutoType,
+                autoType: originData.AutoType,
                 siteId: originData.SiteId,
                 currencyId: originData.CurrencyId,
                 withdrawalAmount: originData.WithdrawalAmount,
                 accountWithdrawalCount: originData.AccountWithdrawalCount,
                 vipLevels: vipLevels,
                 tags: tags,
-                deviceScores : originData.DeviceScores,
+                deviceScores: originData.DeviceScores,
                 deviceLevel: deviceLevel,
                 status: GetStatus(originData.Status));
-            
+
             return beforeLog;
         }
 
-        private object GetActivityLogObj(AutoType autoType,int siteId, CurrencyEnum currencyId, decimal withdrawalAmount,
+        private object GetActivityLogObj(AutoType autoType, int siteId, CurrencyEnum currencyId, decimal withdrawalAmount,
             int accountWithdrawalCount,
             List<int> vipLevels,
             List<int> tags,
@@ -192,7 +193,7 @@ namespace BackendSite.Service.BLL
                 VIPLevel = GetVipLevelName(vipLevels, siteId),
                 Tagging = GetTagNames(tags),
                 DeviceScores = deviceScores,
-                DeviceLevel = deviceLevel.Any() ? string.Join(",", deviceLevel) : null ,
+                DeviceLevel = deviceLevel.Any() ? string.Join(",", deviceLevel) : null,
                 Status = status
             };
         }
@@ -218,7 +219,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         private bool GetStatus(int status)
         {
             if (status == 0) return false;

@@ -14,7 +14,7 @@ namespace BackendSite.Service.Model
         {
             get;
             set;
-        } =new List<DepositAccountModel>();
+        } = new List<DepositAccountModel>();
 
         /// <summary>
         /// 總表各幣別資料
@@ -162,7 +162,7 @@ namespace BackendSite.Service.Model
             get;
             set;
         }
-        
+
         public decimal TotalAmountInMYR
         {
             get;

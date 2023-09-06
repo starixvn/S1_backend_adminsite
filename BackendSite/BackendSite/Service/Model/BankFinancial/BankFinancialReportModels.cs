@@ -1,4 +1,5 @@
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial;
@@ -31,25 +32,25 @@ public class GetFinancialReportParams
     public GetFinancialReportParams(GetFinancialReportRequest req)
     {
         SiteId = req.SiteId;
-        CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds.OrderBy(x=> x));
-        Agents = req.Agents == null 
-            ? null : JsonConvert.SerializeObject(req.Agents.OrderBy(x=> x));
-        Channel = req.Channel == null 
-            ? null : JsonConvert.SerializeObject(req.Channel.OrderBy(x=> x));
-        FinancialAccountIds = req.FinancialAccountIds == null 
-            ? null : JsonConvert.SerializeObject(req.FinancialAccountIds.OrderBy(x=> x));
+        CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds.OrderBy(x => x));
+        Agents = req.Agents == null
+            ? null : JsonConvert.SerializeObject(req.Agents.OrderBy(x => x));
+        Channel = req.Channel == null
+            ? null : JsonConvert.SerializeObject(req.Channel.OrderBy(x => x));
+        FinancialAccountIds = req.FinancialAccountIds == null
+            ? null : JsonConvert.SerializeObject(req.FinancialAccountIds.OrderBy(x => x));
         StartTime = req.StartTime.UtcDateTime;
         EndTime = req.EndTime.UtcDateTime;
         TimeZone = req.StartTime.Offset;
     }
-    
+
     public int SiteId { get; set; }
     public string CurrencyIds { get; set; }
     public string Agents { get; set; }
     public string Channel { get; set; }
-        
+
     public string FinancialAccountIds { get; set; }
-        
+
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public TimeSpan TimeZone { get; set; }

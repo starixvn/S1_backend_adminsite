@@ -1,9 +1,12 @@
 ﻿using System.Data;
+
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -48,10 +51,10 @@ namespace BackendSite.Service.DAL
             await using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
-            
+
             var p = new DynamicParameters();
             p.Add("_CustId", input.After.CustId);
-            p.Add("_Status", (int) input.After.Status);
+            p.Add("_Status", (int)input.After.Status);
             p.Add("_Operator", input.Operator);
 
             var success = await conn
@@ -62,8 +65,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.GameExclusion);
-                logParam.Add("_ActionType", (int) ActionType.Update);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.GameExclusion);
+                logParam.Add("_ActionType", (int)ActionType.Update);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
                 logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -115,7 +118,7 @@ namespace BackendSite.Service.DAL
             await using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
-            
+
             var p = new DynamicParameters();
             p.Add("_CustId", input.Before.CustId);
 
@@ -127,8 +130,8 @@ namespace BackendSite.Service.DAL
                 var logParam = new DynamicParameters();
                 logParam.Add("_SiteId", input.SiteId);
                 logParam.Add("_CurrencyId", input.CurrencyId);
-                logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.GameExclusion);
-                logParam.Add("_ActionType", (int) ActionType.Delete);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.GameExclusion);
+                logParam.Add("_ActionType", (int)ActionType.Delete);
                 logParam.Add("_RefTransId", string.Empty);
                 logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
                 logParam.Add("_AfterDetailInfo", null, DbType.String);

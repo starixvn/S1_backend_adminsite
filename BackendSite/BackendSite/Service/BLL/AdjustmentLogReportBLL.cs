@@ -17,19 +17,19 @@ namespace BackendSite.Service.BLL
         }
         public AdjustmentLogReportResult GetAdjustmentInfoLog(GetAdjustmentInfoLogPara para)
         {
-            return _adjustmentLogReportService.GetAdjustmentInfoLog(para); 
+            return _adjustmentLogReportService.GetAdjustmentInfoLog(para);
         }
-        
+
         public bool CreateAdminAdjustmentInfoLog(CreateAdminAdjustmentInfoLogInput input)
         {
-            return _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(input); 
+            return _adjustmentLogReportService.CreateAdminAdjustmentInfoLog(input);
         }
-        
+
         public AdminAdjustmentLogReportResult GetAdminAdjustmentInfoLog(GetAdminAdjustmentInfoLogInput input)
         {
-            return _adjustmentLogReportService.GetAdminAdjustmentInfoLog(input); 
+            return _adjustmentLogReportService.GetAdminAdjustmentInfoLog(input);
         }
-        
+
         public IEnumerable<SelectListItem> GetActionTypeList()
         {
             var type = typeof(ActionType);
@@ -39,12 +39,12 @@ namespace BackendSite.Service.BLL
                 .Select(x => new SelectListItem
                 {
                     Name = x.ToString(),
-                    Value = (int) x
+                    Value = (int)x
                 });
-            
+
             return menus;
         }
-        
+
         public IEnumerable<SelectListItem> GetAdminAdjustmentInfoLogMenu()
         {
             var type = typeof(AdminAdjustmentLogMenuEnum);
@@ -54,9 +54,9 @@ namespace BackendSite.Service.BLL
                 .Select(x => new SelectListItem
                 {
                     Name = x.ToString(),
-                    Value = (int) x
+                    Value = (int)x
                 });
-            
+
             return menus;
         }
     }

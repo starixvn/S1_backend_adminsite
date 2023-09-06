@@ -125,13 +125,13 @@ namespace BackendSite.Service.Model
         public int BonusId { set; get; }
         public string BonusCode { get; set; }
     }
-    
+
     public class BonusCustUsing
     {
         public int Id { get; set; }
         public int? CustId { get; set; }
     }
-    
+
     public class BonusCustUsingList
     {
         public int CustId { get; set; }

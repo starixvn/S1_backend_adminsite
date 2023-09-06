@@ -18,7 +18,7 @@ namespace BackendSite.Service.Model
             set => _lastUpdateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
     }
-    public class GetAppLinkTableReq 
+    public class GetAppLinkTableReq
     {
         public int SiteId { get; set; }
     }

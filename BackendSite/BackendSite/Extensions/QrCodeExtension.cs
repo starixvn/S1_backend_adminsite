@@ -1,4 +1,5 @@
 using BarcodeReader.ImageSharp;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 

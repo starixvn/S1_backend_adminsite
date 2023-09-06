@@ -1,10 +1,13 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+
+using BackendSite.Extensions;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
+
 using Newtonsoft.Json;
-using System.Data;
-using BackendSite.Extensions;
 
 namespace BackendSite.Service.DAL
 {
@@ -35,7 +38,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<RolePermission>("Admin_RolePermission_Get", new DynamicParameters(new { Role = role }));
         }
-        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId,int siteId)
+        public IEnumerable<UserPermissionData> GetUserPermissionData(int userId, int siteId)
         {
             return _reportDbClient.Query<UserPermissionData>("Admin_UserPermission_Get", new DynamicParameters(new { UserId = userId, SiteId = siteId }));
         }
@@ -44,7 +47,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportDbClient.Query<AdminRole>("Admin_AdminRole_Get");
         }
-        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission,int userId,string Operator)
+        public int AddAdminRole(int siteId, string roleName, string remark, IEnumerable<int> currencyList, List<SetPermission> permission, int userId, string Operator)
         {
             var result = 1;
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -62,7 +65,7 @@ namespace BackendSite.Service.DAL
 
             result = _mainDbClient.Execute("Admin_AdminRole_Ins_V2", trans, props);
 
-            if(result <= 0)
+            if (result <= 0)
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return result;
@@ -77,7 +80,7 @@ namespace BackendSite.Service.DAL
             }
             foreach (var data in permission)
             {
-                _mainDbClient.Execute("Admin_RolePermission_Ins", trans, new DynamicParameters(new { Role= SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList)}));
+                _mainDbClient.Execute("Admin_RolePermission_Ins", trans, new DynamicParameters(new { Role = SEQ, MenuId = data.DisPlayKey, Permission = JsonConvert.SerializeObject(data.PermissionIdList) }));
             }
             _mainDbClient.CommitAndDisposeConnection(conn, trans);
             return result;
@@ -126,8 +129,8 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<RoleList> GetRoleList(string roleName, int siteId)
         {
-            return _reportDbClient.Query<RoleList>("Admin_RoleList_Get", 
-                new DynamicParameters(new { RoleName = string.IsNullOrWhiteSpace(roleName) ? null: roleName, SiteId = siteId }));
+            return _reportDbClient.Query<RoleList>("Admin_RoleList_Get",
+                new DynamicParameters(new { RoleName = string.IsNullOrWhiteSpace(roleName) ? null : roleName, SiteId = siteId }));
         }
         public IEnumerable<UserList> GetAdminUserList(string userName, int siteId)
         {
@@ -135,7 +138,7 @@ namespace BackendSite.Service.DAL
                 new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName, SiteId = siteId }));
         }
 
-        public int AddAdminUser(int siteId,int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
+        public int AddAdminUser(int siteId, int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -182,7 +185,7 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int UpdateAdminUser(int siteId, int userId,int role, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
+        public int UpdateAdminUser(int siteId, int userId, int role, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
         {
             var result = 1;
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -208,7 +211,7 @@ namespace BackendSite.Service.DAL
                 return result;
             }
 
-            _mainDbClient.Execute("Admin_UserPermission_Del", trans, new DynamicParameters(new { UserId = userId, SiteId = siteId}));
+            _mainDbClient.Execute("Admin_UserPermission_Del", trans, new DynamicParameters(new { UserId = userId, SiteId = siteId }));
 
             foreach (var data in permission)
             {
@@ -329,7 +332,7 @@ namespace BackendSite.Service.DAL
             propsLog.Add("Operator", userName);
             #endregion
 
-            var result =  _mainDbClient.Execute("Admin_AdminBrand_Set", trans, props) > 0;
+            var result = _mainDbClient.Execute("Admin_AdminBrand_Set", trans, props) > 0;
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentBrandLog_Ins", trans, propsLog) > 0;
             if (logResult & result)
             {
