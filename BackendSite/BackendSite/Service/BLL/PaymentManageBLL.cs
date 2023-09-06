@@ -70,7 +70,12 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PayListInfo> GetPayList(int siteId)
         {
-            return _paymentManageService.GetPayList(siteId);
+            IEnumerable<int> _siteIds = Enumerable.Repeat(siteId, 1);
+            return _paymentManageService.GetPayList(_siteIds);
+        }
+        public IEnumerable<PayListInfo> GetPayListByMultiSite(IEnumerable<int> siteIds)
+        {
+            return _paymentManageService.GetPayList(siteIds);
         }
 
         public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)

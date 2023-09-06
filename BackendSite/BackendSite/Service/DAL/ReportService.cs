@@ -4,6 +4,8 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.GameStatisticalReport;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.Report;
 
 using Dapper;
@@ -280,39 +282,37 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<GameStatisticalDao>("Admin_GameStatisticalReport_Get_V2", parameters);
         }
-
-        public IEnumerable<PaymentReportDepositDetail> GetPaymentReportDepositDetail(GetPaymentReportParams input)
+        
+        public IEnumerable<PaymentReportDepositDetail> GetPaymentReportDepositDetail(GetPaymentReportParams input,string multiSiteRequest)
         {
             var parameters = new DynamicParameters(
                 new
                 {
-                    _SiteId = input.SiteId,
-                    _CurrencyIds = input.CurrencyIds,
                     _PayIds = input.PayIds,
                     _Types = input.Types,
                     _UserNames = input.UserNames,
                     _StartTime = input.StartTime,
-                    _EndTime = input.EndTime
+                    _EndTime = input.EndTime,
+                    _MultiSiteAndCurrencyIds = multiSiteRequest,
                 });
 
-            return _reportDbClient.Query<PaymentReportDepositDetail>("Admin_PaymentReport_Deposit_Get", parameters);
+            return _reportDbClient.Query<PaymentReportDepositDetail>("Admin_PaymentReport_Deposit_Get_V2", parameters);
         }
-
-        public IEnumerable<PaymentReportWithdrawalDetail> GetPaymentReportWithdrawalDetail(GetPaymentReportParams input)
+        
+        public IEnumerable<PaymentReportWithdrawalDetail> GetPaymentReportWithdrawalDetail(GetPaymentReportParams input, string multiSiteRequest)
         {
             var parameters = new DynamicParameters(
                 new
                 {
-                    _SiteId = input.SiteId,
-                    _CurrencyIds = input.CurrencyIds,
                     _PayIds = input.PayIds,
                     _Types = input.Types,
                     _UserNames = input.UserNames,
                     _StartTime = input.StartTime,
-                    _EndTime = input.EndTime
+                    _EndTime = input.EndTime,
+                    _MultiSiteAndCurrencyIds = multiSiteRequest,
                 });
 
-            return _reportDbClient.Query<PaymentReportWithdrawalDetail>("Admin_PaymentReport_Withdrawal_Get", parameters);
+            return _reportDbClient.Query<PaymentReportWithdrawalDetail>("Admin_PaymentReport_Withdrawal_Get_V2", parameters);
         }
     }
 }

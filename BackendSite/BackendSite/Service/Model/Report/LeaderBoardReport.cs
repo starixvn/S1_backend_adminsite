@@ -1,6 +1,8 @@
+using BackendSite.Service.Model.ApiModel;
+
 namespace BackendSite.Service.Model.Report;
 
-public class GetLeaderboardReportRequest
+public class GetLeaderboardReportRequest : IApiRequest
 {
     private DateTimeOffset _startDate;
     private DateTimeOffset _endDate;
@@ -17,6 +19,9 @@ public class GetLeaderboardReportRequest
         get => _endDate;
         set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
     }
+    public IEnumerable<int> SiteIds { get; set; }
+    public IEnumerable<int> CurrencyIds { get; set; }
+    public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
 }
 
 public class LeaderboardReportModel
@@ -30,18 +35,25 @@ public class LeaderboardReportModel
     public int CustId { get; set; }
     public decimal TurnOver { get; set; }
     public decimal Points { get; set; }
+    public string SiteName { get; set; }
 }
-
+public class LeaderboardReportResponse
+{
+    public List<GetLeaderboardReportResponse> detail { get; set; }
+    public int SiteId { get; set; }
+}
 public class GetLeaderboardReportResponse
 {
     public string Ranking { get; set; }
     public int SiteId { get; set; }
+    public string SiteName { get; set; }
     public int CustId { get; set; }
     public string UserName { get; set; }
     public int CurrencyId { get; set; }
     public string IsoCode { get; set; }
     public decimal TurnOver { get; set; }
     public decimal Points { get; set; }
+    
 }
 
 public class LeaderboardExtraPointReq
