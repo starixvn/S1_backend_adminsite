@@ -311,11 +311,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     }
                 }
 
-                if (_paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
-                        out var transId) > 0)
+                var result = _paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
+                        out var transId);
+                if (result > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = $"Success. ID is {transId}";
+                }
+                else if (result == -1)
+                {
+                    throw new AdminException(ErrorCodeEnum.Fail,
+                        "WrongDepositID.");
                 }
                 else
                 {

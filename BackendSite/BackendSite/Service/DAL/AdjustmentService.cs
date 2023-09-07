@@ -86,7 +86,7 @@ namespace BackendSite.Service.DAL
             try
             {
                 var sForStatus = Newtonsoft.Json.JsonConvert.SerializeObject(forStatus);
-                var p = new DynamicParameters(new { AdjustId = adjustId, SiteId = siteId, RefId =adjustmentInfo.RefId , Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
+                var p = new DynamicParameters(new { AdjustId = adjustId, SiteId = siteId, RefId = adjustmentInfo.RefId, Comment = comment, ForStatus = sForStatus, Status = (int)status, ThirdId = (string)null });
                 p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
                 p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
                 result = _mainDbClient.Execute("Adjustment_Set", trans, p);
@@ -360,14 +360,23 @@ namespace BackendSite.Service.DAL
                     var isAdd = adjustmentAndWithdrawalLimit.AdjustType % 2 == 1; //1, 3(Add)2, 4(Deduct)
 
                     //調帳類型為Main Wallet且為Deposit(1)時變更存款單實際存款金額
-                    if (adjustmentAndWithdrawalLimit.Category == 1 && adjustmentAndWithdrawalLimit.MethodType == 5 )
+                    if (adjustmentAndWithdrawalLimit.Category == 1 && adjustmentAndWithdrawalLimit.MethodType == 5)
                     {
-                        var adjustAmount = isAdd
-                            ? adjustmentAndWithdrawalLimit.Amount
-                            : adjustmentAndWithdrawalLimit.Amount * -1;
+                        //判斷是否為調帳對象的存款單號
+                        var isCustDeposit = getAdjustmentInfo(adjustmentAndWithdrawalLimit.CustId).Any(x => x == adjustmentAndWithdrawalLimit.RefId);
+                        if (isCustDeposit)
+                        {
+                            var adjustAmount = isAdd
+                           ? adjustmentAndWithdrawalLimit.Amount
+                           : adjustmentAndWithdrawalLimit.Amount * -1;
 
-                        result = AdjustmentActualDeposit(adjustmentAndWithdrawalLimit, Adjustment_transId,
-                            adjustAmount, trans);
+                            result = AdjustmentActualDeposit(adjustmentAndWithdrawalLimit, Adjustment_transId,
+                                adjustAmount, trans);
+                        }
+                        else
+                        {
+                            result = -1;
+                        }
                     }
 
                     if (result > 0
@@ -442,7 +451,17 @@ namespace BackendSite.Service.DAL
                 }
 
             }
+
             return result;
+        }
+
+        private IEnumerable<string> getAdjustmentInfo(int custId)
+        {
+            var props = new DynamicParameters();
+            props.Add("_CustId", custId);
+
+            var Result = _reportDbClient.Query<string>("Admin_DepositInfoTransID_Get", props);
+            return Result;
         }
 
         public int AdjustmentActualDeposit(AdjustmentAndWithdrawalLimit input, string transId, decimal adjustAmount, MySqlTransaction trans)
