@@ -11,16 +11,30 @@ namespace BackendSite.Service.BLL
         private readonly IAutoPaymentRuleService _autoPaymentRuleService;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly ITagBLL _tagBll;
+        private readonly PermissionBLL _permissionBll;
+        private readonly AdminBLL _adminBll;
 
-        public AutoPaymentRuleBLL(IAutoPaymentRuleService autoWithdrawalRuleService, VipLevelBLL vipLevelBll, ITagBLL tagBll)
+        public AutoPaymentRuleBLL(
+            IAutoPaymentRuleService autoWithdrawalRuleService, 
+            VipLevelBLL vipLevelBll, 
+            ITagBLL tagBll,
+            PermissionBLL permissionBll,
+            AdminBLL adminBll)
         {
             _autoPaymentRuleService = autoWithdrawalRuleService;
             _vipLevelBll = vipLevelBll;
             _tagBll = tagBll;
+            _permissionBll = permissionBll;
+            _adminBll = adminBll;
         }
 
-        public async Task<IEnumerable<AutoPaymentRuleDataListResponse>> GetDataListAsync(AutoPaymentRuleDataListRequest request)
+        public async Task<IEnumerable<AutoPaymentRuleDataListResponse>> GetDataListAsync(AutoPaymentRuleDataListRequest request ,AuthData authData)
         {
+            if (!PaymentRulePermissionCheck(authData, request.AutoType))
+            {
+                throw new Exception("No Permission");
+            }
+            
             var data = await _autoPaymentRuleService.GetDataListAsync(request);
             var defaultList = new List<int>();
 
@@ -55,10 +69,15 @@ namespace BackendSite.Service.BLL
 
         #region Create
         
-        public async Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest request, string userName)
+        public async Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest request, AuthData authData)
         {
-            await _autoPaymentRuleService.CreateAutoPaymentRuleAsync(request, userName);
-            await CreateActivityLog(request, userName);
+            if (!PaymentRulePermissionCheck(authData, request.AutoType))
+            {
+                throw new Exception("No Permission");
+            }
+            
+            await _autoPaymentRuleService.CreateAutoPaymentRuleAsync(request, authData.UserName);
+            await CreateActivityLog(request, authData.UserName);
         }
 
         private async Task CreateActivityLog(AutoPaymentRuleCreateRequest request, string userName)
@@ -91,11 +110,17 @@ namespace BackendSite.Service.BLL
 
         #region Set
 
-        public async Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest request, string userName)
+        public async Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest request, AuthData authData)
         {
             var originData = await _autoPaymentRuleService.GetDataByIdAsync(request.Id);
-            await _autoPaymentRuleService.SetAutoPaymentRuleAsync(request, userName);
-            await SetActivityLog(request, userName, originData);
+            
+            if (!PaymentRulePermissionCheck(authData, originData.AutoType))
+            {
+                throw new Exception("No Permission");
+            }
+            
+            await _autoPaymentRuleService.SetAutoPaymentRuleAsync(request, authData.UserName);
+            await SetActivityLog(request, authData.UserName, originData);
         }
 
         private async Task SetActivityLog(AutoPaymentRuleSetRequest request, string userName,
@@ -130,9 +155,15 @@ namespace BackendSite.Service.BLL
 
         #region Delete
         
-        public async Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, string userName)
+        public async Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, AuthData authData)
         {
             var originData = await _autoPaymentRuleService.GetDataByIdAsync(request.Id);
+            
+            if (!PaymentRulePermissionCheck(authData, originData.AutoType))
+            {
+                throw new Exception("No Permission");
+            }
+            
             await _autoPaymentRuleService.DeleteAutoPaymentRuleAsync(request);
             var beforeLog = GetBeforeChangeLog(originData);
 
@@ -143,10 +174,32 @@ namespace BackendSite.Service.BLL
                 afterData: null,
                 adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoPaymentRule,
                 actionType: ActionType.Delete,
-                userName);
+                authData.UserName);
         }
 
         #endregion
+        
+        public List<WithdrawalOptionDto> GetWithdrawalOption()
+        {
+            return new List<WithdrawalOptionDto>
+            {
+                new()
+                {
+                    Name = WithdrawalMethodEnum.EWallet.ToString(),
+                    Value = (int)WithdrawalMethodEnum.EWallet
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.BankCard.ToString(),
+                    Value = (int)WithdrawalMethodEnum.BankCard
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.Crypto.ToString(),
+                    Value = (int)WithdrawalMethodEnum.Crypto
+                }
+            };
+        }
         
         #region private common method
 
@@ -233,26 +286,20 @@ namespace BackendSite.Service.BLL
             return true;
         }
         
-        public List<WithdrawalOptionDto> GetWithdrawalOption()
+        private bool PaymentRulePermissionCheck(AuthData authData , AutoType autoType)
         {
-            return new List<WithdrawalOptionDto>()
+            if (autoType == AutoType.AutoVerify)
             {
-                new()
-                {
-                    Name = WithdrawalMethodEnum.EWallet.ToString(),
-                    Value = (int)WithdrawalMethodEnum.EWallet
-                },
-                new()
-                {
-                    Name = WithdrawalMethodEnum.BankCard.ToString(),
-                    Value = (int)WithdrawalMethodEnum.BankCard
-                },
-                new()
-                {
-                    Name = WithdrawalMethodEnum.Crypto.ToString(),
-                    Value = (int)WithdrawalMethodEnum.Crypto
-                }
-            };
+                var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
+                var hasPermission = _permissionBll.CheckPermission(loginUser, 39, 89);
+                return hasPermission;
+            }
+            else
+            {
+                var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
+                var hasPermission = _permissionBll.CheckPermission(loginUser, 39, 82);
+                return hasPermission;
+            }
         }
 
         #endregion
