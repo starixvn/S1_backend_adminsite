@@ -29,6 +29,8 @@ namespace BackendSite.Service.Model
         public List<string> DeviceLevel { get; set; }
 
         public int DeviceScores { get; set; }
+        
+        public WithdrawalMethodEnum WithdrawalType { get; set; }
     }
 
     public class AutoPaymentRuleSetRequest
@@ -54,7 +56,8 @@ namespace BackendSite.Service.Model
         public List<string> DeviceLevel { get; set; }
 
         public int DeviceScores { get; set; }
-
+        
+        public WithdrawalMethodEnum WithdrawalType { get; set; }
     }
 
     public class AutoPaymentRuleDeleteRequest
@@ -109,6 +112,8 @@ namespace BackendSite.Service.Model
 
         public int DeviceScores { get; set; }
 
+        public WithdrawalMethodEnum WithdrawalType { get; set; }
+        
         public int SiteId { get; set; }
     }
 
@@ -134,6 +139,7 @@ namespace BackendSite.Service.Model
 
         public int? DeviceScores { get; set; }
 
+        public WithdrawalMethodEnum WithdrawalType { get; set; }
     }
     #endregion
 
