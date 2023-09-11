@@ -1,4 +1,4 @@
-﻿using BackendSite.Attributes;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -16,21 +16,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
     public class AutoPaymentRuleController : BaseController
     {
         private readonly IAutoPaymentRuleBLL _autoPaymentRuleBll;
+        private readonly NewAuthorizeBLL _newAuthorizeBll;
 
         public AutoPaymentRuleController(IAutoPaymentRuleBLL autoPaymentRuleBll,
+            NewAuthorizeBLL newAuthorizeBll,
             IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             _autoPaymentRuleBll = autoPaymentRuleBll;
+            _newAuthorizeBll = newAuthorizeBll;
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 89 })]
         public async Task<ApiResult<IEnumerable<AutoPaymentRuleDataListResponse>>> GetDataListAsync(AutoPaymentRuleDataListRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<AutoPaymentRuleDataListResponse>>();
+            var authData = _newAuthorizeBll.GetAuthData();
+            
             try
             {
-                var responseData = await _autoPaymentRuleBll.GetDataListAsync(request);
+                var responseData = await _autoPaymentRuleBll.GetDataListAsync(request ,authData);
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -44,13 +48,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 89 })]
         public async Task<ApiResult> CreateAsync(AutoPaymentRuleCreateRequest request)
         {
             var apiResult = new ApiResult { ErrorCode = (int)ErrorCodeEnum.SystemException };
+            var authData = _newAuthorizeBll.GetAuthData();
             try
             {
-                await _autoPaymentRuleBll.CreateAutoPaymentRuleAsync(request, AuthData.UserName);
+                await _autoPaymentRuleBll.CreateAutoPaymentRuleAsync(request, authData);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (MySqlException ex) when (ex?.Number == 1062)
@@ -66,14 +70,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 89 })]
         public async Task<ApiResult> SetAsync(AutoPaymentRuleSetRequest request)
         {
             var apiResult = new ApiResult();
-
+            var authData = _newAuthorizeBll.GetAuthData();
             try
             {
-                await _autoPaymentRuleBll.SetAutoPaymentRuleAsync(request, AuthData.UserName);
+                await _autoPaymentRuleBll.SetAutoPaymentRuleAsync(request, authData);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -86,14 +89,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 89 })]
         public async Task<ApiResult> DeleteAsync(AutoPaymentRuleDeleteRequest request)
         {
             var apiResult = new ApiResult();
-
+            var authData = _newAuthorizeBll.GetAuthData();
             try
             {
-                await _autoPaymentRuleBll.DeleteAutoPaymentRuleAsync(request, AuthData.UserName);
+                await _autoPaymentRuleBll.DeleteAutoPaymentRuleAsync(request, authData);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -106,7 +108,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         }
         
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 39, 82 })]
         public ApiResult<IEnumerable<WithdrawalOptionDto>> WithdrawalTypeAsync()
         {
             return new ApiResult<IEnumerable<WithdrawalOptionDto>>
