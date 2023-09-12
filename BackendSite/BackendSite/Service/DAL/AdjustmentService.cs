@@ -456,7 +456,7 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_CustId", custId);
 
-            var Result = _reportDbClient.Query<string>("Admin_DepositInfoTransID_Get", props);
+            var Result = _reportDbClient.Query<string>("Admin_DepositInfoTransId_Get", props);
             return Result;
         }
 
