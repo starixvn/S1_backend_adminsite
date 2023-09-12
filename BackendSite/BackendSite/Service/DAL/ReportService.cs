@@ -316,7 +316,7 @@ namespace BackendSite.Service.DAL
             var parameters = new DynamicParameters();
             parameters.Add("_SiteIds", JsonConvert.SerializeObject(input.SiteIds));
             parameters.Add("_CurrencyIds", JsonConvert.SerializeObject(input.CurrencyIds));
-            parameters.Add("_UserName", input.UserName);
+            parameters.Add("_UserName", string.IsNullOrEmpty(input.UserName) ? null : input.UserName);
             parameters.Add("_StartDate", input.StartDate.UtcDateTime);
             parameters.Add("_EndDate", input.EndDate.UtcDateTime);
             parameters.Add("_TimeZone", input.TimeZone);
