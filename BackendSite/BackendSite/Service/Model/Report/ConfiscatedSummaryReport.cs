@@ -1,59 +1,74 @@
-﻿using BackendSite.Service.Model.ApiModel;
+﻿#nullable enable
+using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.Model.Report;
 
 public class GetConfiscatedSummaryReportRequest : ApiRequestPageModel
 {
-    public DateTimeOffset StartDate { get; set; }
-    public DateTimeOffset EndDate { get; set; }
+    public DateTimeOffset? StartDate { get; set; }
+    public DateTimeOffset? EndDate { get; set; }
     public IEnumerable<int> SiteIds { get; set; }
     public IEnumerable<int> CurrencyIds { get; set; }
     public int BaseCurrencyId { get; set; }
     public string? UserName { get; set; }
-    public string TimeZone
+    public string? TimeZone
     {
         get
         {
-            var timezone = StartDate.Offset.ToString("hh\\:mm");
-            if (StartDate.Offset >= TimeSpan.Zero)
+            var timezone = StartDate?.Offset.ToString("hh\\:mm");
+            if (StartDate is not null && StartDate.Value.Offset >= TimeSpan.Zero)
             {
                 timezone = "+" + timezone;
                 return timezone;
             }
-            else
+
+            if (StartDate is not null && StartDate.Value.Offset < TimeSpan.Zero)
             {
                 timezone = "-" + timezone;
                 return timezone;
             }
+
+            return null;
+        }
+    }
+}
+
+public class GetConfiscatedSummaryReportSummaryExportRequest
+{
+    public DateTimeOffset? StartDate { get; set; }
+    public DateTimeOffset? EndDate { get; set; }
+    public IEnumerable<int> SiteIds { get; set; }
+    public IEnumerable<int> CurrencyIds { get; set; }
+    public int BaseCurrencyId { get; set; }
+    public string? UserName { get; set; }
+    public string? TimeZone
+    {
+        get
+        {
+            var timezone = StartDate?.Offset.ToString("hh\\:mm");
+            if (StartDate is not null && StartDate.Value.Offset >= TimeSpan.Zero)
+            {
+                timezone = "+" + timezone;
+                return timezone;
+            }
+
+            if (StartDate is not null && StartDate.Value.Offset < TimeSpan.Zero)
+            {
+                timezone = "-" + timezone;
+                return timezone;
+            }
+
+            return null;
         }
     }
 }
 
 public class GetConfiscatedSummaryReportSummaryRequest
 {
-    public DateTimeOffset StartDate { get; set; }
-    public DateTimeOffset EndDate { get; set; }
     public IEnumerable<int> SiteIds { get; set; }
     public IEnumerable<int> CurrencyIds { get; set; }
     public int BaseCurrencyId { get; set; }
     public string? UserName { get; set; }
-    public string TimeZone
-    {
-        get
-        {
-            var timezone = StartDate.Offset.ToString("hh\\:mm");
-            if (StartDate.Offset >= TimeSpan.Zero)
-            {
-                timezone = "+" + timezone;
-                return timezone;
-            }
-            else
-            {
-                timezone = "-" + timezone;
-                return timezone;
-            }
-        }
-    }
 }
 
 public class ConfiscatedSummaryReportDetail

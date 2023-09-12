@@ -1,4 +1,5 @@
-﻿using BackendSite.Attributes;
+﻿using System.Globalization;
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -34,7 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 149, 1 })]
         public ApiResult GetList(GetConfiscatedSummaryReportRequest request)
         {
-            var data = _reportBll.GetConfiscatedSummaryReport(request ,request.PageNumber, out var pageInfo);
+            var data = _reportBll.GetConfiscatedSummaryReportList(request ,request.PageNumber, out var pageInfo);
             
             return new ApiListResult<ConfiscatedSummaryReportDetail>(ErrorCodeEnum.Success, pageInfo, data);
         }
@@ -54,7 +55,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 149, 2 })]
-        public IActionResult ExportList(GetConfiscatedSummaryReportSummaryRequest request)
+        public IActionResult ExportList(GetConfiscatedSummaryReportSummaryExportRequest request)
         {
             var getRequest = new GetConfiscatedSummaryReportRequest
             {
@@ -63,20 +64,20 @@ namespace BackendSite.Controllers.ApiV2.Report
                 SiteIds = request.SiteIds,
                 CurrencyIds = request.CurrencyIds,
                 BaseCurrencyId = request.BaseCurrencyId,
-                UserName = request.UserName,
+                UserName = request.UserName
             };
             
-            var data = _reportBll.GetConfiscatedSummaryReport(getRequest , -1 , out _);
+            var data = _reportBll.GetConfiscatedSummaryReportList(getRequest , -1 , out _);
             
             var exportList = data.Select(d => new ConfiscatedSummaryReportDetailExport
             {
-                SuspendDate = d.SuspendDate.ToString(),
+                SuspendDate = d.SuspendDate.ToString(CultureInfo.InvariantCulture),
                 CustId = d.CustId,
                 CurrencyId = d.CurrencyId,
                 UserName = d.UserName,
                 SabaId = d.SabaId,
                 Currency = d.Currency,
-                RegistrationDate = d.RegistrationDate.ToString(),
+                RegistrationDate = d.RegistrationDate.ToString(CultureInfo.InvariantCulture),
                 LevelName = d.LevelName,
                 SeamlessWallet = d.SeamlessWallet,
                 TotalDeposit = d.TotalDeposit,
