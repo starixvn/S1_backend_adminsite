@@ -1316,7 +1316,26 @@ namespace BackendSite.Service.BLL
         
         #region Confiscated Summary Report
 
-        public IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(
+        public IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReportList(
+            GetConfiscatedSummaryReportRequest request,
+            int pageNumber,
+            out IPageInfo pageInfo)
+        {
+            var dataList = GetConfiscatedSummaryReport(request, pageNumber , out pageInfo).ToList();
+            
+            if (request.TimeZone is not null)
+            {
+                TimeSpan.TryParseExact(request.TimeZone, @"\+hh\:mm", null, out var offset);
+                foreach (var data in dataList)
+                {
+                    data.RegistrationDate += offset;
+                    data.SuspendDate += offset;
+                }
+            }
+            return dataList;
+        }
+        
+        private IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(
             GetConfiscatedSummaryReportRequest request,
             int pageNumber,
             out IPageInfo pageInfo)
@@ -1324,12 +1343,12 @@ namespace BackendSite.Service.BLL
             pageInfo = new PageInfo();
             var key = $"ConfiscatedSummaryReport:{JsonConvert.SerializeObject(request.SiteIds)}:" +
                       $"{JsonConvert.SerializeObject(request.CurrencyIds)}:" +
-                      $"{request.StartDate.DateTime:yyyyMMddHHmmssfff}:" +
-                      $"{request.EndDate.DateTime:yyyyMMddHHmmssfff}:" +
+                      $"{request.StartDate?.DateTime:yyyyMMddHHmmssfff}:" +
+                      $"{request.EndDate?.DateTime:yyyyMMddHHmmssfff}:" +
                       $"{request.UserName}:" +
                       $"{request.BaseCurrencyId}";
             
-            var cacheTime = TimeSpan.FromSeconds(30);
+            var cacheTime = TimeSpan.FromMinutes(2);
             if (_redisHelper.KeyExists(key))
             {
                 //Export
@@ -1363,12 +1382,10 @@ namespace BackendSite.Service.BLL
         {
             var getRequest = new GetConfiscatedSummaryReportRequest
             {
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
                 SiteIds = request.SiteIds,
                 CurrencyIds = request.CurrencyIds,
                 BaseCurrencyId = request.BaseCurrencyId,
-                UserName = request.UserName,
+                UserName = request.UserName
             };
             var data = GetConfiscatedSummaryReport(getRequest, -1 , out _ ).ToList();
 
