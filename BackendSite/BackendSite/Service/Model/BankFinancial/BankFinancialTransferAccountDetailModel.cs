@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
@@ -79,7 +80,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶名稱
         /// </summary>
         public string AccountName { get; set; }
-        
+
         /// <summary>
         /// 目前只 for INR IFSC. 使用
         /// </summary>
@@ -89,7 +90,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶顯示名稱
         /// </summary>
         public string DisplayName { get; set; }
-        
+
         public string FrontendDisplayName { get; set; }
 
         /// <summary>
@@ -126,7 +127,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料建立時間
         /// </summary>
         public DateTimeOffset CreateTime { get; set; }
-        
+
         /// <summary>
         /// 讀寫 資料建立者
         /// </summary>
@@ -141,7 +142,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 資料最近更新時間
         /// </summary>
         public DateTimeOffset UpdateTime { get; set; }
-        
+
         /// <summary>
         /// 讀寫 資料更新者
         /// </summary>
@@ -162,7 +163,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public CryptoCurrencyEnum? CryptoCurrencyId { get; set; }
         public string Network { get; set; }
     }
-    
+
     public class BankFinancialTransferAccountDisplayModel
     {
         public BankFinancialTransferAccountDisplayModel(BankFinancialTransferAccountDetailModel data)
@@ -193,7 +194,7 @@ namespace BackendSite.Service.Model.BankFinancial
             CryptoCurrency = data.CryptoCurrencyId?.ToString();
             CryptoNetwork = data.Network;
         }
-        
+
         public int Id { get; set; }
 
         public int SiteId { get; set; }
@@ -232,18 +233,18 @@ namespace BackendSite.Service.Model.BankFinancial
 
         public decimal InitialAmount { get; set; }
         public DateTimeOffset InitialTime { get; set; }
-        
+
         public TransferAccountStatusEnum Status { get; set; }
 
         public DateTimeOffset CreateTime { get; set; }
-        
+
         public string CreatorName { get; set; }
 
         public DateTimeOffset UpdateTime { get; set; }
-        
+
         public string UpdatorName { get; set; }
     }
-    
+
     public class BankFinancialTransferAccountExportModel
     {
         public int Id { get; set; }
@@ -276,7 +277,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public DateTimeOffset UpdateTime { get; set; }
         public string Updator { get; set; }
     }
-    
+
     public class BankFinancialTransferAccount
     {
         public int FinancialId { get; set; }

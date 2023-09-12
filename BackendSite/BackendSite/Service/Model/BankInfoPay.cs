@@ -26,7 +26,7 @@
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
     }
-    
+
     public class Pay
     {
         /// <summary>
@@ -44,7 +44,7 @@
         /// </summary>
         public int ChannelId { get; set; }
     }
-    
+
     public class PayInfo
     {
         public int PayId { get; set; }

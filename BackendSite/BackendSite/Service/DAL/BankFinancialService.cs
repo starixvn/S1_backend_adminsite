@@ -1,9 +1,12 @@
-﻿using BackendSite.Service.Model;
+﻿using System.Data;
+
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
-using System.Data;
-using BackendSite.Service.Library;
+
 using Newtonsoft.Json;
 using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
@@ -75,7 +78,7 @@ namespace BackendSite.Service.DAL
         #endregion
 
         #region Transfer Account
-        
+
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoListV2(GetTransferAccountInfoListParams input)
         {
             var parameters = new DynamicParameters(
@@ -104,10 +107,10 @@ namespace BackendSite.Service.DAL
                 {
                     _SiteId = siteId
                 });
-            
+
             return _reportDbClient.Query<string>("Admin_BankFinancialTransferAccountAgent_Get", p);
         }
-        
+
         public bool CheckTransferAccountExists(int siteId, string accountNo)
         {
             var parameters = new DynamicParameters(
@@ -116,7 +119,7 @@ namespace BackendSite.Service.DAL
                     _SiteId = siteId,
                     _AccountNo = accountNo,
                 });
-            
+
             var result = _mainDbClient.Query<int>("Admin_BankFinancialTransferAccount_Check", parameters);
 
             return result.Any();
@@ -150,7 +153,7 @@ namespace BackendSite.Service.DAL
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _TransferPin = bankFinancialTransferAccount.TransferPin,
                     _LoginPin = bankFinancialTransferAccount.LoginPin,
-                    _MobilePin =bankFinancialTransferAccount.MobilePin,
+                    _MobilePin = bankFinancialTransferAccount.MobilePin,
                     _CorporateID = bankFinancialTransferAccount.CorporateID,
                     _Reason = bankFinancialTransferAccount.Reason,
                     _Remark = bankFinancialTransferAccount.Remark,
@@ -188,7 +191,7 @@ namespace BackendSite.Service.DAL
                     _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
                     _TransferPin = bankFinancialTransferAccount.TransferPin,
                     _LoginPin = bankFinancialTransferAccount.LoginPin,
-                    _MobilePin =bankFinancialTransferAccount.MobilePin,
+                    _MobilePin = bankFinancialTransferAccount.MobilePin,
                     _CorporateID = bankFinancialTransferAccount.CorporateID,
                     _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
                     _Reason = bankFinancialTransferAccount.Reason,
@@ -237,7 +240,7 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialTransferAccount_GetForList";
             return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
         }
-        
+
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
         {
             var parameters = new DynamicParameters(new
@@ -303,7 +306,7 @@ namespace BackendSite.Service.DAL
         #endregion
 
         #region Transfer Info
-        
+
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoList(GetTransferInfoListParams input,
             int startIndex,
             int pageSize,
@@ -330,25 +333,25 @@ namespace BackendSite.Service.DAL
                     _StartIndex = startIndex,
                     _PageSize = pageSize
                 });
-            
+
             parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var result = _reportDbClient
                 .Query<BankFinancialTransferInfoTransDetailModel>("Admin_BankFinancialTransferInfo_Get_V3", parameters);
-            
+
             totalPages = parameters.Get<int?>("_TotalPages") ?? 0;
             rowCount = parameters.Get<int?>("_RowCount") ?? 0;
 
             return result;
         }
-        
+
         public IEnumerable<BankFinancialTransferInfoTransDetailModel> GetFinancialTransferInfoById(string transferId)
         {
             var parameters = new DynamicParameters(new
-                {
-                    _TransferId = transferId
-                });
+            {
+                _TransferId = transferId
+            });
 
             var result = _reportDbClient
                 .Query<BankFinancialTransferInfoTransDetailModel>("Admin_BankFinancialTransferInfo_GetById", parameters);
@@ -598,7 +601,7 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialReport_Transfer_Get_V2";
             return _reportDbClient.Query<BankFinancialTransferSummaryModel>(SpName, parameters);
         }
-        
+
         public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportDepositAsync(GetFinancialReportParams input)
         {
             var parameters = new DynamicParameters(
@@ -615,7 +618,7 @@ namespace BackendSite.Service.DAL
 
             return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Deposit_Get_V3", parameters);
         }
-        
+
         public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportWithdrawalAsync(GetFinancialReportParams input)
         {
             var parameters = new DynamicParameters(
@@ -632,7 +635,7 @@ namespace BackendSite.Service.DAL
 
             return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Withdrawal_Get_V3", parameters);
         }
-        
+
         public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportTransferAsync(GetFinancialReportParams input)
         {
             var parameters = new DynamicParameters(
@@ -649,7 +652,7 @@ namespace BackendSite.Service.DAL
 
             return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Transfer_Get_V3", parameters);
         }
-        
+
         public async Task<IEnumerable<FinancialAccountOpenBalanceResult>> GetFinancialAccountOpenBalanceAsync(GetFinancialAccountOpenBalanceParams input)
         {
             var parameters = new DynamicParameters(
@@ -662,7 +665,7 @@ namespace BackendSite.Service.DAL
 
             return await _reportDbClient.QueryAsync<FinancialAccountOpenBalanceResult>("Admin_BankFinancialReport_OpenBalance_Get", parameters);
         }
-        
+
         #endregion
 
     }

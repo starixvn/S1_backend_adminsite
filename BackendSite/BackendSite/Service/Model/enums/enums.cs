@@ -398,6 +398,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 2
     }
 
+    public enum BankInfoPayMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+
     #endregion
 
     #region FinancialLog
@@ -691,14 +697,14 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-    
+
     public enum BonusGroupByType
     {
         BonusCode = 0,
-        Date = 1 ,
+        Date = 1,
         Month = 2
     }
-    
+
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -716,7 +722,7 @@ namespace BackendSite.Service.Model.enums
         ReferralFreeCredit = 15,
         DeviceBonus = 16
     }
-    
+
     public enum BonusSummaryTransactionType
     {
         IncreaseBonus = 1,
@@ -724,7 +730,7 @@ namespace BackendSite.Service.Model.enums
         Phone = 3,
         Email = 4
     }
-    
+
     #endregion
 
     #region PromotionCashBackSetting
@@ -781,7 +787,18 @@ namespace BackendSite.Service.Model.enums
     public enum ReferralStatusEnum
     {
         Disable = 0,
-        Enable = 1
+        ReferralEnable = 1,
+        DepositReferralEnable = 2
+    }
+
+    /// <summary>
+    /// Referral for 文案語系區分使用
+    /// </summary>
+    public enum ReferralTypeEnum
+    {
+        None = 0,
+        Referral = 1,         //舊制
+        DepositReferral = 2   //新制 
     }
 
     #endregion
@@ -891,7 +908,8 @@ namespace BackendSite.Service.Model.enums
         RebateExcludeGame = 89,
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
-        AutoPaymentRule = 92
+        AutoPaymentRule = 92,
+        DepositReferral = 93
     }
 
     #region BankFinancialTransferInfoLog
@@ -1147,6 +1165,13 @@ namespace BackendSite.Service.Model.enums
         Invalid = 3
     }
 
+    public enum LiveRegistrationDateTypeEnum
+    {
+        RegisterDate = 1,
+        LastActiveDate = 2,
+        CallRecordDate = 3
+    }
+
     #endregion
 
     public enum SettlementType
@@ -1325,7 +1350,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
     #region Banner
 
     public enum BannerTypeEnum
@@ -1442,7 +1467,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
-    
+
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1871,14 +1896,14 @@ namespace BackendSite.Service.Model.enums
 
         Crypto = 3
     }
-    
+
     public enum ViewTimeType
     {
         Daily = 1,
         Weekly = 2
     }
 
-    public enum UpgradeSettingEnum 
+    public enum UpgradeSettingEnum
     {
         [Description("Monthly Minimum Deposit")]
         UpDeposit = 0,
@@ -1889,12 +1914,18 @@ namespace BackendSite.Service.Model.enums
         [Description("Minimum Turnover Within Validity Period")]
         DownTurnover = 3,
     }
-    
-     public enum AutoType
+
+    public enum AutoType
     {
         AutoVerify = 1,
         AutoApproved = 2
     }
+
+    public enum CashBackPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2
+	}
     /// <summary>
     /// Balance Adjustment頁面 > MethodType
     /// </summary>

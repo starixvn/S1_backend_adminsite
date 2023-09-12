@@ -12,7 +12,7 @@ namespace BackendSite.Service.BLL
         {
             _tagService = tagService;
         }
-        
+
         public async Task<IEnumerable<Tag>> GetAllTag()
         {
             var data = await _tagService.GetAllTag();

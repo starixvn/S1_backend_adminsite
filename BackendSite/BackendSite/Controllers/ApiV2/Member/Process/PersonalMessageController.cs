@@ -5,8 +5,10 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -112,7 +114,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult<int>> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
             var authData = _newAuthorizeBLL.GetAuthData();
-            var batchId =  await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
+            var batchId = await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
 
             if (req.excelUpload != null)
@@ -121,10 +123,10 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "File Type Error" };
 
                 var excelList = _excelBll.Read(req.excelUpload);
-                if(!excelList.Any())
+                if (!excelList.Any())
                     return new ApiResult<int>() { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Empty File" };
-                
-                _ = Task.Run(async () => 
+
+                _ = Task.Run(async () =>
                 {
                     await _messageBll.BatchMessageByFile(req.optSite, batchId, req.IsPopup, authData.UserName, excelList);
                 });
@@ -134,12 +136,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 #region checkMsg
 
-                var (result , errorMsg) = _messageBll.CheckBatchMessage(req.currency, req.personalMsg);
+                var (result, errorMsg) = _messageBll.CheckBatchMessage(req.currency, req.personalMsg);
                 if (!result)
                 {
                     return new ApiResult<int>()
                     {
-                        ErrorCode = (int) ErrorCodeEnum.Fail,
+                        ErrorCode = (int)ErrorCodeEnum.Fail,
                         Message = errorMsg
                     };
                 }
@@ -155,7 +157,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     {
                         langList.AddRange(b.Except(langList));
                     }
-                    
+
                     foreach (var lang in langList)
                     {
                         var msg = JObject.Parse(req.personalMsg)[lang];
@@ -177,7 +179,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
                     _messageBll.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
                     _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
-                    
+
                 });
             }
             _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
@@ -235,7 +237,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var error = await _messageBll.DeleteBatchMessage(authData.SiteId, req.BatchId, authData.UserName);
             if (error == -1)
                 return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "Delete fail." };
-            else if(error == -2)
+            else if (error == -2)
                 return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Fail, Message = "batch message is processing, please wait a moment" };
             return new ApiResult
             {
@@ -284,16 +286,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             var siteId = _newAuthorizeBLL.CheckBrand();
             _ = _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
-                {
-                    Operator = authData.UserName,
-                    SiteId = siteId,
-                    CurrencyId = 0,
-                    ActionType = ActionType.Update,
-                    MenuEnum = AdminAdjustmentLogMenuEnum.SMSGenerator,
-                    BeforeDetailInfo = null,
-                    AfterDetailInfo = JsonConvert.SerializeObject(req),
-                    RefTransId = string.Empty
-                });
+            {
+                Operator = authData.UserName,
+                SiteId = siteId,
+                CurrencyId = 0,
+                ActionType = ActionType.Update,
+                MenuEnum = AdminAdjustmentLogMenuEnum.SMSGenerator,
+                BeforeDetailInfo = null,
+                AfterDetailInfo = JsonConvert.SerializeObject(req),
+                RefTransId = string.Empty
+            });
 
             return new ApiResult
             {

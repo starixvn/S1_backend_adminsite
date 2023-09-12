@@ -1,9 +1,11 @@
-﻿using BackendSite.Service.DAL.Interface;
+﻿using System.Data;
+
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
+
 using Dapper;
-using System.Data;
 
 namespace BackendSite.Service.DAL
 {
@@ -16,35 +18,36 @@ namespace BackendSite.Service.DAL
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
-        public Task<IEnumerable<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryAsync(int siteId,
-            DateTimeOffset startTime, DateTimeOffset endTime)
+        public async Task<IEnumerable<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryAsync(string siteList,
+            DateTime startTime, DateTime endTime)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_StartTime", startTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_SiteIds", siteList);
+            p.Add("_StartTime", startTime);
+            p.Add("_EndTime", endTime);
 
-            return _reportDbClient.QueryAsync<MpaMarketingDepositAmountSummaryDto>("Admin_MpaMarketingDepositAmountSummary_Get", p);
+            var result = await _reportDbClient.QueryAsync<MpaMarketingDepositAmountSummaryDto>("Admin_MpaMarketingDepositAmountSummary_Get_V2", p);
+            return result;
         }
 
-        public Task<IEnumerable<MpaMarketingDepositSignUpSummaryDto>> GetDepositSignUpSummaryAsync(int siteId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public Task<IEnumerable<MpaMarketingDepositSignUpSummaryDto>> GetDepositSignUpSummaryAsync(int siteId, DateTime startTime, DateTime endTime)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_StartTime", startTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_StartTime", startTime);
+            p.Add("_EndTime", endTime);
 
-            return _reportDbClient.QueryAsync<MpaMarketingDepositSignUpSummaryDto>("Admin_MpaMarketingDepositSigUpSummary_Get", p);
+            return _reportDbClient.QueryAsync<MpaMarketingDepositSignUpSummaryDto>("Admin_MpaMarketingDepositSigUpSummarly_Get", p);
         }
 
-        public IEnumerable<MpaMarketingDepositSignUpDetailDto> GetDepositSignUpDetail(int siteId, DateTimeOffset startTime, DateTimeOffset endTime)
+        public IEnumerable<MpaMarketingDepositSignUpDetailDto> GetDepositSignUpDetail(string siteList, DateTime startTime, DateTime endTime)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
-            p.Add("_StartTime", startTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
-            p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
+            p.Add("_SiteIds", siteList);
+            p.Add("_StartTime", startTime);
+            p.Add("_EndTime", endTime);
 
-            return _reportDbClient.Query<MpaMarketingDepositSignUpDetailDto>("Admin_MpaMarketingDepositSignUpDetail_Get", p);
+            return _reportDbClient.Query<MpaMarketingDepositSignUpDetailDto>("Admin_MpaMarketingDepositSignUpDetail_Get_V2", p);
         }
     }
 }

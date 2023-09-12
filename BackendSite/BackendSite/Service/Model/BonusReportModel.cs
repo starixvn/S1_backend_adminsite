@@ -5,7 +5,7 @@ namespace BackendSite.Service.Model
 {
     #region Request
 
-    public class BonusReportRequestV2 : ApiRequestPageModel
+    public class BonusReportRequestV2 : ApiRequestPageModel, IApiRequest
     {
         public int SiteId { get; set; }
         public string BonusCode { get; set; }
@@ -19,9 +19,12 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> PromotionCategoryIds { get; set; }
         public IEnumerable<int> Statuses { get; set; }
         public IEnumerable<BonusAtPageEnum> AtPages { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
     }
 
-    public class BonusReportExportRequestV2
+    public class BonusReportExportRequestV2 : IApiRequest
     {
         public int SiteId { get; set; }
         public string BonusCode { get; set; }
@@ -36,6 +39,9 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> PromotionCategoryIds { get; set; }
         public IEnumerable<int> Statuses { get; set; }
         public IEnumerable<BonusAtPageEnum> AtPages { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
     }
 
     #endregion
@@ -52,12 +58,14 @@ namespace BackendSite.Service.Model
 
     public class BonusReportResponse
     {
+        public int SiteId { get; set; }
         public string SiteName { get; set; }
         public int CustId { get; set; }
         public string TransId { get; set; }
         public string PromotionName { get; set; }
         public string BonusCode { get; set; }
         public string UserName { get; set; }
+        public int CurrencyId { get; set; }
         public string CurrencyName { get; set; }
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }

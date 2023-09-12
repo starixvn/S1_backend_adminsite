@@ -1,15 +1,18 @@
-﻿using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Text;
+
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -19,10 +22,11 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class MpaBonusInfoReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly MpaBonusInfoBLL _mpaBonusInfoBll;
         private readonly ExcelBLL _excelBll;
         private readonly ReportExcelBLL _reportExcelBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -33,13 +37,14 @@ namespace BackendSite.Controllers.ApiV2.Report
             _mpaBonusInfoBll = provider.GetRequiredService<MpaBonusInfoBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _reportExcelBll = provider.GetRequiredService<ReportExcelBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
 
         #region API Model
 
-        public class GetDataRequest : IOrderBy
+        public class GetDataRequest : IOrderBy, IApiRequest
         {
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
@@ -68,7 +73,11 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
             public BonusGroupByType GroupByType { get; set; }
-            
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
+            public IEnumerable<MultiSiteRequestDto> MultiSiteRequest { get; set; }
+
             #region 分頁排序
 
             /// <summary>
@@ -94,8 +103,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             /// 1=降序
             /// </summary>
             public OrderByDirection OrderByDirection { get; set; }
+
             public string GetRedisKey()
-            {         
+            {
                 var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
                 jObject[nameof(StartDate)] = StartDate.ToString("yyyyMMdd");
                 jObject[nameof(EndDate)] = EndDate.ToString("yyyyMMdd");
@@ -106,7 +116,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 jObject.Remove(nameof(OrderByProperty));
                 jObject.Remove(nameof(OrderByDirection));
 
-                var key = new StringBuilder();          
+                var key = new StringBuilder();
                 foreach (var item in jObject.Properties())
                 {
                     key.Append($"{item.Name}:{item.Value}:");
@@ -116,8 +126,8 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             #endregion
         }
-        
-        public class GetDetailRequest : IOrderBy
+
+        public class GetDetailRequest : IOrderBy, IApiRequest
         {
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
@@ -143,7 +153,11 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> ClaimStatuses { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
-            
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
+            public IEnumerable<MultiSiteRequestDto> MultiSiteRequest { get; set; }
+
             #region 分頁排序
 
             /// <summary>
@@ -170,7 +184,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             /// </summary>
             public OrderByDirection OrderByDirection { get; set; }
             public string GetRedisKey()
-            {         
+            {
                 var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
                 jObject[nameof(StartDate)] = StartDate.ToString("yyyyMMdd");
                 jObject[nameof(EndDate)] = EndDate.ToString("yyyyMMdd");
@@ -181,7 +195,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 jObject.Remove(nameof(OrderByProperty));
                 jObject.Remove(nameof(OrderByDirection));
 
-                var key = new StringBuilder();          
+                var key = new StringBuilder();
                 foreach (var item in jObject.Properties())
                 {
                     key.Append($"{item.Name}:{item.Value}:");
@@ -191,8 +205,8 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             #endregion
         }
-        
-        public class GetMarketingDataRequest
+
+        public class GetMarketingDataRequest : IApiRequest
         {
             private DateTimeOffset _comparedStartDate { get; set; }
             private DateTimeOffset _comparedendDate { get; set; }
@@ -222,7 +236,10 @@ namespace BackendSite.Controllers.ApiV2.Report
             public IEnumerable<int> CurrencyIds { get; set; }
             public int BaseCurrencyId { get; set; }
             public bool IsCompared { get; set; }
-            
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
+
             public DateTimeOffset GetEndDate()
             {
                 //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
@@ -235,9 +252,9 @@ namespace BackendSite.Controllers.ApiV2.Report
                 var endDate = ComparedEndDate.AddMonths(1).AddDays(ComparedEndDate.AddMonths(1).Day);
                 return endDate;
             }
-            
+
         }
-        
+
         public class GetMarketingDetailRequest : IOrderBy
         {
             private DateTimeOffset _startDate { get; set; }
@@ -282,7 +299,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             /// </summary>
             public OrderByDirection OrderByDirection { get; set; }
             public string GetRedisKey()
-            {         
+            {
                 var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
                 jObject[nameof(StartDate)] = StartDate.ToString("yyyyMMdd");
                 jObject[nameof(EndDate)] = EndDate.ToString("yyyyMMdd");
@@ -293,7 +310,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 jObject.Remove(nameof(OrderByProperty));
                 jObject.Remove(nameof(OrderByDirection));
 
-                var key = new StringBuilder();          
+                var key = new StringBuilder();
                 foreach (var item in jObject.Properties())
                 {
                     key.Append($"{item.Name}:{item.Value}:");
@@ -302,62 +319,77 @@ namespace BackendSite.Controllers.ApiV2.Report
             }
 
             #endregion
-            
+
         }
-        
+
         #endregion
 
         #region MpaBonusInfo
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 1 })]
         public ApiListResult<MpaBonusInfo> GetInfoData(GetDataRequest request)
         {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            request.MultiSiteRequest = multiSiteRequest;
             var result = _mpaBonusInfoBll.GetMpaBonusInfoList(request, out var pageInfo);
-            
+
             return new ApiListResult<MpaBonusInfo>(ErrorCodeEnum.Success, pageInfo, result);
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 1 })]
         public MpaBonusInfoSummary GetInfoDataSummary(GetDataRequest request)
         {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            request.MultiSiteRequest = multiSiteRequest;
             var result = _mpaBonusInfoBll.GetMpaBonusInfoListSummary(request);
-            
+
             return result;
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 2 })]
         public IActionResult ExportInfoData(GetDataRequest request)
         {
             request.PageNumber = -1; //export all
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            request.MultiSiteRequest = multiSiteRequest;
             var data = _mpaBonusInfoBll.GetMpaBonusInfoList(request, out _);
 
             var stream = _excelBll.Export(data);
             return _excelBll.ExcelFile(stream, "MpaBonusInfoListReport");
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 1 })]
         public ApiListResult<MpaBonusDetail> GetDetailData(GetDetailRequest request)
         {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            request.MultiSiteRequest = multiSiteRequest;
             var result = _mpaBonusInfoBll.GetMpaBonusDetailList(request, out var pageInfo);
-            
+
             return new ApiListResult<MpaBonusDetail>(ErrorCodeEnum.Success, pageInfo, result);
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 72, 2 })]
         public IActionResult ExportDetailData(GetDetailRequest request)
         {
             request.PageNumber = -1; //export all
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            request.MultiSiteRequest = multiSiteRequest;
             var data = _mpaBonusInfoBll.GetMpaBonusDetailList(request, out _);
 
             var stream = _excelBll.Export(data);
             return _excelBll.ExcelFile(stream, "MpaBonusDetailListReport");
         }
-        
+
         #endregion
 
         #region MpaMarketingBonus
@@ -366,31 +398,35 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiResult GetMpaMarketingBonus(GetMarketingDataRequest request)
         {
-            var result = _mpaBonusInfoBll.GetMpaMarketingBonus(request);
-            
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var result = _mpaBonusInfoBll.GetMpaMarketingBonus(multiSiteRequest, request).First();
+
             return new ApiResult<MpaMarketingBonusInfo>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiListResult<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(GetMarketingDetailRequest request)
         {
             var result = _mpaBonusInfoBll.GetMpaMarketingBonusDetail(request, out var pageInfo);
-            
+
             return new ApiListResult<MpaMarketingBonusDetail>(ErrorCodeEnum.Success, pageInfo, result);
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
         public IActionResult Export(GetMarketingDataRequest request)
         {
 
             #region Get Data
-            
-            var exportData = _mpaBonusInfoBll.GetMpaMarketingBonus(new GetMarketingDataRequest
+
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            var exportData = _mpaBonusInfoBll.GetMpaMarketingBonus(multiSiteRequest, new GetMarketingDataRequest
             {
                 SiteId = request.SiteId,
                 StartDate = request.StartDate.DateTime,
@@ -400,8 +436,8 @@ namespace BackendSite.Controllers.ApiV2.Report
                 IsCompared = request.IsCompared,
                 ComparedStartDate = request.ComparedStartDate,
                 ComparedEndDate = request.ComparedEndDate
-            });
-            
+            }).First();
+
             var detailResult = _mpaBonusInfoBll.GetMpaMarketingBonusDetail(new GetMarketingDetailRequest
             {
                 SiteId = request.SiteId,
@@ -415,18 +451,18 @@ namespace BackendSite.Controllers.ApiV2.Report
                 OrderByProperty = "BonusCode",
                 OrderByDirection = OrderByDirection.Ascending
             }, out _);
-            
+
             #endregion
 
             #region Initial Param
-            
+
             var summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
             var summaryBonusCodeTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
             var detailTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
-            
-            var summaryTitles = new Dictionary<string, Api.ReportController.TitleModel>();
-            var summaryBonusCodeTitles = new Dictionary<string, Api.ReportController.TitleModel>();
-            var detailTitles = new Dictionary<string, Api.ReportController.TitleModel>();
+
+            var summaryTitles = new Dictionary<string, TitleModel>();
+            var summaryBonusCodeTitles = new Dictionary<string, TitleModel>();
+            var detailTitles = new Dictionary<string, TitleModel>();
 
             var summaryContent = new List<Dictionary<string, dynamic>>();
             var summaryBonusCodeContent = new List<Dictionary<string, dynamic>>();
@@ -437,13 +473,13 @@ namespace BackendSite.Controllers.ApiV2.Report
             #region Set Title(Title & Total Title & Merge Title & Not Summary Title)
 
             #region Titles To Merge
-            
+
             var summaryMergeTitles = new Dictionary<string, MergeTitleModel>
             {
                 {"FirstMergeTitle", new MergeTitleModel { Name = $"Bonus Amount Claimed, {request.StartDate.ToString("yyyy-MM-dd")} - {request.EndDate.ToString("yyyy-MM-dd")} , View in {Enum.GetName(typeof(CurrencyEnum), request.BaseCurrencyId)}", MergeRange = 4 }}
             };
             summaryTitlesToMerge.Add(summaryMergeTitles);
-            
+
             var summaryBonusCodeMergeTitles = new Dictionary<string, MergeTitleModel>
             {
                 {"FirstMergeTitle", new MergeTitleModel { Name = $"Bonus Amount Claimed, {request.StartDate.ToString("yyyy-MM-dd")} - {request.EndDate.ToString("yyyy-MM-dd")} , View in {Enum.GetName(typeof(CurrencyEnum), request.BaseCurrencyId)}", MergeRange = 6 }}
@@ -455,47 +491,47 @@ namespace BackendSite.Controllers.ApiV2.Report
                 {"FirstMergeTitle", new MergeTitleModel { Name = $"Bonus Amount Claimed, {request.StartDate.ToString("yyyy-MM-dd")} - {request.EndDate.ToString("yyyy-MM-dd")} , View in {Enum.GetName(typeof(CurrencyEnum), request.BaseCurrencyId)}", MergeRange = 9 }}
             };
             detailTitlesToMerge.Add(detailMergeTitles);
-            
+
             #endregion
 
             #region Title
-            
-            summaryTitles.Add("Currency", new Api.ReportController.TitleModel { Name = "Currency", SortId = 2 });
-            summaryTitles.Add("TotalBonusAmountClaimed", new Api.ReportController.TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 1 });
+
+            summaryTitles.Add("Currency", new TitleModel { Name = "Currency", SortId = 2 });
+            summaryTitles.Add("TotalBonusAmountClaimed", new TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 1 });
             if (request.IsCompared)
             {
-                summaryTitles.Add("CompareTotalBonusAmountClaimed", new Api.ReportController.TitleModel { Name = "  Compare Total Bonus Amount Claimed  ", SortId = 3 });
-                summaryTitles.Add("%Change", new Api.ReportController.TitleModel { Name = "  % Change  ", SortId = 4 });
+                summaryTitles.Add("CompareTotalBonusAmountClaimed", new TitleModel { Name = "  Compare Total Bonus Amount Claimed  ", SortId = 3 });
+                summaryTitles.Add("%Change", new TitleModel { Name = "  % Change  ", SortId = 4 });
             }
-           
-            summaryBonusCodeTitles.Add("BonusCode", new Api.ReportController.TitleModel { Name = "  Bonus Code  ", SortId = 1 });
-            summaryBonusCodeTitles.Add("Currency", new Api.ReportController.TitleModel { Name = "  Currency  ", SortId = 2 });
-            summaryBonusCodeTitles.Add("BonusName", new Api.ReportController.TitleModel { Name = "  Bonus Name  ", SortId = 3 });
-            summaryBonusCodeTitles.Add("NoOfUsersClaimingBonus", new Api.ReportController.TitleModel { Name = "  No. of Users Claiming Bonus  ", SortId = 4 });
-            summaryBonusCodeTitles.Add("TotalBonusAmountClaimed_Detail", new Api.ReportController.TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 5 });
-            summaryBonusCodeTitles.Add("TotalBonusAmountClaimed_Base", new Api.ReportController.TitleModel { Name = "  Total Bonus Amount Claimed (Base)  ", SortId = 6 });
-            
-            detailTitles.Add("BonusCode", new Api.ReportController.TitleModel { Name = "Bonus Code  ", SortId = 1 });
-            detailTitles.Add("UserName", new Api.ReportController.TitleModel { Name = "  UserName  ", SortId = 2 });
-            detailTitles.Add("Currency", new Api.ReportController.TitleModel { Name = "  Currency  ", SortId = 3 });
-            detailTitles.Add("RegisteredDate", new Api.ReportController.TitleModel { Name = "  Registered Date  ", SortId = 4 });
-            detailTitles.Add("SignupUrl", new Api.ReportController.TitleModel { Name = "  Signup Url  ", SortId = 5 });
-            detailTitles.Add("AffCode", new Api.ReportController.TitleModel { Name = "  AFF Code  ", SortId = 6 });
-            detailTitles.Add("TotalDepositAmount", new Api.ReportController.TitleModel { Name = "  Total Deposit Amount  ", SortId = 7 });
-            detailTitles.Add("TotalWithdrawalAmount", new Api.ReportController.TitleModel { Name = "  Total Withdrawal Amount  ", SortId = 8 });
-            detailTitles.Add("TotalBonusAmountClaimed", new Api.ReportController.TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 9 });
-           
+
+            summaryBonusCodeTitles.Add("BonusCode", new TitleModel { Name = "  Bonus Code  ", SortId = 1 });
+            summaryBonusCodeTitles.Add("Currency", new TitleModel { Name = "  Currency  ", SortId = 2 });
+            summaryBonusCodeTitles.Add("BonusName", new TitleModel { Name = "  Bonus Name  ", SortId = 3 });
+            summaryBonusCodeTitles.Add("NoOfUsersClaimingBonus", new TitleModel { Name = "  No. of Users Claiming Bonus  ", SortId = 4 });
+            summaryBonusCodeTitles.Add("TotalBonusAmountClaimed_Detail", new TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 5 });
+            summaryBonusCodeTitles.Add("TotalBonusAmountClaimed_Base", new TitleModel { Name = "  Total Bonus Amount Claimed (Base)  ", SortId = 6 });
+
+            detailTitles.Add("BonusCode", new TitleModel { Name = "Bonus Code  ", SortId = 1 });
+            detailTitles.Add("UserName", new TitleModel { Name = "  UserName  ", SortId = 2 });
+            detailTitles.Add("Currency", new TitleModel { Name = "  Currency  ", SortId = 3 });
+            detailTitles.Add("RegisteredDate", new TitleModel { Name = "  Registered Date  ", SortId = 4 });
+            detailTitles.Add("SignupUrl", new TitleModel { Name = "  Signup Url  ", SortId = 5 });
+            detailTitles.Add("AffCode", new TitleModel { Name = "  AFF Code  ", SortId = 6 });
+            detailTitles.Add("TotalDepositAmount", new TitleModel { Name = "  Total Deposit Amount  ", SortId = 7 });
+            detailTitles.Add("TotalWithdrawalAmount", new TitleModel { Name = "  Total Withdrawal Amount  ", SortId = 8 });
+            detailTitles.Add("TotalBonusAmountClaimed", new TitleModel { Name = "  Total Bonus Amount Claimed  ", SortId = 9 });
+
             #endregion
 
             #region Total Title
 
             var totalTitle = new List<string>
             {
-                
+
             };
-            
+
             #endregion
-            
+
             #region Not Summary Title
 
             var notSummaryTitles = new List<string>
@@ -510,14 +546,14 @@ namespace BackendSite.Controllers.ApiV2.Report
             #endregion
 
             #region Summary Content Add
-            
+
             foreach (var item in exportData.GroupByCurrency)
             {
-                
+
                 #region Summary Find Define
 
                 var getSummaryKey = $"{item.CurrencyId}";
-                
+
                 #endregion
 
                 #region Summary Content Add
@@ -534,9 +570,9 @@ namespace BackendSite.Controllers.ApiV2.Report
                     newItem.Add("%Change", $"{decimal.ToInt32(item.ChangeRate)}%");
                 }
                 summaryContent.Add(newItem);
-                
+
                 #endregion
-                
+
             }
 
             foreach (var item in exportData.GroupByBonusCode)
@@ -551,7 +587,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                     { "TotalBonusAmountClaimed_Detail", item.GroupInfo.BonusAmountClaim }
                 };
                 summaryBonusCodeContent.Add(newItem);
-                
+
                 foreach (var child in item.Children)
                 {
                     var childItem = new Dictionary<string, dynamic>()
@@ -584,9 +620,9 @@ namespace BackendSite.Controllers.ApiV2.Report
                 };
                 detailContent.Add(newItem);
             }
-            
+
             #endregion
-            
+
             var d = new List<ComplexReportExportDataToExcel>()
             {
                 new ComplexReportExportDataToExcel()

@@ -9,7 +9,7 @@ namespace BackendSite.Service.Model
         public string Name { get; set; }
     }
     public class GetDeepLinkReq
-    { 
+    {
         public int SiteId { get; set; }
         public int DeepLinkId { get; set; }
     }

@@ -20,9 +20,9 @@ namespace BackendSite.Service.Model.Mpa.Marketing
     public class WithdrawalAmountDetailData
     {
         [JsonIgnore]
-         public int Num { get; set; }
+        public int Num { get; set; }
 
-         public string UserName { get; set; }
+        public string UserName { get; set; }
 
         public string CurrencyName { get; set; }
 

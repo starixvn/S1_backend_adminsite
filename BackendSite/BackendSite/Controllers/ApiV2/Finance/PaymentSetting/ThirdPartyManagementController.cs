@@ -2,6 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,19 +42,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             public int CurrencyId { get; set; }
             public int ChannelId { get; set; }
         }
-        
+
         public class GetPayListRequest
         {
             public int SiteId { get; set; }
         }
-        
+
         public class SetPayListStatusRequest
         {
             public int SiteId { get; set; }
             public int PayId { get; set; }
             public PayListStatusEnum Status { get; set; }
         }
-        
+
         public class SetPayListLoginInfoRequest
         {
             public int SiteId { get; set; }
@@ -65,20 +66,24 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             public string LoginPin { get; set; }
             public string CorporateId { get; set; }
         }
-        
+
         public class UpdateBankInfoByPayIdRequest
         {
             public int SiteId { get; set; }
             public int PayId { get; set; }
 
             public int SysId { get; set; }
+            /// <summary>
+            /// 1=Deposit、2=Withdrawal
+            /// </summary>
+            public BankInfoPayMethodEnum Method { get; set; }
 
             /// <summary>
             /// 狀態(1=Enable、2=Disable)
             /// </summary>
             public BankInfoPayStatusEnum Status { get; set; }
         }
-        
+
         public class SetCryptoInfoStatusRequest
         {
             public CryptoCurrencyEnum CurrencyId { get; set; }
@@ -104,7 +109,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             var authData = _authorizeBll.GetAuthData();
             var success = _paymentManageBll.UpdatePaySetting(request, authData.UserName);
-            
+
             return new ApiResult
             {
                 ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
@@ -116,32 +121,32 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             var authData = _authorizeBll.GetAuthData();
             var success = _paymentManageBll.UpdatePaySettingStatus(request, authData.UserName);
-            
+
             return new ApiResult
             {
                 ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
-        
+
         [HttpPost]
         public ApiResult SetPaySettingChargeFee(UpdatePaySettingChargeFeeParams request)
         {
             var authData = _authorizeBll.GetAuthData();
             var success = _paymentManageBll.UpdatePaySettingChargeFee(request, authData.UserName);
-            
+
             return new ApiResult
             {
                 ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
-        
+
         [HttpPost]
         public ApiResult GetPayList(GetPayListRequest request)
         {
             var result = _paymentManageBll.GetPayList(request.SiteId)
                 .Where(x => x.PayStatus == PayListStatusEnum.Enable);
 
-            if (_permissionBll.CheckPermission(39, new []{15}))
+            if (_permissionBll.CheckPermission(39, new[] { 15 }))
             {
                 foreach (var d in result)
                 {
@@ -156,7 +161,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             return new ApiResult<IEnumerable<PayListInfo>>
             {
                 Data = result,
-                ErrorCode = (int) ErrorCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
 
@@ -165,13 +170,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             var authData = _authorizeBll.GetAuthData();
             var success = _paymentManageBll.SetPayListStatus(request.SiteId, request.PayId, request.Status, authData.UserName);
-            
+
             return new ApiResult
             {
                 ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
-        
+
         [HttpPost]
         public ApiResult SetPayListLoginInfo(SetPayListLoginInfoRequest request)
         {
@@ -188,7 +193,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                 CorporateId = _cryptor.Encrypt(request.CorporateId),
                 Operator = authData.UserName
             });
-            
+
             return new ApiResult
             {
                 ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
@@ -201,7 +206,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             var result =
                 _paymentManageBll.GetBankInfoPayForSetting(request.SiteId, request.CurrencyId, request.ChannelId);
 
-            return new ApiResult<IEnumerable<PayListBankInfoSys>>
+            return new ApiResult<IEnumerable<BankInfoPayForSetting>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
@@ -213,14 +218,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             var authData = _authorizeBll.GetAuthData();
             var result = _paymentManageBll
-                .UpdateBankInfo(request.SiteId, request.PayId, request.SysId, request.Status, authData.UserName);
+                .UpdateBankInfo(request.SiteId, request.PayId, request.SysId, request.Status, request.Method, authData.UserName);
 
             return new ApiResult
             {
                 ErrorCode = (int)(result ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
-        
+
         [HttpPost]
         public ApiResult GetCryptoInfoList()
         {
@@ -230,10 +235,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             return new ApiResult<IEnumerable<CryptoInfo>>
             {
                 Data = result,
-                ErrorCode = (int) ErrorCodeEnum.Success
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         public ApiResult SetCryptoInfoStatus(SetCryptoInfoStatusRequest request)
         {

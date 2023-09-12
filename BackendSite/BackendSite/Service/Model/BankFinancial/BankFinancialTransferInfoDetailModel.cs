@@ -7,7 +7,7 @@ namespace BackendSite.Service.Model.BankFinancial
         private DateTimeOffset _transDate { get; set; }
         private DateTimeOffset _createTime { get; set; }
         private DateTimeOffset _updateTime { get; set; }
-        
+
         /// <summary>
         /// 讀寫 識別值ID
         /// </summary>
@@ -41,7 +41,7 @@ namespace BackendSite.Service.Model.BankFinancial
             get => _transDate;
             set => _transDate = new DateTimeOffset(value.DateTime, TimeSpan.Zero);
         }
-        
+
         /// <summary>
         /// 讀寫 付款方式
         /// </summary>
@@ -86,7 +86,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 幣別名稱
         /// </summary>
         public string IsoCode { get; set; }
-        
+
         /// <summary>
         /// 讀寫 銀行ID
         /// </summary>
@@ -149,7 +149,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 資料最近更新時間
         /// </summary>
-        public DateTimeOffset UpdateTime 
+        public DateTimeOffset UpdateTime
         {
             get => _updateTime;
             set => _updateTime = new DateTimeOffset(value.DateTime, TimeSpan.Zero);

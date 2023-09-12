@@ -8,6 +8,6 @@ namespace BackendSite.Service.DAL.Interface
 
         Task<int> SetSocialSort(SetSocialSortDto setSocialSort);
 
-        Task<int> SetSocialData(SetSocialDataRequest request,string lastUpdateUser);
+        Task<int> SetSocialData(SetSocialDataRequest request, string lastUpdateUser);
     }
 }

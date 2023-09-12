@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -130,6 +131,14 @@ namespace BackendSite.Service.BLL
                 {
                     result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.TpId });
                 });
+
+                //因 SBO Sports、 SBO Virtual Sports 的 PromoCategoryId 相同造成前端元件Bind資料會有問題
+                //故HardCode 移除重複選項，只保留一組 SBO 選單內容
+                if (categoryId == (int)PromotionCategoryEnum.Sports)
+                {
+                    result = result.Where(r => r.Key != 42).ToList();
+                    result.Add(new GetCashBackGamerep { GameName = "SBO Sports", Key = 42 });
+                }
             }
             else
             {
@@ -221,20 +230,20 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.GetPromotionType(isPayout, isNew);
         }
-        
-        public int SetBonusCustUsingInfo(int siteId ,string bonusCode ,string creator)
+
+        public int SetBonusCustUsingInfo(int siteId, string bonusCode, string creator)
         {
             return _bonusManageService.SetBonusCustUsingInfo(siteId, bonusCode, creator);
         }
-        
+
         public bool SetBonusCustUsingDetail(List<BonusCustUsing> list)
         {
             return _bonusManageService.SetBonusCustUsingDetail(list);
         }
-        
+
         public IEnumerable<BonusCustUsingList> GetBonusCustUsingDetail(int siteId, string bonusCode)
         {
-            return _bonusManageService.GetBonusCustUsingDetail(siteId , bonusCode);
+            return _bonusManageService.GetBonusCustUsingDetail(siteId, bonusCode);
         }
     }
 

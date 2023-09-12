@@ -11,6 +11,7 @@
     {
         public DateTime Date { get; set; }
         public decimal DepositAmount { get; set; }
+        public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public int CustId { get; set; }
     }
@@ -26,7 +27,7 @@
     }
 
 
-    public class MpaMarketingDepositSignUpSummaryDto: IMpaMarketingDepositSignUpBaseDto
+    public class MpaMarketingDepositSignUpSummaryDto : IMpaMarketingDepositSignUpBaseDto
     {
         public DateTime Date { get; set; }
 
@@ -58,6 +59,8 @@
 
         public string UserName { get; set; }
 
+        public int SiteId { get; set; }
+
         public int CurrencyId { get; set; }
 
         public decimal DepositAmount { get; set; }
@@ -65,7 +68,7 @@
         public decimal FirstDepositAmount { get; set; }
 
         public int DepositCount { get; set; }
-        
+
         public int FirstDepositCount { get; set; }
 
         public string AffCode { get; set; }

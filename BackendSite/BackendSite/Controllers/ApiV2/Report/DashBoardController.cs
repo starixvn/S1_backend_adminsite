@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,7 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public int BaseCurrencyId { get; set; }
-            
+
             [Range(-12, 14)]
             public int TimeZone { get; set; }
         }

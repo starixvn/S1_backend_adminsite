@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model;
+
 using NUnit.Framework;
 
 namespace BackendSiteTests.Service.Model
@@ -13,7 +14,7 @@ namespace BackendSiteTests.Service.Model
         {
             _checkPayoutBonusCodeData = new CheckPayoutBonusCodeData
             {
-                TierAmount ="[{\"Bonus\":100,\"MaxBonus\":100,\"RequiredAmount\":100},{\"Bonus\":200,\"MaxBonus\":200,\"RequiredAmount\":200},{\"Bonus\":300,\"MaxBonus\":300,\"RequiredAmount\":300}]"
+                TierAmount = "[{\"Bonus\":100,\"MaxBonus\":100,\"RequiredAmount\":100},{\"Bonus\":200,\"MaxBonus\":200,\"RequiredAmount\":200},{\"Bonus\":300,\"MaxBonus\":300,\"RequiredAmount\":300}]"
             };
         }
 

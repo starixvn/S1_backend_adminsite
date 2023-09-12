@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.enums;
-using BackendSite.Attributes;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -19,7 +20,7 @@ namespace BackendSite.Service.Model
         public string DisplayKey { get; set; }
         public string FuncKey { get; set; }
         public bool Enable { get; set; }
-        
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<SubFunctionKey> SubFuncKeys { get; set; }
 
@@ -117,8 +118,8 @@ namespace BackendSite.Service.Model
         public int UserId { get; set; }
         public int SiteId { get; set; }
     }
-    public class UserAllPremission 
-    { 
+    public class UserAllPremission
+    {
         public int MenuId { get; set; }
         public List<int> Permission { get; set; }
     }

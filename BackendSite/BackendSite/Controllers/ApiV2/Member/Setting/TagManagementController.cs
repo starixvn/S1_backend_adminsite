@@ -5,6 +5,7 @@ using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
     public class TagManagementController : ControllerBase
     {
         #region Fields
-        
+
         private readonly CustInfoBLL _custInfoBll;
         private readonly ITagBLL _tagBll;
 
@@ -29,17 +30,17 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         #endregion
 
         #region Constructor
-        
+
 
         #endregion
 
         #region Model
-        
+
         public class GetTagDataReq : ApiRequestPageModel
         {
             public int Status { get; set; }
         }
-        
+
         #endregion
 
         #region CSD > TagMamagement
@@ -95,7 +96,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             }
             catch (Exception ex)
             {
-                apiResult.ErrorCode = (int) ErrorCodeEnum.SystemException;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
                 apiResult.Message = ex.Message;
             }
 

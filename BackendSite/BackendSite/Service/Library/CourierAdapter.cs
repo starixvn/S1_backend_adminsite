@@ -1,10 +1,12 @@
-﻿using BackendSite.Service.Model;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 
+using BackendSite.Service.Model;
+
+using Newtonsoft.Json;
+
 namespace BackendSite.Service.Library
-{ 
+{
     public class CourierAdapter
     {
         private readonly ILogger<CourierAdapter> _logger;
@@ -45,7 +47,7 @@ namespace BackendSite.Service.Library
                 throw;
             }
         }
-        
+
         public async Task<TResponse> PostAsync<TResponse, TRequest>(string url, TRequest request, int timeout = 0)
         {
             try
@@ -60,17 +62,17 @@ namespace BackendSite.Service.Library
                 {
                     client.Timeout = TimeSpan.FromSeconds(timeout);
                 }
-                
+
                 _logger.LogInformation($"url:{url}, request:{jsonReq}");
                 using var response = await client.PostAsync(url, content);
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     var responseBody = await response.Content.ReadAsStringAsync();
                     _logger.LogInformation($"response:{responseBody}");
                     result = JsonConvert.DeserializeObject<TResponse>(responseBody);
                 }
-                
+
                 return result;
 
             }

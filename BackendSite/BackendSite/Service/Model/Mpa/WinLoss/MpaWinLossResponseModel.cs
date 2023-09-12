@@ -538,10 +538,10 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         [JsonProperty(Order = 11)]
         public decimal Margin { get; set; }
 
-        [JsonProperty(Order = 12)] 
+        [JsonProperty(Order = 12)]
         public decimal ClosingBalance => 0.0m;
 
-        [JsonProperty(Order = 13)] 
+        [JsonProperty(Order = 13)]
         public int DepositCount => 0;
 
         [JsonProperty(Order = 14)]

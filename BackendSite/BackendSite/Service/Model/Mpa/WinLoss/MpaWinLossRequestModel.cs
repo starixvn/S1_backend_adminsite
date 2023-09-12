@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss
@@ -87,6 +88,16 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         /// 玩家類型，一般、代理、值播主
         /// </summary>
         public IEnumerable<MemberTypeEnum> MemberTypes { get; set; }
+
+        /// <summary>
+        /// 是否包含測試資料
+        /// </summary>
+        public bool IncludeTest { get; set; }
+
+        /// <summary>
+        /// 各個TpCategory
+        /// </summary>
+        public IEnumerable<int> TpCategorys { get; set; }
 
         public string MemberTypeJson()
         {

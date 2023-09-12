@@ -20,7 +20,7 @@ namespace BackendSite.Service.Model
 
         public string StatusName => Status.ToString();
     }
-    
+
     public class DeleteDisableUser
     {
         [LogIgnore]
@@ -43,7 +43,7 @@ namespace BackendSite.Service.Model
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
     }
-    
+
     public class TpDisableUser
     {
         public int SiteId { get; set; }
@@ -76,7 +76,7 @@ namespace BackendSite.Service.Model
         public int TpId { set; get; }
         public string TpName { set; get; }
     }
-    
+
     public class RiskTpListInfo
     {
         public int TpId { set; get; }
@@ -84,14 +84,14 @@ namespace BackendSite.Service.Model
         public List<TpGameCasino> GameList { set; get; }
         public bool Checked { set; get; }
     }
-    
+
     public class TpGameCasino
     {
         public string GameId { get; set; }
         public string Name { get; set; }
         public bool Checked { get; set; }
     }
-    
+
     public class GameCasinoDataV3
     {
         public int GameCasinoId { get; set; }

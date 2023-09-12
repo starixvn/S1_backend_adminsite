@@ -1,15 +1,13 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
+using BackendSite.Extensions;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
-using K4os.Compression.LZ4.Internal;
-using BackendSite.Extensions;
-using Newtonsoft.Json;
-using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
-using System.Security.Policy;
+
+using Dapper;
 
 namespace BackendSite.Service.DAL
 {
@@ -228,8 +226,8 @@ namespace BackendSite.Service.DAL
             await using var trans = await conn.BeginTransactionAsync();
 
             var sp = string.Empty;
-            
-            foreach(var x in input.After.Detail)
+
+            foreach (var x in input.After.Detail)
             {
                 var p = new DynamicParameters();
                 switch (input.After.Type)

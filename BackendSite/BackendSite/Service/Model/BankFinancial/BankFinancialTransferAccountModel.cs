@@ -51,7 +51,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 第三方支付ID
         /// </summary>
         public int? PayId { get; set; }
-        
+
         public CryptoCurrencyEnum? CryptoCurrencyId { get; set; }
         public NetworkTypeEnum? Network { get; set; }
 
@@ -64,7 +64,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶名稱
         /// </summary>
         public string AccountName { get; set; }
-        
+
         /// <summary>
         /// 目前只 for INR IFSC. 使用
         /// </summary>
@@ -81,7 +81,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 帳戶顯示名稱
         /// </summary>
         public string DisplayName { get; set; }
-        
+
         public string FrontendDisplayName { get; set; }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 資料建立時間
         /// </summary>
-        public DateTimeOffset CreateTime 
+        public DateTimeOffset CreateTime
         {
             get => _createTime;
             set => _createTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
@@ -131,7 +131,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 資料最近更新時間
         /// </summary>
-        public DateTimeOffset UpdateTime 
+        public DateTimeOffset UpdateTime
         {
             get => _updateTime;
             set => _updateTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);

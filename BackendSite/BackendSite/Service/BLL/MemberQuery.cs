@@ -4,7 +4,9 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.Extensions.Options;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -54,6 +56,8 @@ namespace BackendSite.Service.BLL
             var email = string.IsNullOrEmpty(request.Email) ? null : request.Email;
             var phoneNo = string.IsNullOrEmpty(request.PhoneNo) ? null : request.PhoneNo;
             var bankAccountNumber = string.IsNullOrEmpty(request.BankAccountNumber) ? null : request.BankAccountNumber;
+            var eWalletAccountNumber = string.IsNullOrEmpty(request.EWalletAccountNumber) ? null : request.EWalletAccountNumber;
+            var cryptoAddress = string.IsNullOrEmpty(request.CryptoAddress) ? null : request.CryptoAddress;
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
@@ -62,6 +66,7 @@ namespace BackendSite.Service.BLL
 
             var memberList = await _memberService.GetList(request.SiteId, currencyList, statusList, request.Identity,
                 userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo, bankAccountNumber,
+                eWalletAccountNumber, cryptoAddress,
                 affiliateCode, transType, request.TransId, request.ShieldLevel, request.IovationLevel, deviceId, userTypes,
                 request.DateType, startTime, endTime, request.PageNumber, request.PageSize, request.ExcludeTag);
             var pointLevelInfo = await _marketingService.GetPointLevelInfos(request.SiteId);
@@ -113,7 +118,7 @@ namespace BackendSite.Service.BLL
             // 先全部用UserName排序
             var result = source.OrderBy(i => i.UserName).ToList();
             // 檢查是否有完全符合的UserName
-            var index = result.FindIndex(x => x.UserName == userName);           
+            var index = result.FindIndex(x => x.UserName == userName);
             if (index != -1)
             {
                 var item = result[index];
@@ -144,6 +149,8 @@ namespace BackendSite.Service.BLL
             var email = string.IsNullOrEmpty(request.Email) ? null : request.Email;
             var phoneNo = string.IsNullOrEmpty(request.PhoneNo) ? null : request.PhoneNo;
             var bankAccountNumber = string.IsNullOrEmpty(request.BankAccountNumber) ? null : request.BankAccountNumber;
+            var eWalletAccountNumber = string.IsNullOrEmpty(request.EWalletAccountNumber) ? null : request.EWalletAccountNumber;
+            var cryptoAddress = string.IsNullOrEmpty(request.CryptoAddress) ? null : request.CryptoAddress;
             var affiliateCode = string.IsNullOrEmpty(request.AffiliateCode) ? null : request.AffiliateCode;
             var deviceId = string.IsNullOrEmpty(request.DeviceId) ? null : request.DeviceId;
             var transType = GetTransType(request.TransId);
@@ -152,7 +159,7 @@ namespace BackendSite.Service.BLL
 
             var memberList = await _memberService.GetExportData(request.SiteId, currencyList, statusList,
                 request.Identity, userName, tagList, vipList, accountName, affiliateName, tpUserName, loginIp, email, phoneNo,
-                bankAccountNumber, affiliateCode, transType, request.TransId, request.ShieldLevel,
+                bankAccountNumber, eWalletAccountNumber, cryptoAddress, affiliateCode, transType, request.TransId, request.ShieldLevel,
                 request.IovationLevel, deviceId, userTypes, request.DateType, startTime, endTime, request.ExcludeTag);
             var allTagList = await _tagBll.GetAllTag();
             var data = memberList.Select(a => new MemberExportData()

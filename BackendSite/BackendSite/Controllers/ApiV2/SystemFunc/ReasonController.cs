@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,7 +43,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiListResult<ReasonManagementData> GetList(GetReasonManagementDataPara request)
         {
             var searchResult = _reasonManagementBll.GetReasonManagementData(request);
-            
+
             return new ApiListResult<ReasonManagementData>
             {
                 Data = searchResult.ReasonManagementData,
@@ -71,7 +72,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             return new ApiResult
             {
-                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+                ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
                 Message = msg
             };
         }
@@ -91,10 +92,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var authData = _authorizeBll.GetAuthData();
             var (success, msg) = _reasonManagementBll.InsertReasonManagement(request, authData.UserId);
-            
+
             return new ApiResult
             {
-                ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+                ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
                 Message = msg
             };
         }

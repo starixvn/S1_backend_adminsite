@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+
+using Newtonsoft.Json;
+
 using RabbitMQ.Client;
-using System.Text;
 
 namespace BackendSite.Service.BLL
 {

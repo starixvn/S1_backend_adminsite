@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.Model;
+﻿using System.Security.Claims;
+
+using BackendSite.Service.Model;
+
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BackendSite.Controllers.ApiV2
 {

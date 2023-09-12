@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -26,7 +27,7 @@ namespace BackendSite.Service.BLL
         }
         public int SetGameCasinoDetail(SetGameCasinoPara para)
         {
-            return gameCasinoManageService.SetGameCasinoDetail(para);          
+            return gameCasinoManageService.SetGameCasinoDetail(para);
         }
         public int InsertGameCasinoDetail(InsertGameCasinoPara para)
         {
@@ -37,7 +38,7 @@ namespace BackendSite.Service.BLL
             return gameCasinoManageService.DeleteGameCasinoDetail(para);
         }
 
-        public IEnumerable<SiteTpListIfo>  GetTpList()
+        public IEnumerable<SiteTpListIfo> GetTpList()
         {
             return gameCasinoManageService.GetTpList();
         }
@@ -72,7 +73,7 @@ namespace BackendSite.Service.BLL
             var result = new List<GameCasinoDetailBySite>();
             //這個GameCasinoId是屬於哪個TP,哪個Currency有這個TP
             var currencyData = gameCasinoManageService.GetCurrency(para);
-            
+
             siteList.ForEach(x =>
             {
                 //先清空
@@ -125,7 +126,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        public void AddLog(string menu, ActionType actionType, string detailInfo,string user)
+        public void AddLog(string menu, ActionType actionType, string detailInfo, string user)
         {
             var addAdminOperateLog = new AddAdminOperateLog
             {

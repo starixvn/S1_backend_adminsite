@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.BLL;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -24,7 +25,7 @@ namespace BackendSite.Attributes
         }
         public void OnAuthorization(AuthorizationFilterContext filterContext)
         {
-            if(MenuId != 0 && PermissionId != 0)
+            if (MenuId != 0 && PermissionId != 0)
             {
                 var brand = _newAuthorizeBll.CheckBrand();
                 if (brand != 0)
@@ -38,21 +39,21 @@ namespace BackendSite.Attributes
                         {
                             if (loginUser.Status == 0)
                             {
-                                filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                                filterContext.Result = RedirectToLogin();
                             }
                             else
                             {
                                 var permissions = _permissionBll.GetUserPermissionByMenuId(MenuId);
-                                
+
                                 if (permissions == null)
                                 {
-                                    filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                                    filterContext.Result = RedirectToLogin();
                                 }
                                 else
                                 {
                                     if (!permissions.Contains(PermissionId))
                                     {
-                                        filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                                        filterContext.Result = RedirectToLogin();
                                     }
                                 }
                             }
@@ -60,19 +61,24 @@ namespace BackendSite.Attributes
                     }
                     else
                     {
-                        filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                        filterContext.Result = RedirectToLogin();
                     }
                 }
                 else
                 {
-                    filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                    filterContext.Result = RedirectToLogin();
                 }
 
             }
             else
             {
-                filterContext.Result = new RedirectResult("~/Home/AuthorizedFailed");
+                filterContext.Result = RedirectToLogin();
             }
+        }
+
+        private RedirectResult RedirectToLogin()
+        {
+            return new RedirectResult("/login");
         }
     }
 }

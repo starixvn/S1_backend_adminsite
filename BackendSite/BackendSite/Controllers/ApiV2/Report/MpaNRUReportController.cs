@@ -1,15 +1,18 @@
-﻿using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Text;
+
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using BackendSite.Attributes;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {
@@ -19,7 +22,7 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class MpaNRUReportController : ControllerBase
     {
         #region Fields
-        
+
         private readonly MpaNRUBLL _mpaNRUBll;
         private readonly ExcelBLL _excelBll;
         private readonly ReportExcelBLL _reportExcelBll;
@@ -55,7 +58,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             }
             public bool IsCompared { get; set; }
         }
-        
+
         public class GetMarketingNRUDataRequest : IsComparedRequest
         {
             private DateTimeOffset _startDate { get; set; }
@@ -147,50 +150,50 @@ namespace BackendSite.Controllers.ApiV2.Report
             #endregion
         }
 
-        #endregion 
-        
+        #endregion
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiResult GetMpaNRUReport(GetMarketingNRUDataRequest request)
         {
             var result = _mpaNRUBll.GetMpaMarketingNRU(request);
-            
+
             return new ApiResult<NRUReportData>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiResult GetMpaNRUBonusReport(GetMarketingNRUDataRequest request)
         {
             var result = _mpaNRUBll.GetMpaMarketingNRUBonus(request);
-            
+
             return new ApiResult<List<MpaMarketingNRUBonus>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 1 })]
         public ApiListResult<MpaMarketingNRUBonusDetail> GetMpaNRUBonusDetailReport(GetMarketingNRUBonusDetailRequest request)
         {
             var result = _mpaNRUBll.GetMpaMarketingNRUBonusDetail(request, out var pageInfo);
-            
+
             return new ApiListResult<MpaMarketingNRUBonusDetail>(ErrorCodeEnum.Success, pageInfo, result);
         }
-        
+
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 140, 2 })]
         public IActionResult Export(GetMarketingNRUDataRequest request)
         {
             #region Get Data
-            
+
             var sumResult = _mpaNRUBll.GetMpaMarketingNRU(request);
-            
+
             var bonusResult = _mpaNRUBll.GetMpaMarketingNRUBonus(request);
 
             var bonusDetailRequest = new GetMarketingNRUBonusDetailRequest
@@ -206,17 +209,17 @@ namespace BackendSite.Controllers.ApiV2.Report
                 OrderByDirection = OrderByDirection.Ascending
             };
             var bonusDetailResult = _mpaNRUBll.GetMpaMarketingNRUBonusDetail(bonusDetailRequest, out _);
-            
+
             #endregion
 
             #region Initial Param
-            
+
             var summaryTitlesToMerge = new List<Dictionary<string, MergeTitleModel>>();
-           
-            var summaryTitles = new Dictionary<string, Api.ReportController.TitleModel>();
-            var summarySignupUrlTitles = new Dictionary<string, Api.ReportController.TitleModel>();
-            var summaryBonusCodeTitles = new Dictionary<string, Api.ReportController.TitleModel>();
-            var summaryBonusCodeDetailTitles = new Dictionary<string, Api.ReportController.TitleModel>();
+
+            var summaryTitles = new Dictionary<string, TitleModel>();
+            var summarySignupUrlTitles = new Dictionary<string, TitleModel>();
+            var summaryBonusCodeTitles = new Dictionary<string, TitleModel>();
+            var summaryBonusCodeDetailTitles = new Dictionary<string, TitleModel>();
 
             var summaryContent = new List<Dictionary<string, dynamic>>();
             var summarySignupUrlContent = new List<Dictionary<string, dynamic>>();
@@ -228,7 +231,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             #region Set Title(Title & Total Title & Merge Title & Not Summary Title)
 
             #region Titles To Merge
-            
+
             var mergeTitles = new Dictionary<string, MergeTitleModel>
             {
                 {"FirstMergeTitle", new MergeTitleModel { Name = $"Newly Registered Users, {request.StartDate.ToString("yyyy-MM-dd")} - {request.EndDate.ToString("yyyy-MM-dd")} , View in {Enum.GetName(typeof(CurrencyEnum), request.BaseCurrencyId)}", MergeRange = 9 }}
@@ -238,37 +241,37 @@ namespace BackendSite.Controllers.ApiV2.Report
             #endregion
 
             #region Title
-            
-            summaryTitles.Add("Total", new Api.ReportController.TitleModel { Name = " Total ", SortId = 1 });
-            summaryTitles.Add("SumNRU", new Api.ReportController.TitleModel { Name = " NRU ", SortId = 2 });
+
+            summaryTitles.Add("Total", new TitleModel { Name = " Total ", SortId = 1 });
+            summaryTitles.Add("SumNRU", new TitleModel { Name = " NRU ", SortId = 2 });
             if (request.IsCompared)
             {
-                summaryTitles.Add("CompareNRU", new Api.ReportController.TitleModel { Name = " Compare NRU ", SortId = 3 });
-                summaryTitles.Add("%Change", new Api.ReportController.TitleModel { Name = "  % Change  ", SortId = 4 });
+                summaryTitles.Add("CompareNRU", new TitleModel { Name = " Compare NRU ", SortId = 3 });
+                summaryTitles.Add("%Change", new TitleModel { Name = "  % Change  ", SortId = 4 });
             }
-           
-            summarySignupUrlTitles.Add("SignupUrl", new Api.ReportController.TitleModel { Name = " Signup Url ", SortId = 1 });
-            summarySignupUrlTitles.Add("NRU", new Api.ReportController.TitleModel { Name = " NRU ", SortId = 2 });
-            summarySignupUrlTitles.Add("Deposit", new Api.ReportController.TitleModel { Name = " Deposit ", SortId = 3 });
-            summarySignupUrlTitles.Add("FirstDepositAmount", new Api.ReportController.TitleModel { Name = "First Deposit Amount", SortId = 4 });
-            summarySignupUrlTitles.Add("TotalDepositAmount", new Api.ReportController.TitleModel { Name = "Total Deposit Amount", SortId = 5 });
 
-            summaryBonusCodeTitles.Add("BonusCode", new Api.ReportController.TitleModel { Name = "Bonus Code ", SortId = 1 });
-            summaryBonusCodeTitles.Add("BonusName", new Api.ReportController.TitleModel { Name = " Bonus Name ", SortId = 2 });
-            summaryBonusCodeTitles.Add("NRU", new Api.ReportController.TitleModel { Name = "  NRU  ", SortId = 3 });
-            summaryBonusCodeTitles.Add("Deposit", new Api.ReportController.TitleModel { Name = "Deposit", SortId = 4 });
-            summaryBonusCodeTitles.Add("FirstDepositAmount", new Api.ReportController.TitleModel { Name = " First Deposit Amount ", SortId = 5 });
-            summaryBonusCodeTitles.Add("TotalDepositAmount", new Api.ReportController.TitleModel { Name = " Total Deposit Amount ", SortId = 6 });
-            
-            summaryBonusCodeDetailTitles.Add("BonusCode", new Api.ReportController.TitleModel { Name = " Bonus Code ", SortId = 1 });
-            summaryBonusCodeDetailTitles.Add("UserName", new Api.ReportController.TitleModel { Name = " User Name ", SortId = 2 });
-            summaryBonusCodeDetailTitles.Add("Currency", new Api.ReportController.TitleModel { Name = " Currency ", SortId = 3 });
-            summaryBonusCodeDetailTitles.Add("RegisteredDate", new Api.ReportController.TitleModel { Name = " Registered Date ", SortId = 4 });
-            summaryBonusCodeDetailTitles.Add("SignupUrl", new Api.ReportController.TitleModel { Name = " Signup Url ", SortId = 5 });
-            summaryBonusCodeDetailTitles.Add("AffCode", new Api.ReportController.TitleModel { Name = " AFF Code ", SortId = 6 });
-            summaryBonusCodeDetailTitles.Add("Deposit", new Api.ReportController.TitleModel { Name = "Deposit", SortId = 7 });
-            summaryBonusCodeDetailTitles.Add("FirstDepositAmount", new Api.ReportController.TitleModel { Name = " First Deposit Amount ", SortId = 8 });
-            summaryBonusCodeDetailTitles.Add("TotalDepositAmount", new Api.ReportController.TitleModel { Name = " Total Deposit Amount ", SortId = 9 });
+            summarySignupUrlTitles.Add("SignupUrl", new TitleModel { Name = " Signup Url ", SortId = 1 });
+            summarySignupUrlTitles.Add("NRU", new TitleModel { Name = " NRU ", SortId = 2 });
+            summarySignupUrlTitles.Add("Deposit", new TitleModel { Name = " Deposit ", SortId = 3 });
+            summarySignupUrlTitles.Add("FirstDepositAmount", new TitleModel { Name = "First Deposit Amount", SortId = 4 });
+            summarySignupUrlTitles.Add("TotalDepositAmount", new TitleModel { Name = "Total Deposit Amount", SortId = 5 });
+
+            summaryBonusCodeTitles.Add("BonusCode", new TitleModel { Name = "Bonus Code ", SortId = 1 });
+            summaryBonusCodeTitles.Add("BonusName", new TitleModel { Name = " Bonus Name ", SortId = 2 });
+            summaryBonusCodeTitles.Add("NRU", new TitleModel { Name = "  NRU  ", SortId = 3 });
+            summaryBonusCodeTitles.Add("Deposit", new TitleModel { Name = "Deposit", SortId = 4 });
+            summaryBonusCodeTitles.Add("FirstDepositAmount", new TitleModel { Name = " First Deposit Amount ", SortId = 5 });
+            summaryBonusCodeTitles.Add("TotalDepositAmount", new TitleModel { Name = " Total Deposit Amount ", SortId = 6 });
+
+            summaryBonusCodeDetailTitles.Add("BonusCode", new TitleModel { Name = " Bonus Code ", SortId = 1 });
+            summaryBonusCodeDetailTitles.Add("UserName", new TitleModel { Name = " User Name ", SortId = 2 });
+            summaryBonusCodeDetailTitles.Add("Currency", new TitleModel { Name = " Currency ", SortId = 3 });
+            summaryBonusCodeDetailTitles.Add("RegisteredDate", new TitleModel { Name = " Registered Date ", SortId = 4 });
+            summaryBonusCodeDetailTitles.Add("SignupUrl", new TitleModel { Name = " Signup Url ", SortId = 5 });
+            summaryBonusCodeDetailTitles.Add("AffCode", new TitleModel { Name = " AFF Code ", SortId = 6 });
+            summaryBonusCodeDetailTitles.Add("Deposit", new TitleModel { Name = "Deposit", SortId = 7 });
+            summaryBonusCodeDetailTitles.Add("FirstDepositAmount", new TitleModel { Name = " First Deposit Amount ", SortId = 8 });
+            summaryBonusCodeDetailTitles.Add("TotalDepositAmount", new TitleModel { Name = " Total Deposit Amount ", SortId = 9 });
 
             #endregion
 
@@ -276,11 +279,11 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             var totalTitle = new List<string>
             {
-                
+
             };
-            
+
             #endregion
-            
+
             #region Not Summary Title
 
             var notSummaryTitles = new List<string>
@@ -293,7 +296,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             #endregion
 
             #region Summary Content Add
-            
+
             var newItem = new Dictionary<string, dynamic>()
             {
                 { "Total", "NRU" },
@@ -305,7 +308,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 newItem.Add("%Change", $"{decimal.ToInt32(sumResult.SummaryData.ChangeRate)}%");
             }
             summaryContent.Add(newItem);
-            
+
             foreach (var item in sumResult.SignUpDataSum)
             {
                 if (item.Children != null)
@@ -338,7 +341,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                     summarySignupUrlContent.Add(newItem2);
                 }
             }
-            
+
             foreach (var item in bonusResult)
             {
                 var newItem3 = new Dictionary<string, dynamic>()
@@ -353,7 +356,7 @@ namespace BackendSite.Controllers.ApiV2.Report
                 };
                 summaryBonusCodeContent.Add(newItem3);
             }
-            
+
             foreach (var item in bonusDetailResult)
             {
                 var newItem4 = new Dictionary<string, dynamic>()
@@ -371,9 +374,9 @@ namespace BackendSite.Controllers.ApiV2.Report
                 };
                 summaryBonusCodeDetailContent.Add(newItem4);
             }
-            
+
             #endregion
-            
+
             var d = new List<ComplexReportExportDataToExcel>()
             {
                 new()

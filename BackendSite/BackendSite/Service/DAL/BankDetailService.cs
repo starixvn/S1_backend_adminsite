@@ -1,10 +1,13 @@
-﻿using BackendSite.Service.Library;
-using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Extensions;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -46,7 +49,7 @@ namespace BackendSite.Service.DAL
 
             return (result, totalPages, rowCount);
         }
-        
+
         public async Task<OfflineBankingSetting> GetOfflineBankingSettingByIdAsync(int id)
         {
             var para = new DynamicParameters();
@@ -57,7 +60,7 @@ namespace BackendSite.Service.DAL
 
             return result.FirstOrDefault();
         }
-        
+
         public Task<int> SetOfflineBankingSettingAsync(SetOfflineBankingSettingParams input)
         {
             var para = new DynamicParameters();
@@ -75,19 +78,19 @@ namespace BackendSite.Service.DAL
             para.Add("_QRCodeUrl", input.QrCodeUrl);
             para.Add("_Operator", input.Operator);
 
-            
+
             return _mainDbClient.ExecuteAsync("Admin_OfflineBankingSetting_Set_V2", para);
         }
-        
+
         public async Task<IEnumerable<LocalPaySetting>> GetLocalPaySettingAsync()
         {
             return await _mainDbClient.QueryAsync<LocalPaySetting>("Admin_LocalPaySetting_Get");
         }
-        
+
         public IEnumerable<BankDetail> GetLoaclBankList(string siteIds,
             string currencyIdList,
-            string statusList, 
-            int startIndex,int pageSize,
+            string statusList,
+            int startIndex, int pageSize,
             out int totalPages, out int rowCount)
         {
             var props = new DynamicParameters();
@@ -133,10 +136,10 @@ namespace BackendSite.Service.DAL
             var isCreate = input.Before.SysId == 0;
             propsLog.Add("_SiteId", input.SiteId);
             propsLog.Add("_CurrencyId", input.CurrencyId);
-            propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
-            propsLog.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BankCardManagement);
+            propsLog.Add("_ActionType", (int)(isCreate ? ActionType.Create : ActionType.Update));
             propsLog.Add("_RefTransId", string.Empty);
-            propsLog.Add("_BeforeDetailInfo", isCreate ? null :input.Before.ToLog());
+            propsLog.Add("_BeforeDetailInfo", isCreate ? null : input.Before.ToLog());
             propsLog.Add("_AfterDetailInfo", input.After.ToLog());
             propsLog.Add("_Operator", input.Operator);
             #endregion
@@ -181,8 +184,8 @@ namespace BackendSite.Service.DAL
             var isCreate = input.Before == null || input.Before.SysId == 0;
             propsLog.Add("_SiteId", input.SiteId);
             propsLog.Add("_CurrencyId", input.CurrencyId);
-            propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
-            propsLog.Add("_ActionType", (int) (isCreate ? ActionType.Create : ActionType.Update));
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BankCardManagement);
+            propsLog.Add("_ActionType", (int)(isCreate ? ActionType.Create : ActionType.Update));
             propsLog.Add("_RefTransId", string.Empty);
             propsLog.Add("_BeforeDetailInfo", isCreate ? null : input.Before.ToLog(), DbType.String);
             propsLog.Add("_AfterDetailInfo", input.After.ToLog());
@@ -217,15 +220,15 @@ namespace BackendSite.Service.DAL
             #region propsLog
             propsLog.Add("_SiteId", input.SiteId);
             propsLog.Add("_CurrencyId", input.CurrencyId);
-            propsLog.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BankCardManagement);
-            propsLog.Add("_ActionType", (int) ActionType.Delete);
+            propsLog.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BankCardManagement);
+            propsLog.Add("_ActionType", (int)ActionType.Delete);
             propsLog.Add("_RefTransId", string.Empty);
             propsLog.Add("_BeforeDetailInfo", input.Before.ToLog());
             propsLog.Add("_AfterDetailInfo", null, DbType.String);
             propsLog.Add("_Operator", input.Operator);
             #endregion
 
-            var r =  _mainDbClient.Execute("BankCard_Del", trans, props);
+            var r = _mainDbClient.Execute("BankCard_Del", trans, props);
             var result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, propsLog);
             if (result > 0)
             {

@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +14,7 @@ namespace BackendSite.Controllers.ApiV2.Report
     {
         private readonly IovationReportBLL _iovationReport;
         private readonly ExcelBLL _excelBll;
-        
+
         public IovationReportController(IovationReportBLL iovationReport, ExcelBLL excelBll)
         {
             _iovationReport = iovationReport;
@@ -29,7 +30,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<ApiListResult<IovationReport>> GetList(IovationReportGetListRequest request)
         {
             var result = await _iovationReport.GetListAsync(request);
-            
+
             var apiResult = new ApiListResult<IovationReport>
             {
                 Data = result.IovationReport,

@@ -27,7 +27,7 @@ namespace BackendSite.Service.BLL
             var accountNo = withdrawalRequest.AccountNo;
             var accountType = MapWithdrawalAccountType(withdrawalRequest.AccountType);
             var custId = withdrawalRequest.CustId;
-            
+
             // 其他狀態變成 Approved 一律 +1
             if (newStatus == WithdrawalStatusEnum.Approved && originStatus != WithdrawalStatusEnum.Approved)
             {

@@ -4,6 +4,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.Report;
+
 using NPOI.XSSF.UserModel;
 
 namespace BackendSite.Service.BLL
@@ -21,7 +22,7 @@ namespace BackendSite.Service.BLL
             _storeSiteUrl = configuration.GetValue<string>("StoreService");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
         }
-        
+
         public Task<ApiResult<object>> GetDepositPointReportAsync(GetDepositPointReportRequest req)
         {
             var url = _storeSiteUrl + "/api/Report/GetDepositPointReport";
@@ -29,14 +30,14 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public async Task<byte[]> ExportDepositPointReportAsync(ExportDepositPointReportRequest req)
         {
             var url = _storeSiteUrl + "/api/Report/ExportDepositPointReport";
             var exportResult =
                 await _courierAdapter.PostAsync<ApiResult<ExportDepositPointReportResult>, ExportDepositPointReportRequest>(url, req);
 
-            if (exportResult.ErrorCode != (int) ErrorCodeEnum.Success)
+            if (exportResult.ErrorCode != (int)ErrorCodeEnum.Success)
             {
                 _logger.LogError($"StoreService ExportDepositPointReport Failed. ErrorCode: {exportResult.ErrorCode}");
                 throw new AdminException("ExportDepositPointReport Failed.");
@@ -49,14 +50,14 @@ namespace BackendSite.Service.BLL
 
             sheet1.WriteToSheet(exportResult.Data.List, true, offset);
             sheet2.WriteToSheet(exportResult.Data.Overview, true);
-            
+
             await using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             var result = memoryStream.ToArray();
 
             return result;
         }
-        
+
         public Task<ApiResult<object>> GetAdjustmentPointReportAsync(GetAdjustmentPointReportRequest req)
         {
             var url = _storeSiteUrl + "/api/Report/GetAdjustmentPointReport";
@@ -64,14 +65,14 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public async Task<byte[]> ExportAdjustmentPointReportAsync(ExportAdjustmentPointReportRequest req)
         {
             var url = _storeSiteUrl + "/api/Report/ExportAdjustmentPointReport";
             var exportResult =
                 await _courierAdapter.PostAsync<ApiResult<ExportAdjustmentPointReportResult>, ExportAdjustmentPointReportRequest>(url, req);
 
-            if (exportResult.ErrorCode != (int) ErrorCodeEnum.Success)
+            if (exportResult.ErrorCode != (int)ErrorCodeEnum.Success)
             {
                 _logger.LogError($"StoreService ExportAdjustmentPointReport Failed. ErrorCode: {exportResult.ErrorCode}");
                 throw new AdminException("ExportAdjustmentPointReport Failed.");
@@ -84,14 +85,14 @@ namespace BackendSite.Service.BLL
 
             sheet1.WriteToSheet(exportResult.Data.List, true, offset);
             sheet2.WriteToSheet(exportResult.Data.Overview, true);
-            
+
             await using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             var result = memoryStream.ToArray();
 
             return result;
         }
-        
+
         public async Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
         {
             var url = _storeSiteUrl + "/api/Report/GetTurnoverPointReport";

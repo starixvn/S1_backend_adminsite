@@ -2,7 +2,7 @@
 
 namespace BackendSite.Service.Model
 {
-    public class BetLimitSetting 
+    public class BetLimitSetting
     {
         public bool Checked { get; set; }
         [LogIgnore]

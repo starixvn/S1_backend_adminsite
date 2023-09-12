@@ -22,22 +22,11 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <Compile Remove="Controllers\ApiV2\Report\OtherReport\**" />
-    <Content Remove="Controllers\ApiV2\Report\OtherReport\**" />
-    <EmbeddedResource Remove="Controllers\ApiV2\Report\OtherReport\**" />
-    <None Remove="Controllers\ApiV2\Report\OtherReport\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Controllers\ApiV2\Marketing\Setting\VerificationRewardController.cs" />
-    <Compile Remove="Controllers\Api\PendingFund.cs" />
-    <Compile Remove="Service\Model\Payment.cs" />
-    <Compile Remove="Views\Message\Index.cshtml.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Views\Message\Index.cshtml" />
-    <Content Remove="wwwroot\js\component\CSD\VipUpgrade.min.js" />
+    <Compile Remove="Properties\PublishProfiles\**" />
+    <Content Remove="Properties\PublishProfiles\**" />
+    <EmbeddedResource Remove="Properties\PublishProfiles\**" />
+    <None Remove="Properties\PublishProfiles\**" />
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,57 +40,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\css\fonts\fonts\icomoon.svg" />
-    <None Include="wwwroot\css\fonts\icomoon.svg" />
-    <None Include="wwwroot\css\main.css.map" />
-    <None Include="wwwroot\js\site.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar-setup.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar-setup_stripped.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\calendar_stripped.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\doc\reference.pdf" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-br.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ca.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-cs-win.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-da.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-du.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-el.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-en.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-es.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-fr.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hr-utf8.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hr.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-hu.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-it.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-nl.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-no.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-pl.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-pt.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ro.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-ru.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-sp.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-sw.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-tr.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\lang\calendar-zh.js" />
-    <None Include="wwwroot\lib\Oneworks\jscalendar\README" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AWSSDK.CloudFront" Version="3.7.6.26" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.9.30" />
     <PackageReference Include="BarcodeReader.ImageSharp" Version="2.0.1" />
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="Dapper.ParameterExtensions" Version="2022.7.7.1" />
     <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.22.0" />
     <PackageReference Include="Elastic.Apm.SerilogEnricher" Version="8.6.0" />
     <PackageReference Include="Elastic.Apm.SqlClient" Version="1.22.0" />
     <PackageReference Include="Elastic.Apm.StackExchange.Redis" Version="1.22.0" />
-    <PackageReference Include="Elastic.CommonSchema.Serilog" Version="8.6.0" />
     <PackageReference Include="EPPlus" Version="6.0.6" />
     <PackageReference Include="LazZiya.ImageResize" Version="4.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.7" />
     <PackageReference Include="MySql.Data" Version="8.0.27" />
     <PackageReference Include="NPOI" Version="2.6.0" />
@@ -109,38 +58,17 @@
     <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
     <PackageReference Include="Serilog.Exceptions" Version="8.3.0" />
-    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.0.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
     <PackageReference Include="ZXing.Net" Version="0.16.8" />
-    <PackageReference Include="ZXing.Net.Bindings.ImageSharp.V2" Version="0.16.14" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot\js\component\CustManage\CustInfo.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\component\CustManage\CustInfoList.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\component\Deposit\DepositList.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\component\Finance\PaymentAdjustment.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\js\component\Payment\BankInfoList.min.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Controllers\ApiV2\Admin\Permission\" />
-    <Folder Include="Controllers\ApiV2\Admin\Setting\" />
     <Folder Include="Controllers\ApiV2\Finance\DepositSetting\" />
     <Folder Include="Controllers\ApiV2\Marketing\Setting\" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties app_3data_4menu_1json__JsonSchema="http://json-schema.org/draft-04/schema" package_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

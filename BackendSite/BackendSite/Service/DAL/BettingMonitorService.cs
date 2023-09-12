@@ -1,11 +1,14 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using Newtonsoft.Json;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Controllers.ApiV2.CMS.Setting;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -19,13 +22,13 @@ namespace BackendSite.Service.DAL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        
+
         public IEnumerable<BettingMonitorModel> GetList(
-            int siteId, 
-            IEnumerable<int> currencyIds, 
-            IEnumerable<int> tpIds, 
-            IEnumerable<int> categoryIds, 
-            IEnumerable<int> gameTypes, 
+            int siteId,
+            IEnumerable<int> currencyIds,
+            IEnumerable<int> tpIds,
+            IEnumerable<int> categoryIds,
+            IEnumerable<int> gameTypes,
             int startIndex, int pageSize,
             out int totalPages, out int rowCount)
         {
@@ -49,7 +52,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public bool SetSetting(ParamsWithLog<BettingMonitorController.SetRequest> input)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -65,12 +68,12 @@ namespace BackendSite.Service.DAL
                 _Status = input.After.Status,
                 _Operator = input.Operator
             };
-            
+
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BettingMonitor);
-            logParam.Add("_ActionType", input.Before.GameType == 0 ? (int) ActionType.Create : (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BettingMonitor);
+            logParam.Add("_ActionType", input.Before.GameType == 0 ? (int)ActionType.Create : (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -82,20 +85,20 @@ namespace BackendSite.Service.DAL
                 _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
-            
+
             var result = _mainDbClient.Execute("Admin_BettingMonitorSetting_Set", tran, param) > 0;
             if (!result)
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
-            
+
             _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
-            
+
         }
-        
+
         public bool DelSetting(ParamsWithLog<BettingMonitorController.BaseSetting> input)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -109,15 +112,15 @@ namespace BackendSite.Service.DAL
                 _GameType = input.Before.GameType,
                 _Operator = input.Operator
             };
-            
+
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.BettingMonitor);
-            logParam.Add("_ActionType", (int) ActionType.Delete);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.BettingMonitor);
+            logParam.Add("_ActionType", (int)ActionType.Delete);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
-            logParam.Add("_AfterDetailInfo", null , DbType.String);
+            logParam.Add("_AfterDetailInfo", null, DbType.String);
             logParam.Add("_Operator", input.Operator);
 
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", tran, logParam) > 0;
@@ -126,18 +129,18 @@ namespace BackendSite.Service.DAL
                 _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
-            
+
             var result = _mainDbClient.Execute("Admin_BettingMonitorSetting_Del", tran, param) > 0;
             if (!result)
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, tran);
                 return false;
             }
-            
+
             _mainDbClient.CommitAndDisposeConnection(conn, tran);
 
             return true;
-            
+
         }
     }
 }

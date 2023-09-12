@@ -1,8 +1,10 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
 
 namespace BackendSite.Service.DAL
 {
@@ -35,7 +37,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_GameCasinoDetail_Set", props);
         }
 
-        public int InsertGameCasinoDetail (InsertGameCasinoPara para) 
+        public int InsertGameCasinoDetail(InsertGameCasinoPara para)
         {
             var props = new DynamicParameters();
             props.Add("SiteId", para.SiteId);
@@ -67,7 +69,7 @@ namespace BackendSite.Service.DAL
         {
             var logResult = new GameCasinoResult();
             var props = new DynamicParameters();
-            props.Add("PageNumber", gameCasinoPara.PageNumber, DbType.Int32,ParameterDirection.InputOutput);
+            props.Add("PageNumber", gameCasinoPara.PageNumber, DbType.Int32, ParameterDirection.InputOutput);
             props.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("StartIndex", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -107,7 +109,7 @@ namespace BackendSite.Service.DAL
             props.Add("GameCasinoId", para.GameCasinoId);
             return _reportDbClient.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
         }
-        public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para,int SiteId)
+        public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para, int SiteId)
         {
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);

@@ -1,16 +1,16 @@
 ﻿using System.Text.RegularExpressions;
+
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NPOI.POIFS.Crypt.Dsig;
+
 using OfficeOpenXml;
-using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 {
@@ -107,7 +107,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public string BonusCode { get; set; }
             public int ReasonId { get; set; }
         }
-        
+
         public class SelectListItem
         {
             public SelectListItem(int id, string name)
@@ -176,7 +176,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public ApiResult<CheckPayoutBonusCodeRep> CheckBonusCode(CheckBonusCodeRequest request)
         {
             return new ApiResult<CheckPayoutBonusCodeRep>
-            { 
+            {
                 Data = _paymentBll.CheckPayoutBonusCode(request.BonusCode, request.SiteId, request.CurrencyId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
