@@ -8,6 +8,7 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
 namespace BackendSite.Service.DAL
 {
@@ -46,7 +47,20 @@ namespace BackendSite.Service.DAL
             var SpName = "Admin_BankFinancialReason_GetByFuncKey";
             return _reportDbClient.Query<BankFinancialReasonModel>(SpName, parameters);
         }
+        public IEnumerable<BankFinancialReasonModel> GetReasonByAdjustmentType(AdjustmentType adjustmentType)
+        {
+            var parameters = new DynamicParameters(
+                new
+                {
+                    _MethodType = (int)adjustmentType.MethodTypeID,
+                    _AdjustType = (int)adjustmentType.AdjustmentTypeID
+                });
 
+            var SpName = "Admin_ReasonGroup_Get";
+            var funcKey = _reportDbClient.Query<string>(SpName, parameters).FirstOrDefault();
+            return GetReason(funcKey);
+        }
+         
         public (string, string) NoAssign(string prefix)
         {
             var parameters = new DynamicParameters();

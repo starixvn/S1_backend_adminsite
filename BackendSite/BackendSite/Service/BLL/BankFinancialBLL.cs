@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using NPOI.XSSF.UserModel;
 
 using NuGet.Packaging;
+using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
 namespace BackendSite.Service.BLL
 {
@@ -60,6 +61,11 @@ namespace BackendSite.Service.BLL
 
             return _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
                 () => _bankFinancialService.GetReason(funcKey));
+        }
+
+        public IEnumerable<BankFinancialReasonModel> GetReasonByAdjustmentType(AdjustmentType adjustmentType)
+        {
+            return  _bankFinancialService.GetReasonByAdjustmentType(adjustmentType);
         }
 
         [Obsolete("請改用GetPayList(int siteId)")]
