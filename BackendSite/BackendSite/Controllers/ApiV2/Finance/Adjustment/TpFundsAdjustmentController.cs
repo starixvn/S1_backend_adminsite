@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 {
@@ -72,6 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public string Memo { get; set; }
             public int ReasonId { get; set; }
             public string TransId { get; set; }
+            public MethodTypeIDEnum MethodType { get; set; }
         }
 
         public class GetLogRequest : ApiRequestPageModel
@@ -185,7 +187,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         public async Task<ApiResult> Submit(SubmitRequest request)
         {
             var user = User.Identity.Name;
-            var isDeposit = request.ReasonId == 9; // 9: Deposit
+            var isDeposit = (request.ReasonId == 1 && request.MethodType == MethodTypeIDEnum.ThirdWallet); // Methodtype為第3方且ReasonID=1(Deposit)
+            #region option轉換
+            if ((int)request.Option == 5) { request.Option = TpAdjustmentOptionEnum.Add; }
+            else if((int)request.Option == 6) { request.Option = TpAdjustmentOptionEnum.Minus; }
+            #endregion
             var inTpTransfer = new AdminTpTransfer
             {
                 TpId = request.TpId,
@@ -194,7 +200,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 direction = (TpDirection)(int)request.Option,
                 Operator = user,
                 Remarks = request.Memo,
-                Category = request.ReasonId
+                Category = request.ReasonId,
+                IsDepositId = isDeposit
             };
 
             if (isDeposit && !string.IsNullOrWhiteSpace(request.TransId))
@@ -207,7 +214,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             var result = await _tpBll.AdminAdjustmentTransferAsync(inTpTransfer);
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
-                var reasonList = _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+                var reasonList = _bankFinancialBll.GetReason("FunKey/3RDWallet");
                 var reason = reasonList.FirstOrDefault(x => x.ReasonId == request.ReasonId)?.Description;
                 var strDetail = string.Empty;
                 if (isDeposit)
