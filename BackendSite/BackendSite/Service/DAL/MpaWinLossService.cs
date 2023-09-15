@@ -6,6 +6,7 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
 
 using Dapper;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -20,19 +21,19 @@ namespace BackendSite.Service.DAL
             _logger = logger;
         }
 
-        public Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format,
+        public Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime, DateTimeOffset endTime, string format,
             string memberTypeJson,
             MpaDateType mpaDateType = MpaDateType.SettledDate)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds), dbType: DbType.String);
             p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
 
-            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V3", p);
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V4", p);
 
             return data;
         }
@@ -54,16 +55,16 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByPlayer_Get", p);
         }
 
-        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson)
+        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds), dbType: DbType.String);
             p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
 
-            var data = _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get_V3", p);
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get_V4", p);
             return data;
         }
 
@@ -88,16 +89,16 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TpCategoryDto>("Admin_TPCategory_Get");
         }
 
-        public Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson)
+        public Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(IEnumerable<int> siteIds, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds), dbType: DbType.String);
             p.Add("_StartTime", starTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
 
-            var data = _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get_V3", p);
+            var data = _reportDbClient.QueryAsync<MpaWinLossBonusDto>("Admin_MpaWinLossBonus_Get_V4", p);
 
             return data;
         }

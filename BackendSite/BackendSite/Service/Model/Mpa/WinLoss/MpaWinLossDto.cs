@@ -98,6 +98,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal BonusAmountClaim { get; set; }
 
         public int IsTest { get; set; }
+        public int SiteId { get; set; }
     }
 
     public class MpaWinLossBonusWrapper
@@ -364,6 +365,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 18)]
         public decimal TotalBonus { get; set; }
+        public string Currency { get; set; }
     }
 
     public class MpaWinLossByCurrencyCurrencyDetailDto
@@ -467,6 +469,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalWithDrawAmount { get; set; }
 
         public decimal TotalBonus { get; set; }
+        public int SiteId { get; set; } 
     }
 
     public class TpBetRecordByDateWrapper
@@ -626,6 +629,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ClosingBalance { get; set; }
 
         public decimal TotalBonus { get; set; }
+        public int SiteId { get; set; }
     }
 
     public class TpBetRecordByPlayerWrapper

@@ -86,7 +86,6 @@ namespace BackendSite.Service.BLL
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 			var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            //TODO 參數
             var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
             if (custList == null)
                 return new List<Dictionary<string, object>>();

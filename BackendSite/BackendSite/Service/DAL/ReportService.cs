@@ -4,13 +4,13 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.GameStatisticalReport;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.Report;
 
 using Dapper;
 
 using Newtonsoft.Json;
-using BackendSite.Service.BLL;
-using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.DAL
 {
