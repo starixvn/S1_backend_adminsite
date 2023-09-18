@@ -62,6 +62,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             public string Memo { set; get; }
             public string TransId { get; set; }
             public int ReasonId { get; set; }
+            public MethodTypeIDEnum MethodType { get; set; }
         }
 
         public class GetAdjustmentLimitInfoRequest
@@ -114,8 +115,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                 Id = id;
                 Name = name;
             }
+            public SelectListItem(int id, string name,int type)
+            {
+                Id = id;
+                Name = name;
+                Type = type;
+            }
             public int Id { get; set; }
             public string Name { get; set; }
+            public int Type { get; set; }
+        }
+        public class AdjustmentType
+        {
+            public MethodTypeIDEnum MethodTypeID { get; set; }
+            public BalanceAdjustmentTypeIDEnum AdjustmentTypeID { get; set; }
         }
 
         #endregion
@@ -281,21 +294,32 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                     WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
                     Memo = request.Memo,
                     Category = request.ReasonId,
+                    MethodType = (int)request.MethodType,
+                    RefId = request.TransId
                 };
 
                 if (!string.IsNullOrWhiteSpace(request.TransId))
                 {
-                    var m = Regex.Match(request.TransId, @"\d+");
-                    int.TryParse(m.Value, out var depositId);
-                    adjustmentAndWithdrawalLimit.DepositId = depositId;
-                    adjustmentAndWithdrawalLimit.TransId = request.TransId;
+                    if (request.MethodType == MethodTypeIDEnum.MainWallet && request.ReasonId == 1)
+                    {
+                        var m = Regex.Match(request.TransId, @"\d+");
+                        int.TryParse(m.Value, out var depositId);
+                        adjustmentAndWithdrawalLimit.DepositId = depositId;
+                        adjustmentAndWithdrawalLimit.TransId = request.TransId;
+                    }
                 }
 
-                if (_paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
-                        out var transId) > 0)
+                var result = _paymentBll.AdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, User.Identity.Name,
+                        out var transId);
+                if (result > 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                     apiResult.Message = $"Success. ID is {transId}";
+                }
+                else if (result == -1)
+                {
+                    throw new AdminException(ErrorCodeEnum.Fail,
+                        "WrongDepositID.");
                 }
                 else
                 {
@@ -605,18 +629,30 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<SelectListItem>> GetReasonList()
+        public ApiResult<IEnumerable<SelectListItem>> GetReasonList(AdjustmentType adjustmentType)
         {
-            var result =
-                _bankFinancialBll.GetReason("Finance/PaymentAdjustment");
+            var result = _bankFinancialBll.GetReasonByAdjustmentType(adjustmentType);
             var data =
-                result.Select(x => new SelectListItem(x.ReasonId, x.Description));
+                    result.Select(x =>
+                    {
+                        //多回傳一個type給前端做判斷，Deposit=1，Withdrawal=2
+                        switch (x.Description)
+                        {
+                            case "Deposit":
+                                x.Type = 1;
+                                break;
+                            case "Withdrawal":
+                                x.Type = 2;
+                                break;
+                            default: 
+                                break;
+                        };
+                        return new SelectListItem(x.ReasonId, x.Description,x.Type);
+                    });
             var apiResult =
                 new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
-
             return apiResult;
         }
-
         #endregion
 
         #endregion

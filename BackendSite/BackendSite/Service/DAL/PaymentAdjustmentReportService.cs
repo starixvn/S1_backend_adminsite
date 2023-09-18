@@ -133,7 +133,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V7", props);
+            result.QueryResult = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfo_Get_V8", props);
             result.CurrencyAmount = currencyTotalAmount;
             result.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = props.Get<int?>("_RowCount") ?? 0;
@@ -200,7 +200,7 @@ namespace BackendSite.Service.DAL
             props.Add("_DepositId", string.IsNullOrWhiteSpace(depositId) ? null : depositId);
             props.Add("_MemberTypes", memberTypes);
 
-            var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V7", props);
+            var result = await _reportDbClient.QueryAsync<PaymentAdjustmentV2>("Admin_AdjustmentInfoExport_Get_V8", props);
             return result;
         }
 
@@ -343,9 +343,10 @@ namespace BackendSite.Service.DAL
             p.Add("_Category", input.After.Category);
             p.Add("_Memo", input.After.Memo);
             p.Add("_AdjustType", (int)input.After.AdjustType);
+            p.Add("_MethodType",input.After.MethodType);
 
             var success = _mainDbClient
-                .Execute("Admin_AdjustmentInfo_Set_V2", trans, p) > 0;
+                .Execute("Admin_AdjustmentInfo_Set_V3", trans, p) > 0;
 
             if (success)
             {

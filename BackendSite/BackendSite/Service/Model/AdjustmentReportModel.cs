@@ -90,6 +90,7 @@ namespace BackendSite.Service.Model
         public string DepositId { get; set; }
         [ExportIgnore]
         public int AdjustType { get; set; }
+        public int MethodType { get; set; } 
     }
 
 
@@ -115,7 +116,7 @@ namespace BackendSite.Service.Model
         public string WalletType { get; set; }
         public string CategoryName { get; set; }
 
-        public string DepositId { get; set; }
+        public string RefId { get; set; }
         public MemberTypeEnum UserType { get; set; }
     }
 

@@ -12,16 +12,30 @@ namespace BackendSite.Service.BLL
         private readonly IAutoPaymentRuleService _autoPaymentRuleService;
         private readonly VipLevelBLL _vipLevelBll;
         private readonly ITagBLL _tagBll;
+        private readonly PermissionBLL _permissionBll;
+        private readonly AdminBLL _adminBll;
 
-        public AutoPaymentRuleBLL(IAutoPaymentRuleService autoWithdrawalRuleService, VipLevelBLL vipLevelBll, ITagBLL tagBll)
+        public AutoPaymentRuleBLL(
+            IAutoPaymentRuleService autoWithdrawalRuleService, 
+            VipLevelBLL vipLevelBll, 
+            ITagBLL tagBll,
+            PermissionBLL permissionBll,
+            AdminBLL adminBll)
         {
             _autoPaymentRuleService = autoWithdrawalRuleService;
             _vipLevelBll = vipLevelBll;
             _tagBll = tagBll;
+            _permissionBll = permissionBll;
+            _adminBll = adminBll;
         }
 
-        public async Task<IEnumerable<AutoPaymentRuleDataListResponse>> GetDataListAsync(AutoPaymentRuleDataListRequest request)
+        public async Task<IEnumerable<AutoPaymentRuleDataListResponse>> GetDataListAsync(AutoPaymentRuleDataListRequest request ,AuthData authData)
         {
+            if (!PaymentRulePermissionCheck(authData, request.AutoType))
+            {
+                throw new Exception("No Permission");
+            }
+            
             var data = await _autoPaymentRuleService.GetDataListAsync(request);
             var defaultList = new List<int>();
 
@@ -46,6 +60,7 @@ namespace BackendSite.Service.BLL
                     : JsonConvert.DeserializeObject<List<string>>(item.DeviceLevelStr),
 
                 DeviceScores = item.DeviceScores,
+                WithdrawalType = item.WithdrawalType,
                 CreateUser = item.CreateUser,
                 CreateTime = item.CreateTime,
                 LastUpdateUser = item.LastUpdateUser,
@@ -54,10 +69,16 @@ namespace BackendSite.Service.BLL
         }
 
         #region Create
-        public async Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest request, string userName)
+        
+        public async Task CreateAutoPaymentRuleAsync(AutoPaymentRuleCreateRequest request, AuthData authData)
         {
-            await _autoPaymentRuleService.CreateAutoPaymentRuleAsync(request, userName);
-            await CreateActivityLog(request, userName);
+            if (!PaymentRulePermissionCheck(authData, request.AutoType))
+            {
+                throw new Exception("No Permission");
+            }
+            
+            await _autoPaymentRuleService.CreateAutoPaymentRuleAsync(request, authData.UserName);
+            await CreateActivityLog(request, authData.UserName);
         }
 
         private async Task CreateActivityLog(AutoPaymentRuleCreateRequest request, string userName)
@@ -72,6 +93,7 @@ namespace BackendSite.Service.BLL
                 tags: request.Tags,
                 deviceScores: request.DeviceScores,
                 deviceLevel: request.DeviceLevel,
+                withdrawalType: request.WithdrawalType,
                 status: true);
 
             await _autoPaymentRuleService.InsertLogAsync(
@@ -89,11 +111,17 @@ namespace BackendSite.Service.BLL
 
         #region Set
 
-        public async Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest request, string userName)
+        public async Task SetAutoPaymentRuleAsync(AutoPaymentRuleSetRequest request, AuthData authData)
         {
             var originData = await _autoPaymentRuleService.GetDataByIdAsync(request.Id);
-            await _autoPaymentRuleService.SetAutoPaymentRuleAsync(request, userName);
-            await SetActivityLog(request, userName, originData);
+            
+            if (!PaymentRulePermissionCheck(authData, originData.AutoType))
+            {
+                throw new Exception("No Permission");
+            }
+            
+            await _autoPaymentRuleService.SetAutoPaymentRuleAsync(request, authData.UserName);
+            await SetActivityLog(request, authData.UserName, originData);
         }
 
         private async Task SetActivityLog(AutoPaymentRuleSetRequest request, string userName,
@@ -109,8 +137,9 @@ namespace BackendSite.Service.BLL
                 accountWithdrawalCount: request.AccountWithdrawalCount,
                 vipLevels: request.VipLevels,
                 tags: request.Tags,
-                deviceScores: request.DeviceScores,
-                deviceLevel: request.DeviceLevel,
+                deviceScores : request.DeviceScores,
+                deviceLevel:request.DeviceLevel,
+                withdrawalType: request.WithdrawalType,
                 status: GetStatus(request.Status));
 
             await _autoPaymentRuleService.InsertLogAsync(siteId: originData.SiteId,
@@ -126,9 +155,16 @@ namespace BackendSite.Service.BLL
         #endregion
 
         #region Delete
-        public async Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, string userName)
+        
+        public async Task DeleteAutoPaymentRuleAsync(AutoPaymentRuleDeleteRequest request, AuthData authData)
         {
             var originData = await _autoPaymentRuleService.GetDataByIdAsync(request.Id);
+            
+            if (!PaymentRulePermissionCheck(authData, originData.AutoType))
+            {
+                throw new Exception("No Permission");
+            }
+            
             await _autoPaymentRuleService.DeleteAutoPaymentRuleAsync(request);
             var beforeLog = GetBeforeChangeLog(originData);
 
@@ -139,11 +175,33 @@ namespace BackendSite.Service.BLL
                 afterData: null,
                 adminAdjustmentLogMenu: AdminAdjustmentLogMenuEnum.AutoPaymentRule,
                 actionType: ActionType.Delete,
-                userName);
+                authData.UserName);
         }
 
         #endregion
-
+        
+        public List<WithdrawalOptionDto> GetWithdrawalOption()
+        {
+            return new List<WithdrawalOptionDto>
+            {
+                new()
+                {
+                    Name = WithdrawalMethodEnum.EWallet.ToString(),
+                    Value = (int)WithdrawalMethodEnum.EWallet
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.BankCard.ToString(),
+                    Value = (int)WithdrawalMethodEnum.BankCard
+                },
+                new()
+                {
+                    Name = WithdrawalMethodEnum.Crypto.ToString(),
+                    Value = (int)WithdrawalMethodEnum.Crypto
+                }
+            };
+        }
+        
         #region private common method
 
         private object GetBeforeChangeLog(AutoPaymentRuleDataListDto originData)
@@ -171,6 +229,7 @@ namespace BackendSite.Service.BLL
                 tags: tags,
                 deviceScores: originData.DeviceScores,
                 deviceLevel: deviceLevel,
+                withdrawalType: originData.WithdrawalType,
                 status: GetStatus(originData.Status));
 
             return beforeLog;
@@ -182,6 +241,7 @@ namespace BackendSite.Service.BLL
             List<int> tags,
             int deviceScores,
             List<string> deviceLevel,
+            WithdrawalMethodEnum withdrawalType,
             bool status)
         {
             return new
@@ -193,7 +253,8 @@ namespace BackendSite.Service.BLL
                 VIPLevel = GetVipLevelName(vipLevels, siteId),
                 Tagging = GetTagNames(tags),
                 DeviceScores = deviceScores,
-                DeviceLevel = deviceLevel.Any() ? string.Join(",", deviceLevel) : null,
+                DeviceLevel = deviceLevel.Any() ? string.Join(",", deviceLevel) : null ,
+                WithdrawalType = withdrawalType.ToString(),
                 Status = status
             };
         }
@@ -224,6 +285,22 @@ namespace BackendSite.Service.BLL
         {
             if (status == 0) return false;
             return true;
+        }
+        
+        private bool PaymentRulePermissionCheck(AuthData authData , AutoType autoType)
+        {
+            if (autoType == AutoType.AutoVerify)
+            {
+                var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
+                var hasPermission = _permissionBll.CheckPermission(loginUser, 39, 89);
+                return hasPermission;
+            }
+            else
+            {
+                var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
+                var hasPermission = _permissionBll.CheckPermission(loginUser, 39, 82);
+                return hasPermission;
+            }
         }
 
         #endregion

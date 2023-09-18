@@ -1,4 +1,4 @@
-using BackendSite;
+﻿using BackendSite;
 using BackendSite.Extensions;
 using BackendSite.Service;
 
@@ -28,7 +28,8 @@ builder.Host.UseSerilog((context, Configuration) =>
 var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
-builder.Services.AddHostedService<GarbageCollectCheckWorker>();
+//GC無法全部回收，改用其他方式重啟服務
+//builder.Services.AddHostedService<GarbageCollectCheckWorker>();
 
 var app = builder.Build();
 startup.Configure(app, builder.Environment);
