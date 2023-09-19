@@ -1728,6 +1728,7 @@ namespace BackendSite.Service.Model.enums
         BuyFeaturesGames = 4,
         Megaways = 5,
         Mini = 6,
+        Arcade = 7,
     }
 
     public enum SlotGameFilterStatusEnum
@@ -1962,7 +1963,7 @@ namespace BackendSite.Service.Model.enums
     {
         Daily = 1,
         Weekly = 2
-    }    
+	}
     /// <summary>
     /// Balance Adjustment頁面 > MethodType
     /// </summary>
