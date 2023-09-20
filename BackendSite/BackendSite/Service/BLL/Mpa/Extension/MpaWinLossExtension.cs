@@ -67,7 +67,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 if (item.GameType == (int)MpaGGRCustomizationGameTypeEnum.V8Poker)
                 {
-                    /// For p2p products (V8 Poker), show commission: GGR = sum(revenue) 
+                    // For p2p products (V8 Poker), show commission: GGR = sum(revenue) 
                     item.WinLossSummary = item.RevenueSummary;
                 }
             }
