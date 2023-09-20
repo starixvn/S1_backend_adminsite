@@ -883,9 +883,9 @@ namespace BackendSite.Service.BLL.Mpa
                     Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
                         ? ggr / dateSummary.Sum(x => x.ValidTurnOver)
                         : 0.00m,
-                    CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
+                    CurrencyDetailByCategory = request.DisplayGroupBreakdownInOriginalCurrency
                     ? GetOriginalCurrencyDetailByTpCategory(tpBetRecordResult, key)
-                    : GetCurrencyDetailByTpCategory(dateSummary)
+                    : GetCurrencyDetailByTpCategory(dateSummary),
                 };
 
                 exportData.Add(key, result);
@@ -936,37 +936,37 @@ namespace BackendSite.Service.BLL.Mpa
 
             return exportData.ToApiFormat();
         }
-
-        private static Dictionary<string, MpaWinLossByTpCategoryCurrencyDetailDto> GetOriginalCurrencyDetailByTpCategory(IEnumerable<MpaWinLossByTpCategoryDto> combineResult, string key)
+        public IEnumerable<MpaWinLossByTpCategoryCurrencyDetailDto> GetOriginalCurrencyDetailByTpCategory(IEnumerable<MpaWinLossByTpCategoryDto> combineResult,string key)
         {
             return combineResult.Where(x => x.TpCategoryName == key)
-                .ToDictionary(k => k.Currency,
-                    v => new MpaWinLossByTpCategoryCurrencyDetailDto
-                    {
-                        TurnOver = v.TurnOver,
-                        ValidTurnOver = v.ValidTurnOver,
-                        PlayerWinLoss = v.PlayerWinLoss,
-                        ProgressiveWin = v.ProgressiveWin,
-                        ProgressiveBet = v.ProgressiveBet,
-                        Commission = v.Commission,
-                        BetCount = v.BetCount,
-                        UniquePlayers = v.UniquePlayers,
-                    });
-        }
-
-        private static Dictionary<string, MpaWinLossByTpCategoryCurrencyDetailDto> GetCurrencyDetailByTpCategory(IEnumerable<MpaWinLossByTpCategoryDto> dateSummary)
-        {
-            return dateSummary.ToDictionary(k => k.Currency,
-                v => new MpaWinLossByTpCategoryCurrencyDetailDto
+                .GroupBy(x => x.Currency)
+                .Select(r => new MpaWinLossByTpCategoryCurrencyDetailDto
                 {
-                    TurnOver = v.TurnOver,
-                    ValidTurnOver = v.ValidTurnOver,
-                    PlayerWinLoss = v.PlayerWinLoss,
-                    ProgressiveWin = v.ProgressiveWin,
-                    ProgressiveBet = v.ProgressiveBet,
-                    Commission = v.Commission,
-                    BetCount = v.BetCount,
-                    UniquePlayers = v.UniquePlayers,
+                    Currency = r.Key,
+                    TurnOver = r.Sum(x => x.TurnOver),
+                    ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                    PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    ProgressiveWin = r.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                    Commission = r.Sum(x => x.Commission),
+                    BetCount = r.Sum(x => x.BetCount),
+                    UniquePlayers = r.Sum(x => x.UniquePlayers)
+                });
+        }
+        public IEnumerable<MpaWinLossByTpCategoryCurrencyDetailDto> GetCurrencyDetailByTpCategory(IEnumerable<MpaWinLossByTpCategoryDto> dateSummary)
+        {
+            return dateSummary.GroupBy(x => x.Currency)
+                .Select(r => new MpaWinLossByTpCategoryCurrencyDetailDto
+                {
+                    Currency = r.Key,
+                    TurnOver = r.Sum(x=> x.TurnOver),
+                    ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                    PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    ProgressiveWin = r.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                    Commission = r.Sum(x => x.Commission),
+                    BetCount = r.Sum(x => x.BetCount),
+                    UniquePlayers = r.Sum(x =>x.UniquePlayers)
                 });
         }
 
