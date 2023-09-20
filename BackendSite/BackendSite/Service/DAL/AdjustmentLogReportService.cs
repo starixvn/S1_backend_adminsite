@@ -1,9 +1,12 @@
-﻿using BackendSite.Service.Library;
+﻿using System.Data;
+
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
+
 using Newtonsoft.Json;
-using System.Data;
 
 namespace BackendSite.Service.DAL
 {
@@ -40,7 +43,7 @@ namespace BackendSite.Service.DAL
             searchResult.RowCount = props.Get<int?>("_RowCount") ?? 0;
             return searchResult;
         }
-        
+
         public AdminAdjustmentLogReportResult GetAdminAdjustmentInfoLog(GetAdminAdjustmentInfoLogInput input)
         {
             var props = new DynamicParameters();
@@ -57,7 +60,7 @@ namespace BackendSite.Service.DAL
             props.Add("_StartIndex", (Math.Abs(input.PageNumber) - 1) * Math.Abs(input.PageSize));
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var result =
                 _reportDbClient.Query<AdminAdjustmentLogReport>("Admin_AdminAdjustmentInfoLog_Get_V2", props);
 
@@ -69,21 +72,22 @@ namespace BackendSite.Service.DAL
             };
             return logResult;
         }
-        
+
         public bool CreateAdminAdjustmentInfoLog(CreateAdminAdjustmentInfoLogInput input)
         {
             var props = new DynamicParameters();
             props.Add("_SiteId", input.SiteId);
+            props.Add("_CustId", input.CustId);
             props.Add("_CurrencyId", input.CurrencyId);
-            props.Add("_Menu", (int) input.MenuEnum);
-            props.Add("_ActionType", (int) input.ActionType);
+            props.Add("_Menu", (int)input.MenuEnum);
+            props.Add("_ActionType", (int)input.ActionType);
             props.Add("_RefTransId", input.RefTransId ?? string.Empty);
             props.Add("_BeforeDetailInfo", input.BeforeDetailInfo, DbType.String);
             props.Add("_AfterDetailInfo", input.AfterDetailInfo, DbType.String);
             props.Add("_Operator", input.Operator);
-            
+
             var result =
-                _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", props);
+                _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins_V2", props);
 
             return result > 0;
         }

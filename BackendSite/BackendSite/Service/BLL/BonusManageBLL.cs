@@ -1,8 +1,8 @@
 ﻿using BackendSite.Service.DAL;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -12,16 +12,12 @@ namespace BackendSite.Service.BLL
         private readonly BonusManageService _bonusManageService;
         private readonly ServerInfoBLL _serverInfoBLL;
         private readonly AuthorizeBLL _authorizeBLL;
-        private readonly MySqlClient _mainDbClient;
-        private readonly MySqlClient _reportDbClient;
 
         public BonusManageBLL(IServiceProvider provider)
         {
             _bonusManageService = provider.GetRequiredService<BonusManageService>();
             _serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
             _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
-            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
-            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         public IEnumerable<PromotionInfo> GetPromotionList(IEnumerable<int> siteIds,
@@ -135,6 +131,14 @@ namespace BackendSite.Service.BLL
                 {
                     result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.TpId });
                 });
+
+                //因 SBO Sports、 SBO Virtual Sports 的 PromoCategoryId 相同造成前端元件Bind資料會有問題
+                //故HardCode 移除重複選項，只保留一組 SBO 選單內容
+                if (categoryId == (int)PromotionCategoryEnum.Sports)
+                {
+                    result = result.Where(r => r.Key != 42).ToList();
+                    result.Add(new GetCashBackGamerep { GameName = "SBO Sports", Key = 42 });
+                }
             }
             else
             {
@@ -225,6 +229,21 @@ namespace BackendSite.Service.BLL
         public IEnumerable<PromotionType> GetPromotionType(bool isPayout, bool isNew)
         {
             return _bonusManageService.GetPromotionType(isPayout, isNew);
+        }
+
+        public int SetBonusCustUsingInfo(int siteId, string bonusCode, string creator)
+        {
+            return _bonusManageService.SetBonusCustUsingInfo(siteId, bonusCode, creator);
+        }
+
+        public bool SetBonusCustUsingDetail(List<BonusCustUsing> list)
+        {
+            return _bonusManageService.SetBonusCustUsingDetail(list);
+        }
+
+        public IEnumerable<BonusCustUsingList> GetBonusCustUsingDetail(int siteId, string bonusCode)
+        {
+            return _bonusManageService.GetBonusCustUsingDetail(siteId, bonusCode);
         }
     }
 

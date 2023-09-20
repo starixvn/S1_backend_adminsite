@@ -2,6 +2,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,9 +20,9 @@ public class ModifyPaymentChargeFeeController : ControllerBase
         _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         _chargeFeeBll = provider.GetRequiredService<PaymentChargeFeeBLL>();
     }
-    
+
     #region API Model
-    
+
     public class GetModifyPaymentChargeFeeLogListRequest : ApiRequestPageModel
     {
         /// <summary>
@@ -30,7 +31,7 @@ public class ModifyPaymentChargeFeeController : ControllerBase
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
     }
-    
+
     public class ModifyPaymentChargeFeeRequest
     {
         public int CurrencyId { get; set; }
@@ -40,9 +41,9 @@ public class ModifyPaymentChargeFeeController : ControllerBase
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
     }
-    
+
     #endregion
-    
+
     [HttpPost]
     public ApiResult GetList(GetModifyPaymentChargeFeeLogListRequest request)
     {
@@ -53,25 +54,25 @@ public class ModifyPaymentChargeFeeController : ControllerBase
 
         return new ApiListResult<ModifyPaymentChargeFeeLog>(ErrorCodeEnum.Success, pageInfo, result);
     }
-    
+
     [HttpPost]
     public ApiResult Submit(ModifyPaymentChargeFeeRequest request)
     {
         var authData = _authorizeBll.GetAuthData();
-        
+
         var (result, msg) = _chargeFeeBll.ModifyPaymentChargeFee(
             new ModifyPaymentChargeFeeParams
-        {
-            SiteId = authData.SiteId,
-            CurrencyId = request.CurrencyId,
-            ChannelId = request.ChannelId,
-            ChargeFeePercentage = request.ChargeFeePercentage,
-            ChargeFeePreCount = request.ChargeFeePreCount,
-            StartTime = request.StartTime,
-            EndTime = request.EndTime,
-            Operator = authData.UserName
-        });
+            {
+                SiteId = authData.SiteId,
+                CurrencyId = request.CurrencyId,
+                ChannelId = request.ChannelId,
+                ChargeFeePercentage = request.ChargeFeePercentage,
+                ChargeFeePreCount = request.ChargeFeePreCount,
+                StartTime = request.StartTime,
+                EndTime = request.EndTime,
+                Operator = authData.UserName
+            });
 
-        return new ApiResult((int) result, msg);
+        return new ApiResult((int)result, msg);
     }
 }

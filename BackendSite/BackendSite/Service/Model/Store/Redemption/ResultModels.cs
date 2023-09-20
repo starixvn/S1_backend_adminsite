@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+
 using BackendSite.Attributes;
 
 namespace BackendSite.Service.Model.Store.Redemption
@@ -33,7 +34,7 @@ namespace BackendSite.Service.Model.Store.Redemption
         public decimal ActualCost { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class ExportRedemptionListResult
     {
         public IEnumerable<RedemptionOverviewResult> Overview { get; set; }
@@ -50,11 +51,11 @@ namespace BackendSite.Service.Model.Store.Redemption
         public decimal TotalCost { get; set; }
         public int TotalRecord { get; set; }
     }
-    
+
     public class UploadReceiptResult
     {
         public List<string> ReceiptUrls { get; set; }
-       
+
     }
 
 }

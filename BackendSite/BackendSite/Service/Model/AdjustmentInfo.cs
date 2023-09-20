@@ -1,4 +1,6 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Service.Model.enums;
+using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
 namespace BackendSite.Service.Model
 {
@@ -27,9 +29,10 @@ namespace BackendSite.Service.Model
         public decimal WithdrawalLimitAmount { set; get; }
         public int WithdrawalLimitAmountAdjustType { set; get; }
         public int DepositId { get; set; }
+        public int MethodType { get; set; }
     }
     public class SetAdjustBonusReq
-    { 
+    {
         public int CustId { get; set; }
         public string BonusCode { get; set; }
         public string Operator { get; set; }
@@ -49,17 +52,19 @@ namespace BackendSite.Service.Model
     {
         [LogIgnore]
         public int Category { get; set; }
-        
+
         [LogPropertyName("AdjustReason")]
         public string CategoryName { get; set; }
         public string Memo { get; set; }
+        public AdjustTypeEnum AdjustType { get; set; }
+        public MethodTypeIDEnum MethodType { get; set; }
     }
-    
+
     public class AdjustmentDepositLog
     {
         public string TransId { get; set; }
         public int AdjustType { get; set; }
-        public int  DepositId { get; set; }
+        public int DepositId { get; set; }
         public decimal BeforeAmount { get; set; }
         public decimal AfterAmount { get; set; }
     }

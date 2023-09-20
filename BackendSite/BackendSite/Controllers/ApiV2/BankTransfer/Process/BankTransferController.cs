@@ -4,6 +4,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -112,7 +113,7 @@ public class BankTransferController : ControllerBase
             result.UpdatorName = authData.UserName;
 
             apiResult.Data = result;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
         }
         else
         {
@@ -142,9 +143,9 @@ public class BankTransferController : ControllerBase
             TransDate = request.TransDate,
             TransactionType = request.TransactionType,
             TransferType = request.TransferType,
-            FromSiteId = (int) request.SiteId,
+            FromSiteId = (int)request.SiteId,
             FromSiteName = request.SiteId.GetDescription(),
-            ToSiteId = (int) request.SiteId,
+            ToSiteId = (int)request.SiteId,
             ToSiteName = request.SiteId.GetDescription(),
             FromChannel = request.FromChannel,
             FromAgent = request.FromAgent,
@@ -169,12 +170,12 @@ public class BankTransferController : ControllerBase
             Updator = authData.UserId,
             UpdatorName = authData.UserName
         };
-        
+
         var (success, count, message) = await _bankFinancialBll.SetTransferInfo(detail, request.UploadReceipt);
 
         return new ApiResult
         {
-            ErrorCode = (int) (success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
+            ErrorCode = (int)(success ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail),
             Message = message
         };
     }
@@ -199,34 +200,39 @@ public class BankTransferController : ControllerBase
         if (status)
         {
             apiResult.RawMessage = message;
-            apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
         }
         else
         {
             throw new AdminException(ErrorCodeEnum.Fail, message);
         }
 
-        return new ApiResult {ErrorCode = (int) ErrorCodeEnum.Success, Message = message};
+        return new ApiResult { ErrorCode = (int)ErrorCodeEnum.Success, Message = message };
     }
 
     [HttpPost]
     public ApiResult<IEnumerable<SelectListItem>> GetTransferTypeList()
     {
-        var except = new[] {TransferTypeEnum.Undefined};
+        var except = new[]
+        {
+            TransferTypeEnum.Undefined,
+            TransferTypeEnum.Deposit,
+            TransferTypeEnum.Withdrawal
+        };
 
         return new ApiResult<IEnumerable<SelectListItem>>
         {
-            ErrorCode = (int) ErrorCodeEnum.Success,
+            ErrorCode = (int)ErrorCodeEnum.Success,
             Data = EnumExtension.EnumToSelectListItem(except)
         };
     }
-    
+
     [HttpPost]
     public ApiResult<IEnumerable<SelectListItem>> GetTransactionTypeList()
     {
         return new ApiResult<IEnumerable<SelectListItem>>
         {
-            ErrorCode = (int) ErrorCodeEnum.Success,
+            ErrorCode = (int)ErrorCodeEnum.Success,
             Data = EnumExtension.EnumToSelectListItem<TransactionTypeEnum>()
         };
     }

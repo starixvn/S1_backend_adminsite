@@ -1,10 +1,12 @@
-﻿using BackendSite.ExceptionHandling;
+﻿using System.Text.RegularExpressions;
+
+using BackendSite.ExceptionHandling;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
-using System.Text.RegularExpressions;
-using BackendSite.Service.BLL.Interface;
 
 namespace BackendSite.Service.BLL
 {
@@ -24,7 +26,7 @@ namespace BackendSite.Service.BLL
                 WithdrawalStatusEnum.Pending,
                 WithdrawalStatusEnum.OnHold
             };
-            
+
             var withdrawalRequest = GetWithdrawalRequest(transId);
             if (!CheckWithdrawalFlow(forStatus, withdrawalRequest.Status))
             {
@@ -216,6 +218,7 @@ namespace BackendSite.Service.BLL
             }
             return false;
         }
+
     }
 }
 

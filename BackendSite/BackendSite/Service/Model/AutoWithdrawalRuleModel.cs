@@ -40,7 +40,7 @@ namespace BackendSite.Service.Model
         /// <summary>
         /// '0: Close 1:Open'
         /// </summary>
-        public int Status {get; set; }
+        public int Status { get; set; }
 
         public List<int> VipLevels { get; set; }
 
@@ -52,7 +52,7 @@ namespace BackendSite.Service.Model
 
     public class AutoWithdrawalRuleDeleteRequest
     {
-        public int Id {get; set; }
+        public int Id { get; set; }
     }
 
     #endregion
@@ -86,7 +86,7 @@ namespace BackendSite.Service.Model
 
     public class AutoWithdrawalRuleDataListDto : AutoWithdrawalRuleDataListBase
     {
-        
+
         public CurrencyEnum CurrencyId { get; set; }
 
         public decimal WithdrawalAmount { get; set; }
@@ -104,7 +104,7 @@ namespace BackendSite.Service.Model
 
     public class WithdrawalOptionDto
     {
-        public string Name {get; set; }
+        public string Name { get; set; }
 
         public int Value { get; set; }
 
@@ -133,6 +133,6 @@ namespace BackendSite.Service.Model
     }
     #endregion
 
-    
+
 
 }

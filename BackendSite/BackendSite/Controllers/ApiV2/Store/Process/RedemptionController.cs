@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.GiftManagement;
 using BackendSite.Service.Model.Store.Redemption;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
-        
+
         [HttpPost]
         public Task<ApiResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)
         {
@@ -31,16 +32,16 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
 
             return result;
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> ExportRedemptionListAsync(ExportRedemptionListRequest req)
         {
             var result = await _redemptionBll.ExportRedemptionListAsync(req);
 
             return _excelBll.ExcelFile(result, "RedemptionList");
-            
+
         }
-        
+
         [HttpPost]
         public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
         {
@@ -48,7 +49,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
 
             return result;
         }
-        
+
         [HttpPost]
         public Task<ApiResult<object>> GetRedemptionLogAsync(GetRedemptionLogRequest req)
         {
@@ -56,18 +57,18 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
 
             return result;
         }
-        
+
         [HttpPost]
         public Task<ApiResult<object>> SetRedemptionInfoAsync(SetRedemptionInfoRequest req)
         {
             var authData = _authorizeBll.GetAuthData();
             req.Operator = authData.UserName;
-            
+
             var result = _redemptionBll.SetRedemptionInfoAsync(req);
 
             return result;
         }
-        
+
         [HttpPost]
         public async Task<ApiResult> UploadReceiptAsync([FromForm] UploadMultiImagesRequest request)
         {
@@ -76,7 +77,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
                 ReceiptUrls = new List<string>()
             };
             var result = new ApiResult<UploadReceiptResult>();
-            
+
             foreach (var receipt in request.File)
             {
                 var uploadResult = await _redemptionBll.UploadReceiptAsync(receipt);
@@ -90,11 +91,11 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
             if (receiptList.ReceiptUrls.Any())
             {
                 result.Data = receiptList;
-                result.ErrorCode = (int) ErrorCodeEnum.Success;
+                result.ErrorCode = (int)ErrorCodeEnum.Success;
                 return result;
             }
-            
-            result.ErrorCode = (int) ErrorCodeEnum.Fail;
+
+            result.ErrorCode = (int)ErrorCodeEnum.Fail;
             return result;
         }
     }

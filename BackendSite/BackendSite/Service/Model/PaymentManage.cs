@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -54,10 +55,14 @@ namespace BackendSite.Service.Model
         public string BankCode { get; set; }
         public string BankName { get; set; }
         public BankInfoPayStatusEnum Status { get; set; }
-
         public int CurrencyId { get; set; }
     }
-    
+
+    public class BankInfoPayForSetting : PayListBankInfoSys
+    {
+        public BankInfoPayMethodEnum Method { get; set; }
+    }
+
     public class UpdatePayInfo
     {
         [LogIgnore]
@@ -73,7 +78,7 @@ namespace BackendSite.Service.Model
 
         public string StatusName => Status.ToString();
     }
-    
+
     public class UpdatePayChannel
     {
         [LogIgnore]
@@ -112,7 +117,7 @@ namespace BackendSite.Service.Model
 
         public IEnumerable<decimal> FixedAmountList { get; set; }
     }
-    
+
     public class UpdatePaySettingParams
     {
         public int SiteId { get; set; }
@@ -130,12 +135,12 @@ namespace BackendSite.Service.Model
 
         public int Sort { get; set; }
     }
-    
+
     public class PayListInfo
     {
         public int PayId { get; set; }
         public string PayName { get; set; }
-        
+
         /// <summary>
         /// 全域金流狀態
         /// </summary>
@@ -150,7 +155,7 @@ namespace BackendSite.Service.Model
         public PayListStatusEnum Status => PayStatus == PayListStatusEnum.Enable
             ? SitePayStatus
             : PayStatus;
-        
+
         public string LoginUrl { get; set; }
         public string LoginAccount { get; set; }
         public string LoginPassword { get; set; }
@@ -166,7 +171,7 @@ namespace BackendSite.Service.Model
         public int ChannelId { get; set; }
         public PayChannelStatusEnum Status { get; set; }
     }
-    
+
     public class UpdatePaySettingChargeFeeParams
     {
         public int SiteId { get; set; }
@@ -175,7 +180,7 @@ namespace BackendSite.Service.Model
         public decimal Percentage { get; set; }
         public decimal PreCount { get; set; }
     }
-    
+
     public class GetPaySettingListRequest : ApiRequestPageModel
     {
         public int SiteId { get; set; }
@@ -186,7 +191,7 @@ namespace BackendSite.Service.Model
         public PayListStatusEnum? Globalstatus { get; set; }
         public PayChannelStatusEnum? Status { get; set; }
     }
-    
+
     public class SetPayListLoginInfoParams
     {
         public int SiteId { get; set; }
@@ -197,7 +202,7 @@ namespace BackendSite.Service.Model
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string Operator { get; set; }
-        
+
         public string CorporateId { get; set; }
     }
 
@@ -239,7 +244,7 @@ namespace BackendSite.Service.Model
         public AmountRuleEnum AmountRule { get; set; }
         [JsonIgnore]
         public string AmountShow { get; set; }
-        public IEnumerable<decimal> FixedAmountList => 
+        public IEnumerable<decimal> FixedAmountList =>
             JsonConvert.DeserializeObject<IEnumerable<decimal>>(string.IsNullOrEmpty(AmountShow) ? "[]" : AmountShow);
         public int PointLevel { get; set; }
         public int Sort { get; set; }
@@ -253,7 +258,7 @@ namespace BackendSite.Service.Model
         public decimal ChargeFeePercentage { get; set; }
         public decimal ChargeFeePreCount { get; set; }
     }
-    
+
     public class PayChannelInfo
     {
         public PayChannelInfo(PaySetting setting)
@@ -266,7 +271,7 @@ namespace BackendSite.Service.Model
             Mode = setting.Mode;
             Sort = setting.Sort;
         }
-        
+
         public int PayId { get; set; }
         public string PayName { get; set; }
         public int ChannelId { get; set; }
@@ -275,7 +280,7 @@ namespace BackendSite.Service.Model
         public int Mode { get; set; }
         public int Sort { get; set; }
     }
-    
+
     public class PayChannelInfoComparer : IEqualityComparer<PayChannelInfo>
     {
         public bool Equals(PayChannelInfo t1, PayChannelInfo t2)
@@ -288,20 +293,20 @@ namespace BackendSite.Service.Model
             return t.ToString().GetHashCode();
         }
     }
-    
+
     public class LocalPaySetting
     {
         public int CurrencyId { get; set; }
-        
+
         public int SysId { get; set; }
-        
+
         public int GroupId { get; set; }
-        
+
         public string GroupName { get; set; }
-        
+
         public DepositTypeEnum Type { get; set; }
     }
-    
+
     public class PayGroup
     {
         public int GroupId { get; set; }

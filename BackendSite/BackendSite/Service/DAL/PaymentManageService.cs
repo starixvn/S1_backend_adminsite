@@ -1,10 +1,14 @@
-﻿using BackendSite.Service.Library;
-using BackendSite.Service.Model;
-using Dapper;
-using Newtonsoft.Json;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Extensions;
+using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using System.Security.Policy;
+
+using Dapper;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -50,12 +54,12 @@ namespace BackendSite.Service.DAL
             #endregion
 
             #region propsLog
-            
+
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -73,9 +77,9 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-            return false; 
+            return false;
         }
 
         public bool UpdatePayChannel(ParamsWithLog<UpdatePayChannel> input)
@@ -93,12 +97,12 @@ namespace BackendSite.Service.DAL
             #endregion
 
             #region propsLog
-            
+
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -116,7 +120,7 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
@@ -126,7 +130,7 @@ namespace BackendSite.Service.DAL
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            
+
             #region props
             var props = new DynamicParameters();
             props.Add("ChannelId", input.After.ChannelId);
@@ -138,12 +142,12 @@ namespace BackendSite.Service.DAL
             #endregion
 
             #region propsLog
-            
+
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -161,7 +165,7 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
@@ -181,12 +185,12 @@ namespace BackendSite.Service.DAL
             #endregion
 
             #region propsLog
-            
+
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
             logParam.Add("_AfterDetailInfo", input.After.ToLog());
@@ -204,7 +208,7 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
@@ -212,7 +216,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int payId)
         {
             var SpName = "Admin_BankInfoSys_Get";
-            return _reportDbClient.Query<PayListBankInfoSys>(SpName, new {PayId = payId });
+            return _reportDbClient.Query<PayListBankInfoSys>(SpName, new { PayId = payId });
         }
 
         public void UpdateBankInfo(int payId, int sysId, int status, string @operator)
@@ -256,18 +260,20 @@ namespace BackendSite.Service.DAL
 
         #region PaymentGateway Setting Renew
         
-        public IEnumerable<PayListInfo> GetPayList(int siteId)
+        public IEnumerable<PayListInfo> GetPayList(IEnumerable<int> siteIds)
         {
+            var _siteIds = JsonConvert.SerializeObject(siteIds);
             return _reportDbClient
-                .Query<PayListInfo>("Admin_SitePayList_Get", new DynamicParameters(new { _SiteId = siteId }));
+                .Query<PayListInfo>("Admin_SitePayList_Get_V2", new DynamicParameters(new { _SiteId = _siteIds }));
         }
-        
+
         public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var pay = GetPayList(siteId)
+            var siteIds = Enumerable.Repeat(siteId, 1);
+            var pay = GetPayList(siteIds)
                 .First(x => x.PayId == payId);
 
             #region props
@@ -276,17 +282,17 @@ namespace BackendSite.Service.DAL
             {
                 _SiteId = siteId,
                 _PayId = payId,
-                _Status = (int) status
+                _Status = (int)status
             });
-            
+
             #endregion
 
             #region propsLog
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", siteId);
             logParam.Add("_CurrencyId", 0);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
@@ -309,17 +315,18 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
-        
+
         public bool SetPayListLoginInfo(SetPayListLoginInfoParams input)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var pay = GetPayList(input.SiteId)
+            var siteIds = Enumerable.Repeat(input.SiteId, 1);
+            var pay = GetPayList(siteIds)
                 .First(x => x.PayId == input.PayId);
 
             #region props
@@ -335,15 +342,15 @@ namespace BackendSite.Service.DAL
                 _TransferPin = input.TransferPin,
                 _CorporateId = input.CorporateId
             });
-            
+
             #endregion
 
             #region propsLog
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", 0);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
@@ -376,11 +383,11 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
-        
+
         public IEnumerable<PaySetting> GetPaySettingList(GetPaySettingListParams input, int pageSize, int startIndex, out int totalPages, out int rowCount)
         {
             var p = new DynamicParameters(new
@@ -396,17 +403,17 @@ namespace BackendSite.Service.DAL
                 _StartIndex = startIndex
             });
 
-            p.Add("_TotalPages", dbType:DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("_RowCount", dbType:DbType.Int32, direction: ParameterDirection.Output);
-            
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
             var result = _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p);
-            
+
             totalPages = p.Get<int>("_TotalPages");
             rowCount = p.Get<int>("_RowCount");
 
             return result;
         }
-        
+
         public IEnumerable<PaySetting> GetPaySetting(int siteId, int? channelId = null)
         {
             var p = new DynamicParameters(new
@@ -414,10 +421,10 @@ namespace BackendSite.Service.DAL
                 _SiteId = siteId,
                 _ChannelId = channelId
             });
-            
+
             return _reportDbClient.Query<PaySetting>("Admin_PaySetting_Get", p);
         }
-        
+
         public bool UpdatePaySetting(UpdatePaySettingParams input, string @operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -444,8 +451,8 @@ namespace BackendSite.Service.DAL
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
@@ -478,11 +485,11 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
-        
+
         public bool UpdatePaySettingStatus(UpdatePaySettingStatusParams input, string @operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -503,8 +510,8 @@ namespace BackendSite.Service.DAL
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
@@ -527,11 +534,11 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
-        
+
         public bool UpdatePaySettingChargeFee(UpdatePaySettingChargeFeeParams input, string @operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -553,8 +560,8 @@ namespace BackendSite.Service.DAL
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
@@ -578,37 +585,38 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
-        
-        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int siteId, int payId)
+
+        public IEnumerable<BankInfoPayForSetting> GetBankInfoPayList(int siteId, int payId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPay_Get", new
+            return _reportDbClient.Query<BankInfoPayForSetting>("Admin_BankInfoPay_Get_V2", new
             {
                 _PayId = payId,
                 _SiteId = siteId
             });
         }
-        
-        public IEnumerable<PayListBankInfoSys> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
+
+        public IEnumerable<BankInfoPayForSetting> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
         {
-            return _reportDbClient.Query<PayListBankInfoSys>("Admin_BankInfoPayForSetting_Get", new
+            return _reportDbClient.Query<BankInfoPayForSetting>("Admin_BankInfoPayForSetting_Get_V2", new
             {
                 _SiteId = siteId,
                 _CurrencyId = currencyId,
                 _ChannelId = channelId
             });
         }
-        
-        public bool UpdateBankInfo(int siteId, int payId, int sysId, BankInfoPayStatusEnum status, string @operator)
+
+        public bool UpdateBankInfo(int siteId, int payId, int sysId,
+            BankInfoPayStatusEnum status, BankInfoPayMethodEnum method, string @operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-            var bankSysInfo = GetBankSysInfoList(siteId, payId)
-                .First(x => x.Id == sysId);
+            var bankSysInfo = GetBankInfoPayList(siteId, payId)
+                .First(x => x.Id == sysId && x.Method == method);
 
             #region props
             var props = new DynamicParameters();
@@ -616,29 +624,32 @@ namespace BackendSite.Service.DAL
             props.Add("_PayId", payId);
             props.Add("_SysId", sysId);
             props.Add("_Status", status);
+            props.Add("_Method", method);
             #endregion
 
             #region propsLog
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", siteId);
             logParam.Add("_CurrencyId", bankSysInfo.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
                 bankSysInfo.BankName,
+                Method = method.ToString(),
                 Status = bankSysInfo.Status.ToString()
             }));
             logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
             {
                 bankSysInfo.BankName,
+                Method = method.ToString(),
                 Status = status.ToString()
             }));
             logParam.Add("_Operator", @operator);
             #endregion
 
-            var setResult = _mainDbClient.Execute("Admin_BankInfoPay_Set_V2", trans, props);
+            var setResult = _mainDbClient.Execute("Admin_BankInfoPay_Set_V3", trans, props);
             if (setResult > 0)
             {
                 var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam);
@@ -650,13 +661,13 @@ namespace BackendSite.Service.DAL
             }
 
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-                
+
             return false;
         }
-        
+
         public IEnumerable<CryptoInfo> GetCryptoInfoList(int siteId)
-            => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get_V2", new {_SiteId = siteId});
-        
+            => _reportDbClient.Query<CryptoInfo>("Admin_CryptoInfo_Get_V2", new { _SiteId = siteId });
+
         public bool SetCryptoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -675,8 +686,8 @@ namespace BackendSite.Service.DAL
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", siteId);
             logParam.Add("_CurrencyId", currencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.PaymentGateway);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.PaymentGateway);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
@@ -705,10 +716,10 @@ namespace BackendSite.Service.DAL
             }
 
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-            
+
             return false;
         }
-        
+
         public async Task<IEnumerable<PayGroup>> GetPayGroup()
         {
             return await _reportDbClient.QueryAsync<PayGroup>("Service_PayGroup_Get");

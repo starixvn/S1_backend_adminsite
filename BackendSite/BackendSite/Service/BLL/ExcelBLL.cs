@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using System.Reflection;
+﻿using System.Reflection;
+
 using BackendSite.Attributes;
 using BackendSite.Service.Model;
+
+using Microsoft.AspNetCore.Mvc;
+
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace BackendSite.Service.BLL
 {
@@ -33,7 +36,7 @@ namespace BackendSite.Service.BLL
             return _excelContentType.Exists(a => a.Equals(contentType, StringComparison.OrdinalIgnoreCase));
         }
 
-        public List<ExcelData> Read(IFormFile formFile) 
+        public List<ExcelData> Read(IFormFile formFile)
         {
             var excelList = new List<ExcelData>();
             var excelPkg = new ExcelPackage(formFile.OpenReadStream());
@@ -186,7 +189,7 @@ namespace BackendSite.Service.BLL
             return ms.ToArray();
         }
 
-        public virtual byte[] ExportV2<T>(IEnumerable<T> t, int ignoreColumnCount ,IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        public virtual byte[] ExportV2<T>(IEnumerable<T> t, int ignoreColumnCount, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
         {
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var ms = new MemoryStream();
@@ -250,7 +253,7 @@ namespace BackendSite.Service.BLL
             return ms.ToArray();
         }
 
-        public byte[] ExportV2<T>(Dictionary<string,IEnumerable<T>> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
+        public byte[] ExportV2<T>(Dictionary<string, IEnumerable<T>> t, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
         {
             using var ms = new MemoryStream();
             using var p = new ExcelPackage(ms);
@@ -280,6 +283,70 @@ namespace BackendSite.Service.BLL
                             title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
                         }
                     }
+                }
+            }
+            p.Save();
+            return ms.ToArray();
+        }
+
+        public byte[] ExportV2<T, S>(Dictionary<string, IEnumerable<T>> t, Dictionary<string, IEnumerable<S>> s, IEnumerable<PropertyInfo> properties = null)
+        {
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+            foreach (var item in t)
+            {
+                var ws = p.Workbook.Worksheets.Add(item.Key);
+
+                if (item.Value.Any())
+                {
+                    if (properties == null)
+                    {
+                        properties = item.Value.FirstOrDefault().GetType().GetProperties();
+                    }
+                    var rows = item.Value.Count() + 1;
+                    var cols = properties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws.Cells[1, 1].LoadFromCollection(item.Value, true);
+
+                        using (var range = ws.Cells[1, 1, rows, cols])
+                        {
+                            // 標題列
+                            var title = ws.Cells[1, 1, 1, cols];
+                            title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                            title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        }
+                    }
+
+                }
+            }
+            foreach (var item in s)
+            {
+                var ws = p.Workbook.Worksheets.Add(item.Key);
+
+                if (item.Value.Any())
+                {
+                    if (properties == null)
+                    {
+                        properties = item.Value.FirstOrDefault().GetType().GetProperties();
+                    }
+                    var rows = item.Value.Count() + 1;
+                    var cols = properties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws.Cells[1, 1].LoadFromCollection(item.Value, true);
+
+                        using (var range = ws.Cells[1, 1, rows, cols])
+                        {
+                            // 標題列
+                            var title = ws.Cells[1, 1, 1, cols];
+                            title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                            title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        }
+                    }
+
                 }
             }
             p.Save();
@@ -354,8 +421,8 @@ namespace BackendSite.Service.BLL
                 FileDownloadName = $"{fileName}_{DateTime.Now.ToString("yyyyMMdd")}.xlsx"
             };
         }
-        
-        public FileContentResult ExcelFileDateRange(byte[] data, DateTime from , DateTime to ,string fileName)
+
+        public FileContentResult ExcelFileDateRange(byte[] data, DateTime from, DateTime to, string fileName)
         {
             return new FileContentResult(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {

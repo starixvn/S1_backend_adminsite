@@ -191,7 +191,7 @@ namespace BackendSite.Service.Model
         public decimal BonusAmount { get; set; }
         public decimal CancelBonus { get; set; }
     }
-    
+
     public class CustBonusSum
     {
         public decimal FirstDeposit { get; set; }
@@ -506,7 +506,7 @@ namespace BackendSite.Service.Model
         public int TotalPages { get; set; }
         public int RowCount { get; set; }
     }
-    
+
     public class AdjustmentWithdrawalLimitLog
     {
         public int MainType { get; set; }
@@ -517,7 +517,7 @@ namespace BackendSite.Service.Model
         public string Creator { get; set; }
         public DateTimeOffset CreateTime { get; set; }
     }
-    
+
     public class AdjustmentWithdrawalLimitLogData
     {
         public List<AdjustmentWithdrawalLimitLog> AdjustmentWithdrawalLimitLogList { get; set; }
@@ -603,15 +603,35 @@ namespace BackendSite.Service.Model
         public string TpUserName { get; set; }
     }
 
-    public class CustDashBoardTodayModel
+    public class CustDashBoardTodayBaseDto
     {
         public decimal TodayDeposit { get; set; }
         public decimal TodayWithdrawal { get; set; }
         public decimal TodayWinLoss { get; set; }
         public decimal TodayBetting { get; set; }
         public decimal TodayBonus { get; set; }
+    }
+
+    public class CustDashBoardTodayModel : CustDashBoardTodayBaseDto
+    {
+        public decimal TodayReferralAmount { get; set; }
+
+        public decimal TodayReferralFreeCredit { get; set; }
+
+        public decimal TodayPhoneReward { get; set; }
+
+        public decimal TodayEmailReward { get; set; }
+
+        public decimal TodayDraw { get; set; }
+
+        public decimal TodayUpgradeAmount { get; set; }
+    }
+
+    public class CustDashBoardTodayResponse : CustDashBoardTodayBaseDto
+    {
         public decimal TodayReward { get; set; }
     }
+
 
     public class ImportDataByExcelModel
     {

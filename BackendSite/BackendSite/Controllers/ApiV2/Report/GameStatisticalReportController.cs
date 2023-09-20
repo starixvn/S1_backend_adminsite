@@ -1,11 +1,12 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
-using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.GameStatisticalReport;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.Service.Model.GameStatisticalReport;
-using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Controllers.ApiV2.Report
 {

@@ -1,7 +1,9 @@
 using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
 
 namespace BackendSite.Service.DAL;
@@ -36,18 +38,18 @@ public class PaymentChargeFeeService
                 _PageSize = pageSize,
                 _StartIndex = startIndex
             });
-        
+
         parameters.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
         parameters.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
         var result = _reportDbClient.Query<ModifyPaymentChargeFeeLog>("Admin_ModifyPaymentChargeFeeLog_Get", parameters);
-        
+
         totalPages = parameters.Get<int?>("_TotalPages") ?? 0;
         rowCount = parameters.Get<int?>("_RowCount") ?? 0;
 
         return result;
     }
-    
+
     public int CreateModifyPaymentChargeFeeLog(ModifyPaymentChargeFeeParams input)
     {
         using var conn = _mainDbClient.GetMySqlConnection();
@@ -65,9 +67,9 @@ public class PaymentChargeFeeService
                 _EndTime = input.EndTime.UtcDateTime,
                 _Operator = input.Operator
             });
-        
+
         parameters.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
-        
+
         _ = _mainDbClient.Execute("Admin_ModifyPaymentChargeFeeLog_Ins", trans, parameters);
 
         var result = parameters.Get<int>("_Result");

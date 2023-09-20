@@ -2,6 +2,7 @@
 using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -17,7 +18,7 @@ namespace BackendSite.Service.BLL
             _logger = provider.GetService<ILogger<LineChannelBLL>>();
         }
 
-        public IEnumerable<LineChannelModel> GetList(int siteId,IEnumerable<int> currencyIds, int pageNumber, int pageSize,
+        public IEnumerable<LineChannelModel> GetList(int siteId, IEnumerable<int> currencyIds, int pageNumber, int pageSize,
             out int totalPages, out int rowCount)
         {
             var datas = _lineChannelService.GetList(true, 0, siteId, JsonConvert.SerializeObject(currencyIds),
@@ -29,7 +30,7 @@ namespace BackendSite.Service.BLL
 
         public LineChannelModel GetById(int id)
         {
-            var result = _lineChannelService.GetList(false, id, 0,string.Empty,
+            var result = _lineChannelService.GetList(false, id, 0, string.Empty,
                 0, 10, out _, out _);
 
             if (result.Count() == 0)

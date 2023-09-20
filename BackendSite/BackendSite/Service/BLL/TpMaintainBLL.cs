@@ -1,7 +1,9 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model.TpMaintain;
-using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
+
 using Newtonsoft.Json;
+
+using TpGameType = BackendSite.Service.Model.TpMaintain.TpGameType;
 
 namespace BackendSite.Service.BLL
 {
@@ -82,7 +84,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<TpGameType> GetTpGameTypeList(int tpId)
         {
-            return _tpMaintainService.GetTpGameTypeList().Where(r=>r.TpId == tpId);
+            return _tpMaintainService.GetTpGameTypeList().Where(r => r.TpId == tpId);
         }
 
         public IEnumerable<TpCategory> GetTPCategoryList()

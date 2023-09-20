@@ -14,7 +14,7 @@ public class DateTimeHelper
         _redisHelper = provider.GetRequiredService<ICacheHelper>();
     }
 
-    public DateTimeOffset ToCurrencyZone(DateTime time, int currencyId) 
+    public DateTimeOffset ToCurrencyZone(DateTime time, int currencyId)
     {
         var timezone = _redisHelper.TryGetOrCreate($"TimeZone:{currencyId}", null,
             () => _reportService.GetCurrencyList()

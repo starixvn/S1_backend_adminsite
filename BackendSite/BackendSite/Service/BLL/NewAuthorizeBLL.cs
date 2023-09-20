@@ -1,8 +1,9 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Security.Claims;
+
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using System.Security.Claims;
 
 namespace BackendSite.Service.BLL
 {

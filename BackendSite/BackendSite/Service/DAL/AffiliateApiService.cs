@@ -2,6 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.Extensions.Options;
 
 namespace BackendSite.Service.DAL
@@ -53,7 +54,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception e)
             {
-                _logger.LogError(e,"aff AffInfo is failed");
+                _logger.LogError(e, "aff AffInfo is failed");
                 return null;
             }
         }
@@ -73,7 +74,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception e)
             {
-                _logger.LogError(e,"get auth token failed");
+                _logger.LogError(e, "get auth token failed");
                 return null;
             }
         }

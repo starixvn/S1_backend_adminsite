@@ -4,7 +4,7 @@ namespace BackendSite.Extensions
     {
         public static IEnumerable<string> SplitRemoveSpace(string str, char separator)
         {
-            return string.IsNullOrWhiteSpace(str) 
+            return string.IsNullOrWhiteSpace(str)
                 ? Array.Empty<string>()
                 : str.Replace(" ", "").Split(separator);
         }
@@ -18,7 +18,7 @@ namespace BackendSite.Extensions
         //{
         //    return Math.Round(source, 2, MidpointRounding.AwayFromZero);
         //}
-        
+
         public static string GetChannelName(this string currencyName, string network)
         {
             return currencyName.Equals(network, StringComparison.OrdinalIgnoreCase)

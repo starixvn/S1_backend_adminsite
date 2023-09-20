@@ -1,12 +1,16 @@
-﻿using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.DAL.Interface;
-using BackendSite.Service.Model.Mpa.Marketing;
+﻿using System.Reflection;
+
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
-using OfficeOpenXml.Style;
+using BackendSite.Service.Model.Mpa.Marketing;
+
+using Newtonsoft.Json;
+
 using OfficeOpenXml;
-using System.Reflection;
+using OfficeOpenXml.Style;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -27,13 +31,14 @@ namespace BackendSite.Service.BLL.Mpa
 
         public async Task<WithdrawalAmountSummaryResponse> GetWithdrawalAmountSummaryAsync(WithdrawalAmountRequest request)
         {
-            var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.StartDate,
-                request.EndDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var withSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.StartDate.DateTime, request.EndDate.DateTime))
+                .Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRate(withSummaryResult, request.StartDate, request.GetEndDate(), request.BaseCurrencyId);
 
-            var compareWithSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(request.SiteId, request.CompareFromDate,
-                request.CompareToDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var compareWithSummaryResult = (await _withdrawalAmountService.GetWithdrawalAmountSummaryAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.CompareFromDate.DateTime, request.CompareToDate.DateTime)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRate(compareWithSummaryResult, request.CompareFromDate, request.GetCompareEndDate(), request.BaseCurrencyId);
 
@@ -86,8 +91,8 @@ namespace BackendSite.Service.BLL.Mpa
                 return _cacheHelper.GetListByRange<WithdrawalAmountDetailData>(masterKey, startIndex, endIndex);
             }
 
-            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(request.SiteId, request.StartDate,
-                request.EndDate).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.StartDate.DateTime, request.EndDate.DateTime).Result.Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             MultiplyExchangeRate(withDetails, request.StartDate, request.GetEndDate(), request.BaseCurrencyId).Wait();
 

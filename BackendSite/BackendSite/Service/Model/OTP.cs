@@ -43,7 +43,7 @@ namespace BackendSite.Service.Model
                 {
                     return null;
                 }
-                return  new DateTimeOffset(_verifiedTime.Value, TimeSpan.Zero);
+                return new DateTimeOffset(_verifiedTime.Value, TimeSpan.Zero);
             }
             set
             {

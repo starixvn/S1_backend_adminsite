@@ -53,6 +53,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
 
         public Dictionary<string, MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
+        public IEnumerable<MpaWinLossByDayCurrencyDetailDto> CurrencyDetailGroupByCurrency { get; set; }
     }
 
     public class MpaWinLossByTpGameTypeResponse
@@ -191,6 +192,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
 
         public Dictionary<string, MpaWinLossByPlayerCurrencyDetailDto> CurrencyDetail { get; set; }
+        public IEnumerable<MpaWinLossByPlayerCurrencyDetailDto> CurrencyDetailByplayer { get; set; }
     }
 
     public class MpaWinLossByPlayerDetailResponse
@@ -538,10 +540,10 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         [JsonProperty(Order = 11)]
         public decimal Margin { get; set; }
 
-        [JsonProperty(Order = 12)] 
+        [JsonProperty(Order = 12)]
         public decimal ClosingBalance => 0.0m;
 
-        [JsonProperty(Order = 13)] 
+        [JsonProperty(Order = 13)]
         public int DepositCount => 0;
 
         [JsonProperty(Order = 14)]

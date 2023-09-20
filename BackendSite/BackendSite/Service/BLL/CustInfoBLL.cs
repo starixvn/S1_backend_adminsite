@@ -1,15 +1,20 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Text.RegularExpressions;
+using System.Transactions;
+
+using Amazon.S3.Model;
+
+using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
+
 using Newtonsoft.Json;
-using System.Transactions;
+
 using OfficeOpenXml;
-using System.Text.RegularExpressions;
-using Amazon.S3.Model;
-using BackendSite.Extensions;
+
 using Tag = BackendSite.Service.Model.Tag;
 
 namespace BackendSite.Service.BLL
@@ -998,9 +1003,21 @@ namespace BackendSite.Service.BLL
             return queryResult;
         }
 
-        public async Task<CustDashBoardTodayModel> GetCustDashBoardTodayAsync(int custId, int currencyId)
+        public async Task<CustDashBoardTodayResponse> GetCustDashBoardTodayAsync(int custId, int currencyId)
         {
-            return await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+            var data = await _custInfoService.GetCustDashBoardTodayAsync(custId, currencyId);
+            _logger.LogInformation($"GetCustDashBoardTodayAsyncResult：{JsonConvert.SerializeObject(data)} CsutId:{custId} and currencyId:{currencyId}");
+
+            return new CustDashBoardTodayResponse()
+            {
+                TodayDeposit = data.TodayDeposit,
+                TodayWithdrawal = data.TodayWithdrawal,
+                TodayWinLoss = data.TodayWinLoss,
+                TodayBetting = data.TodayBetting,
+                TodayBonus = data.TodayBonus,
+                TodayReward = data.TodayReferralAmount + data.TodayReferralFreeCredit + data.TodayPhoneReward +
+                              data.TodayEmailReward + data.TodayDraw + data.TodayUpgradeAmount
+            };
         }
 
         public IEnumerable<BlockBankAcc> GetBankList(int custId)

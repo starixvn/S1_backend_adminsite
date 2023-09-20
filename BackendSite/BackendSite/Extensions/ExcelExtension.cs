@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Reflection;
+
 using BackendSite.Attributes;
+
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
@@ -17,7 +19,7 @@ namespace BackendSite.Extensions
         /// <param name="freeze">是否凍結窗格</param>
         /// <param name="index"></param>
         public static void CreateHeaders<T>(this ISheet sheet, bool freeze = false, int index = 0)
-            where T: class
+            where T : class
         {
             var headerRow = sheet.CreateRow(0);
             var props = typeof(T).GetProperties();
@@ -32,7 +34,7 @@ namespace BackendSite.Extensions
                 var name = prop.GetDisplayName();
                 headerRow.CreateCell(index).SetCellValue(name);
                 sheet.AutoSizeColumn(index);
-                
+
                 index++;
             }
 
@@ -41,8 +43,24 @@ namespace BackendSite.Extensions
                 sheet.CreateFreezePane(0, 1);
         }
 
-         public static void SetDropDownList(this ISheet sheet, string[] datas,
-            int firstRow, int lastRow, int firstCol, int lastCol)
+        public static void CreateHeaders(this ISheet sheet, IEnumerable<string> headers, bool freeze = false)
+        {
+            var headerRow = sheet.CreateRow(0);
+
+            var index = 0;
+            foreach (var header in headers)
+            {
+                headerRow.CreateCell(index).SetCellValue(header);
+                index++;
+            }
+
+            // 凍結窗格
+            if (freeze)
+                sheet.CreateFreezePane(0, 1);
+        }
+
+        public static void SetDropDownList(this ISheet sheet, string[] datas,
+           int firstRow, int lastRow, int firstCol, int lastCol)
         {
             var dvHelper = sheet.GetDataValidationHelper();
             var cellRange = new CellRangeAddressList(firstRow, lastRow, firstCol, lastCol);
@@ -62,7 +80,7 @@ namespace BackendSite.Extensions
         {
             return cell?.NumericCellValue.ToDecimal() ?? 0m;
         }
-        
+
         public static int CellItemToInt(this ICell cell)
         {
             return cell?.NumericCellValue.ToInt() ?? 0;
@@ -84,7 +102,6 @@ namespace BackendSite.Extensions
         public static void WriteToSheet<T>(this ISheet sheet, IEnumerable<T> list, bool freeze = false, TimeSpan? offset = null)
             where T : class
         {
-            sheet.CreateHeaders<T>(freeze);
             var rowTitle = sheet.CreateRow(1);
 
             if (!list.Any())
@@ -93,8 +110,9 @@ namespace BackendSite.Extensions
             }
             else
             {
-                var props = list.First().GetType().GetProperties();
+                sheet.CreateHeaders<T>(freeze);
 
+                var props = list.First().GetType().GetProperties();
                 var index = 1;
                 foreach (var item in list)
                 {
@@ -107,7 +125,7 @@ namespace BackendSite.Extensions
                         {
                             continue;
                         }
-                        
+
                         var val = item.GetType().GetProperty(prop.Name)?.GetValue(item);
                         if (val is DateTimeOffset dto && dto.Year > 1)
                         {
@@ -118,50 +136,80 @@ namespace BackendSite.Extensions
                         {
                             row.CreateCell(i).SetCellValue(val?.ToString() ?? string.Empty);
                         }
-                        
+
                         i++;
                     }
                     index++;
                 }
             }
         }
-        
+
+        public static void WriteDictionaryListToSheet(this ISheet sheet, IEnumerable<IDictionary<string, string>> list, bool freeze = false)
+        {
+            var rowTitle = sheet.CreateRow(1);
+
+            if (!list.Any())
+            {
+                rowTitle.CreateCell(0).SetCellValue("No Data");
+            }
+            else
+            {
+                var headers = list.First().Keys;
+                sheet.CreateHeaders(headers, freeze);
+
+                var index = 1;
+                foreach (var dic in list)
+                {
+                    var row = sheet.CreateRow(index);
+
+                    var i = 0;
+                    foreach (var item in dic)
+                    {
+                        row.CreateCell(i).SetCellValue(item.Value);
+
+                        i++;
+                    }
+                    index++;
+                }
+            }
+        }
+
         private static decimal ToDecimal(this object value)
         {
             if (value == null)
                 return default;
-            
+
             decimal.TryParse(value.ToString()
                 .Replace(",", string.Empty), out decimal result);
-            
+
             return result;
         }
-        
+
         private static int ToInt(this object value)
         {
             if (value == null)
                 return default;
-            
+
             int.TryParse(value.ToString()
                 .Replace(",", string.Empty), out int result);
-            
+
             return result;
         }
-    
+
         private static bool ExcelIgnore(this ICustomAttributeProvider propertyInfo)
         {
             var attributes = (ExportIgnoreAttribute[])propertyInfo
                 .GetCustomAttributes(typeof(ExportIgnoreAttribute), false);
-     
+
             return attributes.Length > 0;
         }
-        
+
         private static string GetDisplayName(this PropertyInfo propertyInfo)
         {
             var attributes = (DisplayNameAttribute[])propertyInfo
                 .GetCustomAttributes(typeof(DisplayNameAttribute), false);
-            
-            return attributes.Length > 0 
+
+            return attributes.Length > 0
                 ? attributes.First().DisplayName
                 : propertyInfo.Name;
         }

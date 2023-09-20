@@ -1,11 +1,15 @@
 ﻿using System.Reflection;
+
+using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
-using BackendSite.Extensions;
+
+using Newtonsoft.Json;
+
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
@@ -31,15 +35,15 @@ namespace BackendSite.Service.BLL.Mpa
 
         public async Task<DepositAmountSummaryResponse> GetDepositAmountSummaryAsync(DepositAmountRequest request)
         {
-            var depositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(request.SiteId,
-                request.StartDate, request.EndDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var depositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.StartDate.DateTime, request.EndDate.DateTime)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRateAmountSummary(depositSummaryResult, request.StartDate, request.GetEndDate(), request.BaseCurrencyId);
 
-            var compareDepositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(request.SiteId,
-                request.CompareFromDate, request.CompareToDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var compareDepositSummaryResult = (await _depositAmountService.GetDepositAmountSummaryAsync(JsonConvert.SerializeObject(new List<int>() { request.SiteId }),
+                request.StartDateCompared.DateTime, request.EndDateCompared.DateTime)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
-            await MultiplyExchangeRateAmountSummary(compareDepositSummaryResult, request.CompareFromDate, request.GetCompareEndDate(), request.BaseCurrencyId);
+            await MultiplyExchangeRateAmountSummary(compareDepositSummaryResult, request.StartDateCompared, request.GetCompareEndDate(), request.BaseCurrencyId);
 
             var response = new DepositAmountSummaryResponse
             {
@@ -70,7 +74,7 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<DepositSinUpSummaryResponse> GetDepositSinUpSummaryAsync(DepositAmountRequest request)
         {
             var depositSignUpSummaryResult = (await _depositAmountService.GetDepositSignUpSummaryAsync(request.SiteId,
-                request.StartDate, request.EndDate)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+                request.StartDate.DateTime, request.EndDate.DateTime)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRateSinUpSummary(depositSignUpSummaryResult, request.StartDate, request.GetEndDate(), request.BaseCurrencyId);
 
@@ -153,15 +157,15 @@ namespace BackendSite.Service.BLL.Mpa
                     NoOfPlayers = mainSiteList.DistinctBy(x => x.CustId).Count(),
                     FirstDepositAmount = mainSiteList.Sum(r => r.FirstDepositAmount),
                     TotalDepositAmount = mainSiteList.Sum(r => r.DepositAmount),
-                    Children = mainSiteList.Any() 
+                    Children = mainSiteList.Any()
                         ? mainSiteList.DistinctBy(x => x.SignUpUrl).Select(r => new SignUpChildDto
-                    {
-                        SignUpUrl = r.SignUpUrl,
-                        FirstDepositAmount = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).Sum(x => x.FirstDepositAmount),
-                        TotalDepositAmount = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).Sum(x => x.DepositAmount),
-                        NoOfPlayers = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).DistinctBy(x => x.CustId)
+                        {
+                            SignUpUrl = r.SignUpUrl,
+                            FirstDepositAmount = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).Sum(x => x.FirstDepositAmount),
+                            TotalDepositAmount = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).Sum(x => x.DepositAmount),
+                            NoOfPlayers = mainSiteList.Where(x => x.SignUpUrl == r.SignUpUrl).DistinctBy(x => x.CustId)
                             .Count()
-                    }).ToList()
+                        }).ToList()
                         : null
                 };
                 response.SignUpData.Add(mainData);
@@ -370,8 +374,9 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
 
-            var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(request.SiteId, request.StartDate,
-                request.EndDate).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
+            var depositSignUpDetail = _depositAmountService.GetDepositSignUpDetail(
+                JsonConvert.SerializeObject(new List<int>() { request.SiteId }), request.StartDate.DateTime, request.EndDate.DateTime)
+                .Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             MultiplyExchangeRateSinUpSummary(depositSignUpDetail, request.StartDate, request.GetEndDate(), request.BaseCurrencyId).Wait();
 

@@ -1,6 +1,6 @@
 ﻿namespace BackendSite.Service.Model
 {
-    
+
     public class CustIovationData
     {
         public string DeviceId { get; set; }

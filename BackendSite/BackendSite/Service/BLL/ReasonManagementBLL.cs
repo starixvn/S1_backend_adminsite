@@ -22,13 +22,13 @@ namespace BackendSite.Service.BLL
             return _reasonManagementService.GetReasonManagementData(para);
         }
 
-        public (bool Success, string Message) SetReasonManagement(SetReasonManagementPara para,int userId)
+        public (bool Success, string Message) SetReasonManagement(SetReasonManagementPara para, int userId)
         {
             var result = _reasonManagementService.SetReasonManagement(para, userId);
 
             return result switch
             {
-                (int) ErrorCodeEnum.Success => (true, string.Empty),
+                (int)ErrorCodeEnum.Success => (true, string.Empty),
                 -1 => (false, "Duplicate description of FuncKey."),
                 -3 => (false, $"Id {para.Id} not exists."),
                 _ => (false, "Set reason failed.")
@@ -36,11 +36,11 @@ namespace BackendSite.Service.BLL
         }
         public (bool Success, string Message) InsertReasonManagement(InsertReasonManagementPara para, int userId)
         {
-            var result =  _reasonManagementService.InsertReasonManagement(para, userId);
-            
+            var result = _reasonManagementService.InsertReasonManagement(para, userId);
+
             return result switch
             {
-                (int) ErrorCodeEnum.Success => (true, string.Empty),
+                (int)ErrorCodeEnum.Success => (true, string.Empty),
                 -1 => (false, "Duplicate description of FuncKey."),
                 _ => (false, "Set reason failed.")
             };

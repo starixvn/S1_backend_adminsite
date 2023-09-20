@@ -9,7 +9,7 @@ namespace BackendSite.Service.DAL.Interface
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<BonusReportDtoWrapper> GetBonusReportV2Async(BonusReportRequestV2 request);
+        Task<BonusReportDtoWrapper> GetBonusReportV2Async(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportRequestV2 request);
 
 
         /// <summary>
@@ -17,7 +17,7 @@ namespace BackendSite.Service.DAL.Interface
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(BonusReportExportRequestV2 request);
+        Task<IEnumerable<BonusReportDto>> GetBonusReportExportData(IEnumerable<MultiSiteRequestDto> multiSiteRequests, BonusReportExportRequestV2 request);
 
         /// <summary>
         /// 取得PromotionCategory 下拉選單內容

@@ -1,10 +1,40 @@
-﻿using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
+using BackendSite.Service.Model.enums;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
+    public class GetByTransIdRequest
+    {
+        public string TransId { get; set; }
+    }
+
+    public class SendToNextRequest : GetByTransIdRequest
+    {
+        public string Comment { set; get; }
+        public WithdrawalStatusEnum Action { set; get; }
+        public string WithdrawalInfo { set; get; }
+        public WithdrawalTypeEnum? WithdrawalType { set; get; }
+        public int? SelId { set; get; }
+        public int? ChannelId { set; get; }
+        public IEnumerable<WithdrawalAccountingModel> WithdrawalAccountingModels { set; get; }
+    }
+
+    public class ReqWithdrawalOnline
+    {
+        public int SysId { get; set; }
+        public string TransId { get; set; }
+        public int PayId { get; set; }
+        public int ChannelId { get; set; }
+        public int CustId { get; set; }
+        public decimal Amount { get; set; }
+        public string AccountName { set; get; }
+        public string AccountNo { set; get; }
+        public string IFSCCode { set; get; }
+    }
+
     public class WithdrawalRequest
     {
         private DateTimeOffset _flowEndTime { set; get; }
@@ -85,7 +115,7 @@ namespace BackendSite.Service.Model
         public bool HasPic { get; set; }
         public int BankSlipPicCount { get; set; }
         public string PayChannelName { get; set; }
-        
+
         public string ChannelName
         {
             get
@@ -102,7 +132,7 @@ namespace BackendSite.Service.Model
                 }
             }
         }
-        
+
         public string EWalletName { get; set; }
         public int EWalletSysId { get; set; }
         public int? DeviceScore { set; get; }
@@ -239,7 +269,7 @@ namespace BackendSite.Service.Model
         public decimal ActualDeposit { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class WithdrawalLimit
     {
         public int SiteId { get; set; }
@@ -267,13 +297,13 @@ namespace BackendSite.Service.Model
         }
 
         public string UpdateOperator { get; set; }
-        
+
         public string LevelName { get; set; }
 
         public int Times { get; set; }
         public decimal TotalWithdrawalMax { get; set; }
     }
-    
+
     public class SetWithdrawalLimitInfo
     {
         [LogIgnore]
@@ -500,7 +530,7 @@ namespace BackendSite.Service.Model
         public decimal Amount { set; get; }
         public decimal ChargeFee { set; get; }
     }
-    
+
     public class WithdrawalManualRequest
     {
         public string TransId { set; get; }
@@ -513,7 +543,7 @@ namespace BackendSite.Service.Model
 
         public string Message { get; set; }
     }
-    
+
     public class WithdrawalMessage
     {
         private DateTimeOffset _createTime { set; get; }

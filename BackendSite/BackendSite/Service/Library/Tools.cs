@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -7,6 +6,14 @@ namespace BackendSite.Service.Library
 {
     public class Tools
     {
+        private readonly string _backEndKey;
+
+        public Tools(IServiceProvider provider)
+        {
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            _backEndKey = configuration.GetValue<string>("ApiPaymentGateWayKey");
+        }
+
         /// <summary>
         /// MD5加密
         /// </summary>
@@ -247,6 +254,20 @@ namespace BackendSite.Service.Library
 
             var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1})";
             return Regex.Replace(data, pattern, m => new string('*', m.Length));
+        }
+
+        /// <summary>
+        /// BackendApiTokenCheck
+        /// </summary>
+        /// <returns>後台api token檢查</returns>
+        public bool BackendTokenCheck(object para, string token)
+        {
+            if (token == MD5Encrypt($"{para}{_backEndKey}"))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 

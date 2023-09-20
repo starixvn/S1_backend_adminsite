@@ -1,7 +1,8 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -63,7 +64,7 @@ namespace BackendSite.Service.BLL
                 return null;
             }
 
-            var permissions = adminGroupService.GetGroupPermissions((int) loginUser.GroupSEQ);
+            var permissions = adminGroupService.GetGroupPermissions((int)loginUser.GroupSEQ);
 
             return CheckMenuPermission(menuData, permissions);
         }

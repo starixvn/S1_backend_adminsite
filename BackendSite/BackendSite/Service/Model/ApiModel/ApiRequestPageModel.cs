@@ -9,12 +9,12 @@ namespace BackendSite.Service.Model.ApiModel
     {
         private int _pageNumber { get; set; }
         private int _pageSize { get; set; } = 10;
-        
+
         /// <summary>
         /// 頁數
         /// </summary>
         [Required]
-        [Range(1,9999)]
+        [Range(1, 9999)]
         public int PageNumber
         {
             get => _pageNumber;

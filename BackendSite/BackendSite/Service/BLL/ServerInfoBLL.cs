@@ -1,8 +1,10 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Text.Json;
+
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.Extensions.Caching.Memory;
-using System.Text.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -196,7 +198,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)
         {
-            if (currencyId == 0) 
+            if (currencyId == 0)
             {
                 var serverInfo = serverInfoService.GetSiteList().FirstOrDefault(x => x.SiteId == siteId);
                 return serverInfo.ILangList;
@@ -257,5 +259,6 @@ namespace BackendSite.Service.BLL
                 return null;
             }
         }
+
     }
 }

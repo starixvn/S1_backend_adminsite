@@ -16,7 +16,7 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="memberTypeJson"></param>
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(int siteId, DateTimeOffset starTime,
+        Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime,
             DateTimeOffset endTime, string format, string memberTypeJson, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
 
@@ -44,7 +44,7 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="format"></param>
         /// <param name="memberTypeJson"></param>
         /// <returns></returns>
-        Task<IEnumerable<TResult>> GetMapTransaction<TResult>(int siteId, DateTimeOffset starTime,
+        Task<IEnumerable<TResult>> GetMapTransaction<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime,
             DateTimeOffset endTime, string format, string memberTypeJson);
 
 
@@ -75,13 +75,13 @@ namespace BackendSite.Service.DAL.Interface
         /// <summary>
         /// 取得Bonus
         /// </summary>
-        /// <param name="siteId">站台Id</param>
+        /// <param name="siteIds">站台Id</param>
         /// <param name="starTime">起始時間</param>
         /// <param name="endTime">結束時間</param>
         /// <param name="format">日期 format 格式</param>
         /// <param name="memberTypeJson">玩家類型</param>
         /// <returns>Bonus 資訊</returns>
         /// <returns></returns>
-        Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(int siteId, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson);
+        Task<IEnumerable<MpaWinLossBonusDto>> GetMpaWinLossBonus(IEnumerable<int> siteIds, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson);
     }
 }

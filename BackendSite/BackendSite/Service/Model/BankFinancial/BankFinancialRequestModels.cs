@@ -7,7 +7,7 @@ namespace BackendSite.Service.Model.BankFinancial
     {
         public int Id { get; set; }
     }
-    
+
     public class GetTransferAccountInfoListRequest
     {
         public int SiteId { get; set; }
@@ -19,11 +19,11 @@ namespace BackendSite.Service.Model.BankFinancial
         public IEnumerable<int> SysIds { get; set; }
         public string AccountNo { get; set; }
     }
-    
+
     public class SetTransferAccountInfoRequest
     {
         public int Id { get; set; }
-        
+
         /// <summary>
         /// 讀寫 網站ID
         /// </summary>
@@ -59,7 +59,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 第三方支付ID
         /// </summary>
         public int? PayId { get; set; }
-        
+
         public CryptoCurrencyEnum? CryptoCurrencyId { get; set; }
         public NetworkTypeEnum? Network { get; set; }
 
@@ -118,15 +118,21 @@ namespace BackendSite.Service.Model.BankFinancial
         public string MobilePin { get; set; }
         public string CorporateID { get; set; }
     }
-    
+
     public class GetAgentListRequest
     {
         public int SiteId { get; set; }
     }
-    
+
     public class GetAccountListRequest
     {
         public int SiteId { get; set; }
+    }
+
+    public class GetFinancialAccountListRequest
+    {
+        public int SiteId { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
     }
 
     public class GetTransferInfoListRequest : ApiRequestPageModel
@@ -145,7 +151,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public string FromAgent { get; set; }
         public string ToAgent { get; set; }
     }
-    
+
     public class ExportTransferInfoListRequest
     {
         public int SiteId { get; set; }

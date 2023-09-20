@@ -3,6 +3,8 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
+using static BackendSite.Controllers.ApiV2.Marketing.Bonus.RebateExcludeGameController;
+
 namespace BackendSite.Service.BLL
 {
     public class RebateManageBLL
@@ -148,6 +150,16 @@ namespace BackendSite.Service.BLL
         public async Task<bool> SetRebateCategoryAsync(int siteId, int currencyId, int categoryId, int level, decimal percentage, string lastUpdateUser)
         {
             return await _rebateManageService.SetRebateCategoryAsync(siteId, currencyId, categoryId, level, percentage, lastUpdateUser);
+        }
+
+        public async Task<IEnumerable<RebateExcludeGame>> GetRebateExcludeGameByCurrencyIdAsync(int siteId, int currencyId)
+        {
+            return await _rebateManageService.GetRebateExcludeGameByCurrencyIdAsync(siteId, currencyId);
+        }
+
+        public async Task<bool> SetRebateExcludeGameByCurrencyIdAsync(int siteId, int currencyId, IEnumerable<ExcludeGame> excludeGames, string updateOperator)
+        {
+            return await _rebateManageService.SetRebateExcludeGameAsync(siteId, currencyId, excludeGames, updateOperator);
         }
     }
 }

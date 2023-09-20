@@ -1,10 +1,13 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
+using BackendSite.Extensions;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
 
 namespace BackendSite.Service.DAL
 {
@@ -38,7 +41,7 @@ namespace BackendSite.Service.DAL
             var vipLevelInfo = _reportDbClient.QueryFirst<VipLevelInfo>("Admin_CustVipLevel_Get_V3", new { CustId });
             return vipLevelInfo;
         }
-        
+
         public async Task<VipLevelInfoDto> GetVipLevelInfoAsync(int custId)
         {
             return await _reportDbClient.QueryFirstAsync<VipLevelInfoDto>("Admin_CustVipLevel_Get_V4",
@@ -61,7 +64,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public async Task<IEnumerable<VipLevelLogDto>> GetVipLevelLogAsync(int custId)
         {
             return await _reportDbClient.QueryAsync<VipLevelLogDto>("Admin_CustVipLevelLog_Get_V5",
@@ -73,13 +76,17 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_CustVipLevel_Set", new { SiteId, CustId, UserName, VipLevel, Memo, Operator });
             return result;
         }
-        
+
         public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string memo, string updator)
         {
             var p = new DynamicParameters(new
             {
-                SiteId = siteId, CustId = custId, UserName = userName, 
-                VipLevel = vipLevel, Memo = memo, Operator = updator
+                SiteId = siteId,
+                CustId = custId,
+                UserName = userName,
+                VipLevel = vipLevel,
+                Memo = memo,
+                Operator = updator
             });
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevel_Set", p);
         }
@@ -95,8 +102,12 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters(new
             {
-                SiteId = siteId, CustId = custId, UserName = userName, 
-                Manually = manually, Memo = memo, Operator = updator
+                SiteId = siteId,
+                CustId = custId,
+                UserName = userName,
+                Manually = manually,
+                Memo = memo,
+                Operator = updator
             });
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevelManually_Set", p);
         }
@@ -197,10 +208,82 @@ namespace BackendSite.Service.DAL
             props.Add("_Status", newStatus);
             props.Add("_LastUpdateUser", updater);
             _mainDbClient.Execute("Admin_VipDowngradeReview_Set", props);
-            
+
             return true;
         }
 
+        public async Task<IEnumerable<VipSystem>> GetVipSystem(int siteId)
+        {
+            return await _reportDbClient.QueryAsync<VipSystem>("Service_VipSystem_GetV2",
+                new DynamicParameters(new { SiteId = siteId }));
+        }
+
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input)
+        {
+            var result = 0;
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            var sp = string.Empty;
+
+            foreach (var x in input.After.Detail)
+            {
+                var p = new DynamicParameters();
+                switch (input.After.Type)
+                {
+                    case UpgradeSettingEnum.UpDeposit:
+                        p.Add("_UpDeposit", decimal.Parse(x.LevelValue));
+                        sp = "Admin_UpDeposit_Set";
+                        break;
+                    case UpgradeSettingEnum.UpBonus:
+                        p.Add("_UpBonus", decimal.Parse(x.LevelValue));
+                        sp = "Admin_UpBonus_Set";
+                        break;
+                    case UpgradeSettingEnum.DownDeposit:
+                        p.Add("_DownDeposit", decimal.Parse(x.LevelValue));
+                        sp = "Admin_DownDeposit_Set";
+                        break;
+                    case UpgradeSettingEnum.DownTurnover:
+                        p.Add("_DownTurnover", decimal.Parse(x.LevelValue));
+                        sp = "Admin_DownTurnover_Set";
+                        break;
+                }
+                p.Add("_Level", x.Level);
+                p.Add("_SiteId", input.SiteId);
+                p.Add("_CurrencyId", input.CurrencyId);
+                result = await _mainDbClient.ExecuteAsync(sp, trans, p);
+                if (result == 0)
+                {
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                    return result;
+                }
+            }
+
+            if (result > 0)
+            {
+                var logParam = new DynamicParameters();
+                logParam.Add("_SiteId", input.SiteId);
+                logParam.Add("_CurrencyId", input.CurrencyId);
+                logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.VipUpgradeSetting);
+                logParam.Add("_ActionType", (int)ActionType.Update);
+                logParam.Add("_RefTransId", string.Empty);
+                logParam.Add("_BeforeDetailInfo", input.Before.ToLog());
+                logParam.Add("_AfterDetailInfo", input.After.ToLog());
+                logParam.Add("_Operator", input.Operator);
+
+                var logSuccess = await _mainDbClient.ExecuteAsync("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0;
+                if (logSuccess)
+                {
+                    await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+                    return result;
+                }
+            }
+
+            await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
+
+            return result;
+        }
         #region Private Methods
 
         #endregion

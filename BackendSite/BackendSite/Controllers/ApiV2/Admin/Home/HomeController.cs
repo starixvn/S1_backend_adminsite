@@ -1,13 +1,15 @@
-﻿using BackendSite.ExceptionHandling;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 
 namespace BackendSite.Controllers.ApiV2.Admin.Home
 {
@@ -113,13 +115,13 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
 
             var siteList = _newAuthorizeBLL.GetAssignSiteListV2(adminUser.UserId);
 
-            if(siteList.Count == 0)
+            if (siteList.Count == 0)
             {
                 throw new AdminException(ErrorCodeEnum.AccountError);
             }
 
 
-            _newAuthorizeBLL.SetLoginTime(adminUser.UserId);
+            //_newAuthorizeBLL.SetLoginTime(adminUser.UserId);
 
             await HttpContext.SignOutAsync("backendV2");
 
@@ -205,7 +207,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         public ApiResult ChangePwd(ChangePwdReqest changePwd)
         {
             var authInfo = _newAuthorizeBLL.GetAuthData();
-            var result = _adminBll.ChangePwdV2(authInfo.UserId, changePwd.OldPwd,changePwd.NewPwd);
+            var result = _adminBll.ChangePwdV2(authInfo.UserId, changePwd.OldPwd, changePwd.NewPwd);
 
             if (result != ErrorCodeEnum.Success)
             {

@@ -1,10 +1,12 @@
-﻿using BackendSite.Service.DAL.Interface;
+﻿using System.Data;
+
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+
 using Dapper;
-using System.Data;
-using BackendSite.Service.Model.ApiModel;
 
 namespace BackendSite.Service.DAL
 {
@@ -136,7 +138,7 @@ namespace BackendSite.Service.DAL
                 return exportData.OrderByDescending(kvp => kvp.Key)
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
-            
+
             var propertyNames = typeof(TValue).GetProperties().Where(x => x.Name.ToLower() == sortField.ToLower());
             var propertyName = propertyNames.Select(x => x.Name).FirstOrDefault() ?? "";
 

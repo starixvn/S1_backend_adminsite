@@ -1,9 +1,10 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.Extensions;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 {
@@ -57,7 +58,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public async Task<ApiResult> SubmitAsync([FromForm] DepositSubmissionRequest request)
         {
             var result = await _depositBll.CreateDeposit(request.Detail, request.Receipt);
-            
+
             var apiResult = new ApiResult();
             if (result == 1)
             {
@@ -71,7 +72,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     BeforeDetailInfo = null,
                     AfterDetailInfo = request.Detail.ToLog()
                 });
-                
+
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
                 apiResult.Message = _selLangBll.GetMsg("msg_InsertSuccessful");
             }

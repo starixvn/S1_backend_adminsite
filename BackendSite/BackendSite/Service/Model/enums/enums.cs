@@ -398,6 +398,12 @@ namespace BackendSite.Service.Model.enums
         Disable = 2
     }
 
+    public enum BankInfoPayMethodEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+
     #endregion
 
     #region FinancialLog
@@ -691,7 +697,14 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-    
+
+    public enum BonusGroupByType
+    {
+        BonusCode = 0,
+        Date = 1,
+        Month = 2
+    }
+
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -709,7 +722,7 @@ namespace BackendSite.Service.Model.enums
         ReferralFreeCredit = 15,
         DeviceBonus = 16
     }
-    
+
     public enum BonusSummaryTransactionType
     {
         IncreaseBonus = 1,
@@ -717,7 +730,7 @@ namespace BackendSite.Service.Model.enums
         Phone = 3,
         Email = 4
     }
-    
+
     #endregion
 
     #region PromotionCashBackSetting
@@ -774,7 +787,18 @@ namespace BackendSite.Service.Model.enums
     public enum ReferralStatusEnum
     {
         Disable = 0,
-        Enable = 1
+        ReferralEnable = 1,
+        DepositReferralEnable = 2
+    }
+
+    /// <summary>
+    /// Referral for 文案語系區分使用
+    /// </summary>
+    public enum ReferralTypeEnum
+    {
+        None = 0,
+        Referral = 1,         //舊制
+        DepositReferral = 2   //新制 
     }
 
     #endregion
@@ -881,7 +905,11 @@ namespace BackendSite.Service.Model.enums
         ResetSmsOtpTimes = 86,
         RegisterMember = 87,
         SetCustTpGameTypeSetting = 88,
-        AutoWithdrawalRule = 91
+        RebateExcludeGame = 89,
+        VipUpgradeSetting = 90,
+        AutoWithdrawalRule = 91,
+        AutoPaymentRule = 92,
+        DepositReferral = 93
     }
 
     #region BankFinancialTransferInfoLog
@@ -1095,7 +1123,9 @@ namespace BackendSite.Service.Model.enums
         [Description("UNDER CREDIT")]
         UnderCredit = 20,
         [Description("REFUND")]
-        Refund = 21
+        Refund = 21,
+        Deposit = 98,
+        Withdrawal = 99
     }
 
     /// <summary>
@@ -1133,6 +1163,13 @@ namespace BackendSite.Service.Model.enums
         Pending = 1,
         Done = 2,
         Invalid = 3
+    }
+
+    public enum LiveRegistrationDateTypeEnum
+    {
+        RegisterDate = 1,
+        LastActiveDate = 2,
+        CallRecordDate = 3
     }
 
     #endregion
@@ -1313,7 +1350,7 @@ namespace BackendSite.Service.Model.enums
     }
 
     #endregion
-    
+
     #region Banner
 
     public enum BannerTypeEnum
@@ -1430,7 +1467,7 @@ namespace BackendSite.Service.Model.enums
         Lock = 1,
         UnLock = 2,
     }
-    
+
     #region DeepLink
     public enum DeepLinkTableTypeEnum
     {
@@ -1726,7 +1763,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Wrong Bank submitted")]
         WrongBankSubmitted = 5,
         [Description("Inactive Bank Account submission")]
-        InactiveBankAccountSubmission = 6
+        InactiveBankAccountSubmission = 6,
+        [Description("System Unstable")]
+        SystemUnstable = 7,
+        [Description("Bank Under Maintenance")]
+        BankUnderMaintenance = 8,
     }
 
     public enum WithdrawalMessageStatus
@@ -1857,10 +1898,62 @@ namespace BackendSite.Service.Model.enums
 
         Crypto = 3
     }
-    
+
     public enum ViewTimeType
     {
         Daily = 1,
         Weekly = 2
+    }
+
+    public enum UpgradeSettingEnum
+    {
+        [Description("Monthly Minimum Deposit")]
+        UpDeposit = 0,
+        [Description("Tier Upgrade Bonus")]
+        UpBonus = 1,
+        [Description("Minimum Deposit Within Validity Period")]
+        DownDeposit = 2,
+        [Description("Minimum Turnover Within Validity Period")]
+        DownTurnover = 3,
+    }
+
+    public enum AutoType
+    {
+        AutoVerify = 1,
+        AutoApproved = 2
+    }
+
+    public enum CashBackPeriodTypeEnum
+    {
+        Daily = 1,
+        Weekly = 2
+	}
+    /// <summary>
+    /// Balance Adjustment頁面 > MethodType
+    /// </summary>
+    public enum MethodTypeIDEnum
+    {
+        MainWallet = 5,
+        MainWalletBatch = 10,
+        ThirdWallet = 60
+    }
+
+    /// <summary>
+    ///  Balance Adjustment頁面 > Adjustment Type
+    /// </summary>
+    public enum BalanceAdjustmentTypeIDEnum
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        /// <summary>
+        /// 3RD選項Add
+        /// </summary>
+        Add = 5,
+        /// <summary>
+        /// 3RD選項Minus
+        /// </summary>
+        Minus = 6
     }
 }

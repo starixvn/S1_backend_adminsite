@@ -1,6 +1,8 @@
 ﻿using System.Net;
+
 using Amazon.S3;
 using Amazon.S3.Model;
+
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -10,8 +12,10 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
@@ -202,35 +206,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         }
 
-        public class GetByTransIdRequest
-        {
-            public string TransId { get; set; }
-        }
-
-        public class SendToNextRequest : GetByTransIdRequest
-        {
-            public string Comment { set; get; }
-            public WithdrawalStatusEnum Action { set; get; }
-            public string WithdrawalInfo { set; get; }
-            public WithdrawalTypeEnum? WithdrawalType { set; get; }
-            public int? SelId { set; get; }
-            public int? ChannelId { set; get; }
-            public IEnumerable<WithdrawalAccountingModel> WithdrawalAccountingModels { set; get; }
-        }
-
-        public class ReqWithdrawalOnline
-        {
-            public int SysId { get; set; }
-            public string TransId { get; set; }
-            public int PayId { get; set; }
-            public int ChannelId { get; set; }
-            public int CustId { get; set; }
-            public decimal Amount { get; set; }
-            public string AccountName { set; get; }
-            public string AccountNo { set; get; }
-            public string IFSCCode { set; get; }
-        }
-
         public class UploadPictureRequest : GetByTransIdRequest
         {
             public IEnumerable<string> Pic { get; set; }
@@ -297,7 +272,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.SelectCalCode,
                 request.Agent,
                 out var totalPages, out var rowCount, ref currencyAmount);
-            
+
             var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(
                 withdrawalRequestList.Select(x => x.WithdrawalId));
             foreach (var data in withdrawalRequestList)
@@ -552,42 +527,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                     if (withdrawalData.ProcessWay == WithdrawalInfoProcessWayEnum.Auto) // 自動出款要走 Verify + Process 流程
                     {
-                        var paymentGateWay = _autoWithdrawalPaymentGateWayBll.GetPaymentGateWay(withdrawalData, withdrawalData.SiteId);
-                        if (paymentGateWay == null)
-                        {
-                            // 找不到 paymentGateWay 就單純只做 Verify，並且 comment 失敗原因
-                            withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId, "Not Found PaymentGateWay ProcessWay Set to AutoFailBackManual", authData.UserName);
-                            var _ = await _withdrawalBll.SetWithdrawalProcessWay(request.TransId, WithdrawalInfoProcessWayEnum.AutoFailBackManual);
-                            break;
-                        }
-
-                        var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalData.WithdrawalInfo);
-                        withdrawalInfo.PayId = paymentGateWay.PayId;
-                        withdrawalInfo.ChannelId = paymentGateWay.ChannelId;
-                        request.WithdrawalType = paymentGateWay.WithdrawalType;
-
-                        // 先 Verify 後 Process
-                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId, request.Comment, authData.UserName);
-                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalProcess(
-                            request.TransId,
-                            request.Comment,
-                            updater:paymentGateWay.PayName,
-                            authData.UserId,
-                            JsonConvert.SerializeObject(withdrawalInfo),
-                            (int)request.WithdrawalType,
-                            request.WithdrawalAccountingModels,
-                            out var custId, out var amount);
-
-                        if (withdrawConfirmResult > 0)
-                        {
-                            var createFailResult = await PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData, systemOperation: "system");
-                            if (createFailResult != null)
-                            {
-                                // 自動出款失敗，狀態改回 AutoFailBackManual
-                                var _ = await _withdrawalBll.SetWithdrawalProcessWay(request.TransId, WithdrawalInfoProcessWayEnum.AutoFailBackManual);
-                                return createFailResult;
-                            }
-                        }
+                        apiResult = _autoWithdrawalPaymentGateWayBll.AutoWithdrawalProcessWay(request, withdrawalData, authData, apiResult, out withdrawConfirmResult);
                     }
                     else
                     {
@@ -595,7 +535,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             request.Comment,
                             authData.UserName);
                     }
-
                     break;
                 case WithdrawalStatusEnum.Process:
                     {
@@ -615,7 +554,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                         if (withdrawConfirmResult > 0 && request.WithdrawalType is WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.CryptoPay)
                         {
-                            var createFailResult = await PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData);
+                            var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData);
                             if (createFailResult != null) return createFailResult;
                         }
                         break;
@@ -700,8 +639,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             return apiResult;
         }
-
-
 
         /// <summary>
         /// Withdrawal/ManualApproval
@@ -1185,56 +1122,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         #endregion
 
         #region Withdrawal to Process
-
-        private async Task<ApiResult> PaymentOnlineCreate(SendToNextRequest request, WithdrawalInfo withdrawalInfo, int custId,
-        decimal amount, ApiResult apiResult, AuthData authData, string systemOperation = "")
-        {
-            var myUrl = request.WithdrawalType == WithdrawalTypeEnum.CryptoPay
-                ? $"{_payApiUrl}CryptoWithdrawal"
-                : $"{_payApiUrl}Withdrawal";
-
-            myUrl = withdrawalInfo.AccountType == "ewallet" ? $"{_payApiUrl}EWalletWithdrawal" : myUrl;
-
-            var reqWithdrawalOnline = new ReqWithdrawalOnline
-            {
-                SysId = withdrawalInfo.AccountType == "ewallet" ? (int)withdrawalInfo.EWalletSysId : withdrawalInfo.SysId,
-                TransId = request.TransId,
-                CustId = custId,
-                Amount = amount,
-                PayId = withdrawalInfo.PayId ?? 0,
-                ChannelId = withdrawalInfo.ChannelId ?? 0,
-                AccountName = withdrawalInfo.AccountName,
-                AccountNo = withdrawalInfo.AccountNo,
-                IFSCCode = withdrawalInfo.IFSCCode
-            };
-
-            var apiOnlineResult = await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
-            if (apiOnlineResult == null)
-            {
-                var updater = string.IsNullOrEmpty(systemOperation)
-                    ? User.Identity.Name
-                    : systemOperation;
-
-                _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
-                    apiResult.Message, updater);
-                apiResult.ErrorCode = 1101;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-                return apiResult;
-            }
-
-            if (apiOnlineResult.ErrorCode != 0)
-            {
-                var updater = string.IsNullOrEmpty(systemOperation)
-                    ? authData.UserName
-                    : systemOperation;
-
-                _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
-                    apiOnlineResult.Message, updater);
-                return apiOnlineResult;
-            }
-
-            return null;
-        }
 
         private ApiResult CheckWithdrawalTypeAndSetObject(SendToNextRequest request, ApiResult apiResult, WithdrawalInfo withdrawalInfo)
         {

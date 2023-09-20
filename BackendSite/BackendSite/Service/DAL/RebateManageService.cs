@@ -1,9 +1,15 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using MySql.Data.MySqlClient;
+﻿using BackendSite.Extensions;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Extensions;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
+
+using Newtonsoft.Json;
+
+using static BackendSite.Controllers.ApiV2.Marketing.Bonus.RebateExcludeGameController;
 
 namespace BackendSite.Service.DAL
 {
@@ -199,6 +205,35 @@ namespace BackendSite.Service.DAL
                 return true;
             else
                 return false;
+        }
+
+        public async Task<IEnumerable<RebateExcludeGame>> GetRebateExcludeGameByCurrencyIdAsync(int siteId, int currencyId)
+        {
+            return await _reportDbClient.QueryAsync<RebateExcludeGame>("Admin_RebateExcludeGame_Get", new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId }));
+        }
+
+        public async Task<bool> SetRebateExcludeGameAsync(int siteId, int currencyId, IEnumerable<ExcludeGame> excludeGames, string updateOperator)
+        {
+            var result = true;
+
+            await using var conn = _mainDbClient.GetMySqlConnection();
+            await conn.OpenAsync();
+            await using var trans = await conn.BeginTransactionAsync();
+
+            var parameters = new { _SiteId = siteId, _CurrencyId = currencyId, _Infos = JsonConvert.SerializeObject(excludeGames), _LastUpdateUser = updateOperator };
+            if (_mainDbClient.Execute("Admin_RebateExcludeGame_Set", trans, new DynamicParameters(parameters)) == 0)
+                result = false;
+
+            if (result)
+            {
+                await _mainDbClient.CommitAndDisposeConnectionAsync(conn, trans);
+                return true;
+            }
+            else
+            {
+                await _mainDbClient.RollbackAndDisposeConnectionAsync(conn, trans);
+                return false;
+            }
         }
     }
 }

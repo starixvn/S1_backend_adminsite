@@ -1,11 +1,12 @@
-﻿using BackendSite.Service.BLL.Interface;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
-using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.CustVipLevel;
-using Newtonsoft.Json;
 using BackendSite.Service.DAL.Interface;
-using BarcodeReader.ImageSharp;
+using BackendSite.Service.Model;
+using BackendSite.Service.Model.CustVipLevel;
+using BackendSite.Service.Model.enums;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -38,18 +39,18 @@ namespace BackendSite.Service.BLL
         {
             return _vipLevelService.GetVipLevelInfo(custId);
         }
-        
+
         public async Task<MemberVipLevelInfo> GetVipLevelInfoAsync(int custId)
         {
             var data = await _vipLevelService.GetVipLevelInfoAsync(custId);
             if (data == null) return null;
-            
+
             return new MemberVipLevelInfo()
             {
                 Manually = data.Manually,
                 VipLevel = data.VipLevel,
                 QualifiedTime = data.QualifiedTime
-            };;
+            }; ;
 
         }
 
@@ -81,7 +82,7 @@ namespace BackendSite.Service.BLL
             return _vipLevelService.SetVipLevel(siteId, custId, userName, vipLevel, $"{updator} Update VipLevel",
                 updator);
         }
-        
+
         public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string updator)
         {
             return await _vipLevelService.SetVipLevelAsync(siteId, custId, userName, vipLevel, $"{updator} Update VipLevel", updator);
@@ -98,14 +99,14 @@ namespace BackendSite.Service.BLL
             return await _vipLevelService.SetVipLevelManuallyAsync(siteId, custId, userName, manually, $"{updator} Update Manually", updator);
         }
 
-        public async Task<int> VipAutomationExclusion(int custId, bool enable, string updator) 
+        public async Task<int> VipAutomationExclusion(int custId, bool enable, string updator)
         {
             var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
             if (customer == null) return -1;
 
             var beforeStatus = customer.Exclusive;
             var isExclusive = enable ? 1 : 0;
-            if(beforeStatus == isExclusive) return -2;
+            if (beforeStatus == isExclusive) return -2;
 
             var result = await _vipLevelService.SetAutoCustVipExclusionAsync(customer.SiteId, custId, customer.UserName, isExclusive);
             if (result <= 0) return -3;
@@ -261,6 +262,52 @@ namespace BackendSite.Service.BLL
             return CheckCanUpdateStatus(calculateYearMonth, siteId, VipSettingStatusEnum.Downgrade) && UpdateVipDowngradeReview(custIdList, calculateYearMonth, newStatus, updater);
         }
 
+        public async Task<IEnumerable<VipUpgradeSetting>> GetUpgradeSetting(int siteId, int currencyId)
+        {
+            var vipSystem = await _vipLevelService.GetVipSystem(siteId);
+            var currencyVipSystem = vipSystem.ToList().FindAll(x => x.CurrencyId == currencyId);
+            var result = new List<VipUpgradeSetting>();
+            var typeList = new List<UpgradeSettingEnum>();
+            typeList.Add(UpgradeSettingEnum.UpBonus);
+            typeList.Add(UpgradeSettingEnum.UpDeposit);
+            typeList.Add(UpgradeSettingEnum.DownDeposit);
+            typeList.Add(UpgradeSettingEnum.DownTurnover);
+
+            typeList.ForEach(x =>
+            {
+                var detail = x switch
+                {
+                    UpgradeSettingEnum.UpBonus => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.UpBonus.ToString() }).ToList(),
+                    UpgradeSettingEnum.UpDeposit => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.UpDeposit.ToString() }).ToList(),
+                    UpgradeSettingEnum.DownDeposit => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.DownDeposit is null ? null : o.DownDeposit.ToString() }).ToList(),
+                    UpgradeSettingEnum.DownTurnover => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.DownTurnover is null ? null : o.DownTurnover.ToString() }).ToList()
+                };
+                //Leve1跟6沒有提供設定,這邊寫死資料讓前端顯示用
+                detail.Add(new VipUpgradeSettingDetail() { Level = 1, LevelValue = null });
+                detail.Add(new VipUpgradeSettingDetail() { Level = 6, LevelValue = "By Invitation" });
+                result.Add(new VipUpgradeSetting()
+                {
+                    SiteId = siteId,
+                    CurrencyId = currencyId,
+                    Type = x,
+                    TypeName = x.GetDescription(),
+                    Detail = detail.OrderBy(y => y.Level)
+                });
+            });
+
+            return result.OrderBy(x => x.Type);
+        }
+
+        public async Task<int> SetUpgradeSetting(ParamsWithLog<VipUpgradeSetting> input)
+        {
+            return await _vipLevelService.SetUpgradeSetting(input);
+        }
+
+        public async Task<IEnumerable<int>> GetVipUpgradeSupportCurrency(int siteId)
+        {
+            var vipSystem = await _vipLevelService.GetVipSystem(siteId);
+            return vipSystem.GroupBy(y => y.CurrencyId).Select(x => x.Key);
+        }
         #endregion
 
         #region Private Methods
@@ -321,7 +368,7 @@ namespace BackendSite.Service.BLL
             string userName,
             int pageNumber,
             int pageSize,
-            string currencyIds,           
+            string currencyIds,
             out int totalPages,
             out int rowCount)
         {

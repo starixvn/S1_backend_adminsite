@@ -4,6 +4,7 @@ using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -51,7 +52,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByDateExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Date);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByDateExport");
         }
 
@@ -84,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByMonthExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Month);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByMonthExport");
         }
 
@@ -117,7 +118,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByTpGameTypeExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMapWinLossByTpGameTypeExport(request, MpaWinLossGroupByTypeEnum.GameType);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByTpGameTypeExport");
         }
 
@@ -150,7 +151,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByTpCategoryTypeExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMapWinLossByTpCategoryExport(request, MpaWinLossGroupByTypeEnum.TpCategory);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByTpCategoryExport");
         }
 
@@ -184,7 +185,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByPlayerExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMpaWinLossByPlayerExport(request, MpaWinLossGroupByTypeEnum.Player);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByPlayerExport");
         }
 
@@ -237,7 +238,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByCurrencyExport(MpaWinLossRequest request)
         {
             var exportData = await _MaMpaWinLossBll.GetMapWinLossByCurrencyExport(request, MpaWinLossGroupByTypeEnum.Currency);
-            var stream = _excelBll.ExportV2(exportData, 1);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByCurrencyExport");
         }
 
