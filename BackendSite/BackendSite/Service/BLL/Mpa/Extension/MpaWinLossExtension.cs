@@ -67,7 +67,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 if (item.GameType == (int)MpaGGRCustomizationGameTypeEnum.V8Poker)
                 {
-                    /// For p2p products (V8 Poker), show commission: GGR = sum(revenue) 
+                    // For p2p products (V8 Poker), show commission: GGR = sum(revenue) 
                     item.WinLossSummary = item.RevenueSummary;
                 }
             }
@@ -309,14 +309,14 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 };
 
                 // 處理 children
-                if (item.Value.CurrencyDetail == null)
+                if (item.Value.CurrencyDetailByCategory == null)
                 {
                     data.Children = new List<MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd>();
                 }
                 else
                 {
-                    var children = item.Value.CurrencyDetail
-                        .Select(childrenItem => new MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd() { DisplayKey = childrenItem.Key, Data = childrenItem.Value })
+                    var children = item.Value.CurrencyDetailByCategory
+                        .Select(childrenItem => new MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd() { DisplayKey = childrenItem.Currency, Data = childrenItem })
                         .ToList();
                     data.Children = children;
                 }
