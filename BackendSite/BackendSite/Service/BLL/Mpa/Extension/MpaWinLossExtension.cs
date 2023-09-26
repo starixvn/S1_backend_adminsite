@@ -86,8 +86,18 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 if (item.TpId == (int)MpaCommissionCustomizationTpIdEnum.NineW)
                 {
-                    item.RevenueSummary = commission.Where(r => r.Date == item.Date && r.CustId == item.CustId)
-                        .Select(x => x.Commission).FirstOrDefault();
+                    // If filtered by Settled Time: Commission = - TpReport9W.commission
+                    // If filtered by Created Time: Commission = 0
+                    if (request.DateType == MpaDateType.SettledDate)
+                    {
+                        item.RevenueSummary = commission.Where(r => r.Date == item.Date && r.CustId == item.CustId)
+                                                .Select(x => x.Commission).FirstOrDefault();
+                    }else if (request.DateType == MpaDateType.CreatedDate)
+                    {
+                        item.RevenueSummary = 0;
+                    }
+                    //GGR for 9W Sports = - PlayerWinLoss + Commission，外層加總時會*-1 
+                    //item.WinLossSummary = item.WinLossSummary*-1 + item.RevenueSummary;
                 }
             }
 
