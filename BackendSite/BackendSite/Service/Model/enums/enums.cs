@@ -1700,6 +1700,7 @@ namespace BackendSite.Service.Model.enums
         BuyFeaturesGames = 4,
         Megaways = 5,
         Mini = 6,
+        Arcade = 7,
     }
 
     public enum SlotGameFilterStatusEnum
