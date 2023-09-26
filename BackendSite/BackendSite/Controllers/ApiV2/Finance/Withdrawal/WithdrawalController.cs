@@ -534,6 +534,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 case WithdrawalStatusEnum.Process:
                     {
                         var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(request.WithdrawalInfo);
+                        // 這段先寫死，前端改傳正確的WithdrawalType後拿掉
+                        if (request.WithdrawalType == WithdrawalTypeEnum.OnlineBanking &&
+                            withdrawalInfo.AccountType == "ewallet")
+                            request.WithdrawalType = WithdrawalTypeEnum.EWalletPayment;
                         var checkWithdrawalTypeFailResult = CheckWithdrawalTypeAndSetObject(request, apiResult, withdrawalInfo);
                         if (checkWithdrawalTypeFailResult != null) return checkWithdrawalTypeFailResult;
 
@@ -1120,7 +1124,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         
         private ApiResult CheckWithdrawalTypeAndSetObject(SendToNextRequest request, ApiResult apiResult, WithdrawalInfo withdrawalInfo)
         {
-            withdrawalInfo.ChannelId = request.ChannelId;
             switch (request.WithdrawalType)
             {
                 case null:
@@ -1133,6 +1136,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 case WithdrawalTypeEnum.EWalletPayment:
                 case WithdrawalTypeEnum.CryptoPay:
                     withdrawalInfo.PayId = request.SelId;
+                    withdrawalInfo.ChannelId = request.ChannelId;
                     break;
 
                 case WithdrawalTypeEnum.LocalBank:
