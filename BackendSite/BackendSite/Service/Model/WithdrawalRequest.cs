@@ -105,7 +105,7 @@ namespace BackendSite.Service.Model
         public string CalCode => WithdrawalType switch
         {
             WithdrawalTypeEnum.LocalBank => FromAccountDisplayName,//$"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
-            WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            WithdrawalTypeEnum.OnlineBanking => $"{SiteName}-{FromBankCode}",
             _ => null
         };
         public int IsKyc { set; get; }
@@ -244,7 +244,7 @@ namespace BackendSite.Service.Model
         public string CalCode => WithdrawalType switch
         {
             (int)WithdrawalTypeEnum.LocalBank => FromAccountDisplayName,//$"{SiteName}-{FromBankCode}-{FromAccountName?.Replace(" ", string.Empty)}-{FromAccountNo?.Substring(FromAccountNo.Length > 4 ? FromAccountNo.Length - 4 : 0)}",
-            (int)WithdrawalTypeEnum.OnlinePayment => $"{SiteName}-{FromBankCode}",
+            (int)WithdrawalTypeEnum.OnlineBanking => $"{SiteName}-{FromBankCode}",
             _ => null
         };
         public int IsKyc { set; get; }
