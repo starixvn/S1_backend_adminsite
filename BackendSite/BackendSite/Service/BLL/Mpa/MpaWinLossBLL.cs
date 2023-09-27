@@ -345,6 +345,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 計算GGR的輔助方法
                         decimal CalculateGGR(decimal winLoss, decimal progressiveWin, decimal progressiveBet)
                         {
+                            //todo 9w GGR客製
                             return GetGGR(winLoss, progressiveWin, progressiveBet);
                         }
 
