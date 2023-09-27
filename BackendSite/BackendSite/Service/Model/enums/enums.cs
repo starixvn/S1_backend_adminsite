@@ -366,6 +366,22 @@ namespace BackendSite.Service.Model.enums
         QrPayPayment = 6,
         BankAutoChannel = 7
     }
+    
+    public enum DepositChannelTypeEnum
+    {
+        OnlineBanking = 1,
+        MobilePayment = 2,
+        CryptoPayment = 4,
+        QrPayPayment = 6,
+        BankAutoChannel = 7
+    }
+    
+    public enum WithdrawalChannelTypeEnum
+    {
+        OnlineBanking = 1,
+        EWalletPayment = 3,
+        CryptoPayment = 4
+    }
 
     public enum PayChannelStatusEnum
     {
