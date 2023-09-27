@@ -1655,6 +1655,7 @@ namespace BackendSite.Service.Model.enums
         Android = 3,
     }
 
+
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1841,7 +1842,7 @@ namespace BackendSite.Service.Model.enums
     {
         OneGamingPoker = 41,
         V8Poker = 42,
-        NineW = 31
+        NineW = 51
     }
 
     /// <summary>
