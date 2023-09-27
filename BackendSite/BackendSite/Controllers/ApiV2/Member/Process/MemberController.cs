@@ -1382,11 +1382,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         /// </summary>
         /// <remarks>
         /// Http Method：POST
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
-        [HttpPost]
         public async Task<ApiResult<IEnumerable<CustomerAssociateBankInfo>>> GetCustomerAssociateBankUser(GetCustomerAssociateBankUserRequest request)
         {
             return new ApiResult<IEnumerable<CustomerAssociateBankInfo>>()
