@@ -1900,6 +1900,7 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 TurnOver = v.TurnOver,
                 ValidTurnOver = v.ValidTurnOver,
+                GGR = v.GGR,
                 PlayerWinLoss = v.PlayerWinLoss,
                 ProgressiveWin = v.ProgressiveWin,
                 ProgressiveBet = v.ProgressiveBet,

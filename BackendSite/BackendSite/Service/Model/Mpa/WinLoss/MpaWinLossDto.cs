@@ -384,7 +384,24 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR
+        {
+            get
+            {
+                if (_customValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
+                {
+                    return _customValue;
+                }
+                else // 否則使用一般公式
+                {
+                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+                }
+            }
+            set
+            {
+                _customValue = value;
+            }
+        }
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -424,6 +441,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 15)]
         public decimal TotalBonus { get; set; }
+
+        private decimal _customValue;
     }
 
     public class MpaWinLossByDateDto
