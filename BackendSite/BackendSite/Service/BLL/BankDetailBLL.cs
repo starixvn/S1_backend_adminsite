@@ -26,19 +26,6 @@ namespace BackendSite.Service.BLL
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
-        public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
-            IEnumerable<int> currencyIdList,
-            IEnumerable<int> statusList,
-            int pageNumber, int pageSize, out int totalPages, out int rowCount)
-        {
-            return _bankDetailService.GetLoaclBankList(JsonConvert.SerializeObject(siteIds),
-                JsonConvert.SerializeObject(currencyIdList),
-                JsonConvert.SerializeObject(statusList),
-                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                Math.Abs(pageSize),
-                out totalPages, out rowCount);
-        }
-
         public async Task<(IEnumerable<OfflineBankingSetting> Datas, int TotalPages, int RowCount)> GetOfflineBankingSettingList
             (GetOfflineBankingSettingParams input)
         {

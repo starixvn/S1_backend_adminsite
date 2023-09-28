@@ -415,20 +415,6 @@ namespace BackendSite.Service.DAL
                             result = SetDepositInfoFirstDeposit(depositId, siteId, trans);
                         }
 
-                        if (result > 0)
-                        {
-                            if (depositRequest.DepositType == DepositTypeEnum.LocalBanking)
-                            {
-                                var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
-                                result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, trans);
-                            }
-                            else if (depositRequest.oDepositInfo is IPay)
-                            {
-                                var pay = (IPay)depositRequest.oDepositInfo;
-                                result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, trans);
-                            }
-                        }
-
                         if (result > 0 && !string.IsNullOrEmpty(depositInfo))
                         {
                             result = UpdateDepositInfo(depositRequest.TransId, depositInfo, trans);

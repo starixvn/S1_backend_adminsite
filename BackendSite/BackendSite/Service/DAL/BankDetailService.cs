@@ -87,29 +87,6 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.QueryAsync<LocalPaySetting>("Admin_LocalPaySetting_Get");
         }
 
-        public IEnumerable<BankDetail> GetLoaclBankList(string siteIds,
-            string currencyIdList,
-            string statusList,
-            int startIndex, int pageSize,
-            out int totalPages, out int rowCount)
-        {
-            var props = new DynamicParameters();
-            props.Add("_SiteId", siteIds);
-            props.Add("_CurrencyId", currencyIdList);
-            props.Add("_Status", statusList);
-            props.Add("_StartIndex", startIndex);
-            props.Add("_PageSize", pageSize);
-            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var result = _reportDbClient.Query<BankDetail>("LoaclBankList_Get_V2", props);
-
-            totalPages = props.Get<int?>("_TotalPages") ?? 0;
-            rowCount = props.Get<int?>("_RowCount") ?? 0;
-
-            return result;
-        }
-
         public int SetBankCard(ParamsWithLog<SetBankCard> input)
         {
             using var conn = _mainDbClient.GetMySqlConnection();

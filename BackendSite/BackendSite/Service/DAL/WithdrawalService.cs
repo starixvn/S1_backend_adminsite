@@ -506,9 +506,7 @@ namespace BackendSite.Service.DAL
                                 break;
 
                             case WithdrawalStatusEnum.Approved:
-                                updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId, trans);
-
-                                specialResult = updateFlowEndResult == 0 ? 0 : 1;
+                                specialResult = SetWithdrawalInfoFlowEndTime(withdrawalId, trans) == 0 ? 0 : 1;
 
                                 break;
 
