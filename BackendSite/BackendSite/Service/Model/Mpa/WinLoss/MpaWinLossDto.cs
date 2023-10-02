@@ -235,7 +235,24 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR
+        {
+            get
+            {
+                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
+                {
+                    return _ggrValue;
+                }
+                else // 否則使用一般公式
+                {
+                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+                }
+            }
+            set
+            {
+                _ggrValue = value;
+            }
+        }
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -260,6 +277,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 10)]
         public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
+        private decimal _ggrValue;
     }
 
     public class MpaWinLossByTpCategoryCurrencyDetailDto
@@ -279,7 +297,24 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR
+        {
+            get
+            {
+                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
+                {
+                    return _ggrValue;
+                }
+                else // 否則使用一般公式
+                {
+                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+                }
+            }
+            set
+            {
+                _ggrValue = value;
+            }
+        }
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -304,6 +339,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 10)]
         public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
+
+        private decimal _ggrValue;
     }
 
     public class MpaWinLossByPlayerCurrencyDetailDto
@@ -322,7 +359,24 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 4)]
-        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR
+        {
+            get
+            {
+                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
+                {
+                    return _ggrValue;
+                }
+                else // 否則使用一般公式
+                {
+                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+                }
+            }
+            set
+            {
+                _ggrValue = value;
+            }
+        }
 
         [JsonProperty(Order = 5)]
         public decimal PlayerWinLoss { get; set; }
@@ -366,6 +420,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         [JsonProperty(Order = 18)]
         public decimal TotalBonus { get; set; }
         public string Currency { get; set; }
+        private decimal _ggrValue;
     }
 
     public class MpaWinLossByCurrencyCurrencyDetailDto
