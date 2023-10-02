@@ -341,29 +341,9 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
                         var totalRowCount = r.Sum(x => x.RowCount);
+                        var gameType = r.Key.GameType;
+                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
 
-                        // 計算GGR的輔助方法
-                        decimal CalculateGGR(decimal winLoss, decimal progressiveWin, decimal progressiveBet)
-                        {
-                            //todo 9w GGR客製
-                            return GetGGR(winLoss, progressiveWin, progressiveBet);
-                        }
-
-                        // 計算佣金的輔助方法
-                        decimal CalculateCommission(MpaTpBetRecordDto x)
-                        {
-                            if (isOnegameorV8(x.GameType))
-                            {
-                                return 0;
-                            }
-
-                            if (is9w(x.GameType))
-                            {
-                                return x.RevenueSummary * -1;
-                            }
-
-                            return x.RevenueSummary;
-                        }
 
                         // 建立新的MpaWinLossByDateDto物件並返回
                         return new MpaWinLossByDateDto
@@ -374,7 +354,7 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary),
+                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
                             PlayerWinLoss = totalWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
@@ -382,7 +362,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary) / totalValidBetSummary
+                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                             SiteId = r.Key.SiteId
@@ -399,7 +379,43 @@ namespace BackendSite.Service.BLL.Mpa
 
             return wrapperResult;
         }
+        /// <summary>
+        /// 計算GGR的輔助方法
+        /// </summary>
+        /// <param name="gameType"></param>
+        /// <param name="winLoss"></param>
+        /// <param name="progressiveWin"></param>
+        /// <param name="progressiveBet"></param>
+        /// <param name="revenue"></param>
+        /// <returns></returns>
+        private decimal CalculateGGR(int gameType, decimal winLoss, decimal progressiveWin, decimal progressiveBet, decimal revenue)
+        {
+            if (gameType == (int)MpaGGRCustomizationGameTypeEnum.NineW)
+            {
+                //GGR for 9W Sports = - PlayerWinLoss + Commission
+                return GetGGR(winLoss + revenue, progressiveWin, progressiveBet);
+            }
+            return GetGGR(winLoss, progressiveWin, progressiveBet);
+        }
+        /// <summary>
+        /// 計算佣金的輔助方法
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        private decimal CalculateCommission(MpaTpBetRecordDto x)
+        {
+            if (isOnegameorV8(x.GameType))
+            {
+                return 0;
+            }
 
+            if (is9w(x.GameType))
+            {
+                return x.RevenueSummary * -1;
+            }
+
+            return x.RevenueSummary;
+        }
         private static void BetRecordSetDateToOffSet(MpaWinLossRequest request, MpaTpBetRecordWrapper betRecordResult,
             MpaWinLossGroupByTypeEnum groupByType)
         {
@@ -743,33 +759,45 @@ namespace BackendSite.Service.BLL.Mpa
 
             List<MpaWinLossByTpGameTypeDto> GetGroupResult(List<MpaTpBetRecordDto> source)
             {
-                return source.GroupBy(x => new
-                {
-                    x.GameType,
-                    x.CurrencyId
-                })
-                .Select(r => new MpaWinLossByTpGameTypeDto
-                {
-                    TpGameTypeName = tpGameTypeMap[r.Key.GameType],
-                    Currency = currencyNameMapper[r.Key.CurrencyId],
-                    TurnOver = r.Sum(x => x.StakeSummary),
-                    ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    //若為onegaming Poker OR V8Poker，show commission: GGR = sum(revenue)
-                    //若為9w，GGR for 9W Sports = - PlayerWinLoss + Commission
-                    GGR = GetGGR(r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary * -1 : is9w(x.GameType) ? x.WinLossSummary + x.RevenueSummary : x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
-                    PlayerWinLoss = r.Sum(x => x.WinLossSummary),
-                    ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
-                    ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
-                    //若為onegaming Poker OR V8Poker，commission為0
-                    //若為9w，If filtered by Settled Time: Commission = - TpReport9W.commission
-                    Commission = r.Sum(x => isOnegameorV8(x.GameType) ? 0 : is9w(x.GameType) ? x.RevenueSummary * -1 : x.RevenueSummary),
-                    BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0
-                        ? GetGGR(r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary * -1 : is9w(x.GameType) ? x.WinLossSummary + x.RevenueSummary : x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary)
-                        : 0.00m,
-                    UniquePlayers = r.DistinctBy(x => x.CustId).Count()
-                }).ToList();
+                return source
+                    .GroupBy(x => new
+                    {
+                        x.CurrencyId,
+                        x.GameType
+                    }).Select(r =>
+                    {
+                        // 預先計算常用的總和，以避免多次重複計算
+                        var totalStakeSummary = r.Sum(x => x.StakeSummary);
+                        var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
+                        var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
+                        var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
+                        var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
+                        var totalRowCount = r.Sum(x => x.RowCount);
+                        var gameType = r.Key.GameType;
+                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
+
+
+                        // 建立新的MpaWinLossByTpGameTypeDto物件並返回
+                        return new MpaWinLossByTpGameTypeDto
+                        {
+                            TpGameTypeName = tpGameTypeMap[r.Key.GameType],
+                            Currency = currencyNameMapper[r.Key.CurrencyId],
+                            TurnOver = totalStakeSummary,
+                            ValidTurnOver = totalValidBetSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
+                            PlayerWinLoss = totalWinLossSummary,
+                            ProgressiveWin = totalProgressiveWinSummary,
+                            ProgressiveBet = totalProgressiveBetSummary,
+                            Commission = r.Sum(x => CalculateCommission(x)),
+                            BetCount = totalRowCount,
+                            AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
+                            Margin = totalValidBetSummary != 0
+                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
+                                : 0.00m,
+                            UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
+                        };
+                    }).ToList();
             }
 
             var wrapperResult = new TpBetRecordByTpGameTypeWrapper()
@@ -1024,34 +1052,46 @@ namespace BackendSite.Service.BLL.Mpa
 
             List<MpaWinLossByTpCategoryDto> GetGroupResult(List<MpaTpBetRecordDto> source)
             {
-                return source.GroupBy(x => new
-                {
-                    x.CategoryId,
-                    x.CurrencyId,
-                    x.GameType
-                })
-                .Select(r => new MpaWinLossByTpCategoryDto
-                {
-                    TpCategoryName = tpCategoryMap[r.Key.CategoryId],
-                    Currency = currencyNameMapper[r.Key.CurrencyId],
-                    TurnOver = r.Sum(x => x.StakeSummary),
-                    ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    //若為onegaming Poker OR V8Poker，show commission: GGR = sum(revenue)
-                    //若為9w，GGR for 9W Sports = - PlayerWinLoss + Commission
-                    GGR = GetGGR(r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary * -1 : is9w(x.GameType) ? x.WinLossSummary + x.RevenueSummary : x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
-                    PlayerWinLoss = r.Sum(x => x.WinLossSummary),
-                    ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
-                    ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
-                    //若為onegaming Poker OR V8Poker，commission為0
-                    //若為9w，If filtered by Settled Time: Commission = - TpReport9W.commission
-                    Commission = r.Sum(x => isOnegameorV8(x.GameType) ? 0 : is9w(x.GameType) ? x.RevenueSummary * -1 : x.RevenueSummary),
-                    BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0
-                        ? GetGGR(r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary * -1 : is9w(x.GameType) ? x.WinLossSummary + x.RevenueSummary : x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary)
-                        : 0.00m,
-                    UniquePlayers = r.DistinctBy(x => x.CustId).Count()
-                }).ToList();
+                return source
+                    .GroupBy(x => new
+                    {
+                        x.CategoryId,
+                        x.CurrencyId,
+                        x.GameType
+                    }).Select(r =>
+                    {
+                        // 預先計算常用的總和，以避免多次重複計算
+                        var totalStakeSummary = r.Sum(x => x.StakeSummary);
+                        var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
+                        var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
+                        var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
+                        var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
+                        var totalRowCount = r.Sum(x => x.RowCount);
+                        var gameType = r.Key.GameType;
+                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
+
+
+                        // 建立新的MpaWinLossByTpCategoryDto物件並返回
+                        return new MpaWinLossByTpCategoryDto
+                        {
+                            TpCategoryName = tpCategoryMap[r.Key.CategoryId],
+                            Currency = currencyNameMapper[r.Key.CurrencyId],
+                            TurnOver = totalStakeSummary,
+                            ValidTurnOver = totalValidBetSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
+                            PlayerWinLoss = totalWinLossSummary,
+                            ProgressiveWin = totalProgressiveWinSummary,
+                            ProgressiveBet = totalProgressiveBetSummary,
+                            Commission = r.Sum(x => CalculateCommission(x)),
+                            BetCount = totalRowCount,
+                            AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
+                            Margin = totalValidBetSummary != 0
+                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
+                                : 0.00m,
+                            UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
+                        };
+                    }).ToList();
             }
 
             var wrapperResult = new TpBetRecordByTpCategoryWrapper()
@@ -1951,31 +1991,44 @@ namespace BackendSite.Service.BLL.Mpa
 
             List<MpaWinLossByCurrencyDto> GetGroupResult(List<MpaTpBetRecordDto> source)
             {
-                return source.GroupBy(x => new
-                {
-                    x.CurrencyId,
-                    x.GameType
-                }).Select(r => new MpaWinLossByCurrencyDto
-                {
-                    Currency = currencyNameMapper[r.Key.CurrencyId],
-                    TurnOver = r.Sum(x => x.StakeSummary),
-                    ValidTurnOver = r.Sum(x => x.ValidBetSummary),
-                    //若為onegaming Poker OR V8Poker，show commission: GGR = sum(revenue)
-                    //若為9w，GGR for 9W Sports = - PlayerWinLoss + Commission
-                    GGR = GetGGR(r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary * -1 : is9w(x.GameType) ?  x.WinLossSummary + x.RevenueSummary : x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)),
-                    PlayerWinLoss = r.Sum(x => x.WinLossSummary),
-                    ProgressiveWin = r.Sum(x => x.ProgressiveWinSummary),
-                    ProgressiveBet = r.Sum(x => x.ProgressiveBetSummary),
-                    //若為onegaming Poker OR V8Poker，commission為0
-                    //若為9w，If filtered by Settled Time: Commission = - TpReport9W.commission
-                    Commission = r.Sum(x => isOnegameorV8(x.GameType) ? 0 : is9w(x.GameType) ? x.RevenueSummary*-1 : x.RevenueSummary),
-                    BetCount = r.Sum(x => x.RowCount),
-                    AvgBetAmount = r.Sum(x => x.RowCount) != 0 ? r.Sum(x => x.StakeSummary) / r.Sum(x => x.RowCount) : 0.00m,
-                    Margin = r.Sum(x => x.ValidBetSummary) != 0
-                        ? GetGGR(r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary * -1 : is9w(x.GameType) ? x.WinLossSummary + x.RevenueSummary : x.WinLossSummary), r.Sum(x => x.ProgressiveWinSummary), r.Sum(x => x.ProgressiveBetSummary)) / r.Sum(x => x.ValidBetSummary)
-                        : 0.00m,
-                    UniquePlayers = r.DistinctBy(x => x.CustId).Count()
-                }).ToList();
+                return source
+                    .GroupBy(x => new
+                    {
+                        x.CurrencyId,
+                        x.GameType
+                    }).Select(r =>
+                    {
+                        // 預先計算常用的總和，以避免多次重複計算
+                        var totalStakeSummary = r.Sum(x => x.StakeSummary);
+                        var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
+                        var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
+                        var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
+                        var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
+                        var totalRowCount = r.Sum(x => x.RowCount);
+                        var gameType = r.Key.GameType;
+                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
+
+
+                        // 建立新的MpaWinLossByCurrencyDto物件並返回
+                        return new MpaWinLossByCurrencyDto
+                        {
+                            Currency = currencyNameMapper[r.Key.CurrencyId],
+                            TurnOver = totalStakeSummary,
+                            ValidTurnOver = totalValidBetSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
+                            PlayerWinLoss = totalWinLossSummary,
+                            ProgressiveWin = totalProgressiveWinSummary,
+                            ProgressiveBet = totalProgressiveBetSummary,
+                            Commission = r.Sum(x => CalculateCommission(x)),
+                            BetCount = totalRowCount,
+                            AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
+                            Margin = totalValidBetSummary != 0
+                                ?CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
+                                : 0.00m,
+                            UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
+                        };
+                    }).ToList();
             }
 
             var tpBetRecordRelayResultWrapper = new TpBetRecordByCurrencyWrapper()
