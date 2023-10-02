@@ -393,7 +393,8 @@ namespace BackendSite.Service.BLL.Mpa
             if (gameType == (int)MpaGGRCustomizationGameTypeEnum.NineW)
             {
                 //GGR for 9W Sports = - PlayerWinLoss + Commission
-                return GetGGR(winLoss + revenue, progressiveWin, progressiveBet);
+                //因經由CalculateCommission方法計算出的RevenueSummary已經帶負號，故這邊要revenue*-1
+                return GetGGR(winLoss + revenue*-1, progressiveWin, progressiveBet);
             }
             return GetGGR(winLoss, progressiveWin, progressiveBet);
         }
