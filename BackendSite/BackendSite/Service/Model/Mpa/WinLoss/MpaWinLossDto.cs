@@ -442,7 +442,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         [JsonProperty(Order = 15)]
         public decimal TotalBonus { get; set; }
 
-        private decimal _customValue;
+        private decimal _ggrValue;
     }
 
     public class MpaWinLossByDateDto
