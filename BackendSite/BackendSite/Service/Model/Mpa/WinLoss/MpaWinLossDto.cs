@@ -388,9 +388,9 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         {
             get
             {
-                if (_customValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
+                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
                 {
-                    return _customValue;
+                    return _ggrValue;
                 }
                 else // 否則使用一般公式
                 {
@@ -399,7 +399,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
             }
             set
             {
-                _customValue = value;
+                _ggrValue = value;
             }
         }
 
