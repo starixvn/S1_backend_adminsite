@@ -390,13 +390,14 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         private decimal CalculateGGR(int gameType, decimal winLoss, decimal progressiveWin, decimal progressiveBet, decimal revenue)
         {
+            var winLossSummary = winLoss;
             if (gameType == (int)MpaGGRCustomizationGameTypeEnum.NineW)
             {
                 //GGR for 9W Sports = - PlayerWinLoss + Commission
                 //因經由CalculateCommission方法計算出的RevenueSummary已經帶負號，故這邊要revenue*-1
-                return GetGGR(winLoss + revenue*-1, progressiveWin, progressiveBet);
+                winLossSummary = winLoss + (revenue * -1);
             }
-            return GetGGR(winLoss, progressiveWin, progressiveBet);
+            return GetGGR(winLossSummary, progressiveWin, progressiveBet);
         }
         /// <summary>
         /// 計算佣金的輔助方法
