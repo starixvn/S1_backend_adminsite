@@ -390,12 +390,14 @@ namespace BackendSite.Service.BLL.Mpa
         /// <returns></returns>
         private decimal CalculateGGR(int gameType, decimal winLoss, decimal progressiveWin, decimal progressiveBet, decimal revenue)
         {
+            var winLossSummary = winLoss;
             if (gameType == (int)MpaGGRCustomizationGameTypeEnum.NineW)
             {
                 //GGR for 9W Sports = - PlayerWinLoss + Commission
-                return GetGGR(winLoss + revenue, progressiveWin, progressiveBet);
+                //因經由CalculateCommission方法計算出的RevenueSummary已經帶負號，故這邊要revenue*-1
+                winLossSummary = winLoss + (revenue * -1);
             }
-            return GetGGR(winLoss, progressiveWin, progressiveBet);
+            return GetGGR(winLossSummary, progressiveWin, progressiveBet);
         }
         /// <summary>
         /// 計算佣金的輔助方法
@@ -718,6 +720,7 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         TurnOver = v.TurnOver,
                         ValidTurnOver = v.ValidTurnOver,
+                        GGR = v.GGR,
                         PlayerWinLoss = v.PlayerWinLoss,
                         ProgressiveWin = v.ProgressiveWin,
                         ProgressiveBet = v.ProgressiveBet,
@@ -734,6 +737,7 @@ namespace BackendSite.Service.BLL.Mpa
                 {
                     TurnOver = v.TurnOver,
                     ValidTurnOver = v.ValidTurnOver,
+                    GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
@@ -1011,6 +1015,7 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = r.Key,
                     TurnOver = r.Sum(x => x.TurnOver),
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                    GGR = r.Sum(x =>x.GGR),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBet),
@@ -1026,6 +1031,7 @@ namespace BackendSite.Service.BLL.Mpa
                 {
                     Currency = r.Key,
                     TurnOver = r.Sum(x=> x.TurnOver),
+                    GGR = r.Sum(x=> x.GGR),
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
@@ -1400,6 +1406,7 @@ namespace BackendSite.Service.BLL.Mpa
                 Currency = v.Currency,
                 TurnOver = v.TurnOver,
                 ValidTurnOver = v.ValidTurnOver,
+                GGR = v.GGR,
                 PlayerWinLoss = v.PlayerWinLoss,
                 ProgressiveWin = v.ProgressiveWin,
                 ProgressiveBet = v.ProgressiveBet,
@@ -1425,6 +1432,7 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = v.Currency,
                     TurnOver = v.TurnOver,
                     ValidTurnOver = v.ValidTurnOver,
+                    GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
@@ -1962,6 +1970,7 @@ namespace BackendSite.Service.BLL.Mpa
                 {
                     TurnOver = v.TurnOver,
                     ValidTurnOver = v.ValidTurnOver,
+                    GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
