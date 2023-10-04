@@ -92,8 +92,8 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     // If filtered by Created Time: Commission = 0
                     if (request.DateType == MpaDateType.SettledDate)
                     {
-
-                        item.RevenueSummary = commission.FirstOrDefault(r => r.Date == item.Date && r.CustId == item.CustId).Commission;                                                
+                        item.RevenueSummary = commission.Where(r => r.Date == item.Date && r.CustId == item.CustId)
+                                                 .Select(x => x.Commission).FirstOrDefault();
                     }
                     else if (request.DateType == MpaDateType.CreatedDate)
                     {
