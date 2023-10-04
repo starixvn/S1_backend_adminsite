@@ -82,25 +82,32 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             Func<DateTimeOffset, DateTimeOffset, string, MpaDateType, IEnumerable<Commission9WDto>> getCommission, ILogger<MpaWinLossBLL> _logger)
         {
             var commission = getCommission(request.StarTime, request.EndTime, format, request.DateType);
-            _logger.LogInformation(JsonConvert.SerializeObject(data));
-            _logger.LogInformation(JsonConvert.SerializeObject(commission));
-            foreach (var item in data)
+
+            // If filtered by Settled Time: Commission = - TpReport9W.commission
+            if (request.DateType == MpaDateType.SettledDate)
             {
-                if (item.TpId == (int)MpaCommissionCustomizationTpIdEnum.NineW)
+                foreach (var item in commission)
                 {
-                    // If filtered by Settled Time: Commission = - TpReport9W.commission
-                    // If filtered by Created Time: Commission = 0
-                    if (request.DateType == MpaDateType.SettledDate)
+                    //用commission抓第一筆符合9w/date/custId的資料，並給值
+                    var matchRecord = data.FirstOrDefault(r => r.TpId == (int)MpaCommissionCustomizationTpIdEnum.NineW
+                                                              && r.Date == item.Date
+                                                              && r.CustId == item.CustId);
+
+                    if (matchRecord != null)
                     {
-                        item.RevenueSummary = commission.Where(r => r.Date == item.Date && r.CustId == item.CustId)
-                                                 .Select(x => x.Commission).FirstOrDefault();
+                        matchRecord.RevenueSummary = item.Commission;
                     }
-                    else if (request.DateType == MpaDateType.CreatedDate)
+                }
+            }
+            // If filtered by Created Time: Commission = 0
+            else if (request.DateType == MpaDateType.CreatedDate)
+            {
+                foreach (var d in data)
+                {
+                    if (d.TpId == (int)MpaCommissionCustomizationTpIdEnum.NineW)
                     {
-                        item.RevenueSummary = 0;
+                        d.RevenueSummary = 0;
                     }
-                    //GGR for 9W Sports = - PlayerWinLoss + Commission，外層加總時會*-1 
-                    //item.WinLossSummary = item.WinLossSummary*-1 + item.RevenueSummary;
                 }
             }
 
