@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
 using static BackendSite.Service.BLL.Mpa.MpaWinLossBLL;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL.Mpa.Extension
 {
@@ -78,10 +79,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         public static IEnumerable<MpaTpBetRecordDto> SetCommissionByNineW(this IEnumerable<MpaTpBetRecordDto> data,
             MpaWinLossRequest request,
             string format,
-            Func<DateTimeOffset, DateTimeOffset, string, MpaDateType, IEnumerable<Commission9WDto>> getCommission)
+            Func<DateTimeOffset, DateTimeOffset, string, MpaDateType, IEnumerable<Commission9WDto>> getCommission, ILogger<MpaWinLossBLL> _logger)
         {
             var commission = getCommission(request.StarTime, request.EndTime, format, request.DateType);
-
+            _logger.LogInformation(JsonConvert.SerializeObject(data));
+            _logger.LogInformation(JsonConvert.SerializeObject(commission));
             foreach (var item in data)
             {
                 if (item.TpId == (int)MpaCommissionCustomizationTpIdEnum.NineW)
@@ -90,9 +92,10 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     // If filtered by Created Time: Commission = 0
                     if (request.DateType == MpaDateType.SettledDate)
                     {
-                        item.RevenueSummary = commission.Where(r => r.Date == item.Date && r.CustId == item.CustId)
-                                                .Select(x => x.Commission).FirstOrDefault();
-                    }else if (request.DateType == MpaDateType.CreatedDate)
+
+                        item.RevenueSummary = commission.FirstOrDefault(r => r.Date == item.Date && r.CustId == item.CustId).Commission;                                                
+                    }
+                    else if (request.DateType == MpaDateType.CreatedDate)
                     {
                         item.RevenueSummary = 0;
                     }
@@ -120,31 +123,31 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
         public static IEnumerable<MpaWinLossByDateDtoExport> ToExcelFormat(this List<MpaWinLossByDateDto> originData)
         {
-            return originData.GroupBy(x =>new { x.Currency ,x.Date})
+            return originData.GroupBy(x => new { x.Currency, x.Date })
                 .Select(item => new MpaWinLossByDateDtoExport
-            {
-                Date = item.Key.Date,
-                Currency = item.Key.Currency,
-                TurnOver = item.Sum(x=>x.TurnOver).ToString("N2"),
-                ValidTurnOver = item.Sum(x => x.ValidTurnOver).ToString("N2"),
-                GGR = item.Sum(x => x.GGR).ToString("N2"),
-                PlayerWinLoss = item.Sum(x => x.PlayerWinLoss).ToString("N2"),
-                ProgressiveWin = item.Sum(x => x.ProgressiveWin).ToString("N2"),
-                ProgressiveBet = item.Sum(x => x.ProgressiveBet).ToString("N2"),
-                Commission = item.Sum(x => x.Commission).ToString("N2"),
-                BetCount = item.Sum(x => x.BetCount),
-                AvgBetAmount = item.Sum(x => x.BetCount) != 0
+                {
+                    Date = item.Key.Date,
+                    Currency = item.Key.Currency,
+                    TurnOver = item.Sum(x => x.TurnOver).ToString("N2"),
+                    ValidTurnOver = item.Sum(x => x.ValidTurnOver).ToString("N2"),
+                    GGR = item.Sum(x => x.GGR).ToString("N2"),
+                    PlayerWinLoss = item.Sum(x => x.PlayerWinLoss).ToString("N2"),
+                    ProgressiveWin = item.Sum(x => x.ProgressiveWin).ToString("N2"),
+                    ProgressiveBet = item.Sum(x => x.ProgressiveBet).ToString("N2"),
+                    Commission = item.Sum(x => x.Commission).ToString("N2"),
+                    BetCount = item.Sum(x => x.BetCount),
+                    AvgBetAmount = item.Sum(x => x.BetCount) != 0
                         ? (item.Sum(x => x.TurnOver) / item.Sum(x => x.BetCount)).ToString("N2")
                         : "0.00m",
-                UniquePlayers = item.Sum(x => x.UniquePlayers),
-                Margin = item.Sum(x => x.ValidTurnOver) != 0
+                    UniquePlayers = item.Sum(x => x.UniquePlayers),
+                    Margin = item.Sum(x => x.ValidTurnOver) != 0
                         ? (item.Sum(x => x.GGR) / item.Sum(x => x.ValidTurnOver)).ToString("N2")
                         : "0.00m",
-                DepositCount = item.Sum(x => x.DepositCount),
-                TotalDepositAmount = item.Sum(x => x.TotalDepositAmount).ToString("N2"),
-                WithDrawCount = item.Sum(x => x.WithDrawCount),
-                TotalWithDrawAmount = item.Sum(x => x.WithDrawCount).ToString("N2"),
-                TotalBonus = item.Sum(x => x.WithDrawCount).ToString("N2"),
+                    DepositCount = item.Sum(x => x.DepositCount),
+                    TotalDepositAmount = item.Sum(x => x.TotalDepositAmount).ToString("N2"),
+                    WithDrawCount = item.Sum(x => x.WithDrawCount),
+                    TotalWithDrawAmount = item.Sum(x => x.WithDrawCount).ToString("N2"),
+                    TotalBonus = item.Sum(x => x.WithDrawCount).ToString("N2"),
                 })
                 .ToList();
         }
