@@ -2478,6 +2478,10 @@ namespace BackendSite.Service.BLL.Mpa
                                                   let rate = (item.CurrencyId == 15 && request.BaseCurrencyId == 15) || (item.CurrencyId == 51 && request.BaseCurrencyId == 51) ?
                                                   1
                                                   : mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
+                                                  //baseCurrency選VND與IDR時，顯示千單位
+                                                  let baseCurrencyRate = (item.CurrencyId != 15 && request.BaseCurrencyId == 15) || (item.CurrencyId != 51 && request.BaseCurrencyId == 51) ?
+                                                  0.001m
+                                                  : 1
                                                   select new TransactionRelayDto()
                                                   {
                                                       Date = item.Date,
@@ -2488,7 +2492,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                       TpUserName = item.TpUserName,
                                                       SummaryType = item.SummaryType,
                                                       TransactionType = item.TransactionType,
-                                                      Amount = item.Amount * rate,
+                                                      Amount = item.Amount * rate * baseCurrencyRate,
                                                       RowCount = item.RowCount
                                                   }).ToList();
 
@@ -2542,6 +2546,10 @@ namespace BackendSite.Service.BLL.Mpa
                                             let rate = (item.CurrencyId == 15 && request.BaseCurrencyId == 15) || (item.CurrencyId == 51 && request.BaseCurrencyId == 51) ?
                                             1
                                             : mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
+                                            //baseCurrency選VND與IDR時，顯示千單位
+                                            let baseCurrencyRate = (item.CurrencyId != 15 && request.BaseCurrencyId == 15) || (item.CurrencyId != 51 && request.BaseCurrencyId == 51) ?
+                                            0.001m
+                                            : 1
                                             select new MpaWinLossBonusDto()
                                             {
                                                 Date = item.Date,
@@ -2549,7 +2557,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                 UserName = item.UserName,
                                                 TpUserName = item.TpUserName,
                                                 CurrencyId = item.CurrencyId,
-                                                BonusAmountClaim = item.BonusAmountClaim * rate,
+                                                BonusAmountClaim = item.BonusAmountClaim * rate * baseCurrencyRate,
                                                 SiteId = item.SiteId
                                             }).ToList();
 
@@ -2634,6 +2642,10 @@ namespace BackendSite.Service.BLL.Mpa
                                                           let rate = (item.CurrencyId == 15 && request.BaseCurrencyId == 15) || (item.CurrencyId == 51 && request.BaseCurrencyId == 51)?
                                                           1
                                                           :mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
+                                                          //baseCurrency選VND與IDR時，顯示千單位
+                                                          let  baseCurrencyRate = (item.CurrencyId != 15 && request.BaseCurrencyId ==15) || (item.CurrencyId != 51 && request.BaseCurrencyId == 51) ? 
+                                                          0.001m
+                                                          :1
                                                           select new MpaTpBetRecordDto()
                                                           {
                                                               Date = item.Date,
@@ -2649,13 +2661,13 @@ namespace BackendSite.Service.BLL.Mpa
                                                               BonusId = item.BonusId,
                                                               PromotionType = item.PromotionType,
                                                               TicketStatus = item.TicketStatus,
-                                                              StakeSummary = item.StakeSummary * rate,
-                                                              ValidBetSummary = item.ValidBetSummary * rate,
-                                                              WinLossSummary = item.WinLossSummary * rate,
-                                                              RevenueSummary = item.RevenueSummary * rate,
-                                                              ProgressiveWinSummary = item.ProgressiveWinSummary * rate,
-                                                              ProgressiveBetSummary = item.ProgressiveBetSummary * rate,
-                                                              ClosingBalance = item.ClosingBalance * rate,
+                                                              StakeSummary = item.StakeSummary * rate * baseCurrencyRate,
+                                                              ValidBetSummary = item.ValidBetSummary * rate * baseCurrencyRate,
+                                                              WinLossSummary = item.WinLossSummary * rate * baseCurrencyRate,
+                                                              RevenueSummary = item.RevenueSummary * rate * baseCurrencyRate,
+                                                              ProgressiveWinSummary = item.ProgressiveWinSummary * rate * baseCurrencyRate,
+                                                              ProgressiveBetSummary = item.ProgressiveBetSummary * rate * baseCurrencyRate,
+                                                              ClosingBalance = item.ClosingBalance * rate * baseCurrencyRate,
                                                               RowCount = item.RowCount,
                                                           }).ToList();
 
