@@ -2474,7 +2474,10 @@ namespace BackendSite.Service.BLL.Mpa
 
             var mapRate = await GetMapRate(request);
             var alreadyMultiplyRateTransaction = (from item in originTransaction
-                                                  let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
+                                                  //若為VND與IDR則匯率轉為1
+                                                  let rate = (item.CurrencyId == 15 && request.BaseCurrencyId == 15) || (item.CurrencyId == 51 && request.BaseCurrencyId == 51) ?
+                                                  1
+                                                  : mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                                   select new TransactionRelayDto()
                                                   {
                                                       Date = item.Date,
@@ -2513,6 +2516,16 @@ namespace BackendSite.Service.BLL.Mpa
                 originTransaction = originTransaction.Where(x => x.IsTest == 0).ToList();
             }
 
+            //IDR轉KIDR，VND轉KVND
+            decimal rate = 0.001m;
+            foreach (var item in originTransaction)
+            {
+                if (item.CurrencyId == 15 || item.CurrencyId == 51)
+                {
+                    item.Amount = item.Amount * rate;
+                }
+            }
+
             return originTransaction;
         }
 
@@ -2525,7 +2538,10 @@ namespace BackendSite.Service.BLL.Mpa
 
             var mapRate = await GetMapRate(request);
             var alreadyMultiplyRateBonus = (from item in originBonus
-                                            let rate = mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
+                                            //若為VND與IDR則匯率轉為1
+                                            let rate = (item.CurrencyId == 15 && request.BaseCurrencyId == 15) || (item.CurrencyId == 51 && request.BaseCurrencyId == 51) ?
+                                            1
+                                            : mapRate[$"{item.Date.DateMapperToRateDate()}{item.CurrencyId}{request.BaseCurrencyId}"]
                                             select new MpaWinLossBonusDto()
                                             {
                                                 Date = item.Date,
@@ -2560,6 +2576,16 @@ namespace BackendSite.Service.BLL.Mpa
             if (!request.IncludeTest)
             {
                 originBonus = originBonus.Where(x => x.IsTest == 0).ToList();
+            }
+
+            //IDR轉KIDR，VND轉KVND
+            decimal rate = 0.001m;
+            foreach (var item in originBonus)
+            {
+                if (item.CurrencyId == 15 || item.CurrencyId == 51)
+                {
+                    item.BonusAmountClaim = item.BonusAmountClaim * rate;
+                }
             }
 
             return originBonus;
