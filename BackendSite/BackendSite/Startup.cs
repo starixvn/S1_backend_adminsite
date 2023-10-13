@@ -54,9 +54,7 @@ namespace BackendSite
             services.AddSingleton<Cryptor>();
             services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
             services.AddSingleton<DateTimeHelper>();
-            services.AddSingleton<ConfigBLL>();
             
-
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
@@ -133,6 +131,8 @@ namespace BackendSite
             services.DecoratorReferralManagement();
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
             services.DecoratorLiveRegistration();
+            services.AddSingleton<ConfigBLL>();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
