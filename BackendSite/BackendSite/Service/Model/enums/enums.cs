@@ -1535,8 +1535,10 @@ namespace BackendSite.Service.Model.enums
         BWING = 3,
         [Description("Soon88")]
         SOON88 = 4,
-        [Description("ivorysport")]
-        IVORYSPORT = 5
+        [Description("Ivorysport")]
+        IVORYSPORT = 5,
+        [Description("Leobet")]
+        LEOBET = 6
     }
 
     public enum AffSiteEnum
@@ -1692,6 +1694,7 @@ namespace BackendSite.Service.Model.enums
         BuyFeaturesGames = 4,
         Megaways = 5,
         Mini = 6,
+        Arcade = 7,
     }
 
     public enum SlotGameFilterStatusEnum
