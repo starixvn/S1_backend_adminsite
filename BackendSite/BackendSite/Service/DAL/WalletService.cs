@@ -90,6 +90,7 @@ namespace BackendSite.Service.DAL
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
         }
+
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {
             var result = _reportDbClient.Query<PromotionCategory>("Common_PromotionCategory_Get");
