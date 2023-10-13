@@ -140,9 +140,9 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public DepositRequest GetDepositRequest(int depositId, int siteId)
+        public DepositRequest GetDepositRequest(int depositId)
         {
-            return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V4", new DynamicParameters(new { DepositId = depositId/*, SiteId = siteId*/ }));
+            return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V4", new DynamicParameters(new { DepositId = depositId }));
         }
 
         public IEnumerable<DepositComments> GetDepositRequestComment(int depositId, int siteId)
@@ -353,7 +353,7 @@ namespace BackendSite.Service.DAL
             var result = 0;
             try
             {
-                var beforeDepositData = GetDepositRequest(depositId, siteId);
+                var beforeDepositData = GetDepositRequest(depositId);
 
                 using var conn = _mainDbClient.GetMySqlConnection();
                 conn.Open();
