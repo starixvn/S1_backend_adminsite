@@ -372,6 +372,7 @@ namespace BackendSite.Service.Model.enums
         OnlineBanking = 1,
         MobilePayment = 2,
         CryptoPayment = 4,
+        LoadCardPayment = 5,
         QrPayPayment = 6,
         BankAutoChannel = 7
     }
