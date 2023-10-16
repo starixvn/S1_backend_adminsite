@@ -1805,7 +1805,8 @@ namespace BackendSite.Service.Model.enums
     public enum MpaGGRCustomizationGameTypeEnum
     {
         OneGamingPoker = 41,
-        V8Poker = 42
+        V8Poker = 42,
+        NineW = 51
     }
 
     /// <summary>
