@@ -39,7 +39,6 @@ namespace BackendSite.Service.BLL
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
-            _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
@@ -48,7 +47,6 @@ namespace BackendSite.Service.BLL
             custInfoService = provider.GetRequiredService<CustInfoService>();
             _configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-          	_depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
