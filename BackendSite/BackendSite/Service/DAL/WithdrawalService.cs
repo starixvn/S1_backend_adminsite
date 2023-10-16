@@ -243,7 +243,7 @@ namespace BackendSite.Service.DAL
                 _Agent = agent,
                 _WithdrawalMethod = withdrawalMethod
             });
-
+            
             var depositList = _reportDbClient.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V10", p,
                 commandType: CommandType.StoredProcedure);
             return depositList;

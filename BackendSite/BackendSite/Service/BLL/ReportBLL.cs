@@ -4,6 +4,7 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.GameStatisticalReport;
 using BackendSite.Service.Model.Mpa.WinLoss;
@@ -1434,64 +1435,6 @@ namespace BackendSite.Service.BLL
             });
         }
         
-
-        #region Game Statistical Report
-
-        public IEnumerable<GameStatisticalByCurrencyDto> GetGameStatisticalReport(GetListInputModel getListInput)
-        {
-            var key = $"GameStatisticalReport:{getListInput.SiteId}:{getListInput.StartDate}:{getListInput.EndDate}";
-            var source = _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(15),
-                () => GetGameStatisticalSource(getListInput));
-            return ProcessGameStatisticalSource(FilterSorce(getListInput.SiteId, source));
-        }
-
-        public Dictionary<string, IEnumerable<GameStatisticalDao>> ConvertToExport(IEnumerable<GameStatisticalByCurrencyDto> data)
-        {
-            var result = new Dictionary<string, IEnumerable<GameStatisticalDao>>();
-            foreach (var d in data)
-                result.Add(d.CurrencyName, d.CategoryDetail.SelectMany(y => y.GameDetail));
-
-            return result;
-        }
-
-        private IEnumerable<GameStatisticalDao> GetGameStatisticalSource(GetListInputModel getListInput)
-            => reportService.GetGameStatisticalReport(getListInput);
-
-        private IEnumerable<GameStatisticalDao> FilterSorce(int siteId, IEnumerable<GameStatisticalDao> source)
-        {
-            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2().First(x => x.SiteId == siteId);
-            return source.Where(x => userServerInfo.ICurrencyList.Contains(x.CurrencyId));
-        }
-
-        private List<GameStatisticalByCurrencyDto> ProcessGameStatisticalSource(IEnumerable<GameStatisticalDao> source)
-        {
-            var userServerInfos = _serverInfoBll.GetSiteListByLoginUserV2();
-            var currencyList = source.Select(t => new { CurrencyId = t.CurrencyId, CurrencyName = t.CurrencyName }).Distinct()
-                .ToDictionary(t => t.CurrencyId, t => t.CurrencyName).OrderBy(x => x.Key);
-            var categoryList = source.Select(t => new { CategoryId = t.CategoryId, CategoryName = t.CategoryName }).Distinct()
-                .ToDictionary(t => t.CategoryId, t => t.CategoryName).OrderBy(x => x.Key);
-
-            var result = new List<GameStatisticalByCurrencyDto>();
-
-            foreach (var currency in currencyList)
-            {
-                var currencySummaryItem = new GameStatisticalByCurrencyDto() { CurrencyId = currency.Key, CurrencyName = currency.Value };
-                var categorySummaryList = new List<GameStatisticalByCategoryDto>();
-                foreach (var category in categoryList)
-                {
-                    var categorySummaryItem = new GameStatisticalByCategoryDto() { CategoryId = category.Key, CategoryName = category.Value };
-                    var detail = source.Where(x => x.CurrencyId == currency.Key && x.CategoryId == category.Key).OrderByDescending(x => x.ValidBetSummary);
-
-                    if (detail.Count() == 0) continue;
-                    categorySummaryItem.GameDetail = detail;
-                    categorySummaryList.Add(categorySummaryItem);
-                }
-                currencySummaryItem.CategoryDetail = categorySummaryList;
-                result.Add(currencySummaryItem);
-            }
-            return result;
-        }
-
         #endregion
     }
 }

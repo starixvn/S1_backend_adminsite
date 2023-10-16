@@ -1672,6 +1672,7 @@ namespace BackendSite.Service.Model.enums
         Android = 3,
     }
 
+
     public enum ShieldRiskTagged
     {
         IsBot = 1,
@@ -1971,7 +1972,7 @@ namespace BackendSite.Service.Model.enums
         [Description("Minimum Turnover Within Validity Period")]
         DownTurnover = 3,
     }
-
+    
     public enum AutoType
     {
         AutoVerify = 1,
