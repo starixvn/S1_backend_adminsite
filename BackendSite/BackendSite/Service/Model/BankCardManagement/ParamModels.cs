@@ -17,8 +17,8 @@ namespace BackendSite.Service.Model.BankCardManagement
             PointLevels = req.PointLevels;
             AccountNo = req.AccountNo;
             Agent = req.Agent;
-            SupportChannels = req.SupportChannels.Select(x => (int) x);
-            var (startIndex, absPageSize) = req.PageNumber.GetStartIndexAndPageSize(req.PageSize);
+            SupportChannels = req.SupportChannels.Select(x => (int)x);
+            var (startIndex, absPageSize) = req.PageNumber.GetStartIndex(req.PageSize);
             PageSize = absPageSize;
             StartIndex = startIndex;
         }

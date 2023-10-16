@@ -2641,7 +2641,7 @@ namespace BackendSite.Service.BLL.Mpa
             var tpBetRecordRelayResult = data.Filter(request)
                 //.SetGgRByOneGamingPoker()
                 //.SetGgRByV8Poker()
-                .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission, _logger)
+                .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
 
             var mapRate = await GetMapRate(request);

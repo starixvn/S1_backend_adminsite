@@ -133,19 +133,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int CategoryId { get; set; }
         }
-        
+
+        public class GetTpListByCategoryReq
+        {
+            public int CategoryId { get; set; }
+        }
+
         public class GetTpGameTypeByCategoryAndTpIdReq
         {
             public int TpId { get; set; }
             public int CategoryId { get; set; }
         }
-        
-         public class GetTpListByCategoryReq
-        {
-
-            public int CategoryId { get; set; }
-        }
-
 
 
         public class GameCasinoByTpIdReq
