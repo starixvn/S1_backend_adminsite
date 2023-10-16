@@ -19,6 +19,15 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName);
             }
+            //過濾SummaryType
+            if (request.DateType == MpaDateType.SettledDate)
+            {
+                data = data.Where(r => r.SummaryType == 1 || r.SummaryType == 3);
+            }
+            else if(request.DateType == MpaDateType.CreatedDate)
+            {
+                data = data.Where(r => r.SummaryType == 2 || r.SummaryType == 4);
+            }
 
             if (!request.NoDraw)
             {
@@ -272,9 +281,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     TurnOver = item.Value.TurnOver,
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
                     PlayerWinLoss = item.Value.PlayerWinLoss,
                     ProgressiveWin = item.Value.ProgressiveWin,
                     ProgressiveBet = item.Value.ProgressiveBet,
+                    BACommission = item.Value.BACommission,
                     Commission = item.Value.Commission,
                     BetCount = item.Value.BetCount,
                     AvgBetAmount = item.Value.AvgBetAmount,

@@ -15,6 +15,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
 
         [JsonProperty(Order = 4)]
         public decimal ProgressiveWin { get; set; }
@@ -24,6 +25,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 6)]
         public decimal Commission { get; set; }
+        public decimal BACommission { get; set; }
 
         [JsonProperty(Order = 7)]
         public int BetCount { get; set; }
@@ -306,6 +308,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
 
         [JsonProperty(Order = 4)]
         public decimal ProgressiveWin { get; set; }
@@ -315,6 +318,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 6)]
         public decimal Commission { get; set; }
+        public decimal BACommission { get; set; }
 
         [JsonProperty(Order = 7)]
         public int BetCount { get; set; }

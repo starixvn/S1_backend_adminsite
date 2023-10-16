@@ -35,6 +35,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ClosingBalance { get; set; }
         public int RowCount { get; set; }
         public int IsTest { get; set; }
+        public int SummaryType { get; set; }
     }
 
     public class MpaTpBetRecordWrapper
@@ -214,6 +215,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 15)]
         public decimal TotalBonus { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class MpaWinLossByTpGameTypeCurrencyDetailDto
@@ -516,12 +519,14 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal GGR { get; set; }
 
         public decimal PlayerWinLoss { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
 
         public decimal ProgressiveWin { get; set; }
 
         public decimal ProgressiveBet { get; set; }
 
         public decimal Commission { get; set; }
+        public decimal BACommission { get; set; }
 
         public int BetCount { get; set; }
 
