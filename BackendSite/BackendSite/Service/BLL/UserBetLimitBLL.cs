@@ -29,7 +29,7 @@ namespace BackendSite.Service.BLL
         {
             _userBetLimitService = userBetLimitService;
             _adjustmentLogReportService = adjustmentLogReportService;
-            _tpServiceApiUrl = configBll.GetConfigValue<ServiceHostConfig>("ServiceHost").TpService;
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
             _courierAdapter = courierAdapter;
             _custInfoBll = custInfoBll;
             _logger = logger;

@@ -44,7 +44,7 @@ namespace BackendSite.Service.BLL
             _authorizeBLL = authorizeBLL;
             _bonusInfoBLL = bonusInfoBLL;
 
-            _tpServiceApiUrl = configBll.GetConfigValue<ServiceHostConfig>("ServiceHost").TpService;
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
         }
 
         public IEnumerable<PendingFund> PendingFundList()

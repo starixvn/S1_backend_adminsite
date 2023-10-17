@@ -10,6 +10,7 @@ namespace BackendSite.Service.BLL.Infrastructure
         private readonly Dictionary<int, BackendSite.Service.BLL.Infrastructure.Model.SiteConfig> _siteIdConfigs;
 
         private readonly IEnumerable<Config> _rawConfigs;
+        private readonly string _env;
 
         public ConfigBLL(IServiceProvider provider)
         {
@@ -18,6 +19,8 @@ namespace BackendSite.Service.BLL.Infrastructure
             var siteConfigs = siteConfigList.Where(i => i.SiteId != 0);
             _siteIdConfigs = siteConfigs.ToDictionary(i => i.SiteId, i => i);
             _rawConfigs = provider.GetRequiredService<IEnumerable<Config>>();
+            var environment = provider.GetRequiredService<IWebHostEnvironment>();
+            _env = environment.EnvironmentName;
         }
 
         public Dictionary<int, TItem> GetConfigValuesBySiteId<TItem>(string configKey)
@@ -52,6 +55,12 @@ namespace BackendSite.Service.BLL.Infrastructure
             }
 
             return defaultItem;
+        }
+
+        public T GetConfigValueByEnvironment<T>(string configKey, int siteId = 0)
+        {
+            var json = GetConfigValue<T>($"{configKey}.{_env}.json", siteId);
+            return json;
         }
 
         public IEnumerable<TItem> GetRawConfigValues<TItem>(string configKey)

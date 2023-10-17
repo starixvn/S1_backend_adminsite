@@ -29,7 +29,7 @@ namespace BackendSite.Service.BLL
             try
             {
                 var configBll = provider.GetRequiredService<ConfigBLL>();
-                _tpServiceApiUrl = configBll.GetConfigValue<ServiceHostConfig>("ServiceHost").TpService;
+                _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
             }
             catch (Exception e)
             {

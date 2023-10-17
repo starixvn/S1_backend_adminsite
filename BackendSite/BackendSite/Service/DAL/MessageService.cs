@@ -24,7 +24,7 @@ namespace BackendSite.Service.DAL
         public MessageService(IServiceProvider provider)
         {
             var configBll = provider.GetRequiredService<ConfigBLL>();
-            _commonServiceUrl = configBll.GetConfigValue<ServiceHostConfig>("ServiceHost").CommonService;
+            _commonServiceUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").CommonService;
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _logger = provider.GetRequiredService<ILogger<MessageService>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
