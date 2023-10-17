@@ -5,11 +5,12 @@ using Amazon.S3.Model;
 
 using BackendSite.Controllers.ApiV2.Finance.Deposit;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -25,7 +26,6 @@ namespace BackendSite.Service.BLL
         private readonly Common common;
         private readonly CustInfoService custInfoService;
         private readonly ImageEditorBLL _imageEditorBll;
-        private readonly IConfiguration _configuration;
         private readonly CourierAdapter _courierAdapter;
         private readonly ICacheHelper _cacheHelper;
         private readonly string payApiUrl;
@@ -45,9 +45,11 @@ namespace BackendSite.Service.BLL
             authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             common = provider.GetRequiredService<Common>();
             custInfoService = provider.GetRequiredService<CustInfoService>();
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-            payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
+
             _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();

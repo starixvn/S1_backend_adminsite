@@ -1,8 +1,9 @@
-﻿using BackendSite.Service.BLL.Interface;
+﻿using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -29,9 +30,8 @@ namespace BackendSite.Service.BLL
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _logger = provider.GetRequiredService<ILogger<IAutoWithdrawalPaymentGateWayBLL>>();
 
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _payApiUrl = configuration.GetValue<string>("PayService");
-
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
         }
 
         public AutoWithdrawalPaymentGateWayDto GetPaymentGateWay(WithdrawalRequest withdrawalData, int siteId)
