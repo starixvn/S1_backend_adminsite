@@ -16,11 +16,13 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
         private readonly SlotGamesManagementBLL _slotGamesManagementBLL;
         private readonly GameCasinoManageBLL _gameCasinoManageBLL;
+        private readonly IHostEnvironment environment;
         #endregion
 
         #region Constructors
         public SlotGamesManagementController(IServiceProvider provider)
         {
+            environment = provider.GetRequiredService<IHostEnvironment>();
             _slotGamesManagementBLL = provider.GetRequiredService<SlotGamesManagementBLL>();
             _gameCasinoManageBLL = provider.GetRequiredService<GameCasinoManageBLL>();
         }
@@ -102,6 +104,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
+                if (environment.EnvironmentName is "Release"
+                    && request.Status is SlotGameStatusEnum.Open)
+                {
+                    request.Status = SlotGameStatusEnum.ReleaseOpen;
+                }
+
                 var result = _slotGamesManagementBLL.SetSlotGame(request, User.Identity.Name);
                 if (result > 0)
                 {
@@ -194,6 +202,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
+                if (environment.EnvironmentName is "Release"
+                  && request.Status is SlotGameStatusEnum.Open)
+                {
+                    request.Status = SlotGameStatusEnum.ReleaseOpen;
+                }
+
                 var result = _slotGamesManagementBLL.SetSlotGameAllCurrency(request, User.Identity.Name);
                 if (result)
                 {

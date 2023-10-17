@@ -1759,6 +1759,7 @@ namespace BackendSite.Service.Model.enums
     public enum SlotGameStatusEnum
     {
         Closed = 0,
+        ReleaseOpen = 3,
         Open = 1
     }
 
@@ -1983,7 +1984,7 @@ namespace BackendSite.Service.Model.enums
     {
         Daily = 1,
         Weekly = 2
-	}
+    }
     /// <summary>
     /// Balance Adjustment頁面 > MethodType
     /// </summary>
