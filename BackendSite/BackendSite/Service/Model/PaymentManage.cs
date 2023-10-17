@@ -313,4 +313,17 @@ namespace BackendSite.Service.Model
         public string GroupName { get; set; }
         public DepositTypeEnum Type { get; set; }
     }
+
+    public class WithdrawalBlockSetting
+    {
+        public CurrencyEnum CurrencyId { get; set; }
+        public WithdrawalBlockTypeEnum Type { get; set; }
+        public bool Status { get; set; }
+    }
+    
+    public class SetWithdrawalBlockSettingParams : WithdrawalBlockSetting
+    {
+        public int SiteId { get; set; }
+        public string Operator { get; set; }
+    }
 }

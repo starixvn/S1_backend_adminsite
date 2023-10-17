@@ -444,6 +444,13 @@ namespace BackendSite.Service.Model.enums
         CryptoPay = 4,
         CryptoWallet = 5 // Local
     }
+    
+    public enum WithdrawalBlockTypeEnum
+    {
+        BankCard = 1,
+        EWallet = 3,
+        Crypto = 4
+    }
 
     public enum WithdrawalStatusEnum
     {
@@ -928,7 +935,8 @@ namespace BackendSite.Service.Model.enums
         AutoWithdrawalRule = 91,
         AutoPaymentRule = 92,
         DepositReferral = 93,
-        EditSystemBankInfo = 94
+        EditSystemBankInfo = 94,
+        WithdrawalBlockSetting = 95
     }
 
     #region BankFinancialTransferInfoLog
