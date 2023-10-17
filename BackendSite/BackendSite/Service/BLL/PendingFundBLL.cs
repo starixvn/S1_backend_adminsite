@@ -43,12 +43,6 @@ namespace BackendSite.Service.BLL
             apiUrl = configuration.GetValue<string>("TpService");
         }
 
-        public IEnumerable<PendingFund> PendingFundList()
-        {
-            var serverInfo = serverInfoService.GetModel();
-            return pendingFundService.PendingFundList(serverInfo.SiteId);
-        }
-
         public class TpBonusTransfer
         {
             public int TpId { set; get; }

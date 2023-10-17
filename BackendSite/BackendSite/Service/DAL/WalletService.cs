@@ -40,32 +40,6 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.ExecuteScalarAsync<decimal>("Balance_Get", new { CustId = custId });
         }
 
-        public int SetPayDummy(int siteId, int payId, int currencyId, decimal amount, MySqlTransaction trans)
-        {
-            return _mainDbClient.Execute("PayDummy_Set",
-                trans,
-                new DynamicParameters(new
-                {
-                    SiteId = siteId,
-                    PayId = payId,
-                    CurrencyId = currencyId,
-                    Amount = amount
-                }));
-        }
-        public int SetBankOffDummy(int siteId, int sysId, string accountNo, int currencyId, decimal amount, MySqlTransaction trans)
-        {
-            return _mainDbClient.Execute("BankOffDummy_Set",
-                trans,
-                new DynamicParameters(new
-                {
-                    SiteId = siteId,
-                    SysId = sysId,
-                    AccountNo = accountNo,
-                    CurrencyId = currencyId,
-                    Amount = amount
-                }));
-        }
-
         public IEnumerable<BonusLog> GetBonusLog(int custId, string promoCategoryIds, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             totalPages = 0;

@@ -554,7 +554,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                         if (withdrawConfirmResult > 0 && request.WithdrawalType is WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.CryptoPay)
                         {
-                            var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData);
+                            var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request.TransId, apiResult, authData.UserName);
                             if (createFailResult != null) return createFailResult;
                         }
                         break;
