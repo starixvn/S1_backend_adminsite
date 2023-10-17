@@ -1,20 +1,16 @@
 ﻿using System.Text.RegularExpressions;
 using System.Transactions;
-
 using Amazon.S3.Model;
-
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
-
 using Newtonsoft.Json;
-
 using OfficeOpenXml;
-
 using Tag = BackendSite.Service.Model.Tag;
 
 namespace BackendSite.Service.BLL
@@ -59,7 +55,10 @@ namespace BackendSite.Service.BLL
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             var configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-            _bonusApiUrl = configuration.GetValue<string>("BonusService");
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
+
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
