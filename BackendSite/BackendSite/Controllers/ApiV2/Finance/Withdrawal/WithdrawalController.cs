@@ -53,7 +53,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly string _awsWithdrawalFolder;
         private readonly string _awsWithdrawalAccountingFolder;
         private readonly string _awsWithdrawalUrl;
-        private readonly string _awsPaymentBucketName;
+        private readonly string _awsWithdrawalBucketName;
 
         #endregion
 
@@ -81,7 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
-            _awsPaymentBucketName = configBll.GetConfigValueByString("AWSPaymentBucketName");
+            _awsWithdrawalBucketName = configBll.GetConfigValueByString("AWSPaymentBucketName");
             _awsWithdrawalUrl = configBll.GetConfigValueByString("AWSPaymentBucketUrl");
             _awsWithdrawalFolder = configBll.GetConfigValueByString("AWSWithdrawalFolderName");
             _awsWithdrawalAccountingFolder = configBll.GetConfigValueByString("AWSWithdrawalAccountingFolder");
@@ -431,7 +431,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 {
                     var getRequest = new GetObjectRequest();
                     var key = $"{_awsWithdrawalFolder}/{request.TransId}_{withdrawalRequest.BankSlipPicCount}.png";
-                    getRequest.BucketName = _awsPaymentBucketName;
+                    getRequest.BucketName = _awsWithdrawalBucketName;
                     getRequest.Key = key;
                     await _s3Helper.GetObjectAsync(getRequest);
                     withdrawalRequest.HasPic = true;
@@ -817,7 +817,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                         var putRequest = new PutObjectRequest();
                         var key = $"{_awsWithdrawalFolder}/{request.TransId}_{countName}.png";
-                        putRequest.BucketName = _awsPaymentBucketName; // Your bucket name
+                        putRequest.BucketName = _awsWithdrawalBucketName; // Your bucket name
                         putRequest.ContentType = "image/png";
                         putRequest.InputStream = stream;
                         putRequest.Key = key;
@@ -882,7 +882,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 var deleteRequest = new DeleteObjectRequest();
                 var key = $"{_awsWithdrawalFolder}/{request.TransId}_{request.Number}.png";
-                deleteRequest.BucketName = _awsPaymentBucketName;
+                deleteRequest.BucketName = _awsWithdrawalBucketName;
                 deleteRequest.Key = key;
                 var a = await _s3Helper.DeleteObjectAsync(deleteRequest);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -986,7 +986,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 var request = new GetObjectRequest()
                 {
-                    BucketName = _awsPaymentBucketName,
+                    BucketName = _awsWithdrawalBucketName,
                     Key = $"{_awsWithdrawalFolder}/{transId}_{withdrawalPicCount.BankSlipPicCount}.png"
                 };
                 var response = await _s3Helper.GetObjectAsync(request);
@@ -1015,9 +1015,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     var request = new CopyObjectRequest();
                     var withdrawalKey = $"{_awsWithdrawalFolder}/{transId}_{seq}.png";
                     var accountingKey = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_1.png";
-                    request.SourceBucket = _awsPaymentBucketName;
+                    request.SourceBucket = _awsWithdrawalBucketName;
                     request.SourceKey = withdrawalKey;
-                    request.DestinationBucket = _awsPaymentBucketName;
+                    request.DestinationBucket = _awsWithdrawalBucketName;
                     request.DestinationKey = accountingKey;
                     var response = await _s3Helper.CopyObjectAsync(request);
                     if (response.HttpStatusCode != HttpStatusCode.OK)

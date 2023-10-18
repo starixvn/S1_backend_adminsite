@@ -1,8 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using System.Transactions;
-
 using Amazon.S3.Model;
-
 using BackendSite.Controllers.ApiV2.Finance.Deposit;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL.Infrastructure;
@@ -25,7 +23,6 @@ namespace BackendSite.Service.BLL
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Common common;
         private readonly CustInfoService custInfoService;
-        private readonly ImageEditorBLL _imageEditorBll;
         private readonly CourierAdapter _courierAdapter;
         private readonly ICacheHelper _cacheHelper;
         private readonly string payApiUrl;
@@ -35,7 +32,7 @@ namespace BackendSite.Service.BLL
         private readonly AWSS3Helper _s3Helper;
 
 
-        public DepositBLL(IServiceProvider provider, IConfiguration configuration)
+        public DepositBLL(IServiceProvider provider)
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
@@ -49,13 +46,11 @@ namespace BackendSite.Service.BLL
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
-
-            _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+            _awsDepositFolder = configBll.GetConfigValueByString("AWSDepositFolderName");
+            _awsDepositBucketName = configBll.GetConfigValueByString("AWSPaymentBucketName");
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
-            _awsDepositFolder = configuration.GetValue<string>("AwsDepositFolder");
-            _awsDepositBucketName = configuration.GetValue<string>("AwsDepositBucketName");
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
         }
 
