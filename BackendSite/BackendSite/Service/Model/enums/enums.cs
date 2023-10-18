@@ -1694,6 +1694,7 @@ namespace BackendSite.Service.Model.enums
         BuyFeaturesGames = 4,
         Megaways = 5,
         Mini = 6,
+        Arcade = 7,
     }
 
     public enum SlotGameFilterStatusEnum
@@ -1804,7 +1805,8 @@ namespace BackendSite.Service.Model.enums
     public enum MpaGGRCustomizationGameTypeEnum
     {
         OneGamingPoker = 41,
-        V8Poker = 42
+        V8Poker = 42,
+        NineW = 51
     }
 
     /// <summary>

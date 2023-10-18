@@ -130,6 +130,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal Margin { get; set; }
 
         public Dictionary<string, MpaWinLossByTpCategoryCurrencyDetailDto> CurrencyDetail { get; set; }
+        public IEnumerable<MpaWinLossByTpCategoryCurrencyDetailDto> CurrencyDetailByCategory { get; set; }
     }
 
     public class MpaWinLossByPlayerResponse
