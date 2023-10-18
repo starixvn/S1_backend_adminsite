@@ -1,18 +1,17 @@
 ﻿using System.Text;
-
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
@@ -45,7 +44,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         public MemberController(IServiceProvider provider)
         {
-            _bonusApiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("BonusService");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
+
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _memberCommand = provider.GetRequiredService<IMemberCommand>();
             _custPhotoIdBll = provider.GetRequiredService<ICustPhotoIdBLL>();

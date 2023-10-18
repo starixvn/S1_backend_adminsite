@@ -1,5 +1,7 @@
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Store.GiftManagement;
 using GetListRequest = BackendSite.Service.Model.Store.GiftManagement.GetListRequest;
 
@@ -15,17 +17,17 @@ namespace BackendSite.Service.BLL
 
         public GiftManagementBLL(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _storeSiteUrl = configuration.GetValue<string>("StoreService");
-            _bucketName = configuration.GetValue<string>("AwsStoreBucketName");
-            _folder = configuration.GetValue<string>("AwsStoreFolder");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
+            _bucketName = configBll.GetConfigValueByString("AWSBannerBucketName");
+            _folder = configBll.GetConfigValueByString("AWSStoreFolderName");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
         }
 
         public Task<ApiResult<object>> GetGiftListAsync(GetListRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/GetList";
+            var url = _storeSiteUrl + "GiftManagement/GetList";
             var result = _courierAdapter.MyPostAsync<object, GetListRequest>(url, req);
 
             return result;
@@ -33,7 +35,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<object>> GetGiftTagsAsync(GetTagsRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/GetTags";
+            var url = _storeSiteUrl + "GiftManagement/GetTags";
             var result = _courierAdapter.MyPostAsync<object, GetTagsRequest>(url, req);
 
             return result;
@@ -41,7 +43,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<object>> GetGiftCategoriesAsync(GetCategoriesRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/GetCategories";
+            var url = _storeSiteUrl + "GiftManagement/GetCategories";
             var result = _courierAdapter.MyPostAsync<object, GetCategoriesRequest>(url, req);
 
             return result;
@@ -49,7 +51,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<RedemptionLimit>> GetRedemptionLimitAsync(GetRedemptionLimitRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/GetRedemptionLimit";
+            var url = _storeSiteUrl + "GiftManagement/GetRedemptionLimit";
             var result = _courierAdapter.MyPostAsync<RedemptionLimit, GetRedemptionLimitRequest>(url, req);
 
             return result;
@@ -57,7 +59,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<IEnumerable<GiftInfo>>> GetGiftAsync(GetGiftRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/Get";
+            var url = _storeSiteUrl + "GiftManagement/Get";
             var result = _courierAdapter.MyPostAsync<IEnumerable<GiftInfo>, GetGiftRequest>(url, req);
 
             return result;
@@ -65,7 +67,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> CreateGiftAsync(CreateGiftRequest req, string userName)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/Create";
+            var url = _storeSiteUrl + "GiftManagement/Create";
             var data = new CreateGiftParams(req, userName);
             var result = await _courierAdapter.MyPostAsync<object, CreateGiftParams>(url, data);
 
@@ -74,7 +76,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> UpdateGiftAsync(UpdateGiftRequest req, string userName)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/Update";
+            var url = _storeSiteUrl + "GiftManagement/Update";
             var data = new UpdateGiftParams(req, userName);
             var result = await _courierAdapter.MyPostAsync<object, UpdateGiftParams>(url, data);
 
@@ -83,7 +85,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> CreateCategoryAsync(CreateCategoryRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/CreateCategory";
+            var url = _storeSiteUrl + "GiftManagement/CreateCategory";
             var result = await _courierAdapter.MyPostAsync<object, CreateCategoryRequest>(url, req);
 
             return new ApiResult(result.ErrorCode, result.Message);
@@ -91,7 +93,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> UpdateCategoryAsync(UpdateCategoryRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/UpdateCategory";
+            var url = _storeSiteUrl + "GiftManagement/UpdateCategory";
             var result = await _courierAdapter.MyPostAsync<object, UpdateCategoryRequest>(url, req);
 
             return new ApiResult(result.ErrorCode, result.Message);
@@ -99,7 +101,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> CreateTagAsync(CreateTagRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/CreateTag";
+            var url = _storeSiteUrl + "GiftManagement/CreateTag";
             var result = await _courierAdapter.MyPostAsync<object, CreateTagRequest>(url, req);
 
             return new ApiResult(result.ErrorCode, result.Message);
@@ -107,7 +109,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> UpdateTagAsync(UpdateTagRequest req)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/UpdateTag";
+            var url = _storeSiteUrl + "GiftManagement/UpdateTag";
             var result = await _courierAdapter.MyPostAsync<object, UpdateTagRequest>(url, req);
 
             return new ApiResult(result.ErrorCode, result.Message);
@@ -115,7 +117,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> SetRedemptionLimitAsync(SetRedemptionLimitRequest req, string userName)
         {
-            var url = _storeSiteUrl + "/api/GiftManagement/SetRedemptionLimit";
+            var url = _storeSiteUrl + "GiftManagement/SetRedemptionLimit";
             var data = new SetRedemptionLimitParams(req, userName);
             var result = await _courierAdapter.MyPostAsync<object, SetRedemptionLimitParams>(url, data);
 
@@ -148,7 +150,7 @@ namespace BackendSite.Service.BLL
             });
 
             var param = new SetSortParams(sortInfos, userName);
-            var url = _storeSiteUrl + "/api/GiftManagement/SetSort";
+            var url = _storeSiteUrl + "GiftManagement/SetSort";
             var result = await _courierAdapter.MyPostAsync<object, SetSortParams>(url, param);
 
             return new ApiResult(result.ErrorCode, result.Message);

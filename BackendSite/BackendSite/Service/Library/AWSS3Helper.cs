@@ -1,11 +1,10 @@
 ﻿using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
-
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Model;
-
-using Microsoft.Extensions.Options;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite.Service.Library
 {
@@ -16,10 +15,12 @@ namespace BackendSite.Service.Library
 
         public AWSS3Helper(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            var awsKeyConfig = provider.GetRequiredService<IOptions<Dictionary<string, AWSKeyConfig>>>().Value["ailab-s3"];
-            var proxyHost = configuration.GetValue<string>("ProxyHost");
-            var proxyPort = configuration.GetValue<int>("ProxyPort");
+            
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            var awsKeyConfig = configBll.GetConfigValue<AWSKeyConfig>("AWSS3Key");
+            var proxyConfig = configBll.GetConfigValue<ProxyConfig>("ProxySetting");
+            var proxyHost = proxyConfig.ProxyHost;
+            var proxyPort = proxyConfig.ProxyPort;
 
             var config = new AmazonS3Config
             {

@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.DAL.Interface;
+﻿using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite.Service.DAL;
 
@@ -9,10 +11,10 @@ public class BonusApiService : IBonusApiService
     private readonly CourierAdapter _courierAdapter;
     private readonly string _bonusApiUrl;
 
-    public BonusApiService(CourierAdapter courierAdapter, IConfiguration configuration)
+    public BonusApiService(CourierAdapter courierAdapter, ConfigBLL configBll)
     {
         _courierAdapter = courierAdapter;
-        _bonusApiUrl = configuration.GetValue<string>("BonusService");
+        _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
     }
 
     public async Task<ApiResult> SetVerificationRewardAsync(int custId, int otpType)

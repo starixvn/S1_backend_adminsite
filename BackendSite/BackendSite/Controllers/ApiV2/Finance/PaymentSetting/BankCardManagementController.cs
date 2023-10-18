@@ -1,9 +1,9 @@
 ﻿using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using BackendSite.Service.Library;
@@ -48,9 +48,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
 
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
-            _bucketName = configuration.GetValue<string>("AwsPaymentBucketName");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _bucketName = configBll.GetConfigValueByString("AwsPaymentBucketName");
+            _folder = configBll.GetConfigValueByString("AwsLocalPaymentFolderName");
+            _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
         }
 
         #endregion

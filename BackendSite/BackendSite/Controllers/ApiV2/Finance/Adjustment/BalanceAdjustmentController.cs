@@ -1,15 +1,14 @@
 ﻿using System.Text.RegularExpressions;
-
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
@@ -23,7 +22,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
         private readonly PaymentBLL _paymentBll;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly TpBLL _tpBll;
         private readonly AuthorizeBLL _authorizeBll;
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly CourierAdapter _courierAdapter;
@@ -39,13 +37,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         {
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _tpBll = provider.GetRequiredService<TpBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _common = provider.GetRequiredService<Common>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _logger = provider.GetRequiredService<ILogger<BalanceAdjustmentController>>();
-            _bonusApiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("BonusService");
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
         }
 
         #endregion
