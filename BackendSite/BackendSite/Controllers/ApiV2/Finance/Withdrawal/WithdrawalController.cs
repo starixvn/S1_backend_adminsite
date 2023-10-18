@@ -81,10 +81,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
-            _awsWithdrawalBucketName = configBll.GetConfigValueByString("AWSPaymentBucketName");
-            _awsWithdrawalUrl = configBll.GetConfigValueByString("AWSPaymentBucketUrl");
-            _awsWithdrawalFolder = configBll.GetConfigValueByString("AWSWithdrawalFolderName");
-            _awsWithdrawalAccountingFolder = configBll.GetConfigValueByString("AWSWithdrawalAccountingFolder");
+            _awsWithdrawalBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
+            _awsWithdrawalUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
+            _awsWithdrawalFolder = configBll.GetConfigValue("AWSWithdrawalFolderName");
+            _awsWithdrawalAccountingFolder = configBll.GetConfigValue("AWSWithdrawalAccountingFolder");
 
             _usableActionType = new Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>>
             {

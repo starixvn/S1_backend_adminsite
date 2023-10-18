@@ -31,8 +31,8 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         _custInfoBll = custInfoBll;
         _s3Helper = s3Helper;
         _custPhotoIdService = custPhotoIdService;
-        _backOfficeS3Url = configBll.GetConfigValueByString("AWSBackOfficeBucketUrl");
-        _backOfficeS3BucketName = configBll.GetConfigValueByString("AWSBackOfficeBucketName");
+        _backOfficeS3Url = configBll.GetConfigValue("AWSBackOfficeBucketUrl");
+        _backOfficeS3BucketName = configBll.GetConfigValue("AWSBackOfficeBucketName");
         _logger = logger;
         _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
     }

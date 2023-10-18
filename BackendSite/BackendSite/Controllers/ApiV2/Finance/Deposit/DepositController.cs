@@ -54,9 +54,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _producer = provider.GetRequiredService<IRabbitMQProducer>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
-            _awsDepositBucketName = configBll.GetConfigValueByString("AWSPaymentBucketName");
-            _awsDepositUrl = configBll.GetConfigValueByString("AWSPaymentBucketUrl");
-            _awsDepositFolder = configBll.GetConfigValueByString("AWSDepositFolderName");
+            _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
+            _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
+            _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
             
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {

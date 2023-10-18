@@ -58,8 +58,8 @@ namespace BackendSite.Service.BLL
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
-            _backOfficeS3Url = configBll.GetConfigValueByString("AWSBackOfficeBucketUrl");
-            _backOfficeS3BucketName = configBll.GetConfigValueByString("AWSBackOfficeBucketName");
+            _backOfficeS3Url = configBll.GetConfigValue("AWSBackOfficeBucketUrl");
+            _backOfficeS3BucketName = configBll.GetConfigValue("AWSBackOfficeBucketName");
 
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();

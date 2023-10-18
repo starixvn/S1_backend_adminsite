@@ -46,9 +46,9 @@ namespace BackendSite.Service.BLL
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
-            _bucketName = configBll.GetConfigValueByString("AWSBackOfficeBucketName");
-            _bucketUrl = configBll.GetConfigValueByString("AWSBackOfficeBucketUrl");
-            _folder = configBll.GetConfigValueByString("AWSFinanceFolderName");
+            _bucketName = configBll.GetConfigValue("AWSBackOfficeBucketName");
+            _bucketUrl = configBll.GetConfigValue("AWSBackOfficeBucketUrl");
+            _folder = configBll.GetConfigValue("AWSFinanceFolderName");
             _cryptor = provider.GetRequiredService<Cryptor>();
         }
 
