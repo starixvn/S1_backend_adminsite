@@ -53,12 +53,12 @@ namespace BackendSite.Service.BLL
             _promotionService = provider.GetRequiredService<PromotionService>();
             _rolloverService = provider.GetRequiredService<RollOverService>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
-            var configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
-
+            _backofficeS3Url = configBll.GetConfigValueByString("AWSBackOfficeBucketUrl");
+            
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
@@ -69,7 +69,6 @@ namespace BackendSite.Service.BLL
             _rebateManageService = provider.GetRequiredService<RebateManageService>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
-            _backofficeS3Url = configuration.GetValue<string>("AwsBackofficeUrl");
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
             _tagll = provider.GetRequiredService<TagBLL>();
@@ -1239,7 +1238,7 @@ namespace BackendSite.Service.BLL
             batchCustInfo.ForEach(x =>
             {
                 x.StatusName = ((BatchCustInfoStatus)x.Status).ToString();
-                x.Url = $"{_backofficeS3Url}/{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
+                x.Url = $"{_backofficeS3Url}{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
             });
 
             return batchCustInfo;
