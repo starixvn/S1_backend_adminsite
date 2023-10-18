@@ -39,7 +39,8 @@ namespace BackendSite.Service.BLL
         private readonly RebateManageService _rebateManageService;
         private readonly ExcelBLL _excelBll;
         private readonly AWSS3Helper _s3Helper;
-        private readonly string _backofficeS3Url;
+        private readonly string _backOfficeS3Url;
+        private readonly string _backOfficeS3BucketName;
         private readonly string _environment;
         private readonly TagBLL _tagll;
         public CustInfoBLL(IServiceProvider provider)
@@ -57,8 +58,9 @@ namespace BackendSite.Service.BLL
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
-            _backofficeS3Url = configBll.GetConfigValueByString("AWSBackOfficeBucketUrl");
-            
+            _backOfficeS3Url = configBll.GetConfigValueByString("AWSBackOfficeBucketUrl");
+            _backOfficeS3BucketName = configBll.GetConfigValueByString("AWSBackOfficeBucketName");
+
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
@@ -1200,7 +1202,7 @@ namespace BackendSite.Service.BLL
                         var key = $"{_environment}/{site}/CustInfo/BatchMemberInfoReport_{batchId}.xlsx";
                         var putRequest = new PutObjectRequest
                         {
-                            BucketName = "ailab-backoffice",
+                            BucketName = _backOfficeS3BucketName,
                             ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             InputStream = stream,
                             Key = key
@@ -1238,7 +1240,7 @@ namespace BackendSite.Service.BLL
             batchCustInfo.ForEach(x =>
             {
                 x.StatusName = ((BatchCustInfoStatus)x.Status).ToString();
-                x.Url = $"{_backofficeS3Url}{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
+                x.Url = $"{_backOfficeS3Url}{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
             });
 
             return batchCustInfo;

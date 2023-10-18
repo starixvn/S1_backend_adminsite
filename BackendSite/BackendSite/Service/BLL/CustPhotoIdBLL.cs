@@ -16,7 +16,8 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
     private readonly AWSS3Helper _s3Helper;
     private readonly CustPhotoIdService _custPhotoIdService;
     private readonly ILogger<CustPhotoIdBLL> _logger;
-    private readonly string _backofficeS3Url;
+    private readonly string _backOfficeS3Url;
+    private readonly string _backOfficeS3BucketName;
     private readonly string _environment;
     public CustPhotoIdBLL(ImageEditorBLL imageEditorBll,
         CustInfoBLL custInfoBll,
@@ -30,7 +31,8 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         _custInfoBll = custInfoBll;
         _s3Helper = s3Helper;
         _custPhotoIdService = custPhotoIdService;
-        _backofficeS3Url = configBll.GetConfigValueByString("AWSBackOfficeBucketUrl");
+        _backOfficeS3Url = configBll.GetConfigValueByString("AWSBackOfficeBucketUrl");
+        _backOfficeS3BucketName = configBll.GetConfigValueByString("AWSBackOfficeBucketName");
         _logger = logger;
         _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
     }
@@ -44,7 +46,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         var data = photos.Select(sq => new GetCustPhotoIdResponse()
         {
             Id = sq,
-            PhotoUrl = $"{_backofficeS3Url}{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg"
+            PhotoUrl = $"{_backOfficeS3Url}{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg"
         });
         return data;
     }
@@ -86,7 +88,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         var key = $"{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg";
         var putRequest = new PutObjectRequest
         {
-            BucketName = "ailab-backoffice",
+            BucketName = _backOfficeS3BucketName,
             ContentType = "image/jpeg",
             InputStream = stream,
             Key = key
@@ -111,7 +113,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
             var key = $"{_environment}/{site}/CustPhotoId/{custId}/{id}.jpeg";
             var deleteObject = new DeleteObjectRequest()
             {
-                BucketName = "ailab-backoffice",
+                BucketName = _backOfficeS3BucketName,
                 Key = key
             };
 
