@@ -28,7 +28,7 @@ namespace BackendSite.Service.BLL
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
-            _errorPageBucketName = configBll.GetConfigValueByString("AWSErrorPageBucketName");
+            _errorPageBucketName = configBll.GetConfigValue("AWSErrorPageBucketName");
 
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";

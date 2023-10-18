@@ -49,8 +49,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
-            _bucketName = configBll.GetConfigValueByString("AwsPaymentBucketName");
-            _folder = configBll.GetConfigValueByString("AwsLocalPaymentFolderName");
+            _bucketName = configBll.GetConfigValue("AwsPaymentBucketName");
+            _folder = configBll.GetConfigValue("AwsLocalPaymentFolderName");
             _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
         }
 

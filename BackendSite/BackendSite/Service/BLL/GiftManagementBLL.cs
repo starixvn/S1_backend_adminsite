@@ -19,8 +19,8 @@ namespace BackendSite.Service.BLL
         {
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
-            _bucketName = configBll.GetConfigValueByString("AWSBannerBucketName");
-            _folder = configBll.GetConfigValueByString("AWSStoreFolderName");
+            _bucketName = configBll.GetConfigValue("AWSBannerBucketName");
+            _folder = configBll.GetConfigValue("AWSStoreFolderName");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
         }

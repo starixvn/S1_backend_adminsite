@@ -47,8 +47,8 @@ namespace BackendSite.Service.BLL
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
-            _awsDepositFolder = configBll.GetConfigValueByString("AWSDepositFolderName");
-            _awsDepositBucketName = configBll.GetConfigValueByString("AWSPaymentBucketName");
+            _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
+            _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
