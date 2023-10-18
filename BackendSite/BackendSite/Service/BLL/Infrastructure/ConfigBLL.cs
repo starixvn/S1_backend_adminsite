@@ -57,6 +57,14 @@ namespace BackendSite.Service.BLL.Infrastructure
             return defaultItem;
         }
 
+
+        public string GetConfigValueByString(string configKey)
+        {
+            var success = _defaultSiteConfig.TryGetValue(configKey, out var defaultItem);
+            return success ? defaultItem : string.Empty;
+        }
+
+
         public T GetConfigValueByEnvironment<T>(string configKey, int siteId = 0)
         {
             var json = GetConfigValue<T>($"{configKey}.{_env}.json", siteId);

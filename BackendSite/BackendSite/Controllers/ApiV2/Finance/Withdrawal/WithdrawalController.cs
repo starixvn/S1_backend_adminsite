@@ -53,7 +53,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly string _awsWithdrawalFolder;
         private readonly string _awsWithdrawalAccountingFolder;
         private readonly string _awsWithdrawalUrl;
-        private readonly string _awsWithdrawalBucketName;
+        private readonly string _awsPaymentBucketName;
 
         #endregion
 
@@ -81,12 +81,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
+            _awsPaymentBucketName = configBll.GetConfigValueByString("AWSPaymentBucketName");
+            _awsWithdrawalUrl = configBll.GetConfigValueByString("AWSPaymentBucketUrl");
+            _awsWithdrawalFolder = configBll.GetConfigValueByString("AWSWithdrawalFolderName");
+            _awsWithdrawalAccountingFolder = configBll.GetConfigValueByString("AWSWithdrawalAccountingFolder");
 
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
-            _awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
-            _awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
-            _awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
             _usableActionType = new Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>>
             {
                 {WithdrawalStatusEnum.Pending, new List<WithdrawalActionEnum>
@@ -432,7 +431,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 {
                     var getRequest = new GetObjectRequest();
                     var key = $"{_awsWithdrawalFolder}/{request.TransId}_{withdrawalRequest.BankSlipPicCount}.png";
-                    getRequest.BucketName = _awsWithdrawalBucketName;
+                    getRequest.BucketName = _awsPaymentBucketName;
                     getRequest.Key = key;
                     await _s3Helper.GetObjectAsync(getRequest);
                     withdrawalRequest.HasPic = true;
@@ -818,7 +817,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                         var putRequest = new PutObjectRequest();
                         var key = $"{_awsWithdrawalFolder}/{request.TransId}_{countName}.png";
-                        putRequest.BucketName = _awsWithdrawalBucketName; // Your bucket name
+                        putRequest.BucketName = _awsPaymentBucketName; // Your bucket name
                         putRequest.ContentType = "image/png";
                         putRequest.InputStream = stream;
                         putRequest.Key = key;
@@ -883,7 +882,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 var deleteRequest = new DeleteObjectRequest();
                 var key = $"{_awsWithdrawalFolder}/{request.TransId}_{request.Number}.png";
-                deleteRequest.BucketName = _awsWithdrawalBucketName;
+                deleteRequest.BucketName = _awsPaymentBucketName;
                 deleteRequest.Key = key;
                 var a = await _s3Helper.DeleteObjectAsync(deleteRequest);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -987,7 +986,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 var request = new GetObjectRequest()
                 {
-                    BucketName = _awsWithdrawalBucketName,
+                    BucketName = _awsPaymentBucketName,
                     Key = $"{_awsWithdrawalFolder}/{transId}_{withdrawalPicCount.BankSlipPicCount}.png"
                 };
                 var response = await _s3Helper.GetObjectAsync(request);
@@ -1016,9 +1015,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     var request = new CopyObjectRequest();
                     var withdrawalKey = $"{_awsWithdrawalFolder}/{transId}_{seq}.png";
                     var accountingKey = $"{_awsWithdrawalAccountingFolder}/{transId}_{seq}_1.png";
-                    request.SourceBucket = _awsWithdrawalBucketName;
+                    request.SourceBucket = _awsPaymentBucketName;
                     request.SourceKey = withdrawalKey;
-                    request.DestinationBucket = _awsWithdrawalBucketName;
+                    request.DestinationBucket = _awsPaymentBucketName;
                     request.DestinationKey = accountingKey;
                     var response = await _s3Helper.CopyObjectAsync(request);
                     if (response.HttpStatusCode != HttpStatusCode.OK)
