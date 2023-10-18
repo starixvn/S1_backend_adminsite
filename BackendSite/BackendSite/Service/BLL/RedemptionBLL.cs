@@ -6,7 +6,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Store.Redemption;
-
 using NPOI.XSSF.UserModel;
 
 namespace BackendSite.Service.BLL
@@ -23,16 +22,13 @@ namespace BackendSite.Service.BLL
 
         public RedemptionBLL(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
             _logger = provider.GetRequiredService<ILogger<RedemptionBLL>>();
-
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
-            
+            _bucketName = configBll.GetConfigValueByString("AWSBannerBucketName");
+            _folder = configBll.GetConfigValueByString("AWSStoreFolderName");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
-            _bucketName = configuration.GetValue<string>("AwsStoreBucketName");
-            _folder = configuration.GetValue<string>("AwsStoreFolder");
         }
 
         public Task<ApiResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)

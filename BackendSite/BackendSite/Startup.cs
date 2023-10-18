@@ -48,7 +48,6 @@ namespace BackendSite
             services.AddDatabaseConnection(_configuration);
             services.AddMessageQueueConnection(_configuration);
             services.Configure<Dictionary<string, BackendSite.Service.Model.SiteConfig>>(_configuration.GetSection("SiteConfig"));
-            services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
