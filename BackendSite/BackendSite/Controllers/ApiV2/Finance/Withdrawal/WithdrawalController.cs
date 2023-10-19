@@ -7,12 +7,13 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -78,12 +79,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
 
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _payApiUrl = configuration.GetValue<string>("PayService");
-            _awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
-            _awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
-            _awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
-            _awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
+            _awsWithdrawalBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
+            _awsWithdrawalUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
+            _awsWithdrawalFolder = configBll.GetConfigValue("AWSWithdrawalFolderName");
+            _awsWithdrawalAccountingFolder = configBll.GetConfigValue("AWSWithdrawalAccountingFolder");
+
             _usableActionType = new Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>>
             {
                 {WithdrawalStatusEnum.Pending, new List<WithdrawalActionEnum>

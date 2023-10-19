@@ -1,7 +1,5 @@
 ﻿using BackendSite;
 using BackendSite.Extensions;
-using BackendSite.Service;
-
 using Elastic.Apm.SerilogEnricher;
 
 using Serilog;

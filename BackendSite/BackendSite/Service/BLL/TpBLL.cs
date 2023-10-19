@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.TpMaintain;
 
 using TpGameType = BackendSite.Service.Model.TpGameType;
@@ -11,7 +13,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly ServerInfoService _serverInfoService;
         private readonly CourierAdapter _courierAdapter;
-        private readonly string _apiUrl;
+        private readonly string _tpServiceApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
         private readonly ICacheHelper _redisHelper;
         private readonly int _balanceTimeoutSecond;
@@ -23,7 +25,17 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
-            _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
+
+            try
+            {
+                var configBll = provider.GetRequiredService<ConfigBLL>();
+                _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
             _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
             _logger = provider.GetRequiredService<ILogger<TpBLL>>();
         }
@@ -145,7 +157,7 @@ namespace BackendSite.Service.BLL
                 direction = inTpTransfer.direction,
                 inputs = null
             };
-            var myUrl = $"{_apiUrl}Transfer";
+            var myUrl = $"{_tpServiceApiUrl}Transfer";
             var data = await _courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, tpTransfer);
 
             return data;
@@ -153,7 +165,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult<UserBalance>> GetBalanceAsync(TpInfo inInfo)
         {
             var input = new Dictionary<string, string>();
-            var myUrl = $"{_apiUrl}GetBalance";
+            var myUrl = $"{_tpServiceApiUrl}GetBalance";
 
             var oTpInfo = new TpInfo
             {
@@ -181,7 +193,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult<TransferResult>> FixNegativeAsync(TpInfo inInfo)
         {
             var input = new Dictionary<string, string>();
-            var myUrl = $"{_apiUrl}FixNegative";
+            var myUrl = $"{_tpServiceApiUrl}FixNegative";
             var oTpInfo = new TpInfo
             {
                 TpId = inInfo.TpId,
@@ -219,7 +231,7 @@ namespace BackendSite.Service.BLL
                 DepositId = inAdminTpTransfer.DepositId,
                 IsDepositId = inAdminTpTransfer.IsDepositId,
             };
-            var myUrl = $"{_apiUrl}AdjustWallet";
+            var myUrl = $"{_tpServiceApiUrl}AdjustWallet";
             var data = await _courierAdapter.MyPostAsync<AdjustWalletResult, TpTransfer>(myUrl, adminTpTransfer);
 
             return data;
@@ -257,7 +269,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult<dynamic>> GetBetDetail(GetTpBetRecordDetailRequest request)
         {
-            var myUrl = $"{_apiUrl}GetBetDetail";
+            var myUrl = $"{_tpServiceApiUrl}GetBetDetail";
 
             try
             {

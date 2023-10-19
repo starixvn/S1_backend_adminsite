@@ -1,9 +1,10 @@
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Store.StorePoint;
-
 using NPOI.XSSF.UserModel;
 
 namespace BackendSite.Service.BLL
@@ -17,8 +18,8 @@ namespace BackendSite.Service.BLL
 
         public StorePointBLL(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _storeSiteUrl = configuration.GetValue<string>("StoreService");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<StorePointBLL>>();
@@ -26,7 +27,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiListResult<object>> GetMemberListAsync(GetMemberListRequest req)
         {
-            var url = _storeSiteUrl + "/api/Member/GetList";
+            var url = _storeSiteUrl + "Member/GetList";
             var result = _courierAdapter.PostAsync<ApiListResult<object>, GetMemberListRequest>(url, req);
 
             return result;
@@ -34,7 +35,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiListResult<object>> GetMemberRewardPointLogAsync(GetMemberRewardPointLogRequest req)
         {
-            var url = _storeSiteUrl + "/api/Member/GetRewardPointLog";
+            var url = _storeSiteUrl + "Member/GetRewardPointLog";
             var result = _courierAdapter.PostAsync<ApiListResult<object>, GetMemberRewardPointLogRequest>(url, req);
 
             return result;
@@ -43,7 +44,7 @@ namespace BackendSite.Service.BLL
         public Task<ApiResult<object>> ManualRewardPointAsync(CreateManualRewardPointInfoRequest req, string @operator)
         {
             var param = new CreateManualRewardPointInfoParams(req, @operator);
-            var url = _storeSiteUrl + "/api/Member/ManualRewardPoint";
+            var url = _storeSiteUrl + "Member/ManualRewardPoint";
             var result = _courierAdapter.MyPostAsync<object, CreateManualRewardPointInfoParams>(url, param);
 
             return result;
@@ -91,7 +92,7 @@ namespace BackendSite.Service.BLL
 
             // STEP 3: 執行
             var param = new CreateManualRewardPointInfoBatchParams(req.SiteId, list, @operator);
-            var url = _storeSiteUrl + "/api/Member/BatchManualRewardPoint";
+            var url = _storeSiteUrl + "Member/BatchManualRewardPoint";
             var result = await _courierAdapter.MyPostAsync<object, CreateManualRewardPointInfoBatchParams>(url, param);
 
             return new ApiResult(result.ErrorCode, result.Message); ;

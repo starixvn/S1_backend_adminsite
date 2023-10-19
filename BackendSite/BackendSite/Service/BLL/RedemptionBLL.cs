@@ -1,10 +1,11 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Store.Redemption;
-
 using NPOI.XSSF.UserModel;
 
 namespace BackendSite.Service.BLL
@@ -21,18 +22,18 @@ namespace BackendSite.Service.BLL
 
         public RedemptionBLL(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
             _logger = provider.GetRequiredService<ILogger<RedemptionBLL>>();
-            _storeSiteUrl = configuration.GetValue<string>("StoreService");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
+            _bucketName = configBll.GetConfigValue("AWSBannerBucketName");
+            _folder = configBll.GetConfigValue("AWSStoreFolderName");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
-            _bucketName = configuration.GetValue<string>("AwsStoreBucketName");
-            _folder = configuration.GetValue<string>("AwsStoreFolder");
         }
 
         public Task<ApiResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)
         {
-            var url = _storeSiteUrl + "/api/Redemption/GetRedemptionList";
+            var url = _storeSiteUrl + "Redemption/GetRedemptionList";
             var result = _courierAdapter.PostAsync<ApiResult<object>, GetRedemptionListRequest>(url, req);
 
             return result;
@@ -40,7 +41,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<byte[]> ExportRedemptionListAsync(ExportRedemptionListRequest req)
         {
-            var url = _storeSiteUrl + "/api/Redemption/ExportRedemptionList";
+            var url = _storeSiteUrl + "Redemption/ExportRedemptionList";
             var exportResult =
                 await _courierAdapter.PostAsync<ApiResult<ExportRedemptionListResult>, ExportRedemptionListRequest>(url, req);
 
@@ -67,7 +68,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
         {
-            var url = _storeSiteUrl + "/api/Redemption/GetRedemptionDetail";
+            var url = _storeSiteUrl + "Redemption/GetRedemptionDetail";
             var result = _courierAdapter.PostAsync<ApiResult<object>, GetRedemptionDetailRequest>(url, req);
 
             return result;
@@ -75,7 +76,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<object>> GetRedemptionLogAsync(GetRedemptionLogRequest req)
         {
-            var url = _storeSiteUrl + "/api/Redemption/GetRedemptionLog";
+            var url = _storeSiteUrl + "Redemption/GetRedemptionLog";
             var result = _courierAdapter.PostAsync<ApiResult<object>, GetRedemptionLogRequest>(url, req);
 
             return result;
@@ -83,7 +84,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<object>> SetRedemptionInfoAsync(SetRedemptionInfoRequest req)
         {
-            var url = _storeSiteUrl + "/api/Redemption/SetRedemptionInfo";
+            var url = _storeSiteUrl + "Redemption/SetRedemptionInfo";
             var result = _courierAdapter.PostAsync<ApiResult<object>, SetRedemptionInfoRequest>(url, req);
 
             return result;
