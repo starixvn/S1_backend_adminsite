@@ -28,13 +28,30 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         #endregion
 
+        #region API Model
+
+        public class GetBySiteAndCurrencyRequest
+        {
+            /// <summary>
+            /// 品牌
+            /// </summary>
+            public IEnumerable<int> SiteIds { get; set; }
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; }
+        }
+
+        #endregion
+
         #region Actions
         [HttpPost]
-        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
+        public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList(GetBySiteAndCurrencyRequest request)
         {
+
             var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
             {
-                Data = _gameCasinoManageBLL.GetTpList(),
+                Data = _gameCasinoManageBLL.GetTpList(request.SiteIds,request.CurrencyId),
                 ErrorCode = 0
             };
 

@@ -4,12 +4,9 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.TpMaintain;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BackendSite.Service.Model.CustVipLevel;
-using BackendSite.Service.Model.TpMaintain;
-using BackendSite.Service.Model.ApiModel;
+using System.Text.Json;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
 {
@@ -59,6 +56,23 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _deepLinkBll = provider.GetRequiredService<DeepLinkBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+        }
+
+        #endregion
+
+
+        #region Api Model
+
+        public class GetBySiteAndCurrencyRequest
+        {
+            /// <summary>
+            /// 品牌
+            /// </summary>
+            public IEnumerable<int> SiteIds { get; set; }
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; }
         }
 
         #endregion
@@ -215,7 +229,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult<IEnumerable<PayListInfo>> GetUserAllPayList()
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
-            var data = _paymentManageBll.GetPayListByMultiSite(userServerInfo.Select(x=>x.SiteId));
+            var data = _paymentManageBll.GetPayListByMultiSite(userServerInfo.Select(x => x.SiteId));
 
             if (!data.Any())
             {
@@ -293,9 +307,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetSlotTpList()
+        public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetSlotTpList(GetBySiteAndCurrencyRequest request)
         {
-            var data = await _gameCasinoBll.GetTpList();
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+            }
+            var data = await _gameCasinoBll.GetTpList(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
 
             if (!data.Any())
             {
@@ -347,9 +365,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<CommonTpInfo>> GetTpList()
+        public ApiResult<IEnumerable<CommonTpInfo>> GetTpList(GetBySiteAndCurrencyRequest request)
         {
-            var data = _tpMaintainBll.GetCommonTpList();
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+            }
+
+            var data = _tpMaintainBll.GetCommonTpList(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
 
             if (!data.Any())
             {
@@ -402,7 +425,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<GameType>> GetTpGameType()
+        public ApiResult<IEnumerable<GameType>> GetTpGameType(GetBySiteAndCurrencyRequest request)
         {
             var data = _winLostReportBll.GetTpGameType();
 
