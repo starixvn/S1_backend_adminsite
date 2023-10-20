@@ -35,6 +35,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ClosingBalance { get; set; }
         public int RowCount { get; set; }
         public int IsTest { get; set; }
+        public int SummaryType { get; set; }
     }
 
     public class MpaTpBetRecordWrapper
@@ -174,7 +175,24 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal ValidTurnOver { get; set; }
 
         [JsonProperty(Order = 2)]
-        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+        public decimal GGR
+        {
+            get
+            {
+                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
+                {
+                    return _ggrValue;
+                }
+                else // 否則使用一般公式
+                {
+                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+                }
+            }
+            set
+            {
+                _ggrValue = value;
+            }
+        }
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
@@ -214,6 +232,9 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 15)]
         public decimal TotalBonus { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
+        private decimal _ggrValue;
     }
 
     public class MpaWinLossByTpGameTypeCurrencyDetailDto
@@ -278,6 +299,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         [JsonProperty(Order = 10)]
         public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
         private decimal _ggrValue;
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class MpaWinLossByTpCategoryCurrencyDetailDto
@@ -341,6 +364,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
 
         private decimal _ggrValue;
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class MpaWinLossByPlayerCurrencyDetailDto
@@ -421,6 +446,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
         public string Currency { get; set; }
         private decimal _ggrValue;
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class MpaWinLossByCurrencyCurrencyDetailDto
@@ -498,6 +525,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
 
         private decimal _ggrValue;
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class MpaWinLossByDateDto
@@ -516,12 +545,14 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal GGR { get; set; }
 
         public decimal PlayerWinLoss { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
 
         public decimal ProgressiveWin { get; set; }
 
         public decimal ProgressiveBet { get; set; }
 
         public decimal Commission { get; set; }
+        public decimal BACommission { get; set; }
 
         public int BetCount { get; set; }
 
@@ -583,12 +614,14 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal GGR { get; set; }
 
         public decimal PlayerWinLoss { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
 
         public decimal ProgressiveWin { get; set; }
 
         public decimal ProgressiveBet { get; set; }
 
         public decimal Commission { get; set; }
+        public decimal BACommission { get; set; }
 
         public int BetCount { get; set; }
 
@@ -629,12 +662,14 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal GGR { get; set; }
 
         public decimal PlayerWinLoss { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
 
         public decimal ProgressiveWin { get; set; }
 
         public decimal ProgressiveBet { get; set; }
 
         public decimal Commission { get; set; }
+        public decimal BACommission { get; set; }
 
         public int BetCount { get; set; }
 
@@ -705,6 +740,9 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public decimal TotalBonus { get; set; }
         public int SiteId { get; set; }
+
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class TpBetRecordByPlayerWrapper
@@ -779,6 +817,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public decimal TotalBonus { get; set; }
         public int CustId { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class TpBetRecordByCurrencyWrapper
@@ -860,11 +900,15 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string PlayerWinLoss { get; set; }
 
+        public string BAPlayerWinLoss { get; set; }
+
         public string ProgressiveWin { get; set; }
 
         public string ProgressiveBet { get; set; }
 
         public string Commission { get; set; }
+
+        public string BACommission { get; set; }
 
         public int BetCount { get; set; }
 
@@ -883,6 +927,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string TotalWithDrawAmount { get; set; }
 
         public string TotalBonus { get; set; }
+        
     }
 
     public class MpaWinLossByTpGameTypeDtoExport
@@ -898,12 +943,14 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string GGR { get; set; }
 
         public string PlayerWinLoss { get; set; }
+        public string BAPlayerWinLoss { get; set; }
 
         public string ProgressiveWin { get; set; }
 
         public string ProgressiveBet { get; set; }
 
         public string Commission { get; set; }
+        public string BACommission { get; set; }
 
         public int BetCount { get; set; }
 
@@ -928,11 +975,15 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string PlayerWinLoss { get; set; }
 
+        public string BAPlayerWinLoss { get; set; }
+
         public string ProgressiveWin { get; set; }
 
         public string ProgressiveBet { get; set; }
 
         public string Commission { get; set; }
+
+        public string BACommission { get; set; }
 
         public int BetCount { get; set; }
 
@@ -961,11 +1012,15 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string PlayerWinLoss { get; set; }
 
+        public string BAPlayerWinLoss { get; set; }
+
         public string ProgressiveWin { get; set; }
 
         public string ProgressiveBet { get; set; }
 
         public string Commission { get; set; }
+
+        public string BACommission { get; set; }
 
         public int BetCount { get; set; }
 
@@ -1000,11 +1055,15 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string PlayerWinLoss { get; set; }
 
+        public string BAPlayerWinLoss { get; set; }
+
         public string ProgressiveWin { get; set; }
 
         public string ProgressiveBet { get; set; }
 
         public string Commission { get; set; }
+
+        public string BACommission { get; set; }
 
         public int BetCount { get; set; }
 

@@ -15,6 +15,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
 
         [JsonProperty(Order = 4)]
         public decimal ProgressiveWin { get; set; }
@@ -24,6 +25,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 6)]
         public decimal Commission { get; set; }
+        public decimal BACommission { get; set; }
 
         [JsonProperty(Order = 7)]
         public int BetCount { get; set; }
@@ -92,6 +94,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal Margin { get; set; }
 
         public Dictionary<string, MpaWinLossByTpGameTypeCurrencyDetailDto> CurrencyDetail { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class MpaWinLossByTpCategoryResponse
@@ -131,6 +135,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public Dictionary<string, MpaWinLossByTpCategoryCurrencyDetailDto> CurrencyDetail { get; set; }
         public IEnumerable<MpaWinLossByTpCategoryCurrencyDetailDto> CurrencyDetailByCategory { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class MpaWinLossByPlayerResponse
@@ -194,6 +200,9 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public Dictionary<string, MpaWinLossByPlayerCurrencyDetailDto> CurrencyDetail { get; set; }
         public IEnumerable<MpaWinLossByPlayerCurrencyDetailDto> CurrencyDetailByplayer { get; set; }
+
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     public class MpaWinLossByPlayerDetailResponse
@@ -286,6 +295,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
 
         public Dictionary<string, MpaWinLossByCurrencyCurrencyDetailDto> CurrencyDetail { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
     }
 
     #region To FrontEnd API 格式
@@ -306,6 +317,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
+        public decimal BAPlayerWinLoss { get; set; }
 
         [JsonProperty(Order = 4)]
         public decimal ProgressiveWin { get; set; }
@@ -315,6 +327,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         [JsonProperty(Order = 6)]
         public decimal Commission { get; set; }
+        public decimal BACommission { get; set; }
 
         [JsonProperty(Order = 7)]
         public int BetCount { get; set; }
