@@ -33,7 +33,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             /// <summary>
             /// 品牌
             /// </summary>
-            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int>? SiteIds { get; set; }
             /// <summary>
             /// 幣別
             /// </summary>

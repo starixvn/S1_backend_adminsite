@@ -40,7 +40,7 @@ namespace BackendSite.Service.BLL
             return gameCasinoManageService.DeleteGameCasinoDetail(para);
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpList(IEnumerable<int> siteIds, int currencyId)
+        public IEnumerable<SiteTpListIfo> GetTpList(IEnumerable<int>? siteIds, int currencyId)
         {
             if (siteIds is null)
             {
