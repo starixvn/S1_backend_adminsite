@@ -141,6 +141,7 @@ namespace BackendSite.Service.Model.TpMaintain
     public class CommonTpInfo
     {
         public int Id { set; get; }
+        public int TpId { set; get; }
         public string TpName { set; get; }
         public string TpDisplayName { get; set; }
         public int Status { get; set; }
