@@ -311,7 +311,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetSlotTpList(GetBySiteAndCurrencyRequest request)
         {
-            var data = await _gameCasinoBll.GetTpList();
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+            }
+            var data = await _gameCasinoBll.GetTpList(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
 
             if (!data.Any())
             {

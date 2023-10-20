@@ -285,6 +285,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public class GetTpBySiteAndCurrencyReq
         {
             public IEnumerable<int> SiteIds { get; set; }
+            public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
 
@@ -1066,6 +1067,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiListResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
 
+            if (request.SiteId != 0) request.SiteIds = new List<int> { request.SiteId };
             if (request.SiteIds is null)
             {
                 request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
