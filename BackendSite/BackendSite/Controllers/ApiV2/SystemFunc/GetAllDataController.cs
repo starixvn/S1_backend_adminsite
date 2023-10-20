@@ -8,6 +8,7 @@ using BackendSite.Service.Model.TpMaintain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson.IO;
+using System.Text;
 using System.Text.Json;
 
 namespace BackendSite.Controllers.ApiV2.SystemFunc
@@ -70,11 +71,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// <summary>
             /// 品牌
             /// </summary>
-            public IEnumerable<int>? SiteIds { get; set; }
+            public IEnumerable<int>? SiteIds { get; set; } = null;
             /// <summary>
             /// 幣別
             /// </summary>
-            public int CurrencyId { get; set; }
+            public int CurrencyId { get; set; } = 0;
         }
 
         #endregion
@@ -367,8 +368,17 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<CommonTpInfo>> GetTpList(GetBySiteAndCurrencyRequest request)
+        public ApiResult<IEnumerable<CommonTpInfo>> GetTpList()
         {
+            string requestBody = null;
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+            {
+                requestBody = reader.ReadToEnd();
+            }
+
+            var request = string.IsNullOrWhiteSpace(requestBody) ? new GetBySiteAndCurrencyRequest()
+                : JsonSerializer.Deserialize<GetBySiteAndCurrencyRequest>(requestBody);
+
             if (request.SiteIds is null)
             {
                 request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
