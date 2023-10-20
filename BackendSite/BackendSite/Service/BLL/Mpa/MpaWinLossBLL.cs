@@ -66,9 +66,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = dateSummary.Sum(x => x.GGR),
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     DepositCount = dateSummary.Sum(x => x.DepositCount),
@@ -118,9 +120,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = exportDataWithoutAll.Sum(x => x.ValidTurnOver),
                 GGR = exportDataWithoutAll.Sum(x => x.GGR),
                 PlayerWinLoss = exportDataWithoutAll.Sum(x => x.PlayerWinLoss),
+                BAPlayerWinLoss = exportDataWithoutAll.Sum(x => x.BAPlayerWinLoss),
                 ProgressiveWin = exportDataWithoutAll.Sum(x => x.ProgressiveWin),
                 ProgressiveBet = exportDataWithoutAll.Sum(x => x.ProgressiveBet),
                 Commission = exportDataWithoutAll.Sum(x => x.Commission),
+                BACommission = exportDataWithoutAll.Sum(x => x.BACommission),
                 BetCount = exportDataWithoutAll.Sum(x => x.BetCount),
                 UniquePlayers = betRecord.UniquePlayers,
                 DepositCount = exportDataWithoutAll.Sum(x => x.DepositCount),
@@ -178,9 +182,13 @@ namespace BackendSite.Service.BLL.Mpa
                     TurnOver = dateSummary.Sum(x => x.TurnOver),
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = ggr,
+                    //BA
+                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
+                    //BA
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     Commission = dateSummary.Sum(x => x.Commission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Where(x => x.BetCount != 0).DistinctBy(x => x.CustId).Count(),
@@ -234,9 +242,13 @@ namespace BackendSite.Service.BLL.Mpa
                 TurnOver = exportData.Sum(x => x.Value.TurnOver),
                 ValidTurnOver = exportData.Sum(x => x.Value.ValidTurnOver),
                 GGR = exportData.Sum(x => x.Value.GGR),
+                //BA
+                BAPlayerWinLoss = exportData.Sum(x => x.Value.BAPlayerWinLoss),
                 PlayerWinLoss = exportData.Sum(x => x.Value.PlayerWinLoss),
                 ProgressiveWin = exportData.Sum(x => x.Value.ProgressiveWin),
                 ProgressiveBet = exportData.Sum(x => x.Value.ProgressiveBet),
+                //BA
+                BACommission = exportData.Sum(x => x.Value.BACommission),
                 Commission = exportData.Sum(x => x.Value.Commission),
                 BetCount = exportData.Sum(x => x.Value.BetCount),
                 UniquePlayers = betRecord.UniquePlayers,
@@ -292,9 +304,13 @@ namespace BackendSite.Service.BLL.Mpa
                 TurnOver = r.Sum(x => x.TurnOver),
                 ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                 GGR = r.Sum(x => x.GGR),
+                //BA
+                BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
                 PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
                 ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                 ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                //BA
+                BACommission = r.Sum(x => x.BACommission),
                 Commission = r.Sum(x => x.Commission),
                 BetCount = r.Sum(x => x.BetCount),
                 UniquePlayers = r.Sum(x => x.UniquePlayers),
@@ -332,7 +348,8 @@ namespace BackendSite.Service.BLL.Mpa
                         x.CurrencyId,
                         x.SiteId,
                         x.GameType,
-                        x.CustId
+                        x.CustId,
+                        x.SummaryType
                     })
                     .Select(r =>
                     {
@@ -346,7 +363,10 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
                         var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
-
+                        //BA玩家資料
+                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
+                        var totalBACommission = r.Sum(x => IsBAdata(x.SummaryType) ? x.RevenueSummary : 0);
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByDateDto物件並返回
                         return new MpaWinLossByDateDto
@@ -358,11 +378,16 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w)+totalBACommission,
+                            //PlayerWinLoss = 全部資料-BA資料
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
+                            //BAPlayerWinLoss
+                    		BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
-                            Commission = r.Sum(x => CalculateCommission(x)),
+                            Commission = r.Sum(x => CalculateCommission(x))-totalBACommission,
+                            //BACommission
+                    		BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
@@ -422,6 +447,16 @@ namespace BackendSite.Service.BLL.Mpa
 
             return x.RevenueSummary;
         }
+        private bool IsBAdata(int SummaryType)
+        {
+            if (SummaryType == 3 || SummaryType == 4)
+            {
+                return true;
+            }else
+            {
+                return false;
+            }
+        }
         private static void BetRecordSetDateToOffSet(MpaWinLossRequest request, MpaTpBetRecordWrapper betRecordResult,
             MpaWinLossGroupByTypeEnum groupByType)
         {
@@ -468,9 +503,12 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = r.Key,
                     TurnOver = r.Sum(x => x.TurnOver),
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                    GGR = r.Sum(x => x.GGR),
+                    BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                    BACommission = r. Sum(x => x.BACommission),
                     Commission = r.Sum(x => x.Commission),
                     BetCount = r.Sum(x => x.BetCount),
                     UniquePlayers = r.Where(x => x.BetCount != 0).DistinctBy(x => x.CustId).Count(),
@@ -513,9 +551,12 @@ namespace BackendSite.Service.BLL.Mpa
                     Currency = r.Key,
                     TurnOver = r.Sum(x => x.TurnOver),
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                    GGR = r.Sum(x => x.GGR),
+                    BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                    BACommission = r.Sum(x => x.BACommission),
                     Commission = r.Sum(x => x.Commission),
                     BetCount = r.Sum(x => x.BetCount),
                     UniquePlayers = r.Where(x => x.BetCount != 0).DistinctBy(x => x.CustId).Count(),
@@ -556,9 +597,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = dateSummary.Sum(x => x.GGR),
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
@@ -606,9 +649,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = exportDataWithoutAll.Sum(x => x.ValidTurnOver),
                 GGR = exportDataWithoutAll.Sum(x => x.GGR),
                 PlayerWinLoss = exportDataWithoutAll.Sum(x => x.PlayerWinLoss),
+                BAPlayerWinLoss = exportDataWithoutAll.Sum(x => x.BAPlayerWinLoss),
                 ProgressiveWin = exportDataWithoutAll.Sum(x => x.ProgressiveWin),
                 ProgressiveBet = exportDataWithoutAll.Sum(x => x.ProgressiveBet),
                 Commission = exportDataWithoutAll.Sum(x => x.Commission),
+                BACommission = exportDataWithoutAll.Sum(x => x.BACommission),
                 BetCount = exportDataWithoutAll.Sum(x => x.BetCount),
                 AvgBetAmount = (exportDataWithoutAll.Sum(x => x.BetCount) != 0 && exportDataWithoutAll.Sum(x => x.TurnOver) != 0)
                     ? (exportDataWithoutAll.Sum(x => x.TurnOver) / exportDataWithoutAll.Sum(x => x.BetCount))
@@ -650,9 +695,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
@@ -698,9 +745,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = responseResult.Sum(x => x.Value.ValidTurnOver),
                 GGR = responseResult.Sum(x => x.Value.GGR),
                 PlayerWinLoss = responseResult.Sum(x => x.Value.PlayerWinLoss),
+                BAPlayerWinLoss = responseResult.Sum(x => x.Value.BAPlayerWinLoss),
                 ProgressiveWin = responseResult.Sum(x => x.Value.ProgressiveWin),
                 ProgressiveBet = responseResult.Sum(x => x.Value.ProgressiveBet),
                 Commission = responseResult.Sum(x => x.Value.Commission),
+                BACommission = responseResult.Sum(x => x.Value.BACommission),
                 BetCount = responseResult.Sum(x => x.Value.BetCount),
                 AvgBetAmount = (responseResult.Sum(x => x.Value.BetCount) != 0 && responseResult.Sum(x => x.Value.TurnOver) != 0)
                     ? (responseResult.Sum(x => x.Value.TurnOver) / responseResult.Sum(x => x.Value.BetCount))
@@ -726,9 +775,11 @@ namespace BackendSite.Service.BLL.Mpa
                         ValidTurnOver = v.ValidTurnOver,
                         GGR = v.GGR,
                         PlayerWinLoss = v.PlayerWinLoss,
+                        BAPlayerWinLoss = v.BAPlayerWinLoss,
                         ProgressiveWin = v.ProgressiveWin,
                         ProgressiveBet = v.ProgressiveBet,
                         Commission = v.Commission,
+                        BACommission = v.BACommission,
                         BetCount = v.BetCount,
                         UniquePlayers = v.UniquePlayers,
                     });
@@ -743,9 +794,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = v.ValidTurnOver,
                     GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
+                    BAPlayerWinLoss = v.BAPlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
                     Commission = v.Commission,
+                    BACommission = v.BACommission,
                     BetCount = v.BetCount,
                     UniquePlayers = v.UniquePlayers,
                 });
@@ -771,7 +824,8 @@ namespace BackendSite.Service.BLL.Mpa
                     .GroupBy(x => new
                     {
                         x.CurrencyId,
-                        x.GameType
+                        x.GameType,
+                        x.SummaryType
                     }).Select(r =>
                     {
                         // 預先計算常用的總和，以避免多次重複計算
@@ -784,7 +838,10 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
                         var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
-
+                        //BA玩家資料
+                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
+                        var totalBACommission = r.Sum(x => IsBAdata(x.SummaryType) ? x.RevenueSummary : 0);
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByTpGameTypeDto物件並返回
                         return new MpaWinLossByTpGameTypeDto
@@ -793,11 +850,16 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) + totalBACommission,
+                            //PlayerWinLoss = 全部資料-BA資料
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
+                            //BAPlayerWinLoss
+                            BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
-                            Commission = r.Sum(x => CalculateCommission(x)),
+                            Commission = r.Sum(x => CalculateCommission(x))-totalBACommission,
+                            //BACommission
+                            BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
@@ -850,9 +912,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = dateSummary.Sum(x => x.GGR),
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x =>x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
@@ -899,9 +963,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = exportDataWithoutAll.Sum(x => x.ValidTurnOver),
                 GGR = exportDataWithoutAll.Sum(x => x.GGR),
                 PlayerWinLoss = exportDataWithoutAll.Sum(x => x.PlayerWinLoss),
+                BAPlayerWinLoss = exportDataWithoutAll.Sum(x => x.BAPlayerWinLoss),
                 ProgressiveWin = exportDataWithoutAll.Sum(x => x.ProgressiveWin),
                 ProgressiveBet = exportDataWithoutAll.Sum(x => x.ProgressiveBet),
                 Commission = exportDataWithoutAll.Sum(x => x.Commission),
+                BACommission = exportDataWithoutAll.Sum(x => x.BACommission),
                 BetCount = exportDataWithoutAll.Sum(x => x.BetCount),
                 AvgBetAmount = (exportDataWithoutAll.Sum(x => x.BetCount) != 0 && exportDataWithoutAll.Sum(x => x.TurnOver) != 0)
                     ? (exportDataWithoutAll.Sum(x => x.TurnOver) / exportDataWithoutAll.Sum(x => x.BetCount))
@@ -945,9 +1011,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x =>x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
@@ -993,9 +1061,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = exportData.Sum(x => x.Value.ValidTurnOver),
                 GGR = exportData.Sum(x => x.Value.GGR),
                 PlayerWinLoss = exportData.Sum(x => x.Value.PlayerWinLoss),
+                BAPlayerWinLoss = exportData.Sum(x => x.Value.BAPlayerWinLoss),
                 ProgressiveWin = exportData.Sum(x => x.Value.ProgressiveWin),
                 ProgressiveBet = exportData.Sum(x => x.Value.ProgressiveBet),
                 Commission = exportData.Sum(x => x.Value.Commission),
+                BACommission = exportData.Sum(x => x.Value.BACommission),
                 BetCount = exportData.Sum(x => x.Value.BetCount),
                 AvgBetAmount = (exportData.Sum(x => x.Value.BetCount) != 0 && exportData.Sum(x => x.Value.TurnOver) != 0)
                     ? (exportData.Sum(x => x.Value.TurnOver) / exportData.Sum(x => x.Value.BetCount))
@@ -1021,9 +1091,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                     GGR = r.Sum(x =>x.GGR),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = r.Sum(x =>x.BAPlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBet),
                     Commission = r.Sum(x => x.Commission),
+                    BACommission = r.Sum(x => x.BACommission),
                     BetCount = r.Sum(x => x.BetCount),
                     UniquePlayers = r.Sum(x => x.UniquePlayers)
                 });
@@ -1038,9 +1110,11 @@ namespace BackendSite.Service.BLL.Mpa
                     GGR = r.Sum(x=> x.GGR),
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBet),
                     Commission = r.Sum(x => x.Commission),
+                    BACommission = r.Sum(x => x.BACommission),
                     BetCount = r.Sum(x => x.BetCount),
                     UniquePlayers = r.Sum(x =>x.UniquePlayers)
                 });
@@ -1067,7 +1141,8 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         x.CategoryId,
                         x.CurrencyId,
-                        x.GameType
+                        x.GameType,
+                        x.SummaryType
                     }).Select(r =>
                     {
                         // 預先計算常用的總和，以避免多次重複計算
@@ -1080,7 +1155,10 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
                         var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
-
+                        //BA玩家資料
+                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
+                        var totalBACommission = r.Sum(x => IsBAdata(x.SummaryType) ? x.RevenueSummary : 0);
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByTpCategoryDto物件並返回
                         return new MpaWinLossByTpCategoryDto
@@ -1089,11 +1167,16 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) + totalBACommission,
+                            //PlayerWinLoss = 全部資料-BA資料
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
+                            //BAPlayerWinLoss
+                            BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
-                            Commission = r.Sum(x => CalculateCommission(x)),
+                            Commission = r.Sum(x => CalculateCommission(x))-totalBACommission,
+                            //BACommission
+                            BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
@@ -1158,9 +1241,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = validTurnOver,
                     GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     BetCount = betCount,
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     ClosingBalance = dateSummary.Sum(x => x.ClosingBalance),
@@ -1194,9 +1279,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = exportDataWithoutAll.Sum(x => x.ValidTurnOver),
                 GGR = exportDataWithoutAll.Sum(x => x.GGR),
                 PlayerWinLoss = exportDataWithoutAll.Sum(x => x.PlayerWinLoss),
+                BAPlayerWinLoss = exportDataWithoutAll.Sum(x => x.BAPlayerWinLoss),
                 ProgressiveWin = exportDataWithoutAll.Sum(x => x.ProgressiveWin),
                 ProgressiveBet = exportDataWithoutAll.Sum(x => x.ProgressiveBet),
                 Commission = exportDataWithoutAll.Sum(x => x.Commission),
+                BACommission = exportDataWithoutAll.Sum(x => x.BACommission),
                 BetCount = exportDataWithoutAll.Sum(x => x.BetCount),
                 ClosingBalance = exportDataWithoutAll.Sum(x => x.ClosingBalance),
                 UniquePlayers = exportDataWithoutAll.Where(x => !excludeUserName.Contains(x.UserName)).DistinctBy(x => x.UserName).Count(),
@@ -1251,9 +1338,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = ggr,
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     BetCount = betCount,
                     UniquePlayers = dateSummary.Where(x => betCount !=0).DistinctBy(x => x.UserName).Count(),
                     ClosingBalance = dateSummary.Sum(x => x.ClosingBalance),
@@ -1305,9 +1394,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = validTurnOver,
                 GGR = ggr,
                 PlayerWinLoss = response.Sum(x => x.Value.PlayerWinLoss),
+                BAPlayerWinLoss = response.Sum(x => x.Value.BAPlayerWinLoss),
                 ProgressiveWin = response.Sum(x => x.Value.ProgressiveWin),
                 ProgressiveBet = response.Sum(x => x.Value.ProgressiveBet),
                 Commission = response.Sum(x => x.Value.Commission),
+                BACommission = response.Sum(x => x.Value.BACommission),
                 BetCount = betCount,
                 ClosingBalance = response.Sum(x => x.Value.ClosingBalance),
                 UniquePlayers = response.Where(x => !excludeUserName.Contains(x.Key)).DistinctBy(x => x.Value.UserName).Count(),
@@ -1378,9 +1469,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                     GGR = r.Sum(x => x.GGR),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBet),
                     Commission = r.Sum(x => x.Commission),
+                    BACommission = r.Sum(x => x.BACommission),
                     BetCount = r.Sum(x => x.BetCount),
                     UniquePlayers = r.Sum(x => x.UniquePlayers),
                     DepositCount = r.Sum(x => x.DepositCount),
@@ -1413,9 +1506,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = v.ValidTurnOver,
                 GGR = v.GGR,
                 PlayerWinLoss = v.PlayerWinLoss,
+                BAPlayerWinLoss = v.BAPlayerWinLoss,
                 ProgressiveWin = v.ProgressiveWin,
                 ProgressiveBet = v.ProgressiveBet,
                 Commission = v.Commission,
+                BACommission = v.BACommission,
                 BetCount = v.BetCount,
                 UniquePlayers = dateSummary.Where(x => v.BetCount !=0).DistinctBy(x => x.UserName).Count(),
                 ClosingBalance = v.ClosingBalance,
@@ -1439,9 +1534,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = v.ValidTurnOver,
                     GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
+                    BAPlayerWinLoss = v.BAPlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
                     Commission = v.Commission,
+                    BACommission = v.BACommission,
                     BetCount = v.BetCount,
                     UniquePlayers = combineResult.Where(x => v.BetCount != 0).DistinctBy(x => x.UserName).Count(),
                     ClosingBalance = v.ClosingBalance,
@@ -1475,7 +1572,8 @@ namespace BackendSite.Service.BLL.Mpa
                         x.TpUserName,
                         x.CurrencyId,
                         x.SiteId,
-                        x.GameType
+                        x.GameType,
+                        x.SummaryType
                     })
                     .Select(r =>
                     {
@@ -1489,7 +1587,10 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
                         var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
-
+                        //BA玩家資料
+                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
+                        var totalBACommission = r.Sum(x => IsBAdata(x.SummaryType) ? x.RevenueSummary : 0);
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByPlayerDto物件並返回
                         return new MpaWinLossByPlayerDto
@@ -1501,11 +1602,16 @@ namespace BackendSite.Service.BLL.Mpa
                             ClosingBalance = r.Sum(x => x.ClosingBalance),
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) + totalBACommission,
+                            //PlayerWinLoss = 全部資料-BA資料
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
+                            //BAPlayerWinLoss
+                            BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
-                            Commission = r.Sum(x => CalculateCommission(x)),
+                            Commission = r.Sum(x => CalculateCommission(x)) - totalBACommission,
+                            //BACommission
+                            BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
@@ -1700,9 +1806,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                     GGR = r.Sum(x => x.GGR),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBet),
                     Commission = r.Sum(x => x.Commission),
+                    BACommission = r.Sum(x => x.BACommission),
                     BetCount = r.Sum(x => x.BetCount),
                     UniquePlayers = r.Sum(x => x.UniquePlayers),
                     DepositCount = r.Sum(x => x.DepositCount),
@@ -1727,9 +1835,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = dateSummary.Sum(x => x.GGR),
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x =>x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     DepositCount = dateSummary.Sum(x => x.DepositCount),
@@ -1771,30 +1881,32 @@ namespace BackendSite.Service.BLL.Mpa
             #endregion
 
             #region total
-
+            var exportDataWithoutAll = exportData.Where(x => !x.Currency.Contains("All")).ToList();
             exportData.Add(new MpaWinLossByCurrencyDto()
             {
                 Currency = "total",
-                TurnOver = exportData.Sum(x => x.TurnOver),
-                ValidTurnOver = exportData.Sum(x => x.ValidTurnOver),
-                GGR = exportData.Sum(x => x.GGR),
-                PlayerWinLoss = exportData.Sum(x => x.PlayerWinLoss),
-                ProgressiveWin = exportData.Sum(x => x.ProgressiveWin),
-                ProgressiveBet = exportData.Sum(x => x.ProgressiveBet),
-                Commission = exportData.Sum(x => x.Commission),
-                BetCount = exportData.Sum(x => x.BetCount),
+                TurnOver = exportDataWithoutAll.Sum(x => x.TurnOver),
+                ValidTurnOver = exportDataWithoutAll.Sum(x => x.ValidTurnOver),
+                GGR = exportDataWithoutAll.Sum(x => x.GGR),
+                PlayerWinLoss = exportDataWithoutAll.Sum(x => x.PlayerWinLoss),
+                BAPlayerWinLoss = exportDataWithoutAll.Sum(x => x.BAPlayerWinLoss),
+                ProgressiveWin = exportDataWithoutAll.Sum(x => x.ProgressiveWin),
+                ProgressiveBet = exportDataWithoutAll.Sum(x => x.ProgressiveBet),
+                Commission = exportDataWithoutAll.Sum(x => x.Commission),
+                BACommission = exportDataWithoutAll.Sum(x => x.BACommission),
+                BetCount = exportDataWithoutAll.Sum(x => x.BetCount),
                 UniquePlayers = betRecord.UniquePlayers,
-                DepositCount = exportData.Sum(x => x.DepositCount),
-                TotalDepositAmount = exportData.Sum(x => x.TotalDepositAmount),
-                WithDrawCount = exportData.Sum(x => x.WithDrawCount),
-                TotalWithDrawAmount = exportData.Sum(x => x.TotalWithDrawAmount),
-                TotalBonus = exportData.Sum(x => x.TotalBonus),
-                AvgBetAmount = exportData.Sum(x => x.BetCount) != 0
-                    ? (exportData.Sum(x => x.TurnOver) / exportData.Sum(x => x.BetCount))
+                DepositCount = exportDataWithoutAll.Sum(x => x.DepositCount),
+                TotalDepositAmount = exportDataWithoutAll.Sum(x => x.TotalDepositAmount),
+                WithDrawCount = exportDataWithoutAll.Sum(x => x.WithDrawCount),
+                TotalWithDrawAmount = exportDataWithoutAll.Sum(x => x.TotalWithDrawAmount),
+                TotalBonus = exportDataWithoutAll.Sum(x => x.TotalBonus),
+                AvgBetAmount = exportDataWithoutAll.Sum(x => x.BetCount) != 0
+                    ? (exportDataWithoutAll.Sum(x => x.TurnOver) / exportDataWithoutAll.Sum(x => x.BetCount))
                     : 0.00m,
 
-                Margin = exportData.Sum(x => x.ValidTurnOver) != 0
-                    ? exportData.Sum(x => x.GGR) / exportData.Sum(x => x.ValidTurnOver)
+                Margin = exportDataWithoutAll.Sum(x => x.ValidTurnOver) != 0
+                    ? exportDataWithoutAll.Sum(x => x.GGR) / exportDataWithoutAll.Sum(x => x.ValidTurnOver)
                     : 0.00m,
             });
 
@@ -1860,9 +1972,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                     GGR = r.Sum(x => x.GGR),
                     PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = r.Sum(x => x.ProgressiveBet),
                     Commission = r.Sum(x => x.Commission),
+                    BACommission = r.Sum(x => x.BACommission),
                     BetCount = r.Sum(x => x.BetCount),
                     UniquePlayers = r.Where(x => x.BetCount != 0).DistinctBy(x => x.CustId).Count(),
                     DepositCount = r.Sum(x => x.DepositCount),
@@ -1908,9 +2022,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
                     GGR = dateSummary.Sum(x => x.GGR),
                     PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
                     ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x=> x.BACommission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
                     UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     DepositCount = dateSummary.Sum(x => x.DepositCount),
@@ -1961,9 +2077,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = apiData.Sum(x => x.Value.ValidTurnOver),
                 GGR = apiData.Sum(x => x.Value.GGR),
                 PlayerWinLoss = apiData.Sum(x => x.Value.PlayerWinLoss),
+                BAPlayerWinLoss = apiData.Sum(x => x.Value.BAPlayerWinLoss),
                 ProgressiveWin = apiData.Sum(x => x.Value.ProgressiveWin),
                 ProgressiveBet = apiData.Sum(x => x.Value.ProgressiveBet),
                 Commission = apiData.Sum(x => x.Value.Commission),
+                BACommission = apiData.Sum(x =>x.Value.BACommission),
                 BetCount = apiData.Sum(x => x.Value.BetCount),
                 UniquePlayers = betRecord.UniquePlayers,
                 DepositCount = apiData.Sum(x => x.Value.DepositCount),
@@ -1993,9 +2111,11 @@ namespace BackendSite.Service.BLL.Mpa
                 ValidTurnOver = v.ValidTurnOver,
                 GGR = v.GGR,
                 PlayerWinLoss = v.PlayerWinLoss,
+                BAPlayerWinLoss = v.BAPlayerWinLoss,
                 ProgressiveWin = v.ProgressiveWin,
                 ProgressiveBet = v.ProgressiveBet,
                 Commission = v.Commission,
+                BACommission = v.BACommission,
                 BetCount = v.BetCount,
                 UniquePlayers = v.UniquePlayers,
                 DepositCount = v.DepositCount,
@@ -2015,9 +2135,11 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = v.ValidTurnOver,
                     GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
+                    BAPlayerWinLoss = v.BAPlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
                     Commission = v.Commission,
+                    BACommission = v.BACommission,
                     BetCount = v.BetCount,
                     UniquePlayers = v.UniquePlayers,
                     DepositCount = v.DepositCount,
@@ -2048,6 +2170,7 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         x.CurrencyId,
                         x.GameType,
+                        x.SummaryType,
                         x.CustId
                     }).Select(r =>
                     {
@@ -2061,7 +2184,10 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
                         var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
-
+                        //BA玩家資料
+                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
+                        var totalBACommission = r.Sum(x => IsBAdata(x.SummaryType) ? x.RevenueSummary : 0);
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByCurrencyDto物件並返回
                         return new MpaWinLossByCurrencyDto
@@ -2070,11 +2196,16 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w),
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) + totalBACommission,
+                            //PlayerWinLoss = 全部資料-BA資料
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
+                            //BAPlayerWinLoss
+                            BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
-                            Commission = r.Sum(x => CalculateCommission(x)),
+                            Commission = r.Sum(x => CalculateCommission(x)) - totalBACommission,
+                            //BACommission
+                            BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
@@ -2712,6 +2843,7 @@ namespace BackendSite.Service.BLL.Mpa
                                                               BonusId = item.BonusId,
                                                               PromotionType = item.PromotionType,
                                                               TicketStatus = item.TicketStatus,
+                                                              SummaryType = item.SummaryType,
                                                               StakeSummary = item.StakeSummary * rate * baseCurrencyRate * currencyRate,
                                                               ValidBetSummary = item.ValidBetSummary * rate * baseCurrencyRate * currencyRate,
                                                               WinLossSummary = item.WinLossSummary * rate * baseCurrencyRate * currencyRate,
