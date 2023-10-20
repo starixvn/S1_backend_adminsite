@@ -35,7 +35,7 @@ namespace BackendSite.Service.BLL
             {
                 Console.WriteLine(e);
             }
-            
+
             _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
             _logger = provider.GetRequiredService<ILogger<TpBLL>>();
         }
@@ -252,15 +252,9 @@ namespace BackendSite.Service.BLL
             return _thirdPartyService.GetCustTpAdjustmentLog(input, absPageSize, startIndex, out totalPages, out rowCount);
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(string siteId, int currency)
         {
-            var UserSiteList = _serverInfoService.GetSiteList();
-            IEnumerable<SiteTpListIfo> result = null;
-            if (UserSiteList.Where(x => x.SiteId == siteId).Select(x => x).ToList().FirstOrDefault().ICurrencyList.Contains(currency))
-            {
-                result = _thirdPartyService.GetTpBySiteAndCurrency(siteId, currency);
-            }
-            return result;
+            return _thirdPartyService.GetTpBySiteAndCurrency(siteId, currency);
         }
         public void SetAdjustmentTpCustInfoLog(string menu, int actionType, string detailInfo, string @operator)
         {
