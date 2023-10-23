@@ -1578,7 +1578,7 @@ namespace BackendSite.Service.BLL
 
                     }
                 }
-                else if (data.WithdrawalType == WithdrawalTypeEnum.OnlinePayment)
+                else if (data.WithdrawalType == WithdrawalTypeEnum.OnlineBanking)
                 {
                     var account = accountData.FirstOrDefault(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId);
                     var pay = payData.FirstOrDefault(x => x.Id.ToString() == data.AccountNo);

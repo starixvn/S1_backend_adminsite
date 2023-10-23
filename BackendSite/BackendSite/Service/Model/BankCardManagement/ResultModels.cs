@@ -50,6 +50,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public IEnumerable<int> VipLevels =>
             JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels ?? "[]");
         public IEnumerable<string> VipLevelNames { set; get; }
+        // 沒用
         public decimal Dummy { set; get; }
         public string Memo { set; get; }
         public int Sort { set; get; }
