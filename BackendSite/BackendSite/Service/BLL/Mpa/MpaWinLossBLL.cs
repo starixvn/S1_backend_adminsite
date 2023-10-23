@@ -683,7 +683,35 @@ namespace BackendSite.Service.BLL.Mpa
             var responseResult = new Dictionary<string, MpaWinLossByTpGameTypeResponse>();
             foreach (var key in keys)
             {
-                var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.Where(x => x.TpGameTypeName == key).ToList();
+                var dateSummary = data.AlreadyMultiplyRateTpBetRecordResult.GroupBy(x => new { x.TpGameTypeName,x.Currency })
+                    .Select(r =>
+                    {
+                        //因前面用SummaryType分組計算，這邊須把同GameType分組回來
+                        return new MpaWinLossByTpGameTypeDto
+                        {
+                            TpGameTypeName = r.Key.TpGameTypeName,
+                            Currency = r.Key.Currency,
+                            TurnOver = r.Sum(x => x.TurnOver),
+                            ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                            GGR = r.Sum(x => x.GGR),
+                            PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                            BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
+                            ProgressiveWin = r.Sum(x => x.ProgressiveWin),
+                            ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                            Commission = r.Sum(x => x.Commission),
+                            BACommission = r.Sum(x => x.BACommission),
+                            BetCount = r.Sum(x => x.BetCount),
+                            AvgBetAmount = r.Sum(x => x.BetCount) !=0
+                            ? r.Sum(x => x.TurnOver) / r.Sum(x => x.BetCount)
+                            : 0.00m,
+                            Margin = r.Sum(x => x.ValidTurnOver) != 0
+                                ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver)
+                                : 0.00m,
+                            UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
+                        };
+                    })
+                    .Where(x => x.TpGameTypeName == key)
+                    .ToList();
                 var ggr = dateSummary.Sum(x => x.GGR);
                 var result = new MpaWinLossByTpGameTypeResponse
                 {
@@ -821,7 +849,8 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         x.CurrencyId,
                         x.GameType,
-                        x.SummaryType
+                        x.SummaryType,
+                        x.CustId
                     }).Select(r =>
                     {
                         // 預先計算常用的總和，以避免多次重複計算
@@ -842,6 +871,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 建立新的MpaWinLossByTpGameTypeDto物件並返回
                         return new MpaWinLossByTpGameTypeDto
                         {
+                            CustId = r.Key.CustId,
                             TpGameTypeName = tpGameTypeMap[r.Key.GameType],
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
