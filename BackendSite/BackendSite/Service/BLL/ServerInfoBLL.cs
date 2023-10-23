@@ -36,14 +36,6 @@ namespace BackendSite.Service.BLL
             serverInfo = serverInfoService.GetModelWithSiteId(siteId);
             return serverInfo;
         }
-        public ServerInfo GetServerInfo()
-        {
-            if (serverInfo != null)
-                return serverInfo;
-
-            serverInfo = serverInfoService.GetModel();
-            return serverInfo;
-        }
 
         public ServerInfo GetServerInfo(int siteId)
         {

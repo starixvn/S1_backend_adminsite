@@ -1334,9 +1334,132 @@ namespace BackendSite.Service.BLL
             }
             return dataList;
         }
+        {
+
+
+
+        }
+        {
+
+            {
+                {
+            }
+            return result;
+        }
+
+        #endregion
+
+        #region Confiscated Summary Report
+
+        public IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReportList(
+            GetConfiscatedSummaryReportRequest request,
+            int pageNumber,
+            out IPageInfo pageInfo)
+        {
+            var dataList = GetConfiscatedSummaryReport(request, pageNumber , out pageInfo).ToList();
+            
+            if (request.TimeZone is not null)
+            {
+                TimeSpan.TryParseExact(request.TimeZone, @"\+hh\:mm", null, out var offset);
+                foreach (var data in dataList)
+                {
+                    data.RegistrationDate += offset;
+                    data.SuspendDate += offset;
+                }
+            }
+            return dataList;
+        }
         
         private IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(
             GetConfiscatedSummaryReportRequest request,
+        
+        private IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(
+            GetConfiscatedSummaryReportRequest request,
+            int pageNumber,
+            out IPageInfo pageInfo)
+            pageInfo = new PageInfo();
+            var key = $"ConfiscatedSummaryReport:{JsonConvert.SerializeObject(request.SiteIds)}:" +
+                      $"{JsonConvert.SerializeObject(request.CurrencyIds)}:" +
+                      $"{request.StartDate?.DateTime:yyyyMMddHHmmssfff}:" +
+                      $"{request.EndDate?.DateTime:yyyyMMddHHmmssfff}:" +
+                      $"{request.UserName}:" +
+                      $"{request.BaseCurrencyId}";
+            
+            var cacheTime = TimeSpan.FromMinutes(2);
+            if (_redisHelper.KeyExists(key))
+            {
+                //Export
+                if (pageNumber == -1)
+                {
+                    return _redisHelper.GetListByRange<ConfiscatedSummaryReportDetail>(key, 0, pageNumber);
+                }
+                //Redis Pagination
+                var total = (int) _redisHelper.GetListLength(key);
+                var (startIndex, endIndex) = pageInfo.RedisPagination(total, pageNumber, request.PageSize);
+                return _redisHelper.GetListByRange<ConfiscatedSummaryReportDetail>(key, startIndex, endIndex);
+            }
+            
+            //Search range table
+            var data = GetConfiscatedSummaryReportDetail(request).ToList();
+            
+            AddCache(data, key, cacheTime);
+            //Export
+            if (pageNumber == -1 || data.Count == 0)
+            {
+                return data;
+            }
+            var (index, count) = pageInfo.ListPagination(data.Count, pageNumber, request.PageSize);
+            return data.GetRange(index, count);
+        
+        public ConfiscatedSummary GetConfiscatedSummary(GetConfiscatedSummaryReportSummaryRequest request)
+            var getRequest = new GetConfiscatedSummaryReportRequest
+            {
+                SiteIds = request.SiteIds,
+                CurrencyIds = request.CurrencyIds,
+                BaseCurrencyId = request.BaseCurrencyId,
+                UserName = request.UserName
+            };
+            var data = GetConfiscatedSummaryReport(getRequest, -1 , out _ ).ToList();
+            var result = new ConfiscatedSummary();
+            if (data.Any())
+                result = new ConfiscatedSummary
+                    TotalUser = data.Count,
+                    TotalSeamlessWallet = data.Sum(x=>x.SeamlessWallet),
+                    TotalDeposit = data.Sum(x=>x.TotalDeposit),
+                    TotalWithdrawal = data.Sum(x=>x.TotalWithdrawal),
+                    TotalNetDeposit = data.Sum(x=>x.NetDeposit),
+                    TotalNetConfiscatedCash = data.Sum(x=>x.NetConfiscatedCash)
+                };
+            
+        
+        private IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReportDetail(GetConfiscatedSummaryReportRequest request)
+        {
+            var dataList = reportService.GetConfiscatedSummaryReport(request).ToList();
+            //抓3天內 避免MPA匯率未更新
+            var rateStartTime = DateTime.UtcNow.AddDays(-3);
+            var rateEndTime = DateTime.UtcNow;
+            var rateList = _mapMpaCommonService.GetMpaExchangeRate(rateStartTime, rateEndTime).Result.ToList();
+            
+            foreach (var data in dataList)
+            {
+                var rate = rateList.Where(x=>x.CurrencyId == data.CurrencyId && x.TargetCurrencyId == request.BaseCurrencyId)
+                    .MaxBy(item => item.RateDate).Rate;
+                data.TotalDeposit *= rate;
+                data.TotalWithdrawal *= rate;
+                data.SeamlessWallet *= rate;
+            }
+            
+            return dataList;
+        }
+        
+        private void AddCache(IEnumerable<object> list, string masterKey, TimeSpan cacheTime)
+        {
+            _ = Task.Run(() =>
+            {
+                _redisHelper.InsertList(masterKey, cacheTime, list);
+            });
+        }
+        
             int pageNumber,
             out IPageInfo pageInfo)
         {
