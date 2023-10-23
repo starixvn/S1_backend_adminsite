@@ -131,8 +131,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int? CustId { get; set; }
         }
 
-        public class GetTpGameTypeListByCategoryReq
+        public class GetTpGameTypeListReq
         {
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
             public int CategoryId { get; set; }
         }
 
@@ -587,9 +589,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq request)
+        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListReq request)
         {
-            var data = await _tpBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+            }
+
+            var data = await _tpBll.GetTpGameTypeListbyCategoryAsync(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId, request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
             {
                 Data = data,
@@ -995,11 +1002,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeListAsync(GetTpGameTypeListByCategoryReq request)
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeListAsync(GetTpGameTypeListReq request)
         {
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+            }
+
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
             {
-                Data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId),
+                Data = await _tpBll.GetTpGameTypeListByCategoryAsync(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId, request.CategoryId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -1046,7 +1058,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeByCategoryAndTpId(GetTpGameTypeByCategoryAndTpIdReq request)
         {
-            var data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId);
+            var siteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                        var data = await _tpBll.GetTpGameTypeListByCategoryAsync(JsonSerializer.Serialize(siteIds), 0, request.CategoryId);
             var result = data.Where(x => x.TpId == request.TpId);
 
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
