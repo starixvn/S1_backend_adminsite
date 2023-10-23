@@ -974,7 +974,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<TpCategory>>> GetTpCategoryByTpId(TpCategoryByTpIdRequest request)
         {
-            var gameTypeList = _winLostReportBll.GetTpGameType().Where(x => x.TpId == request.TpId);
+            var siteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
+            var gameTypeList = _winLostReportBll.GetTpGameType(JsonSerializer.Serialize(siteIds), 0).Where(x => x.TpId == request.TpId);
             var categories = gameTypeList.DistinctBy(x => x.CategoryId).Select(x => x.CategoryId);
 
             var categoryList = await _reportBll.GetTpCategoryList();

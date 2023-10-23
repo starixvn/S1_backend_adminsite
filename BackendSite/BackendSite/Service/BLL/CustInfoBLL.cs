@@ -1045,7 +1045,8 @@ namespace BackendSite.Service.BLL
         
         public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)
         {
-            var AllGameType = _winLostReportService.GetAllGameType().ToList();
+            var siteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
+            var AllGameType = _winLostReportService.GetAllGameType(System.Text.Json.JsonSerializer.Serialize(siteIds), 0).ToList();
             return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
         }
 
