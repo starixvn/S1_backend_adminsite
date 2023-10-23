@@ -119,7 +119,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             var apiResult = new ApiResult<TpDisableUserForGameDetail>();
 
-            var siteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+            var siteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
             var tpList = await _gameCasinoBll.GetTpList(System.Text.Json.JsonSerializer.Serialize(siteIds), 0);
             var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(req.CustId);
 

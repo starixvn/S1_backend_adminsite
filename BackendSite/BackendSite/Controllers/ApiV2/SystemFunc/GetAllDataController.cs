@@ -310,26 +310,27 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetSlotTpList(GetBySiteAndCurrencyRequest request)
+        public async Task<ApiResult<IEnumerable<RiskTpListInfo>>> GetSlotTpList()
         {
+            string requestBody = null;
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+            {
+                requestBody = reader.ReadToEnd();
+            }
+
+            var request = string.IsNullOrWhiteSpace(requestBody) ? new GetBySiteAndCurrencyRequest()
+                : JsonSerializer.Deserialize<GetBySiteAndCurrencyRequest>(requestBody);
             if (request.SiteIds is null)
             {
                 request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
             }
             var data = await _gameCasinoBll.GetTpList(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
 
-            if (!data.Any())
+            return new ApiResult<IEnumerable<RiskTpListInfo>>
             {
-                throw new AdminException(ErrorCodeEnum.NoData);
-            }
-            else
-            {
-                return new ApiResult<IEnumerable<RiskTpListInfo>>
-                {
-                    Data = data,
-                    ErrorCode = (int)ErrorCodeEnum.Success
-                };
-            }
+                Data = data,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
 
         /// <summary>
@@ -437,9 +438,23 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <returns></returns>
         [HttpPost]
-        public ApiResult<IEnumerable<GameType>> GetTpGameType(GetBySiteAndCurrencyRequest request)
+        public ApiResult<IEnumerable<GameType>> GetTpGameType()
         {
-            var data = _winLostReportBll.GetTpGameType();
+            string requestBody = null;
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+            {
+                requestBody = reader.ReadToEnd();
+            }
+
+            var request = string.IsNullOrWhiteSpace(requestBody) ? new GetBySiteAndCurrencyRequest()
+                : JsonSerializer.Deserialize<GetBySiteAndCurrencyRequest>(requestBody);
+
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+            }
+
+            var data = _winLostReportBll.GetTpGameType(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
 
             if (!data.Any())
             {

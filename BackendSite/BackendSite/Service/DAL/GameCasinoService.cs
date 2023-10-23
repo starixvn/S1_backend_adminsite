@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_SiteIds", siteIds);
             props.Add("_CurrencyId", currencyId);
-            return await _reportDbClient.QueryAsync<RiskTpListInfo>("Admin_TpList_Get_V2", props);
+            return await _reportDbClient.QueryAsync<RiskTpListInfo>("Admin_TpList_Get_OnlySlot", props);
         }
 
         public async Task<IEnumerable<GameCasinoDataV3>> GetGameCasinoByTpId(int tpId)
