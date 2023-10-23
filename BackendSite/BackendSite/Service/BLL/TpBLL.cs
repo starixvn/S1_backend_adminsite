@@ -309,9 +309,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(int categoryId)
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(string siteIds, int currencyId, int categoryId)
         {
-            return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
+            return await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(siteIds, currencyId, categoryId);
         }
 
         public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurremcyListAsync(int siteId, int currencyId)
@@ -319,9 +319,9 @@ namespace BackendSite.Service.BLL
             var result = await _thirdPartyService.GetTpGameTypeCurrency();
             return result.Where(x => x.SiteId == siteId && x.CurrencyId == currencyId);
         }
-        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(string siteIds, int currencyId, int categoryId)
         {
-            var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(categoryId);
+            var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(siteIds, currencyId, categoryId);
             var gameTypeWithBetLimit = tpGameType
                 .Select(a => new GameTypeBetLimit()
                 {
