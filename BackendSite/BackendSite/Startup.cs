@@ -46,8 +46,8 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(_configuration);
-            services.AddMessageQueueConnection(_configuration);
-            //services.Configure<Dictionary<string, BackendSite.Service.Model.SiteConfigInfo>>(_configuration.GetSection("SiteConfig"));
+            
+            
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
@@ -170,10 +170,10 @@ namespace BackendSite
             services.AddOptionListByDB<ServerInfo>("Admin_ServerInfoList_Get");
             services.AddSiteConfig();
             services.AddCloudFrontImageInfo();
+            services.AddMessageQueueConnection();
 
 
-            //services.Configure<Dictionary<string, BackendSite.Service.Model.SiteConfigInfo>>(_configuration.GetSection("SiteConfig"));
-
+           
 
         }
 
