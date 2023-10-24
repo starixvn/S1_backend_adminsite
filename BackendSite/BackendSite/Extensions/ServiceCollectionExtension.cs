@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.BLL.Infrastructure.Model;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
@@ -112,6 +113,15 @@ namespace BackendSite.Extensions
                 var config = siteConfig.ToDictionary(i => i.ConfigKey, i => i.ConfigValue);
                 services.AddSingleton(new BackendSite.Service.BLL.Infrastructure.Model.SiteConfig(serverInfo, config));
             }
+            return services;
+        }
+
+        public static IServiceCollection AddCloudFrontImageInfo(this IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            var siteCloudFrontImageInfo = configBll.GetConfigValuesBySiteName<SiteCloudFrontImageInfo>("SiteCloudFrontImageInfo");
+            services.AddSingleton(siteCloudFrontImageInfo);
             return services;
         }
     }
