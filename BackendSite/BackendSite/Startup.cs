@@ -51,7 +51,7 @@ namespace BackendSite
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
-            services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
+            
             services.AddSingleton<DateTimeHelper>();
             
             /*DAL*/
@@ -171,10 +171,7 @@ namespace BackendSite
             services.AddSiteConfig();
             services.AddCloudFrontImageInfo();
             services.AddMessageQueueConnection();
-
-
-           
-
+            services.AddAffConfig();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

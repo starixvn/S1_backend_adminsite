@@ -129,5 +129,14 @@ namespace BackendSite.Extensions
             services.AddSingleton(siteCloudFrontImageInfo);
             return services;
         }
+
+        public static IServiceCollection AddAffConfig(this IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            var affConfig = configBll.GetConfigValue<AffConfig>("AffConfig");
+            services.AddSingleton(affConfig);
+            return services;
+        }
     }
 }
