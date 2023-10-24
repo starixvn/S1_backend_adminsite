@@ -46,12 +46,12 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(_configuration);
-            services.AddMessageQueueConnection(_configuration);
-            services.Configure<Dictionary<string, BackendSite.Service.Model.SiteConfig>>(_configuration.GetSection("SiteConfig"));
+            
+            
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
-            services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
+            
             services.AddSingleton<DateTimeHelper>();
             
             /*DAL*/
@@ -169,6 +169,9 @@ namespace BackendSite
             services.AddOptionListByDB<Config>("SiteConfig_Get", new { ConfigGroup = "BackEndSite" });
             services.AddOptionListByDB<ServerInfo>("Admin_ServerInfoList_Get");
             services.AddSiteConfig();
+            services.AddCloudFrontImageInfo();
+            services.AddMessageQueueConnection();
+            services.AddAffConfig();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

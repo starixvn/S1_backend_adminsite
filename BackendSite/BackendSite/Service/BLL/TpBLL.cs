@@ -25,18 +25,9 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
-
-            try
-            {
-                var configBll = provider.GetRequiredService<ConfigBLL>();
-                _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
-            _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
+            _balanceTimeoutSecond = int.Parse(configBll.GetConfigValue("BalanceTimeoutSecond"));
             _logger = provider.GetRequiredService<ILogger<TpBLL>>();
         }
 

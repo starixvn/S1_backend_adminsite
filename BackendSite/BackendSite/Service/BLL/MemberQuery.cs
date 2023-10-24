@@ -4,9 +4,6 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
-using Microsoft.Extensions.Options;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -19,14 +16,21 @@ namespace BackendSite.Service.BLL
         private readonly IMarketingService _marketingService;
         private readonly IAffiliateApiService _affiliateApi;
         private readonly ITagBLL _tagBll;
-        private readonly Dictionary<string, SiteConfig> _siteConfig;
+        private readonly Dictionary<string, SiteCloudFrontImageInfo> _siteConfig;
         private readonly PermissionBLL _permissionBll;
         private readonly AdminBLL _adminBll;
         private readonly Tools _tools;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly Library.Common _common;
 
-        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, IOptions<Dictionary<string, SiteConfig>> siteConfig, PermissionBLL permissionBll, AdminBLL adminBll, IMarketingService marketingService, IAffiliateApiService affiliateApi, Tools tools, CustInfoBLL custInfoBll, ITagBLL tagBll, Library.Common common)
+        public MemberQuery(IMemberService memberService, IDeviceService deviceService, ICacheHelper cacheHelper, 
+            Dictionary<string, SiteCloudFrontImageInfo> siteConfig, 
+            PermissionBLL permissionBll,
+            AdminBLL adminBll,
+            IMarketingService marketingService, 
+            IAffiliateApiService affiliateApi,
+            Tools tools,
+            CustInfoBLL custInfoBll, 
+            ITagBLL tagBll)
         {
             _memberService = memberService;
             _deviceService = deviceService;
@@ -36,10 +40,9 @@ namespace BackendSite.Service.BLL
             _marketingService = marketingService;
             _affiliateApi = affiliateApi;
             _tools = tools;
-            _siteConfig = siteConfig.Value;
+            _siteConfig = siteConfig;
             _custInfoBll = custInfoBll;
             _tagBll = tagBll;
-            _common = common;
         }
 
         public async Task<GetMemberListPageData<MemberList>> GetListAsync(GetTempMemberListRequest request)
@@ -253,7 +256,7 @@ namespace BackendSite.Service.BLL
                 CustId = customer.CustId,
                 VipLevel = customer.VipLevel,
                 LevelName = customer.LevelName,
-                VipLogo = $"{_siteConfig[customer.SiteName].BannerURL}/desktop/img/vip/vip{customer.VipLevel}.png",
+                VipLogo = $"{_siteConfig[customer.SiteName].BannerImageUrl}/desktop/img/vip/vip{customer.VipLevel}.png",
                 IsOnline = isOnline,
                 UserName = customer.UserName,
                 UserLang = customer.UserLang,
