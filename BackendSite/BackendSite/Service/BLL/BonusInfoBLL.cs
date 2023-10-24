@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
             var siteList = _serverInfoBll.GetSiteList();
 
             if (!siteIds.Any())
-                siteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                siteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
 
             var datas = _bonusInfoService.GetBonusInfoReport(
                     JsonConvert.SerializeObject(siteIds),
@@ -117,7 +117,7 @@ namespace BackendSite.Service.BLL
             var siteList = _serverInfoBll.GetSiteList();
 
             if (!siteIds.Any())
-                siteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                siteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
 
             var datas = _bonusInfoService.GetBonusInfoExportReport(
                     JsonConvert.SerializeObject(siteIds),

@@ -44,7 +44,7 @@ namespace BackendSite.Service.BLL
         {
             if (siteIds is null)
             {
-                siteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                siteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
             return gameCasinoManageService.GetTpList(System.Text.Json.JsonSerializer.Serialize(siteIds), currencyId);
