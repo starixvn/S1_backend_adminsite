@@ -1,15 +1,14 @@
 ﻿using System.Reflection;
-
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
-
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
-
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
@@ -25,12 +24,12 @@ namespace BackendSite.Service.BLL.Mpa
         public MpaMarketingDepositAmountBLL(IMpaMarketingDepositAmountService depositAmountService,
             IMpaCommonService mapMpaCommonService,
             ICacheHelper cacheHelper,
-            IConfiguration configuration)
+            ConfigBLL configBll)
         {
             _depositAmountService = depositAmountService;
             _mapMpaCommonService = mapMpaCommonService;
             _cacheHelper = cacheHelper;
-            _mpaDomainConfig = configuration.GetSection("MpaDomainConfig").Get<Dictionary<string, Dictionary<string, IEnumerable<string>>>>();
+            _mpaDomainConfig = configBll.GetConfigValuesBySiteName<Dictionary<string, IEnumerable<string>>>("MpaDomainConfig");
         }
 
         public async Task<DepositAmountSummaryResponse> GetDepositAmountSummaryAsync(DepositAmountRequest request)
@@ -73,12 +72,15 @@ namespace BackendSite.Service.BLL.Mpa
 
         public async Task<DepositSinUpSummaryResponse> GetDepositSinUpSummaryAsync(DepositAmountRequest request)
         {
+
+            var sinSetting = GetSignUpSetting(request);
+
             var depositSignUpSummaryResult = (await _depositAmountService.GetDepositSignUpSummaryAsync(request.SiteId,
                 request.StartDate.DateTime, request.EndDate.DateTime)).Where(x => request.CurrencyIds.Contains(x.CurrencyId)).ToList();
 
             await MultiplyExchangeRateSinUpSummary(depositSignUpSummaryResult, request.StartDate, request.GetEndDate(), request.BaseCurrencyId);
 
-            var sinSetting = GetSignUpSetting(request);
+           // var sinSetting = GetSignUpSetting(request);
 
             #region Set SignUpGroupName 先把資料分群
 

@@ -1,5 +1,6 @@
 ﻿using BackendSite.Controllers.ApiV2.Report;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -19,11 +20,11 @@ namespace BackendSite.Service.BLL
 
         public MpaNRUBLL(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
             _nruService = provider.GetRequiredService<NRUService>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
-            _mpaDomainConfig = configuration.GetSection("MpaDomainConfig").Get<Dictionary<string, Dictionary<string, IEnumerable<string>>>>();
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _mpaDomainConfig = configBll.GetConfigValuesBySiteName<Dictionary<string, IEnumerable<string>>>("MpaDomainConfig");
         }
 
         #region MpaMarketingNRU

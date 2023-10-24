@@ -34,18 +34,18 @@ namespace BackendSite.Service.BLL
             { 72, "kh" },
             { 74, "bn" },
         };
-        private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
+        private readonly Dictionary<string, SiteCloudFrontImageInfo> _siteCloudFrontImageInfo;
 
         public HotGameBLL(HotGameService hotGameService,
             ThirdPartyService thirdPartyService,
-            IOptions<Dictionary<string, SiteConfig>> siteConfig,
+            Dictionary<string, SiteCloudFrontImageInfo> siteCloudFrontImageInfo,
             ServerInfoBLL serverInfo,
             ICacheHelper cacheHelper,
             GameCasinoService gameCasinoService)
         {
             _hotGameService = hotGameService;
             _thirdPartyService = thirdPartyService;
-            _siteConfig = siteConfig;
+            _siteCloudFrontImageInfo = siteCloudFrontImageInfo;
             _serverInfo = serverInfo;
             _cacheHelper = cacheHelper;
             _gameCasinoService = gameCasinoService;
@@ -113,7 +113,7 @@ namespace BackendSite.Service.BLL
         {
             request.LangId = CurrencyLangIdMap[request.CurrencyId];
             var site = _serverInfo.GetServerInfoWithSiteId(request.SiteId);
-            request.TpLogo = $"{_siteConfig.Value[site.SiteName].BannerURL}{TpLogoPath}/{request.TpId}.png";
+            request.TpLogo = $"{_siteCloudFrontImageInfo[site.SiteName].BannerImageUrl}{TpLogoPath}/{request.TpId}.png";
             return await _hotGameService.CreateOrUpdate(request, updateOperator);
         }
 
@@ -238,7 +238,7 @@ namespace BackendSite.Service.BLL
         {
             request.LangId = CurrencyLangIdMap[request.CurrencyId];
             var site = _serverInfo.GetServerInfoWithSiteId(request.SiteId);
-            request.TpLogo = $"{_siteConfig.Value[site.SiteName].BannerURL}{TpLogoPath}/{request.TpId}.png";
+            request.TpLogo = $"{_siteCloudFrontImageInfo[site.SiteName].BannerImageUrl}{TpLogoPath}/{request.TpId}.png";
 
             //後端自行組 GameLogo 物件
             request.GameLogo = new GameLogo()
