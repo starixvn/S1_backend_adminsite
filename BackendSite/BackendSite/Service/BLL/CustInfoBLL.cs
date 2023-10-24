@@ -116,9 +116,9 @@ namespace BackendSite.Service.BLL
             out int totalPages,
             out int rowCount)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new[] { x.SiteId });
+            var siteList = _serverInfoBll.GetSiteListByLoginUserV2().SelectMany(x => new[] { x.SiteId });
             var currencyList = new List<int>();
-            _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x =>
+            _serverInfoBll.GetSiteListByLoginUserV2().ToList().ForEach(x =>
             {
                 currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
@@ -160,10 +160,10 @@ namespace BackendSite.Service.BLL
             IEnumerable<int> selectStatus,
             IEnumerable<int> selectTag)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            var siteList = _serverInfoBll.GetSiteListByLoginUserV2().SelectMany(x => new int[] { x.SiteId });
 
             var currencyList = new List<int>();
-            _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x =>
+            _serverInfoBll.GetSiteListByLoginUserV2().ToList().ForEach(x =>
             {
                 currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
@@ -180,7 +180,7 @@ namespace BackendSite.Service.BLL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser()?.SelectMany(x => new int[] { x.SiteId });
+            var siteList = _serverInfoBll.GetSiteListByLoginUserV2()?.SelectMany(x => new int[] { x.SiteId });
             return siteList is null ? null : GetCustInfoDetail(custId, userName, siteList);
         }
 
@@ -711,7 +711,7 @@ namespace BackendSite.Service.BLL
         }
         public CustInfoDetail GetCustData(int custId, string userName)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            var siteList = _serverInfoBll.GetSiteListByLoginUserV2().SelectMany(x => new int[] { x.SiteId });
             var custInfoDetail = _custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {

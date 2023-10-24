@@ -320,7 +320,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 : JsonSerializer.Deserialize<GetBySiteAndCurrencyRequest>(requestBody);
             if (request.SiteIds is null)
             {
-                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
             var data = await _gameCasinoBll.GetTpList(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
 
@@ -380,7 +380,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             if (request.SiteIds is null)
             {
-                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
             var data = _tpMaintainBll.GetCommonTpList(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
@@ -449,7 +449,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             if (request.SiteIds is null)
             {
-                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
             var data = _winLostReportBll.GetTpGameType(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);

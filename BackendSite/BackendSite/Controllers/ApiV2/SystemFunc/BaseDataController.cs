@@ -598,7 +598,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             if (request.SiteIds is null)
             {
-                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
             var data = await _tpBll.GetTpGameTypeListbyCategoryAsync(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId, request.CategoryId);
@@ -769,7 +769,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             if (para.SiteIds is null)
             {
-                para.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                para.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
             apiResult.Data = _bonusManageBll.GetCashBackGameList(JsonSerializer.Serialize(para.SiteIds), para.CurrencyId, para.TpId, para.CategoryId);
@@ -1011,7 +1011,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             if (request.SiteIds is null)
             {
-                request.SiteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
@@ -1033,7 +1033,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             if (request.SiteIds is null)
             {
-                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
             var data = await _tpBll.GetTpGameTypeListByCategoryAsync(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId, request.CategoryId);
@@ -1092,7 +1092,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             if (request.SiteId != 0) request.SiteIds = new List<int> { request.SiteId };
             if (request.SiteIds is null)
             {
-                request.SiteIds = _serverInfoBll.GetSiteListByLoginUser().Select(x => x.SiteId);
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
             var tpList = _tpBll.GetTpBySiteAndCurrency(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
