@@ -1897,6 +1897,7 @@ namespace BackendSite.Service.BLL.Mpa
             var originCombineResult = GetGroupResult(originCombineData);
             var alreadyMultiplyRateCombineResult = GetGroupResult(alreadyMultiplyRateCombineData);
 
+
             List<MpaWinLossByCurrencyDto> GetGroupResult(List<MpaWinLossByCurrencyDto> source)
             {
                 return source.GroupBy(x => new
@@ -1926,7 +1927,32 @@ namespace BackendSite.Service.BLL.Mpa
                     TotalBonus = r.Sum(x => x.TotalBonus)
                 }).ToList();
             }
-
+            List<MpaWinLossByCurrencyDto> GetGroupByCurrency(List<MpaWinLossByCurrencyDto> source)
+            {
+                return source.GroupBy(x => x.Currency)
+                    .Select(r => new MpaWinLossByCurrencyDto
+                    {
+                        Currency = r.Key,
+                        TurnOver = r.Sum(x => x.TurnOver),
+                        ValidTurnOver = r.Sum(x => x.ValidTurnOver),
+                        GGR = r.Sum(x => x.GGR),
+                        PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                        BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
+                        ProgressiveWin = r.Sum(x => x.ProgressiveWin),
+                        ProgressiveBet = r.Sum(x => x.ProgressiveBet),
+                        Commission = r.Sum(x => x.Commission),
+                        BACommission = r.Sum(x => x.BACommission),
+                        BetCount = r.Sum(x => x.BetCount),
+                        UniquePlayers = r.Where(x => x.BetCount != 0).Sum(x => x.UniquePlayers),
+                        DepositCount = r.Sum(x => x.DepositCount),
+                        TotalDepositAmount = r.Sum(x => x.TotalDepositAmount),
+                        WithDrawCount = r.Sum(x => x.WithDrawCount),
+                        TotalWithDrawAmount = r.Sum(x => x.TotalWithDrawAmount),
+                        AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.TurnOver) / r.Sum(x => x.BetCount) : 0.00m,
+                        Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
+                        TotalBonus = r.Sum(x => x.TotalBonus)
+                    }).ToList();
+            }
             var keys = originCombineResult.Select(x => x.Currency).Distinct();
             var allCurrencySummary = new List<MpaWinLossByCurrencyDto>();
             foreach (var key in keys)
@@ -1969,8 +1995,8 @@ namespace BackendSite.Service.BLL.Mpa
                 ? allCurrencySummary.OrderBy(request).ToList()
                 : allCurrencySummary;
             var currencyDetails = request.DisplayGroupBreakdownInOriginalCurrency
-                ? originCombineResult
-                : alreadyMultiplyRateCombineResult;
+                ? GetGroupByCurrency(originCombineResult)
+                : GetGroupByCurrency(alreadyMultiplyRateCombineResult);
 
             var exportData = new List<MpaWinLossByCurrencyDto>();
             foreach (var currencySummary in allCurrencySummary)
@@ -2092,13 +2118,9 @@ namespace BackendSite.Service.BLL.Mpa
                     TotalBonus = r.Sum(x => x.TotalBonus)
                 }).ToList();
             }
-
-            var apiData = new Dictionary<string, MpaWinLossByCurrencyResponse>();
-            var keys = originCombineResult.Select(x => x.Currency).Distinct();
-            foreach (var key in keys)
+            List<MpaWinLossByCurrencyDto> GetGroupByCurrency(List<MpaWinLossByCurrencyDto> source)
             {
-                var dateSummary = alreadyMultiplyRateCombineResult.GroupBy(x => x.Currency)
-                    .Where(x => x.Key == key)
+                return source.GroupBy(x => x.Currency)
                     .Select(r => new MpaWinLossByCurrencyDto
                     {
                         Currency = r.Key,
@@ -2121,35 +2143,47 @@ namespace BackendSite.Service.BLL.Mpa
                         Margin = r.Sum(x => x.ValidTurnOver) != 0 ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver) : 0.00m,
                         TotalBonus = r.Sum(x => x.TotalBonus)
                     }).ToList();
+            }
+
+            var apiData = new Dictionary<string, MpaWinLossByCurrencyResponse>();
+            var keys = originCombineResult.Select(x => x.Currency).Distinct();
+            foreach (var key in keys)
+            {
+                var dateSummaryAlready = GetGroupByCurrency(alreadyMultiplyRateCombineResult)
+                    .Where(x => x.Currency == key)
+                    .ToList();
+                var dateSummaryOrigin = GetGroupByCurrency(originCombineResult)
+                    .Where(x => x.Currency == key)
+                    .ToList();
 
                 var result = new MpaWinLossByCurrencyResponse
                 {
-                    TurnOver = dateSummary.Sum(x => x.TurnOver),
-                    ValidTurnOver = dateSummary.Sum(x => x.ValidTurnOver),
-                    GGR = dateSummary.Sum(x => x.GGR),
-                    PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
-                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
-                    ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
-                    ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
-                    Commission = dateSummary.Sum(x => x.Commission),
-                    BACommission = dateSummary.Sum(x=> x.BACommission),
-                    BetCount = dateSummary.Sum(x => x.BetCount),
-                    UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
-                    DepositCount = dateSummary.Sum(x => x.DepositCount),
-                    TotalDepositAmount = dateSummary.Sum(x => x.TotalDepositAmount),
-                    WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
-                    TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
-                    AvgBetAmount = dateSummary.Sum(x => x.BetCount) != 0
-                        ? dateSummary.Sum(x => x.TurnOver) / dateSummary.Sum(x => x.BetCount)
+                    TurnOver = dateSummaryAlready.Sum(x => x.TurnOver),
+                    ValidTurnOver = dateSummaryAlready.Sum(x => x.ValidTurnOver),
+                    GGR = dateSummaryAlready.Sum(x => x.GGR),
+                    PlayerWinLoss = dateSummaryAlready.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummaryAlready.Sum(x => x.BAPlayerWinLoss),
+                    ProgressiveWin = dateSummaryAlready.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = dateSummaryAlready.Sum(x => x.ProgressiveBet),
+                    Commission = dateSummaryAlready.Sum(x => x.Commission),
+                    BACommission = dateSummaryAlready.Sum(x=> x.BACommission),
+                    BetCount = dateSummaryAlready.Sum(x => x.BetCount),
+                    UniquePlayers = dateSummaryAlready.Sum(x => x.UniquePlayers),
+                    DepositCount = dateSummaryAlready.Sum(x => x.DepositCount),
+                    TotalDepositAmount = dateSummaryAlready.Sum(x => x.TotalDepositAmount),
+                    WithDrawCount = dateSummaryAlready.Sum(x => x.WithDrawCount),
+                    TotalWithDrawAmount = dateSummaryAlready.Sum(x => x.TotalWithDrawAmount),
+                    AvgBetAmount = dateSummaryAlready.Sum(x => x.BetCount) != 0
+                        ? dateSummaryAlready.Sum(x => x.TurnOver) / dateSummaryAlready.Sum(x => x.BetCount)
                         : 0.00m,
 
-                    Margin = dateSummary.Sum(x => x.ValidTurnOver) != 0
-                        ? dateSummary.Sum(x => x.GGR) / dateSummary.Sum(x => x.ValidTurnOver)
+                    Margin = dateSummaryAlready.Sum(x => x.ValidTurnOver) != 0
+                        ? dateSummaryAlready.Sum(x => x.GGR) / dateSummaryAlready.Sum(x => x.ValidTurnOver)
                         : 0.00m,
-                    TotalBonus = dateSummary.Sum(x => x.TotalBonus),
+                    TotalBonus = dateSummaryAlready.Sum(x => x.TotalBonus),
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
-                    ? GetOriginalCurrencyDetailByCurrency(originCombineResult, key)
-                    : GetCurrencyDetailByCurrency(dateSummary)
+                    ? GetOriginalCurrencyDetailByCurrency(dateSummaryOrigin, key)
+                    : GetCurrencyDetailByCurrency(dateSummaryAlready)
                 };
 
                 apiData.Add(key, result);
