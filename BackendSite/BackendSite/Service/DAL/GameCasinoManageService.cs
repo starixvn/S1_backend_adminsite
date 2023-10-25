@@ -60,7 +60,7 @@ namespace BackendSite.Service.DAL
             var props = new DynamicParameters();
             props.Add("_SiteIds", siteIds);
             props.Add("_CurrencyId", currencyId);
-            return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_Get_V2", props);
+            return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_Get_OnlySlot", props);
         }
 
         public IEnumerable<SlotCategoryInfo> GetSlotCategoryList()

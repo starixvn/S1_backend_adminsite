@@ -22,7 +22,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteIds);
             p.Add("_CurrencyId", currencyId);
-            return _reportDbClient.Query<GameType>("Admin_TpGameType_Get_V2", p);
+            return _reportDbClient.Query<GameType>("Admin_TpGameType_Get_V3", p);
         }
     }
 }
