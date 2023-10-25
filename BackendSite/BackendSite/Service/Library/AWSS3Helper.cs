@@ -62,8 +62,7 @@ namespace BackendSite.Service.Library
             try
             {
                 await using var fileStream = file.OpenReadStream();
-
-
+                
                 var putRequest = new PutObjectRequest
                 {
                     BucketName = bucketName,
@@ -114,5 +113,8 @@ namespace BackendSite.Service.Library
                 return false;
             }
         }
+        
+        public bool CheckIsImage(IFormFile file)
+            => file.ContentType.StartsWith("image/");
     }
 }

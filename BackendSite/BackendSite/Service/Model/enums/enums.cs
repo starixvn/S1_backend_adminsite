@@ -803,6 +803,18 @@ namespace BackendSite.Service.Model.enums
 
     #endregion
 
+    #region HeaderManagement
+
+    public enum HeaderPictureEnum
+    {
+        PcHeaderPic = 1,
+        PcLobbyPic = 2,
+        MobileHeaderPic = 3,
+        MobileLobbyPic = 4
+    }
+
+    #endregion
+    
     public enum BonusStatus
     {
         Running = 1,
