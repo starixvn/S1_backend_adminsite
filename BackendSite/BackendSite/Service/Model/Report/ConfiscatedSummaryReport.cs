@@ -85,7 +85,7 @@ public class ConfiscatedSummaryReportDetail
     public decimal TotalDeposit { get; set; }
     public decimal TotalWithdrawal { get; set; }
     public decimal NetDeposit => TotalDeposit - TotalWithdrawal;
-    public decimal NetConfiscatedCash => TotalDeposit <= 0 ? 0 : SetNetConfiscatedCash();
+    public decimal NetConfiscatedCash => NetDeposit <= 0 ? 0 : SetNetConfiscatedCash();
     private decimal SetNetConfiscatedCash()
     {
         // 取NetDeposit,SeamlessWallet 比較小的數值
