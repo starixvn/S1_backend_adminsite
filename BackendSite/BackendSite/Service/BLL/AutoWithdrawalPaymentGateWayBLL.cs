@@ -148,7 +148,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> PaymentOnlineCreate(string transId, ApiResult apiResult, string boUserName, string systemOperation = "")
         {
             var apiOnlineResult = await _courierAdapter
-                .MyPostAsync<bool, object>($"{_payApiUrl}Withdrawal/Create", new { TransId = transId });
+                .MyPostAsync<object, object>($"{_payApiUrl}Withdrawal/Create", new { TransId = transId });
             
             var updater = string.IsNullOrEmpty(systemOperation)
                 ? boUserName
