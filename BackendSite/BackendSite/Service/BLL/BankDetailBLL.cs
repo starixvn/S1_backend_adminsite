@@ -124,6 +124,8 @@ namespace BackendSite.Service.BLL
             if (custId != null)
             {
                 pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+                var cust = _custInfoBll.GetCustInfoWithCache(custId.Value);
+                siteId = cust.SiteId;
             }
 
             var result = _localBankService.GetBankInfoPayList(siteId)
