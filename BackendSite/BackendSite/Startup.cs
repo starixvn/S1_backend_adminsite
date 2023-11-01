@@ -131,6 +131,7 @@ namespace BackendSite
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
             services.DecoratorLiveRegistration();
             services.AddSingleton<ConfigBLL>();
+            services.AddTransient<IUploadImageBLL, UploadImageBLL>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

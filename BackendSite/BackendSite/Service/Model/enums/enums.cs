@@ -1985,4 +1985,15 @@ namespace BackendSite.Service.Model.enums
         /// </summary>
         Minus = 6
     }
+
+
+    /// <summary>
+    /// 上傳類型 By 功能，對應 SiteConfig 的 UploadImageFunctionConfig
+    /// </summary>
+    public enum UploadImageFunctionEnum
+    {
+        BannerManagement = 1,
+        BonusManagement = 2,
+        NewsManagement = 3
+    }
 }

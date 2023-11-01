@@ -70,5 +70,7 @@ namespace BackendSite.Service.Model
         public string HotEventImageUrl {get; set; }
         public string BannerImageUrl { get; set; }
         public string AwsCloudFrontErrorDomainID { get; set; }
+        public string UploadImagesBucketName { get; set; }
+        public string UploadImagesCloudFrontUrl { get; set; }
     }
 }
