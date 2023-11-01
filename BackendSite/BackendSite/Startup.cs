@@ -131,6 +131,7 @@ namespace BackendSite
             services.DecoratorReferralManagement();
             services.DecoratorLiveRegistration();
             services.AddSingleton<ConfigBLL>();
+            services.AddTransient<IUploadImageBLL, UploadImageBLL>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
