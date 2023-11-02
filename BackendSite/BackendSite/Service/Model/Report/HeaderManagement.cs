@@ -9,10 +9,14 @@ namespace BackendSite.Service.Model.Report
         public int LobbyCategoryId { get; set; }
     }
     
-    public class UpdateHeaderSettingReq
+    public class UpdateHeaderStatusReq
     {
         public int Id { get; set; }
         public int Status { get; set; }
+    }
+    
+    public class UpdateHeaderSettingReq : UpdateHeaderStatusReq
+    {
         public string Memo { get; set; }
         public string CurrencyGameName { get; set; }
     }

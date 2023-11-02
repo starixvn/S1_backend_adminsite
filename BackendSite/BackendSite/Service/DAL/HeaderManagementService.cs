@@ -33,12 +33,22 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("_Id", req.Id);
-            props.Add("_Status", req.Status);
-            props.Add("_CurrencyGameName", req.CurrencyGameName);
+            props.Add("_CurrencyGameName", string.IsNullOrEmpty(req.CurrencyGameName) ? "" : req.CurrencyGameName);
             props.Add("_Memo", req.Memo);
             props.Add("_Updater", updater);
             
             var result = _mainDbClient.Execute("Admin_HeaderSetting_Set", props);
+            
+            return result;
+        }
+        
+        public int UpdateHeaderStatus(UpdateHeaderStatusReq req, string updater)
+        {
+            var props = new DynamicParameters();
+            props.Add("_Id", req.Id);
+            props.Add("_Status", req.Status);
+            props.Add("_Updater", updater);
+            var result = _mainDbClient.Execute("Admin_HeaderSettingStatus_Set", props);
             
             return result;
         }
@@ -54,25 +64,25 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public int UploadHeaderPicture(int id, HeaderPictureEnum type, string fileName)
-        {
-            var props = new DynamicParameters();
-            props.Add("_Id", id);
-            props.Add("_HeaderPictureEnum", (int)type);
-            props.Add("_fileName", fileName);
-            var result = _mainDbClient.Execute("Admin_HeaderSettingPicture_Set", props);
-            
-            return result;
-        }
+        // public int UploadHeaderPicture(int id, HeaderPictureEnum type, string fileName)
+        // {
+        //     var props = new DynamicParameters();
+        //     props.Add("_Id", id);
+        //     props.Add("_HeaderPictureEnum", (int)type);
+        //     props.Add("_fileName", fileName);
+        //     var result = _mainDbClient.Execute("Admin_HeaderSettingPicture_Set", props);
+        //     
+        //     return result;
+        // }
         
-        public HeaderPicture GetHeaderPicture(int id)
-        {
-            var props = new DynamicParameters();
-            props.Add("_Id", id);
-            var result = _mainDbClient.QueryFirst<HeaderPicture>("Admin_HeaderPicture_Get", props);
-            
-            return result;
-        }
+        // public HeaderPicture GetHeaderPicture(int id)
+        // {
+        //     var props = new DynamicParameters();
+        //     props.Add("_Id", id);
+        //     var result = _mainDbClient.QueryFirst<HeaderPicture>("Admin_HeaderPicture_Get", props);
+        //     
+        //     return result;
+        // }
         
         public IEnumerable<HeaderLobbyCategory> GetLobbyCategory()
         {
