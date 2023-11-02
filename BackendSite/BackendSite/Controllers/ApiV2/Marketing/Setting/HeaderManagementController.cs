@@ -1,5 +1,4 @@
-﻿using System.Net;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
@@ -44,7 +43,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             var apiResult = new ApiResult<IEnumerable<HeaderManagementReport>>();
             try
             {
-                var data = _headerManagementBll.GetList(para).OrderBy(i => i.Sort);
+                var data = _headerManagementBll.GetList(para)
+                    .OrderBy(i => i.Sort);
                 apiResult.Data = data;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -75,6 +75,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 150, 3 })]
         [HttpPost]
+        public ApiResult UpdateHeaderStatus(UpdateHeaderStatusReq req)
+        {
+            var result = _headerManagementBll.UpdateHeaderStatus(req, User.Identity.Name);
+
+            if (result <= 0)
+                throw new AdminException(ErrorCodeEnum.Fail);
+
+            return new ApiResult()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 150, 3 })]
+        [HttpPost]
         public ApiResult UpdateSort(UpdateHeaderSortReq req)
         {
             var result = _headerManagementBll.UpdateSort(req.Id, req.Sort ,User.Identity.Name);
@@ -88,89 +103,89 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             };
         }
         
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 150, 1 })]
-        [HttpGet]
-        public List<HeaderPictureResponse> GetHeaderPicture(GetHeaderPictureReq req)
-        {
-            var apiResult = new List<HeaderPictureResponse>();
-            using var client = new HttpClient();
-            
-            try
-            {
-                var picList = _headerManagementBll.GetHeaderPicture(req.Id);
-                var headerPictureType = (HeaderPictureEnum[])Enum.GetValues(typeof(HeaderPictureEnum));
-
-                var enumList = new Dictionary<HeaderPictureEnum, string>
-                {
-                    {HeaderPictureEnum.PcHeaderPic,picList.PcHeaderPic},
-                    {HeaderPictureEnum.PcLobbyPic,picList.PcLobbyPic},
-                    {HeaderPictureEnum.MobileHeaderPic,picList.MobileHeaderPic},
-                    {HeaderPictureEnum.MobileLobbyPic,picList.MobileLobbyPic},
-                };
-
-                foreach (var type in headerPictureType)
-                {
-                    var fileName = enumList.First(x => x.Key == type).Value;
-                    if (!string.IsNullOrEmpty(fileName))
-                    {
-                        var url = Redirect($"{_awsHeaderUrl}{fileName}").Url;
-                        
-                        var picRsp = client.GetAsync(url).Result;
-                        if (picRsp.StatusCode == HttpStatusCode.OK)
-                        {
-                            var result = new HeaderPictureResponse
-                            {
-                                HeaderPictureEnum = type,
-                                Url = url
-                            };
-                            apiResult.Add(result);
-                        }
-                    }
-                }
-                
-                return apiResult;
-            }
-            catch (Exception e)
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, $"GetHeaderPicture Fail. {e.Message}");
-            }
-        }
-        
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 150, 3 })]
-        [HttpPost]
-        public async Task<ApiResult> UploadHeaderPicture([FromForm] UpdateHeaderPictureReq req)
-        {
-            var apiResult = new ApiResult();
-            try
-            {
-                if (req.Receipt != null)
-                {
-                    var result = await _headerManagementBll.UploadHeaderPictureAsync(req.Id, req.HeaderPictureEnum, req.Receipt);
-
-                    if (result)
-                    {
-                        apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                    }
-                    else
-                    {
-                        apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                        apiResult.Message = "Upload fail.";
-                    }
-                }
-                else
-                {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "The file is not supported.";
-                }
-                
-            }
-            catch (Exception e)
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, $"UploadReceipt Fail. {e.Message}");
-            }
-
-            return apiResult;
-        }
+        // [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 150, 1 })]
+        // [HttpGet]
+        // public List<HeaderPictureResponse> GetHeaderPicture(GetHeaderPictureReq req)
+        // {
+        //     var apiResult = new List<HeaderPictureResponse>();
+        //     using var client = new HttpClient();
+        //     
+        //     try
+        //     {
+        //         var picList = _headerManagementBll.GetHeaderPicture(req.Id);
+        //         var headerPictureType = (HeaderPictureEnum[])Enum.GetValues(typeof(HeaderPictureEnum));
+        //
+        //         var enumList = new Dictionary<HeaderPictureEnum, string>
+        //         {
+        //             {HeaderPictureEnum.PcHeaderPic,picList.PcHeaderPic},
+        //             {HeaderPictureEnum.PcLobbyPic,picList.PcLobbyPic},
+        //             {HeaderPictureEnum.MobileHeaderPic,picList.MobileHeaderPic},
+        //             {HeaderPictureEnum.MobileLobbyPic,picList.MobileLobbyPic},
+        //         };
+        //
+        //         foreach (var type in headerPictureType)
+        //         {
+        //             var fileName = enumList.First(x => x.Key == type).Value;
+        //             if (!string.IsNullOrEmpty(fileName))
+        //             {
+        //                 var url = Redirect($"{_awsHeaderUrl}{fileName}").Url;
+        //                 
+        //                 var picRsp = client.GetAsync(url).Result;
+        //                 if (picRsp.StatusCode == HttpStatusCode.OK)
+        //                 {
+        //                     var result = new HeaderPictureResponse
+        //                     {
+        //                         HeaderPictureEnum = type,
+        //                         Url = url
+        //                     };
+        //                     apiResult.Add(result);
+        //                 }
+        //             }
+        //         }
+        //         
+        //         return apiResult;
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         throw new AdminException(ErrorCodeEnum.Fail, $"GetHeaderPicture Fail. {e.Message}");
+        //     }
+        // }
+        //
+        // [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 150, 3 })]
+        // [HttpPost]
+        // public async Task<ApiResult> UploadHeaderPicture([FromForm] UpdateHeaderPictureReq req)
+        // {
+        //     var apiResult = new ApiResult();
+        //     try
+        //     {
+        //         if (req.Receipt != null)
+        //         {
+        //             var result = await _headerManagementBll.UploadHeaderPictureAsync(req.Id, req.HeaderPictureEnum, req.Receipt);
+        //
+        //             if (result)
+        //             {
+        //                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+        //             }
+        //             else
+        //             {
+        //                 apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+        //                 apiResult.Message = "Upload fail.";
+        //             }
+        //         }
+        //         else
+        //         {
+        //             apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+        //             apiResult.Message = "The file is not supported.";
+        //         }
+        //         
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         throw new AdminException(ErrorCodeEnum.Fail, $"UploadReceipt Fail. {e.Message}");
+        //     }
+        //
+        //     return apiResult;
+        // }
         
         [HttpPost]
         public ApiResult<IEnumerable<HeaderLobbyCategory>> GetLobbyCategory()
