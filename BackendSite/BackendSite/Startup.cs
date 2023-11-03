@@ -17,6 +17,7 @@ using Elastic.Apm.StackExchange.Redis;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using NSwag;
+using Prometheus;
 using StackExchange.Redis;
 
 namespace BackendSite
@@ -179,6 +180,7 @@ namespace BackendSite
         {
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseHttpMetrics();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
@@ -221,8 +223,14 @@ namespace BackendSite
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpMetrics(options =>
+            {
+                options.AddCustomLabel("host", context => context.Request.Host.Host);
+            });
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapMetrics();
                 endpoints.MapGet("/health", async context =>
                 {
                     await context.Response.WriteAsync($"{env.EnvironmentName}-{DateTime.Now:yyyy/MM/dd HH:mm:ss}");
