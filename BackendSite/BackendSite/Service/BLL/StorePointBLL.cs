@@ -1,7 +1,9 @@
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Store.StorePoint;
 using NPOI.XSSF.UserModel;
 
@@ -16,38 +18,38 @@ namespace BackendSite.Service.BLL
 
         public StorePointBLL(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _storeSiteUrl = configuration.GetValue<string>("StoreService");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<StorePointBLL>>();
         }
-        
+
         public Task<ApiListResult<object>> GetMemberListAsync(GetMemberListRequest req)
         {
-            var url = _storeSiteUrl + "/api/Member/GetList";
+            var url = _storeSiteUrl + "Member/GetList";
             var result = _courierAdapter.PostAsync<ApiListResult<object>, GetMemberListRequest>(url, req);
 
             return result;
         }
-        
+
         public Task<ApiListResult<object>> GetMemberRewardPointLogAsync(GetMemberRewardPointLogRequest req)
         {
-            var url = _storeSiteUrl + "/api/Member/GetRewardPointLog";
+            var url = _storeSiteUrl + "Member/GetRewardPointLog";
             var result = _courierAdapter.PostAsync<ApiListResult<object>, GetMemberRewardPointLogRequest>(url, req);
 
             return result;
         }
-        
+
         public Task<ApiResult<object>> ManualRewardPointAsync(CreateManualRewardPointInfoRequest req, string @operator)
         {
             var param = new CreateManualRewardPointInfoParams(req, @operator);
-            var url = _storeSiteUrl + "/api/Member/ManualRewardPoint";
+            var url = _storeSiteUrl + "Member/ManualRewardPoint";
             var result = _courierAdapter.MyPostAsync<object, CreateManualRewardPointInfoParams>(url, param);
 
             return result;
         }
-        
+
         public async Task<ApiResult> BatchManualRewardPointAsync(CreateManualRewardPointInfoBatchRequest req, string @operator)
         {
             // STEP 1: 讀取 Excel 內容
@@ -58,7 +60,7 @@ namespace BackendSite.Service.BLL
                 {
                     Message =
                         $"import file {req.File.FileName} rows: {string.Join(',', importResult.FailedRows)} was failed, please try again",
-                    ErrorCode = (int) ErrorCodeEnum.Fail
+                    ErrorCode = (int)ErrorCodeEnum.Fail
                 };
             }
 
@@ -80,22 +82,22 @@ namespace BackendSite.Service.BLL
                 var users = list
                     .Where(x => x.CustId == 0)
                     .Select(x => x.UserName);
-                
+
                 return new ApiResult<object>
                 {
                     Message = $"MemberIds: {string.Join(',', users)} not exists, please try again",
-                    ErrorCode = (int) ErrorCodeEnum.Fail
+                    ErrorCode = (int)ErrorCodeEnum.Fail
                 };
             }
-            
+
             // STEP 3: 執行
             var param = new CreateManualRewardPointInfoBatchParams(req.SiteId, list, @operator);
-            var url = _storeSiteUrl + "/api/Member/BatchManualRewardPoint";
+            var url = _storeSiteUrl + "Member/BatchManualRewardPoint";
             var result = await _courierAdapter.MyPostAsync<object, CreateManualRewardPointInfoBatchParams>(url, param);
 
-            return new ApiResult(result.ErrorCode, result.Message);;
+            return new ApiResult(result.ErrorCode, result.Message); ;
         }
-        
+
         public byte[] GetSampleExcelFile()
         {
             var workbook = new XSSFWorkbook();
@@ -108,7 +110,7 @@ namespace BackendSite.Service.BLL
             using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             var result = memoryStream.ToArray();
-            
+
             return result;
         }
 
@@ -116,22 +118,22 @@ namespace BackendSite.Service.BLL
 
         private IDictionary<int, string> GetManualRewardPointCategory()
         {
-            var result = ((ManualRewardPointCategoryEnum[]) Enum
+            var result = ((ManualRewardPointCategoryEnum[])Enum
                     .GetValues(typeof(ManualRewardPointCategoryEnum)))
-                .ToDictionary(x => ((int) x), x => x.ToString());
+                .ToDictionary(x => ((int)x), x => x.ToString());
 
             return result;
         }
-        
+
         private IDictionary<string, int> GetManualRewardPointCategoryMapping()
         {
-            var result = ((ManualRewardPointCategoryEnum[]) Enum
+            var result = ((ManualRewardPointCategoryEnum[])Enum
                     .GetValues(typeof(ManualRewardPointCategoryEnum)))
-                .ToDictionary(x => x.ToString(), x => ((int) x));
+                .ToDictionary(x => x.ToString(), x => ((int)x));
 
             return result;
         }
-        
+
         private ImportManualRewardPointInfoResult ImportExcel(IFormFile file)
         {
             using var fileStream = file.OpenReadStream();

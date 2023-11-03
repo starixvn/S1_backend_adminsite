@@ -10,13 +10,13 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         }
         public string PictureUrl { get; set; }
     }
-    
+
     public class RedemptionLimit : LastUpdateModel
     {
         public int Limit { get; set; }
         public GeneralStatusEnum Status { get; set; }
     }
-    
+
     public class GiftInfo
     {
         public int SiteId { get; set; }

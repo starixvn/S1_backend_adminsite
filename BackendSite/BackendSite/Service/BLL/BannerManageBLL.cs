@@ -1,5 +1,6 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -12,7 +13,7 @@ namespace BackendSite.Service.BLL
         {
             this.bannerManageService = bannerManageService;
         }
-        public int SetBanner(ParamsWithLog<SetRequest> input )
+        public int SetBanner(ParamsWithLog<SetRequest> input)
         {
             return bannerManageService.SetBanner(input);
         }
@@ -27,7 +28,7 @@ namespace BackendSite.Service.BLL
                 Math.Abs(pageSize), out totalPages, out rowCount);
 
         }
-        public BannerInfo GetBanner(int siteId, string bannerName ,int currency)
+        public BannerInfo GetBanner(int siteId, string bannerName, int currency)
         {
             return bannerManageService.GetBanner(siteId, bannerName, currency);
         }
@@ -35,12 +36,12 @@ namespace BackendSite.Service.BLL
         {
             return bannerManageService.UpdateBannerStatus(input);
         }
-        
+
         public int DeleteBanner(ParamsWithLog<GetBannerRequest> input)
         {
             return bannerManageService.DeleteBanner(input);
         }
-        
+
         public IEnumerable<HotEventList> GetHotEventList(IEnumerable<int> siteId,
             IEnumerable<int> status, int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {

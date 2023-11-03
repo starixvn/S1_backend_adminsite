@@ -1,7 +1,9 @@
-﻿using BackendSite.Service.BLL.Interface;
+﻿using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -27,10 +29,9 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _logger = provider.GetRequiredService<ILogger<IAutoWithdrawalPaymentGateWayBLL>>();
-            
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _payApiUrl = configuration.GetValue<string>("PayService");
-            
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
         }
 
         public AutoWithdrawalPaymentGateWayDto GetPaymentGateWay(WithdrawalRequest withdrawalData, int siteId)
@@ -57,7 +58,7 @@ namespace BackendSite.Service.BLL
 
                     if (bankInfo != null)
                     {
-                        return new AutoWithdrawalPaymentGateWayDto(bankInfo.PayId, bankInfo.ChannelId, bankInfo.PayName, WithdrawalTypeEnum.OnlinePayment);
+                        return new AutoWithdrawalPaymentGateWayDto(bankInfo.PayId, bankInfo.ChannelId, bankInfo.PayName, WithdrawalTypeEnum.OnlineBanking);
                     }
 
                     break;
@@ -93,7 +94,7 @@ namespace BackendSite.Service.BLL
                     var eWalletInfo = eWalletOnline.FirstOrDefault();
                     if (eWalletInfo != null)
                     {
-                        return new AutoWithdrawalPaymentGateWayDto(eWalletInfo.PayId, eWalletInfo.ChannelId, eWalletInfo.PayName, WithdrawalTypeEnum.OnlinePayment);
+                        return new AutoWithdrawalPaymentGateWayDto(eWalletInfo.PayId, eWalletInfo.ChannelId, eWalletInfo.PayName, WithdrawalTypeEnum.EWalletPayment);
                     }
 
                     break;
@@ -101,8 +102,8 @@ namespace BackendSite.Service.BLL
 
             return null;
         }
-        
-        public ApiResult AutoWithdrawalProcessWay(SendToNextRequest request ,WithdrawalRequest withdrawalData ,AuthData authData ,ApiResult apiResult , out int withdrawConfirmResult)
+
+        public ApiResult AutoWithdrawalProcessWay(SendToNextRequest request, WithdrawalRequest withdrawalData, AuthData authData, ApiResult apiResult, out int withdrawConfirmResult)
         {
             var paymentGateWay = GetPaymentGateWay(withdrawalData, withdrawalData.SiteId);
             if (paymentGateWay == null)
@@ -123,7 +124,7 @@ namespace BackendSite.Service.BLL
             withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalProcess(
                 request.TransId,
                 request.Comment,
-                updater:paymentGateWay.PayName,
+                updater: paymentGateWay.PayName,
                 authData.UserId,
                 JsonConvert.SerializeObject(withdrawalInfo),
                 (int)request.WithdrawalType,
@@ -132,7 +133,7 @@ namespace BackendSite.Service.BLL
 
             if (withdrawConfirmResult > 0)
             {
-                var createFailResult = PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData, systemOperation: "system" ).Result;
+                var createFailResult = PaymentOnlineCreate(request.TransId, apiResult, authData.UserName, "system").Result;
                 if (createFailResult != null)
                 {
                     // 自動出款失敗，狀態改回 AutoFailBackManual
@@ -143,55 +144,31 @@ namespace BackendSite.Service.BLL
 
             return apiResult;
         }
-        
-        public async Task<ApiResult> PaymentOnlineCreate(SendToNextRequest request, WithdrawalInfo withdrawalInfo, int custId,
-        decimal amount, ApiResult apiResult, AuthData authData, string systemOperation = "")
+
+        public async Task<ApiResult> PaymentOnlineCreate(string transId, ApiResult apiResult, string boUserName, string systemOperation = "")
         {
-            var myUrl = request.WithdrawalType == WithdrawalTypeEnum.CryptoPay
-                ? $"{_payApiUrl}CryptoWithdrawal"
-                : $"{_payApiUrl}Withdrawal";
-
-            myUrl = withdrawalInfo.AccountType == "ewallet" ? $"{_payApiUrl}EWalletWithdrawal" : myUrl;
-
-            var reqWithdrawalOnline = new ReqWithdrawalOnline
-            {
-                SysId = withdrawalInfo.AccountType == "ewallet" ? (int)withdrawalInfo.EWalletSysId : withdrawalInfo.SysId,
-                TransId = request.TransId,
-                CustId = custId,
-                Amount = amount,
-                PayId = withdrawalInfo.PayId ?? 0,
-                ChannelId = withdrawalInfo.ChannelId ?? 0,
-                AccountName = withdrawalInfo.AccountName,
-                AccountNo = withdrawalInfo.AccountNo,
-                IFSCCode = withdrawalInfo.IFSCCode
-            };
-
-            var apiOnlineResult = await _courierAdapter.MyPostAsync<bool, ReqWithdrawalOnline>(myUrl, reqWithdrawalOnline);
+            var apiOnlineResult = await _courierAdapter
+                .MyPostAsync<object, object>($"{_payApiUrl}Withdrawal/Create", new { TransId = transId });
+            
+            var updater = string.IsNullOrEmpty(systemOperation)
+                ? boUserName
+                : systemOperation;
+            
             if (apiOnlineResult == null)
             {
-                var updater = string.IsNullOrEmpty(systemOperation)
-                    ? authData.UserName
-                    : systemOperation;
-
-                _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
-                    apiResult.Message, updater);
+                _withdrawalStateTransferBll.WithdrawalVerify(transId, apiResult.Message, updater);
                 apiResult.ErrorCode = 1101;
                 apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
+                
                 return apiResult;
             }
 
-            if (apiOnlineResult.ErrorCode != 0)
-            {
-                var updater = string.IsNullOrEmpty(systemOperation)
-                    ? authData.UserName
-                    : systemOperation;
+            if (apiOnlineResult.ErrorCode == 0)
+                return null;
 
-                _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
-                    apiOnlineResult.Message, updater);
-                return apiOnlineResult;
-            }
-
-            return null;
+            _withdrawalStateTransferBll.WithdrawalVerify(transId, apiOnlineResult.Message, updater); 
+            
+            return apiOnlineResult;
         }
     }
 }

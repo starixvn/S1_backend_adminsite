@@ -2,8 +2,9 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Model;
-using Microsoft.Extensions.Options;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite.Service.Library
 {
@@ -14,10 +15,12 @@ namespace BackendSite.Service.Library
 
         public AWSS3Helper(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            var awsKeyConfig = provider.GetRequiredService<IOptions<Dictionary<string, AWSKeyConfig>>>().Value["ailab-s3"];
-            var proxyHost = configuration.GetValue<string>("ProxyHost");
-            var proxyPort = configuration.GetValue<int>("ProxyPort");
+            
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            var awsKeyConfig = configBll.GetConfigValue<AWSKeyConfig>("AWSS3Key");
+            var proxyConfig = configBll.GetConfigValue<ProxyConfig>("ProxySetting");
+            var proxyHost = proxyConfig.ProxyHost;
+            var proxyPort = proxyConfig.ProxyPort;
 
             var config = new AmazonS3Config
             {
@@ -53,14 +56,14 @@ namespace BackendSite.Service.Library
         {
             return await _client.CopyObjectAsync(request);
         }
-        
+
         public async Task<bool> UploadFileAsync(IFormFile file, string bucketName, string key)
         {
             try
             {
                 await using var fileStream = file.OpenReadStream();
-                
-                
+
+
                 var putRequest = new PutObjectRequest
                 {
                     BucketName = bucketName,
@@ -72,19 +75,19 @@ namespace BackendSite.Service.Library
                 var success = putResponse.HttpStatusCode.IsSuccess();
                 if (!success)
                 {
-                    _logger.LogError($"Upload to s3 failed, key: {key}, HttpStatusCode: {(int) putResponse.HttpStatusCode}");
+                    _logger.LogError($"Upload to s3 failed, key: {key}, HttpStatusCode: {(int)putResponse.HttpStatusCode}");
                 }
-                
+
                 return success;
             }
             catch (Exception ex)
             {
                 _logger.LogError("Upload to s3 Exception", ex);
-                
+
                 return false;
             }
         }
-        
+
         public async Task<bool> DeleteFileAsync(string bucketName, string key)
         {
             try
@@ -99,15 +102,15 @@ namespace BackendSite.Service.Library
                 var success = putResponse.HttpStatusCode.IsSuccess();
                 if (!success)
                 {
-                    _logger.LogError($"Delete from s3 failed, key: {key}, HttpStatusCode: {(int) putResponse.HttpStatusCode}");
+                    _logger.LogError($"Delete from s3 failed, key: {key}, HttpStatusCode: {(int)putResponse.HttpStatusCode}");
                 }
-                
+
                 return success;
             }
             catch (Exception ex)
             {
                 _logger.LogError("Delete from s3 Exception", ex);
-                
+
                 return false;
             }
         }

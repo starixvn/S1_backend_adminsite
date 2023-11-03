@@ -1,10 +1,11 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss
 {
-    public class MpaWinLossRequest : IOrderBy
+    public class MpaWinLossRequest : IOrderBy, IApiRequest
     {
         /// <summary>
         /// 品牌 1:Nova、2:Goal123、3:Bwing
@@ -97,6 +98,9 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         /// 各個TpCategory
         /// </summary>
         public IEnumerable<int> TpCategorys { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public int CurrencyId { get; set; }
+        public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
 
         public string MemberTypeJson()
         {

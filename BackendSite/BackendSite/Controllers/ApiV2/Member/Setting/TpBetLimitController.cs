@@ -4,6 +4,7 @@ using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -95,7 +96,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         public async Task<ApiResult> Set(dynamic req)
         {
             var result = await _userBetLimitBll.SetUserBetLimit(req, User.Identity.Name);
-            if (result == 1 || result == 2) 
+            if (result == 1 || result == 2)
             {
                 return new ApiResult
                 {

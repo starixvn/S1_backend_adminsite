@@ -1,19 +1,23 @@
-﻿using BackendSite.Service.Model;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Report;
-using Newtonsoft.Json;
 using BackendSite.Service.Model.GameStatisticalReport;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.Report;
+
+using Dapper;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
     public class ReportService
     {
         #region Fields
-
-        private readonly IConfiguration _configuration;
+        
         private readonly MySqlClient _reportDbClient;
 
         #endregion
@@ -22,7 +26,6 @@ namespace BackendSite.Service.DAL
 
         public ReportService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
@@ -47,7 +50,7 @@ namespace BackendSite.Service.DAL
 
         #endregion
 
-        public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate ,string timeZone)
+        public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             var partialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();
             var parameters = new DynamicParameters(
@@ -59,7 +62,7 @@ namespace BackendSite.Service.DAL
                     EndDate = endDate,
                     TimeZone = timeZone
                 });
-            
+
             #region Get Data StoreProcedure
 
             var reportDepositList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportDeposit_GroupByDay_Get_V2", parameters);
@@ -78,11 +81,11 @@ namespace BackendSite.Service.DAL
             partialSummeryModels.Add("Rebate", reportRebateList);
 
             #endregion
-            
+
             return partialSummeryModels;
         }
 
-        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinLossSummary(string siteIds, string currencyIds, string startDate, string endDate , string timeZone)
+        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinLossSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
         {
             var parameters = new DynamicParameters(
                 new
@@ -99,13 +102,13 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<StatisticalPartialSummeryModel> GetStatisticalReport(string siteIds, string timeZone, string startDate, string endDate)
         {
-            var parameters = new DynamicParameters( new
-                {
-                    _SiteIds = siteIds,
-                    _TimeZone = timeZone,
-                    _StartDate = startDate,
-                    _EndDate = endDate
-                });
+            var parameters = new DynamicParameters(new
+            {
+                _SiteIds = siteIds,
+                _TimeZone = timeZone,
+                _StartDate = startDate,
+                _EndDate = endDate
+            });
 
             return _reportDbClient.Query<StatisticalPartialSummeryModel>("Admin_ReportTurnOverValidBet_Statistical_Get_V3", parameters);
         }
@@ -210,7 +213,7 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReport(GetListInput input,
             out int totalPages,
             out int rowCount)
@@ -241,10 +244,10 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        
+
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
         {
-            var parameters = new DynamicParameters( 
+            var parameters = new DynamicParameters(
                 new
                 {
                     _MultiSiteRequest = JsonConvert.SerializeObject(input.MultiSiteRequest),
@@ -258,7 +261,7 @@ namespace BackendSite.Service.DAL
                     _StartDate = input.StartDate,
                     _EndDate = input.EndDate,
                 });
-            
+
             var spName = "Admin_RewardBonusReport_Export_V3";
             var result = _reportDbClient.Query<RewardBonusReportModel>(spName, parameters);
            
@@ -278,38 +281,50 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<GameStatisticalDao>("Admin_GameStatisticalReport_Get_V2", parameters);
         }
         
-        public IEnumerable<PaymentReportDepositDetail> GetPaymentReportDepositDetail(GetPaymentReportParams input)
+        public IEnumerable<PaymentReportDepositDetail> GetPaymentReportDepositDetail(GetPaymentReportParams input,string multiSiteRequest)
         {
             var parameters = new DynamicParameters(
                 new
                 {
-                    _SiteId = input.SiteId,
-                    _CurrencyIds = input.CurrencyIds,
                     _PayIds = input.PayIds,
                     _Types = input.Types,
                     _UserNames = input.UserNames,
                     _StartTime = input.StartTime,
-                    _EndTime = input.EndTime
+                    _EndTime = input.EndTime,
+                    _MultiSiteAndCurrencyIds = multiSiteRequest,
                 });
 
-            return _reportDbClient.Query<PaymentReportDepositDetail>("Admin_PaymentReport_Deposit_Get", parameters);
+            return _reportDbClient.Query<PaymentReportDepositDetail>("Admin_PaymentReport_Deposit_Get_V2", parameters);
         }
         
-        public IEnumerable<PaymentReportWithdrawalDetail> GetPaymentReportWithdrawalDetail(GetPaymentReportParams input)
+        public IEnumerable<PaymentReportWithdrawalDetail> GetPaymentReportWithdrawalDetail(GetPaymentReportParams input, string multiSiteRequest)
         {
             var parameters = new DynamicParameters(
                 new
                 {
-                    _SiteId = input.SiteId,
-                    _CurrencyIds = input.CurrencyIds,
                     _PayIds = input.PayIds,
                     _Types = input.Types,
                     _UserNames = input.UserNames,
                     _StartTime = input.StartTime,
-                    _EndTime = input.EndTime
+                    _EndTime = input.EndTime,
+                    _MultiSiteAndCurrencyIds = multiSiteRequest,
                 });
 
-            return _reportDbClient.Query<PaymentReportWithdrawalDetail>("Admin_PaymentReport_Withdrawal_Get", parameters);
+            return _reportDbClient.Query<PaymentReportWithdrawalDetail>("Admin_PaymentReport_Withdrawal_Get_V2", parameters);
+        }
+        
+        public IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(GetConfiscatedSummaryReportRequest input)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("_SiteIds", JsonConvert.SerializeObject(input.SiteIds));
+            parameters.Add("_CurrencyIds", JsonConvert.SerializeObject(input.CurrencyIds));
+            parameters.Add("_UserName", string.IsNullOrEmpty(input.UserName) ? null : input.UserName);
+            parameters.Add("_StartDate", input.StartDate?.UtcDateTime);
+            parameters.Add("_EndDate", input.EndDate?.UtcDateTime);
+            
+            var data = _reportDbClient.Query<ConfiscatedSummaryReportDetail>("Admin_ConfiscatedSummaryReport_Get" ,parameters);
+            
+            return data;
         }
     }
 }

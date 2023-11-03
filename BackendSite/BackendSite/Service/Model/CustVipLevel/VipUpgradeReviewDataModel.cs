@@ -23,7 +23,7 @@ namespace BackendSite.Service.Model.CustVipLevel
         public DateTimeOffset? QualifiedTime { get; set; }
         public string LastUpdateUser { get; set; }
     }
-    
+
     public class ExportVipUpgradeReviewModel
     {
         public int SiteId { get; set; }

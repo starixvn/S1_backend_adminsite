@@ -5,9 +5,9 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
 {
@@ -56,9 +56,9 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 data.UpdateTime = new DateTimeOffset(data.UpdateTime.DateTime, TimeSpan.Zero);
             }
 
-            var result = 
+            var result =
                 list.Select(x => new BankFinancialTransferAccountDisplayModel(x));
-            
+
             return new ApiResult<IEnumerable<BankFinancialTransferAccountDisplayModel>>
             {
                 Data = result,
@@ -110,11 +110,11 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     UpdateTime = new DateTimeOffset(x.UpdateTime.DateTime, TimeSpan.Zero),
                     Updator = x.UpdatorName
                 });
-            
+
             var stream = _excelBll.ExportV2(result);
             return _excelBll.ExcelFile(stream, "TransferAccountInfoList");
         }
-        
+
         /// <summary>
         /// BankTransferAccount/GetById 取得指定銀行轉帳戶口資料
         /// </summary>
@@ -194,22 +194,22 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             return new ApiResult
             {
                 Message = message,
-                ErrorCode = (int) (status ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
+                ErrorCode = (int)(status ? ErrorCodeEnum.Success : ErrorCodeEnum.Fail)
             };
         }
-        
+
         [HttpPost]
         public ApiResult GetTransferAccountReason()
         {
             var result = _bankFinancialBll.GetReason("BankFinancial/TransferAccountManage");
-            
+
             return new ApiResult<IEnumerable<BankFinancialReasonModel>>
             {
                 Data = result,
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         [HttpPost]
         public ApiResult GetPayList()
         {
@@ -218,7 +218,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             try
             {
                 apiResult.Data = _bankFinancialBll.GetPayList()
-                    .Where(x=> x.Status == (int)GeneralStatusEnum.Enable);
+                    .Where(x => x.Status == (int)GeneralStatusEnum.Enable);
                 apiResult.ErrorCode = 0;
             }
             catch (Exception ex)
@@ -230,7 +230,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
 
             return apiResult;
         }
-        
+
         [HttpPost]
         public ApiResult GetAgentList(GetAgentListRequest req)
         {
@@ -242,7 +242,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-        
+
         #endregion
     }
 }

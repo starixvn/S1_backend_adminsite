@@ -1,16 +1,19 @@
-﻿using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using Dapper;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using System.Data;
+﻿using System.Data;
 using System.Text.RegularExpressions;
+
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
-using Org.BouncyCastle.Bcpg.OpenPgp;
+using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
+
+using Newtonsoft.Json;
+
 using static BackendSite.Controllers.ApiV2.Finance.Withdrawal.WithdrawalController;
-using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Service.DAL
 {
@@ -503,35 +506,7 @@ namespace BackendSite.Service.DAL
                                 break;
 
                             case WithdrawalStatusEnum.Approved:
-                                var dummyResult = 0;
-                                // var accountingResult = 0;
-                                var withdrawalInfoData = JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalInfo);
-
-                                updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId, trans);
-
-                                switch (withdrawalType)
-                                {
-                                    case (int)WithdrawalTypeEnum.OnlinePayment:
-                                        dummyResult = _walletService.SetPayDummy(siteId,
-                                            withdrawalInfoData.PayId ?? 0,
-                                            withdrawalInfoData.CurrencyId ?? 0,
-                                            -1 * amount,
-                                            trans);
-                                        break;
-                                    case (int)WithdrawalTypeEnum.LocalBank:
-                                        dummyResult = _walletService.SetBankOffDummy(siteId,
-                                            withdrawalInfoData.FromSysId ?? 0,
-                                            withdrawalInfoData.FromAccountNo,
-                                            withdrawalInfoData.CurrencyId ?? 0,
-                                            -1 * amount,
-                                            trans);
-                                        break;
-                                    case (int)WithdrawalTypeEnum.CryptoWallet:
-                                        dummyResult = 1;
-                                        break;
-                                }
-
-                                specialResult = updateFlowEndResult == 0 || dummyResult == 0 ? 0 : 1;
+                                specialResult = SetWithdrawalInfoFlowEndTime(withdrawalId, trans) == 0 ? 0 : 1;
 
                                 break;
 
@@ -728,7 +703,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { _WithdrawalId = request.After.WithdrawalId, _Status = request.After.Status });
             return _mainDbClient.Execute("Admin_WithdrawalMessage_Set", p) > 0;
         }
-        
+
         public IEnumerable<WithdrawalMessage> GetWithdrawalMessage(IEnumerable<int> withdrawalIds)
         {
             var props = new DynamicParameters();
@@ -745,7 +720,7 @@ namespace BackendSite.Service.DAL
             p.Add("_WithdrawalId", withdrawalId);
             p.Add("_OnUser", onUser);
             var result = await _mainDbClient.ExecuteAsync("Admin_WithdrawalInfoOnUser_Set", p) > 0;
-            
+
             return result;
         }
 

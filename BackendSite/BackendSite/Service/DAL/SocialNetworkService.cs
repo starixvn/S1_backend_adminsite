@@ -1,8 +1,10 @@
 ﻿using System.Data;
+
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
 
 namespace BackendSite.Service.DAL
@@ -40,7 +42,7 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.ExecuteAsync("Admin_SocialSort_Set", p);
         }
 
-        public Task<int> SetSocialData(SetSocialDataRequest request,string lastUpdateUser)
+        public Task<int> SetSocialData(SetSocialDataRequest request, string lastUpdateUser)
         {
             var p = new DynamicParameters();
             p.Add("_Id", request.Id, dbType: DbType.Int64);
@@ -52,7 +54,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Link", request.Link, dbType: DbType.String);
             p.Add("_AndroidLink", request.AndroidLink, dbType: DbType.String);
             p.Add("_iOSLink", request.IosLink, dbType: DbType.String);
-            p.Add("_LinkType",request.LinkType,dbType: DbType.Int16);
+            p.Add("_LinkType", request.LinkType, dbType: DbType.Int16);
             p.Add("_LastUpdateUser", lastUpdateUser, dbType: DbType.String);
 
             return _mainDbClient.ExecuteAsync("Admin_SocialData_Set", p);

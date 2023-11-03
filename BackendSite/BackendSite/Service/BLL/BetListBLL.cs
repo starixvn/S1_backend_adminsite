@@ -1,12 +1,15 @@
-﻿using BackendSite.Extensions;
+﻿using System.Runtime;
+
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using Dapper;
-using Newtonsoft.Json;
 
+using Dapper;
+
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -44,6 +47,7 @@ namespace BackendSite.Service.BLL
                     var (sortIndex, sortCount) = pageInfo.ListPagination(sortData.Count(), input.PageNumber, input.PageSize);
 
                     var sortResult = sortData.GetRange(sortIndex, sortCount);
+
                     foreach (var item in sortData)
                     {
                         item.Dispose();

@@ -1,4 +1,5 @@
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankCardManagement
@@ -9,13 +10,13 @@ namespace BackendSite.Service.Model.BankCardManagement
         public int FinancialAccountId { set; get; }
         public string AccountName { set; get; }
         public string AccountNo { set; get; }
-        
+
         public string Agent { set; get; }
         /// <summary>
         /// 目前只有 INR IFSCCode 使用
         /// </summary>
         public string AccountCode { set; get; }
-        
+
         public string FrontendDisplayName { set; get; }
         public decimal MinAmount { set; get; }
         public decimal MaxAmount { set; get; }
@@ -24,7 +25,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public string FinancialAccountPurposes { set; get; }
         private IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
             JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(FinancialAccountPurposes);
-        
+
         [JsonIgnore]
         public TransferChannelEnum FinancialAccountChannel { set; get; }
 
@@ -34,7 +35,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             => AccountPurposes
                 .Where(x => x != TransferAccountPurposeEnum.Transfer)
                 .Select(x => x.ToString());
-        
+
         public int CurrencyId { set; get; }
         public int SysId { set; get; }
         public string BankCode { set; get; }
@@ -49,6 +50,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public IEnumerable<int> VipLevels =>
             JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels ?? "[]");
         public IEnumerable<string> VipLevelNames { set; get; }
+        // 沒用
         public decimal Dummy { set; get; }
         public string Memo { set; get; }
         public int Sort { set; get; }

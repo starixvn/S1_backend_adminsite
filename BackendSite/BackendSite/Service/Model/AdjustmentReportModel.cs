@@ -1,7 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using System.Reflection;
 
 namespace BackendSite.Service.Model
 {
@@ -24,7 +23,7 @@ namespace BackendSite.Service.Model
         public string DepositId { get; set; }
 
         public DateTimeOffset StartDate { get; set; }
-     
+
         public DateTimeOffset EndDate { get; set; }
         public IEnumerable<MemberTypeEnum> MemberTypes { get; set; }
     }
@@ -91,6 +90,7 @@ namespace BackendSite.Service.Model
         public string DepositId { get; set; }
         [ExportIgnore]
         public int AdjustType { get; set; }
+        public int MethodType { get; set; } 
     }
 
 
@@ -116,7 +116,7 @@ namespace BackendSite.Service.Model
         public string WalletType { get; set; }
         public string CategoryName { get; set; }
 
-        public string DepositId { get; set; }
+        public string RefId { get; set; }
         public MemberTypeEnum UserType { get; set; }
     }
 

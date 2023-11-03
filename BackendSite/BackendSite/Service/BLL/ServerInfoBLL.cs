@@ -1,8 +1,10 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Text.Json;
+
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.Extensions.Caching.Memory;
-using System.Text.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -33,14 +35,6 @@ namespace BackendSite.Service.BLL
         public ServerInfo GetServerInfoWithSiteId(int siteId)
         {
             serverInfo = serverInfoService.GetModelWithSiteId(siteId);
-            return serverInfo;
-        }
-        public ServerInfo GetServerInfo()
-        {
-            if (serverInfo != null)
-                return serverInfo;
-
-            serverInfo = serverInfoService.GetModel();
             return serverInfo;
         }
 

@@ -5,7 +5,7 @@
         public int CustId { get; set; }
     }
 
-    public class ThirdPartyAccountResponse 
+    public class ThirdPartyAccountResponse
     {
         /// <summary>
         /// 第三方名稱

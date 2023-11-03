@@ -366,6 +366,23 @@ namespace BackendSite.Service.Model.enums
         QrPayPayment = 6,
         BankAutoChannel = 7
     }
+    
+    public enum DepositChannelTypeEnum
+    {
+        OnlineBanking = 1,
+        MobilePayment = 2,
+        CryptoPayment = 4,
+        LoadCardPayment = 5,
+        QrPayPayment = 6,
+        BankAutoChannel = 7
+    }
+    
+    public enum WithdrawalChannelTypeEnum
+    {
+        OnlineBanking = 1,
+        EWalletPayment = 3,
+        CryptoPayment = 4
+    }
 
     public enum PayChannelStatusEnum
     {
@@ -397,7 +414,7 @@ namespace BackendSite.Service.Model.enums
         Enable = 1,
         Disable = 2
     }
-    
+
     public enum BankInfoPayMethodEnum
     {
         Deposit = 1,
@@ -421,10 +438,18 @@ namespace BackendSite.Service.Model.enums
     public enum WithdrawalTypeEnum
     {
         Undefined = 0,
-        OnlinePayment = 1,
+        OnlineBanking = 1,
         LocalBank = 2,
+        EWalletPayment = 3,
         CryptoPay = 4,
         CryptoWallet = 5 // Local
+    }
+    
+    public enum WithdrawalBlockTypeEnum
+    {
+        BankCard = 1,
+        EWallet = 3,
+        Crypto = 4
     }
 
     public enum WithdrawalStatusEnum
@@ -697,14 +722,14 @@ namespace BackendSite.Service.Model.enums
         Promotion = 0,
         Deposit = 1
     }
-    
+
     public enum BonusGroupByType
     {
         BonusCode = 0,
-        Date = 1 ,
+        Date = 1,
         Month = 2
     }
-    
+
     public enum BonusSummaryType
     {
         WelcomeBonus = 1,
@@ -909,7 +934,9 @@ namespace BackendSite.Service.Model.enums
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
         AutoPaymentRule = 92,
-        DepositReferral = 93
+        DepositReferral = 93,
+        EditSystemBankInfo = 94,
+        WithdrawalBlockSetting = 95
     }
 
     #region BankFinancialTransferInfoLog
@@ -1165,7 +1192,7 @@ namespace BackendSite.Service.Model.enums
         Invalid = 3
     }
 
-    public enum LiveRegistrationDateTypeEnum 
+    public enum LiveRegistrationDateTypeEnum
     {
         RegisterDate = 1,
         LastActiveDate = 2,
@@ -1535,8 +1562,10 @@ namespace BackendSite.Service.Model.enums
         BWING = 3,
         [Description("Soon88")]
         SOON88 = 4,
-        [Description("ivorysport")]
-        IVORYSPORT = 5
+        [Description("Ivorysport")]
+        IVORYSPORT = 5,
+        [Description("Leobet")]
+        LEOBET = 6
     }
 
     public enum AffSiteEnum
@@ -1692,6 +1721,7 @@ namespace BackendSite.Service.Model.enums
         BuyFeaturesGames = 4,
         Megaways = 5,
         Mini = 6,
+        Arcade = 7,
     }
 
     public enum SlotGameFilterStatusEnum
@@ -1802,7 +1832,8 @@ namespace BackendSite.Service.Model.enums
     public enum MpaGGRCustomizationGameTypeEnum
     {
         OneGamingPoker = 41,
-        V8Poker = 42
+        V8Poker = 42,
+        NineW = 51
     }
 
     /// <summary>
@@ -1903,7 +1934,7 @@ namespace BackendSite.Service.Model.enums
         Weekly = 2
     }
 
-    public enum UpgradeSettingEnum 
+    public enum UpgradeSettingEnum
     {
         [Description("Monthly Minimum Deposit")]
         UpDeposit = 0,
@@ -1914,8 +1945,8 @@ namespace BackendSite.Service.Model.enums
         [Description("Minimum Turnover Within Validity Period")]
         DownTurnover = 3,
     }
-    
-     public enum AutoType
+
+    public enum AutoType
     {
         AutoVerify = 1,
         AutoApproved = 2
@@ -1925,5 +1956,33 @@ namespace BackendSite.Service.Model.enums
     {
         Daily = 1,
         Weekly = 2
+	}
+    /// <summary>
+    /// Balance Adjustment頁面 > MethodType
+    /// </summary>
+    public enum MethodTypeIDEnum
+    {
+        MainWallet = 5,
+        MainWalletBatch = 10,
+        ThirdWallet = 60
+    }
+
+    /// <summary>
+    ///  Balance Adjustment頁面 > Adjustment Type
+    /// </summary>
+    public enum BalanceAdjustmentTypeIDEnum
+    {
+        BalancePlus = 1,
+        BalanceMinus = 2,
+        BonusPlus = 3,
+        BonusMinus = 4,
+        /// <summary>
+        /// 3RD選項Add
+        /// </summary>
+        Add = 5,
+        /// <summary>
+        /// 3RD選項Minus
+        /// </summary>
+        Minus = 6
     }
 }

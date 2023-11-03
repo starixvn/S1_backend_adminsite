@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Model;
 
 namespace BackendSite.Service.Library;
@@ -11,8 +12,8 @@ public class Cryptor
 
     public Cryptor(IServiceProvider provider)
     {
-        var configuration = provider.GetRequiredService<IConfiguration>();
-        var config = configuration.GetSection("CryptorConfig").Get<CryptorConfig>();
+        var configBll = provider.GetRequiredService<ConfigBLL>();
+        var config = configBll.GetConfigValue<CryptorConfig>("CryptorConfig");
         _key = config.Key;
         _iv = config.IV;
     }
@@ -40,7 +41,7 @@ public class Cryptor
         {
             return string.Empty;
         }
-        
+
         var key = Encoding.ASCII.GetBytes(_key);
         var iv = Encoding.ASCII.GetBytes(_iv);
         var bytes = Convert.FromBase64String(text);

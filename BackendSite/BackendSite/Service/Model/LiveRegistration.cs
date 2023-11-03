@@ -22,6 +22,7 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public string DepositStatus { get; set; }
         public string ReferralUrl { get; set; }
+        public string SiteName { get; set; }
     }
     public class ExportRegLiveStatusData
     {
@@ -41,8 +42,9 @@ namespace BackendSite.Service.Model
         public string PromotionCategory { get; set; }
         public DateTime FTDDate { get; set; }
         public decimal Amount { get; set; }
+        public string SiteName { get; set; }
     }
-    public class GetRegLiveStatusRequest : ApiRequestPageModel, IOrderBy
+    public class GetRegLiveStatusRequest : ApiRequestPageModel, IOrderBy, IApiRequest
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
@@ -59,9 +61,12 @@ namespace BackendSite.Service.Model
         public bool OrderBy { get; set; }
         public string OrderByProperty { get; set; }
         public OrderByDirection OrderByDirection { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
     }
 
-    public class ExportRegLiveStatusRequest
+    public class ExportRegLiveStatusRequest : IApiRequest
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
@@ -75,6 +80,9 @@ namespace BackendSite.Service.Model
         public LiveRegistrationDateTypeEnum DateType { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
     }
     public class ExportLiveRegistration
     {
@@ -92,6 +100,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset FTDDate { get; set; }
         public decimal Amount { get; set; }
         public List<string> CallRecord { get; set; }
+        public string SiteName { get; set; }
     }
     public class RegLiveStatusPageResult
     {
@@ -124,6 +133,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public List<string> UpdateRemark { get; set; }
         public string ReferralUrl { get; set; }
+        public string SiteName { get; set; }
     }
     public class TeleCsdUpdateReq
     {
@@ -140,7 +150,7 @@ namespace BackendSite.Service.Model
     {
         public CustomerRegLiveStatusStatusEnum Status { get; set; }
     }
-    
+
     public class CustRegLiveStatusNotesData
     {
         public int Id { get; set; }
@@ -149,7 +159,7 @@ namespace BackendSite.Service.Model
         public DateTime UpdateTime { get; set; }
         public string Operator { get; set; }
     }
-    
+
     public class CustRegLiveStatusNotes
     {
         public int Id { get; set; }

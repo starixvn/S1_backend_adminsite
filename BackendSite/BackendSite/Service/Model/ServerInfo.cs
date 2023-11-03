@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -20,8 +21,8 @@ namespace BackendSite.Service.Model
         {
             get
             {
-                return string.IsNullOrWhiteSpace(CurrencyList) ? 
-                    null:
+                return string.IsNullOrWhiteSpace(CurrencyList) ?
+                    null :
                     JsonConvert.DeserializeObject<IEnumerable<int>>(CurrencyList);
             }
         }
@@ -62,9 +63,12 @@ namespace BackendSite.Service.Model
         public long endDate { get; set; }
         public int PageNumber { get; set; }
     }
-    public class SiteConfig
+    public class SiteCloudFrontImageInfo
     {
-        public string BannerURL { get; set; }
-        public string AwsCloudFrontErrorDomainID { get; set; }     
+        public string OldImageUrl { get; set; }
+        public string MaintainUrl { get; set; }
+        public string HotEventImageUrl {get; set; }
+        public string BannerImageUrl { get; set; }
+        public string AwsCloudFrontErrorDomainID { get; set; }
     }
 }

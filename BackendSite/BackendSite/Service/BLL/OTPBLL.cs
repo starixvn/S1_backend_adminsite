@@ -7,6 +7,7 @@ using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 using Dapper;
+
 using Newtonsoft.Json;
 
 
@@ -27,8 +28,8 @@ namespace BackendSite.Service.BLL
         {
             pageInfo = new PageInfo();
             var (StartIndex, PageSize) = request.PageNumber.GetStartIndex(request.PageSize);
-            
-            var p = new 
+
+            var p = new
             {
                 SiteId = _newAuthorizeBLL.CheckBrand(),
                 SelectCurrency = JsonConvert.SerializeObject(request.CurrencyList),
@@ -46,12 +47,12 @@ namespace BackendSite.Service.BLL
             props.Add("RowCount", DbType.Int32, direction: ParameterDirection.Output);
             var result = _reportDbClient.Query<OTPLog>("Admin_OTPLog_Get", props);
             var totalCount = props.Get<int?>("RowCount") ?? 0;
-            
+
             pageInfo.SetPageInfo(totalCount, request.PageNumber, request.PageSize);
             return result;
         }
 
-        
+
 
     }
 }

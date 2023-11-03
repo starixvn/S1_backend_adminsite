@@ -1,6 +1,4 @@
-﻿using BackendSite.Service.Model.ApiModel;
-
-namespace BackendSite.Service.Model
+﻿namespace BackendSite.Service.Model
 {
     public class RewardBonusReportModel
     {

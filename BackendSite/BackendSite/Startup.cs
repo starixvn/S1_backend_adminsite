@@ -1,24 +1,23 @@
-using BackendSite.Service.Library;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Mvc;
-using BackendSite.Attributes;
-using BackendSite.Extensions;
 using BackendSite.ExceptionHandling;
-using NSwag;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.BLL.Infrastructure.Model;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
-using StackExchange.Redis;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Option;
-using Elastic.Apm.NetCoreAll;
-using Elastic.Apm;
-using Elastic.Apm.SqlClient;
-using Elastic.Apm.StackExchange.Redis;
 using Elastic.Apm.AspNetCore;
 using Elastic.Apm.DiagnosticSource;
+using Elastic.Apm.SqlClient;
+using Elastic.Apm.StackExchange.Redis;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc;
+using NSwag;
+using StackExchange.Redis;
 
 namespace BackendSite
 {
@@ -39,8 +38,6 @@ namespace BackendSite
             redisConnection.UseElasticApm();
             services.AddSingleton<IConnectionMultiplexer>(redisConnection);
             services.AddSingleton<ICacheHelper, RedisCacheHelper>();
-            /*Attributes*/
-            services.AddSingleton<AuthorizeByFuncAttribute>();
 
             /*Library*/
             services.AddSingleton<Tools>();
@@ -49,15 +46,14 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(_configuration);
-            services.AddMessageQueueConnection(_configuration);
-            services.Configure<Dictionary<string, SiteConfig>>(_configuration.GetSection("SiteConfig"));          
-            services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
+            
+            
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
-            services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
+            
             services.AddSingleton<DateTimeHelper>();
-
+            
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
@@ -134,6 +130,8 @@ namespace BackendSite
             services.DecoratorReferralManagement();
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
             services.DecoratorLiveRegistration();
+            services.AddSingleton<ConfigBLL>();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
@@ -142,22 +140,14 @@ namespace BackendSite
             {
                 options.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
             });
-            
-            services.AddAuthentication(option => 
+
+            services.AddAuthentication(option =>
             {
-                option.DefaultScheme = "backend";
-            })
-            .AddCookie("backend", "backend", option =>
-            {
-                //option.AccessDeniedPath
-                option.LoginPath = "/Home/Signin";
-                option.Cookie.Name = ".backend";
-                option.ExpireTimeSpan = TimeSpan.FromDays(1);//?S???w?]14??
-                option.Cookie.SameSite = SameSiteMode.Unspecified;
+                option.DefaultScheme = "backendV2";
             })
             .AddCookie("backendV2", "backendV2", option =>
             {
-                option.LoginPath = "/Home/AuthorizedFailed";
+                option.LoginPath = "/login";
                 option.Cookie.Name = ".backendV2";
                 option.ExpireTimeSpan = TimeSpan.FromDays(1);
                 option.Cookie.SameSite = SameSiteMode.Unspecified;
@@ -176,6 +166,12 @@ namespace BackendSite
             services.AddOptionListByDB<TpGameTypeOption>("Admin_TpGameType_Get");
             services.AddOptionListByDB<TpListOption>("Common_TpList_Get");
             services.AddOptionListByDB<CurrencyOption>("Common_Currency_Get");
+            services.AddOptionListByDB<Config>("SiteConfig_Get", new { ConfigGroup = "BackEndSite" });
+            services.AddOptionListByDB<ServerInfo>("Admin_ServerInfoList_Get");
+            services.AddSiteConfig();
+            services.AddCloudFrontImageInfo();
+            services.AddMessageQueueConnection();
+            services.AddAffConfig();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -190,7 +186,7 @@ namespace BackendSite
 
             if (!env.IsEnvironment("Local"))
             {
-                app.UseElasticApm(_configuration, 
+                app.UseElasticApm(_configuration,
                     new HttpDiagnosticsSubscriber(),
                     new SqlClientDiagnosticSubscriber());
             }

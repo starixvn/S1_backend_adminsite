@@ -1,9 +1,12 @@
-﻿using MySql.Data.MySqlClient;
-using Dapper;
-using System.Data;
+﻿using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
@@ -37,39 +40,15 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.ExecuteScalarAsync<decimal>("Balance_Get", new { CustId = custId });
         }
 
-        public int SetPayDummy(int siteId, int payId, int currencyId, decimal amount, MySqlTransaction trans)
-        {
-            return _mainDbClient.Execute("PayDummy_Set",
-                trans,
-                new DynamicParameters(new
-                {
-                    SiteId = siteId,
-                    PayId = payId,
-                    CurrencyId = currencyId,
-                    Amount = amount
-                }));
-        }
-        public int SetBankOffDummy(int siteId, int sysId, string accountNo, int currencyId, decimal amount, MySqlTransaction trans)
-        {
-            return _mainDbClient.Execute("BankOffDummy_Set",
-                trans,
-                new DynamicParameters(new
-                {
-                    SiteId = siteId,
-                    SysId = sysId,
-                    AccountNo = accountNo,
-                    CurrencyId = currencyId,
-                    Amount = amount
-                }));
-        }
-
         public IEnumerable<BonusLog> GetBonusLog(int custId, string promoCategoryIds, DateTime? startDate, DateTime? endDate, string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
             totalPages = 0;
             var p = new DynamicParameters(
-                new { CustId = custId, 
+                new
+                {
+                    CustId = custId,
                     PromoCategoryIds = promoCategoryIds,
-                    StartDate = startDate, 
+                    StartDate = startDate,
                     EndDate = endDate,
                     RefTransId = refTransId,
                     PageSize = pageSize
@@ -78,7 +57,7 @@ namespace BackendSite.Service.DAL
             p.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
             p.Add("TotalPages", Math.Abs(totalPages), DbType.Int32, ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var depositList = _mainDbClient.Query<BonusLog>("Admin_BonusLogList_Get_V4", p);
             pageNumber = p.Get<int?>("PageNumber") ?? 0;
             totalPages = p.Get<int?>("TotalPages") ?? 0;
@@ -96,7 +75,7 @@ namespace BackendSite.Service.DAL
             DateTime endDate,
             string userName,
             string categoryIdStr,
-            int baseCurrencyId, int payoutStatuses,int startIndex, int pageSize,
+            int baseCurrencyId, int payoutStatuses, int startIndex, int pageSize,
             ref List<string> currencyAmount)
         {
             var tempCurrencyTotalAmount = new List<string>();
@@ -129,7 +108,7 @@ namespace BackendSite.Service.DAL
             props.Add("_PageSize", pageSize);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            
+
             var result = _reportDbClient.Query<VipRebateInfo>("Admin_VipRebateReportList_Get_V10", props).ToList();
 
             searchData.VipRebateInfoList = result;
@@ -189,8 +168,8 @@ namespace BackendSite.Service.DAL
 
         public VipRebateInfoData GetVipRebateInfoListExport(string multiSiteRequest,
             DateTime startDate,
-            DateTime endDate, 
-            string userName, 
+            DateTime endDate,
+            string userName,
             string categoryIdStr,
             int baseCurrencyId,
             int spPayoutStatus)

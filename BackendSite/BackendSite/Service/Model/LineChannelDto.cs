@@ -36,7 +36,7 @@ namespace BackendSite.Service.Model
         [LogIgnore]
         public LineChannelStatusEnum Status { get; set; }
     }
-    
+
     public class DeleteLineChannel
     {
         [LogIgnore]

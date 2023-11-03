@@ -1,5 +1,7 @@
 ﻿using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
+
 using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model
@@ -53,7 +55,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset CreateTime { get; set; }
         public DateTimeOffset UpdateTime { get; set; }
         public int AssociateAccount { get; set; }
-        public List<int> Tags{ get; set; }
+        public List<int> Tags { get; set; }
     }
 
     public class ShieldTaggingReportExport
@@ -97,7 +99,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset UpdateTime { get; set; }
         public int AssociateAccount { get; set; }
     }
-    
+
     public class ShieldAssociateAccountResult
     {
         public int SiteId { get; set; }

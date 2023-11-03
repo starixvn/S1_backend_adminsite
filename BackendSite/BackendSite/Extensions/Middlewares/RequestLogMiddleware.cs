@@ -1,9 +1,13 @@
 ﻿using System.Text;
+
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
+
 using Microsoft.AspNetCore.Http.Extensions;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 using Serilog.Context;
 
 namespace BackendSite.Extensions.Middlewares
@@ -37,12 +41,12 @@ namespace BackendSite.Extensions.Middlewares
 
         #region Action
 
-        public async Task Invoke(HttpContext context,IWebHostEnvironment env)
+        public async Task Invoke(HttpContext context, IWebHostEnvironment env)
         {
             context.Request.EnableBuffering();
             var url = context.Request.GetDisplayUrl();
             var path = context.Request.Path.Value;
-            
+
             var requestBodyStream = new MemoryStream();
             var originalRequestBody = context.Request.Body;
             var content = string.Empty;
@@ -51,13 +55,13 @@ namespace BackendSite.Extensions.Middlewares
                 var formData = await context.Request.ReadFormAsync();
                 var dic = formData.ToDictionary(i => i.Key, i => i.Value);
 
-                if (path.Contains("UpdatePassword", StringComparison.OrdinalIgnoreCase) && 
-                    dic.TryGetValue("Password", out var pwd1) && 
+                if (path.Contains("UpdatePassword", StringComparison.OrdinalIgnoreCase) &&
+                    dic.TryGetValue("Password", out var pwd1) &&
                     !string.IsNullOrEmpty(pwd1.ToString()))
                 {
                     dic["Password"] = "********";
-                }   
-                
+                }
+
                 content = JsonConvert.SerializeObject(dic);
             }
 
@@ -81,7 +85,7 @@ namespace BackendSite.Extensions.Middlewares
                     // log需將登入密碼隱碼
                     if (path.Contains("Signin", StringComparison.OrdinalIgnoreCase) ||
                         path.Contains("CreateUser", StringComparison.OrdinalIgnoreCase) ||
-                        path.Contains("AddUser", StringComparison.OrdinalIgnoreCase) || 
+                        path.Contains("AddUser", StringComparison.OrdinalIgnoreCase) ||
                         path.Contains("Password", StringComparison.OrdinalIgnoreCase) ||
                         path.Contains("ChangePwd", StringComparison.OrdinalIgnoreCase))
                     {
@@ -93,7 +97,7 @@ namespace BackendSite.Extensions.Middlewares
                                 "Password", "password", "PassWord",
                                 "userPwd", "txtPW", "OldPwd", "NewPwd",
                             };
-                            
+
                             foreach (var word in passWordCheckList)
                             {
 
@@ -108,7 +112,7 @@ namespace BackendSite.Extensions.Middlewares
                         catch
                         {
                             // ignore
-                        }   
+                        }
                     }
 
                     if (path.Contains("SetAdminUserPassword", StringComparison.OrdinalIgnoreCase))
@@ -120,7 +124,7 @@ namespace BackendSite.Extensions.Middlewares
                             if (!string.IsNullOrEmpty(password))
                             {
                                 jbody["after"]["password"] = "********";
-                            }                          
+                            }
                             content = jbody.ToString();
                         }
                         catch

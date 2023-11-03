@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using System.Reflection;
+﻿using System.Reflection;
+
 using BackendSite.Attributes;
 using BackendSite.Service.Model;
+
+using Microsoft.AspNetCore.Mvc;
+
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace BackendSite.Service.BLL
 {

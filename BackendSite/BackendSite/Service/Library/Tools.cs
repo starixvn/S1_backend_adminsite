@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using BackendSite.Service.BLL.Infrastructure;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -10,10 +11,10 @@ namespace BackendSite.Service.Library
 
         public Tools(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();         
-            _backEndKey = configuration.GetValue<string>("ApiPaymentGateWayKey");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _backEndKey = configBll.GetConfigValue("ApiPaymentGateWayKey");
         }
-        
+
         /// <summary>
         /// MD5加密
         /// </summary>
@@ -260,7 +261,7 @@ namespace BackendSite.Service.Library
         /// BackendApiTokenCheck
         /// </summary>
         /// <returns>後台api token檢查</returns>
-        public bool BackendTokenCheck(object para , string token)
+        public bool BackendTokenCheck(object para, string token)
         {
             if (token == MD5Encrypt($"{para}{_backEndKey}"))
             {

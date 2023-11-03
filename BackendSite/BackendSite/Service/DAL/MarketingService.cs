@@ -2,6 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
 
 namespace BackendSite.Service.DAL
@@ -62,7 +63,7 @@ namespace BackendSite.Service.DAL
 
         public int DeletePointLevelInfo(PointLevelInfo pointLevelInfo)
         {
-            return _mainDbClient.Execute("PointLevelInfo_Del",new { SiteId = pointLevelInfo.SiteId, CurrencyId = pointLevelInfo.CurrencyId, PointLevel = pointLevelInfo.PointLevel });
+            return _mainDbClient.Execute("PointLevelInfo_Del", new { SiteId = pointLevelInfo.SiteId, CurrencyId = pointLevelInfo.CurrencyId, PointLevel = pointLevelInfo.PointLevel });
         }
     }
 }

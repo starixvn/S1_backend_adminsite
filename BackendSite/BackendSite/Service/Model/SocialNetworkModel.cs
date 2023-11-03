@@ -58,7 +58,7 @@ namespace BackendSite.Service.Model
     /// <summary>
     /// DTO 用來接DB Query資料
     /// </summary>
-    public class SocialDataListDto: SocialDataListBase
+    public class SocialDataListDto : SocialDataListBase
     {
         [JsonProperty("linkType")]
         public byte LinkType { get; set; }
@@ -75,7 +75,7 @@ namespace BackendSite.Service.Model
         [JsonProperty("linkType", Order = 97)]
         public bool LinkType { get; set; }
 
-        [JsonProperty("lastUpdateTime",Order = 99)]
+        [JsonProperty("lastUpdateTime", Order = 99)]
         public string LastUpdateTime { get; set; }
     }
 
@@ -95,7 +95,7 @@ namespace BackendSite.Service.Model
         public string LangId { get; set; }
     }
 
-    public class SetSocialSortRequest: SetSocialSortBase
+    public class SetSocialSortRequest : SetSocialSortBase
     {
         [JsonProperty("sortIds")]
         public List<int> SortIds { get; set; }

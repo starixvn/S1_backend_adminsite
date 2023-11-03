@@ -1,5 +1,7 @@
 ﻿using Amazon.S3.Model;
+
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -13,11 +15,13 @@ public class BlockIpToS3
     private readonly string _fileName;
     private readonly string _folder;
     private readonly string _nginxIpKey;
+    private readonly string _bucketName;
 
-    public BlockIpToS3(AWSS3Helper s3Helper, IWebHostEnvironment env, BlockService blockService)
+    public BlockIpToS3(AWSS3Helper s3Helper, IWebHostEnvironment env, BlockService blockService, ConfigBLL configBll)
     {
         _s3Helper = s3Helper;
         _blockService = blockService;
+        _bucketName = configBll.GetConfigValue("AWSConfigBucketName");
         _fileName = env.IsProduction() || env.EnvironmentName == "Release" ? "geoblockIp.txt" : "geoblockIp_test.txt";
         _nginxIpKey = env.IsProduction() || env.EnvironmentName == "Release" ? "$remote_addr" : "$real_ip";
         _folder = Path.Combine(env.ContentRootPath, "NginxConfig");
@@ -33,7 +37,7 @@ public class BlockIpToS3
                                                "{ \r\n" +
                                                "default -1;\r\n");
         await File.AppendAllLinesAsync(filePath, ipLines);
-        await File.AppendAllTextAsync(filePath, "}\r\n" + 
+        await File.AppendAllTextAsync(filePath, "}\r\n" +
                                                 "\r\n" +
                                                 "map $ip_geoblock:$ipcheck $geoblock {\r\n" +
                                                 "default $default_geoblock;\r\n" +
@@ -55,7 +59,7 @@ public class BlockIpToS3
         }
         var putRequest = new PutObjectRequest
         {
-            BucketName = "ailab-config",
+            BucketName = _bucketName,
             ContentType = "text/plain",
             InputStream = destination,
             Key = _fileName

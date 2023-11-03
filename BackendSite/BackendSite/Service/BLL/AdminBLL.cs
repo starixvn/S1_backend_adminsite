@@ -1,10 +1,12 @@
-﻿using BackendSite.Service.DAL;
+﻿using System.Security.Claims;
+
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
-using System.Security.Claims;
 
 namespace BackendSite.Service.BLL
 {
@@ -43,27 +45,6 @@ namespace BackendSite.Service.BLL
             return adminUserService.GetUser(userId);
         }
 
-        public ErrorCodeEnum ChangePwd(ChangePwd changePwd)
-        {
-            string Md5Userpwd = null;
-            var serverInfo = serverInfoService.GetModel();
-            var userId = 0;
-            int.TryParse(httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out userId);
-            changePwd.OldPwd = tools.MD5Encrypt(changePwd.OldPwd);
-            changePwd.NewPwd = tools.MD5Encrypt(changePwd.NewPwd);
-
-            if (adminService.ChangePwd(serverInfo.SiteId, userId, changePwd, out Md5Userpwd))
-            {
-                return ErrorCodeEnum.Success;
-            }
-            else
-            {
-                if (Md5Userpwd != changePwd.OldPwd)
-                    return ErrorCodeEnum.OldpwdNotMatch;
-                else
-                    return ErrorCodeEnum.Fail;
-            }
-        }
         public SpecialPasswordManagement GetSpecialPasswordData(int sitId)
         {
             return adminService.GetSpecialPasswordData(sitId);

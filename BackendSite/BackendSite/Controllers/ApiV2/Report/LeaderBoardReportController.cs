@@ -1,8 +1,10 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,22 +17,46 @@ namespace BackendSite.Controllers.ApiV2.Report
     {
         private readonly LeaderBoardBLL _leaderBoardBll;
         private readonly ExcelBLL _excelBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         public LeaderBoardReportController(IServiceProvider provider)
         {
             _leaderBoardBll = provider.GetRequiredService<LeaderBoardBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
         public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
             var apiResult = new ApiListResult<GetLeaderboardReportResponse>();
-
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             try
             {
                 var data = _leaderBoardBll.GetLeaderboardReport(request);
+                apiResult.Data = data;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
+        public ApiListResult<LeaderboardReportResponse> GetLeaderboardReportBySiteIds(GetLeaderboardReportRequest request)
+        {
+            var apiResult = new ApiListResult<LeaderboardReportResponse>();
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            try
+            {
+                var data = _leaderBoardBll.GetLeaderboardReportBySiteIds(request);
                 apiResult.Data = data;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -48,10 +74,10 @@ namespace BackendSite.Controllers.ApiV2.Report
         public IActionResult GetLeaderboardReportExport(GetLeaderboardReportRequest request)
         {
             var data = _leaderBoardBll.GetLeaderboardReport(request);
-            
+
             var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "LeaderboardReport");
         }
-        
+
     }
 }

@@ -1,9 +1,13 @@
-﻿using Dapper;
-using MySql.Data.MySqlClient;
-using Serilog.Context;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
+
 using BackendSite.Service.Model.enums;
+
+using Dapper;
+
+using MySql.Data.MySqlClient;
+
+using Serilog.Context;
 
 namespace BackendSite.Service.Library
 {
@@ -26,7 +30,7 @@ namespace BackendSite.Service.Library
         }
 
         #region Query
-        
+
         public async Task<T> QueryFirstAsync<T>(string name, object parameters)
         {
             T result;
@@ -38,7 +42,7 @@ namespace BackendSite.Service.Library
                 var command = new CommandDefinition(name, parameters, // 使用 CommandDefinition 不讓 Dapper 用預設值建立
                     commandType: CommandType.StoredProcedure,
                     flags: CommandFlags.Buffered);
-                
+
                 result = await connection.QueryFirstOrDefaultAsync<T>(command);
                 await connection.CloseAsync();
                 await connection.DisposeAsync();
@@ -101,7 +105,7 @@ namespace BackendSite.Service.Library
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: commandTimeout,
                     flags: CommandFlags.Buffered);
-                
+
                 result = connection.QueryFirstOrDefault<T>(command);
                 connection.Close();
                 connection.Dispose();
@@ -116,7 +120,7 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         public T QueryFirst<T>(string name, IDbTransaction transaction, object parameters, int? commandTimeout = null)
         {
             T result;
@@ -135,12 +139,12 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
-         public IEnumerable<T> Query<T>(string name)
+
+        public IEnumerable<T> Query<T>(string name)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
-            
+
             try
             {
                 using var connection = new MySqlConnection(_connectionString);
@@ -161,7 +165,7 @@ namespace BackendSite.Service.Library
             _logger.LogDebug(name);
             return result.ToList();
         }
-        
+
         public IEnumerable<T> Query<T>(string sql, object parameters, CommandType commandType = CommandType.StoredProcedure)
         {
             IEnumerable<T> result;
@@ -199,7 +203,7 @@ namespace BackendSite.Service.Library
                 var command = new CommandDefinition(name, parameters, // 使用 CommandDefinition 不讓 Dapper 用預設值建立
                     commandType: CommandType.StoredProcedure,
                     flags: CommandFlags.Buffered);
-                
+
                 var multiple = connection.QueryMultiple(command);
                 result = func.Invoke(multiple);
                 connection.Close();
@@ -215,7 +219,7 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         public T QuerySingle<T>(string name, object parameters, CommandType commandType = CommandType.StoredProcedure)
         {
             T result;
@@ -246,7 +250,7 @@ namespace BackendSite.Service.Library
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
-            
+
             try
             {
                 await using var connection = new MySqlConnection(_connectionString);
@@ -279,7 +283,7 @@ namespace BackendSite.Service.Library
                 var command = new CommandDefinition(name, parameters, // 使用 CommandDefinition 不讓 Dapper 用預設值建立
                     commandType: CommandType.StoredProcedure,
                     flags: CommandFlags.Buffered);
-                
+
                 var multiple = connection.QueryMultipleAsync(command);
                 result = func.Invoke(await multiple);
                 await connection.CloseAsync();
@@ -299,11 +303,11 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         #endregion
-        
+
         #region Execute
-        
+
         public int Execute(string name, object parameters, int? commandTimeout = null)
         {
             var result = 0;
@@ -326,7 +330,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public int Execute(string name, IDbTransaction transaction, object parameters = null, int? commandTimeout = null )
+        public int Execute(string name, IDbTransaction transaction, object parameters = null, int? commandTimeout = null)
         {
             var sw = Stopwatch.StartNew();
             int result;
@@ -415,7 +419,7 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         public T ExecuteScalar<T>(string name, object parameters)
         {
             T result;
@@ -437,7 +441,7 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         public T ExecuteScalar<T>(string name, IDbTransaction transaction, object parameters)
         {
             T result;
@@ -476,7 +480,7 @@ namespace BackendSite.Service.Library
             _logger.LogInformation($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         public async Task<IEnumerable<T>> QueryAsync<T>(string name, SqlMapper.IDynamicParameters parameters)
         {
             IEnumerable<T> result;
@@ -581,9 +585,9 @@ namespace BackendSite.Service.Library
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         #endregion
-        
+
         public void CommitAndDisposeConnection(MySqlConnection conn, IDbTransaction trans)
         {
             trans.Commit();
@@ -591,7 +595,7 @@ namespace BackendSite.Service.Library
             conn.Close();
             conn.Dispose();
         }
-        
+
         public void RollbackAndDisposeConnection(MySqlConnection conn, IDbTransaction trans)
         {
             trans.Rollback();
@@ -607,7 +611,7 @@ namespace BackendSite.Service.Library
             await conn.CloseAsync();
             await conn.DisposeAsync();
         }
-        
+
         public async Task RollbackAndDisposeConnectionAsync(MySqlConnection conn, MySqlTransaction trans)
         {
             await trans.RollbackAsync();

@@ -1,8 +1,9 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL

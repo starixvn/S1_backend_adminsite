@@ -11,7 +11,7 @@
         public string Content { get; set; }
         public string ImageURL { get; set; }
         public int? Status { get; set; }
-        public DateTimeOffset? PostTime 
+        public DateTimeOffset? PostTime
         {
             get => _createTime;
             set
@@ -27,7 +27,7 @@
                 if (value != null) _postTime = new DateTimeOffset(value.Value.DateTime, TimeSpan.Zero);
             }
         }
-        public DateTimeOffset? LastUpdateTime 
+        public DateTimeOffset? LastUpdateTime
         {
             get => _lastUpdateTime;
             set
@@ -39,7 +39,7 @@
         public string LastUpdateUser { get; set; }
         public int? Sort { get; set; }
     }
-    public class NewsData 
+    public class NewsData
     {
         public List<News> NewsList { get; set; }
         public int PageNumber { get; set; }

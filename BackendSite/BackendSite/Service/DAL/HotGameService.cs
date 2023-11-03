@@ -1,9 +1,13 @@
 ﻿using System.Data;
+
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Dapper;
+
 using MySql.Data.MySqlClient;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -148,7 +152,7 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_HotGames_Del_V2", p);
         }
 
-        public async Task<int> SortingV2(int id, int sort,int siteId)
+        public async Task<int> SortingV2(int id, int sort, int siteId)
         {
             var p = new DynamicParameters();
             p.Add("_Id", id);

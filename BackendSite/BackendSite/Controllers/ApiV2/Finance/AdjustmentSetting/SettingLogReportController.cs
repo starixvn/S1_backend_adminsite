@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
         }
 
         #endregion
-        
+
         /// <summary>
         /// SettingLogReport/GetList 取得調整資料紀錄
         /// </summary>
@@ -49,14 +50,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.AdjustmentSetting
                     PageNumber = searchResult.PageNumber,
                     TotalPages = searchResult.TotalPages,
                     RowCount = searchResult.RowCount,
-                    ErrorCode = (int) ErrorCodeEnum.Success
+                    ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
             catch (Exception ex)
             {
                 return new ApiListResult<AdminAdjustmentLogReport>
                 {
-                    ErrorCode = (int) ErrorCodeEnum.SystemException,
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
                     Message = ex.Message
                 };
             }

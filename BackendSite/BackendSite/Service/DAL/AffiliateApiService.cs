@@ -2,7 +2,6 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Options;
 
 namespace BackendSite.Service.DAL
 {
@@ -13,9 +12,9 @@ namespace BackendSite.Service.DAL
         private readonly ICacheHelper _cacheHelper;
         private readonly ILogger<AffiliateApiService> _logger;
         private const string TokenKey = "AffAuthToken";
-        public AffiliateApiService(IOptions<AffConfig> affConfig, CourierAdapter courierAdapter, ICacheHelper cacheHelper, ILogger<AffiliateApiService> logger)
+        public AffiliateApiService(AffConfig affConfig, CourierAdapter courierAdapter, ICacheHelper cacheHelper, ILogger<AffiliateApiService> logger)
         {
-            _affConfig = affConfig.Value;
+            _affConfig = affConfig;
             _courierAdapter = courierAdapter;
             _cacheHelper = cacheHelper;
             _logger = logger;
@@ -53,7 +52,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception e)
             {
-                _logger.LogError(e,"aff AffInfo is failed");
+                _logger.LogError(e, "aff AffInfo is failed");
                 return null;
             }
         }
@@ -73,7 +72,7 @@ namespace BackendSite.Service.DAL
             }
             catch (Exception e)
             {
-                _logger.LogError(e,"get auth token failed");
+                _logger.LogError(e, "get auth token failed");
                 return null;
             }
         }

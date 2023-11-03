@@ -1,8 +1,9 @@
+﻿using BackendSite;
+using BackendSite.Extensions;
+using Elastic.Apm.SerilogEnricher;
+
 using Serilog;
 using Serilog.Exceptions;
-using BackendSite.Extensions;
-using BackendSite;
-using Elastic.Apm.SerilogEnricher;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddRemoteJsonConfig(builder.Configuration.GetSection("ConfigService").Get<string[]>());
@@ -24,6 +25,9 @@ builder.Host.UseSerilog((context, Configuration) =>
 
 var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
+
+//GC無法全部回收，改用其他方式重啟服務
+//builder.Services.AddHostedService<GarbageCollectCheckWorker>();
 
 var app = builder.Build();
 startup.Configure(app, builder.Environment);

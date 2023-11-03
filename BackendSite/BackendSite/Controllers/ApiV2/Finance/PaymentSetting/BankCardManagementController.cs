@@ -1,12 +1,11 @@
 ﻿using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Amazon.S3.Model;
-using BackendSite.Service.Library;
-using BackendSite.Extensions;
-using BackendSite.Service.Model.BankCardManagement;
 using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
@@ -45,10 +44,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
-            
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _folder = configuration.GetValue<string>("AwsLocalPaymentFolder");
-            _bucketName = configuration.GetValue<string>("AwsPaymentBucketName");
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _bucketName = configBll.GetConfigValue("AwsPaymentBucketName");
+            _folder = configBll.GetConfigValue("AwsLocalPaymentFolderName");
             _logger = provider.GetRequiredService<ILogger<BankCardManagementController>>();
         }
 
@@ -60,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             public IFormFile File { get; set; }
         }
-        
+
         public class GetQrCodeUrlResult
         {
             public string QrCodeUrl { get; set; }
@@ -89,7 +88,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             {
                 var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
                     new GetOfflineBankingSettingParams(request));
-                
+
                 return new ApiListResult<OfflineBankingSetting>
                 {
                     Data = datas,
@@ -111,7 +110,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                     ErrorCode = (int)ErrorCodeEnum.Fail
                 };
             }
-            
+
         }
 
         /// <summary>
@@ -137,7 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             if (success)
             {
                 _ = await _redisHelper.KeyDeleteByPatternAsync("PaySetting:*", RedisDataBase.Member);
-                
+
                 var vip = await _vipLevelBll.GetVipLevelSettingAsync(request.SiteId);
                 var localPaySettings = await _bankDetailBll.GetLocalPaySettingAsync();
                 var payGroups = await _paymentManageBll.GetPayGroupWithCache();
@@ -195,12 +194,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
                     Operator = updater
                 });
             }
-            
+
             return success
                 ? new ApiResult((int)ErrorCodeEnum.Success, _selLangBll.GetMsg("msg_Updatesuccessful"))
                 : new ApiResult((int)ErrorCodeEnum.UpdateFailed, _selLangBll.GetMsg("msg_UpdateFailed"));
         }
-        
+
         [HttpPost]
         public async Task<ApiResult<GetQrCodeUrlResult>> GetQrCodeUrl([FromForm] GetQrCodeUrlRequest request)
         {
@@ -225,7 +224,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
 
             return success ? path : string.Empty;
         }
-        
+
         #endregion
 
     }

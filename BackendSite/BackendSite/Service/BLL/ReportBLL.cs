@@ -4,15 +4,19 @@ using BackendSite.Service.DAL;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using BackendSite.Service.Model.Mpa.WinLoss;
 using BackendSite.Service.Model.GameStatisticalReport;
+using BackendSite.Service.Model.Mpa.WinLoss;
 using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Report;
+
 using Newtonsoft.Json;
+
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-
+using BackendSite.Service.Model.ApiModel;
+using Namotion.Reflection;
 
 namespace BackendSite.Service.BLL
 {
@@ -27,6 +31,7 @@ namespace BackendSite.Service.BLL
         private readonly IMpaCommonService _mpaCommonService;
         private readonly ICacheHelper _redisHelper;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly IMpaCommonService _mapMpaCommonService;
 
         #endregion
 
@@ -41,6 +46,7 @@ namespace BackendSite.Service.BLL
             _mpaCommonService = provider.GetRequiredService<IMpaCommonService>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _mapMpaCommonService = provider.GetRequiredService<IMpaCommonService>();
         }
 
         #endregion
@@ -985,14 +991,14 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<RewardBonusReportModel> GetRewardBonusReportExport(GetListInput input)
             => reportService.GetRewardBonusReportExport(input);
-        
+
         private decimal GetBaseCurrencyTotalAmount(IList<MpaRateDto> rateList,
             IEnumerable<IPaymentReportDetail> source,
             int baseCurrencyId)
         {
             var result = source.Sum(x =>
             {
-                var rate = _mpaCommonService.MapperExchangeRate(rateList, x.FlowEndTime.UtcDateTime, (int) x.CurrencyId,
+                var rate = _mpaCommonService.MapperExchangeRate(rateList, x.FlowEndTime.UtcDateTime, (int)x.CurrencyId,
                     baseCurrencyId);
                 var amount = x.Amount * rate;
 
@@ -1015,17 +1021,19 @@ namespace BackendSite.Service.BLL
             {
                 return now;
             }
-            
+
             // 該月最後一天
             var lastDate = new DateTime(endTime.Year, endTime.Month, DateTime.DaysInMonth(endTime.Year, endTime.Month));
-            
+
             return new DateTimeOffset(lastDate, TimeSpan.Zero);
         }
-        
+
         public async Task<IEnumerable<DepositPaymentReportSummary>> GetDepositPaymentReportAsync(
             GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
         {
-            var detailList = reportService.GetPaymentReportDepositDetail(input)
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)input).ConvertToMultiSiteParam(userServerInfo);
+            var detailList = reportService.GetPaymentReportDepositDetail(input, JsonConvert.SerializeObject(multiSiteRequest))
                 .ToList();
 
             if (groupBy is PaymentReportGroupByEnum.Date or PaymentReportGroupByEnum.Month)
@@ -1036,7 +1044,7 @@ namespace BackendSite.Service.BLL
                     x.FlowEndTime = x.FlowEndTime.ToOffset(offset);
                 });
             }
-            
+
             var rateList = (await _mpaCommonService.GetMpaExchangeRate(input.StartTime, GetEndDateForExchangeRate(input.EndTime))).ToList();
             var gData = detailList.GroupBy(x =>
             {
@@ -1056,7 +1064,7 @@ namespace BackendSite.Service.BLL
             {
                 var count = g.Count();
                 var details = g
-                    .GroupBy(x => x.CurrencyId)
+                    .GroupBy(x => new { x.CurrencyId, x.SiteName })
                     .Select(gg =>
                     {
                         var gCount = gg.Count();
@@ -1064,7 +1072,8 @@ namespace BackendSite.Service.BLL
 
                         return new DepositPaymentReportDetail
                         {
-                            Key = gg.Key.ToString(),
+                            Key = gg.Key.CurrencyId.ToString(),
+                            SiteName = gg.Key.SiteName,
                             TotalDepositCount = gCount,
                             AverageDepositAmount = decimal.Round(gTotalDepositAmount / gCount, 4),
                             FirstDepositCount = gg.Count(x => x.FirstDeposit),
@@ -1092,16 +1101,18 @@ namespace BackendSite.Service.BLL
                             .ToString(@"d\.hh\:mm\:ss")
                 };
             });
-                
+
             return result;
         }
-        
+
         public async Task<IEnumerable<WithdrawalPaymentReportSummary>> GetWithdrawalPaymentReportAsync(
             GetPaymentReportParams input, TimeSpan offset, PaymentReportGroupByEnum groupBy)
         {
-            var detailList = reportService.GetPaymentReportWithdrawalDetail(input)
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            var multiSiteRequest = ((IApiRequest)input).ConvertToMultiSiteParam(userServerInfo);
+            var detailList = reportService.GetPaymentReportWithdrawalDetail(input, JsonConvert.SerializeObject(multiSiteRequest))
                 .ToList();
-            
+
             if (groupBy is PaymentReportGroupByEnum.Date or PaymentReportGroupByEnum.Month)
             {
                 detailList.ForEach(x =>
@@ -1110,7 +1121,7 @@ namespace BackendSite.Service.BLL
                     x.FlowEndTime = x.FlowEndTime.ToOffset(offset);
                 });
             }
-            
+
             var rateList = (await _mpaCommonService.GetMpaExchangeRate(input.StartTime, input.EndTime)).ToList();
             var gData = detailList.GroupBy(x =>
             {
@@ -1125,12 +1136,12 @@ namespace BackendSite.Service.BLL
                         $"Group by {groupBy.ToString()} not support")
                 };
             });
-            
+
             var result = gData.Select(g =>
             {
                 var count = g.Count();
                 var details = g
-                    .GroupBy(x => x.CurrencyId)
+                    .GroupBy(x => new { x.CurrencyId, x.SiteName })
                     .Select(gg =>
                     {
                         var gCount = gg.Count();
@@ -1138,7 +1149,8 @@ namespace BackendSite.Service.BLL
 
                         return new WithdrawalPaymentReportDetail
                         {
-                            Key = gg.Key.ToString(),
+                            Key = gg.Key.CurrencyId.ToString(),
+                            SiteName = gg.Key.SiteName,
                             TotalWithdrawalCount = gCount,
                             AverageWithdrawalAmount = decimal.Round(gTotalDepositAmount / gCount, 4),
                             TotalWithdrawalAmount = decimal.Round(gTotalDepositAmount, 4),
@@ -1164,35 +1176,35 @@ namespace BackendSite.Service.BLL
                             .ToString(@"d\.hh\:mm\:ss")
                 };
             });
-                
+
             return result;
         }
 
         public static byte[] ExportPaymentReport<TSummary, TDetail>(IEnumerable<TSummary> data)
-            where TSummary: class, IPaymentReportSummary<TDetail>
-            where TDetail: class
+            where TSummary : class, IPaymentReportSummary<TDetail>
+            where TDetail : class
         {
             if (!data.Any())
             {
                 throw new AdminException(ErrorCodeEnum.NoData);
             }
-            
+
             var workbook = new XSSFWorkbook();
             var sheet = workbook.CreateSheet("Report");
 
             sheet.CreateHeaders<TDetail>(freeze: true, index: 1);
-            
+
             var gCellStyle = workbook.CreateCellStyle();
             gCellStyle.BorderBottom = BorderStyle.Medium;
             gCellStyle.FillForegroundColor = IndexedColors.LightCornflowerBlue.Index;
             gCellStyle.FillPattern = FillPattern.SolidForeground;
-            
+
             var subCellStyle = workbook.CreateCellStyle();
             subCellStyle.BorderBottom = BorderStyle.Thin;
             subCellStyle.FillForegroundColor = IndexedColors.LightTurquoise.Index;
             subCellStyle.FillPattern = FillPattern.SolidForeground;
 
-            var skipSProps = new[] {"Children"};
+            var skipSProps = new[] { "Children" };
             var dProps = typeof(TDetail).GetProperties();
             var sProps = typeof(TSummary).GetProperties()
                 .Where(x => !skipSProps.Contains(x.Name));
@@ -1200,7 +1212,7 @@ namespace BackendSite.Service.BLL
             foreach (var gData in data)
             {
                 var groupRow = sheet.CreateRow(index);
-                
+
                 var idx = 0;
                 foreach (var prop in sProps)
                 {
@@ -1208,42 +1220,42 @@ namespace BackendSite.Service.BLL
                     var val = typeof(TSummary).GetProperty(prop.Name)?.GetValue(gData);
                     groupRow.CreateCell(idx).SetCellValue(val?.ToString());
                     groupCell.CellStyle = gCellStyle;
-                    
+
                     idx++;
                 }
-                
+
                 index++;
 
                 var children = typeof(TSummary).GetProperty("Children")?.GetValue(gData) as IEnumerable<TDetail>;
                 foreach (var detail in children)
                 {
                     var row = sheet.CreateRow(index);
-                    
+
                     var i = 0;
                     foreach (var prop in dProps)
                     {
                         var subGroupCell = row.CreateCell(i);
                         var val = typeof(TDetail).GetProperty(prop.Name)?.GetValue(detail);
                         row.CreateCell(i).SetCellValue(val?.ToString());
-                   
+
                         if (i == 0)
                             subGroupCell.CellStyle = subCellStyle;
-                        
+
                         i++;
                     }
                     index++;
                 }
             }
-            
+
             sheet.AutoSizeColumn(0);
 
             using var memoryStream = new MemoryStream();
             workbook.Write(memoryStream);
             var result = memoryStream.ToArray();
-            
+
             return result;
         }
-        
+
         #region Game Statistical Report
 
         public IEnumerable<GameStatisticalByCurrencyDto> GetGameStatisticalReport(GetListInputModel getListInput)
@@ -1262,7 +1274,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         private IEnumerable<GameStatisticalDao> GetGameStatisticalSource(GetListInputModel getListInput)
             => reportService.GetGameStatisticalReport(getListInput);
 
@@ -1301,6 +1313,129 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        #endregion
+
+        #region Confiscated Summary Report
+
+        public IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReportList(
+            GetConfiscatedSummaryReportRequest request,
+            int pageNumber,
+            out IPageInfo pageInfo)
+        {
+            var dataList = GetConfiscatedSummaryReport(request, pageNumber , out pageInfo).ToList();
+            
+            if (request.TimeZone is not null)
+            {
+                TimeSpan.TryParseExact(request.TimeZone, @"\+hh\:mm", null, out var offset);
+                foreach (var data in dataList)
+                {
+                    data.RegistrationDate += offset;
+                    data.SuspendDate += offset;
+                }
+            }
+            return dataList;
+        }
+        
+        private IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReport(
+            GetConfiscatedSummaryReportRequest request,
+            int pageNumber,
+            out IPageInfo pageInfo)
+        {
+            pageInfo = new PageInfo();
+            var key = $"ConfiscatedSummaryReport:{JsonConvert.SerializeObject(request.SiteIds)}:" +
+                      $"{JsonConvert.SerializeObject(request.CurrencyIds)}:" +
+                      $"{request.StartDate?.DateTime:yyyyMMddHHmmssfff}:" +
+                      $"{request.EndDate?.DateTime:yyyyMMddHHmmssfff}:" +
+                      $"{request.UserName}:" +
+                      $"{request.BaseCurrencyId}";
+            
+            var cacheTime = TimeSpan.FromMinutes(2);
+            if (_redisHelper.KeyExists(key))
+            {
+                //Export
+                if (pageNumber == -1)
+                {
+                    return _redisHelper.GetListByRange<ConfiscatedSummaryReportDetail>(key, 0, pageNumber);
+                }
+
+                //Redis Pagination
+                var total = (int) _redisHelper.GetListLength(key);
+                var (startIndex, endIndex) = pageInfo.RedisPagination(total, pageNumber, request.PageSize);
+                return _redisHelper.GetListByRange<ConfiscatedSummaryReportDetail>(key, startIndex, endIndex);
+            }
+            
+            //Search range table
+            var data = GetConfiscatedSummaryReportDetail(request).ToList();
+            
+            AddCache(data, key, cacheTime);
+
+            //Export
+            if (pageNumber == -1 || data.Count == 0)
+            {
+                return data;
+            }
+
+            var (index, count) = pageInfo.ListPagination(data.Count, pageNumber, request.PageSize);
+            return data.GetRange(index, count);
+        }
+        
+        public ConfiscatedSummary GetConfiscatedSummary(GetConfiscatedSummaryReportSummaryRequest request)
+        {
+            var getRequest = new GetConfiscatedSummaryReportRequest
+            {
+                SiteIds = request.SiteIds,
+                CurrencyIds = request.CurrencyIds,
+                BaseCurrencyId = request.BaseCurrencyId,
+                UserName = request.UserName
+            };
+            var data = GetConfiscatedSummaryReport(getRequest, -1 , out _ ).ToList();
+
+            var result = new ConfiscatedSummary();
+            if (data.Any())
+            {
+                result = new ConfiscatedSummary
+                {
+                    TotalUser = data.Count,
+                    TotalSeamlessWallet = data.Sum(x=>x.SeamlessWallet),
+                    TotalDeposit = data.Sum(x=>x.TotalDeposit),
+                    TotalWithdrawal = data.Sum(x=>x.TotalWithdrawal),
+                    TotalNetDeposit = data.Sum(x=>x.NetDeposit),
+                    TotalNetConfiscatedCash = data.Sum(x=>x.NetConfiscatedCash)
+                };
+            }
+            
+            return result;
+        }
+        
+        private IEnumerable<ConfiscatedSummaryReportDetail> GetConfiscatedSummaryReportDetail(GetConfiscatedSummaryReportRequest request)
+        {
+            var dataList = reportService.GetConfiscatedSummaryReport(request).ToList();
+
+            //抓3天內 避免MPA匯率未更新
+            var rateStartTime = DateTime.UtcNow.AddDays(-3);
+            var rateEndTime = DateTime.UtcNow;
+            var rateList = _mapMpaCommonService.GetMpaExchangeRate(rateStartTime, rateEndTime).Result.ToList();
+            
+            foreach (var data in dataList)
+            {
+                var rate = rateList.Where(x=>x.CurrencyId == data.CurrencyId && x.TargetCurrencyId == request.BaseCurrencyId)
+                    .MaxBy(item => item.RateDate).Rate;
+                data.TotalDeposit *= rate;
+                data.TotalWithdrawal *= rate;
+                data.SeamlessWallet *= rate;
+            }
+            
+            return dataList;
+        }
+        
+        private void AddCache(IEnumerable<object> list, string masterKey, TimeSpan cacheTime)
+        {
+            _ = Task.Run(() =>
+            {
+                _redisHelper.InsertList(masterKey, cacheTime, list);
+            });
+        }
+        
         #endregion
     }
 }

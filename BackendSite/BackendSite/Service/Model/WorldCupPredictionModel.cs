@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.ApiModel;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
@@ -171,7 +172,7 @@ namespace BackendSite.Service.Model
         public string TeamName { get; set; }
         public string SelectTime { get; set; }
     }
-    
+
     public class WorldCupMemberReportDto
     {
         public string Currency { get; set; }
@@ -180,7 +181,7 @@ namespace BackendSite.Service.Model
         public string TeamName { get; set; }
         public DateTime? SelectTime { get; set; }
     }
-    
+
     public class ExportWorldCupMemberReportRequest
     {
         [JsonProperty("siteId")]
@@ -197,12 +198,12 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         [JsonProperty("startTime")]
         public DateTimeOffset StartTime { get; set; }
-        [JsonProperty("endTime")] 
+        [JsonProperty("endTime")]
         public DateTimeOffset EndTime { get; set; }
-        [JsonProperty("timezone")] 
+        [JsonProperty("timezone")]
         public int Timezone { get; set; }
     }
-    
+
     public class ExportWorldCupMemberReportResponse
     {
         public string Currency { get; set; }
@@ -211,7 +212,7 @@ namespace BackendSite.Service.Model
         public string TeamName { get; set; }
         public DateTimeOffset? SelectTime { get; set; }
     }
-    
+
     public class WorldCupPredictiveStatisticsDto
     {
         public int TeamId { get; set; }

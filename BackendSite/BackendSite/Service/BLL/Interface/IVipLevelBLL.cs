@@ -1,6 +1,4 @@
 ﻿using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
-using static BackendSite.Controllers.ApiV2.Member.Setting.VipLevelController;
 
 namespace BackendSite.Service.BLL.Interface
 {

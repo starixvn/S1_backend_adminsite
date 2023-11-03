@@ -4,6 +4,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -31,12 +32,12 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PayChannelInfo> GetPayChannel(int siteId)
         {
-            var list =_paymentManageService.GetPaySetting(siteId);
+            var list = _paymentManageService.GetPaySetting(siteId);
 
             return list.Select(x => new PayChannelInfo(x))
                 .Distinct(new PayChannelInfoComparer());
         }
-        
+
         public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
         {
             return _paymentManageService.UpdatePayList(input);
@@ -64,14 +65,19 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
         {
-            return _paymentManageService.GetBankSysInfoList(PayId).OrderBy(x=>x.CurrencyId);
+            return _paymentManageService.GetBankSysInfoList(PayId).OrderBy(x => x.CurrencyId);
         }
 
         public IEnumerable<PayListInfo> GetPayList(int siteId)
         {
-            return _paymentManageService.GetPayList(siteId);
+            IEnumerable<int> _siteIds = Enumerable.Repeat(siteId, 1);
+            return _paymentManageService.GetPayList(_siteIds);
         }
-        
+        public IEnumerable<PayListInfo> GetPayListByMultiSite(IEnumerable<int> siteIds)
+        {
+            return _paymentManageService.GetPayList(siteIds);
+        }
+
         public bool SetPayListStatus(int siteId, int payId, PayListStatusEnum status, string @operator)
         {
             var result = _paymentManageService.SetPayListStatus(siteId, payId, status, @operator);
@@ -80,15 +86,15 @@ namespace BackendSite.Service.BLL
             {
                 ClearRedisPaySettingCache("PaymentSetting:*", RedisDataBase.Payment);
             }
-            
+
             return result;
         }
-        
+
         public bool SetPayListLoginInfo(SetPayListLoginInfoParams input)
         {
             return _paymentManageService.SetPayListLoginInfo(input);
         }
-        
+
         public IEnumerable<PaySetting> GetPaySettingList(GetPaySettingListParams input,
             int pageNumber, int pageSize, out IPageInfo pageInfo)
         {
@@ -100,7 +106,7 @@ namespace BackendSite.Service.BLL
 
             return result;
         }
-        
+
         public IEnumerable<PaySetting> GetPaySetting(int siteId, int? channelId = null)
         {
             return _paymentManageService.GetPaySetting(siteId, channelId);
@@ -130,10 +136,10 @@ namespace BackendSite.Service.BLL
                 ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
                 ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Payment);
             }
-            
+
             return result;
         }
-        
+
         public bool UpdatePaySettingChargeFee(UpdatePaySettingChargeFeeParams input, string @operator)
         {
             var result = _paymentManageService.UpdatePaySettingChargeFee(input, @operator);
@@ -144,10 +150,10 @@ namespace BackendSite.Service.BLL
                 ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
                 ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Payment);
             }
-            
+
             return result;
         }
-        
+
         public IEnumerable<BankInfoPayForSetting> GetBankInfoPayForSetting(int siteId, int currencyId, int channelId)
         {
             return _paymentManageService.GetBankInfoPayForSetting(siteId, currencyId, channelId);
@@ -160,23 +166,23 @@ namespace BackendSite.Service.BLL
         {
             _paymentManageService.UpdateBankInfo(PayId, SysId, Status, Operator);
         }
-        
+
         public bool UpdateBankInfo(int siteId, int payId, int sysId,
-            BankInfoPayStatusEnum status, BankInfoPayMethodEnum method, string  @operator)
+            BankInfoPayStatusEnum status, BankInfoPayMethodEnum method, string @operator)
         {
-            var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status, method,  @operator);
+            var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status, method, @operator);
 
             if (result)
             {
                 ClearRedisPaySettingCache("PaySetting:OnlineBanking:*", RedisDataBase.Shared);
             }
-            
+
             return result;
         }
-        
+
         public IEnumerable<CryptoInfo> GetCryptoInfoList(int siteId)
             => _paymentManageService.GetCryptoInfoList(siteId);
-        
+
         public bool SetCryptoInfoStatus(int siteId, CryptoCurrencyEnum currencyId, string network, GeneralStatusEnum status, string @operator)
         {
             var result = _paymentManageService.SetCryptoStatus(siteId, currencyId, network, status, @operator);
@@ -185,7 +191,7 @@ namespace BackendSite.Service.BLL
             {
                 _ = _redisHelper.KeyDeleteByPattern($"PaySetting:SupportCrypto:{siteId}", RedisDataBase.Member);
             }
-            
+
             return result;
         }
 
@@ -194,12 +200,27 @@ namespace BackendSite.Service.BLL
             _ = Task.Run(() => _redisHelper.KeyDeleteByPattern(pattern, db))
                 .ConfigureAwait(false);
         }
-        
+
         public async Task<IEnumerable<PayGroup>> GetPayGroupWithCache()
         {
             var dbData = await _redisHelper.TryGetOrCreateAsync("PayGroupInfoList", TimeSpan.FromMinutes(5),
                 () => _paymentManageService.GetPayGroup(), RedisDataBase.Shared);
             return dbData;
+        }
+        
+        public IEnumerable<WithdrawalBlockSetting> GetWithdrawalBlockSettingList(int siteId)
+            => _paymentManageService.GetWithdrawalBlockSettingList(siteId);
+        
+        public bool SetWithdrawalBlockSetting(SetWithdrawalBlockSettingParams input)
+        {
+            var result = _paymentManageService.SetWithdrawalBlockSetting(input);
+
+            if (result)
+            {
+                _ = _redisHelper.KeyDelete($"PaySetting:WithdrawalBlock:{input.SiteId}", RedisDataBase.Member);
+            }
+            
+            return result;
         }
     }
 }
