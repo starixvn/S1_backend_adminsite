@@ -1,21 +1,18 @@
 ﻿using System.Data;
-
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BatchMessageSendLog;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Dapper;
-
 using MySql.Data.MySqlClient;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
     public class MessageService
     {
-        private readonly IConfiguration _configuration;
         private readonly string _commonServiceUrl;
         private readonly CourierAdapter _courierAdapter;
         private readonly ILogger<MessageService> _logger;
@@ -26,8 +23,8 @@ namespace BackendSite.Service.DAL
 
         public MessageService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
-            _commonServiceUrl = _configuration.GetValue<string>("CommonService");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _commonServiceUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").CommonService;
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _logger = provider.GetRequiredService<ILogger<MessageService>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);

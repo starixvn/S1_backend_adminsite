@@ -366,6 +366,23 @@ namespace BackendSite.Service.Model.enums
         QrPayPayment = 6,
         BankAutoChannel = 7
     }
+    
+    public enum DepositChannelTypeEnum
+    {
+        OnlineBanking = 1,
+        MobilePayment = 2,
+        CryptoPayment = 4,
+        LoadCardPayment = 5,
+        QrPayPayment = 6,
+        BankAutoChannel = 7
+    }
+    
+    public enum WithdrawalChannelTypeEnum
+    {
+        OnlineBanking = 1,
+        EWalletPayment = 3,
+        CryptoPayment = 4
+    }
 
     public enum PayChannelStatusEnum
     {
@@ -421,10 +438,18 @@ namespace BackendSite.Service.Model.enums
     public enum WithdrawalTypeEnum
     {
         Undefined = 0,
-        OnlinePayment = 1,
+        OnlineBanking = 1,
         LocalBank = 2,
+        EWalletPayment = 3,
         CryptoPay = 4,
         CryptoWallet = 5 // Local
+    }
+    
+    public enum WithdrawalBlockTypeEnum
+    {
+        BankCard = 1,
+        EWallet = 3,
+        Crypto = 4
     }
 
     public enum WithdrawalStatusEnum
@@ -909,7 +934,9 @@ namespace BackendSite.Service.Model.enums
         VipUpgradeSetting = 90,
         AutoWithdrawalRule = 91,
         AutoPaymentRule = 92,
-        DepositReferral = 93
+        DepositReferral = 93,
+        EditSystemBankInfo = 94,
+        WithdrawalBlockSetting = 95
     }
 
     #region BankFinancialTransferInfoLog
@@ -1535,8 +1562,10 @@ namespace BackendSite.Service.Model.enums
         BWING = 3,
         [Description("Soon88")]
         SOON88 = 4,
-        [Description("ivorysport")]
-        IVORYSPORT = 5
+        [Description("Ivorysport")]
+        IVORYSPORT = 5,
+        [Description("Leobet")]
+        LEOBET = 6
     }
 
     public enum AffSiteEnum
@@ -1692,6 +1721,7 @@ namespace BackendSite.Service.Model.enums
         BuyFeaturesGames = 4,
         Megaways = 5,
         Mini = 6,
+        Arcade = 7,
     }
 
     public enum SlotGameFilterStatusEnum
@@ -1802,7 +1832,8 @@ namespace BackendSite.Service.Model.enums
     public enum MpaGGRCustomizationGameTypeEnum
     {
         OneGamingPoker = 41,
-        V8Poker = 42
+        V8Poker = 42,
+        NineW = 51
     }
 
     /// <summary>

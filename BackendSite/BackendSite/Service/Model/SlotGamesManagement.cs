@@ -119,6 +119,7 @@ namespace BackendSite.Service.Model
         /// BuyFeaturesGames = 4,
         /// Megaways = 5,
         /// Mini = 6,
+        /// Arcade = 7,
         /// </summary>
         public SlotGameCategoryEnum Category { get; set; }
         public GetSlotGameCategoryListReq()

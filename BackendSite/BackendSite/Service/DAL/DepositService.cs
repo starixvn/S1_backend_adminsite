@@ -140,9 +140,9 @@ namespace BackendSite.Service.DAL
             return depositList;
         }
 
-        public DepositRequest GetDepositRequest(int depositId, int siteId)
+        public DepositRequest GetDepositRequest(int depositId)
         {
-            return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V4", new DynamicParameters(new { DepositId = depositId/*, SiteId = siteId*/ }));
+            return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V4", new DynamicParameters(new { DepositId = depositId }));
         }
 
         public IEnumerable<DepositComments> GetDepositRequestComment(int depositId, int siteId)
@@ -353,7 +353,7 @@ namespace BackendSite.Service.DAL
             var result = 0;
             try
             {
-                var beforeDepositData = GetDepositRequest(depositId, siteId);
+                var beforeDepositData = GetDepositRequest(depositId);
 
                 using var conn = _mainDbClient.GetMySqlConnection();
                 conn.Open();
@@ -413,20 +413,6 @@ namespace BackendSite.Service.DAL
                         if (is1stDepoist == 1 && result > 0)
                         {
                             result = SetDepositInfoFirstDeposit(depositId, siteId, trans);
-                        }
-
-                        if (result > 0)
-                        {
-                            if (depositRequest.DepositType == DepositTypeEnum.LocalBanking)
-                            {
-                                var depositInfo3 = (DepositInfo3_1)depositRequest.oDepositInfo;
-                                result = walletService.SetBankOffDummy(depositRequest.SiteId, depositInfo3.SysId, depositInfo3.AccountNo, depositInfo3.CurrencyId, actualDeposit, trans);
-                            }
-                            else if (depositRequest.oDepositInfo is IPay)
-                            {
-                                var pay = (IPay)depositRequest.oDepositInfo;
-                                result = walletService.SetPayDummy(depositRequest.SiteId, pay.PayId, pay.CurrencyId, actualDeposit, trans);
-                            }
                         }
 
                         if (result > 0 && !string.IsNullOrEmpty(depositInfo))

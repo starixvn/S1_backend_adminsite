@@ -87,29 +87,6 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.QueryAsync<LocalPaySetting>("Admin_LocalPaySetting_Get");
         }
 
-        public IEnumerable<BankDetail> GetLoaclBankList(string siteIds,
-            string currencyIdList,
-            string statusList,
-            int startIndex, int pageSize,
-            out int totalPages, out int rowCount)
-        {
-            var props = new DynamicParameters();
-            props.Add("_SiteId", siteIds);
-            props.Add("_CurrencyId", currencyIdList);
-            props.Add("_Status", statusList);
-            props.Add("_StartIndex", startIndex);
-            props.Add("_PageSize", pageSize);
-            props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var result = _reportDbClient.Query<BankDetail>("LoaclBankList_Get_V2", props);
-
-            totalPages = props.Get<int?>("_TotalPages") ?? 0;
-            rowCount = props.Get<int?>("_RowCount") ?? 0;
-
-            return result;
-        }
-
         public int SetBankCard(ParamsWithLog<SetBankCard> input)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -241,9 +218,62 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<BankInfoSys> GetSysBankList()
+        public IEnumerable<BankInfoSys> GetBankSysInfoList()
+            => _reportDbClient.Query<BankInfoSys>("Admin_BankInfoSys_GetAll");
+
+        public bool SetBankSysInfo(SetBankInfoSysModel input, BankInfoSys before, string @operator)
         {
-            return _reportDbClient.Query<BankInfoSys>("BankInfoSysList_Get", new { SiteId = (int?)null }, commandType: CommandType.StoredProcedure);
+            using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var props = new DynamicParameters();
+            
+            #region props
+            props.Add("_SysId", input.SysId);
+            props.Add("_BankCode", input.BankCode);
+            props.Add("_BankName", input.BankName);
+            props.Add("_Status", input.Status);
+            #endregion
+
+            var result = _mainDbClient.Execute("Admin_BankInfoSys_Set", trans, props);
+            
+            if (result > 0)
+            {
+                #region propsLog
+                props.Add("_SiteId", 0);
+                props.Add("_CurrencyId", before.CurrencyId);
+                props.Add("_Menu", AdminAdjustmentLogMenuEnum.EditSystemBankInfo);
+                props.Add("_ActionType", ActionType.Update);
+                props.Add("_RefTransId", string.Empty);
+                props.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
+                {
+                    before.SysId,
+                    before.BankCode,
+                    before.BankName,
+                    Status = before.Status.ToString()
+                }));
+                props.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
+                {
+                    input.SysId,
+                    input.BankCode,
+                    input.BankName,
+                    Status = input.Status.ToString()
+                }));
+                props.Add("_Operator", @operator);
+                #endregion
+                
+                result = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, props);
+                if (result > 0)
+                {
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
+
+                    return true;
+                }
+            }
+            
+            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            
+            return false;
         }
     }
 }

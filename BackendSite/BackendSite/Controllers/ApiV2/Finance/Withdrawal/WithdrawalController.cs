@@ -7,12 +7,13 @@ using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -78,12 +79,13 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
 
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _payApiUrl = configuration.GetValue<string>("PayService");
-            _awsWithdrawalFolder = configuration.GetValue<string>("AwsWithdrawalFolder");
-            _awsWithdrawalAccountingFolder = configuration.GetValue<string>("AwsWithdrawalAccountingFolder");
-            _awsWithdrawalUrl = configuration.GetValue<string>("AwsWithdrawalUrl");
-            _awsWithdrawalBucketName = configuration.GetValue<string>("AwsWithdrawalBucketName");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
+            _awsWithdrawalBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
+            _awsWithdrawalUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
+            _awsWithdrawalFolder = configBll.GetConfigValue("AWSWithdrawalFolderName");
+            _awsWithdrawalAccountingFolder = configBll.GetConfigValue("AWSWithdrawalAccountingFolder");
+
             _usableActionType = new Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>>
             {
                 {WithdrawalStatusEnum.Pending, new List<WithdrawalActionEnum>
@@ -106,8 +108,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     WithdrawalActionEnum.Draft,
                     WithdrawalActionEnum.Process,
                     WithdrawalActionEnum.Pending,
-                    WithdrawalActionEnum.Rejected,
-                    WithdrawalActionEnum.ManualApproved,
+                    WithdrawalActionEnum.Rejected
                 }},
                 {WithdrawalStatusEnum.Process, new List<WithdrawalActionEnum>
                 {
@@ -539,6 +540,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 case WithdrawalStatusEnum.Process:
                     {
                         var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(request.WithdrawalInfo);
+                        // 這段先寫死，前端改傳正確的WithdrawalType後拿掉
+                        if (request.WithdrawalType == WithdrawalTypeEnum.OnlineBanking &&
+                            withdrawalInfo.AccountType == "ewallet")
+                            request.WithdrawalType = WithdrawalTypeEnum.EWalletPayment;
                         var checkWithdrawalTypeFailResult = CheckWithdrawalTypeAndSetObject(request, apiResult, withdrawalInfo);
                         if (checkWithdrawalTypeFailResult != null) return checkWithdrawalTypeFailResult;
 
@@ -552,9 +557,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                             request.WithdrawalAccountingModels,
                             out var custId, out var amount);
 
-                        if (withdrawConfirmResult > 0 && request.WithdrawalType is WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.CryptoPay)
+                        if (withdrawConfirmResult > 0 && IsOnlinePayment(request.WithdrawalType.Value))
                         {
-                            var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request, withdrawalInfo, custId, amount, apiResult, authData);
+                            var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request.TransId, apiResult, authData.UserName);
                             if (createFailResult != null) return createFailResult;
                         }
                         break;
@@ -1052,28 +1057,28 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 var usableList = _usableActionType[withdrawalRequest.Status];
                 var usableActionButton = usableList.Where(item => permissionList.Contains((int)item)).ToList();
 
-                if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
+                if (IsLocalPayment(withdrawalRequest.WithdrawalType))
                 {
                     usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
                     usableActionButton.Remove(WithdrawalActionEnum.ManualRejected);
                 }
 
-                if (withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank
-                    && withdrawalRequest.Status is WithdrawalStatusEnum.Approved)
+                if (withdrawalRequest.Status is WithdrawalStatusEnum.Approved &&
+                    IsLocalPayment(withdrawalRequest.WithdrawalType))
                 {
                     usableActionButton.Add(WithdrawalActionEnum.ManualRejected);
                     usableActionButton.Remove(WithdrawalActionEnum.Receive);
                 }
 
                 if (withdrawalRequest.Status == WithdrawalStatusEnum.Process &&
-                    withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
+                    IsOnlinePayment(withdrawalRequest.WithdrawalType))
                 {
                     usableActionButton.Remove(WithdrawalActionEnum.Verified);
                     usableActionButton.Remove(WithdrawalActionEnum.Approved);
                 }
 
                 if (withdrawalRequest.Status == WithdrawalStatusEnum.Rejected &&
-                    withdrawalRequest.WithdrawalType is not (WithdrawalTypeEnum.OnlinePayment or WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet))
+                    IsLocalPayment(withdrawalRequest.WithdrawalType))
                 {
                     usableActionButton.Remove(WithdrawalActionEnum.ManualApproved);
                 }
@@ -1133,8 +1138,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     apiResult.Message = "Select 1 Type of Withdrawal Please.";
                     return apiResult;
 
-                case WithdrawalTypeEnum.OnlinePayment:
+                case WithdrawalTypeEnum.OnlineBanking:
+                case WithdrawalTypeEnum.EWalletPayment:
+                case WithdrawalTypeEnum.CryptoPay:
                     withdrawalInfo.PayId = request.SelId;
+                    withdrawalInfo.ChannelId = request.ChannelId;
                     break;
 
                 case WithdrawalTypeEnum.LocalBank:
@@ -1172,16 +1180,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                         break;
                     }
 
-                case WithdrawalTypeEnum.CryptoPay:
-                    withdrawalInfo.PayId = request.SelId;
-                    withdrawalInfo.ChannelId = request.ChannelId;
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
             return null;
         }
+
+        private static bool IsOnlinePayment(WithdrawalTypeEnum type)
+            => type is (WithdrawalTypeEnum.CryptoPay
+                or WithdrawalTypeEnum.OnlineBanking
+                or WithdrawalTypeEnum.EWalletPayment);
+        private static bool IsLocalPayment(WithdrawalTypeEnum type)
+            => type is (WithdrawalTypeEnum.LocalBank
+                or WithdrawalTypeEnum.CryptoWallet);
 
         #endregion
 

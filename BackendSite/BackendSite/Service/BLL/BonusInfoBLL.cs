@@ -1,8 +1,9 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -11,19 +12,19 @@ namespace BackendSite.Service.BLL
     {
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly SelLangBLL _selLangBll;
-        private readonly SystemEnumBLL _systemEnumBll;
         private readonly BonusInfoService _bonusInfoService;
         private readonly CourierAdapter _courierAdapter;
-        private readonly string _apiUrl;
+        private readonly string _tpServiceApiUrl;
 
         public BonusInfoBLL(IServiceProvider provider)
         {
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _systemEnumBll = provider.GetService<SystemEnumBLL>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-            _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
         }
 
         public IEnumerable<BonusInfoFrontEnd> GetBonusInfoReport(IEnumerable<int> siteIds,
@@ -185,7 +186,7 @@ namespace BackendSite.Service.BLL
 
         public ApiResult<TransferResult> BonusCancelTransfer(TpBonusCancelTransfer tpBonusCancelTransfer)
         {
-            var myUrl = $"{_apiUrl}BonusCancelTransfer";
+            var myUrl = $"{_tpServiceApiUrl}BonusCancelTransfer";
             var data = _courierAdapter.MyPostAsync<TransferResult, TpBonusCancelTransfer>(myUrl, tpBonusCancelTransfer).Result;
             return data;
         }

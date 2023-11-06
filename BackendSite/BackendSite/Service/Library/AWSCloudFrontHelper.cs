@@ -1,10 +1,9 @@
 ﻿using Amazon;
 using Amazon.CloudFront;
 using Amazon.CloudFront.Model;
-
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Model;
-
-using Microsoft.Extensions.Options;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite.Service.Library
 {
@@ -14,10 +13,11 @@ namespace BackendSite.Service.Library
 
         public AWSCloudFrontHelper(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            var awsKeyConfig = provider.GetRequiredService<IOptions<Dictionary<string, AWSKeyConfig>>>().Value["ailab-cloudfront"];
-            var proxyHost = configuration.GetValue<string>("ProxyHost");
-            var proxyPort = configuration.GetValue<int>("ProxyPort");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            var awsKeyConfig = configBll.GetConfigValue<AWSKeyConfig>("AWSCloudFrontKey");
+            var proxyConfig = configBll.GetConfigValue<ProxyConfig>("ProxySetting");
+            var proxyHost = proxyConfig.ProxyHost;
+            var proxyPort = proxyConfig.ProxyPort;
 
             var config = new AmazonCloudFrontConfig
             {
@@ -37,7 +37,5 @@ namespace BackendSite.Service.Library
         {
             return await _client.CreateInvalidationAsync(request);
         }
-
-
     }
 }
