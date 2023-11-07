@@ -5,6 +5,8 @@ using BackendSite.Service.Model.enums;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Text.Json;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
@@ -26,13 +28,38 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         #endregion
 
+        #region API Model
+
+        public class GetBySiteAndCurrencyRequest
+        {
+            /// <summary>
+            /// 品牌
+            /// </summary>
+            public IEnumerable<int>? SiteIds { get; set; } = null;
+            /// <summary>
+            /// 幣別
+            /// </summary>
+            public int CurrencyId { get; set; } = 0;
+        }
+
+        #endregion
+
         #region Actions
         [HttpPost]
         public ApiResult<IEnumerable<SiteTpListIfo>> GetTpList()
         {
+            string requestBody = null;
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+            {
+                requestBody = reader.ReadToEnd();
+            }
+
+            var request = string.IsNullOrWhiteSpace(requestBody) ? new GetBySiteAndCurrencyRequest()
+                : JsonSerializer.Deserialize<GetBySiteAndCurrencyRequest>(requestBody);
+
             var apiResult = new ApiResult<IEnumerable<SiteTpListIfo>>
             {
-                Data = _gameCasinoManageBLL.GetTpList(),
+                Data = _gameCasinoManageBLL.GetTpList(request.SiteIds, request.CurrencyId),
                 ErrorCode = 0
             };
 

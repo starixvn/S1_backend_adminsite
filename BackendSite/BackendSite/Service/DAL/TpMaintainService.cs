@@ -22,9 +22,12 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<CommonTpInfo> GetCommonTpList()
+        public IEnumerable<CommonTpInfo> GetCommonTpList(string siteIds, int currencyId)
         {
-            return _reportDbClient.Query<CommonTpInfo>("Common_TpList_Get").Where(i => i.Status > 0);
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteIds);
+            p.Add("_CurrencyId", currencyId);
+            return _reportDbClient.Query<CommonTpInfo>("Admin_TpList_Get_V2", p);
         }
 
         public IEnumerable<TpMaintain> GetTpMaintainList()

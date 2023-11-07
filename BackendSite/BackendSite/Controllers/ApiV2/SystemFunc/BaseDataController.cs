@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-
+using System.Text.Json;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
@@ -39,6 +39,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         private readonly PermissionBLL _permissionBll;
         private readonly Cryptor _cryptor;
         private readonly PaymentManageBLL _paymentManageBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -63,6 +64,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _cryptor = provider.GetRequiredService<Cryptor>();
             _paymentManageBll = provider.GetRequiredService<PaymentManageBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -129,8 +131,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             public int? CustId { get; set; }
         }
 
-        public class GetTpGameTypeListByCategoryReq
+        public class GetTpGameTypeListReq
         {
+            public IEnumerable<int> SiteIds { get; set; }
+            public int CurrencyId { get; set; }
             public int CategoryId { get; set; }
         }
 
@@ -178,6 +182,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         public class GetTpGameListReq
         {
+            public IEnumerable<int> SiteIds { get; set; }
+
+            public int CurrencyId { get; set; }
+
             [Description("tpId = 0 WalletType is Seamless, tpId > 0 WalletType is Transfer")]
             public int TpId { get; set; }
 
@@ -278,6 +286,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
         public class GetTpBySiteAndCurrencyReq
         {
+            public IEnumerable<int> SiteIds { get; set; }
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
@@ -580,9 +589,14 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListByCategoryReq request)
+        public async Task<ApiResult<IEnumerable<GameTypeBetLimit>>> GetTpGameTypeListByCategory(GetTpGameTypeListReq request)
         {
-            var data = await _tpBll.GetTpGameTypeListbyCategoryAsync(request.CategoryId);
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
+            }
+
+            var data = await _tpBll.GetTpGameTypeListbyCategoryAsync(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId, request.CategoryId);
             var apiResult = new ApiResult<IEnumerable<GameTypeBetLimit>>
             {
                 Data = data,
@@ -748,7 +762,12 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<IEnumerable<GetCashBackGamerep>>();
 
-            apiResult.Data = _bonusManageBll.GetCashBackGameList(para.TpId, para.CategoryId);
+            if (para.SiteIds is null)
+            {
+                para.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
+            }
+
+            apiResult.Data = _bonusManageBll.GetCashBackGameList(JsonSerializer.Serialize(para.SiteIds), para.CurrencyId, para.TpId, para.CategoryId);
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;
@@ -959,7 +978,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<TpCategory>>> GetTpCategoryByTpId(TpCategoryByTpIdRequest request)
         {
-            var gameTypeList = _winLostReportBll.GetTpGameType().Where(x => x.TpId == request.TpId);
+            var siteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
+            var gameTypeList = _winLostReportBll.GetTpGameType(JsonSerializer.Serialize(siteIds), 0).Where(x => x.TpId == request.TpId);
             var categories = gameTypeList.DistinctBy(x => x.CategoryId).Select(x => x.CategoryId);
 
             var categoryList = await _reportBll.GetTpCategoryList();
@@ -982,11 +1002,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeListAsync(GetTpGameTypeListByCategoryReq request)
+        public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeListAsync(GetTpGameTypeListReq request)
         {
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
+            }
+
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
             {
-                Data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId),
+                Data = await _tpBll.GetTpGameTypeListByCategoryAsync(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId, request.CategoryId),
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
 
@@ -1033,7 +1058,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         [HttpPost]
         public async Task<ApiResult<IEnumerable<TpGameType>>> GetTpGameTypeByCategoryAndTpId(GetTpGameTypeByCategoryAndTpIdReq request)
         {
-            var data = await _tpBll.GetTpGameTypeListByCategoryAsync(request.CategoryId);
+            var siteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
+                        var data = await _tpBll.GetTpGameTypeListByCategoryAsync(JsonSerializer.Serialize(siteIds), 0, request.CategoryId);
             var result = data.Where(x => x.TpId == request.TpId);
 
             var apiResult = new ApiResult<IEnumerable<TpGameType>>
@@ -1055,7 +1081,13 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiListResult = new ApiResult<IEnumerable<SiteTpListIfo>>();
 
-            var tpList = _tpBll.GetTpBySiteAndCurrency(request.SiteId, request.CurrencyId);
+            if (request.SiteId != 0) request.SiteIds = new List<int> { request.SiteId };
+            if (request.SiteIds is null)
+            {
+                request.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
+            }
+
+            var tpList = _tpBll.GetTpBySiteAndCurrency(JsonSerializer.Serialize(request.SiteIds), request.CurrencyId);
             apiListResult.Data = tpList;
             apiListResult.ErrorCode = 0;
             return apiListResult;

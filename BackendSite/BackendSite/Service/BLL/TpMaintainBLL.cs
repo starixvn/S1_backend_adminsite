@@ -19,9 +19,11 @@ namespace BackendSite.Service.BLL
 
         }
 
-        public IEnumerable<CommonTpInfo> GetCommonTpList()
+        public IEnumerable<CommonTpInfo> GetCommonTpList(string siteIds, int currencyId)
         {
-            return _tpMaintainService.GetCommonTpList();
+            var result = _tpMaintainService.GetCommonTpList(siteIds, currencyId);
+            result.ToList().ForEach(x => { x.Id = x.TpId; });
+            return result;
         }
 
         public IEnumerable<TpMaintain> GetTpMaintainList()
