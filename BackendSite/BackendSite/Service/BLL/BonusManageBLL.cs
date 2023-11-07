@@ -117,10 +117,10 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.GetTpGameList();
         }
 
-        public IEnumerable<GetCashBackGamerep> GetCashBackGameList(int tpId, int categoryId)
+        public IEnumerable<GetCashBackGamerep> GetCashBackGameList(string siteIds,int currencyId,int tpId, int categoryId)
         {
             var result = new List<GetCashBackGamerep>();
-            var tempResult = _bonusManageService.GetCashBackGameList(tpId, categoryId);
+            var tempResult = _bonusManageService.GetCashBackGameList(siteIds,currencyId, tpId, categoryId);
 
             //tpId == 0,WalletType is Seamless
             //tpId != 0,WalletType is Transfer
