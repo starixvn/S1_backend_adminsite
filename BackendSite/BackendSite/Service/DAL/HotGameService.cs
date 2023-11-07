@@ -112,7 +112,7 @@ namespace BackendSite.Service.DAL
 
             var result = new GetHotGameListDtoV2Wrapper
             {
-                Data = await _reportDbClient.QueryAsync<GetHotGameListDtoV2>("Admin_HotGames_Get_V2", p),
+                Data = await _reportDbClient.QueryAsync<GetHotGameListDtoV2>("Admin_HotGames_Get_V3", p),
                 TotalPages = p.Get<int?>("_TotalPages") ?? 0,
                 RowCount = p.Get<int?>("_RowCount") ?? 0
             };
@@ -123,7 +123,7 @@ namespace BackendSite.Service.DAL
         public async Task<GetHotGameDetailDtoV2> GetDetailV2(int id, int siteId)
         {
             var p = new DynamicParameters(new { _id = id, _siteId = siteId });
-            return await _reportDbClient.QueryFirstAsync<GetHotGameDetailDtoV2>("Admin_HotGamesById_Get_V2", p);
+            return await _reportDbClient.QueryFirstAsync<GetHotGameDetailDtoV2>("Admin_HotGamesById_Get_V3", p);
         }
 
         public async Task<int> CreateOrUpdateV2(SetHotGameRequestV2 request, string updateOperator)
@@ -138,12 +138,10 @@ namespace BackendSite.Service.DAL
             p.Add("_TpGameType", request.TpGameType);
             p.Add("_TpCategory", request.TpCategory);
             p.Add("_GameName", request.GameName);
-            p.Add("_GameLogo", JsonConvert.SerializeObject(request.GameLogo));
             p.Add("_TpName", request.TpName);
-            p.Add("_TpLogo", request.TpLogo);
             p.Add("_TopCategory", request.TopCategory);
             p.Add("_Operator", updateOperator);
-            return await _mainDbClient.ExecuteAsync("Admin_HotGames_Set_V2", p);
+            return await _mainDbClient.ExecuteAsync("Admin_HotGames_Set_V3", p);
         }
 
         public async Task<int> DeleteV2(int id, int siteId)
