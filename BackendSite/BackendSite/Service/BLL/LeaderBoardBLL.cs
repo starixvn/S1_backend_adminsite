@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
 
 using Newtonsoft.Json;
@@ -17,61 +18,111 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
-            var data = _leaderBoardService.GetLeaderboardReport(
-                JsonConvert.SerializeObject(request.SiteIds),
-                request.CurrencyId,
-                request.CategoryId,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime);
+            var data = DealLeaderboardReport(request);
 
-            var groupData = data.GroupBy(x => x.CustId)
+            var rankingBonus = _leaderBoardService.GetLeaderboardRankingBonus(JsonConvert.SerializeObject(request.SiteIds));
+            
+            var groupData = data.GroupBy(x => new {x.CustId ,x.SiteId, x.SiteName, x.UserName ,x.CurrencyId ,x.IsoCode})
                 .OrderByDescending(x => x.Sum(i => i.Points))
-                .Select((r, index) => new GetLeaderboardReportResponse
+                .Select((r, index) =>
                 {
-                    Ranking = $"TOP {index + 1}",
-                    SiteId = request.SiteId,
-                    UserName = r.FirstOrDefault()?.UserName,
-                    CurrencyId = request.CurrencyId,
-                    IsoCode = r.FirstOrDefault()?.IsoCode,
-                    CustId = r.Key,
-                    TurnOver = r.Sum(i => i.TurnOver),
-                    Points = r.Sum(i => i.Points)
+                    var bonusModel = rankingBonus.FirstOrDefault(rb =>
+                        rb.SiteId == r.Key.SiteId &&
+                        rb.CurrencyId == r.Key.CurrencyId &&
+                        (rb.Ranking == (index + 1).ToString() || rb.Ranking == "9-30"));
+                    
+                    return new GetLeaderboardReportResponse
+                    {
+                        Ranking = $"TOP {index + 1}",
+                        SiteId = r.Key.SiteId,
+                        SiteName = r.Key.SiteName,
+                        UserName = r.Key.UserName,
+                        CurrencyId = r.Key.CurrencyId,
+                        IsoCode = r.Key.IsoCode,
+                        CustId = r.Key.CustId,
+                        TurnOver = r.Sum(i => i.TurnOver),
+                        Points = r.Sum(i => i.Points),
+                        Reward = request.CategoryId != 0 || r.Sum(i => i.Points) < bonusModel.MinPoint ? 0 : bonusModel.Bonus
+                    };
                 }).Take(30);
 
             return groupData;
         }
+        
         public IEnumerable<LeaderboardReportResponse> GetLeaderboardReportBySiteIds(GetLeaderboardReportRequest request)
+        {
+            var data = DealLeaderboardReport(request);
+            
+            var rankingBonus = _leaderBoardService.GetLeaderboardRankingBonus(JsonConvert.SerializeObject(request.SiteIds));
+            
+            var groupData = data.GroupBy(x => x.SiteId)
+                .Select(x => new LeaderboardReportResponse
+                {
+                    SiteId = x.Key,
+                    detail = x.GroupBy(y => new { y.CustId, y.SiteId, y.SiteName, y.UserName, y.CurrencyId, y.IsoCode })
+                        .OrderByDescending(z => z.Sum(i => i.Points))
+                        .Select((r, index) =>
+                        {
+                            var bonusModel = rankingBonus.FirstOrDefault(rb =>
+                                rb.SiteId == r.Key.SiteId &&
+                                rb.CurrencyId == r.Key.CurrencyId &&
+                                (rb.Ranking == (index + 1).ToString() || rb.Ranking == "9-30"));
+                            
+                            return new GetLeaderboardReportResponse
+                            {
+                                Ranking = $"TOP {index + 1}",
+                                SiteId = r.Key.SiteId,
+                                SiteName = r.Key.SiteName,
+                                UserName = r.Key.UserName,
+                                CurrencyId = r.Key.CurrencyId,
+                                IsoCode = r.Key.IsoCode,
+                                CustId = r.Key.CustId,
+                                TurnOver = r.Sum(i => i.TurnOver),
+                                Points = r.Sum(i => i.Points),
+                                Reward = request.CategoryId != 0 || r.Sum(i => i.Points) < bonusModel.MinPoint ? 0 : bonusModel.Bonus
+                            };
+                        }).Take(30).ToList()
+                });
+            
+            return groupData;
+        }
+
+        private IEnumerable<LeaderboardReportModel> DealLeaderboardReport(GetLeaderboardReportRequest request)
         {
             var data = _leaderBoardService.GetLeaderboardReport(
                 JsonConvert.SerializeObject(request.SiteIds),
                 request.CurrencyId,
                 request.CategoryId,
                 request.StartDate.DateTime,
-                request.EndDate.DateTime);
+                request.EndDate.DateTime).ToList();
 
-            var groupData = data.GroupBy(x => x.SiteId)
-               .Select(x => new LeaderboardReportResponse
-               {
-                   detail = x.GroupBy(x => x.CustId)
-                                        .OrderByDescending(x => x.Sum(i => i.Points))
-                                        .Select((r, index) => new GetLeaderboardReportResponse
-                                        {
-                                            Ranking = $"TOP {index + 1}",
-                                            SiteId = (int)(r.FirstOrDefault()?.SiteId),
-                                            SiteName = r.FirstOrDefault()?.SiteName,
-                                            UserName = r.FirstOrDefault()?.UserName,
-                                            CurrencyId = (int)(r.FirstOrDefault()?.CurrencyId),
-                                            IsoCode = r.FirstOrDefault()?.IsoCode,
-                                            CustId = r.Key,
-                                            TurnOver = r.Sum(i => i.TurnOver),
-                                            Points = r.Sum(i => i.Points)
-                                        }).Take(30).ToList(),
-                   SiteId = x.FirstOrDefault().SiteId,
-               });
+            var pointCalculation = _leaderBoardService.GetLeaderboardPointCalculation(JsonConvert.SerializeObject(request.SiteIds));
 
-            return groupData;
+            var joinData = data
+                .Join(pointCalculation,
+                    d => new { d.SiteId, d.CurrencyId},
+                    p =>  new { p.SiteId, p.CurrencyId},
+                    (d,p) => new LeaderboardReportModel
+                    {
+                        Date = d.Date,
+                        SiteId = d.SiteId,
+                        UserName = d.UserName,
+                        CurrencyId = d.CurrencyId,
+                        IsoCode = d.IsoCode,
+                        CategoryId = d.CategoryId,
+                        CustId = d.CustId,
+                        TurnOver = d.TurnOver,
+                        SiteName = d.SiteName,
+                        SlotTurnOver = p.SlotTurnOver,
+                        SportTurnOver = p.SportTurnOver,
+                        LiveCasinoTurnOver = p.LiveCasinoTurnOver,
+                        Status = p.Status,
+                    }
+                ).Where(x => x.Status == 1);
+
+            return joinData;
         }
-
+        
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(
             int siteId,
             IEnumerable<int> categoryIds,
@@ -112,5 +163,24 @@ namespace BackendSite.Service.BLL
             return _leaderBoardService.SetBatchLeaderboardExtraPoint(input);
         }
 
+        public IEnumerable<LeaderboardRankingBonusData> GetLeaderboardRankingBonus(string siteIds)
+        {
+            return _leaderBoardService.GetLeaderboardRankingBonus(siteIds);
+        }
+        
+        public bool SetLeaderboardRankingBonus(SetLeaderboardRankingBonusReq req , string updater)
+        {
+            return _leaderBoardService.SetLeaderboardRankingBonus(req, updater);
+        }
+        
+        public IEnumerable<LeaderboardPointCalculation> GetLeaderboardPointCalculation(string siteIds)
+        {
+            return _leaderBoardService.GetLeaderboardPointCalculation(siteIds);
+        }
+        
+        public bool SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req , string updater)
+        {
+            return _leaderBoardService.SetLeaderboardPointCalculation(req, updater);
+        }
     }
 }
