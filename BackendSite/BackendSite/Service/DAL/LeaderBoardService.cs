@@ -1,9 +1,7 @@
 ﻿using System.Data;
-
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
-
 using Dapper;
 
 namespace BackendSite.Service.DAL
@@ -27,7 +25,7 @@ namespace BackendSite.Service.DAL
             props.Add("_CategoryId", categoryId);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V3", props);
+            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V4", props);
 
             return result;
         }
@@ -99,5 +97,53 @@ namespace BackendSite.Service.DAL
 
             return result > 0;
         }
+        
+        public IEnumerable<LeaderboardRankingBonusData> GetLeaderboardRankingBonus(string siteIds)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteIds);
+            var result = _reportDbClient.Query<LeaderboardRankingBonusData>("Admin_LeaderboardRankingBonus_Get", p);
+
+            return result;
+        }
+        
+        public bool SetLeaderboardRankingBonus(SetLeaderboardRankingBonusReq req , string updater)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", req.SiteId);
+            p.Add("_CurrencyId", req.CurrencyId);
+            p.Add("_Ranking", req.Ranking);
+            p.Add("_MinPoint", req.MinPoint);
+            p.Add("_Bonus", req.Bonus);
+            p.Add("_Updater", updater);
+            var result = _mainDbClient.Execute("Admin_LeaderboardRankingBonus_Set", p);
+            
+            return result > 0 ;
+        }
+
+        public IEnumerable<LeaderboardPointCalculation> GetLeaderboardPointCalculation(string siteIds)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteIds);
+            var result = _reportDbClient.Query<LeaderboardPointCalculation>("Admin_LeaderboardPointCalculation_Get", p);
+
+            return result;
+        }
+
+        public bool SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req , string updater)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", req.SiteId);
+            p.Add("_CurrencyId", req.CurrencyId);
+            p.Add("_SlotTurnOver", req.SlotTurnOver);
+            p.Add("_SportTurnOver", req.SportTurnOver);
+            p.Add("_LiveCasinoTurnOver", req.LiveCasinoTurnOver);
+            p.Add("_Status", req.Status);
+            p.Add("_Updater", updater);
+            var result = _mainDbClient.Execute("Admin_LeaderboardPointCalculation_Set", p);
+            
+            return result > 0 ;
+        }
     }
 }
+
