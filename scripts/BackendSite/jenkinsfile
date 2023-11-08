@@ -40,9 +40,9 @@ pipeline {
                 steps{
                     dir('/jenkins/backend-manifest/dev-galaxy/leobet'){
                         sh 'git pull'
-                        sh "yq -i '.spec.template.spec.containers[0].image = \"harbor.ailabpte.co/adminsite/backendsite:${version}\"' adminsite-deploy.yaml"
+                        sh "yq -i '.spec.template.spec.containers[0].image = \"harbor.ailabpte.co/adminsite/backendsite:${imageversion}\"' adminsite-deploy.yaml"
                         sh 'git add adminsite-deploy.yaml'
-                        sh "git commit -m 'update dev adminsite ver:${version}'"
+                        sh "git commit -m 'update dev adminsite ver:${imageversion}'"
                         sh 'git push'
                     }
                 }
