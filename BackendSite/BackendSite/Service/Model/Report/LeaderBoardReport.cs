@@ -40,27 +40,6 @@ public class LeaderboardReportModel
     public decimal SlotTurnOver { get; set; }
     public decimal LiveCasinoTurnOver { get; set; }
     public int Status { get; set; }
-    public int Points => CategoryId switch
-    {
-        (int)TpCategoryEnum.Sports => (int)(TurnOver / SportTurnOver),
-        (int)TpCategoryEnum.Casino => (int)(TurnOver / SlotTurnOver),
-        (int)TpCategoryEnum.LiveCasino => (int)( TurnOver / LiveCasinoTurnOver),
-        _ => 0
-    };
-}
-
-public class LeaderboardReportModelOld
-{
-    public DateTime Date { get; set; }
-    public int SiteId { get; set; }
-    public string UserName { get; set; }
-    public int CurrencyId { get; set; }
-    public string IsoCode { get; set; }
-    public int CategoryId { get; set; }
-    public int CustId { get; set; }
-    public decimal TurnOver { get; set; }
-    public string SiteName { get; set; }
-    public int Status { get; set; }
     public int Points { get; set; }
 }
 
