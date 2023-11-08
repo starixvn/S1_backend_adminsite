@@ -126,29 +126,42 @@ namespace BackendSite.Service.BLL
 
             var pointCalculation = _leaderBoardService.GetLeaderboardPointCalculation(JsonConvert.SerializeObject(request.SiteIds));
 
-            var joinData = data
-                .Join(pointCalculation,
-                    d => new { d.SiteId, d.CurrencyId},
-                    p =>  new { p.SiteId, p.CurrencyId},
-                    (d,p) => new LeaderboardReportModel
+            //GroupBy CustId,CategoryId 
+            var groupCategoryIdData = data.GroupBy(x => new
+                {
+                    x.SiteId, x.UserName, x.CurrencyId, x.IsoCode, x.CategoryId, x.CustId, x.SiteName
+                })
+                .Select(x => new LeaderboardReportModel
+                {
+                    SiteId = x.Key.SiteId,
+                    UserName = x.Key.UserName,
+                    CurrencyId = x.Key.CurrencyId,
+                    IsoCode = x.Key.IsoCode,
+                    CategoryId = x.Key.CategoryId,
+                    CustId = x.Key.CustId,
+                    TurnOver = x.Sum(y=>y.TurnOver),
+                    SiteName = x.Key.SiteName
+                }).ToList();
+            
+            // 計算Points with SlotTurnOver,SportTurnOver,LiveCasinoTurnOver
+            foreach (var detail in groupCategoryIdData)
+            {
+                var cal = pointCalculation.FirstOrDefault(x =>
+                    x.SiteId == detail.SiteId && x.CurrencyId == detail.CurrencyId && x.Status == 1);
+                
+                if (cal != null)
+                {
+                    detail.Points = detail.CategoryId switch
                     {
-                        Date = d.Date,
-                        SiteId = d.SiteId,
-                        UserName = d.UserName,
-                        CurrencyId = d.CurrencyId,
-                        IsoCode = d.IsoCode,
-                        CategoryId = d.CategoryId,
-                        CustId = d.CustId,
-                        TurnOver = d.TurnOver,
-                        SiteName = d.SiteName,
-                        SlotTurnOver = p.SlotTurnOver,
-                        SportTurnOver = p.SportTurnOver,
-                        LiveCasinoTurnOver = p.LiveCasinoTurnOver,
-                        Status = p.Status,
-                    }
-                ).Where(x => x.Status == 1);
-
-            return joinData;
+                        (int)TpCategoryEnum.Sports => (int)(detail.TurnOver / cal.SportTurnOver),
+                        (int)TpCategoryEnum.Casino => (int)(detail.TurnOver / cal.SlotTurnOver),
+                        (int)TpCategoryEnum.LiveCasino => (int)( detail.TurnOver / cal.LiveCasinoTurnOver),
+                        _ => 0
+                    };
+                }
+            }
+            
+            return groupCategoryIdData;
         }
         
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(
