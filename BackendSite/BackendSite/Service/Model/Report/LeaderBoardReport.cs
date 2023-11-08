@@ -49,6 +49,21 @@ public class LeaderboardReportModel
     };
 }
 
+public class LeaderboardReportModelOld
+{
+    public DateTime Date { get; set; }
+    public int SiteId { get; set; }
+    public string UserName { get; set; }
+    public int CurrencyId { get; set; }
+    public string IsoCode { get; set; }
+    public int CategoryId { get; set; }
+    public int CustId { get; set; }
+    public decimal TurnOver { get; set; }
+    public string SiteName { get; set; }
+    public int Status { get; set; }
+    public int Points { get; set; }
+}
+
 public class LeaderboardReportResponse
 {
     public List<GetLeaderboardReportResponse> detail { get; set; }

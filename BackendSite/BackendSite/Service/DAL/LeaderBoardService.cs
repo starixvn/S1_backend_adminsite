@@ -30,6 +30,19 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
+        public IEnumerable<LeaderboardReportModelOld> GetLeaderboardReportOld(string siteIds, int currencyId, int categoryId, DateTime startDate, DateTime endDate)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyId", currencyId);
+            props.Add("_CategoryId", categoryId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            var result = _reportDbClient.Query<LeaderboardReportModelOld>("Admin_LeaderboardReport_Get_V3", props);
+
+            return result;
+        }
+        
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(
             int siteId,
             string categoryIds,
