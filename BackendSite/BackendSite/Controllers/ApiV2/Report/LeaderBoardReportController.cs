@@ -34,7 +34,9 @@ namespace BackendSite.Controllers.ApiV2.Report
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             try
             {
-                var data = _leaderBoardBll.GetLeaderboardReport(request);
+                var newCalculation = request.SiteId == (int) SiteEnum.NOVA88;
+                var data = _leaderBoardBll.GetLeaderboardReport(request,newCalculation);
+                
                 apiResult.Data = data;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -46,6 +48,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             return apiResult;
         }
+        
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
         public ApiListResult<LeaderboardReportResponse> GetLeaderboardReportBySiteIds(GetLeaderboardReportRequest request)
@@ -72,7 +75,8 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 2 })]
         public IActionResult GetLeaderboardReportExport(GetLeaderboardReportRequest request)
         {
-            var data = _leaderBoardBll.GetLeaderboardReport(request);
+            var newCalculation = request.SiteId == (int) SiteEnum.NOVA88;
+            var data = _leaderBoardBll.GetLeaderboardReport(request,newCalculation);
 
             var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "LeaderboardReport");
