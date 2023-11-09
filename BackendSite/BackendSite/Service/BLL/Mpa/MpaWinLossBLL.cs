@@ -6,6 +6,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -775,7 +776,7 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
                         //Progressive Win already included in PlayerWinLoss. 
-                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary)+ r.Sum(x => x.ProgressiveWinSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -812,7 +813,7 @@ namespace BackendSite.Service.BLL.Mpa
                 AlreadyMultiplyRateTpBetRecordResult = alreadyMultiplyRateTpBetRecordResult,
                 UniquePlayers = betRecordResult.OriginBetRecord.DistinctBy(x => x.CustId).Count()
             };
-
+            _logger.LogInformation($"第一次分組計算:{JsonConvert.SerializeObject(wrapperResult)}");
             return wrapperResult;
         }
 
@@ -2450,7 +2451,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
-
+            
             //IDR轉KIDR，VND轉KVND
             decimal rate = 0.001m;
             foreach (var item in data)
@@ -2648,6 +2649,7 @@ namespace BackendSite.Service.BLL.Mpa
                 //.SetGgRByV8Poker()
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
+            _logger.LogInformation($"篩選完資料:{JsonConvert.SerializeObject(data)}");
 
             var mapRate = await GetMapRate(request);
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult
