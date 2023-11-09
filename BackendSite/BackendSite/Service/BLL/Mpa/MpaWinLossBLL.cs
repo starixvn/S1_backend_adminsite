@@ -775,7 +775,6 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        //Progressive Win already included in PlayerWinLoss. 
                         var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
@@ -813,7 +812,7 @@ namespace BackendSite.Service.BLL.Mpa
                 AlreadyMultiplyRateTpBetRecordResult = alreadyMultiplyRateTpBetRecordResult,
                 UniquePlayers = betRecordResult.OriginBetRecord.DistinctBy(x => x.CustId).Count()
             };
-            _logger.LogInformation($"第一次分組計算:{JsonConvert.SerializeObject(wrapperResult)}");
+
             return wrapperResult;
         }
 
@@ -2645,11 +2644,8 @@ namespace BackendSite.Service.BLL.Mpa
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var data = await GetMapTpBetRecordByDate(request, groupByType);
             var tpBetRecordRelayResult = data.Filter(request)
-                //.SetGgRByOneGamingPoker()
-                //.SetGgRByV8Poker()
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
-            _logger.LogInformation($"篩選完資料:{JsonConvert.SerializeObject(data)}");
 
             var mapRate = await GetMapRate(request);
             wrapperResult.AlreadyMultiplyRateBetRecord = (from item in tpBetRecordRelayResult

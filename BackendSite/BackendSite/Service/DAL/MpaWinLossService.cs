@@ -34,7 +34,6 @@ namespace BackendSite.Service.DAL
             p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
 
             var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V4", p);
-            _logger.LogInformation($"sp拉出資料:{JsonConvert.SerializeObject(data)}");
             return data;
         }
 
