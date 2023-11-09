@@ -31,7 +31,6 @@ namespace BackendSite.Service.DAL
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
-            //p.Add("_DateType", (int)mpaDateType, dbType: DbType.Int32);
 
             var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V5", p);
 

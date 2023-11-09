@@ -6,6 +6,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -388,8 +389,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        //Progressive Win already included in PlayerWinLoss. 
-                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary)+ r.Sum(x => x.ProgressiveWinSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -934,8 +934,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        //Progressive Win already included in PlayerWinLoss. 
-                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary)+ r.Sum(x => x.ProgressiveWinSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -1286,8 +1285,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        //Progressive Win already included in PlayerWinLoss. 
-                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary) + r.Sum(x => x.ProgressiveWinSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -1719,8 +1717,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        //Progressive Win already included in PlayerWinLoss. 
-                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary) + r.Sum(x => x.ProgressiveWinSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -2353,8 +2350,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        //Progressive Win already included in PlayerWinLoss. 
-                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary) + r.Sum(x => x.ProgressiveWinSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -2792,7 +2788,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
-
+            
             //IDR轉KIDR，VND轉KVND
             decimal rate = 0.001m;
             foreach (var item in data)
@@ -2986,9 +2982,7 @@ namespace BackendSite.Service.BLL.Mpa
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var data = await GetMapTpBetRecordByDate(request, groupByType);
             var tpBetRecordRelayResult = data.Filter(request)
-                //.SetGgRByOneGamingPoker()
-                //.SetGgRByV8Poker()
-                .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission, _logger)
+                .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
 
             var mapRate = await GetMapRate(request);
