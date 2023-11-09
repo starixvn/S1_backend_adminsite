@@ -100,7 +100,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         {
             var apiResult = new ApiResult<IEnumerable<LeaderboardPointCalculation>>();
 
-            var data = _leaderBoardBll.GetLeaderboardPointCalculation(JsonConvert.SerializeObject(request.SiteIds));
+            var date = DateTime.UtcNow.ToString("yyyyMM");
+            var data = _leaderBoardBll.GetLeaderboardPointCalculation(JsonConvert.SerializeObject(request.SiteIds) ,date);
             
             apiResult.Data = data;
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -117,7 +118,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                var result = _leaderBoardBll.SetLeaderboardPointCalculation(req ,authData.UserName );
+                var date = DateTime.UtcNow.ToString("yyyyMM");
+                var result = _leaderBoardBll.SetLeaderboardPointCalculation(req ,date ,authData.UserName );
                 if (result)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

@@ -134,16 +134,17 @@ namespace BackendSite.Service.DAL
             return result > 0 ;
         }
 
-        public IEnumerable<LeaderboardPointCalculation> GetLeaderboardPointCalculation(string siteIds)
+        public IEnumerable<LeaderboardPointCalculation> GetLeaderboardPointCalculation(string siteIds , string date)
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteIds);
+            p.Add("_Date", date);
             var result = _reportDbClient.Query<LeaderboardPointCalculation>("Admin_LeaderboardPointCalculation_Get", p);
 
             return result;
         }
 
-        public bool SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req , string updater)
+        public bool SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req , string date , string updater)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", req.SiteId);
@@ -152,6 +153,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SportTurnOver", req.SportTurnOver);
             p.Add("_LiveCasinoTurnOver", req.LiveCasinoTurnOver);
             p.Add("_Status", req.Status);
+            p.Add("_Date", date);
             p.Add("_Updater", updater);
             var result = _mainDbClient.Execute("Admin_LeaderboardPointCalculation_Set", p);
             
