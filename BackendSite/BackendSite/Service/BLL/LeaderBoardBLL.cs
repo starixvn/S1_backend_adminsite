@@ -123,8 +123,9 @@ namespace BackendSite.Service.BLL
                 request.CategoryId,
                 request.StartDate.DateTime,
                 request.EndDate.DateTime).ToList();
-
-            var pointCalculation = _leaderBoardService.GetLeaderboardPointCalculation(JsonConvert.SerializeObject(request.SiteIds));
+            
+            var date = request.StartDate.ToString("yyyyMM");
+            var pointCalculation = _leaderBoardService.GetLeaderboardPointCalculation(JsonConvert.SerializeObject(request.SiteIds) ,date);
 
             //GroupBy CustId,CategoryId 
             var groupCategoryIdData = data.GroupBy(x => new
@@ -214,14 +215,14 @@ namespace BackendSite.Service.BLL
             return _leaderBoardService.SetLeaderboardRankingBonus(req, updater);
         }
         
-        public IEnumerable<LeaderboardPointCalculation> GetLeaderboardPointCalculation(string siteIds)
+        public IEnumerable<LeaderboardPointCalculation> GetLeaderboardPointCalculation(string siteIds ,string date)
         {
-            return _leaderBoardService.GetLeaderboardPointCalculation(siteIds);
+            return _leaderBoardService.GetLeaderboardPointCalculation(siteIds ,date);
         }
         
-        public bool SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req , string updater)
+        public bool SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req ,string date, string updater)
         {
-            return _leaderBoardService.SetLeaderboardPointCalculation(req, updater);
+            return _leaderBoardService.SetLeaderboardPointCalculation(req, date, updater);
         }
     }
 }
