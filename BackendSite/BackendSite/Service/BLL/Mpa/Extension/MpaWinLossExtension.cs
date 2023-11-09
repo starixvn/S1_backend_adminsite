@@ -82,7 +82,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         public static IEnumerable<MpaTpBetRecordDto> SetCommissionByNineW(this IEnumerable<MpaTpBetRecordDto> data,
             MpaWinLossRequest request,
             string format,
-            Func<DateTimeOffset, DateTimeOffset, string, MpaDateType, IEnumerable<Commission9WDto>> getCommission, ILogger<MpaWinLossBLL> _logger)
+            Func<DateTimeOffset, DateTimeOffset, string, MpaDateType, IEnumerable<Commission9WDto>> getCommission)
         {
             var commission = getCommission(request.StarTime, request.EndTime, format, request.DateType);
 
