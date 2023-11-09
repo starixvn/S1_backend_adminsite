@@ -1,25 +1,14 @@
 using BackendSite.Service.Model.ApiModel;
-using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.Report;
 
 public class GetLeaderboardReportRequest : IApiRequest
 {
-    private DateTimeOffset _startDate;
-    private DateTimeOffset _endDate;
     public int SiteId { get; set; }
     public int CurrencyId { get; set; }
     public int CategoryId { get; set; }
-    public DateTimeOffset StartDate
-    {
-        get => _startDate;
-        set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-    }
-    public DateTimeOffset EndDate
-    {
-        get => _endDate;
-        set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
-    }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
     public IEnumerable<int> SiteIds { get; set; }
     public IEnumerable<int> CurrencyIds { get; set; }
     public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }

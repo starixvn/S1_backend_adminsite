@@ -27,15 +27,14 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
-        public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
+        public ApiResult<IEnumerable<GetLeaderboardReportResponse>> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
-            var apiResult = new ApiListResult<GetLeaderboardReportResponse>();
+            var apiResult = new ApiResult<IEnumerable<GetLeaderboardReportResponse>>();
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             try
             {
-                var newCalculation = request.SiteId == (int) SiteEnum.NOVA88;
-                var data = _leaderBoardBll.GetLeaderboardReport(request,newCalculation);
+                var data = _leaderBoardBll.GetLeaderboardReport(request);
                 
                 apiResult.Data = data;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -75,8 +74,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 2 })]
         public IActionResult GetLeaderboardReportExport(GetLeaderboardReportRequest request)
         {
-            var newCalculation = request.SiteId == (int) SiteEnum.NOVA88;
-            var data = _leaderBoardBll.GetLeaderboardReport(request,newCalculation);
+            var data = _leaderBoardBll.GetLeaderboardReport(request);
 
             var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "LeaderboardReport");
