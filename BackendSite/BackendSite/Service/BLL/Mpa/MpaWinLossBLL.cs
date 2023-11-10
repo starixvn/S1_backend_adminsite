@@ -6,6 +6,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -2524,7 +2525,7 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
-
+            
             //IDR轉KIDR，VND轉KVND
             decimal rate = 0.001m;
             foreach (var item in data)
@@ -2718,8 +2719,6 @@ namespace BackendSite.Service.BLL.Mpa
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
             var data = await GetMapTpBetRecordByDate(request, groupByType);
             var tpBetRecordRelayResult = data.Filter(request)
-                //.SetGgRByOneGamingPoker()
-                //.SetGgRByV8Poker()
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
                 .ToList();
 
