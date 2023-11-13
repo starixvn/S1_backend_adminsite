@@ -33,12 +33,6 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             }
 
 
-            //For product has jackpot: GGR = - (Player WL – Progressive Win) – Progressive Bet
-            foreach (var item in data)
-            {
-                item.WinLossSummary -= item.ProgressiveWinSummary;
-            }
-
             if (!request.IncludeTest)
             {
                 //istest = 0, test member
