@@ -822,7 +822,6 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         x.CurrencyId,
                         x.GameType,
-                        x.CustId
                     }).Select(r =>
                     {
                         // 預先計算常用的總和，以避免多次重複計算
@@ -845,7 +844,6 @@ namespace BackendSite.Service.BLL.Mpa
                         // 建立新的MpaWinLossByTpGameTypeDto物件並返回
                         return new MpaWinLossByTpGameTypeDto
                         {
-                            CustId = r.Key.CustId,
                             TpGameTypeName = tpGameTypeMap[r.Key.GameType],
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
