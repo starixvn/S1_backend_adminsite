@@ -168,9 +168,9 @@ namespace BackendSite.Service.BLL
         }
 
         public bool UpdateBankInfo(int siteId, int payId, int sysId,
-            BankInfoPayStatusEnum status, BankInfoPayMethodEnum method, string @operator)
+            BankInfoPayStatusEnum status, int channelId, string @operator)
         {
-            var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status, method, @operator);
+            var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status, channelId, @operator);
 
             if (result)
             {

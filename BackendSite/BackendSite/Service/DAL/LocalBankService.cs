@@ -48,7 +48,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<BankInfoPay> GetBankInfoPayList(int siteId)
         {
-            return _mainDbClient.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V4", new { _SiteId = siteId });
+            return _mainDbClient.Query<BankInfoPay>("Common_BankInfoPayForPayout_Get_V5", new { _SiteId = siteId });
         }
 
         public IEnumerable<BankInfoPay> GetEWalletPayList(int siteId)
