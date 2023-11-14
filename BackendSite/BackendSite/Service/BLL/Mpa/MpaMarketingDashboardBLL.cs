@@ -64,6 +64,7 @@ namespace BackendSite.Service.BLL
 
             var MTDRequest = new GetDataRequest
             {
+                MultiSiteRequest = input.MultiSiteRequest,
                 StartDate = MTDStartDate,
                 EndDate = MTDEndDate,
                 SiteId = input.SiteId,
