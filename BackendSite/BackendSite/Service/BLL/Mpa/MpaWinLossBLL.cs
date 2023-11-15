@@ -483,8 +483,8 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 return x.RevenueSummary * -1;
             }
-
-            return x.RevenueSummary;
+            //除9W外，其他commission皆為0
+            return 0;
         }
         private bool IsBAdata(int SummaryType)
         {
