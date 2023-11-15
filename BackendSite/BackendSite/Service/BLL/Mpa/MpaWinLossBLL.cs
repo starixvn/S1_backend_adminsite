@@ -433,7 +433,7 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 //GGR for 9W Sports = - PlayerWinLoss + Commission
                 winLossSummary = winLoss + revenuefor9w ;
-            }if (gameType == (int)MpaGGRCustomizationGameTypeEnum.V8Poker || gameType == (int)MpaGGRCustomizationGameTypeEnum.V8PokerNoRevenue || gameType ==(int)MpaGGRCustomizationGameTypeEnum.OneGamingPoker)
+            }if (gameType == (int)MpaGGRCustomizationGameTypeEnum.V8Poker || gameType ==(int)MpaGGRCustomizationGameTypeEnum.OneGamingPoker)
             {
                 //若為onegaming Poker OR V8Poker，show commission: GGR = sum(revenue)
                 winLossSummary = revenueforV8 *-1;
@@ -1565,7 +1565,7 @@ namespace BackendSite.Service.BLL.Mpa
 
         private bool isOnegameorV8(int gameType)
         {
-            return (gameType == (int)MpaGGRCustomizationGameTypeEnum.OneGamingPoker) || (gameType == (int)MpaGGRCustomizationGameTypeEnum.V8Poker || (gameType == (int)MpaGGRCustomizationGameTypeEnum.V8PokerNoRevenue));
+            return (gameType == (int)MpaGGRCustomizationGameTypeEnum.OneGamingPoker) || (gameType == (int)MpaGGRCustomizationGameTypeEnum.V8Poker);
         }
         private bool is9w(int gameType)
         {
