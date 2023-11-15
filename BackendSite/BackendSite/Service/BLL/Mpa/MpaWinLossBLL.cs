@@ -394,7 +394,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
-                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
+                        var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary : 0);
+                        var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
                         var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
                         var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
@@ -412,7 +413,7 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w)+totalBACommission,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8)+totalBACommission,
                             //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             //BAPlayerWinLoss
@@ -425,7 +426,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
+                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                             SiteId = r.Key.SiteId
@@ -449,16 +450,20 @@ namespace BackendSite.Service.BLL.Mpa
         /// <param name="winLoss"></param>
         /// <param name="progressiveWin"></param>
         /// <param name="progressiveBet"></param>
-        /// <param name="revenue"></param>
+        /// <param name="revenuefor9w"></param>
+        /// <param name="revenueforV8"></param>
         /// <returns></returns>
-        private decimal CalculateGGR(int gameType, decimal winLoss, decimal progressiveWin, decimal progressiveBet, decimal revenue)
+        private decimal CalculateGGR(int gameType, decimal winLoss, decimal progressiveWin, decimal progressiveBet, decimal revenuefor9w, decimal revenueforV8)
         {
             var winLossSummary = winLoss;
             if (gameType == (int)MpaGGRCustomizationGameTypeEnum.NineW)
             {
                 //GGR for 9W Sports = - PlayerWinLoss + Commission
-                //因經由CalculateCommission方法計算出的RevenueSummary已經帶負號，故這邊要revenue*-1
-                winLossSummary = winLoss + (revenue * -1);
+                winLossSummary = winLoss + revenuefor9w ;
+            }if (gameType == (int)MpaGGRCustomizationGameTypeEnum.V8Poker || gameType ==(int)MpaGGRCustomizationGameTypeEnum.OneGamingPoker)
+            {
+                //若為onegaming Poker OR V8Poker，show commission: GGR = sum(revenue)
+                winLossSummary = revenueforV8 *-1;
             }
             return GetGGR(winLossSummary, progressiveWin, progressiveBet);
         }
@@ -870,7 +875,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
-                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
+                        var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary : 0);
+                        var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
                         var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
                         var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
@@ -885,7 +891,7 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) + totalBACommission,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
                             //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             //BAPlayerWinLoss
@@ -898,7 +904,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
+                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                         };
@@ -1188,7 +1194,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
-                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
+                        var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary : 0);
+                        var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
                         var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
                         var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
@@ -1203,7 +1210,7 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) + totalBACommission,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
                             //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             //BAPlayerWinLoss
@@ -1216,7 +1223,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
+                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                         };
@@ -1621,7 +1628,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
-                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
+                        var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary : 0);
+                        var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
                         var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
                         var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
@@ -1639,7 +1647,7 @@ namespace BackendSite.Service.BLL.Mpa
                             ClosingBalance = r.Sum(x => x.ClosingBalance),
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) + totalBACommission,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
                             //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             //BAPlayerWinLoss
@@ -1652,7 +1660,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
+                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                         };
@@ -2255,7 +2263,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
                         var totalRowCount = r.Sum(x => x.RowCount);
                         var gameType = r.Key.GameType;
-                        var totalRevenueSummaryfor9w = r.Sum(x => CalculateCommission(x));
+                        var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary  : 0);
+                        var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
                         var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
                         var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
@@ -2270,7 +2279,7 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) + totalBACommission,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
                             //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             //BAPlayerWinLoss
@@ -2283,7 +2292,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ?CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w) / totalValidBetSummary
+                                ?CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                         };
