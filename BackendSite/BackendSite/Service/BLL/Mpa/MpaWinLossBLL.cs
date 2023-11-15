@@ -436,7 +436,7 @@ namespace BackendSite.Service.BLL.Mpa
             }if (gameType == (int)MpaGGRCustomizationGameTypeEnum.V8Poker || gameType == (int)MpaGGRCustomizationGameTypeEnum.V8PokerNoRevenue || gameType ==(int)MpaGGRCustomizationGameTypeEnum.OneGamingPoker)
             {
                 //若為onegaming Poker OR V8Poker，show commission: GGR = sum(revenue)
-                winLossSummary = revenueforV8;
+                winLossSummary = revenueforV8 *-1;
             }
             return GetGGR(winLossSummary, progressiveWin, progressiveBet);
         }
