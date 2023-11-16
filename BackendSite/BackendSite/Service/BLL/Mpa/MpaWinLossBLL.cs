@@ -388,7 +388,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        var totalWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? 0 : x.WinLossSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -397,8 +397,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary : 0);
                         var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
-                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
-                        var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
+                        var totalBAWinLossSummary = r.Sum(x => x.BAWinLossSummary);
+                        var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver *0.25%
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
                         var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
@@ -869,7 +869,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        var totalWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? 0 : x.WinLossSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -878,8 +878,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary : 0);
                         var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
-                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
-                        var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
+                        var totalBAWinLossSummary = r.Sum(x => x.BAWinLossSummary);
+                        var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver *0.25%
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
                         var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
@@ -1188,7 +1188,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        var totalWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? 0 : x.WinLossSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -1197,8 +1197,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary : 0);
                         var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
-                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
-                        var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
+                        var totalBAWinLossSummary = r.Sum(x => x.BAWinLossSummary);
+                        var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver *0.25%
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
                         var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
@@ -1622,7 +1622,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        var totalWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? 0 : x.WinLossSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -1631,8 +1631,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary : 0);
                         var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
-                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
-                        var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
+                        var totalBAWinLossSummary = r.Sum(x => x.BAWinLossSummary);
+                        var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver * 0.25 %
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
                         var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
@@ -2257,7 +2257,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 預先計算常用的總和，以避免多次重複計算
                         var totalStakeSummary = r.Sum(x => x.StakeSummary);
                         var totalValidBetSummary = r.Sum(x => x.ValidBetSummary);
-                        var totalWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? 0 : x.WinLossSummary);
+                        var totalWinLossSummary = r.Sum(x => x.WinLossSummary);
                         var totalRevenueSummary = r.Sum(x => x.RevenueSummary);
                         var totalProgressiveWinSummary = r.Sum(x => x.ProgressiveWinSummary);
                         var totalProgressiveBetSummary = r.Sum(x => x.ProgressiveBetSummary);
@@ -2266,8 +2266,8 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalRevenueSummaryfor9w = r.Sum(x => is9w(x.GameType) ? x.RevenueSummary  : 0);
                         var totalRevenueSummaryforV8 = r.Sum(x => isOnegameorV8(x.GameType) ? x.RevenueSummary : 0);
                         //BA玩家資料
-                        var totalBAWinLossSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.WinLossSummary : 0);
-                        var totalBAValidBetSummary = r.Sum(x => IsBAdata(x.SummaryType) ? x.ValidBetSummary : 0);
+                        var totalBAWinLossSummary = r.Sum(x => x.BAWinLossSummary);
+                        var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver *0.25%
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
                         var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
@@ -2893,6 +2893,7 @@ namespace BackendSite.Service.BLL.Mpa
             var data = await GetMapTpBetRecordByDate(request, groupByType);
             var tpBetRecordRelayResult = data.Filter(request)
                 .SetCommissionByNineW(request, format, _mpaWinLossService.Get9WCommission)
+                .SetBAdata()
                 .ToList();
 
             var mapRate = await GetMapRate(request);
@@ -2931,6 +2932,12 @@ namespace BackendSite.Service.BLL.Mpa
                                                               RevenueSummary = item.RevenueSummary * rate * baseCurrencyRate * currencyRate,
                                                               ProgressiveWinSummary = item.ProgressiveWinSummary * rate * baseCurrencyRate * currencyRate,
                                                               ProgressiveBetSummary = item.ProgressiveBetSummary * rate * baseCurrencyRate * currencyRate,
+                                                              BAStakeSummary = item.BAStakeSummary * rate * baseCurrencyRate * currencyRate,
+                                                              BAValidBetSummary = item.BAValidBetSummary * rate * baseCurrencyRate * currencyRate,
+                                                              BAWinLossSummary = item.BAWinLossSummary * rate * baseCurrencyRate * currencyRate,
+                                                              BARevenueSummary = item.BARevenueSummary * rate * baseCurrencyRate * currencyRate,
+                                                              BAProgressiveWinSummary = item.BAProgressiveWinSummary * rate * baseCurrencyRate * currencyRate,
+                                                              BAProgressiveBetSummary = item.BAProgressiveBetSummary * rate * baseCurrencyRate * currencyRate,
                                                               ClosingBalance = item.ClosingBalance * rate * baseCurrencyRate * currencyRate,
                                                               RowCount = item.RowCount,
                                                           }).ToList();
