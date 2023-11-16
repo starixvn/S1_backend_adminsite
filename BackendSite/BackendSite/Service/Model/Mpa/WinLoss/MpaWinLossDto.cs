@@ -36,6 +36,12 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int RowCount { get; set; }
         public int IsTest { get; set; }
         public int SummaryType { get; set; }
+        public decimal BAStakeSummary { get; set; }
+        public decimal BAValidBetSummary { get; set; }
+        public decimal BAWinLossSummary { get; set; }
+        public decimal BARevenueSummary { get; set; }
+        public decimal BAProgressiveWinSummary { get; set; }
+        public decimal BAProgressiveBetSummary { get; set; }
     }
 
     public class MpaTpBetRecordWrapper

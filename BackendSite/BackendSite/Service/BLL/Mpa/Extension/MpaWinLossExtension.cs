@@ -84,6 +84,33 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             return data;
         }
+        /// <summary>
+        /// 區分出BA資料
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static IEnumerable<MpaTpBetRecordDto> SetBAdata(this IEnumerable<MpaTpBetRecordDto> data)
+        {
+            foreach (var item in data)
+            {
+                if (item.SummaryType == 3 || item.SummaryType == 4)
+                {
+                    item.BAStakeSummary = item.StakeSummary;
+                    item.BAValidBetSummary = item.ValidBetSummary;
+                    item.BARevenueSummary = item.RevenueSummary;
+                    item.BAWinLossSummary = item.WinLossSummary;
+                    item.BAProgressiveBetSummary = item.ProgressiveBetSummary;
+                    item.BAProgressiveWinSummary = item.ProgressiveWinSummary;
+                    item.StakeSummary = 0;
+                    item.ValidBetSummary = 0;
+                    item.RevenueSummary = 0;
+                    item.WinLossSummary = 0;
+                    item.ProgressiveBetSummary= 0;
+                    item.ProgressiveWinSummary= 0;
+                }
+            }
+            return data;
+        }
 
         public static IEnumerable<MpaTpBetRecordDto> SetCommissionByNineW(this IEnumerable<MpaTpBetRecordDto> data,
             MpaWinLossRequest request,
