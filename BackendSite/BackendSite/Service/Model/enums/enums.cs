@@ -1985,4 +1985,10 @@ namespace BackendSite.Service.Model.enums
         /// </summary>
         Minus = 6
     }
+    
+    public enum QueueJob
+    {
+        Init = 0 ,
+        Verification = 1
+    }
 }
