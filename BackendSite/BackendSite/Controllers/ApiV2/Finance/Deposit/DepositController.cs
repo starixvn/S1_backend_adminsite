@@ -425,7 +425,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
                     // verification job queue
                     var custVerificationReward = _verificationRewardBLL.GetCustVerificationRewardByCust(depositRequest.CustId);
-                    if (custVerificationReward is not null && custVerificationReward.EmailReward != 0 && custVerificationReward.PhoneReward != 0)
+                    if (custVerificationReward is null || custVerificationReward.EmailReward == 0 || custVerificationReward.PhoneReward == 0)
                     {
                         _verificationRewardBLL.InsertQueueJob(depositRequest.CustId, QueueJob.Verification, string.Empty);
                     }
