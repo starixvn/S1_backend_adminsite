@@ -49,7 +49,8 @@ public class GetPaymentReportParams : IApiRequest
     public GetPaymentReportParams(GetDepositPaymentReportRequest req)
     {
         SiteId = req.SiteId;
-        CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
+        SiteIds = req.SiteIds;
+        CurrencyIds = req.CurrencyIds;
         BaseCurrencyId = (int) req.BaseCurrencyId;
         PayIds = JsonConvert.SerializeObject(req.PayIds);
         Types = JsonConvert.SerializeObject(req.Types);
@@ -62,7 +63,8 @@ public class GetPaymentReportParams : IApiRequest
     public GetPaymentReportParams(GetWithdrawalPaymentReportRequest req)
     {
         SiteId = req.SiteId;
-        CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
+        SiteIds = req.SiteIds;
+        CurrencyIds = req.CurrencyIds;
         BaseCurrencyId = (int) req.BaseCurrencyId;
         PayIds = JsonConvert.SerializeObject(req.PayIds);
         Types = JsonConvert.SerializeObject(req.Types);
@@ -73,7 +75,7 @@ public class GetPaymentReportParams : IApiRequest
     }
     
     public int SiteId { get; set; }
-    public string CurrencyIds { get; set; }
+    public IEnumerable<int> CurrencyIds { get; set; }
     public int BaseCurrencyId { get; set; }
     public string PayIds { get; set; }
     public string Types { get; set; }
@@ -83,7 +85,6 @@ public class GetPaymentReportParams : IApiRequest
     public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
     public IEnumerable<int> SiteIds { get; set; }
     public int CurrencyId { get; set; }
-    IEnumerable<int> IApiRequest.CurrencyIds { get; set; }
 }
 
 public class GetDepositPaymentReportRequest : IApiRequest
