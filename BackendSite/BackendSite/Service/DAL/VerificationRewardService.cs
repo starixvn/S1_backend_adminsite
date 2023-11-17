@@ -90,6 +90,15 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public CustVerificationReward GetCustVerificationRewardByCust(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            var result = _reportDbClient.QueryFirst<CustVerificationReward>("Service_CustVerificationRewardByCustId_Get", p);
+            
+            return result;
+        }
+        
         public int InsertQueueJob(int custId, QueueJob type, string data)
         {
             var p = new DynamicParameters(new

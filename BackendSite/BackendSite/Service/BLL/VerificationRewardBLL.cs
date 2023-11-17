@@ -144,6 +144,11 @@ namespace BackendSite.Service.BLL
                 return new DateTime(1900, 1, 1);
         }
         
+        public CustVerificationReward GetCustVerificationRewardByCust(int custId)
+        {
+            return _verificationRewardService.GetCustVerificationRewardByCust(custId);
+        }
+        
         public int InsertQueueJob(int custId, QueueJob type, string data)
         {
             return _verificationRewardService.InsertQueueJob(custId, type, data);
