@@ -424,7 +424,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
 
                     // verification job queue
-                    _verificationRewardBLL.InsertQueueJob(depositRequest.CustId, QueueJob.Verification, string.Empty);
+                    var custVerificationReward = _verificationRewardBLL.GetCustVerificationRewardByCust(depositRequest.CustId);
+                    if (custVerificationReward is not null && custVerificationReward.EmailReward != 0 && custVerificationReward.PhoneReward != 0)
+                    {
+                        _verificationRewardBLL.InsertQueueJob(depositRequest.CustId, QueueJob.Verification, string.Empty);
+                    }
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
