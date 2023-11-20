@@ -1833,6 +1833,7 @@ namespace BackendSite.Service.Model.enums
     {
         OneGamingPoker = 41,
         V8Poker = 42,
+        V8PokerNoRevenue = 47,
         NineW = 51
     }
 
