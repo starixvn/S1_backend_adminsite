@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
 
+using Org.BouncyCastle.Ocsp;
+
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
@@ -485,159 +487,169 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var authData = _authorizeBll.GetAuthData();
             var withdrawConfirmResult = -1;
 
-            var key = $"lock:withdrawalTransId:{request.TransId}";
-            var lockUser = await _redisHelper.StringGetAsync(key);
-
-            //非 Draft 才判斷自己是否還是 OnUser
-            if (request.Action != WithdrawalStatusEnum.Draft &&
-                lockUser != authData.UserName)
+            //第一把鎖，鎖定後臺同一操作者短時間操作相同單號單
+            var lockKey = $"Withdrawal:SendToNext:Lock:{authData.UserName}:{request.TransId}";
+            var lockValue = Guid.NewGuid().ToString(); // 每次取鎖使用唯一值，確保為同一個執行序所執行
+            var lockExpiry = TimeSpan.FromSeconds(15); //lock 15 sec        
+            if (await _redisHelper.TryCreateLockAsync(lockKey, lockValue, lockExpiry))
             {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = $"{request.TransId} Now OnUser is {lockUser}";
-                return apiResult;
-            }
+                //第二把鎖，鎖定後臺不同操作者操作相同單號
+                var key = $"lock:withdrawalTransId:{request.TransId}";
+                var lockUser = await _redisHelper.StringGetAsync(key);
 
-            var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-            switch (request.Action)
-            {
-                case WithdrawalStatusEnum.Draft:
-
-                    var checkWithdrawalDraftFailResult = CheckWithdrawalDraft(request, withdrawalData, apiResult);
-                    if (checkWithdrawalDraftFailResult != null) return checkWithdrawalDraftFailResult;
-
-                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalDraft(request.TransId,
-                        request.Comment,
-                        request.WithdrawalAccountingModels,
-                        authData.UserName);
-                    break;
-                case WithdrawalStatusEnum.Pending:
-                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalPending(request.TransId,
-                        request.Comment,
-                        authData.UserName);
-                    break;
-                case WithdrawalStatusEnum.OnHold:
-                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalOnHold(request.TransId,
-                        request.Comment,
-                        authData.UserName);
-                    break;
-                case WithdrawalStatusEnum.Verify:
-
-                    if (withdrawalData.ProcessWay == WithdrawalInfoProcessWayEnum.Auto) // 自動出款要走 Verify + Process 流程
-                    {
-                        apiResult = _autoWithdrawalPaymentGateWayBll.AutoWithdrawalProcessWay(request, withdrawalData, authData, apiResult, out withdrawConfirmResult);
-                    }
-                    else
-                    {
-                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
-                            request.Comment,
-                            authData.UserName);
-                    }
-                    break;
-                case WithdrawalStatusEnum.Process:
-                    {
-                        var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(request.WithdrawalInfo);
-                        // 這段先寫死，前端改傳正確的WithdrawalType後拿掉
-                        if (request.WithdrawalType == WithdrawalTypeEnum.OnlineBanking &&
-                            withdrawalInfo.AccountType == "ewallet")
-                            request.WithdrawalType = WithdrawalTypeEnum.EWalletPayment;
-                        var checkWithdrawalTypeFailResult = CheckWithdrawalTypeAndSetObject(request, apiResult, withdrawalInfo);
-                        if (checkWithdrawalTypeFailResult != null) return checkWithdrawalTypeFailResult;
-
-                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalProcess(
-                            request.TransId,
-                            request.Comment,
-                            authData.UserName,
-                            authData.UserId,
-                            JsonConvert.SerializeObject(withdrawalInfo),
-                            (int)request.WithdrawalType,
-                            request.WithdrawalAccountingModels,
-                            out var custId, out var amount);
-
-                        if (withdrawConfirmResult > 0 && IsOnlinePayment(request.WithdrawalType.Value))
-                        {
-                            var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request.TransId, apiResult, authData.UserName);
-                            if (createFailResult != null) return createFailResult;
-                        }
-                        break;
-                    }
-                case WithdrawalStatusEnum.Approved:
-                    {
-                        //Check has pic or not
-                        var hasPic = await CheckWithdrawalPictureAsync(request.TransId);
-
-                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalApproved(request.TransId, request.Comment,
-                            authData.UserName, authData.UserId, hasPic);
-
-                        if (withdrawConfirmResult > 0)
-                        {
-                            var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                            var userLang = _custInfoBll.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
-                            // Send message to player
-                            var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                            var title = _selLangBll.GetResourceValue("lbl_WithdrawalApprovedTitle", userLang);
-                            title = string.Format(title, request.TransId);
-                            var content = _selLangBll.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
-                            content = string.Format(content, request.TransId);
-                            await _messageBll.SendMessageAsync(new Message(sender, withdrawConfirmResult, userLang, title, content));
-
-                            #region Copy Picture
-
-                            if ((withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
-                                && hasPic)
-                            {
-                                await CopyWithdrawalPictureAsync(withdrawalRequest.TransId);
-                            }
-
-                            #endregion
-                        }
-                        break;
-                    }
-                case WithdrawalStatusEnum.Rejected:
-                    {
-                        withdrawConfirmResult =
-                            _withdrawalStateTransferBll.WithdrawalRejected(request.TransId, request.Comment, authData.UserName);
-
-                        if (withdrawConfirmResult > 0)
-                        {
-                            var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
-                            var userLang = _custInfoBll.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
-                            // Send message to player
-                            var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
-                            var title = _selLangBll.GetResourceValue("lbl_WithdrawalRejectTitle", userLang);
-                            title = string.Format(title, request.TransId);
-                            var content = _selLangBll.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
-                            content = string.Format(content, request.TransId);
-                            await _messageBll.SendMessageAsync(new Message(sender, withdrawConfirmResult, userLang, title, content));
-                        }
-                        break;
-                    }
-                case WithdrawalStatusEnum.ToKyc:
-                    withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalToKyc(request.TransId,
-                        request.Comment,
-                        authData.UserName);
-                    break;
-
-            }
-
-            if (withdrawConfirmResult <= 0)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
-                apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
-            }
-            else
-            {
-                if (request.Action != WithdrawalStatusEnum.Draft)
+                //非 Draft 才判斷自己是否還是 OnUser
+                if (request.Action != WithdrawalStatusEnum.Draft &&
+                    lockUser != authData.UserName)
                 {
-                    var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId);
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                    apiResult.Message = $"{request.TransId} Now OnUser is {lockUser}";
+                    return apiResult;
                 }
 
-                var changeStatus = request.Action;
-                await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, changeStatus);
+                var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                switch (request.Action)
+                {
+                    case WithdrawalStatusEnum.Draft:
 
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
+                        var checkWithdrawalDraftFailResult = CheckWithdrawalDraft(request, withdrawalData, apiResult);
+                        if (checkWithdrawalDraftFailResult != null) return checkWithdrawalDraftFailResult;
+
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalDraft(request.TransId,
+                            request.Comment,
+                            request.WithdrawalAccountingModels,
+                            authData.UserName);
+                        break;
+                    case WithdrawalStatusEnum.Pending:
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalPending(request.TransId,
+                            request.Comment,
+                            authData.UserName);
+                        break;
+                    case WithdrawalStatusEnum.OnHold:
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalOnHold(request.TransId,
+                            request.Comment,
+                            authData.UserName);
+                        break;
+                    case WithdrawalStatusEnum.Verify:
+
+                        if (withdrawalData.ProcessWay == WithdrawalInfoProcessWayEnum.Auto) // 自動出款要走 Verify + Process 流程
+                        {
+                            apiResult = _autoWithdrawalPaymentGateWayBll.AutoWithdrawalProcessWay(request, withdrawalData, authData, apiResult, out withdrawConfirmResult);
+                        }
+                        else
+                        {
+                            withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalVerify(request.TransId,
+                                request.Comment,
+                                authData.UserName);
+                        }
+                        break;
+                    case WithdrawalStatusEnum.Process:
+                        {
+                            var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(request.WithdrawalInfo);
+                            // 這段先寫死，前端改傳正確的WithdrawalType後拿掉
+                            if (request.WithdrawalType == WithdrawalTypeEnum.OnlineBanking &&
+                                withdrawalInfo.AccountType == "ewallet")
+                                request.WithdrawalType = WithdrawalTypeEnum.EWalletPayment;
+                            var checkWithdrawalTypeFailResult = CheckWithdrawalTypeAndSetObject(request, apiResult, withdrawalInfo);
+                            if (checkWithdrawalTypeFailResult != null) return checkWithdrawalTypeFailResult;
+
+                            withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalProcess(
+                                request.TransId,
+                                request.Comment,
+                                authData.UserName,
+                                authData.UserId,
+                                JsonConvert.SerializeObject(withdrawalInfo),
+                                (int)request.WithdrawalType,
+                                request.WithdrawalAccountingModels,
+                                out var custId, out var amount);
+
+                            if (withdrawConfirmResult > 0 && IsOnlinePayment(request.WithdrawalType.Value))
+                            {
+                                var createFailResult = await _autoWithdrawalPaymentGateWayBll.PaymentOnlineCreate(request.TransId, apiResult, authData.UserName);
+                                if (createFailResult != null) return createFailResult;
+                            }
+                            break;
+                        }
+                    case WithdrawalStatusEnum.Approved:
+                        {
+                            //Check has pic or not
+                            var hasPic = await CheckWithdrawalPictureAsync(request.TransId);
+
+                            withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalApproved(request.TransId, request.Comment,
+                                authData.UserName, authData.UserId, hasPic);
+
+                            if (withdrawConfirmResult > 0)
+                            {
+                                var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                                var userLang = _custInfoBll.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
+                                // Send message to player
+                                var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                                var title = _selLangBll.GetResourceValue("lbl_WithdrawalApprovedTitle", userLang);
+                                title = string.Format(title, request.TransId);
+                                var content = _selLangBll.GetResourceValue("lbl_WithdrawalApprovedContent", userLang);
+                                content = string.Format(content, request.TransId);
+                                await _messageBll.SendMessageAsync(new Message(sender, withdrawConfirmResult, userLang, title, content));
+
+                                #region Copy Picture
+
+                                if ((withdrawalRequest.WithdrawalType is WithdrawalTypeEnum.LocalBank or WithdrawalTypeEnum.CryptoWallet)
+                                    && hasPic)
+                                {
+                                    await CopyWithdrawalPictureAsync(withdrawalRequest.TransId);
+                                }
+
+                                #endregion
+                            }
+                            break;
+                        }
+                    case WithdrawalStatusEnum.Rejected:
+                        {
+                            withdrawConfirmResult =
+                                _withdrawalStateTransferBll.WithdrawalRejected(request.TransId, request.Comment, authData.UserName);
+
+                            if (withdrawConfirmResult > 0)
+                            {
+                                var withdrawalRequest = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                                var userLang = _custInfoBll.GetCustInfoWithCache(withdrawalRequest.CustId).UserLang;
+                                // Send message to player
+                                var sender = _selLangBll.GetResourceValue("lbl_MessageDepositWithdrawalSender", userLang);
+                                var title = _selLangBll.GetResourceValue("lbl_WithdrawalRejectTitle", userLang);
+                                title = string.Format(title, request.TransId);
+                                var content = _selLangBll.GetResourceValue("lbl_WithdrawalRejectContent", userLang);
+                                content = string.Format(content, request.TransId);
+                                await _messageBll.SendMessageAsync(new Message(sender, withdrawConfirmResult, userLang, title, content));
+                            }
+                            break;
+                        }
+                    case WithdrawalStatusEnum.ToKyc:
+                        withdrawConfirmResult = _withdrawalStateTransferBll.WithdrawalToKyc(request.TransId,
+                            request.Comment,
+                            authData.UserName);
+                        break;
+
+                }
+
+                if (withdrawConfirmResult <= 0)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                    apiResult.Message = _selLangBll.GetMsg("msg_UpdateFailed");
+                }
+                else
+                {
+                    if (request.Action != WithdrawalStatusEnum.Draft)
+                    {
+                        var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(request.TransId, authData.SiteId);
+                    }
+
+                    var changeStatus = request.Action;
+                    await _withdrawalAccountBll.WithdrawalAccountCounter(withdrawalData, changeStatus);
+
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                    apiResult.Message = _selLangBll.GetMsg("msg_Updatesuccessful");
+                }
+
+                // 解鎖除第一把
+                await _redisHelper.UnLockAsync(lockKey, lockValue);
             }
-
             return apiResult;
         }
 
