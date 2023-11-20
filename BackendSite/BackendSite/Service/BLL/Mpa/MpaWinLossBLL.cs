@@ -1857,26 +1857,26 @@ namespace BackendSite.Service.BLL.Mpa
             #endregion
 
             #region total
-
+            var exportDatawithoutAll = exportData.Where(x => !x.Currency.Contains("All")).ToList();
             exportData.Add(new MpaWinLossByCurrencyDto()
             {
                 Currency = "total",
-                TurnOver = exportData.Sum(x => x.TurnOver),
-                ValidTurnOver = exportData.Sum(x => x.ValidTurnOver),
-                GGR = exportData.Sum(x => x.GGR),
-                PlayerWinLoss = exportData.Sum(x => x.PlayerWinLoss),
-                ProgressiveWin = exportData.Sum(x => x.ProgressiveWin),
-                ProgressiveBet = exportData.Sum(x => x.ProgressiveBet),
-                Commission = exportData.Sum(x => x.Commission),
-                BetCount = exportData.Sum(x => x.BetCount),
+                TurnOver = exportDatawithoutAll.Sum(x => x.TurnOver),
+                ValidTurnOver = exportDatawithoutAll.Sum(x => x.ValidTurnOver),
+                GGR = exportDatawithoutAll.Sum(x => x.GGR),
+                PlayerWinLoss = exportDatawithoutAll.Sum(x => x.PlayerWinLoss),
+                ProgressiveWin = exportDatawithoutAll.Sum(x => x.ProgressiveWin),
+                ProgressiveBet = exportDatawithoutAll.Sum(x => x.ProgressiveBet),
+                Commission = exportDatawithoutAll.Sum(x => x.Commission),
+                BetCount = exportDatawithoutAll.Sum(x => x.BetCount),
                 UniquePlayers = betRecord.UniquePlayers,
-                DepositCount = exportData.Sum(x => x.DepositCount),
-                TotalDepositAmount = exportData.Sum(x => x.TotalDepositAmount),
-                WithDrawCount = exportData.Sum(x => x.WithDrawCount),
-                TotalWithDrawAmount = exportData.Sum(x => x.TotalWithDrawAmount),
-                TotalBonus = exportData.Sum(x => x.TotalBonus),
-                AvgBetAmount = exportData.Sum(x => x.BetCount) != 0
-                    ? (exportData.Sum(x => x.TurnOver) / exportData.Sum(x => x.BetCount))
+                DepositCount = exportDatawithoutAll.Sum(x => x.DepositCount),
+                TotalDepositAmount = exportDatawithoutAll.Sum(x => x.TotalDepositAmount),
+                WithDrawCount = exportDatawithoutAll.Sum(x => x.WithDrawCount),
+                TotalWithDrawAmount = exportDatawithoutAll.Sum(x => x.TotalWithDrawAmount),
+                TotalBonus = exportDatawithoutAll.Sum(x => x.TotalBonus),
+                AvgBetAmount = exportDatawithoutAll.Sum(x => x.BetCount) != 0
+                    ? (exportDatawithoutAll.Sum(x => x.TurnOver) / exportDatawithoutAll.Sum(x => x.BetCount))
                     : 0.00m,
 
                 Margin = exportData.Sum(x => x.ValidTurnOver) != 0
