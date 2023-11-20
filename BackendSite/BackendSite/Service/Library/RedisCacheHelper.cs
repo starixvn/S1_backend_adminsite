@@ -374,46 +374,42 @@ namespace BackendSite.Service.Library
             }
         }
 
-        public async Task<RedisSetAndGetResult> StringSetAndGetAsync(string key, string value, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        public async Task<bool> TryCreateLockAsync(RedisKey lockKey, RedisValue lockValue, TimeSpan? expiry, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
-            var result = new RedisSetAndGetResult() { Success = true, Value = value };
-            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
-            RedisKey[] keys = { $"{key}" };
-            RedisValue[] values = { value };
-
-            // 如果 key 存在，回傳 Value，如果 Key 不存在，則 Set Key，並回傳該次 Set 的 Value
-            var LuaScript = @"
-            local value = redis.call(""GET"", KEYS[1])
-            if (not value) then
-                redis.call(""SET"", KEYS[1], ARGV[1])
-            return ARGV[1]
-            end
-            return value";
-
-            var db = _multiplexer.GetDatabase((int)redisDataBase);
-            var returnValue = await db.ScriptEvaluateAsync(LuaScript, keys, values);
-
-            if (returnValue.ToString() != value)
+            var key = $"{redisDataBase}:{RemoveSpecialChars(lockKey)}";
+            try
             {
-                result.Success = false;
-                result.Value = returnValue.ToString(); // redis origin value
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                return await db.StringSetAsync(key, lockValue, expiry, When.NotExists);// 使用When.NotExists選項，確保操作的原子性
             }
-
-            return result;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return false;
+            }
         }
 
-        public async Task<bool> ExecuteLuaScriptAsync(string script, string key, string value, RedisDataBase redisDataBase = RedisDataBase.Admin)
+        public async Task<bool> UnLockAsync(RedisKey lockKey, RedisValue lockValue, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
-            key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
-            RedisKey[] keys = { $"{key}" };
-            RedisValue[] values = { value };
-
-            var db = _multiplexer.GetDatabase((int)redisDataBase);
-            var execResult = await db.ScriptEvaluateAsync(script, keys, values);
-
-            return (execResult.ToString() == "1");
+            //當鎖的值與預期的值相匹配時才釋放鎖，使用Lua script確保操作的原子性
+            var key = $"{redisDataBase}:{RemoveSpecialChars(lockKey)}";
+            var script = @"if redis.call('GET', KEYS[1]) == ARGV[1] then 
+                           return redis.call('DEL', KEYS[1]) 
+                       else 
+                           return 0 
+                       end";
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)redisDataBase);
+                var result = await db.ScriptEvaluateAsync(script, new RedisKey[] { key }, new RedisValue[] { lockValue });
+                return result.ToString() == "1";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return false;
+            }
         }
-
 
         private string RemoveSpecialChars(string key)
         {
