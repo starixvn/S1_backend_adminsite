@@ -1991,7 +1991,7 @@ namespace BackendSite.Service.BLL.Mpa
             #endregion
 
             #region total
-            var exportDataWithoutAll = exportData.Where(x => x.Currency.Contains("All")).ToList();
+            var exportDataWithoutAll = exportData.Where(x => !x.Currency.Contains("All")).ToList();
             exportData.Add(new MpaWinLossByCurrencyDto()
             {
                 Currency = "total",
