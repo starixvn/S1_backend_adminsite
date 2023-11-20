@@ -216,7 +216,7 @@ namespace BackendSite.Service.BLL.Mpa
                     ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
                     Commission = dateSummary.Sum(x => x.Commission),
                     BetCount = dateSummary.Sum(x => x.BetCount),
-                    UniquePlayers = dateSummary.Where(x => x.BetCount != 0).DistinctBy(x => x.CustId).Count(),
+                    UniquePlayers = dateSummary.Sum(x => x.UniquePlayers),
                     DepositCount = dateSummary.Sum(x => x.DepositCount),
                     TotalDepositAmount = dateSummary.Sum(x => x.TotalDepositAmount),
                     WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
@@ -323,7 +323,7 @@ namespace BackendSite.Service.BLL.Mpa
                 ProgressiveBet = r.Sum(x => x.ProgressiveBet),
                 Commission = r.Sum(x => x.Commission),
                 BetCount = r.Sum(x => x.BetCount),
-                UniquePlayers = r.Sum(x => x.UniquePlayers),
+                UniquePlayers = r.Where(x => x.BetCount != 0).DistinctBy(x => x.CustId).Count(),
                 DepositCount = r.Sum(x => x.DepositCount),
                 TotalDepositAmount = r.Sum(x => x.TotalDepositAmount),
                 WithDrawCount = r.Sum(x => x.WithDrawCount),
@@ -358,6 +358,7 @@ namespace BackendSite.Service.BLL.Mpa
                         x.Date,
                         x.CurrencyId,
                         x.GameType,
+                        x.CustId
                     })
                     .Select(r =>
                     {
@@ -376,6 +377,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 建立新的MpaWinLossByDateDto物件並返回
                         return new MpaWinLossByDateDto
                         {
+                            CustId = r.Key.CustId,
                             Date = groupByType == MpaWinLossGroupByTypeEnum.Date
                                 ? r.Key.Date.ToString("yyyy-MM-dd")
                                 : r.Key.Date.ToString("yyyy-MM"),
@@ -403,6 +405,7 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         x.Date,
                         x.Currency,
+                        x.CustId
                     })
                     .Select(r =>
                     {
@@ -410,6 +413,7 @@ namespace BackendSite.Service.BLL.Mpa
                         // 建立新的MpaWinLossByDateDto物件並返回
                         return new MpaWinLossByDateDto
                         {
+                            CustId = r.Key.CustId,
                             Date = groupByType == MpaWinLossGroupByTypeEnum.Date
                                 ? r.Key.Date
                                 : r.Key.Date,
@@ -428,7 +432,7 @@ namespace BackendSite.Service.BLL.Mpa
                             Margin = r.Sum(x => x.ValidTurnOver) != 0
                             ? r.Sum(x => x.GGR) / r.Sum(x => x.ValidTurnOver)
                             : 0.00m,
-                            UniquePlayers = r.Sum(x => x.UniquePlayers)
+                            UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                         };
                     }).ToList();
             }
