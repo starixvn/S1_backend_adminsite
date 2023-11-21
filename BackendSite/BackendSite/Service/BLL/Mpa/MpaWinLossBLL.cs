@@ -1126,7 +1126,7 @@ namespace BackendSite.Service.BLL.Mpa
                     ValidTurnOver = v.ValidTurnOver,
                     GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
-                    BAPlayerWinLoss = v.BAplayerWinLoss,
+                    BAPlayerWinLoss = v.BAPlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
                     Commission = v.Commission,
