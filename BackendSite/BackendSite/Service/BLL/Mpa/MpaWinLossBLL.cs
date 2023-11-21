@@ -983,9 +983,6 @@ namespace BackendSite.Service.BLL.Mpa
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
                     ? GetOriginalCurrencyDetailByTpCategory(tpBetRecordResult, key)
                     : GetCurrencyDetailByTpCategory(dateSummary),
-                    //CurrencyDetailByCategory = request.DisplayGroupBreakdownInOriginalCurrency
-                    //? GetOriginalCurrencyDetailByTpCategory(tpBetRecordResult, key)
-                    //: GetCurrencyDetailByTpCategory(dateSummary),
                 };
 
                 exportData.Add(key, result);
@@ -1036,41 +1033,6 @@ namespace BackendSite.Service.BLL.Mpa
 
             return exportData.ToApiFormat();
         }
-        //public IEnumerable<MpaWinLossByTpCategoryCurrencyDetailDto> GetOriginalCurrencyDetailByTpCategory(IEnumerable<MpaWinLossByTpCategoryDto> combineResult,string key)
-        //{
-        //    return combineResult.Where(x => x.TpCategoryName == key)
-        //        .GroupBy(x => x.Currency)
-        //        .Select(r => new MpaWinLossByTpCategoryCurrencyDetailDto
-        //        {
-        //            Currency = r.Key,
-        //            TurnOver = r.Sum(x => x.TurnOver),
-        //            ValidTurnOver = r.Sum(x => x.ValidTurnOver),
-        //            GGR = r.Sum(x =>x.GGR),
-        //            PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
-        //            ProgressiveWin = r.Sum(x => x.ProgressiveWin),
-        //            ProgressiveBet = r.Sum(x => x.ProgressiveBet),
-        //            Commission = r.Sum(x => x.Commission),
-        //            BetCount = r.Sum(x => x.BetCount),
-        //            UniquePlayers = r.Sum(x => x.UniquePlayers)
-        //        });
-        //}
-        //public IEnumerable<MpaWinLossByTpCategoryCurrencyDetailDto> GetCurrencyDetailByTpCategory(IEnumerable<MpaWinLossByTpCategoryDto> dateSummary)
-        //{
-        //    return dateSummary.GroupBy(x => x.Currency)
-        //        .Select(r => new MpaWinLossByTpCategoryCurrencyDetailDto
-        //        {
-        //            Currency = r.Key,
-        //            TurnOver = r.Sum(x=> x.TurnOver),
-        //            GGR = r.Sum(x=> x.GGR),
-        //            ValidTurnOver = r.Sum(x => x.ValidTurnOver),
-        //            PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
-        //            ProgressiveWin = r.Sum(x => x.ProgressiveWin),
-        //            ProgressiveBet = r.Sum(x => x.ProgressiveBet),
-        //            Commission = r.Sum(x => x.Commission),
-        //            BetCount = r.Sum(x => x.BetCount),
-        //            UniquePlayers = r.Sum(x =>x.UniquePlayers)
-        //        });
-        //}
 
         private static Dictionary<string, MpaWinLossByTpCategoryCurrencyDetailDto> GetCurrencyDetailByTpCategory(List<MpaWinLossByTpCategoryDto> dateSummary)
         {
