@@ -419,7 +419,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
+                                ? (CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                         };
@@ -884,7 +884,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
+                                ? (CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                         };
@@ -1049,9 +1049,6 @@ namespace BackendSite.Service.BLL.Mpa
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
                     ? GetOriginalCurrencyDetailByTpCategory(tpBetRecordResult, key)
                     : GetCurrencyDetailByTpCategory(dateSummary),
-                    //CurrencyDetailByCategory = request.DisplayGroupBreakdownInOriginalCurrency
-                    //? GetOriginalCurrencyDetailByTpCategory(tpBetRecordResult, key)
-                    //: GetCurrencyDetailByTpCategory(dateSummary),
                 };
 
                 exportData.Add(key, result);
@@ -1104,41 +1101,6 @@ namespace BackendSite.Service.BLL.Mpa
 
             return exportData.ToApiFormat();
         }
-        //public IEnumerable<MpaWinLossByTpCategoryCurrencyDetailDto> GetOriginalCurrencyDetailByTpCategory(IEnumerable<MpaWinLossByTpCategoryDto> combineResult,string key)
-        //{
-        //    return combineResult.Where(x => x.TpCategoryName == key)
-        //        .GroupBy(x => x.Currency)
-        //        .Select(r => new MpaWinLossByTpCategoryCurrencyDetailDto
-        //        {
-        //            Currency = r.Key,
-        //            TurnOver = r.Sum(x => x.TurnOver),
-        //            ValidTurnOver = r.Sum(x => x.ValidTurnOver),
-        //            GGR = r.Sum(x =>x.GGR),
-        //            PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
-        //            ProgressiveWin = r.Sum(x => x.ProgressiveWin),
-        //            ProgressiveBet = r.Sum(x => x.ProgressiveBet),
-        //            Commission = r.Sum(x => x.Commission),
-        //            BetCount = r.Sum(x => x.BetCount),
-        //            UniquePlayers = r.Sum(x => x.UniquePlayers)
-        //        });
-        //}
-        //public IEnumerable<MpaWinLossByTpCategoryCurrencyDetailDto> GetCurrencyDetailByTpCategory(IEnumerable<MpaWinLossByTpCategoryDto> dateSummary)
-        //{
-        //    return dateSummary.GroupBy(x => x.Currency)
-        //        .Select(r => new MpaWinLossByTpCategoryCurrencyDetailDto
-        //        {
-        //            Currency = r.Key,
-        //            TurnOver = r.Sum(x=> x.TurnOver),
-        //            GGR = r.Sum(x=> x.GGR),
-        //            ValidTurnOver = r.Sum(x => x.ValidTurnOver),
-        //            PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
-        //            ProgressiveWin = r.Sum(x => x.ProgressiveWin),
-        //            ProgressiveBet = r.Sum(x => x.ProgressiveBet),
-        //            Commission = r.Sum(x => x.Commission),
-        //            BetCount = r.Sum(x => x.BetCount),
-        //            UniquePlayers = r.Sum(x =>x.UniquePlayers)
-        //        });
-        //}
 
         private static Dictionary<string, MpaWinLossByTpCategoryCurrencyDetailDto> GetCurrencyDetailByTpCategory(List<MpaWinLossByTpCategoryDto> dateSummary)
         {
@@ -1162,10 +1124,13 @@ namespace BackendSite.Service.BLL.Mpa
                 {
                     TurnOver = v.TurnOver,
                     ValidTurnOver = v.ValidTurnOver,
+                    GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
+                    BAPlayerWinLoss = v.BAplayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
                     Commission = v.Commission,
+                    BACommission = v.BACommission,
                     BetCount = v.BetCount,
                     UniquePlayers = v.UniquePlayers,
                 });
@@ -1233,7 +1198,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
+                                ? (CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                         };
@@ -1699,7 +1664,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ? CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
+                                ? (CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count()
                         };
@@ -2124,7 +2089,7 @@ namespace BackendSite.Service.BLL.Mpa
                         TotalBonus = r.Sum(x => x.TotalBonus)
                     }).ToList();
             }
-
+            
             var apiData = new Dictionary<string, MpaWinLossByCurrencyResponse>();
             var keys = originCombineResult.Select(x => x.Currency).Distinct();
             foreach (var key in keys)
@@ -2331,7 +2296,7 @@ namespace BackendSite.Service.BLL.Mpa
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
                             Margin = totalValidBetSummary != 0
-                                ?CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) / totalValidBetSummary
+                                ? (CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission) / totalValidBetSummary
                                 : 0.00m,
                             UniquePlayers = r.DistinctBy(x => x.CustId).Count(),
                         };

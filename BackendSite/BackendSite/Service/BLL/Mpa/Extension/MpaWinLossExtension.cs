@@ -87,7 +87,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         {
             foreach (var item in data)
             {
-                if (item.SummaryType == 3 || item.SummaryType == 4)
+                if (item.GameType == 69 && (item.SummaryType == 3 || item.SummaryType == 4))
                 {
                     item.BAStakeSummary = item.StakeSummary;
                     item.BAValidBetSummary = item.ValidBetSummary;
