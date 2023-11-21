@@ -1,10 +1,11 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Store.Report;
-
 using NPOI.XSSF.UserModel;
 
 namespace BackendSite.Service.BLL
@@ -17,15 +18,15 @@ namespace BackendSite.Service.BLL
 
         public StoreReportBLL(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
             _logger = provider.GetRequiredService<ILogger<StoreReportBLL>>();
-            _storeSiteUrl = configuration.GetValue<string>("StoreService");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
         }
 
         public Task<ApiResult<object>> GetDepositPointReportAsync(GetDepositPointReportRequest req)
         {
-            var url = _storeSiteUrl + "/api/Report/GetDepositPointReport";
+            var url = _storeSiteUrl + "Report/GetDepositPointReport";
             var result = _courierAdapter.PostAsync<ApiResult<object>, GetDepositPointReportRequest>(url, req);
 
             return result;
@@ -33,7 +34,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<byte[]> ExportDepositPointReportAsync(ExportDepositPointReportRequest req)
         {
-            var url = _storeSiteUrl + "/api/Report/ExportDepositPointReport";
+            var url = _storeSiteUrl + "Report/ExportDepositPointReport";
             var exportResult =
                 await _courierAdapter.PostAsync<ApiResult<ExportDepositPointReportResult>, ExportDepositPointReportRequest>(url, req);
 
@@ -60,7 +61,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<object>> GetAdjustmentPointReportAsync(GetAdjustmentPointReportRequest req)
         {
-            var url = _storeSiteUrl + "/api/Report/GetAdjustmentPointReport";
+            var url = _storeSiteUrl + "Report/GetAdjustmentPointReport";
             var result = _courierAdapter.PostAsync<ApiResult<object>, GetAdjustmentPointReportRequest>(url, req);
 
             return result;
@@ -68,7 +69,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<byte[]> ExportAdjustmentPointReportAsync(ExportAdjustmentPointReportRequest req)
         {
-            var url = _storeSiteUrl + "/api/Report/ExportAdjustmentPointReport";
+            var url = _storeSiteUrl + "Report/ExportAdjustmentPointReport";
             var exportResult =
                 await _courierAdapter.PostAsync<ApiResult<ExportAdjustmentPointReportResult>, ExportAdjustmentPointReportRequest>(url, req);
 
@@ -95,7 +96,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult<object>> GetTurnoverPointReportAsync(GetTurnoverPointReportRequest req)
         {
-            var url = _storeSiteUrl + "/api/Report/GetTurnoverPointReport";
+            var url = _storeSiteUrl + "Report/GetTurnoverPointReport";
             var result = await _courierAdapter.PostAsync<ApiResult<object>, GetTurnoverPointReportRequest>(url, req);
 
             return result;
@@ -103,7 +104,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<byte[]> ExportTurnoverPointReportAsync(ExportTurnoverPointReportRequest req)
         {
-            var url = _storeSiteUrl + "/api/Report/ExportTurnoverPointReport";
+            var url = _storeSiteUrl + "Report/ExportTurnoverPointReport";
             var exportResult =
                 await _courierAdapter.PostAsync<ApiResult<ExportDepositPointReportResult>, ExportTurnoverPointReportRequest>(url, req);
 

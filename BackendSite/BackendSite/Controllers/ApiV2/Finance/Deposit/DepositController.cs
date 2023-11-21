@@ -1,22 +1,18 @@
 ﻿using System.Net;
-
 using Amazon.S3.Model;
-
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
@@ -31,7 +27,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly DepositBLL _depositBll;
         private readonly SelLangBLL _selLangBll;
         private readonly MessageBLL _messageBll;
-        private readonly PendingFundBLL _pendingFundBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
         private readonly PermissionBLL _permissionBll;
@@ -41,7 +36,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly string _awsDepositUrl;
         private readonly string _awsDepositFolder;
         private readonly string _awsDepositBucketName;
-        private readonly int _mainWalletType;
         private readonly IRabbitMQProducer _producer;
 
         #endregion
@@ -53,16 +47,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _depositBll = provider.GetRequiredService<DepositBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
-            _pendingFundBll = provider.GetRequiredService<PendingFundBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _producer = provider.GetRequiredService<IRabbitMQProducer>();
-            _awsDepositUrl = configuration.GetValue<string>("AwsDepositUrl");
-            _awsDepositFolder = configuration.GetValue<string>("AwsDepositFolder");
-            _awsDepositBucketName = configuration.GetValue<string>("AwsDepositBucketName");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
+            _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
+            _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
+            
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
                 { DepositStatusEnum.Pending,
@@ -884,7 +879,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             {
                 usableActionButton.Remove(DepositActionEnum.ManualApproved);
             }
-            else if (depositRequest.DepositType is not DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
+            else if (depositRequest.DepositType is not (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet))
             {
                 usableActionButton.Remove(DepositActionEnum.Approved);
             }

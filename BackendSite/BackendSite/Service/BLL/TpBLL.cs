@@ -1,6 +1,8 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.TpMaintain;
 
 using TpGameType = BackendSite.Service.Model.TpGameType;
@@ -11,7 +13,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly ServerInfoService _serverInfoService;
         private readonly CourierAdapter _courierAdapter;
-        private readonly string _apiUrl;
+        private readonly string _tpServiceApiUrl;
         private readonly ThirdPartyService _thirdPartyService;
         private readonly ICacheHelper _redisHelper;
         private readonly int _balanceTimeoutSecond;
@@ -23,8 +25,9 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
-            _apiUrl = provider.GetRequiredService<IConfiguration>().GetValue<string>("TpService");
-            _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
+            _balanceTimeoutSecond = int.Parse(configBll.GetConfigValue("BalanceTimeoutSecond"));
             _logger = provider.GetRequiredService<ILogger<TpBLL>>();
         }
 
@@ -145,7 +148,7 @@ namespace BackendSite.Service.BLL
                 direction = inTpTransfer.direction,
                 inputs = null
             };
-            var myUrl = $"{_apiUrl}Transfer";
+            var myUrl = $"{_tpServiceApiUrl}Transfer";
             var data = await _courierAdapter.MyPostAsync<TransferResult, TpTransfer>(myUrl, tpTransfer);
 
             return data;
@@ -153,7 +156,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult<UserBalance>> GetBalanceAsync(TpInfo inInfo)
         {
             var input = new Dictionary<string, string>();
-            var myUrl = $"{_apiUrl}GetBalance";
+            var myUrl = $"{_tpServiceApiUrl}GetBalance";
 
             var oTpInfo = new TpInfo
             {
@@ -181,7 +184,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult<TransferResult>> FixNegativeAsync(TpInfo inInfo)
         {
             var input = new Dictionary<string, string>();
-            var myUrl = $"{_apiUrl}FixNegative";
+            var myUrl = $"{_tpServiceApiUrl}FixNegative";
             var oTpInfo = new TpInfo
             {
                 TpId = inInfo.TpId,
@@ -219,7 +222,7 @@ namespace BackendSite.Service.BLL
                 DepositId = inAdminTpTransfer.DepositId,
                 IsDepositId = inAdminTpTransfer.IsDepositId,
             };
-            var myUrl = $"{_apiUrl}AdjustWallet";
+            var myUrl = $"{_tpServiceApiUrl}AdjustWallet";
             var data = await _courierAdapter.MyPostAsync<AdjustWalletResult, TpTransfer>(myUrl, adminTpTransfer);
 
             return data;
@@ -240,15 +243,9 @@ namespace BackendSite.Service.BLL
             return _thirdPartyService.GetCustTpAdjustmentLog(input, absPageSize, startIndex, out totalPages, out rowCount);
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(string siteId, int currency)
         {
-            var UserSiteList = _serverInfoService.GetSiteList();
-            IEnumerable<SiteTpListIfo> result = null;
-            if (UserSiteList.Where(x => x.SiteId == siteId).Select(x => x).ToList().FirstOrDefault().ICurrencyList.Contains(currency))
-            {
-                result = _thirdPartyService.GetTpBySiteAndCurrency(siteId, currency);
-            }
-            return result;
+            return _thirdPartyService.GetTpBySiteAndCurrency(siteId, currency);
         }
         public void SetAdjustmentTpCustInfoLog(string menu, int actionType, string detailInfo, string @operator)
         {
@@ -257,7 +254,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult<dynamic>> GetBetDetail(GetTpBetRecordDetailRequest request)
         {
-            var myUrl = $"{_apiUrl}GetBetDetail";
+            var myUrl = $"{_tpServiceApiUrl}GetBetDetail";
 
             try
             {
@@ -303,9 +300,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(int categoryId)
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(string siteIds, int currencyId, int categoryId)
         {
-            return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
+            return await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(siteIds, currencyId, categoryId);
         }
 
         public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurremcyListAsync(int siteId, int currencyId)
@@ -313,9 +310,9 @@ namespace BackendSite.Service.BLL
             var result = await _thirdPartyService.GetTpGameTypeCurrency();
             return result.Where(x => x.SiteId == siteId && x.CurrencyId == currencyId);
         }
-        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(string siteIds, int currencyId, int categoryId)
         {
-            var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(categoryId);
+            var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(siteIds, currencyId, categoryId);
             var gameTypeWithBetLimit = tpGameType
                 .Select(a => new GameTypeBetLimit()
                 {

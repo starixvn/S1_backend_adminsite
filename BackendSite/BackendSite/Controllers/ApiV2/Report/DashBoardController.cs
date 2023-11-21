@@ -66,7 +66,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             if (request.TimeZone > 14 || request.TimeZone < -12)
                 throw new AdminException(ErrorCodeEnum.Fail, "Invalid TimeZone");
 
-            _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x => canSearchSite.Add(x.SiteId));
+            _serverInfoBll.GetSiteListByLoginUserV2().ToList().ForEach(x => canSearchSite.Add(x.SiteId));
             var result = _dashBoardBll.GetDashBoardData(request.SiteId, request.CurrencyId, request.BaseCurrencyId, canSearchSite, request.TimeZone);
 
             return new ApiResult<DashBoardData>

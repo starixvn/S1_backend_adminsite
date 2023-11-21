@@ -1,6 +1,7 @@
 ﻿using System.Transactions;
 
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -38,16 +39,16 @@ namespace BackendSite.Service.BLL
 
         public BankFinancialBLL(IServiceProvider provider)
         {
-            var configuration = provider.GetRequiredService<IConfiguration>();
             _bankFinancialService = provider.GetRequiredService<BankFinancialService>();
             _paymentManageService = provider.GetRequiredService<PaymentManageService>();
             _reportService = provider.GetRequiredService<ReportService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
-            _bucketName = configuration.GetValue<string>("AwsFinanceBucketName");
-            _bucketUrl = configuration.GetValue<string>("AwsFinanceBucketUrl");
-            _folder = configuration.GetValue<string>("AwsFinanceFolder");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _bucketName = configBll.GetConfigValue("AWSBackOfficeBucketName");
+            _bucketUrl = configBll.GetConfigValue("AWSBackOfficeBucketUrl");
+            _folder = configBll.GetConfigValue("AWSFinanceFolderName");
             _cryptor = provider.GetRequiredService<Cryptor>();
         }
 
@@ -1577,7 +1578,7 @@ namespace BackendSite.Service.BLL
 
                     }
                 }
-                else if (data.WithdrawalType == WithdrawalTypeEnum.OnlinePayment)
+                else if (data.WithdrawalType == WithdrawalTypeEnum.OnlineBanking)
                 {
                     var account = accountData.FirstOrDefault(x => x.PayId.ToString() == data.AccountNo && x.SiteId == data.SiteId && x.CurrencyId == data.CurrencyId);
                     var pay = payData.FirstOrDefault(x => x.Id.ToString() == data.AccountNo);

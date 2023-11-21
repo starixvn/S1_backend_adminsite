@@ -1,15 +1,14 @@
 ﻿using System.Text.RegularExpressions;
 using System.Transactions;
-
 using Amazon.S3.Model;
-
 using BackendSite.Controllers.ApiV2.Finance.Deposit;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -24,8 +23,6 @@ namespace BackendSite.Service.BLL
         private readonly AuthorizeBLL authorizeBLL;
         private readonly Common common;
         private readonly CustInfoService custInfoService;
-        private readonly ImageEditorBLL _imageEditorBll;
-        private readonly IConfiguration _configuration;
         private readonly CourierAdapter _courierAdapter;
         private readonly ICacheHelper _cacheHelper;
         private readonly string payApiUrl;
@@ -35,7 +32,7 @@ namespace BackendSite.Service.BLL
         private readonly AWSS3Helper _s3Helper;
 
 
-        public DepositBLL(IServiceProvider provider, IConfiguration configuration)
+        public DepositBLL(IServiceProvider provider)
         {
             depositService = provider.GetRequiredService<DepositService>();
             serverInfoService = provider.GetRequiredService<ServerInfoService>();
@@ -45,15 +42,15 @@ namespace BackendSite.Service.BLL
             authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             common = provider.GetRequiredService<Common>();
             custInfoService = provider.GetRequiredService<CustInfoService>();
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-            payApiUrl = _configuration.GetValue<string>("PayService"); //DepositManual
-            _imageEditorBll = provider.GetRequiredService<ImageEditorBLL>();
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
+            _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
+            _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _logger = provider.GetRequiredService<ILogger<DepositBLL>>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
-            _awsDepositFolder = configuration.GetValue<string>("AwsDepositFolder");
-            _awsDepositBucketName = configuration.GetValue<string>("AwsDepositBucketName");
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
         }
 
@@ -200,11 +197,9 @@ namespace BackendSite.Service.BLL
 
         public DepositRequest GetDepositRequest(string transId)
         {
-            var serverInfo = serverInfoService.GetModel();
-
             var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var depositId);
-            return depositService.GetDepositRequest(depositId, serverInfo.SiteId/*Not require*/);/*Check SiteID By Permission*/
+            _ = int.TryParse(m.Value, out var depositId);
+            return depositService.GetDepositRequest(depositId);
         }
 
         public GetDepositAccountingListModel GetDepositAccountingList(

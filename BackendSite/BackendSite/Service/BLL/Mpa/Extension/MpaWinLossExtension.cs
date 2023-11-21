@@ -42,12 +42,6 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             }
 
 
-            //For product has jackpot: GGR = - (Player WL – Progressive Win) – Progressive Bet
-            foreach (var item in data)
-            {
-                item.WinLossSummary -= item.ProgressiveWinSummary;
-            }
-
             if (!request.IncludeTest)
             {
                 //istest = 0, test member
@@ -336,14 +330,14 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 };
 
                 // 處理 children
-                if (item.Value.CurrencyDetailGroupByCurrency == null)
+                if (item.Value.CurrencyDetail == null)
                 {
                     data.Children = new List<MpaWinLossByDayCurrencyDetailDtoToFrontEnd>();
                 }
                 else
                 {
-                    var children = item.Value.CurrencyDetailGroupByCurrency
-                        .Select(childrenItem => new MpaWinLossByDayCurrencyDetailDtoToFrontEnd { DisplayKey = childrenItem.Currency, Data = childrenItem })
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByDayCurrencyDetailDtoToFrontEnd { DisplayKey = childrenItem.Key, Data = childrenItem.Value })
                         .ToList();
                     data.Children = children;
                 }
@@ -379,14 +373,14 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 };
 
                 // 處理 children
-                if (item.Value.CurrencyDetailByCategory == null)
+                if (item.Value.CurrencyDetail == null)
                 {
                     data.Children = new List<MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd>();
                 }
                 else
                 {
-                    var children = item.Value.CurrencyDetailByCategory
-                        .Select(childrenItem => new MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd() { DisplayKey = childrenItem.Currency, Data = childrenItem })
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd() { DisplayKey = childrenItem.Key, Data = childrenItem.Value })
                         .ToList();
                     data.Children = children;
                 }

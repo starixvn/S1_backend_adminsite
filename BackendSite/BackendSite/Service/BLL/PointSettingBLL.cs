@@ -1,5 +1,7 @@
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Store.PointSetting;
 
 namespace BackendSite.Service.BLL
@@ -12,13 +14,13 @@ namespace BackendSite.Service.BLL
         public PointSettingBLL(IServiceProvider provider)
         {
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-            var configuration = provider.GetRequiredService<IConfiguration>();
-            _storeSiteUrl = configuration.GetValue<string>("StoreService");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
         }
 
         public Task<ApiResult<InactivePointExpirySetting>> GetInactivePointExpirySettingAsync(GetInactivePointExpirySettingRequest req)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/GetInactivePointExpirySetting";
+            var url = _storeSiteUrl + "PointSetting/GetInactivePointExpirySetting";
             var result = _courierAdapter.MyPostAsync<InactivePointExpirySetting, GetInactivePointExpirySettingRequest>(url, req);
 
             return result;
@@ -27,7 +29,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> SetInactivePointExpirySettingAsync(SetInactivePointExpirySettingRequest req,
             string user)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/SetInactivePointExpirySetting";
+            var url = _storeSiteUrl + "PointSetting/SetInactivePointExpirySetting";
             var data = new SetInactivePointExpirySettingParams(req, user);
             var result = await _courierAdapter.MyPostAsync<object, SetInactivePointExpirySettingParams>(url, data);
 
@@ -36,7 +38,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<object>> GetTurnoverPointSettingListAsync(GetTurnoverPointSettingListRequest req)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/GetTurnoverPointSettingList";
+            var url = _storeSiteUrl + "PointSetting/GetTurnoverPointSettingList";
             var result =
                 _courierAdapter.MyPostAsync<object, GetTurnoverPointSettingListRequest>(url, req);
 
@@ -45,7 +47,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<IEnumerable<TurnoverPointSetting>>> GetTurnoverPointSettingAsync(GetTurnoverPointSettingRequest req)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/GetTurnoverPointSetting";
+            var url = _storeSiteUrl + "PointSetting/GetTurnoverPointSetting";
             var result =
                 _courierAdapter.MyPostAsync<IEnumerable<TurnoverPointSetting>, GetTurnoverPointSettingRequest>(url, req);
 
@@ -54,7 +56,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> SetTurnoverPointSettingAsync(SetTurnoverPointSettingRequest req, string user)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/SetTurnoverPointSetting";
+            var url = _storeSiteUrl + "PointSetting/SetTurnoverPointSetting";
             var data = new SetTurnoverPointSettingParams(req, user);
             var result = await _courierAdapter.MyPostAsync<object, SetTurnoverPointSettingParams>(url, data);
 
@@ -64,7 +66,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<IEnumerable<DepositPointSetting>>> GetDepositPointSettingAsync(GetDepositPointSettingRequest req)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/GetDepositPointSetting";
+            var url = _storeSiteUrl + "PointSetting/GetDepositPointSetting";
             var result =
                 _courierAdapter.MyPostAsync<IEnumerable<DepositPointSetting>, GetDepositPointSettingRequest>(url, req);
 
@@ -73,7 +75,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> SetDepositPointSettingAsync(SetDepositPointSettingRequest req, string user)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/SetDepositPointSetting";
+            var url = _storeSiteUrl + "PointSetting/SetDepositPointSetting";
             var data = new SetDepositPointSettingParams(req, user);
             var result = await _courierAdapter.MyPostAsync<object, SetDepositPointSettingParams>(url, data);
 
@@ -82,7 +84,7 @@ namespace BackendSite.Service.BLL
 
         public Task<ApiResult<IEnumerable<TurnoverPointStatusSetting>>> GetTurnoverPointStatusSettingAsync(GetTurnoverPointStatusSettingRequest req)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/GetTurnoverPointStatusSetting";
+            var url = _storeSiteUrl + "PointSetting/GetTurnoverPointStatusSetting";
             var result =
                 _courierAdapter.MyPostAsync<IEnumerable<TurnoverPointStatusSetting>, GetTurnoverPointStatusSettingRequest>(url, req);
 
@@ -92,7 +94,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> SetTurnoverPointStatusSettingAsync(SetTurnoverPointStatusSettingRequest req,
             string user)
         {
-            var url = _storeSiteUrl + "/api/PointSetting/SetTurnoverPointStatusSetting";
+            var url = _storeSiteUrl + "PointSetting/SetTurnoverPointStatusSetting";
             var data = new SetTurnoverPointStatusSettingParams(req, user);
             var result = await _courierAdapter.MyPostAsync<object, SetTurnoverPointStatusSettingParams>(url, data);
 

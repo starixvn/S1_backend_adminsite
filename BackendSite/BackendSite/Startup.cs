@@ -1,7 +1,8 @@
-using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.BLL.Infrastructure.Model;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.BLL.Mpa;
 using BackendSite.Service.DAL;
@@ -9,17 +10,13 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Option;
-
 using Elastic.Apm.AspNetCore;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm.SqlClient;
 using Elastic.Apm.StackExchange.Redis;
-
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-
 using NSwag;
-
 using StackExchange.Redis;
 
 namespace BackendSite
@@ -49,15 +46,14 @@ namespace BackendSite
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
             services.AddDatabaseConnection(_configuration);
-            services.AddMessageQueueConnection(_configuration);
-            services.Configure<Dictionary<string, SiteConfig>>(_configuration.GetSection("SiteConfig"));
-            services.Configure<Dictionary<string, AWSKeyConfig>>(_configuration.GetSection("AwsKeyConfig"));
+            
+            
             services.AddSingleton<AWSS3Helper>();
             services.AddSingleton<AWSCloudFrontHelper>();
             services.AddSingleton<Cryptor>();
-            services.Configure<AffConfig>(_configuration.GetSection("AffConfig"));
+            
             services.AddSingleton<DateTimeHelper>();
-
+            
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
@@ -134,6 +130,9 @@ namespace BackendSite
             services.DecoratorReferralManagement();
             services.AddTransient<IAutoPaymentRuleService, AutoPaymentRuleService>();
             services.DecoratorLiveRegistration();
+            services.AddSingleton<ConfigBLL>();
+            services.AddTransient<IUploadImageBLL, UploadImageBLL>();
+
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
@@ -168,6 +167,12 @@ namespace BackendSite
             services.AddOptionListByDB<TpGameTypeOption>("Admin_TpGameType_Get");
             services.AddOptionListByDB<TpListOption>("Common_TpList_Get");
             services.AddOptionListByDB<CurrencyOption>("Common_Currency_Get");
+            services.AddOptionListByDB<Config>("SiteConfig_Get", new { ConfigGroup = "BackEndSite" });
+            services.AddOptionListByDB<ServerInfo>("Admin_ServerInfoList_Get");
+            services.AddSiteConfig();
+            services.AddCloudFrontImageInfo();
+            services.AddMessageQueueConnection();
+            services.AddAffConfig();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

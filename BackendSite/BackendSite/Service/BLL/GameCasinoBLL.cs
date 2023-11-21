@@ -14,9 +14,9 @@ namespace BackendSite.Service.BLL
             _gameCasinoService = gameCasinoService;
         }
 
-        public async Task<IEnumerable<RiskTpListInfo>> GetTpList()
+        public async Task<IEnumerable<RiskTpListInfo>> GetTpList(string siteIds, int currencyId)
         {
-            return await _gameCasinoService.GetTpList();
+            return await _gameCasinoService.GetTpList(siteIds, currencyId);
         }
 
         public async Task<IEnumerable<RiskGameCasinoData>> GetGameCasinoByTpId(int tpId)

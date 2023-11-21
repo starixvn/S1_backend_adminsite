@@ -1,20 +1,16 @@
 ﻿using System.Text.RegularExpressions;
 using System.Transactions;
-
 using Amazon.S3.Model;
-
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
-
 using Newtonsoft.Json;
-
 using OfficeOpenXml;
-
 using Tag = BackendSite.Service.Model.Tag;
 
 namespace BackendSite.Service.BLL
@@ -43,7 +39,8 @@ namespace BackendSite.Service.BLL
         private readonly RebateManageService _rebateManageService;
         private readonly ExcelBLL _excelBll;
         private readonly AWSS3Helper _s3Helper;
-        private readonly string _backofficeS3Url;
+        private readonly string _backOfficeS3Url;
+        private readonly string _backOfficeS3BucketName;
         private readonly string _environment;
         private readonly TagBLL _tagll;
         public CustInfoBLL(IServiceProvider provider)
@@ -57,9 +54,13 @@ namespace BackendSite.Service.BLL
             _promotionService = provider.GetRequiredService<PromotionService>();
             _rolloverService = provider.GetRequiredService<RollOverService>();
             _bonusInfoService = provider.GetRequiredService<BonusInfoService>();
-            var configuration = provider.GetRequiredService<IConfiguration>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
-            _bonusApiUrl = configuration.GetValue<string>("BonusService");
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
+            _backOfficeS3Url = configBll.GetConfigValue("AWSBackOfficeBucketUrl");
+            _backOfficeS3BucketName = configBll.GetConfigValue("AWSBackOfficeBucketName");
+
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _logger = provider.GetRequiredService<ILogger<CustInfoBLL>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
@@ -70,7 +71,6 @@ namespace BackendSite.Service.BLL
             _rebateManageService = provider.GetRequiredService<RebateManageService>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
-            _backofficeS3Url = configuration.GetValue<string>("AwsBackofficeUrl");
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
             _tagll = provider.GetRequiredService<TagBLL>();
@@ -117,9 +117,9 @@ namespace BackendSite.Service.BLL
             out int totalPages,
             out int rowCount)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new[] { x.SiteId });
+            var siteList = _serverInfoBll.GetSiteListByLoginUserV2().SelectMany(x => new[] { x.SiteId });
             var currencyList = new List<int>();
-            _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x =>
+            _serverInfoBll.GetSiteListByLoginUserV2().ToList().ForEach(x =>
             {
                 currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
@@ -161,10 +161,10 @@ namespace BackendSite.Service.BLL
             IEnumerable<int> selectStatus,
             IEnumerable<int> selectTag)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            var siteList = _serverInfoBll.GetSiteListByLoginUserV2().SelectMany(x => new int[] { x.SiteId });
 
             var currencyList = new List<int>();
-            _serverInfoBll.GetSiteListByLoginUser().ToList().ForEach(x =>
+            _serverInfoBll.GetSiteListByLoginUserV2().ToList().ForEach(x =>
             {
                 currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
             });
@@ -181,7 +181,7 @@ namespace BackendSite.Service.BLL
 
         public CustInfoDetail GetCustInfoDetail(int custId, string userName)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser()?.SelectMany(x => new int[] { x.SiteId });
+            var siteList = _serverInfoBll.GetSiteListByLoginUserV2()?.SelectMany(x => new int[] { x.SiteId });
             return siteList is null ? null : GetCustInfoDetail(custId, userName, siteList);
         }
 
@@ -712,7 +712,7 @@ namespace BackendSite.Service.BLL
         }
         public CustInfoDetail GetCustData(int custId, string userName)
         {
-            var siteList = _serverInfoBll.GetSiteListByLoginUser().SelectMany(x => new int[] { x.SiteId });
+            var siteList = _serverInfoBll.GetSiteListByLoginUserV2().SelectMany(x => new int[] { x.SiteId });
             var custInfoDetail = _custInfoService.GetCustInfoDetail(custId, userName, JsonConvert.SerializeObject(siteList));
             if (custInfoDetail != null)
             {
@@ -1046,7 +1046,8 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<GameType> GetGameTypeList(IEnumerable<int> TPCategoryList)
         {
-            var AllGameType = _winLostReportService.GetAllGameType().ToList();
+            var siteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
+            var AllGameType = _winLostReportService.GetAllGameType(System.Text.Json.JsonSerializer.Serialize(siteIds), 0).ToList();
             return AllGameType.Where(x => TPCategoryList.Contains(x.CategoryId)).ToList();
         }
 
@@ -1202,7 +1203,7 @@ namespace BackendSite.Service.BLL
                         var key = $"{_environment}/{site}/CustInfo/BatchMemberInfoReport_{batchId}.xlsx";
                         var putRequest = new PutObjectRequest
                         {
-                            BucketName = "ailab-backoffice",
+                            BucketName = _backOfficeS3BucketName,
                             ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                             InputStream = stream,
                             Key = key
@@ -1240,7 +1241,7 @@ namespace BackendSite.Service.BLL
             batchCustInfo.ForEach(x =>
             {
                 x.StatusName = ((BatchCustInfoStatus)x.Status).ToString();
-                x.Url = $"{_backofficeS3Url}/{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
+                x.Url = $"{_backOfficeS3Url}{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
             });
 
             return batchCustInfo;

@@ -115,7 +115,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     var AccountInfoList = await _custInfoBll.GetCustBankDetailAsync(custInfo.CustId);
                     var cryptoAccountInfoList = await _custInfoBll.GetCustCryptoInfoListAsync(custInfo.CustId);
                     var sysLocalBankList = _bankDetailBll.GetSysBankList()
-                        .Where(x => x.CurrencyId == custInfo.CurrencyId)
+                        .Where(x => (int)x.CurrencyId == custInfo.CurrencyId)
                         .Select(x => new { Value = x.SysId, Content = $"{x.BankCode}-{x.BankName}" });
                     apiResult.Data = new
                     {

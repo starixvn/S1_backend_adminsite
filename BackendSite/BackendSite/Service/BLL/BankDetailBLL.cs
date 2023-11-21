@@ -2,7 +2,7 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.BankCardManagement;
-
+using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
 
 using Newtonsoft.Json;
@@ -15,7 +15,6 @@ namespace BackendSite.Service.BLL
         private readonly LocalBankService _localBankService;
         private readonly VipLevelService _vipLevelService;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly IMemoryCache _cache;
         private readonly ICacheHelper _redisHelper;
 
         public BankDetailBLL(IServiceProvider provider)
@@ -23,22 +22,8 @@ namespace BackendSite.Service.BLL
             _bankDetailService = provider.GetRequiredService<BankDetailService>();
             _localBankService = provider.GetRequiredService<LocalBankService>();
             _vipLevelService = provider.GetRequiredService<VipLevelService>();
-            _cache = provider.GetRequiredService<IMemoryCache>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-        }
-
-        public IEnumerable<BankDetail> GetLoaclBankList(IEnumerable<int> siteIds,
-            IEnumerable<int> currencyIdList,
-            IEnumerable<int> statusList,
-            int pageNumber, int pageSize, out int totalPages, out int rowCount)
-        {
-            return _bankDetailService.GetLoaclBankList(JsonConvert.SerializeObject(siteIds),
-                JsonConvert.SerializeObject(currencyIdList),
-                JsonConvert.SerializeObject(statusList),
-                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                Math.Abs(pageSize),
-                out totalPages, out rowCount);
         }
 
         public async Task<(IEnumerable<OfflineBankingSetting> Datas, int TotalPages, int RowCount)> GetOfflineBankingSettingList
@@ -93,24 +78,26 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankInfoSys> GetSysBankList()
         {
-            var sBankInfoSysListKey = $"SysBankList";
+            const string key = "Admin:BankInfoSysList";
+            
+            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+                () => _bankDetailService.GetBankSysInfoList());
+        }
+        
+        public bool SetBankInfoSys(SetBankInfoSysModel input, string @operator)
+        {
+            var before = GetSysBankList().First(x => x.SysId == input.SysId);
+            var result = _bankDetailService.SetBankSysInfo(input, before, @operator);
+            _ = _redisHelper.KeyDeleteByPattern("BankInfoSysList:*", RedisDataBase.Member);
+            _ = _redisHelper.KeyDeleteByPattern("PaySetting:LocalBank:*", RedisDataBase.Member);
 
-            var sysBankList = _cache.Get<IEnumerable<BankInfoSys>>(sBankInfoSysListKey);
-            if (sysBankList == null)
-            {
-                sysBankList = _bankDetailService.GetSysBankList();
-                if (sysBankList != null)
-                {
-                    _cache.Set(sBankInfoSysListKey, sysBankList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromHours(10)));
-                }
-            }
-
-            return sysBankList;
+            return result 
+                   && _redisHelper.KeyDelete("Admin:BankInfoSysList");
         }
 
         public IEnumerable<BankInfoSys> GetSysBankList(int currencyId)
         {
-            var sysBankList = GetSysBankList().Where(x => x.CurrencyId == currencyId);
+            var sysBankList = GetSysBankList().Where(x => (int)x.CurrencyId == currencyId);
 
             return sysBankList;
         }
@@ -137,6 +124,8 @@ namespace BackendSite.Service.BLL
             if (custId != null)
             {
                 pointLevel = _custInfoBll.GetPointLevelWithCache(custId.Value);
+                var cust = _custInfoBll.GetCustInfoWithCache(custId.Value);
+                siteId = cust.SiteId;
             }
 
             var result = _localBankService.GetBankInfoPayList(siteId)

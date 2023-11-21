@@ -207,5 +207,20 @@ namespace BackendSite.Service.BLL
                 () => _paymentManageService.GetPayGroup(), RedisDataBase.Shared);
             return dbData;
         }
+        
+        public IEnumerable<WithdrawalBlockSetting> GetWithdrawalBlockSettingList(int siteId)
+            => _paymentManageService.GetWithdrawalBlockSettingList(siteId);
+        
+        public bool SetWithdrawalBlockSetting(SetWithdrawalBlockSettingParams input)
+        {
+            var result = _paymentManageService.SetWithdrawalBlockSetting(input);
+
+            if (result)
+            {
+                _ = _redisHelper.KeyDelete($"PaySetting:WithdrawalBlock:{input.SiteId}", RedisDataBase.Member);
+            }
+            
+            return result;
+        }
     }
 }

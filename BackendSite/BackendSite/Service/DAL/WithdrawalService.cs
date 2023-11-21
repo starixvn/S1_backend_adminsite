@@ -506,35 +506,7 @@ namespace BackendSite.Service.DAL
                                 break;
 
                             case WithdrawalStatusEnum.Approved:
-                                var dummyResult = 0;
-                                // var accountingResult = 0;
-                                var withdrawalInfoData = JsonConvert.DeserializeObject<WithdrawalInfo>(withdrawalInfo);
-
-                                updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId, trans);
-
-                                switch (withdrawalType)
-                                {
-                                    case (int)WithdrawalTypeEnum.OnlinePayment:
-                                        dummyResult = _walletService.SetPayDummy(siteId,
-                                            withdrawalInfoData.PayId ?? 0,
-                                            withdrawalInfoData.CurrencyId ?? 0,
-                                            -1 * amount,
-                                            trans);
-                                        break;
-                                    case (int)WithdrawalTypeEnum.LocalBank:
-                                        dummyResult = _walletService.SetBankOffDummy(siteId,
-                                            withdrawalInfoData.FromSysId ?? 0,
-                                            withdrawalInfoData.FromAccountNo,
-                                            withdrawalInfoData.CurrencyId ?? 0,
-                                            -1 * amount,
-                                            trans);
-                                        break;
-                                    case (int)WithdrawalTypeEnum.CryptoWallet:
-                                        dummyResult = 1;
-                                        break;
-                                }
-
-                                specialResult = updateFlowEndResult == 0 || dummyResult == 0 ? 0 : 1;
+                                specialResult = SetWithdrawalInfoFlowEndTime(withdrawalId, trans) == 0 ? 0 : 1;
 
                                 break;
 

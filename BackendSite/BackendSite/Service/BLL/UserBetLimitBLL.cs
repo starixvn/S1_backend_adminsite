@@ -1,10 +1,11 @@
 ﻿using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -14,16 +15,21 @@ namespace BackendSite.Service.BLL
         private readonly CustInfoBLL _custInfoBll;
         private readonly UserBetLimitService _userBetLimitService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
-        private readonly string _apiUrl;
+        private readonly string _tpServiceApiUrl;
         private readonly CourierAdapter _courierAdapter;
         private readonly ILogger<UserBetLimitBLL> _logger;
         private readonly List<int> CallApi = new() { (int)TpGameTypeEnum.SBO_Sports };
 
-        public UserBetLimitBLL(CustInfoBLL custInfoBll, UserBetLimitService userBetLimitService, AdjustmentLogReportService adjustmentLogReportService, IConfiguration configuration, CourierAdapter courierAdapter, ILogger<UserBetLimitBLL> logger)
+        public UserBetLimitBLL(CustInfoBLL custInfoBll, 
+            UserBetLimitService userBetLimitService,
+            AdjustmentLogReportService adjustmentLogReportService,
+            CourierAdapter courierAdapter,
+            ConfigBLL configBll,
+            ILogger<UserBetLimitBLL> logger)
         {
             _userBetLimitService = userBetLimitService;
             _adjustmentLogReportService = adjustmentLogReportService;
-            _apiUrl = configuration.GetValue<string>("TpService");
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
             _courierAdapter = courierAdapter;
             _custInfoBll = custInfoBll;
             _logger = logger;
@@ -192,7 +198,7 @@ namespace BackendSite.Service.BLL
 
         private async Task<ApiResult> SetBetLimit(SetBetLimit request)
         {
-            return await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_apiUrl}SetBetLimit", request);
+            return await _courierAdapter.MyPostAsync<ApiResult, SetBetLimit>($"{_tpServiceApiUrl}SetBetLimit", request);
         }
 
         private async Task<SetBetLimit> Compare(int custId, SportsSetting before, SportsSetting after)

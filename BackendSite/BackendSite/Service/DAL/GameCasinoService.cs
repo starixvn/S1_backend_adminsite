@@ -15,9 +15,12 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public async Task<IEnumerable<RiskTpListInfo>> GetTpList()
+        public async Task<IEnumerable<RiskTpListInfo>> GetTpList(string siteIds,int currencyId)
         {
-            return await _reportDbClient.QueryAsync<RiskTpListInfo>("Admin_TpList_Get");
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyId", currencyId);
+            return await _reportDbClient.QueryAsync<RiskTpListInfo>("Admin_TpList_Get_OnlySlot", props);
         }
 
         public async Task<IEnumerable<GameCasinoDataV3>> GetGameCasinoByTpId(int tpId)

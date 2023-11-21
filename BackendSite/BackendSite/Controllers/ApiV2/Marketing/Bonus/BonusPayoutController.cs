@@ -1,16 +1,14 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using BackendSite.Service.Model.Option;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using Newtonsoft.Json;
-
 using OfficeOpenXml;
-
 using Common = BackendSite.Service.Library.Common;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
@@ -28,7 +26,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         private readonly CourierAdapter _courierAdapter;
         private readonly BonusPayoutBLL _bonusPayoutBLL;
         private readonly Common _common;
-        private readonly PaymentBLL _paymentBll;
+        
         #endregion
 
         #region Constructors
@@ -37,11 +35,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
-            _bonusApiUrl = configuration.GetValue<string>("BonusService");
+
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _bonusApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
+
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _bonusPayoutBLL = provider.GetRequiredService<BonusPayoutBLL>();
             _common = provider.GetRequiredService<Common>();
-            _paymentBll = provider.GetRequiredService<PaymentBLL>();
         }
         #endregion
 

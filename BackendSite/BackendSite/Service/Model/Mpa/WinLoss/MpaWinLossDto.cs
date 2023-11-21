@@ -606,6 +606,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public decimal TotalBonus { get; set; }
         public int SiteId { get; set; } 
+        public int CustId {get; set; }
     }
 
     public class TpBetRecordByDateWrapper
@@ -847,6 +848,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalWithDrawAmount { get; set; }
 
         public decimal TotalBonus { get; set; }
+        public int CustId { get; set; }
         public decimal BAPlayerWinLoss { get; set; }
         public decimal BACommission { get; set; }
     }

@@ -1,0 +1,38 @@
+# localhost
+@url=http://localhost:5070
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+POST {{url}}/apiV2/WithdrawalBlockSwitch/GetList HTTP/1.1
+Content-Type: application/json
+
+
+###
+POST {{url}}/apiV2/WithdrawalBlockSwitch/Set HTTP/1.1
+Content-Type: application/json
+
+{
+    "currencyId": 2,
+    "type": 1,
+    "status": false
+}
+
+###
+POST {{url}}/apiV2/Enum/GetEnumType HTTP/1.1
+Content-Type: application/json
+
+{
+    "enumName": "WithdrawalBlockTypeEnum"
+}

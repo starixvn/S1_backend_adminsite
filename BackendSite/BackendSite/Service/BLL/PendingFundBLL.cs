@@ -1,7 +1,9 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite.Service.BLL
 {
@@ -12,7 +14,7 @@ namespace BackendSite.Service.BLL
         private readonly Tools tools;
         private readonly PendingFundService pendingFundService;
         private readonly ServerInfoService serverInfoService;
-        private readonly string apiUrl;
+        private readonly string _tpServiceApiUrl;
         private readonly WalletService walletService;
         private readonly BonusInfoService bonusInfoService;
         private readonly ServerInfoBLL _serverInfoBLL;
@@ -29,7 +31,8 @@ namespace BackendSite.Service.BLL
             BonusInfoService bonusInfoService,
             ServerInfoBLL serverInfoBLL,
             AuthorizeBLL authorizeBLL,
-            BonusInfoBLL bonusInfoBLL)
+            BonusInfoBLL bonusInfoBLL,
+            ConfigBLL configBll)
         {
             this.courierAdapter = courierAdapter;
             this.configuration = configuration;
@@ -40,13 +43,8 @@ namespace BackendSite.Service.BLL
             _serverInfoBLL = serverInfoBLL;
             _authorizeBLL = authorizeBLL;
             _bonusInfoBLL = bonusInfoBLL;
-            apiUrl = configuration.GetValue<string>("TpService");
-        }
 
-        public IEnumerable<PendingFund> PendingFundList()
-        {
-            var serverInfo = serverInfoService.GetModel();
-            return pendingFundService.PendingFundList(serverInfo.SiteId);
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
         }
 
         public class TpBonusTransfer
@@ -77,7 +75,7 @@ namespace BackendSite.Service.BLL
                 inputs = new Dictionary<string, string>()
             };
 
-            var myUrl = $"{apiUrl}BonusTransfer";
+            var myUrl = $"{_tpServiceApiUrl}BonusTransfer";
             var apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
             return apiResult;
         }
@@ -95,7 +93,7 @@ namespace BackendSite.Service.BLL
                     inputs = new Dictionary<string, string>()
                 };
 
-                var myUrl = $"{apiUrl}BonusTransfer";
+                var myUrl = $"{_tpServiceApiUrl}BonusTransfer";
                 apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
 
                 if (apiResult.ErrorCode != 0)
@@ -127,7 +125,7 @@ namespace BackendSite.Service.BLL
                         inputs = new Dictionary<string, string>()
                     };
 
-                    var myUrl = $"{apiUrl}BonusTransfer";
+                    var myUrl = $"{_tpServiceApiUrl}BonusTransfer";
 
                     apiResult = await courierAdapter.MyPostAsync<TransferResult, TpBonusTransfer>(myUrl, tpBonusTransfer);
 

@@ -24,6 +24,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         private readonly ILogger<TpDisableController> _logger;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -37,6 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             _logger = provider.GetRequiredService<ILogger<TpDisableController>>();
             _newAuthorizeBLL = provider.GetService<NewAuthorizeBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -117,7 +119,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             var apiResult = new ApiResult<TpDisableUserForGameDetail>();
 
-            var tpList = await _gameCasinoBll.GetTpList();
+            var siteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
+            var tpList = await _gameCasinoBll.GetTpList(System.Text.Json.JsonSerializer.Serialize(siteIds), 0);
             var userDisableGames = await _riskBll.GetTpDisableUserBuCustId(req.CustId);
 
             if (userDisableGames.GameInfo != null && userDisableGames.GameInfo != "null")

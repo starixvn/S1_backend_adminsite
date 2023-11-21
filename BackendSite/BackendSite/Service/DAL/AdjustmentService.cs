@@ -358,9 +358,10 @@ namespace BackendSite.Service.DAL
                 {
                     Adjustment_transId = adjustmentP.Get<string>("TransId");
                     var isAdd = adjustmentAndWithdrawalLimit.AdjustType % 2 == 1; //1, 3(Add)2, 4(Deduct)
+                    var isBalance = adjustmentAndWithdrawalLimit.AdjustType is 1 or 2;
 
-                    //調帳類型為Main Wallet且為Deposit(1)時變更存款單實際存款金額
-                    if (adjustmentAndWithdrawalLimit.Category == 1 && adjustmentAndWithdrawalLimit.MethodType == 5)
+                    //調帳類型為Main Wallet的現金錢包且為Deposit(1)時變更存款單實際存款金額
+                    if (adjustmentAndWithdrawalLimit.Category == 1 && adjustmentAndWithdrawalLimit.MethodType == 5 && isBalance)
                     {
                         //判斷是否為調帳對象的存款單號
                         var isCustDeposit = getAdjustmentInfo(adjustmentAndWithdrawalLimit.CustId).Any(x => x == adjustmentAndWithdrawalLimit.RefId);
