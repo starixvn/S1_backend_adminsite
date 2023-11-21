@@ -26,18 +26,25 @@ namespace BackendSite.Service.BLL
             _withdrawalService = withdrawalService;
         }
 
-        public async Task<RedisSetAndGetResult> LockWithdrawalTicketAsync(string transId, string userName, int siteId, bool writeLog = true)
+        public async Task<RedisSetAndGetResult> LockWithdrawalTicketAsync(string transId, string userName, int siteId)
         {
             var key = $"lock:withdrawalTransId:{transId}";
-            var createResult = await _redisHelper.StringSetAndGetAsync(key, userName);
-
-            if (createResult.Success && writeLog)
+            var createLockResult = await _redisHelper.TryCreateLockAsync(key, userName, null);
+            if (createLockResult)
             {
                 var _ = await _withdrawalService.SetWithdrawalInfoOnUser(transId, onUser: userName);
                 _withdrawalService.SetWithdrawalLog(GetWithdrawalId(transId), siteId, "", (int)WithdrawalStatusEnum.Receive, Operator: userName);
             }
+            else
+            {
+                userName = await _redisHelper.StringGetAsync(key);
+            }
 
-            return createResult;
+            return new RedisSetAndGetResult
+            {
+                Success = createLockResult,
+                Value = userName,
+            };
         }
 
         public async Task<bool> UnLockWithdrawalTicketAsync(string transId, int siteId, string userName = "")
@@ -47,7 +54,7 @@ namespace BackendSite.Service.BLL
             if (!string.IsNullOrEmpty(userName))
             {
                 // 只有原本Lock的人可以自己 UnLock，Lua Script 會判斷 value 是否相同
-                unLockResult = await _redisHelper.ExecuteLuaScriptAsync(UnLockWithdrawalScript, key, userName);
+                unLockResult = await _redisHelper.UnLockAsync(key, userName);
                 if (unLockResult)
                 {
                     var _ = await _withdrawalService.SetWithdrawalInfoOnUser(transId, onUser: "");

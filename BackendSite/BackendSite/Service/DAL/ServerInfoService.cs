@@ -18,11 +18,6 @@ namespace BackendSite.Service.DAL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        public ServerInfo GetModel()
-        {
-            var siteId = 1;
-            return _reportDbClient.QueryFirst<ServerInfo>("ServerInfo_Get", new { SiteId = siteId });
-        }
 
         public ServerInfo GetModelWithSiteId(int siteId)
         {

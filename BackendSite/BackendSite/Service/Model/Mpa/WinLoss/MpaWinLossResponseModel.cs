@@ -53,7 +53,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
 
         public Dictionary<string, MpaWinLossByDayCurrencyDetailDto> CurrencyDetail { get; set; }
-        public IEnumerable<MpaWinLossByDayCurrencyDetailDto> CurrencyDetailGroupByCurrency { get; set; }
     }
 
     public class MpaWinLossByTpGameTypeResponse

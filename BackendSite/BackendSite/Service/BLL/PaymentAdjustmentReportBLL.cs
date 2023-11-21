@@ -46,7 +46,7 @@ namespace BackendSite.Service.BLL
             var AdjustTypesForLAAW = new List<int>();
 
             if (!siteIds.Any())
-                siteIds = serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
+                siteIds = serverInfoBLL.GetSiteListByLoginUserV2().Select(x => x.SiteId);
 
             #region AdjustType
 
@@ -186,7 +186,7 @@ namespace BackendSite.Service.BLL
             var AdjustTypesForLAAW = new List<int>();
 
             if (!siteIds.Any())
-                siteIds = serverInfoBLL.GetSiteListByLoginUser().Select(x => x.SiteId);
+                siteIds = serverInfoBLL.GetSiteListByLoginUserV2().Select(x => x.SiteId);
 
             #region AdjustType
 

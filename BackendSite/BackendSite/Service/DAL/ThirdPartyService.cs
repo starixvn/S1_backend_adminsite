@@ -72,14 +72,6 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<SiteTpListIfo>("Admin_SiteTpList_GetAll", para);
         }
 
-        public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategory(int categoryId)
-        {
-            var para = new DynamicParameters();
-            para.Add("CategoryId", categoryId);
-
-            return _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", para);
-        }
-
         public IEnumerable<AdminTpTransferInfo> GetAdjustmentTpLog(int siteId, int tpId, int custId, int pageSize, ref int pageNumber, ref int totalPages, ref int rowCount)
         {
             var props = new DynamicParameters();
@@ -146,9 +138,9 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(string siteIds, int currency)
         {
-            return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_GetByCurrency", new { CurrencyId = currency, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_Get_V2", new { _SiteIds = siteIds, _CurrencyId = currency, }, commandType: CommandType.StoredProcedure);
         }
 
         public void SetAdjustmentTpCustInfoLog(string menu, int actionType, string detailInfo, string @operator)
@@ -186,11 +178,13 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<TpGameTypeCurrency>("Admin_TpGameTypeCurrency_Get");
         }
 
-        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListbyCategoryAsync(string siteIds, int currencyId, int categoryId)
         {
             var p = new DynamicParameters();
-            p.Add("CategoryId", categoryId);
-            return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get", p);
+            p.Add("_SiteIds", siteIds);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_CategoryId", categoryId);
+            return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get_V2", p);
         }
 
         public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)

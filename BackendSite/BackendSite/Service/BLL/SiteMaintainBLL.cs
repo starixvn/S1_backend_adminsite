@@ -8,14 +8,13 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
     public class SiteMaintainBLL
     {
-        private readonly IOptions<Dictionary<string, SiteConfig>> _siteConfig;
+        private readonly Dictionary<string, SiteCloudFrontImageInfo> _siteConfig;
         private readonly AWSS3Helper _s3Helper;
         private readonly AWSCloudFrontHelper _cloudFrontHelper;
         private readonly string _fileName;
@@ -24,7 +23,7 @@ namespace BackendSite.Service.BLL
 
         public SiteMaintainBLL(IServiceProvider provider)
         {
-            _siteConfig = provider.GetRequiredService<IOptions<Dictionary<string, SiteConfig>>>();
+            _siteConfig = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
@@ -79,7 +78,7 @@ namespace BackendSite.Service.BLL
             //clear cache
             var invalidationRequest = new CreateInvalidationRequest()
             {
-                DistributionId = _siteConfig.Value[request.SiteId.GetDescription()].AwsCloudFrontErrorDomainID,
+                DistributionId = _siteConfig[request.SiteId.GetDescription()].AwsCloudFrontErrorDomainID,
                 InvalidationBatch = new InvalidationBatch()
                 {
                     CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),

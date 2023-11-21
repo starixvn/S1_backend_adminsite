@@ -25,18 +25,9 @@ namespace BackendSite.Service.BLL
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
-
-            try
-            {
-                var configBll = provider.GetRequiredService<ConfigBLL>();
-                _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            
-            _balanceTimeoutSecond = provider.GetRequiredService<IConfiguration>().GetValue<int>("BalanceTimeoutSecond");
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
+            _balanceTimeoutSecond = int.Parse(configBll.GetConfigValue("BalanceTimeoutSecond"));
             _logger = provider.GetRequiredService<ILogger<TpBLL>>();
         }
 
@@ -252,15 +243,9 @@ namespace BackendSite.Service.BLL
             return _thirdPartyService.GetCustTpAdjustmentLog(input, absPageSize, startIndex, out totalPages, out rowCount);
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(int siteId, int currency)
+        public IEnumerable<SiteTpListIfo> GetTpBySiteAndCurrency(string siteId, int currency)
         {
-            var UserSiteList = _serverInfoService.GetSiteList();
-            IEnumerable<SiteTpListIfo> result = null;
-            if (UserSiteList.Where(x => x.SiteId == siteId).Select(x => x).ToList().FirstOrDefault().ICurrencyList.Contains(currency))
-            {
-                result = _thirdPartyService.GetTpBySiteAndCurrency(siteId, currency);
-            }
-            return result;
+            return _thirdPartyService.GetTpBySiteAndCurrency(siteId, currency);
         }
         public void SetAdjustmentTpCustInfoLog(string menu, int actionType, string detailInfo, string @operator)
         {
@@ -315,9 +300,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(int categoryId)
+        public async Task<IEnumerable<TpGameType>> GetTpGameTypeListByCategoryAsync(string siteIds, int currencyId, int categoryId)
         {
-            return _thirdPartyService.GetTpGameTypeListByCategory(categoryId);
+            return await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(siteIds, currencyId, categoryId);
         }
 
         public async Task<IEnumerable<TpGameTypeCurrency>> GetTpGameTypeCurremcyListAsync(int siteId, int currencyId)
@@ -325,9 +310,9 @@ namespace BackendSite.Service.BLL
             var result = await _thirdPartyService.GetTpGameTypeCurrency();
             return result.Where(x => x.SiteId == siteId && x.CurrencyId == currencyId);
         }
-        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(int categoryId)
+        public async Task<IEnumerable<GameTypeBetLimit>> GetTpGameTypeListbyCategoryAsync(string siteIds, int currencyId, int categoryId)
         {
-            var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(categoryId);
+            var tpGameType = await _thirdPartyService.GetTpGameTypeListbyCategoryAsync(siteIds, currencyId, categoryId);
             var gameTypeWithBetLimit = tpGameType
                 .Select(a => new GameTypeBetLimit()
                 {

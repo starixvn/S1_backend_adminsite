@@ -63,9 +63,14 @@ namespace BackendSite.Service.Model
         public long endDate { get; set; }
         public int PageNumber { get; set; }
     }
-    public class SiteConfig
+    public class SiteCloudFrontImageInfo
     {
-        public string BannerURL { get; set; }
+        public string OldImageUrl { get; set; }
+        public string MaintainUrl { get; set; }
+        public string HotEventImageUrl {get; set; }
+        public string BannerImageUrl { get; set; }
         public string AwsCloudFrontErrorDomainID { get; set; }
+        public string UploadImagesBucketName { get; set; }
+        public string UploadImagesCloudFrontUrl { get; set; }
     }
 }

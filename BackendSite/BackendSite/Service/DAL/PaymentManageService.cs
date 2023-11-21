@@ -724,6 +724,66 @@ namespace BackendSite.Service.DAL
         {
             return await _reportDbClient.QueryAsync<PayGroup>("Service_PayGroup_Get");
         }
+        
+        public IEnumerable<WithdrawalBlockSetting> GetWithdrawalBlockSettingList(int siteId)
+        {
+            var p = new DynamicParameters(new
+            {
+                _SiteId = siteId
+            });
+            
+            return _reportDbClient.Query<WithdrawalBlockSetting>("Service_WithdrawalBlockSetting_Get", p);
+        }
+        
+        public bool SetWithdrawalBlockSetting(SetWithdrawalBlockSettingParams input)
+        {
+            using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var setting = GetWithdrawalBlockSettingList(input.SiteId)
+                .First(x => x.CurrencyId == input.CurrencyId
+                    && x.Type == input.Type);
+
+            #region props
+            var props = new DynamicParameters();
+            props.Add("_SiteId", input.SiteId);
+            props.Add("_CurrencyId", input.CurrencyId);
+            props.Add("_Type", input.Type);
+            props.Add("_Status", input.Status);
+            #endregion
+
+            #region propsLog
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", input.SiteId);
+            logParam.Add("_CurrencyId", input.CurrencyId);
+            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalBlockSetting);
+            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
+            {
+                Type = input.Type.ToString(),
+                Status = setting.Status.ToString()
+            }));
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(new
+            {
+                Type = input.Type.ToString(),
+                Status = input.Status.ToString()
+            }));
+            logParam.Add("_Operator", input.Operator);
+            #endregion
+
+            if (_mainDbClient.Execute("Admin_WithdrawalBlockSetting_Set", trans, props) > 0)
+            {
+                if (_mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", trans, logParam) > 0)
+                {
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
+                    return true;
+                }
+            }
+            
+            _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            return false;
+        }
 
         #endregion
     }

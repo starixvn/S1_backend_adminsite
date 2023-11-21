@@ -37,14 +37,6 @@ namespace BackendSite.Service.BLL
             serverInfo = serverInfoService.GetModelWithSiteId(siteId);
             return serverInfo;
         }
-        public ServerInfo GetServerInfo()
-        {
-            if (serverInfo != null)
-                return serverInfo;
-
-            serverInfo = serverInfoService.GetModel();
-            return serverInfo;
-        }
 
         public ServerInfo GetServerInfo(int siteId)
         {
@@ -96,22 +88,6 @@ namespace BackendSite.Service.BLL
             }
 
             return null;
-        }
-
-        public IEnumerable<int> GetCurrencyList()
-        {
-            var result = new List<int>();
-            var siteList = GetSiteListByLoginUser();
-            if (siteList != null)
-            {
-                foreach (var siteInfo in siteList)
-                {
-                    var currencies = siteInfo.ICurrencyList.Where(x => !result.Any(y => x == y));
-                    result.AddRange(currencies);
-                }
-            }
-
-            return result;
         }
 
         public int AdminOperateLog(int? SiteId, int? CustId, string Menu, ActionType ActionType, Dictionary<string, dynamic> DetailInfo, string Operator)

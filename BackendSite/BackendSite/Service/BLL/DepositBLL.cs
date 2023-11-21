@@ -197,11 +197,9 @@ namespace BackendSite.Service.BLL
 
         public DepositRequest GetDepositRequest(string transId)
         {
-            var serverInfo = serverInfoService.GetModel();
-
             var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var depositId);
-            return depositService.GetDepositRequest(depositId, serverInfo.SiteId/*Not require*/);/*Check SiteID By Permission*/
+            _ = int.TryParse(m.Value, out var depositId);
+            return depositService.GetDepositRequest(depositId);
         }
 
         public GetDepositAccountingListModel GetDepositAccountingList(
