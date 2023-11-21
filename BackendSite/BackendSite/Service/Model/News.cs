@@ -7,6 +7,7 @@
         private DateTimeOffset? _lastUpdateTime { get; set; }
         public int? NewsId { get; set; }
         public int? SiteId { get; set; }
+        public string SiteName { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public string ImageURL { get; set; }
