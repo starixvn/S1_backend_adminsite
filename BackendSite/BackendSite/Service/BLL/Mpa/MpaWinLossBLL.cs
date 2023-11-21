@@ -1954,7 +1954,7 @@ namespace BackendSite.Service.BLL.Mpa
                 var dateSummaryAlready = GetGroupByCurrency(alreadyMultiplyRateCombineResult)
                     .Where(x => x.Currency == key)
                     .ToList();
-                var dateSummaryOrigin = GetGroupByCurrency(originCombineData)
+                var dateSummaryOrigin = GetGroupByCurrency(originCombineResult)
                     .Where(x => x.Currency == key)
                     .ToList();
 
