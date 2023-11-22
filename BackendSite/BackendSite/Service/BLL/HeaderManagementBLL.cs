@@ -34,39 +34,15 @@ namespace BackendSite.Service.BLL
             return _headerManagementService.UpdateHeaderSetting(req, updater);
         }
         
-        public int UpdateHeaderStatus(UpdateHeaderStatusReq req , string updater)
+        public int UpdateHeaderSettingByTpGameId(UpdateHeaderSettingByTpGameIdReq req , string updater)
         {
-            return _headerManagementService.UpdateHeaderStatus(req, updater);
+            return _headerManagementService.UpdateHeaderSettingByTpGameId(req, updater);
         }
         
         public int UpdateSort(int id,int sort, string updater)
         {
             return _headerManagementService.UpdateSort(id, sort ,updater);
         }
-        
-        // public async Task<bool> UploadHeaderPictureAsync(int id ,HeaderPictureEnum picType, IFormFile file)
-        // {
-        //     if (!_aWSS3Helper.CheckIsImage(file))
-        //     {
-        //         return false;
-        //     }
-        //
-        //     var ext = Path.GetExtension(file.FileName);
-        //     var path = $"/HeaderPicture/{id}_{picType.ToString()}{ext}";
-        //     var key = _folder + path;
-        //     var success = await _aWSS3Helper.UploadFileAsync(file, _bucketName, key);
-        //     
-        //     if (success)
-        //     {
-        //         return _headerManagementService.UploadHeaderPicture(id, picType, key) > 0;
-        //     }
-        //     return false;
-        // }
-        
-        // public HeaderPicture GetHeaderPicture(int id)
-        // {
-        //     return _headerManagementService.GetHeaderPicture(id);
-        // }
         
         public IEnumerable<HeaderLobbyCategory> GetLobbyCategory()
         {

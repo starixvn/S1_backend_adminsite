@@ -868,6 +868,12 @@ namespace BackendSite.Service.Model.enums
         MobileLobbyPic = 4
     }
 
+    public enum HeaderIconTypeEnum
+    {
+        Init = 0,
+        New = 1
+    }
+    
     #endregion
     
     public enum BonusStatus
