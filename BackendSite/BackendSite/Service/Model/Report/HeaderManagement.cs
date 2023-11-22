@@ -82,6 +82,9 @@ namespace BackendSite.Service.Model.Report
         public string ProductName { get; set; }
         public string CurrencyGameName { get; set; }
         public string Memo { get; set; }
+        public HeaderIconTypeEnum IconType { get; set; }
+        public DateTime IconStartTime { get; set; }
+        public DateTime IconEndTime { get; set; }
         public int Status { get; set; }
         public int Sort { get; set; }
         public DateTime UpdateTime { get; set; }
@@ -93,6 +96,9 @@ namespace BackendSite.Service.Model.Report
         public int SiteId { get; set; }
         public int TpGameIdNo { get; set; }
         public int Status { get; set; }
+        public HeaderIconTypeEnum IconType { get; set; }
+        public DateTime IconStartTime { get; set; }
+        public DateTime IconEndTime { get; set; }
     }
     
     public class HeaderLobbyCategory

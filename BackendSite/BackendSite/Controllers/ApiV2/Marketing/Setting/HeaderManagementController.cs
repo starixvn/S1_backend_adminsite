@@ -67,7 +67,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                     {
                         SiteId = group.Key.SiteId,
                         TpGameIdNo = group.Key.TpGameIdNo,
-                        Status = group.FirstOrDefault().Status
+                        Status = group.FirstOrDefault().Status,
+                        IconType = group.FirstOrDefault().IconType,
+                        IconStartTime = group.FirstOrDefault().IconStartTime,
+                        IconEndTime = group.FirstOrDefault().IconEndTime,
                     }).OrderBy(y => y.TpGameIdNo);
                 
                 apiResult.Data = data;
