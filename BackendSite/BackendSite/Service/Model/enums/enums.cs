@@ -1997,4 +1997,10 @@ namespace BackendSite.Service.Model.enums
         BonusManagement = 2,
         NewsManagement = 3
     }
+    
+    public enum QueueJob
+    {
+        Init = 0 ,
+        Verification = 1
+    }
 }
