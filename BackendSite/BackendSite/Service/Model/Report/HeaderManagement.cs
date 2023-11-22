@@ -9,13 +9,28 @@ namespace BackendSite.Service.Model.Report
         public int LobbyCategoryId { get; set; }
     }
     
-    public class UpdateHeaderStatusReq
+    public class UpdateHeaderSettingByTpGameIdReq
     {
         public int Id { get; set; }
+        private DateTimeOffset _iconStartTime;
+        private DateTimeOffset _iconEndTime;
+        public int SiteId { get; set; }
+        public int TpGameIdNo { get; set; }
         public int Status { get; set; }
+        public HeaderIconTypeEnum IconType { get; set; }
+        public DateTimeOffset IconStartTime
+        {
+            get => _iconStartTime;
+            set => _iconStartTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset IconEndTime
+        {
+            get => _iconEndTime;
+            set => _iconEndTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
     }
     
-    public class UpdateHeaderSettingReq : UpdateHeaderStatusReq
+    public class UpdateHeaderSettingReq : UpdateHeaderSettingByTpGameIdReq
     {
         public string Memo { get; set; }
         public string CurrencyGameName { get; set; }
@@ -71,6 +86,13 @@ namespace BackendSite.Service.Model.Report
         public int Sort { get; set; }
         public DateTime UpdateTime { get; set; }
         public string Updater { get; set; }
+    }
+    
+    public class HeaderManagementGroup
+    {
+        public int SiteId { get; set; }
+        public int TpGameIdNo { get; set; }
+        public int Status { get; set; }
     }
     
     public class HeaderLobbyCategory
