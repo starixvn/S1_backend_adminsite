@@ -1870,7 +1870,8 @@ namespace BackendSite.Service.Model.enums
         GameType = 3,
         Currency = 4,
         Player = 5,
-        TpCategory = 6
+        TpCategory = 6,
+        Brand = 7
     }
 
     /// <summary>
