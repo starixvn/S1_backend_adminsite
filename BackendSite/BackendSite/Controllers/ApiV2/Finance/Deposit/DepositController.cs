@@ -585,20 +585,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
             foreach (var receipt in depositReceipt)
             {
-                var picUrl = Redirect($"{_awsDepositUrl}{_awsDepositFolder}/{transId}_{receipt.ReceiptNo}.png").Url;
-                var picRsp = client.GetAsync(picUrl).Result;
-                if (picRsp.StatusCode == HttpStatusCode.OK)
+                var picUrl = $"{_awsDepositUrl}{_awsDepositFolder}/{transId}_{receipt.ReceiptNo}.png";
+                var model = new DepositReceiptModel
                 {
-                    var model = new DepositReceiptModel
-                    {
-                        ReceiptNo = receipt.ReceiptNo,
-                        Receipt = picUrl,
-                        Creator = receipt.Creator,
-                        CreateTime = receipt.CreateTime,
-                        CreateFrom = receipt.CreateFrom
-                    };
-                    result.Add(model);
-                }
+                    ReceiptNo = receipt.ReceiptNo,
+                    Receipt = picUrl,
+                    Creator = receipt.Creator,
+                    CreateTime = receipt.CreateTime,
+                    CreateFrom = receipt.CreateFrom
+                };
+                result.Add(model);
             }
 
             return result;
