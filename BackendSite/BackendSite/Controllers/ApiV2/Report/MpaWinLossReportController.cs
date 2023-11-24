@@ -34,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Report
             var apiResult = new ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>();
             try
             {
-                var responseData = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request, MpaWinLossGroupByTypeEnum.Brand);
+                var responseData = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request, MpaWinLossGroupByTypeEnum.Date);
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -51,7 +51,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
         public async Task<IActionResult> GetWinLossByDateExport(MpaWinLossRequest request)
         {
-            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Brand);
+            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Date);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByDateExport");
         }
@@ -270,7 +270,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
         public async Task<IActionResult> GetWinLossByBrandExport(MpaWinLossRequest request)
         {
-            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByBrandExport(request, MpaWinLossGroupByTypeEnum.Date);
+            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByBrandExport(request, MpaWinLossGroupByTypeEnum.Brand);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByBrandExport");
         }

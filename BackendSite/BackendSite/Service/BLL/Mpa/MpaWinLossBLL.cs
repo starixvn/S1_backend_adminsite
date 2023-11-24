@@ -3101,14 +3101,12 @@ namespace BackendSite.Service.BLL.Mpa
 
             var combineResult = combineData.GroupBy(x => new
             {
-                x.Date,
                 x.Currency,
                 x.SiteId
             })
             .Select(r => new MpaWinLossByBrandDto
             {
                 SiteId = r.Key.SiteId,
-                Date = r.Key.Date,
                 Currency = r.Key.Currency,
                 TurnOver = r.Sum(x => x.TurnOver),
                 ValidTurnOver = r.Sum(x => x.ValidTurnOver),
