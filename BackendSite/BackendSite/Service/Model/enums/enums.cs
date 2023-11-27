@@ -1833,6 +1833,7 @@ namespace BackendSite.Service.Model.enums
     {
         OneGamingPoker = 41,
         V8Poker = 42,
+        V8PokerNoRevenue = 47,
         NineW = 51
     }
 
@@ -1984,5 +1985,22 @@ namespace BackendSite.Service.Model.enums
         /// 3RD選項Minus
         /// </summary>
         Minus = 6
+    }
+
+
+    /// <summary>
+    /// 上傳類型 By 功能，對應 SiteConfig 的 UploadImageFunctionConfig
+    /// </summary>
+    public enum UploadImageFunctionEnum
+    {
+        BannerManagement = 1,
+        BonusManagement = 2,
+        NewsManagement = 3
+    }
+    
+    public enum QueueJob
+    {
+        Init = 0 ,
+        Verification = 1
     }
 }

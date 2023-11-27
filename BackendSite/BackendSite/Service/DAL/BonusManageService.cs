@@ -62,9 +62,15 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<TpGameType>("Admin_TpGameType_Get");
         }
 
-        public IEnumerable<CashBackGame> GetCashBackGameList(int? tpId, int? categoryId)
+        public IEnumerable<CashBackGame> GetCashBackGameList(string siteIds, int currencyId, int? tpId, int? categoryId)
         {
-            return _reportDbClient.Query<CashBackGame>("Admin_CashBackGameType_Get", new DynamicParameters(new { TpId = tpId, PromoCategoryId = categoryId }));
+            return _reportDbClient.Query<CashBackGame>("Admin_CashBackGameType_Get_V2", 
+                new DynamicParameters(
+                    new { 
+                        _SiteIds = siteIds, 
+                        _CurrencyId = currencyId, 
+                        _TpId = tpId, 
+                        _PromoCategoryId = categoryId }));
         }
 
         public int SetScratchCardCode(string specialCode, string scratchCardCode, string lastUpdateUser)
@@ -645,7 +651,7 @@ namespace BackendSite.Service.DAL
             p.Add("_PromotionAction", promotion.PromotionAction);
             p.Add("_AutoExtend", promotion.AutoExtend);
             p.Add("_IsPopUp", promotion.IsPopUp);
-            
+
             //啟用限制條件，可用次數下限為1
             var _sameDeviceIDAvailableCount = promotion.SameDeviceIDRestrict && promotion.SameDeviceIDAvailableCount < 1 ? 1 : promotion.SameDeviceIDAvailableCount;
             var _sameIPRestrictAvailableCountt = promotion.SameIPRestrict && promotion.SameIPRestrictAvailableCount < 1 ? 1 : promotion.SameIPRestrictAvailableCount;
