@@ -35,7 +35,7 @@ namespace BackendSite.Service.DAL
             props.Add("_PageSize", pageSize);
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<News>("Admin_News_Get_V4", props).ToList();
+            var result = _reportDbClient.Query<News>("Admin_News_Get_V5", props).ToList();
 
             searchData.NewsList = result;
             searchData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;
