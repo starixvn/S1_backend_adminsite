@@ -78,9 +78,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     if (userData.IsSuper)
                     {
                         var siteList = _serverInfoBLL.GetSiteList().ToList();
+                        var siteListbyUser = _newAuthorizeBLL.GetAssignSiteListV2(authInfo.UserId);
                         var brandData = siteList.Find(x => x.SiteId == brand);
+                        var resultList = new List<IEnumerable<int>>();
+
+                        siteListbyUser.ForEach(x =>
+                        {
+                            var jsonArray = JsonConvert.DeserializeObject<IEnumerable<int>>(x.CurrencyList);
+                            resultList.Add(jsonArray);
+                        });
+
                         normalCurrencyList = brandData.ICurrencyList;
-                        AllSiteCurrencyList = siteList.SelectMany(r => r.ICurrencyList).Distinct();
+                        AllSiteCurrencyList = resultList.SelectMany(r => r).Distinct();
+
                         if (brandData != null)
                             normalCurrencyList = brandData.ICurrencyList;
                     }
