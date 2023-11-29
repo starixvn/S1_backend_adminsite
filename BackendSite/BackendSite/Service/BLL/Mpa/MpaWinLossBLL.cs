@@ -550,6 +550,7 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 TurnOver = v.TurnOver,
                 ValidTurnOver = v.ValidTurnOver,
+                GGR = v.GGR,
                 PlayerWinLoss = v.PlayerWinLoss,
                 BAPlayerWinLoss = v.BAPlayerWinLoss,
                 ProgressiveWin = v.ProgressiveWin,
@@ -573,6 +574,7 @@ namespace BackendSite.Service.BLL.Mpa
                 {
                     TurnOver = v.TurnOver,
                     ValidTurnOver = v.ValidTurnOver,
+                    GGR = v.GGR,
                     PlayerWinLoss = v.PlayerWinLoss,
                     BAPlayerWinLoss = v.BAPlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
@@ -1108,6 +1110,7 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 TurnOver = v.TurnOver,
                 ValidTurnOver = v.ValidTurnOver,
+                GGR = v.GGR,
                 PlayerWinLoss = v.PlayerWinLoss,
                 BAPlayerWinLoss = v.BAPlayerWinLoss,
                 ProgressiveWin = v.ProgressiveWin,
