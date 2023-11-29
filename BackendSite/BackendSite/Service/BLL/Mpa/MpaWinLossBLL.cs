@@ -409,14 +409,11 @@ namespace BackendSite.Service.BLL.Mpa
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
                             GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8)+totalBACommission,
-                            //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummary,
-                            //BAPlayerWinLoss
                     		BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
                             Commission = r.Sum(x => CalculateCommission(x)),
-                            //BACommission
                     		BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
@@ -453,9 +450,11 @@ namespace BackendSite.Service.BLL.Mpa
                             ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                             GGR = r.Sum(x => x.GGR),
                             PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                            BAPlayerWinLoss = r.Sum(x => x.BAPlayerWinLoss),
                             ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                             ProgressiveBet = r.Sum(x => x.ProgressiveBet),
                             Commission = r.Sum(x => x.Commission),
+                            BACommission = r.Sum(x => x.BACommission),
                             BetCount = r.Sum(x => x.BetCount),
                             AvgBetAmount = r.Sum(x => x.BetCount) != 0
                             ? r.Sum(x => x.TurnOver) / r.Sum(x => x.BetCount)
@@ -556,9 +555,11 @@ namespace BackendSite.Service.BLL.Mpa
                 TurnOver = v.TurnOver,
                 ValidTurnOver = v.ValidTurnOver,
                 PlayerWinLoss = v.PlayerWinLoss,
+                BAPlayerWinLoss = v.BAPlayerWinLoss,
                 ProgressiveWin = v.ProgressiveWin,
                 ProgressiveBet = v.ProgressiveBet,
                 Commission = v.Commission,
+                BACommission = v.BACommission,
                 BetCount = v.BetCount,
                 UniquePlayers = v.UniquePlayers,
                 DepositCount = v.DepositCount,
@@ -577,9 +578,11 @@ namespace BackendSite.Service.BLL.Mpa
                     TurnOver = v.TurnOver,
                     ValidTurnOver = v.ValidTurnOver,
                     PlayerWinLoss = v.PlayerWinLoss,
+                    BAPlayerWinLoss = v.BAPlayerWinLoss,
                     ProgressiveWin = v.ProgressiveWin,
                     ProgressiveBet = v.ProgressiveBet,
                     Commission = v.Commission,
+                    BACommission = v.BACommission,
                     BetCount = v.BetCount,
                     UniquePlayers = v.UniquePlayers,
                     DepositCount = v.DepositCount,
@@ -876,14 +879,11 @@ namespace BackendSite.Service.BLL.Mpa
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
                             GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
-                            //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummary,
-                            //BAPlayerWinLoss
                             BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
                             Commission = r.Sum(x => CalculateCommission(x)),
-                            //BACommission
                             BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
@@ -1113,9 +1113,11 @@ namespace BackendSite.Service.BLL.Mpa
                 TurnOver = v.TurnOver,
                 ValidTurnOver = v.ValidTurnOver,
                 PlayerWinLoss = v.PlayerWinLoss,
+                BAPlayerWinLoss = v.BAPlayerWinLoss,
                 ProgressiveWin = v.ProgressiveWin,
                 ProgressiveBet = v.ProgressiveBet,
                 Commission = v.Commission,
+                BACommission = v.BACommission,
                 BetCount = v.BetCount,
                 UniquePlayers = v.UniquePlayers,
             });
@@ -1151,6 +1153,7 @@ namespace BackendSite.Service.BLL.Mpa
             var tpCategoryMap = await GetTpCategoryMapper();
             var currencyNameMapper = await GetCurrencyIsoCodeMapper();
             var betRecordResult = await GetTpBetRecord(request, groupByType);
+            //因需用gametype分組計算，需在分組回來
             var originTpBetRecordResult = GetGroupResultbyCurrency(GetGroupResult(betRecordResult.OriginBetRecord));
             var alreadyMultiplyRateTpBetRecordResult = GetGroupResultbyCurrency(GetGroupResult(betRecordResult.AlreadyMultiplyRateBetRecord));
 
@@ -1190,14 +1193,11 @@ namespace BackendSite.Service.BLL.Mpa
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
                             GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
-                            //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummary,
-                            //BAPlayerWinLoss
                             BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
                             Commission = r.Sum(x => CalculateCommission(x)),
-                            //BACommission
                             BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
@@ -1226,9 +1226,11 @@ namespace BackendSite.Service.BLL.Mpa
                             ValidTurnOver = r.Sum(x => x.ValidTurnOver),
                             GGR = r.Sum(x => x.GGR),
                             PlayerWinLoss = r.Sum(x => x.PlayerWinLoss),
+                            BAPlayerWinLoss = r.Sum(x =>x.BAPlayerWinLoss),
                             ProgressiveWin = r.Sum(x => x.ProgressiveWin),
                             ProgressiveBet = r.Sum(x => x.ProgressiveBet),
                             Commission = r.Sum(x => x.Commission),
+                            BACommission = r.Sum(x => x.BACommission),
                             BetCount = r.Sum(x => x.BetCount),
                             AvgBetAmount = r.Sum(x => x.BetCount) != 0 ? r.Sum(x => x.TurnOver) / r.Sum(x => x.BetCount) : 0.00m,
                             Margin = r.Sum(x => x.ValidTurnOver) != 0
@@ -1656,14 +1658,11 @@ namespace BackendSite.Service.BLL.Mpa
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
                             GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
-                            //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummary,
-                            //BAPlayerWinLoss
                             BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
                             Commission = r.Sum(x => CalculateCommission(x)),
-                            //BACommission
                             BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
@@ -2288,14 +2287,11 @@ namespace BackendSite.Service.BLL.Mpa
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
                             GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
-                            //PlayerWinLoss = 全部資料-BA資料
                             PlayerWinLoss = totalWinLossSummary,
-                            //BAPlayerWinLoss
                             BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
                             Commission = r.Sum(x => CalculateCommission(x)),
-                            //BACommission
                             BACommission = totalBACommission,
                             BetCount = totalRowCount,
                             AvgBetAmount = totalRowCount != 0 ? totalStakeSummary / totalRowCount : 0.00m,
