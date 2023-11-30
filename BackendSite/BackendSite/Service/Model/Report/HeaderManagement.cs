@@ -94,7 +94,9 @@ namespace BackendSite.Service.Model.Report
     public class HeaderManagementGroup
     {
         public int SiteId { get; set; }
+        public string LobbyCategory { get; set; }
         public int TpGameIdNo { get; set; }
+        public string ProductName { get; set; }
         public int Status { get; set; }
         public HeaderIconTypeEnum IconType { get; set; }
         public DateTime IconStartTime { get; set; }
