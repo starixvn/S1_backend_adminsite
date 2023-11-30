@@ -394,7 +394,7 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver *0.25%
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
-                        
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByDateDto物件並返回
                         return new MpaWinLossByDateDto
@@ -406,8 +406,8 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8)+totalBACommission,
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8)+totalBACommission,
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
                     		BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
@@ -867,7 +867,7 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver *0.25%
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
-                        
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByTpGameTypeDto物件並返回
                         return new MpaWinLossByTpGameTypeDto
@@ -876,8 +876,8 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
@@ -1182,7 +1182,7 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver *0.25%
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
-                        
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByTpCategoryDto物件並返回
                         return new MpaWinLossByTpCategoryDto
@@ -1191,8 +1191,8 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
@@ -1644,7 +1644,7 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver * 0.25 %
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
-                        
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByPlayerDto物件並返回
                         return new MpaWinLossByPlayerDto
@@ -1656,8 +1656,8 @@ namespace BackendSite.Service.BLL.Mpa
                             ClosingBalance = r.Sum(x => x.ClosingBalance),
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
@@ -2276,7 +2276,7 @@ namespace BackendSite.Service.BLL.Mpa
                         var totalBAValidBetSummary = r.Sum(x => x.BAValidBetSummary);
                         //BACommission = ValidTurnOver *0.25%
                         var totalBACommission = totalBAValidBetSummary * 0.0025m;
-                        
+                        var totalWinLossSummaryWithoutBA = totalWinLossSummary - totalBAWinLossSummary;
 
                         // 建立新的MpaWinLossByCurrencyDto物件並返回
                         return new MpaWinLossByCurrencyDto
@@ -2285,8 +2285,8 @@ namespace BackendSite.Service.BLL.Mpa
                             Currency = currencyNameMapper[r.Key.CurrencyId],
                             TurnOver = totalStakeSummary,
                             ValidTurnOver = totalValidBetSummary,
-                            GGR = CalculateGGR(gameType, totalWinLossSummary, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
-                            PlayerWinLoss = totalWinLossSummary,
+                            GGR = CalculateGGR(gameType, totalWinLossSummaryWithoutBA, totalProgressiveWinSummary, totalProgressiveBetSummary, totalRevenueSummaryfor9w, totalRevenueSummaryforV8) + totalBACommission,
+                            PlayerWinLoss = totalWinLossSummaryWithoutBA,
                             BAPlayerWinLoss = totalBAWinLossSummary,
                             ProgressiveWin = totalProgressiveWinSummary,
                             ProgressiveBet = totalProgressiveBetSummary,
