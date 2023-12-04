@@ -64,6 +64,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             var apiResult = new ApiResult<object>();
             var normalCurrencyList = Enumerable.Empty<int>();
+            var AllSiteCurrencyList = Enumerable.Empty<int>();
             var vipCurrencyList = Enumerable.Empty<int>();
             var allSiteEnableCurrencyList = Enumerable.Empty<int>();
 
@@ -77,8 +78,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     if (userData.IsSuper)
                     {
                         var siteList = _serverInfoBLL.GetSiteList().ToList();
+                        var siteListbyUser = _newAuthorizeBLL.GetAssignSiteListV2(authInfo.UserId);
                         var brandData = siteList.Find(x => x.SiteId == brand);
+                        var resultList = new List<IEnumerable<int>>();
+
+                        siteListbyUser.ForEach(x =>
+                        {
+                            var jsonArray = JsonConvert.DeserializeObject<IEnumerable<int>>(x.CurrencyList);
+                            resultList.Add(jsonArray);
+                        });
+
                         normalCurrencyList = brandData.ICurrencyList;
+                        AllSiteCurrencyList = resultList.SelectMany(r => r).Distinct();
+
                         if (brandData != null)
                             normalCurrencyList = brandData.ICurrencyList;
                     }
@@ -86,8 +98,19 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                     {
                         var siteList = _newAuthorizeBLL.GetAssignSiteListV2(authInfo.UserId);
                         var brandData = siteList.Find(x => x.SiteId == brand);
+                        var resultList = new List<IEnumerable<int>>();
+
+                        siteList.ForEach(x =>
+                        {
+                            var jsonArray = JsonConvert.DeserializeObject<IEnumerable<int>>(x.CurrencyList);
+                            resultList.Add(jsonArray);
+                        });
                         if (brandData != null)
+                        {
                             normalCurrencyList = JsonConvert.DeserializeObject<IEnumerable<int>>(brandData.CurrencyList);
+                            AllSiteCurrencyList = resultList.SelectMany(r => r).Distinct();
+                        }
+                            
                     }
 
                     vipCurrencyList = _rebateManageBLL.GetRebatePeriodList(brand).Select(x => x.CurrencyId).Distinct();
@@ -100,6 +123,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 apiResult.Data = new
                 {
                     SiteCurrencyList = normalCurrencyList,
+                    AllSiteCurrencyList = AllSiteCurrencyList,
                     RewardsCurrencyList = normalCurrencyList.Intersect(_RewardCurrencyList),
                     VipCurrencyList = normalCurrencyList.Intersect(vipCurrencyList),
                     AllSiteEnableCurrencyList = allSiteEnableCurrencyList

@@ -67,6 +67,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                     {
                         SiteId = group.Key.SiteId,
                         TpGameIdNo = group.Key.TpGameIdNo,
+                        LobbyCategory = group.FirstOrDefault().LobbyCategory,
+                        ProductName = group.FirstOrDefault().ProductName,
                         Status = group.FirstOrDefault().Status,
                         IconType = group.FirstOrDefault().IconType,
                         IconStartTime = group.FirstOrDefault().IconStartTime,
