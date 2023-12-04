@@ -84,8 +84,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
                         siteListbyUser.ForEach(x =>
                         {
-                            var jsonArray = JsonConvert.DeserializeObject<IEnumerable<int>>(x.CurrencyList);
-                            resultList.Add(jsonArray);
+                            if(x.CurrencyList != null)
+                            {
+                                var jsonArray = JsonConvert.DeserializeObject<IEnumerable<int>>(x.CurrencyList);
+                                resultList.Add(jsonArray);
+                            }
                         });
 
                         normalCurrencyList = brandData.ICurrencyList;
@@ -102,8 +105,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
                         siteList.ForEach(x =>
                         {
-                            var jsonArray = JsonConvert.DeserializeObject<IEnumerable<int>>(x.CurrencyList);
-                            resultList.Add(jsonArray);
+                            if (x.CurrencyList != null)
+                            {
+                                var jsonArray = JsonConvert.DeserializeObject<IEnumerable<int>>(x.CurrencyList);
+                                resultList.Add(jsonArray);
+                            }
                         });
                         if (brandData != null)
                         {
