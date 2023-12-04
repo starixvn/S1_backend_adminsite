@@ -17,6 +17,7 @@ using Newtonsoft.Json.Linq;
 
 namespace BackendSite.Controllers.ApiV2.Member.Process
 {
+    //etta eks test
     [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
