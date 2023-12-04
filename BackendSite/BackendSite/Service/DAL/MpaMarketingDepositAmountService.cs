@@ -37,7 +37,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartTime", startTime);
             p.Add("_EndTime", endTime);
 
-            return _reportDbClient.QueryAsync<MpaMarketingDepositSignUpSummaryDto>("Admin_MpaMarketingDepositSigUpSummarly_Get", p);
+            return _reportDbClient.QueryAsync<MpaMarketingDepositSignUpSummaryDto>("Admin_MpaMarketingDepositSigUpSummary_Get", p);
         }
 
         public IEnumerable<MpaMarketingDepositSignUpDetailDto> GetDepositSignUpDetail(string siteList, DateTime startTime, DateTime endTime)
