@@ -148,6 +148,7 @@ public class LeaderboardRankingBonusList
 public class LeaderboardRankingBonusDetail
 {
     public string Ranking { get; set; }
+    public string RankingName { get; set; }
     public decimal MinPoint { get; set; }
     public decimal Bonus { get; set; }
 }

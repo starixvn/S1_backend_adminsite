@@ -57,7 +57,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                     CurrencyId = group.Key.CurrencyId,
                     Data = group.Select(item => new LeaderboardRankingBonusDetail
                     {
-                        Ranking = $"TOP {item.Ranking}",
+                        Ranking = item.Ranking,
+                        RankingName = $"TOP {item.Ranking}",
                         MinPoint = item.MinPoint,
                         Bonus = item.Bonus
                     })
