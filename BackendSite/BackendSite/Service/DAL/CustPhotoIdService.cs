@@ -41,7 +41,7 @@ public class CustPhotoIdService
         p.Add("_SiteId", siteId);
         p.Add("SQ", dbType: DbType.Int64, direction: ParameterDirection.Output);
 
-        var result = await _mainDbClient.ExecuteAsync("Admin_CustPhotoId_Ins_V2", p);
+        var result = await _mainDbClient.ExecuteAsync("Admin_CustPhotoId_Ins_V3", p);
         if (result <= 0) return 0;
 
         var sq = p.Get<long>("SQ");

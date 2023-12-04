@@ -1,7 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
+using System.Text.Json;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -11,12 +11,14 @@ namespace BackendSite.Service.BLL
         private readonly GameCasinoManageService gameCasinoManageService;
         private readonly ReportService reportService;
         private readonly ServerInfoService serverInfoService;
+        private readonly ServerInfoBLL _serverInfoBll;
 
-        public GameCasinoManageBLL(GameCasinoManageService gameCasinoManageService, ReportService reportService, ServerInfoService serverInfoService)
+        public GameCasinoManageBLL(ServerInfoBLL serverInfoBll, GameCasinoManageService gameCasinoManageService, ReportService reportService, ServerInfoService serverInfoService)
         {
             this.gameCasinoManageService = gameCasinoManageService;
             this.reportService = reportService;
             this.serverInfoService = serverInfoService;
+            _serverInfoBll = serverInfoBll;
         }
 
         public class GameCasinoName
@@ -38,9 +40,14 @@ namespace BackendSite.Service.BLL
             return gameCasinoManageService.DeleteGameCasinoDetail(para);
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpList()
+        public IEnumerable<SiteTpListIfo> GetTpList(IEnumerable<int>? siteIds, int currencyId)
         {
-            return gameCasinoManageService.GetTpList();
+            if (siteIds is null)
+            {
+                siteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
+            }
+
+            return gameCasinoManageService.GetTpList(System.Text.Json.JsonSerializer.Serialize(siteIds), currencyId);
         }
 
         public IEnumerable<SlotCategoryInfo> GetSlotCategoryList()

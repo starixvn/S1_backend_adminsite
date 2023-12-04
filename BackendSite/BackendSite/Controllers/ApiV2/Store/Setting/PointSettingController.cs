@@ -209,7 +209,8 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
 
             if (result.ErrorCode == (int)ErrorCodeEnum.Success)
             {
-                var typeList = await _tpBLL.GetTpGameTypeListbyCategoryAsync(request.TpCategoryId);
+                List<int> siteList = new() { request.SiteId };
+                var typeList = await _tpBLL.GetTpGameTypeListbyCategoryAsync(System.Text.Json.JsonSerializer.Serialize(siteList), request.CurrencyId, request.TpCategoryId);
                 var beforeData = before.Data.Any()
                     ? JsonConvert.SerializeObject(new
                     {

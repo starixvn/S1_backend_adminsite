@@ -37,6 +37,8 @@ namespace BackendSite.Service.Model
         public string UrlRouter { get; set; }
         public IEnumerable<BannerDetails> Specific { get; set; }
         public int Sort { get; set; }
+        public string SiteName { get; set; }
+
     }
 
     public class SetRequest
