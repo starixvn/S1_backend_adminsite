@@ -1,6 +1,6 @@
 ﻿using BackendSite;
 using BackendSite.Extensions;
-using Elastic.Apm.SerilogEnricher;
+using Elastic.Apm.SerilogEnricher; 
 
 using Serilog;
 using Serilog.Exceptions;
