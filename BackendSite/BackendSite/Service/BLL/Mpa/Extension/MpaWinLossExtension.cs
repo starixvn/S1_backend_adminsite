@@ -306,9 +306,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     ValidTurnOver = item.Sum(x => x.ValidTurnOver).ToString("N2"),
                     GGR = item.Sum(x => x.GGR).ToString("N2"),
                     PlayerWinLoss = item.Sum(x => x.PlayerWinLoss).ToString("N2"),
+                    BAPlayerWinLoss = item.Sum(x => x.BAPlayerWinLoss).ToString("N2"),
                     ProgressiveWin = item.Sum(x => x.ProgressiveWin).ToString("N2"),
                     ProgressiveBet = item.Sum(x => x.ProgressiveBet).ToString("N2"),
                     Commission = item.Sum(x => x.Commission).ToString("N2"),
+                    BACommission = item.Sum(x => x.BACommission).ToString("N2"),
                     BetCount = item.Sum(x => x.BetCount),
                     AvgBetAmount = item.Sum(x => x.BetCount) != 0
                         ? (item.Sum(x => x.TurnOver) / item.Sum(x => x.BetCount)).ToString("N2")
@@ -623,9 +625,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
                     PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
                     ProgressiveWin = item.Value.ProgressiveWin,
                     ProgressiveBet = item.Value.ProgressiveBet,
                     Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
                     BetCount = item.Value.BetCount,
                     AvgBetAmount = item.Value.AvgBetAmount,
                     UniquePlayers = item.Value.UniquePlayers,
