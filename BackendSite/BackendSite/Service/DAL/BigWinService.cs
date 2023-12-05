@@ -25,7 +25,7 @@ namespace BackendSite.Service.DAL
                 SiteId = siteId
             });
 
-            return _reportDbClient.Query<BigWinSetting>("Admin_BigWinSetting_Get", p);
+            return _reportDbClient.Query<BigWinSetting>("Service_BigWinSetting_Get", p);
         }
 
         public async Task<bool> SetBigWinSetting(ParamsWithLog<BigWinSetting> input)
@@ -40,7 +40,8 @@ namespace BackendSite.Service.DAL
                 CurrencyId = input.CurrencyId,
                 Status = input.After.Status,
                 TpCategory = JsonConvert.SerializeObject(input.After.ITpCategoryList),
-                MultipleOfWinning = input.After.MultipleOfWinning
+                MultipleOfWinning = input.After.MultipleOfWinning,
+                MinOfWinning = input.After.MinOfWinning
             });
 
             var success = await conn

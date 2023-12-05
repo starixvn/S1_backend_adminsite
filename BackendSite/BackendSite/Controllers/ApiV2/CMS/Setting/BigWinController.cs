@@ -1,17 +1,13 @@
-﻿using BackendSite.Controllers.ApiV2.Member.Process;
+﻿using BackendSite.Attributes;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
-using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Org.BouncyCastle.Ocsp;
 
-namespace BackendSite.Controllers.ApiV2.Marketing.Setting
+namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
@@ -31,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 152, 1 })]
         public ApiResult<IEnumerable<BigWinSetting>> GetBigWinSetting(GetBigWinSettingRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<BigWinSetting>>();
@@ -50,6 +47,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 152, 3 })]
         public async Task<ApiResult> SetBigWinSetting(ApiRequestWithLog<BigWinSetting> request)
         {
             var authData = _newAuthorizeBLL.GetAuthData();
@@ -75,9 +73,10 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<BigWinReport>> GetBigWinReport(BigWinReportRequest request)
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 153, 1 })]
+        public ApiResult<IEnumerable<BigWinExportData>> GetBigWinReport(BigWinReportRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<BigWinReport>>();
+            var apiResult = new ApiResult<IEnumerable<BigWinExportData>>();
             try
             {
                 apiResult.Data = _bigWinBLL.GetBigWinReport(request);
@@ -94,6 +93,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         }
 
         [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 153, 2 })]
         public IActionResult Export(BigWinReportRequest request)
         {
             var exportData = _bigWinBLL.GetBigWinReport(request);

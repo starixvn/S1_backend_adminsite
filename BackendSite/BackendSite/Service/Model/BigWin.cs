@@ -19,6 +19,7 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public string CurrencyName { get; set; }
         public string SiteName { get; set; }
+        public decimal MinOfWinning { get; set; }
         public IEnumerable<int> ITpCategoryList
         {
             get
@@ -39,11 +40,28 @@ namespace BackendSite.Service.Model
     { 
         public string Site { get; set; }
         public string Currency { get; set; }
-        public DateTime EventDate { get; set; }
+        public string EventDate { get; set; }
+        public string MemberID { get; set; }
+        public string Category { get; set; }
+        public string VenderName { get; set; }
+        public decimal Amount { get; set; }
+        public int TpId { get; set; }
+        public int TpGameType { get; set; }
+        public int TpCategory { get; set; }
+        public string GameID { get; set; }
+        public int SiteId { get; set; }
+        public int CurrencyId { get; set; }
+        public string TypeName { get; set; }
+    }
+    public class BigWinExportData
+    {
+        public string Site { get; set; }
+        public string Currency { get; set; }
+        public string EventDate { get; set; }
         public string MemberID { get; set; }
         public string Category { get; set; }
         public string VenderName { get; set; }
         public string GameName { get; set; }
+        public decimal Amount { get; set; }
     }
-
 }
