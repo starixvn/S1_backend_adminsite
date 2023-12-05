@@ -876,6 +876,116 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public IEnumerable<MpaWinLossByCurrencyDto> AlreadyMultiplyRateBonus { get; set; }
     }
 
+    public class MpaWinLossByBrandCurrencyDetailDto
+    {
+        [JsonIgnore]
+        public string Date { get; set; }
+
+        [JsonIgnore]
+        //MYR、CNY...etc
+        public string Currency { get; set; }
+
+        [JsonIgnore]
+        public int GameType { get; set; }
+
+        [JsonProperty(Order = 0)]
+        public decimal TurnOver { get; set; }
+
+        [JsonProperty(Order = 1)]
+        public decimal ValidTurnOver { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public decimal GGR => -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
+
+        [JsonProperty(Order = 3)]
+        public decimal PlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 4)]
+        public decimal ProgressiveWin { get; set; }
+
+        [JsonProperty(Order = 5)]
+        public decimal ProgressiveBet { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public decimal Commission { get; set; }
+
+        [JsonProperty(Order = 7)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
+
+        [JsonProperty(Order = 9)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 10)]
+        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
+
+        [JsonProperty(Order = 11)]
+        public int DepositCount { get; set; }
+
+        [JsonProperty(Order = 12)]
+        public decimal TotalDepositAmount { get; set; }
+
+        [JsonProperty(Order = 13)]
+        public int WithDrawCount { get; set; }
+
+        [JsonProperty(Order = 14)]
+        public decimal TotalWithDrawAmount { get; set; }
+
+        [JsonProperty(Order = 15)]
+        public decimal TotalBonus { get; set; }
+    }
+
+    public class MpaWinLossByBrandDto
+    {
+        //[JsonIgnore]
+        public string Date { get; set; }
+
+        //[JsonIgnore]
+        //MYR、CNY...etc
+        public string Currency { get; set; }
+
+        public decimal TurnOver { get; set; }
+
+        public decimal ValidTurnOver { get; set; }
+
+        public decimal GGR { get; set; }
+
+        public decimal PlayerWinLoss { get; set; }
+
+        public decimal ProgressiveWin { get; set; }
+
+        public decimal ProgressiveBet { get; set; }
+
+        public decimal Commission { get; set; }
+
+        public int BetCount { get; set; }
+
+        public decimal AvgBetAmount { get; set; }
+
+        public int UniquePlayers { get; set; }
+
+        [EpplusIgnore]
+        public decimal Margin { get; set; }
+
+        public string MarginStr { get; set; }
+
+        public int DepositCount { get; set; }
+
+        public decimal TotalDepositAmount { get; set; }
+
+        public int WithDrawCount { get; set; }
+
+        public decimal TotalWithDrawAmount { get; set; }
+
+        public decimal TotalBonus { get; set; }
+        public int SiteId { get; set; }
+
+        public string SiteName { get; set; }
+        public int CustId { get; set; }
+    }
+
     #region To FrontEnd API Formate
 
     public class MpaWinLossByDayCurrencyDetailDtoToFrontEnd
@@ -911,6 +1021,13 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string DisplayKey { get; set; }
 
         public MpaWinLossByCurrencyCurrencyDetailDto Data { get; set; }
+    }
+
+    public class MpaWinLossByBrandCurrencyDetailDtoToFrontEnd
+    {
+        public string DisplayKey { get; set; }
+
+        public MpaWinLossByBrandCurrencyDetailDto Data { get; set; }
     }
 
     #endregion
@@ -1096,6 +1213,45 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string Commission { get; set; }
 
         public string BACommission { get; set; }
+
+        public int BetCount { get; set; }
+
+        public string AvgBetAmount { get; set; }
+
+        public int UniquePlayers { get; set; }
+
+        public string Margin { get; set; }
+
+        public int DepositCount { get; set; }
+
+        public string TotalDepositAmount { get; set; }
+
+        public int WithDrawCount { get; set; }
+
+        public string TotalWithDrawAmount { get; set; }
+
+        public string TotalBonus { get; set; }
+    }
+
+    public class MpaWinLossByBrandDtoExport
+    {
+        public string SiteName { get; set; }
+
+        public string Currency { get; set; }
+
+        public string TurnOver { get; set; }
+
+        public string ValidTurnOver { get; set; }
+
+        public string GGR { get; set; }
+
+        public string PlayerWinLoss { get; set; }
+
+        public string ProgressiveWin { get; set; }
+
+        public string ProgressiveBet { get; set; }
+
+        public string Commission { get; set; }
 
         public int BetCount { get; set; }
 
