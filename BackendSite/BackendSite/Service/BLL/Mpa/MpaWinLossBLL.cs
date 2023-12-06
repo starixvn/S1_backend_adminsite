@@ -145,7 +145,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             #region Total
 
-            var exportDataWithoutAll = exportData.Where(r => r.Currency == "All").ToList();
+            var exportDataWithoutAll = exportData.Where(r => r.Currency != "All").ToList();
             exportData.Add(new MpaWinLossByDateDto()
             {
                 Date = "Total",
@@ -669,7 +669,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             #region total
 
-            var exportDataWithoutAll = exportData.Where(r => r.Currency == "All").ToList();
+            var exportDataWithoutAll = exportData.Where(r => r.Currency != "All").ToList();
             exportData.Add(new MpaWinLossByTpGameTypeDto()
             {
                 TpGameTypeName = "total",
@@ -982,7 +982,7 @@ namespace BackendSite.Service.BLL.Mpa
             #endregion
 
             #region total
-            var exportDataWithoutAll = exportData.Where(r => r.Currency == "All").ToList();
+            var exportDataWithoutAll = exportData.Where(r => r.Currency != "All").ToList();
             exportData.Add(new MpaWinLossByTpCategoryDto()
             {
                 TpCategoryName = "total",
@@ -1327,7 +1327,7 @@ namespace BackendSite.Service.BLL.Mpa
                 : exportData.OrderBy(x => x.UserName).ThenBy(x => x.Currency).ToList();
 
             #region total
-            var exportDataWithoutAll = exportData.Where(r => r.Currency == "All").ToList();
+            var exportDataWithoutAll = exportData.Where(r => r.Currency != "All").ToList();
             exportData.Add(new MpaWinLossByPlayerDto()
             {
                 TpUserName = "total",
