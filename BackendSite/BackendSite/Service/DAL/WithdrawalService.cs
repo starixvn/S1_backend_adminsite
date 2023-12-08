@@ -28,6 +28,8 @@ namespace BackendSite.Service.DAL
         private const int TypePosition = 1000;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly MySqlClient _reportDb34Client;
+
 
         #endregion
 
@@ -41,6 +43,7 @@ namespace BackendSite.Service.DAL
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _reportDb34Client = provider.GetServices<MySqlClient>().FirstOrDefault(p => p.DataBase == DataBase.Report34);
         }
 
         #endregion
@@ -119,7 +122,19 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V12", p);
+            var result = Enumerable.Empty<WithdrawalRequest>();
+            try
+            {
+                result = _reportDb34Client != null ?
+                    _reportDb34Client.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V12", p):
+                    _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V12", p);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, JsonConvert.SerializeObject(p));
+                result = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V12", p);
+            }
+
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 

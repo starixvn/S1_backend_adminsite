@@ -27,16 +27,14 @@ namespace BackendSite.Extensions
             {
                 services.AddSingleton(factory => new MySqlClient(reportDB34Conn, logger)
                 {
-                    DataBase = DataBase.Report
+                    DataBase = DataBase.Report34
                 });
             }
-            else
+
+            services.AddSingleton(factory => new MySqlClient(config.GetConnectionString($"{serviceType}_ReportDB"), logger)
             {
-                services.AddSingleton(factory => new MySqlClient(config.GetConnectionString($"{serviceType}_ReportDB"), logger)
-                {
-                    DataBase = DataBase.Report
-                });
-            }
+                DataBase = DataBase.Report
+            });
 
             return services
                 .AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_MainDB"), logger)
