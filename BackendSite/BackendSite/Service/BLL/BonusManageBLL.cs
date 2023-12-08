@@ -103,18 +103,9 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.SetPromotionStatus(bonusCode, siteId, status, _authorizeBLL.GetAuthData().UserName);
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
+        public IEnumerable<PromoCategory> GetPromoCategories()
         {
-            return _bonusManageService.GetPromoCategories(walletType);
-        }
-        public IEnumerable<PromoCategory> GetPromoCategoriesV2(int walletType)
-        {
-            return _bonusManageService.GetPromoCategoriesV2(walletType);
-        }
-
-        public IEnumerable<TpGameType> GetTpGameList()
-        {
-            return _bonusManageService.GetTpGameList();
+            return _bonusManageService.GetPromoCategories();
         }
 
         public IEnumerable<GetCashBackGamerep> GetCashBackGameList(string siteIds,int currencyId,int tpId, int categoryId)
