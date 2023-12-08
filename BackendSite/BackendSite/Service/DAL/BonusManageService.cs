@@ -47,19 +47,14 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get", new { isPayout, isNew });
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
+        public IEnumerable<PromoCategory> GetPromoCategories()
         {
-            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
+            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V4");
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategoriesV2(int walletType)
+        public IEnumerable<int> GetPromotionCategoryGameTypeList(int PromotionCategoryId)
         {
-            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V3", new DynamicParameters(new { _WalletType = walletType }));
-        }
-
-        public IEnumerable<TpGameType> GetTpGameList()
-        {
-            return _reportDbClient.Query<TpGameType>("Admin_TpGameType_Get");
+            return _reportDbClient.Query<int>("Admin_PromotionCategoryGameType_Get", new { PromotionCategoryId });
         }
 
         public IEnumerable<CashBackGame> GetCashBackGameList(string siteIds, int currencyId, int? tpId, int? categoryId)
@@ -296,6 +291,11 @@ namespace BackendSite.Service.DAL
                         }
                     }
                 }
+                
+                if (promotion.CategoryId.HasValue)
+                {
+                    promotion.PromotionCategoryGameTypeList = GetPromotionCategoryGameTypeList(promotion.CategoryId.Value);
+                }               
             }
             return promotion;
         }

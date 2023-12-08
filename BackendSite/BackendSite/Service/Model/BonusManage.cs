@@ -12,10 +12,11 @@ namespace BackendSite.Service.Model
         private DateTimeOffset? _lastUpdateTime { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
+        [Description("請查看PromotionType的Type設定")]
         public int PromotionType { get; set; }
         public string CategoryName { get; set; }
 
-        [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
+        [Description("請查看PromotionCategory的Id設定")]
         public int? CategoryId { get; set; }
 
         public DateTimeOffset? PeriodFrom
@@ -131,6 +132,9 @@ namespace BackendSite.Service.Model
 
         [Description("前台是否會以PopUp的方式顯示: 0.不會 1.會")]
         public bool IsPopUp { get; set; }
+
+        [Description("PromotionCategory支援的GameTypeList")]
+        public IEnumerable<int> PromotionCategoryGameTypeList { get; set; } = new List<int>();
     }
 
     public class PromotionInfoReq
@@ -142,10 +146,10 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public string Description { get; set; }
 
-        [Description("1.1st Deposit, 2.Re-Deposit, 3.FreeBet, 5.Wallet bonus, 6.Rebate, 7.CashBack, 8.Special Bonus 9.Retention free bet")]
+        [Description("請查看PromotionType的Type設定")]
         public int PromotionType { get; set; }
 
-        [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
+        [Description("請查看PromotionCategory的Id設定")]
         public int? CategoryId { get; set; }
         public DateTimeOffset? PeriodFromTime
         {
@@ -321,7 +325,6 @@ namespace BackendSite.Service.Model
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int TpId { get; set; }
     }
 
     public class TpGameTypeCurrency
