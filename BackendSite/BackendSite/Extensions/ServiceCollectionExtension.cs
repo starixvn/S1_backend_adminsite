@@ -26,8 +26,10 @@ namespace BackendSite.Extensions
             
             if (!string.IsNullOrEmpty(reportDB34Conn))
             {
-                // PRD ReportDB使用34當Master，36當Slave
-                services.AddSingleton(new MySqlClient(DataBase.Report, logger, reportDB34Conn, reportDBConn));
+                // PRD ReportDB使用36當Master，34當backup
+                services.AddSingleton(new MySqlClient(DataBase.Report, logger, reportDBConn, reportDB34Conn));
+                // PRD TestReportDB指定使用34當Master，不設定backup
+                services.AddSingleton(new MySqlClient(DataBase.TestReport, logger, reportDB34Conn));
             }
             else
             {
