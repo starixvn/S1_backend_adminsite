@@ -22,14 +22,16 @@ namespace BackendSite.Extensions
             var serviceType = config.GetValue<string>("ServiceType");
 
             var reportDBConn = config.GetConnectionString($"{serviceType}_ReportDB");
-            var reportDB34Conn = config.GetConnectionString($"{serviceType}_ReportDB_34");//只有PRD環境有設定34的連線字串         
-            
+            var reportDB34Conn = config.GetConnectionString($"{serviceType}_ReportDB_34");       
+            var reportDB32Conn = config.GetConnectionString($"{serviceType}_ReportDB_32");
+
+            //只有PRD環境有設定34跟32的連線字串
             if (!string.IsNullOrEmpty(reportDB34Conn))
             {
                 // PRD ReportDB使用34當Master，36當backup
                 services.AddSingleton(new MySqlClient(DataBase.Report, logger, reportDB34Conn, reportDBConn));
-                // PRD TestReportDB指定使用36當Master，34當backup
-                services.AddSingleton(new MySqlClient(DataBase.TestReport, logger, reportDBConn, reportDB34Conn));
+                // PRD TestReportDB指定使用32當Master，34當backup
+                services.AddSingleton(new MySqlClient(DataBase.TestReport, logger, reportDB32Conn, reportDB34Conn));
             }
             else
             {
