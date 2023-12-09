@@ -113,12 +113,18 @@ namespace BackendSite.Service.DAL
                 _WithdrawalMethod = withdrawalMethod
             });
 
-            #region GetCurrencyTotalAmount
-
-            currencyAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p).ToList();
-
-            #endregion
-
+            try
+            {
+                currencyAmount = _reportDb34Client != null ?
+                    _reportDb34Client.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p).ToList():
+                    _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, JsonConvert.SerializeObject(p));
+                currencyAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p).ToList();
+            }
+    
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 

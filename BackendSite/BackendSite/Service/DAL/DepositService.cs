@@ -88,11 +88,18 @@ namespace BackendSite.Service.DAL
                 PayIds = payIds.Any() ? JsonConvert.SerializeObject(payIds) : null,
             });
 
-            #region GetCurrencyTotalAmount
 
-            currencyAmountRecord = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
-
-            #endregion
+            try
+            {
+                currencyAmountRecord = _reportDb34Client != null ?
+                _reportDb34Client.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList() :
+                _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, JsonConvert.SerializeObject(p));
+                currencyAmountRecord = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
+            }           
 
             p.Add("PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
             p.Add("StartIndex", Math.Abs(pageNumber - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
