@@ -22,7 +22,6 @@ namespace BackendSite.Service.DAL
         private int payTypePosition = 100;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        private readonly MySqlClient _reportDb34Client;
         private readonly ILogger<DepositService> _logger;
 
         public DepositService(IServiceProvider provider)
@@ -34,7 +33,6 @@ namespace BackendSite.Service.DAL
             _bankFinancialService = provider.GetRequiredService<BankFinancialService>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
-            _reportDb34Client = provider.GetServices<MySqlClient>().FirstOrDefault(p => p.DataBase == DataBase.Report34);
             _logger = provider.GetRequiredService<ILogger<DepositService>>();
         }
 
@@ -106,19 +104,7 @@ namespace BackendSite.Service.DAL
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = Enumerable.Empty<DepositRequest>();
-            try
-            {
-                depositList = _reportDb34Client != null ?
-                    _reportDb34Client.Query<DepositRequest>("Admin_DepositList_Get_V13", p):
-                    _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V13", p);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, JsonConvert.SerializeObject(p));
-                depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V13", p);
-            }
-            
+            var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V13", p);
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
             return depositList;
