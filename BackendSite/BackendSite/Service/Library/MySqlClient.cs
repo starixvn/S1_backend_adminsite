@@ -7,8 +7,6 @@ using Dapper;
 
 using MySql.Data.MySqlClient;
 
-using NPOI.SS.Formula.Functions;
-
 using Serilog.Context;
 
 namespace BackendSite.Service.Library
