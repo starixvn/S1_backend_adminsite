@@ -30,8 +30,8 @@ namespace BackendSite.Extensions
             {
                 // PRD ReportDB使用34當Master，36當backup
                 services.AddSingleton(new MySqlClient(DataBase.Report, logger, reportDB34Conn, reportDBConn));
-                // PRD TestReportDB指定使用32當Master，34當backup
-                services.AddSingleton(new MySqlClient(DataBase.TestReport, logger, reportDB32Conn, reportDB34Conn));
+                // PRD TestReportDB指定使用32當Master，不指定backup
+                services.AddSingleton(new MySqlClient(DataBase.TestReport, logger, reportDB32Conn));
             }
             else
             {
