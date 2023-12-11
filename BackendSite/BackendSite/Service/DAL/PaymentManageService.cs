@@ -181,8 +181,8 @@ namespace BackendSite.Service.DAL
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var result = _testReportDbClient != null
-                ? _testReportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p)
-                : _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p);
+                ? _testReportDbClient.TestQuery<PaySetting>("Admin_PaySetting_GetList", p)
+                : _reportDbClient.TestQuery<PaySetting>("Admin_PaySetting_GetList", p);
 
             totalPages = p.Get<int>("_TotalPages");
             rowCount = p.Get<int>("_RowCount");

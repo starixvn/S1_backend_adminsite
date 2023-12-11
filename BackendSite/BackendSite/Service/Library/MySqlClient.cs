@@ -5,6 +5,8 @@ using BackendSite.Service.Model.enums;
 
 using Dapper;
 
+using Newtonsoft.Json;
+
 using MySql.Data.MySqlClient;
 
 using Serilog.Context;
@@ -200,6 +202,36 @@ namespace BackendSite.Service.Library
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
             _logger.LogDebug($"{sql} {sw.Elapsed:c}");
             return result.ToList();
+        }
+
+        public IEnumerable<T> TestQuery<T>(string sql, object parameters)
+        {
+            IEnumerable<T> result;
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                var conn = HealthCheck();
+                _logger.LogInformation($"DB {conn} | {sql} | {JsonConvert.SerializeObject(parameters)}");
+                using var connection = new MySqlConnection(conn);
+                result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (MySqlException sqlEx)
+            {
+                var conn = HealthCheck();
+                _logger.LogError(sqlEx, $"DBRetry {conn} | {sql} | {JsonConvert.SerializeObject(parameters)}");
+                using var connection = new MySqlConnection(conn);
+                result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{sql} | {JsonConvert.SerializeObject(parameters)}");
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{sql} {sw.Elapsed:c}");
+            return result;
         }
 
         public async Task<IEnumerable<T>> QueryAsync<T>(string name, object parameters = null)
