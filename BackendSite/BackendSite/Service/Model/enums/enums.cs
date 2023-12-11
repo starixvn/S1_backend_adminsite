@@ -1609,8 +1609,8 @@ namespace BackendSite.Service.Model.enums
         SOON88 = 4,
         [Description("Ivorysport")]
         IVORYSPORT = 5,
-        [Description("Leobet")]
-        LEOBET = 6
+        [Description("Yashbet")]
+        YASHBET = 6
     }
 
     public enum AffSiteEnum
