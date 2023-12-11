@@ -16,10 +16,13 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly MySqlClient _testReportDbClient;
+
         public PaymentManageService(IEnumerable<MySqlClient> sqlClients)
         {
             _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
+            _testReportDbClient = sqlClients.FirstOrDefault(p => p.DataBase == DataBase.TestReport);
         }
 
         [Obsolete("請改用GetPayList(int siteId)")]
@@ -177,7 +180,9 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p);
+            var result = _testReportDbClient != null
+                ? _testReportDbClient.TestQuery<PaySetting>("Admin_PaySetting_GetList", p)
+                : _reportDbClient.TestQuery<PaySetting>("Admin_PaySetting_GetList", p);
 
             totalPages = p.Get<int>("_TotalPages");
             rowCount = p.Get<int>("_RowCount");
