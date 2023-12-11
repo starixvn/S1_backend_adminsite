@@ -28,8 +28,8 @@ namespace BackendSite.Extensions
             //只有PRD環境有設定34跟32的連線字串
             if (!string.IsNullOrEmpty(reportDB34Conn))
             {
-                // PRD ReportDB使用34當Master，36當backup
-                services.AddSingleton(new MySqlClient(DataBase.Report, logger, reportDB34Conn, reportDBConn));
+                // PRD ReportDB使用36當Master，34當backup
+                services.AddSingleton(new MySqlClient(DataBase.Report, logger, reportDBConn, reportDB34Conn));
                 // PRD TestReportDB指定使用32當Master，34當backup
                 services.AddSingleton(new MySqlClient(DataBase.TestReport, logger, reportDB32Conn, reportDB34Conn));
             }
