@@ -1,5 +1,6 @@
 ﻿using System.Data;
 
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -445,27 +446,16 @@ namespace BackendSite.Service.DAL
                 {
                     foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
                     {
-                        var tpCategoryId = 0;
-                        if (promotion.WalletType == (int)PromotionWalletTypeEnum.Transfer || tpInfo.TpId == (int)TpEnum.SBSW)
+                        var tpCategoryId = tpInfo.CategoryId switch
                         {
-                            tpCategoryId = tpInfo.CategoryId;
-                        }
-                        else if (promotion.TpId == (int)TpEnum.SBSW)
-                        {
-                            tpCategoryId = tpInfo.TpId;
-                        }
-                        else
-                        {
-                            tpCategoryId = tpInfo.CategoryId switch
-                            {
-                                (int)PromotionCategoryEnum.SlotsGame => (int)TpCategoryEnum.Casino,
-                                (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
-                                (int)PromotionCategoryEnum.Fish => (int)TpCategoryEnum.Fishing,
-                                (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
-                                (int)PromotionCategoryEnum.ESports => (int)TpCategoryEnum.ESports,
-                                _ => 0
-                            };
-                        }
+                            (int)PromotionCategoryEnum.SlotsGame => (int)TpCategoryEnum.Casino,
+                            (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
+                            (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
+                            (int)PromotionCategoryEnum.Sports => (int)TpCategoryEnum.Sports,
+                            (int)PromotionCategoryEnum.SBSW => (int)TpCategoryEnum.Sports,
+                            (int)PromotionCategoryEnum.ESports => (int)TpCategoryEnum.ESports,
+                            _ => throw new AdminException($"PromotionCategoryId:{tpInfo.CategoryId} no support cashback")
+                        };
 
                         vipLevelCondition.SelectedVipLevel.ToList().ForEach(vipLevel =>
                         {
