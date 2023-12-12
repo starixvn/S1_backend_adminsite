@@ -186,10 +186,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             public int CurrencyId { get; set; }
 
-            [Description("tpId = 0 WalletType is Seamless, tpId > 0 WalletType is Transfer")]
-            public int TpId { get; set; }
-
-            [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
+            [Description("請查看PromotionCategory的Id設定")]
             public int CategoryId { get; set; }
         }
 
@@ -767,7 +764,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 para.SiteIds = _serverInfoBll.GetSiteListByLoginUserV2().Select(x => x.SiteId);
             }
 
-            apiResult.Data = _bonusManageBll.GetCashBackGameList(JsonSerializer.Serialize(para.SiteIds), para.CurrencyId, para.TpId, para.CategoryId);
+            apiResult.Data = _bonusManageBll.GetCashBackGameList(JsonSerializer.Serialize(para.SiteIds), para.CurrencyId, para.CategoryId);
             apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
 
             return apiResult;

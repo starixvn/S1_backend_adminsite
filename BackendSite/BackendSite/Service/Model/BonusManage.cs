@@ -436,7 +436,7 @@ namespace BackendSite.Service.Model
     {
         public string GameName { get; set; }
 
-        [Description("TpId 傳入參數為0回傳 key 為 TpId，TpId 傳入參數大於0回傳 key 代表 Tp CategoryId")]
+        [Description("Tp CategoryId")]
         public int Key { get; set; }
     }
 

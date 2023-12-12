@@ -57,14 +57,13 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<int>("Admin_PromotionCategoryGameType_Get", new { PromotionCategoryId });
         }
 
-        public IEnumerable<CashBackGame> GetCashBackGameList(string siteIds, int currencyId, int? tpId, int? categoryId)
+        public IEnumerable<CashBackGame> GetCashBackGameList(string siteIds, int currencyId, int categoryId)
         {
-            return _reportDbClient.Query<CashBackGame>("Admin_CashBackGameType_Get_V2", 
+            return _reportDbClient.Query<CashBackGame>("Admin_CashBackGameType_Get_V3", 
                 new DynamicParameters(
                     new { 
                         _SiteIds = siteIds, 
-                        _CurrencyId = currencyId, 
-                        _TpId = tpId, 
+                        _CurrencyId = currencyId,
                         _PromoCategoryId = categoryId }));
         }
 
