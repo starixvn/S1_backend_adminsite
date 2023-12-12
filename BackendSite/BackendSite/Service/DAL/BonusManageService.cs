@@ -448,10 +448,11 @@ namespace BackendSite.Service.DAL
                     foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
                     {
                         var tpCategoryId = 0;
-                        if (tpInfo.TpId == (int)TpEnum.SBSW)
-                        { 
-                            // SBSW 由前端直接帶入遊戲類型
-                            tpCategoryId = tpInfo.CategoryId;
+                        
+                        if (tpInfo.CategoryId == (int)PromotionCategoryEnum.SBSW)
+                        {
+                            // SBSW的遊戲類型放在TpId內
+                            tpCategoryId = tpInfo.TpId;
                         }
                         else
                         {
@@ -471,7 +472,7 @@ namespace BackendSite.Service.DAL
                             cashBackList.Add(new PromotionCashBackSetting
                             {
                                 CurrencyId = specific.CurrencyId,
-                                TpId = promotion.TpId == (int)TpEnum.SBSW ? promotion.TpId : tpInfo.TpId,
+                                TpId = tpInfo.CategoryId == (int)PromotionCategoryEnum.SBSW ? (int)TpEnum.SBSW : tpInfo.TpId,
                                 CategoryId = tpCategoryId,
                                 Level = vipLevel,
                                 Percentage = specific.CashBackSetting.Percentage,
