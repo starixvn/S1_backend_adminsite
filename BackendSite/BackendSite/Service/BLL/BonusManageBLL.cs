@@ -111,7 +111,15 @@ namespace BackendSite.Service.BLL
         public IEnumerable<GetCashBackGamerep> GetCashBackGameList(string siteIds,int currencyId, int categoryId)
         {
             var result = _bonusManageService.GetCashBackGameList(siteIds, currencyId, categoryId)
-                .Select(x => { return new GetCashBackGamerep { GameName = x.GameName, Key = x.CategoryId }; });        
+                .Select(x => 
+                { 
+                    return new GetCashBackGamerep 
+                    { 
+                        GameName = x.GameName, 
+                        Key = x.TpId
+                    }; 
+                })
+                .DistinctBy(i => i);        
             return result;
         }
 
