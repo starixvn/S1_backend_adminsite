@@ -472,7 +472,7 @@ namespace BackendSite.Service.DAL
                             cashBackList.Add(new PromotionCashBackSetting
                             {
                                 CurrencyId = specific.CurrencyId,
-                                TpId = promotion.TpId == (int)TpEnum.SBSW ? promotion.TpId : tpInfo.TpId,
+                                TpId = tpInfo.CategoryId == (int)PromotionCategoryEnum.SBSW ? (int)TpEnum.SBSW : tpInfo.TpId,
                                 CategoryId = tpCategoryId,
                                 Level = vipLevel,
                                 Percentage = specific.CashBackSetting.Percentage,
