@@ -5,6 +5,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+using BackendSite.Service.Model.TpMaintain;
 
 using Dapper;
 
@@ -446,23 +447,31 @@ namespace BackendSite.Service.DAL
                 {
                     foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
                     {
-                        var tpCategoryId = tpInfo.CategoryId switch
+                        var tpCategoryId = 0;
+                        if (tpInfo.TpId == (int)TpEnum.SBSW)
+                        { 
+                            // SBSW 由前端直接帶入遊戲類型
+                            tpCategoryId = tpInfo.CategoryId;
+                        }
+                        else
                         {
-                            (int)PromotionCategoryEnum.SlotsGame => (int)TpCategoryEnum.Casino,
-                            (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
-                            (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
-                            (int)PromotionCategoryEnum.Sports => (int)TpCategoryEnum.Sports,
-                            (int)PromotionCategoryEnum.SBSW => (int)TpCategoryEnum.Sports,
-                            (int)PromotionCategoryEnum.ESports => (int)TpCategoryEnum.ESports,
-                            _ => throw new AdminException($"PromotionCategoryId:{tpInfo.CategoryId} no support cashback")
-                        };
+                            tpCategoryId = tpInfo.CategoryId switch
+                            {
+                                (int)PromotionCategoryEnum.SlotsGame => (int)TpCategoryEnum.Casino,
+                                (int)PromotionCategoryEnum.LiveCasino => (int)TpCategoryEnum.LiveCasino,
+                                (int)PromotionCategoryEnum.Fish => (int)TpCategoryEnum.Fishing,
+                                (int)PromotionCategoryEnum.Lottery => (int)TpCategoryEnum.Lottery,
+                                (int)PromotionCategoryEnum.ESports => (int)TpCategoryEnum.ESports,
+                                _ => 0
+                            };
+                        }
 
                         vipLevelCondition.SelectedVipLevel.ToList().ForEach(vipLevel =>
                         {
                             cashBackList.Add(new PromotionCashBackSetting
                             {
                                 CurrencyId = specific.CurrencyId,
-                                TpId = tpInfo.TpId,
+                                TpId = promotion.TpId == (int)TpEnum.SBSW ? promotion.TpId : tpInfo.TpId,
                                 CategoryId = tpCategoryId,
                                 Level = vipLevel,
                                 Percentage = specific.CashBackSetting.Percentage,

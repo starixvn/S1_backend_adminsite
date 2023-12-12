@@ -1,4 +1,6 @@
-﻿using BackendSite.Service.DAL;
+﻿using Amazon.CloudFront.Model;
+
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
@@ -108,18 +110,36 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.GetPromoCategories();
         }
 
-        public IEnumerable<GetCashBackGamerep> GetCashBackGameList(string siteIds,int currencyId, int categoryId)
+        public IEnumerable<GetCashBackGamerep> GetCashBackGameList(string siteIds, int currencyId, int categoryId)
         {
-            var result = _bonusManageService.GetCashBackGameList(siteIds, currencyId, categoryId)
-                .Select(x => 
-                { 
-                    return new GetCashBackGamerep 
-                    { 
-                        GameName = x.GameName, 
-                        Key = x.TpId
-                    }; 
-                })
-                .DistinctBy(i => i);        
+            var result = new List<GetCashBackGamerep>();
+            var tempResult = _bonusManageService.GetCashBackGameList(siteIds, currencyId, categoryId);
+
+
+            if (categoryId == (int)PromotionCategoryEnum.SBSW)
+            {
+                //SBSW key by CategoryId
+                tempResult.ToList().ForEach(x =>
+                {
+                    result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.CategoryId });
+                });
+            }
+            else
+            {
+                tempResult.ToList().ForEach(x =>
+                {
+                    result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.TpId });
+                });
+
+                //因 SBO Sports、 SBO Virtual Sports 的 PromoCategoryId 相同造成前端元件Bind資料會有問題
+                //故HardCode 移除重複選項，只保留一組 SBO 選單內容
+                if (categoryId == (int)PromotionCategoryEnum.Sports)
+                {
+                    result = result.Where(r => r.Key != 42).ToList();
+                    result.Add(new GetCashBackGamerep { GameName = "SBO Sports", Key = 42 });
+                }
+            }
+
             return result;
         }
 
