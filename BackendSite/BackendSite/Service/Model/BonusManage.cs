@@ -357,7 +357,10 @@ namespace BackendSite.Service.Model
     {
         public int TpId { get; set; }
 
-        [Description("相同於 [TpGameType.CategoryId] [TpCategory.Id]")]
+        /// <summary>
+        /// PromotionCategory的類型
+        /// </summary>
+        [Description("PromotionCategory.Id")]
         public int CategoryId { get; set; }
     }
 
