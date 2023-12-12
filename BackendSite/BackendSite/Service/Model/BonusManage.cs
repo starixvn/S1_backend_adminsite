@@ -303,9 +303,6 @@ namespace BackendSite.Service.Model
         [Description("總共領取數量限制，0為不限制")]
         public int TotalUsageLimit { get; set; }
 
-        [Obsolete("V2 Cashback 不需要此參數")]
-        public IEnumerable<PromotionCashBack> CashBackList { get; set; } = new List<PromotionCashBack>();
-
         [Description("V2 Cashback 使用參數")]
         public CashBackSetting CashBackSetting { get; set; } = new();
         public string TierAmount { get; set; } = string.Empty;
@@ -360,7 +357,7 @@ namespace BackendSite.Service.Model
     {
         public int TpId { get; set; }
 
-        [Description("Tp CategoryId: 1=Sports, 2=Casino (Slot Game), 3=Live Casino, 4=Fishing, 5=Cockfighting, 6=Lottery, 7=Virtual Sports, 8=Poker")]
+        [Description("相同於 [TpGameType.CategoryId] [TpCategory.Id]")]
         public int CategoryId { get; set; }
     }
 
@@ -420,17 +417,18 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public int? TpId { get; set; }
     }
+
     public class CashBackGame
     {
         public string GameName { get; set; }
         public int CategoryId { get; set; }
         public int TpId { get; set; }
     }
+
     public class GetCashBackGamerep
     {
         public string GameName { get; set; }
 
-        [Description("Tp CategoryId")]
         public int Key { get; set; }
     }
 
