@@ -303,7 +303,10 @@ namespace BackendSite.Service.Model
         [Description("總共領取數量限制，0為不限制")]
         public int TotalUsageLimit { get; set; }
 
-        [Description("V2 Cashback 使用參數")]
+        [Description("前端Cashback顯示使用此參數")]
+        public IEnumerable<PromotionCashBack> CashBackList { get; set; } = new List<PromotionCashBack>();
+
+        [Description("V2 Cashback 設定使用參數")]
         public CashBackSetting CashBackSetting { get; set; } = new();
         public string TierAmount { get; set; } = string.Empty;
         public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
@@ -364,7 +367,7 @@ namespace BackendSite.Service.Model
         public int CategoryId { get; set; }
     }
 
-    public class PromotionCashBack1 : PromotionCashBack
+    public class PromotionCashBackCurrency : PromotionCashBack
     {
         public int CurrencyId { get; set; }
         public int Level { get; set; }
