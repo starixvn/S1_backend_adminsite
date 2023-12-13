@@ -269,7 +269,8 @@ namespace BackendSite.Service.Model.enums
         QRPay = 6,
         BankAutoChannel = 7,
         CryptoWallet = 8,
-        QuickTransfer = 9
+        QuickTransfer = 9,
+        ChatTransfer = 10
     }
 
     public enum DepositStatusEnum
@@ -377,7 +378,8 @@ namespace BackendSite.Service.Model.enums
         LoadCardPayment = 5,
         QrPayPayment = 6,
         BankAutoChannel = 7,
-        QuickTransfer = 9
+        QuickTransfer = 9,
+        ChatTransfer = 10
     }
     
     public enum WithdrawalChannelTypeEnum
