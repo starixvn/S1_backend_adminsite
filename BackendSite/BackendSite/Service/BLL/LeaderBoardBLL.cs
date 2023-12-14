@@ -93,10 +93,10 @@ namespace BackendSite.Service.BLL
                 JsonConvert.SerializeObject(request.SiteIds),
                 request.CurrencyId,
                 request.CategoryId,
-                request.StartDate,
-                request.EndDate).ToList();
+                request.StartDate.DateTime,
+                request.EndDate.DateTime).ToList();
             
-            var date = request.StartDate.ToString("yyyyMM");
+            var date = request.StartDate.DateTime.ToString("yyyyMM");
             var pointCalculation = _leaderBoardService.GetLeaderboardPointCalculation(JsonConvert.SerializeObject(request.SiteIds) ,date);
 
             //GroupBy CustId,CategoryId 

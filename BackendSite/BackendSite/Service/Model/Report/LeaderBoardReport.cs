@@ -4,11 +4,21 @@ namespace BackendSite.Service.Model.Report;
 
 public class GetLeaderboardReportRequest : IApiRequest
 {
+    private DateTimeOffset _startDate;
+    private DateTimeOffset _endDate;
     public int SiteId { get; set; }
     public int CurrencyId { get; set; }
     public int CategoryId { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateTimeOffset StartDate
+    {
+        get => _startDate;
+        set => _startDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+    }
+    public DateTimeOffset EndDate
+    {
+        get => _endDate;
+        set => _endDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+    }
     public IEnumerable<int> SiteIds { get; set; }
     public IEnumerable<int> CurrencyIds { get; set; }
     public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
