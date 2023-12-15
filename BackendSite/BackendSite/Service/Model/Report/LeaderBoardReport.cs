@@ -193,5 +193,5 @@ public class LeaderboardPointCalculation
     public decimal LiveCasinoTurnOver { get; set; }
     public int Status { get; set; }
     public string Updater { get; set; }
-    public DateTime UpdateTime { get; set; }
+    public DateTimeOffset UpdateTime { get; set; }
 }
