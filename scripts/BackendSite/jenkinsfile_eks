@@ -18,22 +18,25 @@ pipeline {
         stage('Deploy') {
             agent { node { label 'Build-EKS' } }
             environment {
-                pulumi_env = 'DEV'
-                pulumi_project = 'BackendSite'
-                AWS_ACCESS_KEY_ID     = 'AKIA3CXJE5UPUBU2H3XE'
-                AWS_SECRET_ACCESS_KEY = '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'
+                AWS_ACCESS_KEY_ID     = 'AKIA3CXJE5UPTOT2R6GL'
+                AWS_SECRET_ACCESS_KEY = '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'
+                AWS_REGION = "ap-southeast-1"
             }
             steps {
                 dir('/jenkins/ailab-k8s/EKS/dev-nova/AdminSite') {
                     sh 'pwd'
                     sh 'ls'
+                    sh 'aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}'
+                    sh 'aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}'
+                    sh 'aws configure set region ${AWS_REGION}'
+                    sh 'aws configure set output json'
                     script {
                           replicas = sh (script: 'kubectl get deployment adminsite-deployment -o=jsonpath={.spec.replicas}', returnStdout: true).trim()
                               sh "yq -i '.spec.replicas = ${replicas}' adminsite-deploy.yaml"
                               sh 'yq -i ".spec.template.spec.containers[0].image = \"harbor.ailabpte.co/adminsite/backendsite:${imageversion}\"" adminsite-deploy.yaml'
                         }
-                    sh 'kubectl apply -f ${K8s_Project_Name}-deploy.yaml'
-                    sh 'git checkout HEAD^ ${K8s_Project_Name}-deploy.yaml'
+                    sh 'kubectl apply -f adminsite-deploy.yaml'
+                    sh 'git checkout HEAD^ adminsite-deploy.yaml'
                 }
             }
         }
