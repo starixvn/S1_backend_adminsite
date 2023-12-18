@@ -190,15 +190,13 @@ namespace BackendSite.Service.BLL
         
         public bool SetLeaderboardRankingBonus(ParamsWithLog<SetLeaderboardRankingBonusReq> input)
         {
-            var request = new SetLeaderboardRankingBonusReq
-            {
-                SiteId = input.SiteId,
-                CurrencyId = input.CurrencyId,
-                Ranking = input.After.Ranking,
-                MinPoint = input.After.MinPoint,
-                Bonus = input.After.Bonus
-            };
-            var result = _leaderBoardService.SetLeaderboardRankingBonus(request, input.Operator);
+            var result = _leaderBoardService.SetLeaderboardRankingBonus(
+                input.SiteId,
+                input.CurrencyId,
+                input.After.Ranking,
+                input.After.MinPoint,
+                input.After.Bonus, 
+                input.Operator);
 
             if (result)
             {
@@ -229,17 +227,15 @@ namespace BackendSite.Service.BLL
         
         public bool SetLeaderboardPointCalculation(ParamsWithLog<SetLeaderboardPointCalculationReq> input ,string date)
         {
-            var request = new SetLeaderboardPointCalculationReq
-            {
-                SiteId = input.SiteId,
-                CurrencyId = input.CurrencyId,
-                SportTurnOver = input.After.SportTurnOver,
-                SlotTurnOver = input.After.SlotTurnOver,
-                LiveCasinoTurnOver = input.After.LiveCasinoTurnOver,
-                Status = input.After.Status
-            };
-            
-            var result = _leaderBoardService.SetLeaderboardPointCalculation(request, date, input.Operator);
+            var result = _leaderBoardService.SetLeaderboardPointCalculation(
+                input.SiteId,
+                input.CurrencyId,
+                input.After.SlotTurnOver,
+                input.After.SportTurnOver,
+                input.After.LiveCasinoTurnOver,
+                input.After.Status, 
+                date, 
+                input.Operator);
 
             if (result)
             {

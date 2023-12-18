@@ -120,14 +120,14 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
-        public bool SetLeaderboardRankingBonus(SetLeaderboardRankingBonusReq req , string updater)
+        public bool SetLeaderboardRankingBonus(int siteId,int currencyId,string ranking, decimal minPoint, decimal bonus, string updater)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", req.SiteId);
-            p.Add("_CurrencyId", req.CurrencyId);
-            p.Add("_Ranking", req.Ranking);
-            p.Add("_MinPoint", req.MinPoint);
-            p.Add("_Bonus", req.Bonus);
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_Ranking", ranking);
+            p.Add("_MinPoint", minPoint);
+            p.Add("_Bonus", bonus);
             p.Add("_Updater", updater);
             var result = _mainDbClient.Execute("Admin_LeaderboardRankingBonus_Set", p);
             
@@ -144,15 +144,15 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public bool SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req , string date , string updater)
+        public bool SetLeaderboardPointCalculation(int siteId,int currencyId ,decimal slotTurnOver, decimal sportTurnOver, decimal liveCasinoTurnOver, int status ,string date , string updater)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", req.SiteId);
-            p.Add("_CurrencyId", req.CurrencyId);
-            p.Add("_SlotTurnOver", req.SlotTurnOver);
-            p.Add("_SportTurnOver", req.SportTurnOver);
-            p.Add("_LiveCasinoTurnOver", req.LiveCasinoTurnOver);
-            p.Add("_Status", req.Status);
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_SlotTurnOver", slotTurnOver);
+            p.Add("_SportTurnOver", sportTurnOver);
+            p.Add("_LiveCasinoTurnOver", liveCasinoTurnOver);
+            p.Add("_Status", status);
             p.Add("_Date", date);
             p.Add("_Updater", updater);
             var result = _mainDbClient.Execute("Admin_LeaderboardPointCalculation_Set", p);
