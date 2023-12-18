@@ -120,9 +120,11 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
-        return _testReportDbClient != null
-               ? await _testReportDbClient.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p)
-               : await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p);
+        //return _testReportDbClient != null
+        //       ? await _testReportDbClient.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p)
+        //       : await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p);
+
+        return await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p);
     }
 
     public async Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList)
