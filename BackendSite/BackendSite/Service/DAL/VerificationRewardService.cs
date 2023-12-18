@@ -1,12 +1,8 @@
 ﻿using System.Data;
-
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
 using Dapper;
-
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -21,6 +17,7 @@ namespace BackendSite.Service.DAL
             _mainDbClient = mySqlClients.FirstOrDefault(a => a.DataBase == DataBase.Main);
             _reportDbClient = mySqlClients.FirstOrDefault(a => a.DataBase == DataBase.Report);
         }
+        
         public async Task<VerificationRewardModel> GetVerificationReward(int siteId, int currencyId)
         {
             var p = new DynamicParameters(new { _SiteId = siteId, _CurrencyId = currencyId });
@@ -32,21 +29,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { _SiteId = siteId });
             return await _reportDbClient.QueryAsync<VerificationRewardModel>("Admin_VerificationReward_GetBySiteId", p);
         }
-
-        public async Task<int> InsertOrUpdate(int siteId, int currencyId, int verificationType, decimal phoneReward, decimal emailReward, string updateOperator)
-        {
-            var p = new DynamicParameters(new
-            {
-                _SiteId = siteId,
-                _CurrencyId = currencyId,
-                _VerificationType = verificationType,
-                _PhoneReward = phoneReward,
-                _EmailReward = emailReward,
-                _Operator = updateOperator
-            });
-            return await _mainDbClient.ExecuteAsync("Admin_VerificationReward_Set", p);
-        }
-
+        
         public async Task<int> InsertOrUpdate(int siteId, int currencyId, SetVerificationRewardParams input, string updateOperator)
         {
             var p = new DynamicParameters(new
@@ -73,40 +56,6 @@ namespace BackendSite.Service.DAL
                 _Operator = updateOperator
             });
             return await _mainDbClient.ExecuteAsync("Admin_VerificationRewardStatus_Set", p);
-        }
-
-        public IEnumerable<CustVerificationReward> GetCustVerificationReward(IEnumerable<int> siteIds, int currencyId, string userName,
-            DateTimeOffset startDate, DateTimeOffset endDate, int pageSize, int pageNumber, out int totalPages,
-            out int rowCount)
-        {
-            var p = new DynamicParameters();
-            p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds));
-            p.Add("_Currency", currencyId);
-            p.Add("_UserName", userName);
-            p.Add("_StartDate", startDate.DateTime);
-            p.Add("_EndDate", endDate.DateTime);
-            p.Add("_PageSize", Math.Abs(pageSize));
-            p.Add("_StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize));
-            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            var result = _reportDbClient.Query<CustVerificationReward>("Admin_CustVerificationReward_Get", p);
-            totalPages = p.Get<int?>("_TotalPages") ?? 0;
-            rowCount = p.Get<int?>("_RowCount") ?? 0;
-            return result;
-        }
-
-        public async Task<IEnumerable<CustVerificationReward>> GetCustVerificationRewardExport(string siteIds, int currencyId, string userName, DateTimeOffset startDate, DateTimeOffset endDate)
-        {
-            var p = new DynamicParameters();
-            p.Add("_SiteIds", siteIds);
-            p.Add("_Currency", currencyId);
-            p.Add("_UserName", userName);
-            p.Add("_StartDate", startDate.DateTime);
-            p.Add("_EndDate", endDate.DateTime);
-
-            var result = await _reportDbClient.QueryAsync<CustVerificationReward>("Admin_CustVerificationRewardExport_Get", p);
-            return result;
         }
         
         public IEnumerable<CustVerificationReward> GetCustVerificationRewardV2(int? custId,string multiSiteRequest,
@@ -139,6 +88,26 @@ namespace BackendSite.Service.DAL
 
             var result = await _reportDbClient.QueryAsync<CustVerificationReward>("Admin_CustVerificationRewardExport_Get_V3", p);
             return result;
+        }
+        
+        public CustVerificationReward GetCustVerificationRewardByCust(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            var result = _reportDbClient.QueryFirst<CustVerificationReward>("Service_CustVerificationRewardByCustId_Get", p);
+            
+            return result;
+        }
+        
+        public int InsertQueueJob(int custId, QueueJob type, string data)
+        {
+            var p = new DynamicParameters(new
+            {
+                _CustId = custId,
+                _Type = (int) type,
+                _Data = data
+            });
+            return _mainDbClient.Execute("Service_QueueJob_Ins", p);
         }
     }
 }

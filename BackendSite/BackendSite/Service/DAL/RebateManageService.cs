@@ -185,8 +185,8 @@ namespace BackendSite.Service.DAL
         public async Task<bool> SetRebateGameTypeAsync(int siteId, int currencyId, int gameType, int level, decimal percentage, string lastUpdateUser, MySqlTransaction trans)
         {
             var result = true;
-
-            var gameTypeData = _winLostReportService.GetAllGameType().FirstOrDefault(x => x.Type == gameType) ?? null;
+            List<int> siteList = new() { siteId };
+            var gameTypeData = _winLostReportService.GetAllGameType(JsonConvert.SerializeObject(siteList), currencyId).FirstOrDefault(x => x.Type == gameType) ?? null;
             var asignBeforeData = GetRebateGameTypeList(siteId, currencyId, gameType).FirstOrDefault(x => x.Level == level) ?? null;
             var vipLevelData = _custInfoService.GetAllSiteVipLevelList().FirstOrDefault(x => x.SiteId == siteId && x.Level == level) ?? null;
 

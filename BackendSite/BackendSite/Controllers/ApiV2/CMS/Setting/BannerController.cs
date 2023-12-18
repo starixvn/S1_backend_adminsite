@@ -18,6 +18,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
 
         private readonly BannerManageBLL _bannerManageBll;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -26,18 +27,22 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public BannerController(IServiceProvider provider)
         {
             _bannerManageBll = provider.GetRequiredService<BannerManageBLL>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
 
         #region API Model
 
-        public class GetListRequest : ApiRequestPageModel
+        public class GetListRequest : ApiRequestPageModel , IApiRequest
         {
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
             public IEnumerable<BannerTypeEnum> BannerTypes { get; set; }
             public IEnumerable<BannerStatusEnum> Statuses { get; set; }
+            public IEnumerable<int> SiteIds { get; set; }
+            public IEnumerable<int> CurrencyIds { get; set; }
+            public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
         }
 
         #endregion
@@ -97,9 +102,11 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             {
                 var bannerTypeList = request.BannerTypes.Select(x => (int)x);
                 var statusList = request.Statuses.Select(x => (int)x);
+                var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+                ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
 
                 var data = _bannerManageBll.GetBannerList(
-                    new List<int> { request.SiteId },
+                    request.SiteIds,
                     bannerTypeList,
                     statusList,
                     new List<int> { request.CurrencyId },

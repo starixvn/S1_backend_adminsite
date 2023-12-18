@@ -26,36 +26,9 @@ namespace BackendSite.Service.BLL
 
         #region Public Methods
 
-        public IEnumerable<WinLostReport> GetWinLostReport(DateTime StartDate,
-                                                           DateTime EndDate,
-                                                           int Currency,
-                                                           bool isExport)
+        public IEnumerable<GameType> GetTpGameType(string siteIds,int currencyId)
         {
-            var siteList = serverInfoBLL.GetSiteListByLoginUser();
-            var report = winLostReportService.GetWinLostReport(StartDate, EndDate, siteList?.Select(x => x.SiteId), Currency);
-            if (report != null && report.Any())
-            {
-                var gameTypeList = winLostReportService.GetAllGameType().ToDictionary(row => (int)row.Type, row => (string)row.TypeName);
-                foreach (var row in report)
-                {
-                    if (isExport)
-                    {
-                        row.SettledDate = row.SettledDate.AddHours(8);
-                    }
-                    row.CurrencyName = selLangBLL.GetResourceValue($"Currency_{row.CurrencyId}");
-                    row.SiteName = siteList.FirstOrDefault(x => x.SiteId == row.SiteId).SiteName;
-
-                    gameTypeList.TryGetValue(row.GameType, out var GameName);
-                    row.GameName = GameName;
-                }
-            }
-
-            return report;
-        }
-
-        public IEnumerable<GameType> GetTpGameType()
-        {
-            return winLostReportService.GetAllGameType();
+            return winLostReportService.GetAllGameType(siteIds,currencyId);
         }
 
         #endregion

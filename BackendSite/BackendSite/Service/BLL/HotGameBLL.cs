@@ -216,7 +216,6 @@ namespace BackendSite.Service.BLL
         {
             var hotGame = await _hotGameService.GetDetailV2(id, siteId);
             if (hotGame == null) return null;
-            var gameLogo = JsonConvert.DeserializeObject<GameLogo>(hotGame.GameLogo);
             return new GetHotGameDetailResponseV2()
             {
                 Id = hotGame.Id,
@@ -228,8 +227,6 @@ namespace BackendSite.Service.BLL
                 TpGameType = hotGame.TpGameType,
                 TpCategory = hotGame.TpCategory,
                 TpCategoryName = hotGame.TpCategoryName,
-                HotGamePcUrl = gameLogo.HotGamePcUrl,
-                HotGameMobileUrl = gameLogo.HotGameMobileUrl,
                 TopCategory = hotGame.TopCategory
             };
         }
@@ -238,14 +235,6 @@ namespace BackendSite.Service.BLL
         {
             request.LangId = CurrencyLangIdMap[request.CurrencyId];
             var site = _serverInfo.GetServerInfoWithSiteId(request.SiteId);
-            request.TpLogo = $"{_siteCloudFrontImageInfo[site.SiteName].BannerImageUrl}{TpLogoPath}/{request.TpId}.png";
-
-            //後端自行組 GameLogo 物件
-            request.GameLogo = new GameLogo()
-            {
-                HotGamePcUrl = request.HotGamePcUrl,
-                HotGameMobileUrl = request.HotGameMobileUrl
-            };
 
             var result = await _hotGameService.CreateOrUpdateV2(request, updateOperator);
             if (result == 1) await _cacheHelper.KeyDeleteByPatternAsync($"GetHotGamesV2:{request.SiteId}*", RedisDataBase.Member);

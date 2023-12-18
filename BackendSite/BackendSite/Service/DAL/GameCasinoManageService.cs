@@ -55,9 +55,12 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_GameCasinoDetail_Del", props);
         }
 
-        public IEnumerable<SiteTpListIfo> GetTpList()
+        public IEnumerable<SiteTpListIfo> GetTpList(string siteIds,int currencyId)
         {
-            return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_Get");
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyId", currencyId);
+            return _reportDbClient.Query<SiteTpListIfo>("Admin_TpList_Get_OnlySlot", props);
         }
 
         public IEnumerable<SlotCategoryInfo> GetSlotCategoryList()

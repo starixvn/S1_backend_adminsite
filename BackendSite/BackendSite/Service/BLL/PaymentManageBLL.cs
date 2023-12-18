@@ -20,52 +20,12 @@ namespace BackendSite.Service.BLL
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
-        public FrontEndDatas GetPayInfoList()
-        {
-            return new FrontEndDatas()
-            {
-                ChannelList = _paymentManageService.GetPayChannelList(),
-                CurrencyList = _paymentManageService.GetPayCurrencyList(),
-                PayList = _paymentManageService.GetPayList()
-            };
-        }
-
         public IEnumerable<PayChannelInfo> GetPayChannel(int siteId)
         {
             var list = _paymentManageService.GetPaySetting(siteId);
 
             return list.Select(x => new PayChannelInfo(x))
                 .Distinct(new PayChannelInfoComparer());
-        }
-
-        public bool UpdatePayList(ParamsWithLog<UpdatePayInfo> input)
-        {
-            return _paymentManageService.UpdatePayList(input);
-        }
-
-        public bool UpdatePayChannel(ParamsWithLog<UpdatePayChannel> input)
-        {
-            return _paymentManageService.UpdatePayChannel(input);
-        }
-
-        public bool UpdatePayCurrency(ParamsWithLog<UpdatePayCurrency> input)
-        {
-            string amountShow = null;
-            if (input.After.AmountRule == AmountRuleEnum.Fixed)
-            {
-                amountShow = JsonConvert.SerializeObject(input.After.FixedAmountList);
-            }
-            return _paymentManageService.UpdatePayCurrency(input, amountShow);
-        }
-
-        public bool UpdatePayCurrencyAmount(ParamsWithLog<UpdatePayCurrency> input)
-        {
-            return _paymentManageService.UpdatePayCurrencyAmount(input);
-        }
-
-        public IEnumerable<PayListBankInfoSys> GetBankSysInfoList(int PayId)
-        {
-            return _paymentManageService.GetBankSysInfoList(PayId).OrderBy(x => x.CurrencyId);
         }
 
         public IEnumerable<PayListInfo> GetPayList(int siteId)
@@ -159,18 +119,10 @@ namespace BackendSite.Service.BLL
             return _paymentManageService.GetBankInfoPayForSetting(siteId, currencyId, channelId);
         }
 
-        /// <summary>
-        /// 舊 API 用的
-        /// </summary>
-        public void UpdateBankInfo(int PayId, int SysId, int Status, string Operator)
-        {
-            _paymentManageService.UpdateBankInfo(PayId, SysId, Status, Operator);
-        }
-
         public bool UpdateBankInfo(int siteId, int payId, int sysId,
-            BankInfoPayStatusEnum status, BankInfoPayMethodEnum method, string @operator)
+            BankInfoPayStatusEnum status, int channelId, string @operator)
         {
-            var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status, method, @operator);
+            var result = _paymentManageService.UpdateBankInfo(siteId, payId, sysId, status, channelId, @operator);
 
             if (result)
             {

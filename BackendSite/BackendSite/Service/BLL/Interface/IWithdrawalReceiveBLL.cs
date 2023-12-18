@@ -12,7 +12,7 @@ public interface IWithdrawalReceiveBLL
     /// <param name="siteId"></param>
     /// <param name="writeLog"></param>
     /// <returns></returns>
-    Task<RedisSetAndGetResult> LockWithdrawalTicketAsync(string transId, string userName, int siteId, bool writeLog = true);
+    Task<RedisSetAndGetResult> LockWithdrawalTicketAsync(string transId, string userName, int siteId);
 
     /// <summary>
     /// 提款單解鎖，並同時更新 db onUser欄位
