@@ -789,7 +789,9 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
+            return _testReportDbClient != null
+                ? _testReportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }))
+                : _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
         }
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
