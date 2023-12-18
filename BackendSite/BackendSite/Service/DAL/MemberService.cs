@@ -3,6 +3,7 @@
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
 
 using Dapper;
@@ -17,11 +18,13 @@ public class MemberService : IMemberService
 {
     private readonly MySqlClient _sqlClienct;
     private readonly MySqlClient _mainSqlClient;
+    private readonly MySqlClient _testReportDbClient;
 
     public MemberService(IEnumerable<MySqlClient> sqlCliencts)
     {
         _sqlClienct = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Report);
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
+        _testReportDbClient = sqlCliencts.FirstOrDefault(p => p.DataBase == DataBase.TestReport);
     }
 
     public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList,
@@ -117,7 +120,9 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
-        return await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p);
+        return _testReportDbClient != null
+               ? await _testReportDbClient.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p)
+               : await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p);
     }
 
     public async Task<IEnumerable<CustomerTag>> GetCustomerTagsAsync(string tagList)

@@ -1,0 +1,58 @@
+pipeline {
+    agent none
+    stages {
+        stage('Build') {
+            agent { node { label 'Build-EKS' } }
+            environment {
+                registry = '13.213.82.69/adminsite/backendsite'
+            }
+            steps {
+                script {
+                    env.imageversion = sh (script: 'git rev-parse --short=7 HEAD', returnStdout: true).trim()
+                }
+                sh 'sudo docker build -f ./BackendSite/BackendSite/Dockerfile -t ${registry}:${imageversion} .'
+                sh 'sudo docker push ${registry}:${imageversion}'
+                sh 'sudo docker rmi ${registry}:${imageversion}'
+            }
+        }
+        stage('Deploy') {
+            agent { node { label 'Build-EKS' } }
+            environment {
+                pulumi_env = 'DEV'
+                pulumi_project = 'BackendSite'
+                AWS_ACCESS_KEY_ID     = 'AKIA3CXJE5UPUBU2H3XE'
+                AWS_SECRET_ACCESS_KEY = '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'
+            }
+            steps {
+                dir('/jenkins/ailab-k8s/EKS/dev-nova/AdminSite') {
+                    sh 'pwd'
+                    sh 'ls'
+                    script {
+                          replicas = sh (script: 'kubectl get deployment adminsite-deployment -o=jsonpath={.spec.replicas}', returnStdout: true).trim()
+                              sh "yq -i '.spec.replicas = ${replicas}' adminsite-deploy.yaml"
+                              sh 'yq -i ".spec.template.spec.containers[0].image = \"harbor.ailabpte.co/adminsite/backendsite:${imageversion}\"" adminsite-deploy.yaml'
+                        }
+                    sh 'kubectl apply -f ${K8s_Project_Name}-deploy.yaml'
+                    sh 'git checkout HEAD^ ${K8s_Project_Name}-deploy.yaml'
+                }
+            }
+        }
+        stage('ArgoCD'){
+            agent { node { label 'Build-EKS' } }
+                steps{
+                    dir('/jenkins/backend-manifest/dev-galaxy/leobet'){
+                        sh 'git pull'
+                        sh "yq -i '.spec.template.spec.containers[0].image = \"harbor.ailabpte.co/adminsite/backendsite:${imageversion}\"' adminsite-deploy.yaml"
+                        sh 'git add adminsite-deploy.yaml'
+                        script {
+                          status = sh (script: 'git status --short', returnStdout: true).trim()
+                          if(!status.startsWith("??")){
+                              sh "git commit -m 'update dev adminsite ver:${imageversion} by eks-struct'"
+                              sh 'git push'
+                          }
+                        }
+                    }
+                }
+        }
+    }
+}
