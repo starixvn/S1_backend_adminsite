@@ -1,4 +1,6 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
 
@@ -10,10 +12,14 @@ namespace BackendSite.Service.BLL
     public class LeaderBoardBLL
     {
         private readonly LeaderBoardService _leaderBoardService;
+        private readonly AdjustmentLogReportService _adjustmentLogReportService;
+        private readonly ILogger<UserBetLimitBLL> _logger;
 
         public LeaderBoardBLL(IServiceProvider provider)
         {
             _leaderBoardService = provider.GetRequiredService<LeaderBoardService>();
+            _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
+            _logger = provider.GetRequiredService<ILogger<UserBetLimitBLL>>();
         }
 
         public IEnumerable<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
@@ -182,9 +188,38 @@ namespace BackendSite.Service.BLL
             return _leaderBoardService.GetLeaderboardRankingBonus(siteIds);
         }
         
-        public bool SetLeaderboardRankingBonus(SetLeaderboardRankingBonusReq req , string updater)
+        public bool SetLeaderboardRankingBonus(ParamsWithLog<SetLeaderboardRankingBonusReq> input)
         {
-            return _leaderBoardService.SetLeaderboardRankingBonus(req, updater);
+            var request = new SetLeaderboardRankingBonusReq
+            {
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                Ranking = input.After.Ranking,
+                MinPoint = input.After.MinPoint,
+                Bonus = input.After.Bonus
+            };
+            var result = _leaderBoardService.SetLeaderboardRankingBonus(request, input.Operator);
+
+            if (result)
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = input.SiteId,
+                    CurrencyId = input.CurrencyId,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.LeaderboardRankingBonus,
+                    ActionType = ActionType.Update,
+                    BeforeDetailInfo = input.Before.ToLog(),
+                    AfterDetailInfo = input.After.ToLog(),
+                    Operator = input.Operator
+                };
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            }
+            
+            return result;
         }
         
         public IEnumerable<LeaderboardPointCalculation> GetLeaderboardPointCalculation(string siteIds ,string date)
@@ -192,9 +227,40 @@ namespace BackendSite.Service.BLL
             return _leaderBoardService.GetLeaderboardPointCalculation(siteIds ,date);
         }
         
-        public bool SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req ,string date, string updater)
+        public bool SetLeaderboardPointCalculation(ParamsWithLog<SetLeaderboardPointCalculationReq> input ,string date)
         {
-            return _leaderBoardService.SetLeaderboardPointCalculation(req, date, updater);
+            var request = new SetLeaderboardPointCalculationReq
+            {
+                SiteId = input.SiteId,
+                CurrencyId = input.CurrencyId,
+                SportTurnOver = input.After.SportTurnOver,
+                SlotTurnOver = input.After.SlotTurnOver,
+                LiveCasinoTurnOver = input.After.LiveCasinoTurnOver,
+                Status = input.After.Status
+            };
+            
+            var result = _leaderBoardService.SetLeaderboardPointCalculation(request, date, input.Operator);
+
+            if (result)
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = input.SiteId,
+                    CurrencyId = input.CurrencyId,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.LeaderboardPointCalculation,
+                    ActionType = ActionType.Update,
+                    BeforeDetailInfo = input.Before.ToLog(),
+                    AfterDetailInfo = input.After.ToLog(),
+                    Operator = input.Operator
+                };
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("CreateAdminAdjustmentInfoLog failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            }
+           
+            return result;
         }
     }
 }

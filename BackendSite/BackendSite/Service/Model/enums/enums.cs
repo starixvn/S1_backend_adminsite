@@ -939,7 +939,9 @@ namespace BackendSite.Service.Model.enums
         AutoPaymentRule = 92,
         DepositReferral = 93,
         EditSystemBankInfo = 94,
-        WithdrawalBlockSetting = 95
+        WithdrawalBlockSetting = 95,
+        LeaderboardPointCalculation = 96,
+        LeaderboardRankingBonus = 97
     }
 
     #region BankFinancialTransferInfoLog
