@@ -44,9 +44,11 @@ namespace BackendSite.Service.DAL
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _testReportDbClient != null
-                ? await _testReportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para)
-                : await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para);
+            //var result = _testReportDbClient != null
+            //    ? await _testReportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para)
+            //    : await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para);
+
+            var result = await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para);
 
             var totalPages = para.Get<int?>("_TotalPages") ?? 0;
             var rowCount = para.Get<int?>("_RowCount") ?? 0;
