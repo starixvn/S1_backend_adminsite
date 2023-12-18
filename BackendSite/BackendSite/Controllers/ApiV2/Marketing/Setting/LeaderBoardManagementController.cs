@@ -2,6 +2,7 @@
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
 using Microsoft.AspNetCore.Authorization;
@@ -72,14 +73,14 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 151, 3 })]
-        public ApiResult SetLeaderboardRankingBonus(SetLeaderboardRankingBonusReq req)
+        public ApiResult SetLeaderboardRankingBonus(ApiRequestWithLog<SetLeaderboardRankingBonusReq> req)
         {
             var apiResult = new ApiResult();
 
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                var result = _leaderBoardBll.SetLeaderboardRankingBonus(req ,authData.UserName );
+                var result = _leaderBoardBll.SetLeaderboardRankingBonus(new ParamsWithLog<SetLeaderboardRankingBonusReq>(req, authData.UserName));
                 if (result)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -112,7 +113,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 151, 3 })]
-        public ApiResult SetLeaderboardPointCalculation(SetLeaderboardPointCalculationReq req)
+        public ApiResult SetLeaderboardPointCalculation(ApiRequestWithLog<SetLeaderboardPointCalculationReq> req)
         {
             var apiResult = new ApiResult();
 
@@ -120,7 +121,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             {
                 var authData = _authorizeBll.GetAuthData();
                 var date = DateTime.UtcNow.ToString("yyyyMM");
-                var result = _leaderBoardBll.SetLeaderboardPointCalculation(req ,date ,authData.UserName );
+                var result = _leaderBoardBll.SetLeaderboardPointCalculation
+                    (new ParamsWithLog<SetLeaderboardPointCalculationReq>(req, authData.UserName) ,date);
                 if (result)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
