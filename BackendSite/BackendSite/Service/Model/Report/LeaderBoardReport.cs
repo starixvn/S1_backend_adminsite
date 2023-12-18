@@ -165,8 +165,6 @@ public class LeaderboardRankingBonusDetail
 
 public class SetLeaderboardRankingBonusReq
 {
-    public int SiteId { get; set; }
-    public int CurrencyId { get; set; }
     public string Ranking { get; set; }
     public decimal MinPoint { get; set; }
     public decimal Bonus { get; set; }
@@ -174,8 +172,6 @@ public class SetLeaderboardRankingBonusReq
 
 public class SetLeaderboardPointCalculationReq
 {
-    public int SiteId { get; set; }
-    public int CurrencyId { get; set; }
     public decimal SportTurnOver { get; set; }
     public decimal SlotTurnOver { get; set; }
     public decimal LiveCasinoTurnOver { get; set; }
