@@ -18,11 +18,13 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly MySqlClient _testReportDbClient;
 
         public CustInfoService(IServiceProvider provider)
         {
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);          
+            _testReportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.TestReport);
         }
 
         public Customer GetCustInfo(int custId)
@@ -792,7 +794,9 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
         {
-            return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
+            return _testReportDbClient != null
+                ? _testReportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }))
+                : _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
         }
 
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
