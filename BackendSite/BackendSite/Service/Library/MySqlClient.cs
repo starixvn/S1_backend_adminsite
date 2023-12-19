@@ -204,36 +204,6 @@ namespace BackendSite.Service.Library
             return result.ToList();
         }
 
-        public IEnumerable<T> TestQuery<T>(string sql, object parameters)
-        {
-            IEnumerable<T> result;
-            var sw = Stopwatch.StartNew();
-
-            try
-            {
-                var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn} | {sql} | {JsonConvert.SerializeObject(parameters)}");
-                using var connection = new MySqlConnection(conn);
-                result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
-            }
-            catch (MySqlException sqlEx)
-            {
-                var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn} | {sql} | {JsonConvert.SerializeObject(parameters)}");
-                using var connection = new MySqlConnection(conn);
-                result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{sql} | {JsonConvert.SerializeObject(parameters)}");
-                throw;
-            }
-
-            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug($"{sql} {sw.Elapsed:c}");
-            return result;
-        }
-
         public async Task<IEnumerable<T>> QueryAsync<T>(string name, object parameters = null)
         {
             IEnumerable<T> result;
@@ -306,7 +276,7 @@ namespace BackendSite.Service.Library
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
             _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
-        }  
+        }
 
         public async Task<int> ExecuteAsync(string name, object parameters)
         {
@@ -420,7 +390,7 @@ namespace BackendSite.Service.Library
             _logger.LogInformation($"{name} {sw.Elapsed:c}");
             return result;
         }
-        
+
         public int Execute(string name, IDbTransaction transaction, object parameters = null)
         {
             var sw = Stopwatch.StartNew();
@@ -498,5 +468,98 @@ namespace BackendSite.Service.Library
             await conn.CloseAsync();
             await conn.DisposeAsync();
         }
+
+        #region RetryQuery
+
+        public async Task<T> RetryQueryFirstAsync<T>(string name, object parameters)
+        {
+            T result;
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                var conn = HealthCheck();
+                _logger.LogInformation($"DB {conn} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                using var connection = new MySqlConnection(conn);
+                result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (MySqlException sqlEx)
+            {
+                var conn = HealthCheck();
+                _logger.LogError(sqlEx, $"DBRetry {conn} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                using var connection = new MySqlConnection(conn);
+                result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{name} | {JsonConvert.SerializeObject(parameters)}");
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+
+        public IEnumerable<T> RetryQuery<T>(string sql, object parameters)
+        {
+            IEnumerable<T> result;
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                var conn = HealthCheck();
+                _logger.LogInformation($"DB {conn} | {sql} | {JsonConvert.SerializeObject(parameters)}");
+                using var connection = new MySqlConnection(conn);
+                result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (MySqlException sqlEx)
+            {
+                var conn = HealthCheck();
+                _logger.LogError(sqlEx, $"DBRetry {conn} | {sql} | {JsonConvert.SerializeObject(parameters)}");
+                using var connection = new MySqlConnection(conn);
+                result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{sql} | {JsonConvert.SerializeObject(parameters)}");
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{sql} {sw.Elapsed:c}");
+            return result;
+        }
+
+        public async Task<IEnumerable<T>> RetryQueryAsync<T>(string name, object parameters)
+        {
+            IEnumerable<T> result;
+            var sw = Stopwatch.StartNew();
+            try
+            {
+                var conn = HealthCheck();
+                _logger.LogInformation($"DB {conn} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                await using var connection = new MySqlConnection(conn);
+                result = await connection.QueryAsync<T>(name, parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (MySqlException sqlEx)
+            {
+                var conn = HealthCheck();
+                _logger.LogError(sqlEx, $"DBRetry {conn} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                using var connection = new MySqlConnection(conn);
+                result = await connection.QueryAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{name} | {JsonConvert.SerializeObject(parameters)}");
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogInformation($"{name} {sw.Elapsed:c}");
+            return result;
+        }
+
+        #endregion
     }
 }
