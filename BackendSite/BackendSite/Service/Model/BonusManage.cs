@@ -291,7 +291,7 @@ namespace BackendSite.Service.Model
         [Description("幣別啟用開關, 1.開, 2.關")]
         public int Status { get; set; }
 
-        [Description("達到多少存款金額才可領, PromotionType = 1,2 時必填, 其餘皆傳0")]
+        [Description("達到多少存款金額才可領, PromotionType = 1,2 時必填,PromotionType = 11 選填, 其餘皆傳0")]
         public decimal RequiredAmount { get; set; }
         /// <summary>
         /// 目前應該都固定帶1
@@ -310,8 +310,11 @@ namespace BackendSite.Service.Model
         public CashBackSetting CashBackSetting { get; set; } = new();
         public string TierAmount { get; set; } = string.Empty;
         public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
+        [Description("MissionBonus 計算Turnover的GameType")]
+        public string TurnoverTpGameTypes { get; set; } = string.Empty;
+        public IEnumerable<int> TurnoverTpGameTypeList { get; set; }
     }
-
+    
     public class TpGameType
     {
         public int TpId { get; set; }
@@ -449,6 +452,7 @@ namespace BackendSite.Service.Model
         public decimal Bonus { get; set; }
         public decimal MaxBonus { get; set; }
         public decimal RequiredAmount { get; set; }
+        public decimal RequiredTurnover { get; set; }
         public int RollOver { get; set; }
         public int WinOver { get; set; }
     }
