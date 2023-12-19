@@ -790,17 +790,17 @@ namespace BackendSite.Service.DAL
         public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId, DateTimeOffset dateTime)
         {
             return _testReportDbClient != null
-                ? _testReportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }))
+                ? _testReportDbClient.RetryQuery<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }))
                 : _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
         }
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
         {
-            //return _testReportDbClient != null
-            //    ? _testReportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }))
-            //    : _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
-            
-            return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
+            return _testReportDbClient != null
+                ? _testReportDbClient.RetryQuery<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }))
+                : _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
+
+            //return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
         }
 
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
