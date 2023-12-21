@@ -308,7 +308,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
         [Description("MissionBonus 計算Turnover的GameType")]
         public string TurnoverTpGameTypes { get; set; } = string.Empty;
-        public IEnumerable<int> TurnoverTpGameTypeList { get; set; }
+        public IEnumerable<int> TurnoverTpGameTypeList { get; set; } = new List<int>();
     }
     
     public class TpGameType

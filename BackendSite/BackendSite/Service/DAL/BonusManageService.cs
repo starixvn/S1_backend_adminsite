@@ -294,6 +294,12 @@ namespace BackendSite.Service.DAL
                         {
                             specific.TierAmountList = JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(specific.TierAmount);
                         }
+                        
+                        if (!string.IsNullOrEmpty(specific.TurnoverTpGameTypes))
+                        {
+                            specific.TurnoverTpGameTypeList = JsonConvert.DeserializeObject<IEnumerable<int>>(specific.TurnoverTpGameTypes);
+                        }
+                        
                     }
                 }
             }
@@ -305,8 +311,6 @@ namespace BackendSite.Service.DAL
         /// </summary>
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
-        /// <param name="connection"></param>
-        /// <param name="transaction"></param>
         /// <returns></returns>
         public PromotionInfo GetPromotion(string bonusCode, int siteId)
         {
