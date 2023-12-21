@@ -426,7 +426,7 @@ namespace BackendSite.Service.DAL
                         : null,
                     TotalUsageLimit = specific.TotalUsageLimit,
                     TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]",
-                    TurnoverTpGameTypes = specific.TurnoverTpGameTypeList.Any() ? JsonConvert.SerializeObject(specific.TurnoverTpGameTypeList) : "[]",
+                    TurnoverTpGameTypes = specific.TurnoverTpGameTypeList is not null ? JsonConvert.SerializeObject(specific.TurnoverTpGameTypeList) : "[]",
                 });
             }
 
