@@ -77,7 +77,8 @@ namespace BackendSite.Service.DAL
             p.Add("_HomeSportTeamId", request.HomeTeamNameId);
             p.Add("_AwaySportTeamId", request.AwayTeamNameId);
             p.Add("_CreateUser", createUser);
-            return _mainDbClient.ExecuteAsync("Admin_HotEventInfo_Ins", p);
+            p.Add("_IsLiveStreaming", request.IsLiveStreaming);
+            return _mainDbClient.ExecuteAsync("Admin_HotEventInfo_Ins_V2", p);
         }
 
         public Task SetHotEventDataAsync(SetHotEventDataRequest request, string updateUser)

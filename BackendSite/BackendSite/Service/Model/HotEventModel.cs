@@ -49,6 +49,7 @@ namespace BackendSite.Service.Model
 
         [JsonProperty("awayTeamNameId")]
         public int AwayTeamNameId { get; set; }
+        public bool IsLiveStreaming { get; set; }
     }
 
     public class HotEventDetailRequest
