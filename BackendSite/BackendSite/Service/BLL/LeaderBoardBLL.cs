@@ -26,7 +26,8 @@ namespace BackendSite.Service.BLL
         {
             var data = DealLeaderboardReport(request);
 
-            var rankingBonus = _leaderBoardService.GetLeaderboardRankingBonus(JsonConvert.SerializeObject(request.SiteIds));
+            var rankingBonus = _leaderBoardService.GetLeaderboardRankingBonus(JsonConvert.SerializeObject(request.SiteIds))
+                .OrderByDescending(x=>x.Bonus).ToList();
             
             var groupData = data.GroupBy(x => new {x.CustId ,x.SiteId, x.SiteName, x.UserName ,x.CurrencyId ,x.IsoCode})
                 .OrderByDescending(x => x.Sum(i => i.Points))
@@ -35,7 +36,13 @@ namespace BackendSite.Service.BLL
                     var bonusModel = rankingBonus.FirstOrDefault(rb =>
                         rb.SiteId == r.Key.SiteId &&
                         rb.CurrencyId == r.Key.CurrencyId &&
-                        (rb.Ranking == (index + 1).ToString() || rb.Ranking == "9-30"));
+                        r.Sum(i => i.Points) >= rb.MinPoint);
+                    // && (rb.Ranking == (index + 1).ToString() || rb.Ranking == "9-30"));
+
+                    if (bonusModel is not null && bonusModel.Ranking != "9-30")
+                    {
+                        rankingBonus.Remove(bonusModel);
+                    }
                     
                     return new GetLeaderboardReportResponse
                     {
@@ -59,7 +66,8 @@ namespace BackendSite.Service.BLL
         {
             var data = DealLeaderboardReport(request);
             
-            var rankingBonus = _leaderBoardService.GetLeaderboardRankingBonus(JsonConvert.SerializeObject(request.SiteIds));
+            var rankingBonus = _leaderBoardService.GetLeaderboardRankingBonus(JsonConvert.SerializeObject(request.SiteIds))
+                .OrderByDescending(x=>x.Bonus).ToList();
             
             var groupData = data.GroupBy(x => x.SiteId)
                 .Select(x => new LeaderboardReportResponse
@@ -72,8 +80,14 @@ namespace BackendSite.Service.BLL
                             var bonusModel = rankingBonus.FirstOrDefault(rb =>
                                 rb.SiteId == r.Key.SiteId &&
                                 rb.CurrencyId == r.Key.CurrencyId &&
-                                (rb.Ranking == (index + 1).ToString() || rb.Ranking == "9-30"));
-                            
+                                r.Sum(i => i.Points) >= rb.MinPoint);
+                                // && (rb.Ranking == (index + 1).ToString() || rb.Ranking == "9-30"));
+
+                                if (bonusModel is not null && bonusModel.Ranking != "9-30")
+                                {
+                                    rankingBonus.Remove(bonusModel);
+                                }
+                                
                             return new GetLeaderboardReportResponse
                             {
                                 Ranking = $"TOP {index + 1}",
@@ -85,7 +99,7 @@ namespace BackendSite.Service.BLL
                                 CustId = r.Key.CustId,
                                 TurnOver = r.Sum(i => i.TurnOver),
                                 Points = r.Sum(i => i.Points),
-                                Reward = request.CategoryId != 0 || r.Sum(i => i.Points) < bonusModel.MinPoint ? 0 : bonusModel.Bonus
+                                Reward = request.CategoryId != 0 || bonusModel is null ? 0 : bonusModel.Bonus
                             };
                         }).Take(30).ToList()
                 });
