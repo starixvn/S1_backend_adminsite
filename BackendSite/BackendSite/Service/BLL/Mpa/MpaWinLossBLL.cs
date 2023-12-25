@@ -1382,6 +1382,7 @@ namespace BackendSite.Service.BLL.Mpa
             foreach (var userName in userNames)
             {
                 var dateSummary = result.AlreadyMultiplyRateData.Where(x => x.UserName == userName.UserName & x.SiteId == userName.SiteId).ToList();
+                var dateSummaryOrigin = result.OriginData.Where(x => x.UserName == userName.UserName & x.SiteId == userName.SiteId).ToList();
                 var ggr = dateSummary.Sum(x => x.GGR);
                 var betCount = dateSummary.Sum(x => x.BetCount);
                 if (betCount == 0) { excludeUserName.Add($"{userName.UserName}-{userName.TpUserName}"); }
@@ -1415,7 +1416,7 @@ namespace BackendSite.Service.BLL.Mpa
                         : 0.00m,
                     TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
-                        ? GetOriginalCurrencyDetailByPlayer(result.OriginData, userName.UserName, _common)
+                        ? GetOriginalCurrencyDetailByPlayer(dateSummaryOrigin, userName.UserName, _common)
                         : GetCurrencyDetailByPlayer(dateSummary, _common),
                 };
                 apiData.Add(responseItem);

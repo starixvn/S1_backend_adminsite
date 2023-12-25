@@ -20,12 +20,15 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName);
             }
             //過濾SummaryType
+            
             if (request.DateType == MpaDateType.SettledDate)
             {
+                //DateType == SettledDate時，篩選1跟3，3為BA資料
                 data = data.Where(r => r.SummaryType == 1 || r.SummaryType == 3);
             }
             else if(request.DateType == MpaDateType.CreatedDate)
             {
+                //DateType == CreatedDate，篩選2跟4，4為BA資料
                 data = data.Where(r => r.SummaryType == 2 || r.SummaryType == 4);
             }
 
@@ -87,8 +90,10 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         {
             foreach (var item in data)
             {
+                //BA 只計算 SBSW Sport
                 if (item.GameType == 69 && (item.SummaryType == 3 || item.SummaryType == 4))
                 {
+                    //把BA資料區隔出來，避免影響一般資料計算
                     item.BAStakeSummary = item.StakeSummary;
                     item.BAValidBetSummary = item.ValidBetSummary;
                     item.BARevenueSummary = item.RevenueSummary;
