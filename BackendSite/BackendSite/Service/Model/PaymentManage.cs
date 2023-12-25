@@ -60,7 +60,8 @@ namespace BackendSite.Service.Model
 
     public class BankInfoPayForSetting : PayListBankInfoSys
     {
-        public BankInfoPayMethodEnum Method { get; set; }
+        public int ChannelId { get; set; }
+        public string ChannelName { get; set; }
     }
 
     public class UpdatePayInfo

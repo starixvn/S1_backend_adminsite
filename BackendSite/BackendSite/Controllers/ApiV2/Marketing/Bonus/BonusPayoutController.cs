@@ -186,7 +186,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// Func Path：Finance  > BonusPayout > [Submit]
         /// </remarks>
         /// <param name="request"></param>
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 127, 5 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 33, 5 })]
         [HttpPost]
         public ApiResult<CheckTierRedepositBonusRep> CheckTierRedepositBonus(CheckTierRedepositBonusReq request)
         {
