@@ -73,7 +73,9 @@ namespace BackendSite.Service.BLL
                     EndTime = DatetimeFormat(r.EndTime),
                     BattleTime = DatetimeFormat(r.BattleTime),
                     LastUpdateUser = r.LastUpdateUser,
-                    LastUpdateTime = DatetimeFormat(r.LastUpdateTime)
+                    LastUpdateTime = DatetimeFormat(r.LastUpdateTime),
+                    ICurrencyList = r.ICurrencyList,
+                    IsLiveStreaming = r.IsLiveStreaming
                 }),
                 RowCount = queryResult.RowCount,
                 TotalPages = queryResult.TotalPages
