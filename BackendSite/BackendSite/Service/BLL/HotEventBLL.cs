@@ -49,7 +49,9 @@ namespace BackendSite.Service.BLL
                 HomeSportLeaguesId = data.HomeSportLeaguesId,
                 AwaySportLeaguesId = data.AwaySportLeaguesId,
                 HomeTeamNameId = data.HomeSportTeamId,
-                AwayTeamNameId = data.AwaySportTeamId
+                AwayTeamNameId = data.AwaySportTeamId,
+                ICurrencyList = data.ICurrencyList,
+                IsLiveStreaming = data.IsLiveStreaming
             };
         }
 
