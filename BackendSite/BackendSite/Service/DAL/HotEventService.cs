@@ -99,7 +99,7 @@ namespace BackendSite.Service.DAL
             p.Add("_UpdateUser", updateUser);
             p.Add("_IsLiveStreaming", request.IsLiveStreaming);
             p.Add("_Currency", JsonConvert.SerializeObject(request.ICurrencyList));
-            return _mainDbClient.ExecuteAsync("Admin_HotEventData_Set", p);
+            return _mainDbClient.ExecuteAsync("Admin_HotEventData_Set_V2", p);
         }
 
         public Task SetHotEventStatusAsync(SetHotEventStatusRequest request, string updateUser)
