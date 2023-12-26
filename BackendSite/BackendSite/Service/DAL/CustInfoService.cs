@@ -1,15 +1,11 @@
 ﻿using System.Data;
-
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
-
 using Dapper;
-
 using MySql.Data.MySqlClient;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -248,7 +244,11 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfos(int? custId, string userName, int? siteId)
         {
-            return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId }));
+            //先加時間 後面要整合
+            //_memberService.GetCustId,public async Task<CustomerForRisk> GetCustId
+            var startTime = DateTime.Now;
+            var endTime = startTime.AddYears(-5);
+            return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId , StartTime = startTime, EndTime = endTime}));
         }
 
         public bool SendMessageBatch(BatchPersonalMsg req)
