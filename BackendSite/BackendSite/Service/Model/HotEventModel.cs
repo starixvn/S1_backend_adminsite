@@ -262,6 +262,8 @@ namespace BackendSite.Service.Model
 
         [JsonProperty("lastUpdateTime")]
         public string LastUpdateTime { get; set; }
+        public bool IsLiveStreaming { get; set; }
+        public IEnumerable<int> ICurrencyList { get; set; }
     }
 
     public class HotEventDataListResponseWrapper
