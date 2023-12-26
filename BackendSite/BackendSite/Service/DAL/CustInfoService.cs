@@ -649,10 +649,16 @@ namespace BackendSite.Service.DAL
 
         public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId)
         {
+            var endTime = DateTime.Now;
+            var startTime = endTime.AddYears(-5);
+            
             var props = new DynamicParameters();
             props.Add("CustId", custId);
             props.Add("UserName", userName);
             props.Add("SiteId", siteId);
+            //要整合 先加時間
+            props.Add("StartTime", startTime);
+            props.Add("EndTime", endTime);
             return await _reportDbClient.QueryFirstAsync<CustomerForRisk>("Admin_CustInfo_Get", props);
         }
 
