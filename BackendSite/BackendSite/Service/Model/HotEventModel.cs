@@ -50,6 +50,17 @@ namespace BackendSite.Service.Model
         [JsonProperty("awayTeamNameId")]
         public int AwayTeamNameId { get; set; }
         public bool IsLiveStreaming { get; set; }
+        public string Currency { get; set; }
+
+        public IEnumerable<int> ICurrencyList
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(Currency) ?
+                    null :
+                    JsonConvert.DeserializeObject<IEnumerable<int>>(Currency);
+            }
+        }
     }
 
     public class HotEventDetailRequest
@@ -89,6 +100,18 @@ namespace BackendSite.Service.Model
 
         [JsonProperty("awayTeamNameId")]
         public int AwaySportTeamId { get; set; }
+        public bool IsLiveStreaming { get; set; }
+        public string Currency { get; set; }
+
+        public IEnumerable<int> ICurrencyList
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(Currency) ?
+                    null :
+                    JsonConvert.DeserializeObject<IEnumerable<int>>(Currency);
+            }
+        }
     }
 
     public class SetHotEventStatusRequest
@@ -201,6 +224,8 @@ namespace BackendSite.Service.Model
 
         [JsonProperty("awayTeamNameId")]
         public int AwayTeamNameId { get; set; }
+        public bool IsLiveStreaming { get; set; }
+        public IEnumerable<int> ICurrencyList { get; set; }
     }
 
     /// <summary>
@@ -274,6 +299,18 @@ namespace BackendSite.Service.Model
         public int HomeSportTeamId { get; set; }
 
         public int AwaySportTeamId { get; set; }
+        public bool IsLiveStreaming { get; set; }
+        public string Currency { get; set; }
+
+        public IEnumerable<int> ICurrencyList
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(Currency) ?
+                    null :
+                    JsonConvert.DeserializeObject<IEnumerable<int>>(Currency);
+            }
+        }
     }
 
     public class HotEventDataListDto
@@ -307,6 +344,18 @@ namespace BackendSite.Service.Model
 
         [JsonProperty("lastUpdateTime")]
         public DateTime LastUpdateTime { get; set; }
+        public bool IsLiveStreaming { get; set; }
+        public string Currency { get; set; }
+
+        public IEnumerable<int> ICurrencyList
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(Currency) ?
+                    null :
+                    JsonConvert.DeserializeObject<IEnumerable<int>>(Currency);
+            }
+        }
     }
 
     public class HotEventDataListDtoWrapper
