@@ -590,9 +590,10 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId, _EnableTurnoverRewardPoint = status });
         return await _mainSqlClient.ExecuteAsync("Admin_CustInfoEnableTurnoverRewardPoint_Set", p);
     }
-    public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId)
+    public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId,DateTime startTime,DateTime endTime)
     {
         return await _sqlClienct.QueryFirstAsync<CustomerForRisk>("Admin_CustInfo_Get",
-            new { CustId = custId, UserName = userName, SiteId = siteId });
+            new { CustId = custId, UserName = userName, SiteId = siteId, StartTime = startTime, EndTime = endTime});
     }
+    
 }
