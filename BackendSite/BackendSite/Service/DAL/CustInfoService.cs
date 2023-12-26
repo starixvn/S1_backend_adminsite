@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -246,8 +246,8 @@ namespace BackendSite.Service.DAL
         {
             //先加時間 後面要整合
             //_memberService.GetCustId,public async Task<CustomerForRisk> GetCustId
-            var startTime = DateTime.Now;
-            var endTime = startTime.AddYears(-5);
+            var endTime = DateTime.Now;
+            var startTime = endTime.AddYears(-5);
             return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId , StartTime = startTime, EndTime = endTime}));
         }
 
