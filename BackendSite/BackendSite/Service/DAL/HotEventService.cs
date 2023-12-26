@@ -6,6 +6,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
 using Dapper;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -77,7 +78,9 @@ namespace BackendSite.Service.DAL
             p.Add("_HomeSportTeamId", request.HomeTeamNameId);
             p.Add("_AwaySportTeamId", request.AwayTeamNameId);
             p.Add("_CreateUser", createUser);
-            return _mainDbClient.ExecuteAsync("Admin_HotEventInfo_Ins", p);
+            p.Add("_IsLiveStreaming", request.IsLiveStreaming);
+            p.Add("_Currency", JsonConvert.SerializeObject(request.ICurrencyList));
+            return _mainDbClient.ExecuteAsync("Admin_HotEventInfo_Ins_V2", p);
         }
 
         public Task SetHotEventDataAsync(SetHotEventDataRequest request, string updateUser)
@@ -94,6 +97,8 @@ namespace BackendSite.Service.DAL
             p.Add("_HomeSportTeamId", request.HomeSportTeamId);
             p.Add("_AwaySportTeamId", request.AwaySportTeamId);
             p.Add("_UpdateUser", updateUser);
+            p.Add("_IsLiveStreaming", request.IsLiveStreaming);
+            p.Add("_Currency", JsonConvert.SerializeObject(request.ICurrencyList));
             return _mainDbClient.ExecuteAsync("Admin_HotEventData_Set", p);
         }
 
