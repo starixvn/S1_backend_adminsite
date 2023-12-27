@@ -74,13 +74,14 @@ namespace BackendSite.Service.DAL
             return false;
         }
 
-        public IEnumerable<BigWinReport> GetBigWinReport(IEnumerable<int> currencyId, DateTime startDate, DateTime endDate)
+        public IEnumerable<BigWinReport> GetBigWinReport(IEnumerable<int> currencyId, DateTime startDate, DateTime endDate, int siteId)
         {
             var p = new DynamicParameters(new
             {
                 _CurrencyList = JsonConvert.SerializeObject(currencyId),
                 _StartDate = startDate,
                 _EndDate = endDate,
+                _SiteId = siteId
             });
 
             return _reportDbClient.Query<BigWinReport>("Admin_BigWinInfo_Get", p);

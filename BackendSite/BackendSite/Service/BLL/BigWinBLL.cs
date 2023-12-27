@@ -39,7 +39,7 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime.Date;
             var endTime = request.EndDate.ToUniversalTime().DateTime.Date;
 
-            var bigWinReportList = _bigWinService.GetBigWinReport(currencyList, startTime, endTime);
+            var bigWinReportList = _bigWinService.GetBigWinReport(currencyList, startTime, endTime, request.SiteId);
 
             foreach (var bigWinReport in bigWinReportList)
             {
