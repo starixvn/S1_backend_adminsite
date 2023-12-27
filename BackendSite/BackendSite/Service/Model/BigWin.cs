@@ -35,6 +35,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public IEnumerable<int> CurrencyId { get; set; }
+        public int SiteId { get; set; }
     }
     public class BigWinReport 
     { 
