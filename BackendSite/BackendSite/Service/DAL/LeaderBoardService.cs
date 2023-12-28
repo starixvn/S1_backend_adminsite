@@ -1,9 +1,7 @@
 ﻿using System.Data;
-
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
-
 using Dapper;
 
 namespace BackendSite.Service.DAL
@@ -27,11 +25,24 @@ namespace BackendSite.Service.DAL
             props.Add("_CategoryId", categoryId);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
-            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V3", props);
+            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V4", props);
 
             return result;
         }
 
+        public IEnumerable<LeaderboardReportModel> GetLeaderboardReportOld(string siteIds, int currencyId, int categoryId, DateTime startDate, DateTime endDate)
+        {
+            var props = new DynamicParameters();
+            props.Add("_SiteIds", siteIds);
+            props.Add("_CurrencyId", currencyId);
+            props.Add("_CategoryId", categoryId);
+            props.Add("_StartDate", startDate);
+            props.Add("_EndDate", endDate);
+            var result = _reportDbClient.Query<LeaderboardReportModel>("Admin_LeaderboardReport_Get_V3", props);
+
+            return result;
+        }
+        
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(
             int siteId,
             string categoryIds,
@@ -99,5 +110,55 @@ namespace BackendSite.Service.DAL
 
             return result > 0;
         }
+        
+        public IEnumerable<LeaderboardRankingBonusData> GetLeaderboardRankingBonus(string siteIds)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteIds);
+            var result = _reportDbClient.Query<LeaderboardRankingBonusData>("Admin_LeaderboardRankingBonus_Get", p);
+
+            return result;
+        }
+        
+        public bool SetLeaderboardRankingBonus(int siteId,int currencyId,string ranking, decimal minPoint, decimal bonus, string updater)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_Ranking", ranking);
+            p.Add("_MinPoint", minPoint);
+            p.Add("_Bonus", bonus);
+            p.Add("_Updater", updater);
+            var result = _mainDbClient.Execute("Admin_LeaderboardRankingBonus_Set", p);
+            
+            return result > 0 ;
+        }
+
+        public IEnumerable<LeaderboardPointCalculation> GetLeaderboardPointCalculation(string siteIds , string date)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteIds", siteIds);
+            p.Add("_Date", date);
+            var result = _reportDbClient.Query<LeaderboardPointCalculation>("Admin_LeaderboardPointCalculation_Get", p);
+
+            return result;
+        }
+
+        public bool SetLeaderboardPointCalculation(int siteId,int currencyId ,decimal slotTurnOver, decimal sportTurnOver, decimal liveCasinoTurnOver, int status ,string date , string updater)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_CurrencyId", currencyId);
+            p.Add("_SlotTurnOver", slotTurnOver);
+            p.Add("_SportTurnOver", sportTurnOver);
+            p.Add("_LiveCasinoTurnOver", liveCasinoTurnOver);
+            p.Add("_Status", status);
+            p.Add("_Date", date);
+            p.Add("_Updater", updater);
+            var result = _mainDbClient.Execute("Admin_LeaderboardPointCalculation_Set", p);
+            
+            return result > 0 ;
+        }
     }
 }
+

@@ -12,12 +12,12 @@ public class GetLeaderboardReportRequest : IApiRequest
     public DateTimeOffset StartDate
     {
         get => _startDate;
-        set => _startDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        set => _startDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
     }
     public DateTimeOffset EndDate
     {
         get => _endDate;
-        set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        set => _endDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
     }
     public IEnumerable<int> SiteIds { get; set; }
     public IEnumerable<int> CurrencyIds { get; set; }
@@ -34,14 +34,20 @@ public class LeaderboardReportModel
     public int CategoryId { get; set; }
     public int CustId { get; set; }
     public decimal TurnOver { get; set; }
-    public decimal Points { get; set; }
     public string SiteName { get; set; }
+    public decimal SportTurnOver { get; set; }
+    public decimal SlotTurnOver { get; set; }
+    public decimal LiveCasinoTurnOver { get; set; }
+    public int Status { get; set; }
+    public int Points { get; set; }
 }
+
 public class LeaderboardReportResponse
 {
     public List<GetLeaderboardReportResponse> detail { get; set; }
     public int SiteId { get; set; }
 }
+
 public class GetLeaderboardReportResponse
 {
     public string Ranking { get; set; }
@@ -53,7 +59,7 @@ public class GetLeaderboardReportResponse
     public string IsoCode { get; set; }
     public decimal TurnOver { get; set; }
     public decimal Points { get; set; }
-    
+    public decimal Reward { get; set; }
 }
 
 public class LeaderboardExtraPointReq
@@ -122,4 +128,66 @@ public class ExcelData
     public int CategoryId { get; set; }
     public string UserName { get; set; }
     public decimal ExtraPoint { get; set; }
+}
+
+public class LeaderboardRankingBonusReq
+{
+    public IEnumerable<int> SiteIds { get; set; }
+}
+
+public class LeaderboardRankingBonusData
+{
+    public int SiteId { get; set; }
+    public string SiteName { get; set; }
+    public string Currency { get; set; }
+    public int CurrencyId { get; set; }
+    public string Ranking { get; set; }
+    public decimal MinPoint { get; set; }
+    public decimal Bonus { get; set; }
+}
+
+public class LeaderboardRankingBonusList
+{
+    public int SiteId { get; set; }
+    public string SiteName { get; set; }
+    public string Currency { get; set; }
+    public int CurrencyId { get; set; }
+    public IEnumerable<LeaderboardRankingBonusDetail> Data { get; set; }
+}
+
+public class LeaderboardRankingBonusDetail
+{
+    public string Ranking { get; set; }
+    public string RankingName { get; set; }
+    public decimal MinPoint { get; set; }
+    public decimal Bonus { get; set; }
+}
+
+public class SetLeaderboardRankingBonusReq
+{
+    public string Ranking { get; set; }
+    public decimal MinPoint { get; set; }
+    public decimal Bonus { get; set; }
+}
+
+public class SetLeaderboardPointCalculationReq
+{
+    public decimal SportTurnOver { get; set; }
+    public decimal SlotTurnOver { get; set; }
+    public decimal LiveCasinoTurnOver { get; set; }
+    public int Status { get; set; }
+}
+
+public class LeaderboardPointCalculation
+{
+    public int SiteId { get; set; }
+    public string SiteName { get; set; }
+    public string Currency { get; set; }
+    public int CurrencyId { get; set; }
+    public decimal SportTurnOver { get; set; }
+    public decimal SlotTurnOver { get; set; }
+    public decimal LiveCasinoTurnOver { get; set; }
+    public int Status { get; set; }
+    public string Updater { get; set; }
+    public DateTimeOffset UpdateTime { get; set; }
 }

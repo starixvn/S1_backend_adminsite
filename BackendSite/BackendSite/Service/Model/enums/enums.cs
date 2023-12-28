@@ -18,7 +18,8 @@ namespace BackendSite.Service.Model.enums
         Report, //ConnectionStringReport
         Wager,  //ConnectionStringWager
         Log,    //ConnectionStringLog
-        IP      //ConnectionStringIPTable
+        IP,    //ConnectionStringIPTable
+        TestReport,
     }
 
     #region Deposit Request / Withdrawal Request For Frontend Use
@@ -267,7 +268,9 @@ namespace BackendSite.Service.Model.enums
         LoadCard = 5,
         QRPay = 6,
         BankAutoChannel = 7,
-        CryptoWallet = 8
+        CryptoWallet = 8,
+        QuickTransfer = 9,
+        ChatTransfer = 10
     }
 
     public enum DepositStatusEnum
@@ -374,7 +377,9 @@ namespace BackendSite.Service.Model.enums
         CryptoPayment = 4,
         LoadCardPayment = 5,
         QrPayPayment = 6,
-        BankAutoChannel = 7
+        BankAutoChannel = 7,
+        QuickTransfer = 9,
+        ChatTransfer = 10
     }
     
     public enum WithdrawalChannelTypeEnum
@@ -937,7 +942,9 @@ namespace BackendSite.Service.Model.enums
         DepositReferral = 93,
         EditSystemBankInfo = 94,
         WithdrawalBlockSetting = 95,
-        SetBigWinSetting = 96
+        SetBigWinSetting = 96,
+        LeaderboardPointCalculation = 97,
+        LeaderboardRankingBonus = 98
     }
 
     #region BankFinancialTransferInfoLog
@@ -1565,8 +1572,8 @@ namespace BackendSite.Service.Model.enums
         SOON88 = 4,
         [Description("Ivorysport")]
         IVORYSPORT = 5,
-        [Description("Leobet")]
-        LEOBET = 6
+        [Description("Yashbet")]
+        YASHBET = 6
     }
 
     public enum AffSiteEnum
@@ -1824,7 +1831,8 @@ namespace BackendSite.Service.Model.enums
         GameType = 3,
         Currency = 4,
         Player = 5,
-        TpCategory = 6
+        TpCategory = 6,
+        Brand = 7
     }
 
     /// <summary>

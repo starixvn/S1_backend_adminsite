@@ -136,9 +136,10 @@ Content-Type: application/json
 
 {
     "siteId": 1,
-    "payId": 1,
-    "sysId": 37,
-    "status": 1
+    "payId": 56,
+    "sysId": 1,
+    "channelId": 551,
+    "status": 2
 }
 
 ###
