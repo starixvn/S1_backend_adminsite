@@ -54,5 +54,5 @@ public interface IMemberService
     Task<IEnumerable<CustTpGameTypeSettingDto>> GetCustTpGameTypeSettingAsync(int custId);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type);
     Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status);
-    Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId,DateTime startTime,DateTime endTime);
+    Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId);
 }
