@@ -26,17 +26,22 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
+            var custList = new List<int>();
 
-            var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
-            if (custList == null)
-                return new LiveRegistrationResponse()
-                {
-                    LiveRegistration = new List<LiveRegistration>(),
-                    PageNumber = 1,
-                    TotalPages = 0,
-                    RowCount = 0
-                };
-
+            if (request.DateType == LiveRegistrationDateTypeEnum.CallRecordDate ||
+                !string.IsNullOrEmpty(request.UserName))
+            {
+                custList = await GetQueryCustId(request.DateType, request.SiteIds, request.SiteId, startTime, endTime, request.UserName);
+                if (custList == null || custList.Count == 0)
+                    return new LiveRegistrationResponse()
+                    {
+                        LiveRegistration = new List<LiveRegistration>(),
+                        PageNumber = 1,
+                        TotalPages = 0,
+                        RowCount = 0
+                    };
+            }
+            
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 
             var orderByProperty = string.IsNullOrEmpty(request.OrderByProperty) ? "RegTime" : request.OrderByProperty;
@@ -79,6 +84,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<Dictionary<string, object>>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
         {
+            var custList = new List<int>();
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
@@ -86,10 +92,13 @@ namespace BackendSite.Service.BLL
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 			var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            var custList = await GetQueryCustId(request.DateType, request.SiteId, startTime, endTime, request.UserName);
-            if (custList == null)
-                return new List<Dictionary<string, object>>();
-
+            if (request.DateType == LiveRegistrationDateTypeEnum.CallRecordDate 
+                || !string.IsNullOrEmpty(request.UserName))
+            {
+                custList = await GetQueryCustId(request.DateType,request.SiteIds ,request.SiteId, startTime, endTime, request.UserName);
+                if (custList == null || custList.Count == 0)
+                    return new List<Dictionary<string, object>>();
+            }
             var result = await _registrationService.GetExportRegLiveStatus(JsonConvert.SerializeObject(multiSiteRequest),
                 request.DepositStatus, request.Status, custList, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantFrequency, dormantType, request.CallOutStatus,
@@ -230,29 +239,40 @@ namespace BackendSite.Service.BLL
             return (frequency, type);
         }
 
-        private async Task<List<int>> GetQueryCustId(LiveRegistrationDateTypeEnum dateType, int siteId, DateTime startTime, DateTime endTime, string userName)
+        private async Task<List<int>> GetQueryCustId(LiveRegistrationDateTypeEnum dateType, IEnumerable<int> siteIds,int siteId, DateTime startTime, DateTime endTime, string userName)
         {
             var custList = new List<int>();
-            if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate)
+            var selectCustList = new List<CustomerForRisk>();
+            
+            foreach (var siteIdTest in siteIds)
             {
-                var callRecord = await _registrationService.QueryCallingRecord(siteId, startTime, endTime);
-                custList = callRecord.ToList();
-                if (custList.Count == 0)
+                if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate)
                 {
-                    return null;
+                    var callRecord = await _registrationService.QueryCallingRecord(siteIdTest, startTime, endTime);
+                    if (!callRecord.Any())
+                    {
+                        continue;
+                    } 
+                    custList.AddRange(callRecord);
+                }
+
+                if (!string.IsNullOrEmpty(userName))
+                {
+                    var cust = await _memberService.GetCustId(null, userName, siteIdTest);
+                    if (cust == null) 
+                        continue;
+                    
+                    selectCustList.Add(cust);
                 }
             }
-
-            if (!string.IsNullOrEmpty(userName))
+            
+            if (selectCustList.Count != 0)
             {
-                var cust = await _memberService.GetCustId(null, userName, siteId, startTime, endTime);
-                if (cust == null) return null;
-
-                if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate && (!custList.Any(c => c == cust.CustId)))
-                    return null;
-
-                custList = new List<int>() { cust.CustId };
+                custList = dateType == LiveRegistrationDateTypeEnum.CallRecordDate ? 
+                    custList.Intersect(selectCustList.Select(c => c.CustId)).ToList() : 
+                    selectCustList.Select(x => x.CustId).ToList();
             }
+            
             return custList;
         }
     }

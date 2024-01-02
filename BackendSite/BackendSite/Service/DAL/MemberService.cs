@@ -584,10 +584,10 @@ public class MemberService : IMemberService
         var p = new DynamicParameters(new { _CustId = custId });
         return await _sqlClienct.QueryAsync<CustTpGameTypeSettingDto>("Admin_CustTpGameTypeSetting_Get", p);
     }
-    public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId,DateTime startTime,DateTime endTime)
+    public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId)
     {
         return await _sqlClienct.QueryFirstAsync<CustomerForRisk>("Admin_CustInfo_Get",
-            new { CustId = custId, UserName = userName, SiteId = siteId, StartTime = startTime, EndTime = endTime});
+            new { CustId = custId, UserName = userName, SiteId = siteId});
     }
     
 }
