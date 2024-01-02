@@ -2730,7 +2730,7 @@ namespace BackendSite.Service.BLL.Mpa
             MpaWinLossGroupByTypeEnum groupByType)
         {
             var format = MapMpaWinLossGroupByTypeEnumFormat(groupByType);
-            var originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteIds, request.StarTime, request.EndTime, format, request.MemberTypeJson())).ToList();
+            var originTransaction = (await _mpaWinLossService.GetMapTransaction<TransactionRelayDto>(request.SiteIds, request.StarTime, request.EndTime, format, request.MemberTypeJson(), request.UserNameJson())).ToList();
             originTransaction = FilterMapWinLossTransaction(request, originTransaction);
 
             var mapRate = await GetMapRate(request);
