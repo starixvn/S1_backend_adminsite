@@ -672,13 +672,9 @@ namespace BackendSite.Service.Model.enums
         SlotsGame = 1,
         LiveCasino = 2,
         Fish = 3,
-        SabaSports = 4,
         Lottery = 5,
         Sports = 6,
-        PTSlotsGame = 7,
-        PTLiveCasino = 8,
         SBSW = 9,
-        Mega888SlotRNGAndFishing = 10,
         ESports = 11
     }
 
