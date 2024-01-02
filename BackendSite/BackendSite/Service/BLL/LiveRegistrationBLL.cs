@@ -31,8 +31,7 @@ namespace BackendSite.Service.BLL
             if (request.DateType == LiveRegistrationDateTypeEnum.CallRecordDate ||
                 !string.IsNullOrEmpty(request.UserName))
             {
-                custList = await GetQueryCustId(request.DateType, request.SiteIds, request.SiteId, startTime,
-                    endTime, request.UserName);
+                custList = await GetQueryCustId(request.DateType, request.SiteIds, request.SiteId, startTime, endTime, request.UserName);
                 if (custList == null || custList.Count == 0)
                     return new LiveRegistrationResponse()
                     {
@@ -85,6 +84,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<Dictionary<string, object>>> GetExportRegLiveStatus(ExportRegLiveStatusRequest request)
         {
+            var custList = new List<int>();
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
             var timezone = request.StartDate.Offset;
@@ -92,10 +92,13 @@ namespace BackendSite.Service.BLL
             var (dormantFrequency, dormantType) = GetDormant(request.DormantUser);
 			var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             var multiSiteRequest = ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            var custList = await GetQueryCustId(request.DateType,request.SiteIds ,request.SiteId, startTime, endTime, request.UserName);
-            if (custList == null || custList.Count == 0)
-                return new List<Dictionary<string, object>>();
-
+            if (request.DateType == LiveRegistrationDateTypeEnum.CallRecordDate 
+                || !string.IsNullOrEmpty(request.UserName))
+            {
+                custList = await GetQueryCustId(request.DateType,request.SiteIds ,request.SiteId, startTime, endTime, request.UserName);
+                if (custList == null || custList.Count == 0)
+                    return new List<Dictionary<string, object>>();
+            }
             var result = await _registrationService.GetExportRegLiveStatus(JsonConvert.SerializeObject(multiSiteRequest),
                 request.DepositStatus, request.Status, custList, startTime, endTime,
                 request.AffiliatesCode, request.AgentCodeType, dormantFrequency, dormantType, request.CallOutStatus,
