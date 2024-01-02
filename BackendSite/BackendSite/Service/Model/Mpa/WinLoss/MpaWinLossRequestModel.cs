@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 
 using Newtonsoft.Json;
@@ -111,6 +112,14 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
             return memberTypeJson;
         }
 
+        public string UserNameJson()
+        {
+            var json = string.IsNullOrEmpty(UserName)
+                ? null
+                : JsonConvert.SerializeObject(FormatExtension.SplitRemoveSpace(UserName, ','));
+
+            return json;
+        }
 
         public string GetWinLossByPlayerRedisKey()
         {
