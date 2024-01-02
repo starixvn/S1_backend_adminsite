@@ -12,10 +12,11 @@ namespace BackendSite.Service.Model
         private DateTimeOffset? _lastUpdateTime { get; set; }
         public string BonusCode { get; set; }
         public string Description { get; set; }
+        [Description("請查看PromotionType的Type設定")]
         public int PromotionType { get; set; }
         public string CategoryName { get; set; }
 
-        [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
+        [Description("請查看PromotionCategory的Id設定")]
         public int? CategoryId { get; set; }
 
         public DateTimeOffset? PeriodFrom
@@ -131,6 +132,9 @@ namespace BackendSite.Service.Model
 
         [Description("前台是否會以PopUp的方式顯示: 0.不會 1.會")]
         public bool IsPopUp { get; set; }
+
+        [Description("PromotionCategory支援的GameTypeList")]
+        public IEnumerable<int> PromotionCategoryGameTypeList { get; set; } = new List<int>();
     }
 
     public class PromotionInfoReq
@@ -142,10 +146,10 @@ namespace BackendSite.Service.Model
         public string BonusCode { get; set; }
         public string Description { get; set; }
 
-        [Description("1.1st Deposit, 2.Re-Deposit, 3.FreeBet, 5.Wallet bonus, 6.Rebate, 7.CashBack, 8.Special Bonus 9.Retention free bet")]
+        [Description("請查看PromotionType的Type設定")]
         public int PromotionType { get; set; }
 
-        [Description("Promotion CategoryId: 1=Slots Game, 2=Live Casino, 3=Fish, 4=Saba Sports, 5=Lottery, 6=Sports, 7=PT Slots, 8=PT Live Casino, 9=SBSW, 10=Mega888 Slot RNG & Fishing")]
+        [Description("請查看PromotionCategory的Id設定")]
         public int? CategoryId { get; set; }
         public DateTimeOffset? PeriodFromTime
         {
@@ -299,10 +303,10 @@ namespace BackendSite.Service.Model
         [Description("總共領取數量限制，0為不限制")]
         public int TotalUsageLimit { get; set; }
 
-        [Obsolete("V2 Cashback 不需要此參數")]
+        [Description("前端Cashback顯示使用此參數")]
         public IEnumerable<PromotionCashBack> CashBackList { get; set; } = new List<PromotionCashBack>();
 
-        [Description("V2 Cashback 使用參數")]
+        [Description("V2 Cashback 設定使用參數")]
         public CashBackSetting CashBackSetting { get; set; } = new();
         public string TierAmount { get; set; } = string.Empty;
         public IEnumerable<TierAmount> TierAmountList { get; set; } = new List<TierAmount>();
@@ -321,7 +325,6 @@ namespace BackendSite.Service.Model
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int TpId { get; set; }
     }
 
     public class TpGameTypeCurrency
@@ -363,11 +366,14 @@ namespace BackendSite.Service.Model
     {
         public int TpId { get; set; }
 
-        [Description("Tp CategoryId: 1=Sports, 2=Casino (Slot Game), 3=Live Casino, 4=Fishing, 5=Cockfighting, 6=Lottery, 7=Virtual Sports, 8=Poker")]
+        /// <summary>
+        /// PromotionCategory的類型
+        /// </summary>
+        [Description("PromotionCategory.Id")]
         public int CategoryId { get; set; }
     }
 
-    public class PromotionCashBack1 : PromotionCashBack
+    public class PromotionCashBackCurrency : PromotionCashBack
     {
         public int CurrencyId { get; set; }
         public int Level { get; set; }
@@ -423,17 +429,18 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public int? TpId { get; set; }
     }
+
     public class CashBackGame
     {
         public string GameName { get; set; }
         public int CategoryId { get; set; }
         public int TpId { get; set; }
     }
+
     public class GetCashBackGamerep
     {
         public string GameName { get; set; }
 
-        [Description("TpId 傳入參數為0回傳 key 為 TpId，TpId 傳入參數大於0回傳 key 代表 Tp CategoryId")]
         public int Key { get; set; }
     }
 

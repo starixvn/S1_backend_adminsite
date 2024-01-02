@@ -367,7 +367,7 @@ namespace BackendSite.Service.BLL
 
             if (balanceAdjustBonusCodeData != null)
             {
-                var promoCategories = _bonusManageService.GetPromoCategories(balanceAdjustBonusCodeData.WalletType).Where(x => x.Id == balanceAdjustBonusCodeData.CategoryId && x.TpId == balanceAdjustBonusCodeData.TpId)?.FirstOrDefault();
+                var promoCategories = _bonusManageService.GetPromoCategories().FirstOrDefault(x => x.Id == balanceAdjustBonusCodeData.CategoryId);
                 result.HasBonusCode = true;
                 result.BonusCode = bonusCode;
                 result.RollOver = balanceAdjustBonusCodeData.RollOver;
@@ -392,8 +392,8 @@ namespace BackendSite.Service.BLL
 
             if (balanceAdjustBonusCodeBatchData.Count != 0)
             {
-                var promoCategories = _bonusManageService.GetPromoCategories(balanceAdjustBonusCodeBatchData.FirstOrDefault().WalletType)
-                    .Where(x => x.Id == balanceAdjustBonusCodeBatchData.FirstOrDefault().CategoryId && x.TpId == balanceAdjustBonusCodeBatchData.FirstOrDefault().TpId)?.FirstOrDefault();
+                var promoCategories = _bonusManageService.GetPromoCategories()
+                    .FirstOrDefault(x => x.Id == balanceAdjustBonusCodeBatchData.FirstOrDefault()?.CategoryId);
 
                 balanceAdjustBonusCodeBatchData.ForEach(x =>
                 {
@@ -439,8 +439,7 @@ namespace BackendSite.Service.BLL
                 };
             }
 
-            var promoCategories = _bonusManageService.GetPromoCategories(checkData.WalletType)
-                .FirstOrDefault(x => x.Id == checkData.CategoryId && x.TpId == checkData.TpId);
+            var promoCategories = _bonusManageService.GetPromoCategories().FirstOrDefault(x => x.Id == checkData.CategoryId );
             return new CheckPayoutBonusCodeRep
             {
                 HasBonusCode = true,
