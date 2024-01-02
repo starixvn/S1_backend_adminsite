@@ -1,4 +1,6 @@
-﻿using BackendSite.Service.DAL;
+﻿using Amazon.CloudFront.Model;
+
+using BackendSite.Service.DAL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
@@ -103,30 +105,27 @@ namespace BackendSite.Service.BLL
             return _bonusManageService.SetPromotionStatus(bonusCode, siteId, status, _authorizeBLL.GetAuthData().UserName);
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
+        public IEnumerable<PromoCategory> GetPromoCategories()
         {
-            return _bonusManageService.GetPromoCategories(walletType);
-        }
-        public IEnumerable<PromoCategory> GetPromoCategoriesV2(int walletType)
-        {
-            return _bonusManageService.GetPromoCategoriesV2(walletType);
+            return _bonusManageService.GetPromoCategories();
         }
 
-        public IEnumerable<TpGameType> GetTpGameList()
-        {
-            return _bonusManageService.GetTpGameList();
-        }
-
-        public IEnumerable<GetCashBackGamerep> GetCashBackGameList(string siteIds,int currencyId,int tpId, int categoryId)
+        public IEnumerable<GetCashBackGamerep> GetCashBackGameList(string siteIds, int currencyId, int categoryId)
         {
             var result = new List<GetCashBackGamerep>();
-            var tempResult = _bonusManageService.GetCashBackGameList(siteIds,currencyId, tpId, categoryId);
+            var tempResult = _bonusManageService.GetCashBackGameList(siteIds, currencyId, categoryId);
 
-            //tpId == 0,WalletType is Seamless
-            //tpId != 0,WalletType is Transfer
-            if (tpId == 0)
+
+            if (categoryId == (int)PromotionCategoryEnum.SBSW)
             {
-                //WalletType is Seamless key by tpId
+                //SBSW key by CategoryId
+                tempResult.ToList().ForEach(x =>
+                {
+                    result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.CategoryId });
+                });
+            }
+            else
+            {
                 tempResult.ToList().ForEach(x =>
                 {
                     result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.TpId });
@@ -139,14 +138,6 @@ namespace BackendSite.Service.BLL
                     result = result.Where(r => r.Key != 42).ToList();
                     result.Add(new GetCashBackGamerep { GameName = "SBO Sports", Key = 42 });
                 }
-            }
-            else
-            {
-                //WalletType is Seamless key by CategoryId
-                tempResult.ToList().ForEach(x =>
-                {
-                    result.Add(new GetCashBackGamerep { GameName = x.GameName, Key = x.CategoryId });
-                });
             }
 
             return result;

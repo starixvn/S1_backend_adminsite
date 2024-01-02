@@ -672,13 +672,9 @@ namespace BackendSite.Service.Model.enums
         SlotsGame = 1,
         LiveCasino = 2,
         Fish = 3,
-        SabaSports = 4,
         Lottery = 5,
         Sports = 6,
-        PTSlotsGame = 7,
-        PTLiveCasino = 8,
         SBSW = 9,
-        Mega888SlotRNGAndFishing = 10,
         ESports = 11
     }
 
@@ -941,7 +937,9 @@ namespace BackendSite.Service.Model.enums
         AutoPaymentRule = 92,
         DepositReferral = 93,
         EditSystemBankInfo = 94,
-        WithdrawalBlockSetting = 95
+        WithdrawalBlockSetting = 95,
+        LeaderboardPointCalculation = 97,
+        LeaderboardRankingBonus = 98
     }
 
     #region BankFinancialTransferInfoLog
@@ -1828,7 +1826,8 @@ namespace BackendSite.Service.Model.enums
         GameType = 3,
         Currency = 4,
         Player = 5,
-        TpCategory = 6
+        TpCategory = 6,
+        Brand = 7
     }
 
     /// <summary>

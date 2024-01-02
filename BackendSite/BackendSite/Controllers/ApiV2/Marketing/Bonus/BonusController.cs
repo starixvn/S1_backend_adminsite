@@ -312,6 +312,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         break;
                 }
 
+                // 檢查CashBack的PromotionCategory類型
+                if (request.PromotionInfo.PromotionType == (int)PromotionTypeEnum.Cashback
+                && !Enum.IsDefined(typeof(PromotionCategoryEnum), request.PromotionInfo.CategoryId))
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                    apiResult.Message = $"This PromotionCategory({request.PromotionInfo.CategoryId}) not support Cashback.";
+                    return apiResult;
+                }
+
                 var errorCode = _bonusManageBll.SetPromotion(request.IsAdd,
                     request.PromotionInfo,
                     request.DisplayConditionAboutVipLevel,

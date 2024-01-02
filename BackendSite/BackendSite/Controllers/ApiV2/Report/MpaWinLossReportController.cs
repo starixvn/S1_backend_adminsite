@@ -243,5 +243,38 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         #endregion
+
+        #region GroupBy Brand
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
+        public async Task<ApiResult<IEnumerable<MpaWinLossByBrandResponseToFrontEnd>>> GetWinLossByBrand(MpaWinLossRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossByBrandResponseToFrontEnd>>();
+            try
+            {
+                var responseData = await _MaMpaWinLossBll.GetMapWinLossByBrandResult(request, MpaWinLossGroupByTypeEnum.Brand);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
+        public async Task<IActionResult> GetWinLossByBrandExport(MpaWinLossRequest request)
+        {
+            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByBrandExport(request, MpaWinLossGroupByTypeEnum.Brand);
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "WinLossByBrandExport");
+        }
+
+        #endregion
     }
 }
