@@ -2696,7 +2696,7 @@ namespace BackendSite.Service.BLL.Mpa
                 var segmentStart = startDate.AddDays(i * interval.TotalDays);
                 var segmentEnd = segmentStart.AddDays(interval.TotalDays);
                 if (segmentEnd > endDate) segmentEnd = endDate;
-                tasks.Add(Task.Run(() => _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteIds, segmentStart, segmentEnd.AddSeconds(-1), format, request.MemberTypeJson(), request.DateType)));
+                tasks.Add(Task.Run(() => _mpaWinLossService.GetMapTpBetRecord<MpaTpBetRecordDto>(request.SiteIds, segmentStart, segmentEnd.AddSeconds(-1), format, request.MemberTypeJson(), request.UserNameJson(), request.DateType)));
             }
 
             await Task.WhenAll(tasks);
