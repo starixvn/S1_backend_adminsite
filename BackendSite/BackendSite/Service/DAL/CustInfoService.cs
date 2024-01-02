@@ -244,11 +244,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfos(int? custId, string userName, int? siteId)
         {
-            //先加時間 後面要整合
-            //_memberService.GetCustId,public async Task<CustomerForRisk> GetCustId
-            var endTime = DateTime.Now;
-            var startTime = endTime.AddYears(-5);
-            return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId , StartTime = startTime, EndTime = endTime}));
+            return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId}));
         }
 
         public bool SendMessageBatch(BatchPersonalMsg req)

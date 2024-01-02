@@ -245,7 +245,7 @@ namespace BackendSite.Service.BLL
 
             if (!string.IsNullOrEmpty(userName))
             {
-                var cust = await _memberService.GetCustId(null, userName, siteId, startTime, endTime);
+                var cust = await _memberService.GetCustId(null, userName, siteId);
                 if (cust == null) return null;
 
                 if (dateType == LiveRegistrationDateTypeEnum.CallRecordDate && (!custList.Any(c => c == cust.CustId)))
