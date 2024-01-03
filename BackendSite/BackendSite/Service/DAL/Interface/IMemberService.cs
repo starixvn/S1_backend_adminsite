@@ -53,5 +53,5 @@ public interface IMemberService
         string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl);
     Task<IEnumerable<CustTpGameTypeSettingDto>> GetCustTpGameTypeSettingAsync(int custId);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type);
-    Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId,DateTime startTime,DateTime endTime);
+    Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId);
 }
