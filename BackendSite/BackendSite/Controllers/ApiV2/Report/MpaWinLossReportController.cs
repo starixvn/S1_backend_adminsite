@@ -1,5 +1,4 @@
-﻿using BackendSite.ActionFilter;
-using BackendSite.Attributes;
+﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
@@ -30,7 +29,6 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        [TimeoutFilter(120000)]
         public async Task<ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>> GetWinLossByDate(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>();

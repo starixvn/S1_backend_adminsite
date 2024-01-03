@@ -1,7 +1,7 @@
 ﻿using BackendSite;
-using BackendSite.ActionFilter;
 using BackendSite.Extensions;
 using Elastic.Apm.SerilogEnricher;
+
 using Serilog;
 using Serilog.Exceptions;
 
@@ -24,10 +24,6 @@ builder.Host.UseSerilog((context, Configuration) =>
                 excludesApiEndpoints.Any(item => p.Value.ToString().Contains(item))
                 || excludesMessage.Any(item => c.MessageTemplate.ToString().Contains(item))))
         .Enrich.WithExceptionDetails();
-});
-builder.Services.AddControllersWithViews(options =>
-{
-    options.Filters.Add<TimeoutFilter>();
 });
 
 var startup = new Startup(builder.Configuration);
