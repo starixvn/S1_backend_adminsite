@@ -1,3 +1,4 @@
+using BackendSite.ActionFilter;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
@@ -132,6 +133,7 @@ namespace BackendSite
             services.DecoratorLiveRegistration();
             services.AddSingleton<ConfigBLL>();
             services.AddTransient<IUploadImageBLL, UploadImageBLL>();
+            services.AddSingleton<TimeoutFilter>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {
