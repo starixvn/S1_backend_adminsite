@@ -277,10 +277,11 @@ namespace BackendSite.Service.BLL
 
         public Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
         {
-            var key = $"TpCategory_{siteId}";
+            return GetSiteTpCategoryListAsync(siteId);
+            //var key = $"TpCategory_{siteId}";
 
-            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
-                () => GetSiteTpCategoryListAsync(siteId));
+            //return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+            //    () => GetSiteTpCategoryListAsync(siteId));
         }
 
         private async Task<IEnumerable<TpCategory>> GetSiteTpCategoryListAsync(int siteId)
