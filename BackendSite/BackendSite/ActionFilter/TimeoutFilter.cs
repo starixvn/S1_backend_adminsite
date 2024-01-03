@@ -7,10 +7,6 @@ namespace BackendSite.ActionFilter;
 public class TimeoutFilter: ActionFilterAttribute
 {
     public int Timeout { get; set; }
-    public TimeoutFilter()
-    {
-        Timeout = 120000;
-    }
     
     public TimeoutFilter(int timeout)
     {
