@@ -161,20 +161,6 @@ namespace BackendSite.Service.Model.TpMaintain
         public string CategoryName { set; get; }
     }
 
-    public class TpCategoryComparer : IEqualityComparer<TpCategory>
-    {
-        public bool Equals(TpCategory t1, TpCategory t2)
-        {
-            return (t1.CategoryId == t2.CategoryId
-                    && t1.CategoryName == t2.CategoryName);
-        }
-
-        public int GetHashCode(TpCategory t)
-        {
-            return t.CategoryName.GetHashCode();
-        }
-    }
-
     public class FilterInfo
     {
         public List<int> SiteId { get; set; }
