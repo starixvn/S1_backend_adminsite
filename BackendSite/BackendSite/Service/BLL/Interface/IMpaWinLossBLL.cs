@@ -109,4 +109,18 @@ public interface IMpaWinLossBLL
     /// <param name="groupByType"></param>
     /// <returns></returns>
     Task<IEnumerable<MpaWinLossByBrandDtoExport>> GetMpaWinLossByBrandExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    /// <summary>
+    /// api
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="groupByType"></param>
+    /// <returns></returns>
+    Task<MpaWinLossByAffiliateResponseToFrontEndWrapper> GetMapWinLossByAffiliateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    /// <summary>
+    /// api
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="groupByType"></param>
+    /// <returns></returns>
+    Task<IEnumerable<object>> GetMpaWinLossByAffiliateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 }

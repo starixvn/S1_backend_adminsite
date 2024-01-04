@@ -51,6 +51,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 data = data.Where(x => x.IsTest == 0);
             }
 
+            if (!string.IsNullOrEmpty(request.AffiliateAccount))
+            {
+                data = data.Where(x => x.AffiliateName == request.AffiliateAccount);
+            }
+
             return data;
         }
 
@@ -663,6 +668,66 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             }
 
             return result;
+        }
+
+        public static MpaWinLossByAffiliateResponseToFrontEndWrapper ToApiFormat(this Dictionary<string, MpaWinLossByAffiliateResponse> source, int rowCount)
+        {
+            var response = new MpaWinLossByAffiliateResponseToFrontEndWrapper();
+
+            var result = new List<MpaWinLossByAffiliateResponseToFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByAffiliateResponseToFrontEnd()
+                {
+                    DisplayKey = item.Key,// == null ? item.Key.UserName : item.Key.Total,
+                    SabaId = item.Value.SabaId,
+                    UserName = item.Value.UserName,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin,
+                    ClosingBalance = item.Value.ClosingBalance,
+                    DepositCount = item.Value.DepositCount,
+                    TotalDepositAmount = item.Value.TotalDepositAmount,
+                    WithDrawCount = item.Value.WithDrawCount,
+                    TotalWithDrawAmount = item.Value.TotalWithDrawAmount,
+                    TotalBonus = item.Value.TotalBonus
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByAffiliateCurrencyDetailDtoFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByAffiliateCurrencyDetailDtoFrontEnd
+                        {
+                            DisplayKey = childrenItem.Key,
+                            Data = childrenItem.Value
+                        })
+                        .ToList();
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            response.Data = result;
+            response.RowCount = rowCount;
+
+            return response;
         }
 
         #endregion

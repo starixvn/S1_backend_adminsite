@@ -1827,7 +1827,8 @@ namespace BackendSite.Service.Model.enums
         Currency = 4,
         Player = 5,
         TpCategory = 6,
-        Brand = 7
+        Brand = 7,
+        Affiliate = 8
     }
 
     /// <summary>

@@ -32,7 +32,7 @@ namespace BackendSite.Service.DAL
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
 
-            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V5", p);
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V7", p);
 
             return data;
         }
