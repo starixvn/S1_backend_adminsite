@@ -224,6 +224,9 @@ namespace BackendSite.Service.BLL
                 custInfoDetail.CustBonusSum = _bonusInfoService.GetCustBonusSum(custInfoDetail.SiteId, custId);
                 custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
                 custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
+
+                // 2024 New Year Egg
+                custInfoDetail.EggTickets = _bonusInfoService.GetEggTicket(custId);
             }
 
             return custInfoDetail;
