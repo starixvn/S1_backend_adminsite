@@ -3434,12 +3434,12 @@ namespace BackendSite.Service.BLL.Mpa
             MpaWinLossByAffiliateResponse totalItem;
 
             var result = await GetWinLossByAffiliate(request, groupByType);
-            var AffiliateAccounts = result.OriginData.Where(x => !string.IsNullOrEmpty(x.AffiliateAccount))
+            var affiliateAccounts = result.OriginData.Where(x => !string.IsNullOrEmpty(x.AffiliateAccount))
                 .Select(x => x.AffiliateAccount).Distinct();
-            foreach (var AffiliateAccount in AffiliateAccounts)
+            foreach (var affiliateAccount in affiliateAccounts)
             {
-                var dateSummary = result.AlreadyMultiplyRateData.Where(x => x.AffiliateAccount == AffiliateAccount).ToList();
-                var dateSummaryOrigin = result.OriginData.Where(x => x.AffiliateAccount == AffiliateAccount).ToList();
+                var dateSummary = result.AlreadyMultiplyRateData.Where(x => x.AffiliateAccount == affiliateAccount).ToList();
+                var dateSummaryOrigin = result.OriginData.Where(x => x.AffiliateAccount == affiliateAccount).ToList();
                 var ggr = dateSummary.Sum(x => x.GGR);
                 var betCount = dateSummary.Sum(x => x.BetCount);
 
@@ -3471,7 +3471,7 @@ namespace BackendSite.Service.BLL.Mpa
                         : 0.00m,
                     TotalBonus = dateSummary.Sum(x => x.TotalBonus),
                     CurrencyDetail = request.DisplayGroupBreakdownInOriginalCurrency
-                        ? GetOriginalCurrencyDetailByAffiliate(dateSummaryOrigin, AffiliateAccount)
+                        ? GetOriginalCurrencyDetailByAffiliate(dateSummaryOrigin, affiliateAccount)
                         : GetCurrencyDetailByAffiliate(dateSummary),
                 };
                 apiData.Add(responseItem);
@@ -3591,9 +3591,101 @@ namespace BackendSite.Service.BLL.Mpa
         /// <param name="groupByType"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Task<IEnumerable<object>> GetMpaWinLossByAffiliateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        public async Task<IEnumerable<MpaWinLossByAffiliateDtoExport>> GetMpaWinLossByAffiliateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            throw new NotImplementedException();
+            var winLossByPlayer = await GetWinLossByAffiliate(request, groupByType);
+            //var excludeUserName = new List<string>();
+            var exportData = new List<MpaWinLossByAffiliateDto>();
+            exportData.AddRange(request.DisplayGroupBreakdownInOriginalCurrency
+                ? winLossByPlayer.OriginData.Where(x => !string.IsNullOrEmpty(x.AffiliateAccount))
+                : winLossByPlayer.AlreadyMultiplyRateData.Where(x => !string.IsNullOrEmpty(x.AffiliateAccount)));
+
+            var affiliAccounts = winLossByPlayer.OriginData.Where(x => !string.IsNullOrEmpty(x.AffiliateAccount))
+                .Select(x => x.AffiliateAccount).Distinct();
+
+            foreach (var affiliAccount in affiliAccounts)
+            {
+                var dateSummary = winLossByPlayer.AlreadyMultiplyRateData.Where(x => x.AffiliateAccount == affiliAccount).ToList();
+                var validTurnOver = dateSummary.Sum(x => x.ValidTurnOver);
+                var turnOver = dateSummary.Sum(x => x.TurnOver);
+                var ggr = dateSummary.Sum(x => x.GGR);
+                var betCount = dateSummary.Sum(x => x.BetCount);
+                //if (betCount == 0) { excludeUserName.Add(userName); }
+
+                var responseItem = new MpaWinLossByAffiliateDto
+                {
+                    AffiliateAccount = dateSummary.Select(x => x.AffiliateAccount).FirstOrDefault(),
+                    TpUserName = "All",
+                    Currency = "All",
+                    UserName = "All",
+                    TurnOver = turnOver,
+                    ValidTurnOver = validTurnOver,
+                    GGR = ggr,
+                    PlayerWinLoss = dateSummary.Sum(x => x.PlayerWinLoss),
+                    BAPlayerWinLoss = dateSummary.Sum(x => x.BAPlayerWinLoss),
+                    ProgressiveWin = dateSummary.Sum(x => x.ProgressiveWin),
+                    ProgressiveBet = dateSummary.Sum(x => x.ProgressiveBet),
+                    Commission = dateSummary.Sum(x => x.Commission),
+                    BACommission = dateSummary.Sum(x => x.BACommission),
+                    BetCount = betCount,
+                    UniquePlayers = dateSummary.Where(x => betCount != 0).DistinctBy(x => x.UserName).Count(),
+                    ClosingBalance = dateSummary.Sum(x => x.ClosingBalance),
+                    DepositCount = dateSummary.Sum(x => x.DepositCount),
+                    TotalDepositAmount = dateSummary.Sum(x => x.TotalDepositAmount),
+                    WithDrawCount = dateSummary.Sum(x => x.WithDrawCount),
+                    TotalWithDrawAmount = dateSummary.Sum(x => x.TotalWithDrawAmount),
+                    AvgBetAmount = betCount != 0
+                        ? turnOver / betCount
+                        : decimal.Zero,
+
+                    Margin = validTurnOver != 0
+                        ? ggr / validTurnOver
+                        : decimal.Zero,
+                    TotalBonus = dateSummary.Sum(x => x.TotalBonus),
+                };
+
+                exportData.Add(responseItem);
+            }
+
+            exportData = request.OrderBy
+                ? exportData.OrderBy(request).ToList()
+                : exportData.OrderBy(x => x.AffiliateAccount).ThenBy(x => x.UserName).ToList();
+
+            #region total
+            var exportDataWithoutAll = exportData.Where(r => r.TpUserName != "All" && r.UserName != "All").ToList();
+            exportData.Add(new MpaWinLossByAffiliateDto()
+            {
+                UserName = "total",
+                TurnOver = exportDataWithoutAll.Sum(x => x.TurnOver),
+                ValidTurnOver = exportDataWithoutAll.Sum(x => x.ValidTurnOver),
+                GGR = exportDataWithoutAll.Sum(x => x.GGR),
+                PlayerWinLoss = exportDataWithoutAll.Sum(x => x.PlayerWinLoss),
+                BAPlayerWinLoss = exportDataWithoutAll.Sum(x => x.BAPlayerWinLoss),
+                ProgressiveWin = exportDataWithoutAll.Sum(x => x.ProgressiveWin),
+                ProgressiveBet = exportDataWithoutAll.Sum(x => x.ProgressiveBet),
+                Commission = exportDataWithoutAll.Sum(x => x.Commission),
+                BACommission = exportDataWithoutAll.Sum(x => x.BACommission),
+                BetCount = exportDataWithoutAll.Sum(x => x.BetCount),
+                ClosingBalance = exportDataWithoutAll.Sum(x => x.ClosingBalance),
+                //UniquePlayers = exportDataWithoutAll.Where(x => !excludeUserName.Contains(x.UserName)).DistinctBy(x => x.UserName).Count(),
+                UniquePlayers = exportDataWithoutAll.Sum(x => x.UniquePlayers),
+                DepositCount = exportDataWithoutAll.Sum(x => x.DepositCount),
+                TotalDepositAmount = exportDataWithoutAll.Sum(x => x.TotalDepositAmount),
+                WithDrawCount = exportDataWithoutAll.Sum(x => x.WithDrawCount),
+                TotalWithDrawAmount = exportDataWithoutAll.Sum(x => x.TotalWithDrawAmount),
+                TotalBonus = exportDataWithoutAll.Sum(x => x.TotalBonus),
+                AvgBetAmount = exportDataWithoutAll.Sum(x => x.BetCount) != 0
+                    ? (exportDataWithoutAll.Sum(x => x.TurnOver) / exportDataWithoutAll.Sum(x => x.BetCount))
+                    : 0.00m,
+
+                Margin = exportDataWithoutAll.Sum(x => x.ValidTurnOver) != 0
+                    ? exportDataWithoutAll.Sum(x => x.GGR) / exportDataWithoutAll.Sum(x => x.ValidTurnOver)
+                    : 0.00m,
+            });
+
+            #endregion
+
+            return exportData.ToExcelFormat();
         }
 
         /// <summary>

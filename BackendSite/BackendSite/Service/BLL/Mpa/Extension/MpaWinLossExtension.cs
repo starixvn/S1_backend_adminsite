@@ -338,6 +338,38 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 .ToList();
         }
 
+        public static IEnumerable<MpaWinLossByAffiliateDtoExport> ToExcelFormat(this List<MpaWinLossByAffiliateDto> originData)
+        {
+            var temp = originData.Select(item => new MpaWinLossByAffiliateDtoExport
+            {
+                AffiliateAccount = item.AffiliateAccount,
+                UserName = item.UserName,
+                TpUserName = item.TpUserName,
+                Currency = item.Currency,
+                TurnOver = Math.Round(item.TurnOver, 2).ToString("N2"),
+                ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
+                GGR = Math.Round(item.GGR, 2).ToString("N2"),
+                PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                BAPlayerWinLoss = Math.Round(item.BAPlayerWinLoss, 2).ToString("N2"),
+                ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
+                ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
+                Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                BACommission = Math.Round(item.BACommission, 2).ToString("N2"),
+                BetCount = item.BetCount,
+                AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
+                UniquePlayers = item.UniquePlayers,
+                Margin = decimal.Round((item.Margin * 100), 2).ToString() + "%",
+                DepositCount = item.DepositCount,
+                TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2).ToString("N2"),
+                WithDrawCount = item.WithDrawCount,
+                TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2).ToString("N2"),
+                ClosingBalance = Math.Round(item.ClosingBalance, 2).ToString("N2"),
+                TotalBonus = Math.Round(item.TotalBonus, 2).ToString("N2")
+            })
+                .ToList();
+            return temp;
+        }
+
         #endregion
 
         #region ToApiDataFormat
