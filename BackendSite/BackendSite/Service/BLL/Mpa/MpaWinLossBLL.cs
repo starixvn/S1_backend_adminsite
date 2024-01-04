@@ -6,7 +6,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -2712,20 +2711,6 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             data = data.Where(x => !string.IsNullOrEmpty(x.UserName)).ToList();
-            
-            // 調整顯示單位
-            foreach (var item in data.Where(item => _fixAmountMapper.ContainsKey(item.CurrencyId)))
-            {
-                var rate = _fixAmountMapper[item.CurrencyId];
-                
-                item.StakeSummary /= rate;
-                item.ValidBetSummary /= rate;
-                item.WinLossSummary /= rate;
-                item.RevenueSummary /= rate;
-                item.ProgressiveWinSummary /= rate;
-                item.ProgressiveBetSummary /= rate;
-                item.ClosingBalance /= rate;
-            }
 
             return data;
         }
@@ -2777,14 +2762,7 @@ namespace BackendSite.Service.BLL.Mpa
             {
                 originTransaction = originTransaction.Where(x => x.IsTest == 0).ToList();
             }
-
-            // 調整顯示單位
-            foreach (var item in originTransaction.Where(item => _fixAmountMapper.ContainsKey(item.CurrencyId)))
-            {
-                var rate = _fixAmountMapper[item.CurrencyId];
-                item.Amount /= rate;
-            }
-
+            
             return originTransaction;
         }
 
@@ -2832,13 +2810,6 @@ namespace BackendSite.Service.BLL.Mpa
             if (!request.IncludeTest)
             {
                 originBonus = originBonus.Where(x => x.IsTest == 0).ToList();
-            }
-
-            // 調整顯示單位
-            foreach (var item in originBonus.Where(item => _fixAmountMapper.ContainsKey(item.CurrencyId)))
-            {
-                var rate = _fixAmountMapper[item.CurrencyId];
-                item.BonusAmountClaim /= rate;
             }
 
             return originBonus;

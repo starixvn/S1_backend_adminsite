@@ -32,11 +32,6 @@ startup.ConfigureServices(builder.Services);
 //GC無法全部回收，改用其他方式重啟服務
 //builder.Services.AddHostedService<GarbageCollectCheckWorker>();
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(2);
-});
-
 var app = builder.Build();
 startup.Configure(app, builder.Environment);
 
