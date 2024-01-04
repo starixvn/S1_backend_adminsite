@@ -82,7 +82,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception ex)
             {
-                _logger.LogError("Upload to s3 Exception", ex);
+                _logger.LogError(ex, "Upload to s3 Exception");
 
                 return false;
             }
