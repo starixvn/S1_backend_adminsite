@@ -86,7 +86,6 @@ namespace BackendSite
                 });
 
             }
-            services.AddSingleton<IRabbitMQProducer, RabbitMQProducer>();
             services.AddTransient<IMemberQuery, MemberQuery>();
             services.AddTransient<IMemberCommand, MemberCommand>();
             services.AddTransient<BlockIpToS3, BlockIpToS3>();
@@ -172,7 +171,6 @@ namespace BackendSite
             services.AddOptionListByDB<ServerInfo>("Admin_ServerInfoList_Get");
             services.AddSiteConfig();
             services.AddCloudFrontImageInfo();
-            services.AddMessageQueueConnection();
             services.AddAffConfig();
         }
 
