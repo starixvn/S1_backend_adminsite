@@ -184,7 +184,8 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteIds", siteIds);
             p.Add("_CurrencyId", currencyId);
             p.Add("_CategoryId", categoryId);
-            return await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get_V2", p);
+            var result = await _reportDbClient.QueryAsync<TpGameType>("Admin_TpGameTypebyCategory_Get_V2", p);            
+            return result.DistinctBy(i => i.Type);
         }
 
         public async Task<IEnumerable<SiteTpListIfo>> GetTpListByCategoryAsync(int categoryId)

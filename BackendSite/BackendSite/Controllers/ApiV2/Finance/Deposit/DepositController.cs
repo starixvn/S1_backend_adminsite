@@ -36,7 +36,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly string _awsDepositUrl;
         private readonly string _awsDepositFolder;
         private readonly string _awsDepositBucketName;
-        private readonly IRabbitMQProducer _producer;
         private readonly VerificationRewardBLL _verificationRewardBLL;
         
 
@@ -54,7 +53,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
-            _producer = provider.GetRequiredService<IRabbitMQProducer>();
             _verificationRewardBLL = provider.GetRequiredService<VerificationRewardBLL>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");

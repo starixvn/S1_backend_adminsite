@@ -275,12 +275,12 @@ namespace BackendSite.Service.BLL
             return await _thirdPartyService.GetTpCustInfoListByCustId(custId);
         }
 
-        public Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
+        public async Task<IEnumerable<TpCategory>> GetTpCategoryListAsync(int siteId)
         {
             var key = $"TpCategory_{siteId}";
 
-            return _redisHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
-                () => GetSiteTpCategoryListAsync(siteId));
+            return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(5),
+                async () => await GetSiteTpCategoryListAsync(siteId));
         }
 
         private async Task<IEnumerable<TpCategory>> GetSiteTpCategoryListAsync(int siteId)
@@ -294,7 +294,7 @@ namespace BackendSite.Service.BLL
                     CategoryId = x.CategoryId,
                     CategoryName = x.CategoryName
                 })
-                .Distinct(new TpCategoryComparer())
+                .DistinctBy(i => i.CategoryId)
                 .OrderBy(x => x.CategoryId);
 
             return result;
