@@ -91,6 +91,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public IEnumerable<MemberTypeEnum> MemberTypes { get; set; }
 
         /// <summary>
+        /// AffiliateAccount
+        /// </summary>
+        public string AffiliateAccount { get; set; }
+
+        /// <summary>
         /// 是否包含測試資料
         /// </summary>
         public bool IncludeTest { get; set; }

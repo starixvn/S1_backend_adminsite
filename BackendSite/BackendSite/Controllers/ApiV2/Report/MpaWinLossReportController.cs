@@ -276,5 +276,37 @@ namespace BackendSite.Controllers.ApiV2.Report
         }
 
         #endregion
+
+        #region GroupBy Affiliate
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
+        public async Task<ApiListResult<MpaWinLossByAffiliateResponseToFrontEnd>> GetWinLossByAffiliate(MpaWinLossRequest request)
+        {
+            var apiResult = new ApiListResult<MpaWinLossByAffiliateResponseToFrontEnd>();
+            try
+            {
+                var response = await _MaMpaWinLossBll.GetMapWinLossByAffiliateResult(request, MpaWinLossGroupByTypeEnum.Affiliate);
+                apiResult.Data = response.Data;
+                apiResult.RowCount = response.RowCount;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
+        public async Task<IActionResult> GetWinLossByAffiliateExport(MpaWinLossRequest request)
+        {
+            var exportData = await _MaMpaWinLossBll.GetMpaWinLossByAffiliateExport(request, MpaWinLossGroupByTypeEnum.Affiliate);
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "WinLossByAffiliateExport");
+        }
+        #endregion
     }
 }

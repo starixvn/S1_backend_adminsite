@@ -51,6 +51,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 data = data.Where(x => x.IsTest == 0);
             }
 
+            if (!string.IsNullOrEmpty(request.AffiliateAccount))
+            {
+                data = data.Where(x => x.AffiliateName == request.AffiliateAccount);
+            }
+
             return data;
         }
 
@@ -331,6 +336,38 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     TotalBonus = item.Sum(x => x.WithDrawCount).ToString("N2"),
                 })
                 .ToList();
+        }
+
+        public static IEnumerable<MpaWinLossByAffiliateDtoExport> ToExcelFormat(this List<MpaWinLossByAffiliateDto> originData)
+        {
+            var temp = originData.Select(item => new MpaWinLossByAffiliateDtoExport
+            {
+                AffiliateAccount = item.AffiliateAccount,
+                UserName = item.UserName,
+                TpUserName = item.TpUserName,
+                Currency = item.Currency,
+                TurnOver = Math.Round(item.TurnOver, 2).ToString("N2"),
+                ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
+                GGR = Math.Round(item.GGR, 2).ToString("N2"),
+                PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                BAPlayerWinLoss = Math.Round(item.BAPlayerWinLoss, 2).ToString("N2"),
+                ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
+                ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
+                Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                BACommission = Math.Round(item.BACommission, 2).ToString("N2"),
+                BetCount = item.BetCount,
+                AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
+                UniquePlayers = item.UniquePlayers,
+                Margin = decimal.Round((item.Margin * 100), 2).ToString() + "%",
+                DepositCount = item.DepositCount,
+                TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2).ToString("N2"),
+                WithDrawCount = item.WithDrawCount,
+                TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2).ToString("N2"),
+                ClosingBalance = Math.Round(item.ClosingBalance, 2).ToString("N2"),
+                TotalBonus = Math.Round(item.TotalBonus, 2).ToString("N2")
+            })
+                .ToList();
+            return temp;
         }
 
         #endregion
@@ -663,6 +700,66 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             }
 
             return result;
+        }
+
+        public static MpaWinLossByAffiliateResponseToFrontEndWrapper ToApiFormat(this Dictionary<string, MpaWinLossByAffiliateResponse> source, int rowCount)
+        {
+            var response = new MpaWinLossByAffiliateResponseToFrontEndWrapper();
+
+            var result = new List<MpaWinLossByAffiliateResponseToFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByAffiliateResponseToFrontEnd()
+                {
+                    DisplayKey = item.Key,// == null ? item.Key.UserName : item.Key.Total,
+                    SabaId = item.Value.SabaId,
+                    UserName = item.Value.UserName,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin,
+                    ClosingBalance = item.Value.ClosingBalance,
+                    DepositCount = item.Value.DepositCount,
+                    TotalDepositAmount = item.Value.TotalDepositAmount,
+                    WithDrawCount = item.Value.WithDrawCount,
+                    TotalWithDrawAmount = item.Value.TotalWithDrawAmount,
+                    TotalBonus = item.Value.TotalBonus
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByAffiliateCurrencyDetailDtoFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByAffiliateCurrencyDetailDtoFrontEnd
+                        {
+                            DisplayKey = childrenItem.Key,
+                            Data = childrenItem.Value
+                        })
+                        .ToList();
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            response.Data = result;
+            response.RowCount = rowCount;
+
+            return response;
         }
 
         #endregion
