@@ -16,7 +16,6 @@ using Elastic.Apm.SqlClient;
 using Elastic.Apm.StackExchange.Redis;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using NSwag;
 using StackExchange.Redis;
 
@@ -174,11 +173,6 @@ namespace BackendSite
             services.AddCloudFrontImageInfo();
             services.AddMessageQueueConnection();
             services.AddAffConfig();
-
-            // services.Configure<KestrelServerOptions>("MpaApi", op =>
-            // {
-            //     op.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5);
-            // });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -237,9 +231,6 @@ namespace BackendSite
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}");
-                // endpoints.MapControllerRoute(
-                //     name: "MpaApi",
-                //     pattern: "apiV2/{controller=MpaWinLossReport}");
             });
 
         }

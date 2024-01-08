@@ -17,7 +17,6 @@ namespace BackendSite.Service.BLL.Mpa
         private readonly ILogger<MpaWinLossBLL> _logger;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly Common _common;
-        private readonly Dictionary<int, decimal> _fixAmountMapper;
 
         public MpaWinLossBLL(IMpaWinLossService mpaWinLossService, ICacheHelper redisHelper, IMpaCommonService mpaCommonService, ILogger<MpaWinLossBLL> logger, ServerInfoBLL serverInfoBll, Common common)
         {
@@ -27,11 +26,6 @@ namespace BackendSite.Service.BLL.Mpa
             _logger = logger;
             _serverInfoBll = serverInfoBll;
             _common = common;
-            _fixAmountMapper = new Dictionary<int, decimal>
-            {
-                {(int)CurrencyEnum.IDR, 1000m},
-                {(int)CurrencyEnum.VND, 1000m}
-            };
         }
 
         #region GropuByDate、Month
@@ -447,9 +441,7 @@ namespace BackendSite.Service.BLL.Mpa
                         {
                             SiteId = r.Key.SiteId,
                             CustId = r.Key.CustId,
-                            Date = groupByType == MpaWinLossGroupByTypeEnum.Date
-                                ? r.Key.Date
-                                : r.Key.Date,
+                            Date = r.Key.Date,
                             Currency = r.Key.Currency,
                             TurnOver = r.Sum(x => x.TurnOver),
                             ValidTurnOver = r.Sum(x => x.ValidTurnOver),
