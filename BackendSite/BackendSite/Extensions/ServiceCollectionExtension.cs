@@ -8,7 +8,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
-using RabbitMQ.Client;
 
 
 namespace BackendSite.Extensions
@@ -43,23 +42,6 @@ namespace BackendSite.Extensions
             services.AddSingleton(new MySqlClient(DataBase.Log, logger, config.GetConnectionString($"{serviceType}_LogDB")));
             services.AddSingleton(new MySqlClient(DataBase.IP, logger, config.GetConnectionString($"{serviceType}_IPTable")));
             return services;
-        }
-
-        public static void AddMessageQueueConnection(this IServiceCollection services)
-        {
-            var provider = services.BuildServiceProvider();
-            var configBll = provider.GetRequiredService<ConfigBLL>();
-            var rabbitMqConfig = configBll.GetConfigValueByEnvironment<RabbitMqConfig>("RabbitMQ");
-
-            var hostName = rabbitMqConfig.HostName;
-            var userName = rabbitMqConfig.UserName;
-            var password = rabbitMqConfig.Password;
-            services.AddSingleton<IConnectionFactory>(_ => new ConnectionFactory()
-            {
-                HostName = hostName,
-                UserName = userName,
-                Password = password
-            });
         }
 
         public static IServiceCollection AddOptionListByDB<T>(this IServiceCollection services, string sql, object parameters = null)

@@ -49,7 +49,9 @@ namespace BackendSite.Service.BLL
                 HomeSportLeaguesId = data.HomeSportLeaguesId,
                 AwaySportLeaguesId = data.AwaySportLeaguesId,
                 HomeTeamNameId = data.HomeSportTeamId,
-                AwayTeamNameId = data.AwaySportTeamId
+                AwayTeamNameId = data.AwaySportTeamId,
+                ICurrencyList = data.ICurrencyList,
+                IsLiveStreaming = data.IsLiveStreaming
             };
         }
 
@@ -71,7 +73,9 @@ namespace BackendSite.Service.BLL
                     EndTime = DatetimeFormat(r.EndTime),
                     BattleTime = DatetimeFormat(r.BattleTime),
                     LastUpdateUser = r.LastUpdateUser,
-                    LastUpdateTime = DatetimeFormat(r.LastUpdateTime)
+                    LastUpdateTime = DatetimeFormat(r.LastUpdateTime),
+                    ICurrencyList = r.ICurrencyList,
+                    IsLiveStreaming = r.IsLiveStreaming
                 }),
                 RowCount = queryResult.RowCount,
                 TotalPages = queryResult.TotalPages
