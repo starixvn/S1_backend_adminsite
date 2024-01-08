@@ -17,7 +17,7 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="mpaDateType"></param>
         /// <returns></returns>
         Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime,
-            DateTimeOffset endTime, string format, string memberTypeJson, MpaDateType mpaDateType = MpaDateType.SettledDate);
+            DateTimeOffset endTime, string format, string memberTypeJson, string userNameJson, MpaDateType mpaDateType = MpaDateType.SettledDate);
 
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace BackendSite.Service.DAL.Interface
         /// <param name="memberTypeJson"></param>
         /// <returns></returns>
         Task<IEnumerable<TResult>> GetMapTransaction<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime,
-            DateTimeOffset endTime, string format, string memberTypeJson);
+            DateTimeOffset endTime, string format, string memberTypeJson, string userNameJson);
 
 
         /// <summary>
