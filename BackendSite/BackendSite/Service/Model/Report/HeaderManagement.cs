@@ -99,8 +99,8 @@ namespace BackendSite.Service.Model.Report
         public string ProductName { get; set; }
         public int Status { get; set; }
         public HeaderIconTypeEnum IconType { get; set; }
-        public DateTime IconStartTime { get; set; }
-        public DateTime IconEndTime { get; set; }
+        public DateTimeOffset IconStartTime { get; set; }
+        public DateTimeOffset IconEndTime { get; set; }
     }
     
     public class HeaderLobbyCategory
