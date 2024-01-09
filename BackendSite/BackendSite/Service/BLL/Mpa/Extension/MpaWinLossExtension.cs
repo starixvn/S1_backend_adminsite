@@ -712,7 +712,8 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 var data = new MpaWinLossByAffiliateResponseToFrontEnd()
                 {
-                    DisplayKey = item.Key,// == null ? item.Key.UserName : item.Key.Total,
+                    DisplayKey = item.Key,
+                    Currency = item.Value.Currency,
                     SabaId = item.Value.SabaId,
                     UserName = item.Value.UserName,
                     TurnOver = item.Value.TurnOver,
