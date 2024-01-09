@@ -3460,7 +3460,6 @@ namespace BackendSite.Service.BLL.Mpa
         {
             return dateSummary.ToDictionary(k => k.UserName, v => new MpaWinLossByAffiliateCurrencyDetailDto
             {
-                UserName = v.UserName,
                 SabaId = v.TpUserName,
                 Currency = v.Currency,
                 TurnOver = v.TurnOver,
@@ -3488,7 +3487,6 @@ namespace BackendSite.Service.BLL.Mpa
             return combineResult.Where(x => x.AffiliateAccount == key)
                 .ToDictionary(k => k.UserName, v => new MpaWinLossByAffiliateCurrencyDetailDto
                 {
-                    UserName = v.UserName,
                     SabaId = v.TpUserName,
                     Currency = v.Currency,
                     TurnOver = v.TurnOver,
