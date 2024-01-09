@@ -3358,7 +3358,6 @@ namespace BackendSite.Service.BLL.Mpa
             var apiData = new List<MpaWinLossByAffiliateResponse>();
             apiData.Clear();
             var rowCount = 0;
-            //var excludeUserName = new List<string>();
             MpaWinLossByAffiliateResponse totalItem;
 
             var result = await GetWinLossByAffiliate(request, groupByType);
