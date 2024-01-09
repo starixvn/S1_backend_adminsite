@@ -1019,10 +1019,6 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
     public class MpaWinLossByAffiliateCurrencyDetailDto
     {
-
-        [JsonProperty(Order = 0)]
-        public string UserName { get; set; }
-
         [JsonProperty(Order = 1)]
         public string SabaId { get; set; }
 

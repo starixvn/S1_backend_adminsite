@@ -715,7 +715,6 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     DisplayKey = item.Key,
                     Currency = item.Value.Currency,
                     SabaId = item.Value.SabaId,
-                    UserName = item.Value.UserName,
                     TurnOver = item.Value.TurnOver,
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
