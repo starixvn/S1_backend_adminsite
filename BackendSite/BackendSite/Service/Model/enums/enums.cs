@@ -938,6 +938,7 @@ namespace BackendSite.Service.Model.enums
         DepositReferral = 93,
         EditSystemBankInfo = 94,
         WithdrawalBlockSetting = 95,
+        SetBigWinSetting = 96,
         LeaderboardPointCalculation = 97,
         LeaderboardRankingBonus = 98
     }
