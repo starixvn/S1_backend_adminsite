@@ -10,10 +10,20 @@ namespace BackendSite.Controllers.ApiV2.ProductManagement
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
     public class SlotGameGeneratorController : Controller
-    {        
-        public bool AddSlotGame(string request)
+    {
+        #region API Model
+        public class SetSlotGameRequest
         {
-            return true;
+            public int TpId { get; set; }
+        }
+        #endregion
+
+
+        [HttpPost]
+        public ApiResult AddSlotGame(SetSlotGameRequest request)
+        {
+            var result = new ApiResult();
+            return result;
         }
     }
 }
