@@ -122,8 +122,7 @@ namespace BackendSite.Service.Model
         public int CheckReceipt { set; get; }
         public string CheckReceiptBy { set; get; }
         public string Network { set; get; }
-        [JsonProperty("remark")]
-        public string Code { set; get; }
+        public string Remark { set; get; }
         public IEnumerable<DepositMessage> DepositMessageList { set; get; }
     }
 
