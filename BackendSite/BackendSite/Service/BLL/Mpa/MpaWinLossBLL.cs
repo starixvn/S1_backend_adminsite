@@ -2979,11 +2979,9 @@ namespace BackendSite.Service.BLL.Mpa
 
         private async Task<Dictionary<string, decimal>> GetMapRate(MpaWinLossRequest request)
         {
-            var rate =  (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime, request.BaseCurrencyId))
+            return (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime, request.BaseCurrencyId))
                 .Where(x => x.TargetCurrencyId == request.BaseCurrencyId)
                 .ToDictionary(k => $"{k.RateDate.ToString("yyyy-MM-dd")}{k.CurrencyId}{k.TargetCurrencyId}", v => v.Rate);
-
-            return rate;
         }
 
         #endregion
@@ -3403,11 +3401,9 @@ namespace BackendSite.Service.BLL.Mpa
                 };
                 apiData.Add(responseItem);
             }
-
             rowCount = apiData.Count;
             apiData = request.OrderBy ? apiData.OrderBy(request).ToList() : apiData;
             totalItem = GetMpaWinLossByAffiliateTotal(apiData.ToDictionary(k => k.AffiliateName, v => v));
-
             if (request.PageNumber != -1)
             {
                 var (index, count) = pageInfo.ListPagination(apiData.Count, request.PageNumber, request.PageSize);
@@ -3698,6 +3694,7 @@ namespace BackendSite.Service.BLL.Mpa
             var betRecord = await GetTpBetRecord(request, groupByType);
             var originBetRecord = GetGroupResult(betRecord.OriginBetRecord);
             var alreadyMultiplyRateBetRecord = GetGroupResult(betRecord.AlreadyMultiplyRateBetRecord);
+
 
             List<MpaWinLossByAffiliateDto> GetGroupResult(List<MpaTpBetRecordDto> source)
             {
