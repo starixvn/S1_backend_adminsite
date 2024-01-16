@@ -6,7 +6,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
-using NuGet.Protocol;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -2980,11 +2979,9 @@ namespace BackendSite.Service.BLL.Mpa
 
         private async Task<Dictionary<string, decimal>> GetMapRate(MpaWinLossRequest request)
         {
-            var rate =  (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime, request.BaseCurrencyId))
+            return (await _mpaCommonService.GetMpaExchangeRate(request.StarTime, request.EndTime, request.BaseCurrencyId))
                 .Where(x => x.TargetCurrencyId == request.BaseCurrencyId)
                 .ToDictionary(k => $"{k.RateDate.ToString("yyyy-MM-dd")}{k.CurrencyId}{k.TargetCurrencyId}", v => v.Rate);
-
-            return rate;
         }
 
         #endregion
