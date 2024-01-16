@@ -6,6 +6,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+using NuGet.Protocol;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -3363,6 +3364,9 @@ namespace BackendSite.Service.BLL.Mpa
             var result = await GetWinLossByAffiliate(request, groupByType);
             var affiliateAccounts = result.OriginData.Where(x => !string.IsNullOrEmpty(x.AffiliateAccount))
                 .Select(x => x.AffiliateAccount).Distinct();
+            string resultString = string.Join(", ", affiliateAccounts);
+            _logger.LogInformation("1"+ result.ToJson());
+            _logger.LogInformation("2"+ resultString);
             foreach (var affiliateAccount in affiliateAccounts)
             {
                 var dateSummary = result.AlreadyMultiplyRateData.Where(x => x.AffiliateAccount == affiliateAccount).ToList();
@@ -3403,11 +3407,12 @@ namespace BackendSite.Service.BLL.Mpa
                 };
                 apiData.Add(responseItem);
             }
-
+            string resultString1 = string.Join(", ", apiData);
+            _logger.LogInformation("3"+ resultString1);
             rowCount = apiData.Count;
             apiData = request.OrderBy ? apiData.OrderBy(request).ToList() : apiData;
             totalItem = GetMpaWinLossByAffiliateTotal(apiData.ToDictionary(k => k.AffiliateName, v => v));
-
+            _logger.LogInformation("4" + totalItem.ToJson());
             if (request.PageNumber != -1)
             {
                 var (index, count) = pageInfo.ListPagination(apiData.Count, request.PageNumber, request.PageSize);
@@ -3415,7 +3420,9 @@ namespace BackendSite.Service.BLL.Mpa
             }
 
             var response = apiData.ToDictionary(k => k.AffiliateName, v => v);
+            _logger.LogInformation("5" + response.ToJson());
             response.Add("Total", totalItem);
+            _logger.LogInformation("6" + response.ToJson());
             return response.ToApiFormat(rowCount);
         }
 
@@ -3698,6 +3705,9 @@ namespace BackendSite.Service.BLL.Mpa
             var betRecord = await GetTpBetRecord(request, groupByType);
             var originBetRecord = GetGroupResult(betRecord.OriginBetRecord);
             var alreadyMultiplyRateBetRecord = GetGroupResult(betRecord.AlreadyMultiplyRateBetRecord);
+
+            string resultString = string.Join(", ", originBetRecord);
+            _logger.LogInformation("0" + resultString);
 
             List<MpaWinLossByAffiliateDto> GetGroupResult(List<MpaTpBetRecordDto> source)
             {
