@@ -33,7 +33,7 @@ namespace BackendSite.Service.DAL
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
             p.Add("_UserNames", userNameJson, dbType: DbType.String);
 
-            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V6", p, 120);
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V7", p, 120);
 
             return data;
         }

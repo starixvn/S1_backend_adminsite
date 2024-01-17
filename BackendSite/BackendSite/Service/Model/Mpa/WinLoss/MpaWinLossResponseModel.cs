@@ -357,6 +357,75 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public Dictionary<string, MpaWinLossByBrandCurrencyDetailDto> CurrencyDetail { get; set; }
     }
 
+    public class MpaWinLossByAffiliateResponse
+    {
+        [JsonProperty(Order = 0)]
+        public string Currency { get; set; }
+        [JsonProperty(Order = 1)]
+        public string SabaId { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public string UserName { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public decimal TurnOver { get; set; }
+
+        [JsonProperty(Order = 4)]
+        public decimal ValidTurnOver { get; set; }
+
+        [JsonProperty(Order = 5)]
+        public decimal GGR { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public decimal PlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 7)]
+        public decimal ProgressiveWin { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public decimal ProgressiveBet { get; set; }
+
+        [JsonProperty(Order = 9)]
+        public decimal Commission { get; set; }
+
+        [JsonProperty(Order = 10)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 11)]
+        public decimal AvgBetAmount { get; set; }
+
+        [JsonProperty(Order = 12)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 13)]
+        public decimal Margin { get; set; }
+
+        [JsonProperty(Order = 14)]
+        public decimal ClosingBalance { get; set; }
+
+        [JsonProperty(Order = 15)]
+        public int DepositCount { get; set; }
+
+        [JsonProperty(Order = 16)]
+        public decimal TotalDepositAmount { get; set; }
+
+        [JsonProperty(Order = 17)]
+        public int WithDrawCount { get; set; }
+
+        [JsonProperty(Order = 18)]
+        public decimal TotalWithDrawAmount { get; set; }
+
+        [JsonProperty(Order = 19)]
+        public decimal TotalBonus { get; set; }
+
+        public decimal BAPlayerWinLoss { get; set; }
+        public decimal BACommission { get; set; }
+
+        public string AffiliateName { get; set; }
+        public Dictionary<string, MpaWinLossByAffiliateCurrencyDetailDto> CurrencyDetail { get; set; }
+        public IEnumerable<MpaWinLossByAffiliateCurrencyDetailDto> CurrencyDetailByplayer { get; set; }
+    }
+
     #region To FrontEnd API 格式
 
     public class MpaWinLossByDateResponseToFrontEnd
@@ -775,6 +844,83 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
 
         public List<MpaWinLossByBrandCurrencyDetailDtoToFrontEnd> Children { get; set; }
+    }
+
+    public class MpaWinLossByAffiliateResponseToFrontEndWrapper
+    {
+        public IEnumerable<MpaWinLossByAffiliateResponseToFrontEnd> Data { get; set; }
+
+        public int RowCount { get; set; }
+    }
+
+    public class MpaWinLossByAffiliateResponseToFrontEnd
+    {
+        [JsonProperty(Order = -1)]
+        public string DisplayKey { get; set; }
+
+        [JsonProperty(Order = 0)]
+        public string Currency { get; set; }
+        [JsonProperty(Order = 1)]
+        public string SabaId { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public decimal TurnOver { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public decimal ValidTurnOver { get; set; }
+
+        [JsonProperty(Order = 4)]
+        public decimal GGR { get; set; }
+
+        [JsonProperty(Order = 5)]
+        public decimal PlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 6)]
+        public decimal BAPlayerWinLoss { get; set; }
+
+        [JsonProperty(Order = 7)]
+        public decimal ProgressiveWin { get; set; }
+
+        [JsonProperty(Order = 8)]
+        public decimal ProgressiveBet { get; set; }
+
+        [JsonProperty(Order = 9)]
+        public decimal Commission { get; set; }
+
+        [JsonProperty(Order = 10)]
+        public decimal BACommission { get; set; }
+
+        [JsonProperty(Order = 11)]
+        public int BetCount { get; set; }
+
+        [JsonProperty(Order = 12)]
+        public decimal AvgBetAmount { get; set; }
+
+        [JsonProperty(Order = 13)]
+        public int UniquePlayers { get; set; }
+
+        [JsonProperty(Order = 14)]
+        public decimal Margin { get; set; }
+
+        [JsonProperty(Order = 15)]
+        public decimal ClosingBalance { get; set; }
+
+        [JsonProperty(Order = 16)]
+        public int DepositCount { get; set; }
+
+        [JsonProperty(Order = 17)]
+        public decimal TotalDepositAmount { get; set; }
+
+        [JsonProperty(Order = 18)]
+        public int WithDrawCount { get; set; }
+
+        [JsonProperty(Order = 19)]
+        public decimal TotalWithDrawAmount { get; set; }
+
+        [JsonProperty(Order = 20)]
+        public decimal TotalBonus { get; set; }
+
+        public List<MpaWinLossByAffiliateCurrencyDetailDtoFrontEnd> Children { get; set; }
     }
 
     #endregion
