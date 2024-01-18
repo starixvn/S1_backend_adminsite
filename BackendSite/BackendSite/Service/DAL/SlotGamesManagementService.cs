@@ -44,6 +44,25 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_SlotGameStatus_Set", parameter);
         }
 
+        public int SetNewSlotGame(int tpId, string gameId, string ename, string cname, string rtp, string reel,int fun, int device, string payline,int nextId,string sql)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_TpId", tpId, DbType.Int32);
+            parameter.Add("_GameId",gameId);
+            parameter.Add("_EName",ename);
+            parameter.Add("_CName",cname);
+            parameter.Add("_RTP", rtp);
+            parameter.Add("_Reel", reel);
+            parameter.Add("_Fun", fun, DbType.Int32);
+            parameter.Add("_Device", device, DbType.Int32);
+            parameter.Add("_Payline", payline, DbType.Int32);
+            parameter.Add("_NextId", nextId, DbType.Int32);
+            parameter.Add("_SqlStatement", sql);
+
+
+            return _mainDbClient.Execute("Admin_SlotGame_Set", parameter);
+        }
+
         public IEnumerable<SlotGame> GetSlotGameCategoryList(int siteId, int tpId, string name, string gameId, SlotGameCategoryEnum category)
         {
             var parameter = new DynamicParameters();
@@ -113,6 +132,22 @@ namespace BackendSite.Service.DAL
             parameter.Add("StatusJson", JsonConvert.SerializeObject(statusList));
 
             return _reportDbClient.Query<SlotGameInfo>("Service_SlotGame_Get", parameter).ToList();
+        }
+
+        public IEnumerable<int> GetTpCurrencyLists(int TpId)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_TpId", TpId);
+
+            return _reportDbClient.Query<int>("Service_TpCurrency_Get", parameter);
+        }
+
+        public int QueryNextGameId(int TpId)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_TpId", TpId, DbType.Int32);
+
+            return _reportDbClient.Query<int>("Admin_SlotGameNextId_Get", parameter).FirstOrDefault();
         }
     }
 }

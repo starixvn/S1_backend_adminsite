@@ -33,6 +33,14 @@ namespace BackendSite.Service.BLL
         {
             return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId, req.Status, Operator);
         }
+        public int SetNewSlotGame(SetNewSlotGameReq req)
+        {
+            var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
+            var currencyIdList = _slotGamesManagementService.GetTpCurrencyLists(req.TpId);
+            var sql = BuildInsertStatement(currencyIdList, nextId);
+
+            return _slotGamesManagementService.SetNewSlotGame(req.TpId, req.GameId, req.Ename, req.Cname, req.RTP,req.Reel, req.Fun, req.Device, req.Payline,nextId,sql);
+        }
 
         public IEnumerable<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request, out IPageInfo pageInfo)
         {
@@ -64,6 +72,28 @@ namespace BackendSite.Service.BLL
             var userSiteData = _serverInfoService.GetSiteList().First(x => x.SiteId == req.SiteId);
 
             return _slotGamesManagementService.SetSlotGameAllCurrency(req.SiteId, userSiteData.ICurrencyList, req.SlotGameId, req.Status, Operator);
+        }
+
+        private string BuildInsertStatement(IEnumerable<int> currencies, int nextId)
+        {
+            var sql = "\r\nINSERT INTO Siebog.SlotGameStatus (SiteId, CurrencyId, SlotGameId, Status, Operator) VALUES";
+            var values = "";
+
+            foreach (var currency in currencies)
+            {
+                if (currency == 51)
+                {
+                    values += $"\r\n(1, 51, {nextId}, 1, 'Admin'),";
+                    values += $"\r\n(2, 51, {nextId}, 1, 'Admin'),";
+                    values += $"\r\n(3, 51, {nextId}, 1, 'Admin'),";
+                }
+                else
+                {
+                    values += $"\r\n(1, {currency}, {nextId}, 1, 'Admin'),";
+                }
+            }
+
+            return sql+values;
         }
     }
 }

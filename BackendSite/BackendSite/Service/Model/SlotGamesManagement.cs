@@ -104,6 +104,18 @@ namespace BackendSite.Service.Model
         /// </summary>
         public SlotGameStatusEnum Status { get; set; }
     }
+    public class SetNewSlotGameReq
+    {
+        public int TpId { get; set; }
+        public string GameId { get; set; }
+        public string Ename { get; set; }
+        public string Cname { get; set; }
+        public string RTP { get; set; }
+        public string Reel { get; set; }
+        public int Device { get;set; }
+        public string Payline { get; set; }
+        public int Fun { get; set; }
+    }
     public class GetSlotGameCategoryListReq : ApiRequestPageModel
     {
         public int SiteId { get; set; }
