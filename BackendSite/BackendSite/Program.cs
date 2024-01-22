@@ -32,25 +32,11 @@ builder.Host.UseSerilog((context, Configuration) =>
 void OverrideLoggerWriteToLFile(LoggerConfiguration configuration)
 {
     const string cashSiteBrand = "Nova";
-    const string releaseEnvironment = "Release";
-    const string localEnvironment = "Local";
 
     var brand = Environment.GetEnvironmentVariable("Brand") ?? string.Empty;
     if (brand != cashSiteBrand) return;
 
-    var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-    var logFolderPrefix = string.Empty;
-
-    switch (environment)
-    {
-        case localEnvironment:
-            return;
-        case releaseEnvironment:
-            logFolderPrefix = "rls";
-            break;
-    }
-
-    var logFilePath = $"/backendsite{logFolderPrefix}/backendsite-{DateTime.Now:yyyyMMddHHmmssfff}.log";
+    var logFilePath = $"/backendsite/backendsite-{DateTime.Now:yyyyMMddHHmmssfff}.log";
     configuration
         .WriteTo.File(new JsonFormatter(),
             logFilePath,
@@ -62,9 +48,6 @@ void OverrideLoggerWriteToLFile(LoggerConfiguration configuration)
 
 var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
-
-//GC無法全部回收，改用其他方式重啟服務
-//builder.Services.AddHostedService<GarbageCollectCheckWorker>();
 
 var app = builder.Build();
 startup.Configure(app, builder.Environment);
