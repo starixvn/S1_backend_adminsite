@@ -20,6 +20,7 @@ namespace BackendSite.Service.BLL
         private readonly string _fileName;
         private readonly string _errorPageBucketName;
         private readonly MySqlClient _mainDbClient;
+        private readonly Dictionary<string, IEnumerable<string>> _maintainExcludeDomainConfig;
 
         public SiteMaintainBLL(IServiceProvider provider)
         {
@@ -28,6 +29,7 @@ namespace BackendSite.Service.BLL
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _errorPageBucketName = configBll.GetConfigValue("AWSErrorPageBucketName");
+            _maintainExcludeDomainConfig = configBll.GetConfigValuesBySiteName<IEnumerable<string>>("MaintainExcludeDomain");
 
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
@@ -52,6 +54,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
+            var excludeDomain = _maintainExcludeDomainConfig[$"{request.SiteId.GetDescription()}"];
             var siteMaintainObject = new
             {
                 request.Maintain,
@@ -59,6 +62,7 @@ namespace BackendSite.Service.BLL
                 UTCTimeStart = request.BeginTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
                 DateTimeEnd = request.EndTime.ToOffset(new TimeSpan(8, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss"),
                 UTCTimeEnd = request.EndTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
+                ExcludeDomain = excludeDomain
             };
 
             //update s3
