@@ -22,7 +22,7 @@ namespace BackendSite.Service.DAL
         }
 
         public Task<IEnumerable<TResult>> GetMapTpBetRecord<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime, DateTimeOffset endTime, string format,
-            string memberTypeJson,
+            string memberTypeJson, string userNameJson,
             MpaDateType mpaDateType = MpaDateType.SettledDate)
         {
             var p = new DynamicParameters();
@@ -31,8 +31,9 @@ namespace BackendSite.Service.DAL
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
+            p.Add("_UserNames", userNameJson, dbType: DbType.String);
 
-            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V5", p);
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByDate_Get_V7", p, 120);
 
             return data;
         }
@@ -54,7 +55,8 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryAsync<TResult>("Admin_TpBetRecordRelayGroupByPlayer_Get", p);
         }
 
-        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime, DateTimeOffset endTime, string format, string memberTypeJson)
+        public Task<IEnumerable<TResult>> GetMapTransaction<TResult>(IEnumerable<int> siteIds, DateTimeOffset starTime, DateTimeOffset endTime, string format,
+            string memberTypeJson, string userNameJson)
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", JsonConvert.SerializeObject(siteIds), dbType: DbType.String);
@@ -62,8 +64,9 @@ namespace BackendSite.Service.DAL
             p.Add("_EndTime", endTime.ToUniversalTime().DateTime, dbType: DbType.DateTime);
             p.Add("_Format", format, dbType: DbType.String);
             p.Add("_MemberTypeJson", memberTypeJson, dbType: DbType.String);
+            p.Add("_UserNames", userNameJson, dbType: DbType.String);
 
-            var data = _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get_V4", p);
+            var data = _reportDbClient.QueryAsync<TResult>("Admin_TransactionRelayGroupByDate_Get_V5", p);
             return data;
         }
 

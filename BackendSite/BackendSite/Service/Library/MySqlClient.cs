@@ -349,7 +349,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public async Task<IEnumerable<T>> QueryAsync<T>(string name, SqlMapper.IDynamicParameters parameters)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string name, SqlMapper.IDynamicParameters parameters, int? commandTimeout = null)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
@@ -357,7 +357,7 @@ namespace BackendSite.Service.Library
             {
                 var conn = HealthCheck();
                 await using var connection = new MySqlConnection(conn);
-                result = await connection.QueryAsync<T>(name, parameters, commandType: CommandType.StoredProcedure);
+                result = await connection.QueryAsync<T>(name, parameters, commandType: CommandType.StoredProcedure, commandTimeout: commandTimeout);
             }
             catch (Exception e)
             {
