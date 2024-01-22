@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
         {
             return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId, req.Status, Operator);
         }
-        public int SetNewSlotGame(SetNewSlotGameReq req)
+        public bool SetNewSlotGame(SetNewSlotGameReq req)
         {
             var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
             var currencyIdList = _slotGamesManagementService.GetTpCurrencyLists(req.TpId);
@@ -92,7 +92,7 @@ namespace BackendSite.Service.BLL
                     values += $"\r\n(1, {currency}, {nextId}, 1, 'Admin'),";
                 }
             }
-
+            values = values.TrimEnd(',') + ";";
             return sql+values;
         }
     }

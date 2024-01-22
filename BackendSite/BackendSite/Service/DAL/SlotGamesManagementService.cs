@@ -44,8 +44,13 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_SlotGameStatus_Set", parameter);
         }
 
-        public int SetNewSlotGame(int tpId, string gameId, string ename, string cname, string rtp, string reel,int fun, int device, string payline,int nextId,string sql)
+        public bool SetNewSlotGame(int tpId, string gameId, string ename, string cname, string rtp, string reel,int fun, int device, string payline,int nextId,string sql)
         {
+            using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var success = true;
+
             var parameter = new DynamicParameters();
             parameter.Add("_TpId", tpId, DbType.Int32);
             parameter.Add("_GameId",gameId);
@@ -59,8 +64,22 @@ namespace BackendSite.Service.DAL
             parameter.Add("_NextId", nextId, DbType.Int32);
             parameter.Add("_SqlStatement", sql);
 
+            var result = _mainDbClient.Execute("Admin_SlotGame_Set",trans, parameter) == 0;
+            if (!result)
+            {
+                success = false;
+            }
 
-            return _mainDbClient.Execute("Admin_SlotGame_Set", parameter);
+            if (success)
+            {
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
+            }
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            }
+
+            return success;
         }
 
         public IEnumerable<SlotGame> GetSlotGameCategoryList(int siteId, int tpId, string name, string gameId, SlotGameCategoryEnum category)
@@ -137,7 +156,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<int> GetTpCurrencyLists(int TpId)
         {
             var parameter = new DynamicParameters();
-            parameter.Add("_TpId", TpId);
+            parameter.Add("TpId", TpId);
 
             return _reportDbClient.Query<int>("Service_TpCurrency_Get", parameter);
         }
