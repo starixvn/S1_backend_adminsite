@@ -21,6 +21,7 @@ namespace BackendSite.Service.BLL
         private readonly string _errorPageBucketName;
         private readonly MySqlClient _mainDbClient;
         private readonly Dictionary<string, IEnumerable<string>> _maintainExcludeDomainConfig;
+        private readonly IEnumerable<int> _maintainJsonSyncSiteConfig;
 
         public SiteMaintainBLL(IServiceProvider provider)
         {
@@ -29,6 +30,7 @@ namespace BackendSite.Service.BLL
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _errorPageBucketName = configBll.GetConfigValue("AWSErrorPageBucketName");
+            _maintainJsonSyncSiteConfig = configBll.GetConfigValue<IEnumerable<int>>("MaintainJsonSyncSite");
             _maintainExcludeDomainConfig = configBll.GetConfigValuesBySiteName<IEnumerable<string>>("MaintainExcludeDomain");
 
             var env = provider.GetRequiredService<IWebHostEnvironment>();
@@ -79,6 +81,26 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
+            var clearCacheList = new List<string> { $"/{_fileName}" };
+
+            if (_maintainJsonSyncSiteConfig.Contains((int)request.SiteId))
+            {
+                //update s3 給前端新架構的path
+                var putNewRequest = new PutObjectRequest
+                {
+                    BucketName = _errorPageBucketName,
+                    ContentType = "application/json",
+                    InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
+                    Key = $"{request.SiteId}/{request.SiteId}/{_fileName}"
+                };
+                var putNewResponse = await _s3Helper.PutObjectAsync(putNewRequest);
+                if (!putNewResponse.HttpStatusCode.IsSuccess())
+                {
+                    return false;
+                }
+                clearCacheList.Add($"/{request.SiteId.GetDescription().ToUpper()}/{_fileName}");
+            }
+
             //clear cache
             var invalidationRequest = new CreateInvalidationRequest()
             {
@@ -88,8 +110,8 @@ namespace BackendSite.Service.BLL
                     CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
                     Paths = new Paths
                     {
-                        Quantity = 1,
-                        Items = new List<string> { $"/{_fileName}" }
+                        Quantity = clearCacheList.Count,
+                        Items = clearCacheList
                     }
                 }
             };
