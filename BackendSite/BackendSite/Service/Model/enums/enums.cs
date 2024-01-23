@@ -2000,7 +2000,8 @@ namespace BackendSite.Service.Model.enums
     {
         BannerManagement = 1,
         BonusManagement = 2,
-        NewsManagement = 3
+        NewsManagement = 3,
+        SlotGameManagement = 4
     }
     
     public enum QueueJob
