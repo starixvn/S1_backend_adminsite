@@ -19,7 +19,7 @@ namespace BackendSite.Service.Model.enums
         Wager,  //ConnectionStringWager
         Log,    //ConnectionStringLog
         IP,    //ConnectionStringIPTable
-        TestReport,
+        ReportBackupDB,
     }
 
     #region Deposit Request / Withdrawal Request For Frontend Use

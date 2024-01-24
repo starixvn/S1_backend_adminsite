@@ -18,13 +18,13 @@ public class MemberService : IMemberService
 {
     private readonly MySqlClient _sqlClienct;
     private readonly MySqlClient _mainSqlClient;
-    private readonly MySqlClient _testReportDbClient;
+    private readonly MySqlClient _reportbackupDbClient;
 
     public MemberService(IEnumerable<MySqlClient> sqlCliencts)
     {
         _sqlClienct = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Report);
         _mainSqlClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
-        _testReportDbClient = sqlCliencts.FirstOrDefault(p => p.DataBase == DataBase.TestReport);
+        _reportbackupDbClient = sqlCliencts.FirstOrDefault(p => p.DataBase == DataBase.ReportBackupDB);
     }
 
     public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList,
@@ -120,8 +120,8 @@ public class MemberService : IMemberService
     {
         var p = new DynamicParameters();
         p.Add("_CustId", custId);
-        return _testReportDbClient != null
-               ? await _testReportDbClient.RetryQueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p)
+        return _reportbackupDbClient != null
+               ? await _reportbackupDbClient.RetryQueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p)
                : await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p);
 
         //return await _sqlClienct.QueryFirstAsync<CustomerDto>("Admin_CustomerBasicInfo_Get_V2", p);
