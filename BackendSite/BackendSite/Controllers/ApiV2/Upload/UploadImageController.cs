@@ -42,7 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Upload
         }
 
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 55, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
         public async Task<ApiResult<UploadImageResponse>> SlotGameManagementAsync([FromForm] UploadSlotImageRequest uploadImageRequest)
         {
             return await HandleUploadSlotActionAsync(uploadImageRequest, UploadImageFunctionEnum.SlotGameManagement);

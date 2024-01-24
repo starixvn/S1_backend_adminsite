@@ -255,7 +255,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                var result = _slotGamesManagementBLL.SetNewSlotGame(request);
+                var result = _slotGamesManagementBLL.SetNewSlotGame(request, User.Identity.Name);
                 if (result)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Success;

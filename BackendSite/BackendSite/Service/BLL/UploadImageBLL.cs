@@ -60,7 +60,7 @@ namespace BackendSite.Service.BLL
             var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(request.File, siteCloudFrontImageInfo.UploadImagesBucketName, key);
 
             return s3UploadSuccess
-                ? UploadSuccess(request, siteCloudFrontImageInfo, key)
+                ? UploadSuccess(request, siteCloudFrontImageInfo.UploadImagesCloudFrontUrl, key)
                 : UploadFailure();
         }
 
@@ -105,7 +105,7 @@ namespace BackendSite.Service.BLL
             request.File = new FormFile(stream, 0, stream.Length, "name", "filename");
 
             var folder = $"{_environmentPrefix}/{request.TpName}/";
-            var fileName = $"{request.Ename}-{request.Lang}{ext}";
+            var fileName = $"{OrgFileNameFilter(request.Ename)}-{request.Lang}.jpg";
             var key = Path.Combine(folder, fileName);
             var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(request.File, siteCloudFrontImageInfo.UploadSlotImagesBucketName, key);
 
@@ -113,7 +113,7 @@ namespace BackendSite.Service.BLL
             stream.Dispose();
 
             return s3UploadSuccess
-                ? UploadSlotSuccess(request, siteCloudFrontImageInfo, key)
+                ? UploadSuccess(request, siteCloudFrontImageInfo.OldImageUrl, key)
                 : UploadFailure();
         }
 
@@ -125,29 +125,10 @@ namespace BackendSite.Service.BLL
         /// <param name="key"></param>
         /// <returns></returns>
         private static UploadResultDto UploadSuccess(UploadImageRequest request,
-            SiteCloudFrontImageInfo siteCloudFrontImageInfo, string key)
+            string siteCloudFrontImageInfo, string key)
         {
             var returnPath = request.ReturnFullPath
-                ? $"{siteCloudFrontImageInfo.UploadImagesCloudFrontUrl}/{key}"
-                : $"/{key}";
-
-            return new UploadResultDto(
-                success: true,
-                imagePath: returnPath,
-                message: "success");
-        }
-        /// <summary>
-        /// slotgame圖片上傳成功結果
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="siteCloudFrontImageInfo"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        private static UploadResultDto UploadSlotSuccess(UploadImageRequest request,
-            SiteCloudFrontImageInfo siteCloudFrontImageInfo, string key)
-        {
-            var returnPath = request.ReturnFullPath
-                ? $"{siteCloudFrontImageInfo.OldImageUrl}/{key}"
+                ? $"{siteCloudFrontImageInfo}/{key}"
                 : $"/{key}";
 
             return new UploadResultDto(
@@ -202,6 +183,28 @@ namespace BackendSite.Service.BLL
                 success: false,
                 imagePath: string.Empty,
                 message: "image extension not supported");
+        }
+        /// <summary>
+        /// 圖檔上傳S3檔名格式
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static string OrgFileNameFilter(string fileName)
+        {
+            return fileName.Replace(" ", "-")
+                                       .Replace("&", "-")
+                                       .Replace(":", "-")
+                                       .Replace("'", "")
+                                       .Replace("’", "")
+                                       .Replace(".", "")
+                                       .Replace("™", "")
+                                       .Replace("---", "-")
+                                       .Replace("--", "-")
+                                       .Replace("\u200B", "")
+                                       .Replace(",", "")
+                                       .Replace("?", "")
+                                       .Replace("!", "")
+                                       .ToLower();
         }
     }
 }
