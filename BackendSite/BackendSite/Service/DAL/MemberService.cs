@@ -586,7 +586,7 @@ public class MemberService : IMemberService
     public async Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status)
     {
         var p = new DynamicParameters(new { _CustId = custId, _EnableTurnoverRewardPoint = status });
-        return await _mainSqlClient.ExecuteAsync("Admin_CustInfoEnableTurnoverRewardPoint_Set", p);
+        return await _mainDbClient.ExecuteAsync("Admin_CustInfoEnableTurnoverRewardPoint_Set", p);
     }
     public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId)
     {
