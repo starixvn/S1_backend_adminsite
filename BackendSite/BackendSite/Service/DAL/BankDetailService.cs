@@ -48,8 +48,6 @@ namespace BackendSite.Service.DAL
                 ? await _reportbackupDbClient.RetryQueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para)
                 : await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para);
 
-            //var result = await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para);
-
             var totalPages = para.Get<int?>("_TotalPages") ?? 0;
             var rowCount = para.Get<int?>("_RowCount") ?? 0;
 

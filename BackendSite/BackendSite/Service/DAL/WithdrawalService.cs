@@ -135,7 +135,7 @@ namespace BackendSite.Service.DAL
         public IEnumerable<WithdrawalComments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
         {
             return _reportDbClient.Query<WithdrawalComments>("WithdrawalRequestComment_Get_V2",
-                new { WithdrawalId = withdrawalId, SiteId = siteId }, commandType: CommandType.StoredProcedure);
+                new { WithdrawalId = withdrawalId, SiteId = siteId });
         }
 
         public int SetWithdrawalLog(int withdrawalId, int siteId, string comment, int status, string Operator, MySqlTransaction trans = null)
@@ -244,8 +244,7 @@ namespace BackendSite.Service.DAL
                 _WithdrawalMethod = withdrawalMethod
             });
 
-            var depositList = _reportDbClient.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V10", p,
-                commandType: CommandType.StoredProcedure);
+            var depositList = _reportDbClient.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V10", p);
             return depositList;
         }
 
@@ -298,8 +297,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)
         {
-            var WithdrawalMinInfo = _reportDbClient.Query<WithdrawalMinInfo>("Admin_WithdrawalMinInfo_Get", new { SiteId },
-                commandType: CommandType.StoredProcedure);
+            var WithdrawalMinInfo = _reportDbClient.Query<WithdrawalMinInfo>("Admin_WithdrawalMinInfo_Get", new { SiteId });
             return WithdrawalMinInfo;
         }
 
@@ -329,8 +327,7 @@ namespace BackendSite.Service.DAL
 
         public BankSlipPic GetWithdrawalPicCount(string transId)
         {
-            var WithdrawalMinInfo = _reportDbClient.Query<BankSlipPic>("Admin_BankSlipPic_Get", new { TransId = transId },
-                commandType: CommandType.StoredProcedure).FirstOrDefault();
+            var WithdrawalMinInfo = _reportDbClient.Query<BankSlipPic>("Admin_BankSlipPic_Get", new { TransId = transId }).FirstOrDefault();
             return WithdrawalMinInfo;
         }
 
@@ -400,8 +397,7 @@ namespace BackendSite.Service.DAL
             props.Add("WithdrawalId", tempWithdrawalId);
             props.Add("SelectStatus", selectStatus);
             props.Add("CustId", custId);
-            return _reportDbClient.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get_V4", props,
-                commandType: CommandType.StoredProcedure).ToList();
+            return _reportDbClient.Query<WithdrawalTimeList>("Admin_WithdrawalStatusTimeExport_Get_V4", props).ToList();
         }
 
         public int SetWithdrawalInfoFlow(string transId,
