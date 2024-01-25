@@ -57,7 +57,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props, commandType: CommandType.StoredProcedure);
+            var result = _reportDbClient.Query<VipLevelLog>("Admin_CustVipLevelLog_Get_V4", props);
 
             totalPages = props.Get<int?>("_TotalPages") ?? 0;
             rowCount = props.Get<int?>("_RowCount") ?? 0;

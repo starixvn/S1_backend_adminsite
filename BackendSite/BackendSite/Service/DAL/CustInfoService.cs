@@ -794,9 +794,7 @@ namespace BackendSite.Service.DAL
         {
             return _reportbackupDbClient != null
                 ? _reportbackupDbClient.RetryQuery<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }))
-                : _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
-
-            //return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
+                : _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));            
         }
 
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
