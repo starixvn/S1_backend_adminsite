@@ -207,7 +207,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public async Task<IEnumerable<T>> QueryAsync<T>(string name, SqlMapper.IDynamicParameters parameters, int? commandTimeout = null)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string name, object parameters, int? commandTimeout = null)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
@@ -232,7 +232,7 @@ namespace BackendSite.Service.Library
 
         #region RetryQuery
 
-        public async Task<T> RetryQueryFirstAsync<T>(string name, object parameters)
+        public async Task<T> RetryQueryFirstAsync<T>(string name, DynamicParameters parameters)
         {
             T result;
             var sw = Stopwatch.StartNew();
@@ -240,20 +240,20 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} | {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} | {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(e, $"{name} | {SerializeDynamicParameters(parameters)}");
                 throw;
             }
 
@@ -262,7 +262,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public IEnumerable<T> RetryQuery<T>(string sql, object parameters)
+        public IEnumerable<T> RetryQuery<T>(string sql, DynamicParameters parameters)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
@@ -270,20 +270,20 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {sql} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {sql} | {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {sql} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {sql} | {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{sql} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(e, $"{sql} | {SerializeDynamicParameters(parameters)}");
                 throw;
             }
 
@@ -292,27 +292,27 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public async Task<IEnumerable<T>> RetryQueryAsync<T>(string name, object parameters)
+        public async Task<IEnumerable<T>> RetryQueryAsync<T>(string name, DynamicParameters parameters)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} | {SerializeDynamicParameters(parameters)}");
                 await using var connection = new MySqlConnection(conn);
                 result = await connection.QueryAsync<T>(name, parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} | {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(e, $"{name} | {SerializeDynamicParameters(parameters)}");
                 throw;
             }
 
@@ -502,5 +502,17 @@ namespace BackendSite.Service.Library
         }
 
         #endregion
+
+        private string SerializeDynamicParameters(DynamicParameters parameters)
+        {
+            var dictionary = new Dictionary<string, object>();
+            foreach (var paramName in parameters.ParameterNames)
+            {
+                var value = parameters.Get<dynamic>(paramName);
+                dictionary.Add(paramName, value);
+            }
+
+            return JsonConvert.SerializeObject(dictionary);
+        }
     }
 }

@@ -184,8 +184,6 @@ namespace BackendSite.Service.DAL
                 ? _reportbackupDbClient.RetryQuery<PaySetting>("Admin_PaySetting_GetList", p)
                 : _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p);
 
-            //var result = _reportDbClient.TestQuery<PaySetting>("Admin_PaySetting_GetList", p);
-
             totalPages = p.Get<int>("_TotalPages");
             rowCount = p.Get<int>("_RowCount");
 
