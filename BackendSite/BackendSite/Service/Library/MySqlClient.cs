@@ -224,7 +224,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
 
@@ -240,7 +240,7 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} | {JsonConvert.SerializeObject(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
@@ -270,7 +270,7 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn} | {sql} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {sql} | {JsonConvert.SerializeObject(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
             }
@@ -299,7 +299,7 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} | {JsonConvert.SerializeObject(parameters)}");
                 await using var connection = new MySqlConnection(conn);
                 result = await connection.QueryAsync<T>(name, parameters, commandType: CommandType.StoredProcedure);
             }
@@ -317,7 +317,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
 
@@ -415,7 +415,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
 
