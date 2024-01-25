@@ -247,7 +247,7 @@ namespace BackendSite.Service.Library
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} | {JsonConvert.SerializeObject(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
@@ -258,7 +258,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            _logger.LogInformation($"{name} {sw.Elapsed:c}");
             return result;
         }
 
@@ -277,7 +277,7 @@ namespace BackendSite.Service.Library
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn} | {sql} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {sql} | {JsonConvert.SerializeObject(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
             }
@@ -288,7 +288,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug($"{sql} {sw.Elapsed:c}");
+            _logger.LogInformation($"{sql} {sw.Elapsed:c}");
             return result;
         }
 
@@ -306,7 +306,7 @@ namespace BackendSite.Service.Library
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn} | {name} | {JsonConvert.SerializeObject(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} | {JsonConvert.SerializeObject(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
@@ -317,7 +317,7 @@ namespace BackendSite.Service.Library
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogDebug($"{name} {sw.Elapsed:c}");
+            _logger.LogInformation($"{name} {sw.Elapsed:c}");
             return result;
         }
 
