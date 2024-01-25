@@ -44,96 +44,72 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_SlotGameStatus_Set", parameter);
         }
 
-        public bool SetNewSlotGame(int tpId, string gameId, string ename, string cname, string rtp, string reel,int fun, int device, string payline,int nextId,string Operator,IEnumerable<int> currencyIdList)
+        public bool SetNewSlotGame(int tpId, string gameId, string ename, string cname, string rtp, string reel, 
+            int fun, int device, string payline, int nextId, string Operator, IEnumerable<int> currencyIdList, string opencurrencyIds)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
             var success = true;
 
-            try
-            {
-                var parameter1 = new DynamicParameters();
-                parameter1.Add("_TpId", tpId, DbType.Int32);
-                parameter1.Add("_GameId", gameId);
-                parameter1.Add("_Fun", fun, DbType.Int32);
-                parameter1.Add("_Device", device, DbType.Int32);
-                parameter1.Add("_NextId", nextId, DbType.Int32);
+            var parameter1 = new DynamicParameters();
+            parameter1.Add("_TpId", tpId, DbType.Int32);
+            parameter1.Add("_GameId", gameId);
+            parameter1.Add("_Fun", fun, DbType.Int32);
+            parameter1.Add("_Device", device, DbType.Int32);
+            parameter1.Add("_NextId", nextId, DbType.Int32);
+            parameter1.Add("_Result", dbType: DbType.Boolean, direction: ParameterDirection.Output);
 
-                var result1 = _mainDbClient.Execute("Admin_SlotGame_Set", trans, parameter1);
-                if (result1 > 0)
-                {
-                    success = true;
-                }
-
-                var parameter2 = new DynamicParameters();
-                parameter2.Add("_TpId", tpId, DbType.Int32);
-                parameter2.Add("_RTP", rtp);
-                parameter2.Add("_Reel", reel);
-                parameter2.Add("_Payline", payline, DbType.Int32);
-                parameter2.Add("_NextId", nextId, DbType.Int32);
-
-                var result2 = _mainDbClient.Execute("Admin_GameCasinoExtra_Set", trans, parameter2);
-                if (result2 > 0)
-                {
-                    success = true;
-                }
-
-                var parameter3 = new DynamicParameters();
-                parameter3.Add("_TpId", tpId, DbType.Int32);
-                parameter3.Add("_EName", ename);
-                parameter3.Add("_CName", cname);
-                parameter3.Add("_NextId", nextId, DbType.Int32);
-
-                var result3 = _mainDbClient.Execute("Admin_GameCasinoInfo_Set", trans, parameter3);
-                if (result3 > 0)
-                {
-                    success = true;
-                }
-
-                foreach (var currencyId in currencyIdList)
-                {
-                    if (currencyId == 51)
-                    {
-                        var parameter4 = new DynamicParameters();
-                        parameter4.Add("_CurrencyId", currencyId, DbType.Int32);
-                        parameter4.Add("_NextId", nextId, DbType.Int32);
-                        parameter4.Add("_Operator", Operator);
-
-                        var result4 = _mainDbClient.Execute("Admin_NewSlotGameStatus_Set", trans, parameter4);
-                        if (result4 > 0)
-                        {
-                            success = true;
-                        }
-                    }
-                    else
-                    {
-                        var parameter4 = new DynamicParameters();
-                        parameter4.Add("_CurrencyId", currencyId, DbType.Int32);
-                        parameter4.Add("_NextId", nextId, DbType.Int32);
-                        parameter4.Add("_Operator", Operator);
-
-                        var result4 = _mainDbClient.Execute("Admin_NewSlotGameStatus_Set", trans, parameter4);
-                        if (result4 > 0)
-                        {
-                            success = true;
-                        }
-                    }
-                }
-                if (success)
-                {
-                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
-                }
-                else
-                {
-                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-                }
-            }
-            catch (Exception ex)
+            var result1 = _mainDbClient.Execute("Admin_SlotGame_Set", trans, parameter1);
+            var isDuplicateGameId = parameter1.Get<byte>("_Result");//檢查gameId是否重複的結果
+            success &= result1 > 0;
+            if (isDuplicateGameId == 1)
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-                success = false;
+                throw new Exception("Duplicate GameId");
             }
+
+            var parameter2 = new DynamicParameters();
+            parameter2.Add("_TpId", tpId, DbType.Int32);
+            parameter2.Add("_RTP", rtp);
+            parameter2.Add("_Reel", reel);
+            parameter2.Add("_Payline", payline, DbType.Int32);
+            parameter2.Add("_NextId", nextId, DbType.Int32);
+
+            var result2 = _mainDbClient.Execute("Admin_GameCasinoExtra_Set", trans, parameter2);
+            success &= result2 > 0;
+
+            var parameter3 = new DynamicParameters();
+            parameter3.Add("_TpId", tpId, DbType.Int32);
+            parameter3.Add("_EName", ename);
+            parameter3.Add("_CName", cname);
+            parameter3.Add("_NextId", nextId, DbType.Int32);
+
+            var result3 = _mainDbClient.Execute("Admin_GameCasinoInfo_Set", trans, parameter3);
+            success &= result3 > 0;
+
+            foreach (var currencyId in currencyIdList)
+            {
+                var parameter4 = new DynamicParameters();
+                parameter4.Add("_CurrencyId", currencyId, DbType.Int32);
+                parameter4.Add("_Opencurrency", opencurrencyIds);
+                parameter4.Add("_NextId", nextId, DbType.Int32);
+                parameter4.Add("_Operator", Operator);
+                
+
+                var result4 = _mainDbClient.Execute("Admin_NewSlotGameStatus_Set", trans, parameter4);
+                success &= result4 > 0;
+            }
+
+            if (success)
+            {
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
+            }
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            }
+
 
             return success;
         }

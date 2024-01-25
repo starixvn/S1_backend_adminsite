@@ -2,6 +2,7 @@
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -36,9 +37,10 @@ namespace BackendSite.Service.BLL
         public bool SetNewSlotGame(SetNewSlotGameReq req,string Operator)
         {
             var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
+            //抓TP支援的currency
             var currencyIdList = _slotGamesManagementService.GetTpCurrencyLists(req.TpId);
-
-            return _slotGamesManagementService.SetNewSlotGame(req.TpId, req.GameId, req.Ename, req.Cname, req.RTP,req.Reel, req.Fun, req.Device, req.Payline,nextId,Operator,currencyIdList);
+            var opencurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
+            return _slotGamesManagementService.SetNewSlotGame(req.TpId, req.GameId, req.Ename, req.Cname, req.RTP,req.Reel, req.Fun, req.Device, req.Payline,nextId,Operator,currencyIdList, opencurrencyIds);
         }
 
         public IEnumerable<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request, out IPageInfo pageInfo)

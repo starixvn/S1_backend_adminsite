@@ -115,6 +115,7 @@ namespace BackendSite.Service.Model
         public int Device { get;set; }
         public string Payline { get; set; }
         public int Fun { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
     }
     public class GetSlotGameCategoryListReq : ApiRequestPageModel
     {
