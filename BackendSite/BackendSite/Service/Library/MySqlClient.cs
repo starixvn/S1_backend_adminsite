@@ -21,12 +21,12 @@ namespace BackendSite.Service.Library
 
         private readonly string _backupConnectionString;
 
-        private readonly ILogger _logger;
+        private readonly ILogger<MySqlClient> _logger;
 
-        public MySqlClient(DataBase dataBase, ILoggerFactory factory, string connectionString, string backupConnectionString = null)
+        public MySqlClient(IServiceProvider provider, DataBase dataBase, string connectionString, string backupConnectionString = null)
         {
             DataBase = dataBase;
-            _logger = factory.CreateLogger("MySqlClient");
+            _logger = provider.GetRequiredService<ILogger<MySqlClient>>();
             _connectionString = connectionString;
             _backupConnectionString = backupConnectionString;
         }
