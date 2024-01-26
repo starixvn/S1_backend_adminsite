@@ -16,31 +16,28 @@ namespace BackendSite.Extensions
     {
         public static IServiceCollection AddDatabaseConnection(this IServiceCollection services, IConfiguration config)
         {
-            var provider = services.BuildServiceProvider();
-            var factory = provider.GetRequiredService<ILoggerFactory>();
             var serviceType = config.GetValue<string>("ServiceType");
-
             var reportDBConn = config.GetConnectionString($"{serviceType}_ReportDB");
-            var reportBackupDB1 = config.GetConnectionString($"{serviceType}_ReportBackupDB1");       
+            var reportBackupDB1 = config.GetConnectionString($"{serviceType}_ReportBackupDB1");
             var reportBackupDB2 = config.GetConnectionString($"{serviceType}_ReportBackupDB2");
 
             //檢查是否有BackupDB連線字串
             if (!string.IsNullOrEmpty(reportBackupDB1) && !string.IsNullOrEmpty(reportBackupDB2))
             {
                 // 設定主要的ReportDB與BackupDB1
-                services.AddSingleton(new MySqlClient(DataBase.Report, factory, reportDBConn, reportBackupDB1));
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, reportDBConn, reportBackupDB1));
                 // 設定Backup，使用BackupDB1與BackupDB2
-                services.AddSingleton(new MySqlClient(DataBase.ReportBackupDB, factory, reportBackupDB1, reportBackupDB2));
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.ReportBackupDB, reportBackupDB1, reportBackupDB2));
             }
             else
             {
-                services.AddSingleton(new MySqlClient(DataBase.Report, factory, reportDBConn));
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, reportDBConn));
             }
 
-            services.AddSingleton(new MySqlClient(DataBase.Main, factory, config.GetConnectionString($"{serviceType}_MainDB")));
-            services.AddSingleton(new MySqlClient(DataBase.Wager, factory, config.GetConnectionString($"{serviceType}_WagerDB")));
-            services.AddSingleton(new MySqlClient(DataBase.Log, factory, config.GetConnectionString($"{serviceType}_LogDB")));
-            services.AddSingleton(new MySqlClient(DataBase.IP, factory, config.GetConnectionString($"{serviceType}_IPTable")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Main, config.GetConnectionString($"{serviceType}_MainDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Wager, config.GetConnectionString($"{serviceType}_WagerDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Log, config.GetConnectionString($"{serviceType}_LogDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.IP, config.GetConnectionString($"{serviceType}_IPTable")));
             return services;
         }
 
