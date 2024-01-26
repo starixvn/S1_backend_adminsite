@@ -78,11 +78,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                await Task.Run(() =>
-                {
-                    _logger.LogError(exception: e, message: name);
-                    return Task.CompletedTask;
-                });
+                _logger.LogError(e, name);
                 throw;
             }
 
@@ -110,11 +106,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                await Task.Run(() =>
-                {
-                    _logger.LogError(exception: e, message: name);
-                    return Task.CompletedTask;
-                });
+                _logger.LogError(e, name);
                 throw;
             }
 
@@ -194,11 +186,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                await Task.Run(() =>
-                {
-                    _logger.LogError(exception: e, message: name);
-                    return Task.CompletedTask;
-                });
+                _logger.LogError(e, name);
                 throw;
             }
 
@@ -240,29 +228,29 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{name} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(e, $"{name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 throw;
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
 
-        public IEnumerable<T> RetryQuery<T>(string sql, DynamicParameters parameters)
+        public IEnumerable<T> RetryQuery<T>(string name, DynamicParameters parameters)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
@@ -270,25 +258,25 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {sql} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
-                result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
+                result = connection.Query<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {sql} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
-                result = connection.Query<T>(sql, param: parameters, commandType: CommandType.StoredProcedure);
+                result = connection.Query<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{sql} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(e, $"{name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 throw;
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{sql} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
 
@@ -299,25 +287,25 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 await using var connection = new MySqlConnection(conn);
                 result = await connection.QueryAsync<T>(name, parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{name} | {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(e, $"{name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 throw;
             }
 
             LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation($"{name} {sw.Elapsed:c}");
+            _logger.LogDebug($"{name} {sw.Elapsed:c}");
             return result;
         }
 
@@ -335,11 +323,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                await Task.Run(() =>
-                {
-                    _logger.LogError(exception: e, message: name);
-                    return Task.CompletedTask;
-                });
+                _logger.LogError(e, name);
                 throw;
             }
 
@@ -362,11 +346,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                await Task.Run(() =>
-                {
-                    _logger.LogError(exception: e, message: name);
-                    return Task.CompletedTask;
-                });
+                _logger.LogError(e, name);
                 throw;
             }
 
@@ -452,11 +432,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception e)
             {
-                await Task.Run(() =>
-                {
-                    _logger.LogError(exception: e, message: name);
-                    return Task.CompletedTask;
-                });
+                _logger.LogError(e, name);
                 throw;
             }
 
