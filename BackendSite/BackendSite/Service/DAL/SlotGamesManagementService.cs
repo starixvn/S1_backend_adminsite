@@ -5,8 +5,8 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
 using Dapper;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Ocsp;
 
 namespace BackendSite.Service.DAL
 {
@@ -43,97 +43,6 @@ namespace BackendSite.Service.DAL
             parameter.Add("Operator", Operator);
 
             return _mainDbClient.Execute("Admin_SlotGameStatus_Set", parameter);
-        }
-
-        public bool SetNewSlotGame(int tpId, string gameId, string ename, string cname, string rtp, string reel, 
-            int fun, int device, string payline, int nextId, string Operator, IEnumerable<int> currencyIdList, IEnumerable<int> opencurrencyIds,IEnumerable<int> categoryIds)
-        {
-            using var conn = _mainDbClient.GetMySqlConnection();
-            conn.Open();
-            using var trans = conn.BeginTransaction();
-            var success = true;
-
-            //寫入SlotGame
-            var parameter1 = new DynamicParameters();
-            parameter1.Add("_TpId", tpId, DbType.Int32);
-            parameter1.Add("_GameId", gameId);
-            parameter1.Add("_Fun", fun, DbType.Int32);
-            parameter1.Add("_Device", device, DbType.Int32);
-            parameter1.Add("_NextId", nextId, DbType.Int32);
-            parameter1.Add("_Result", dbType: DbType.Boolean, direction: ParameterDirection.Output);
-
-            var result1 = _mainDbClient.Execute("Admin_SlotGame_Set", trans, parameter1);
-            var isDuplicateGameId = parameter1.Get<byte>("_Result");//檢查gameId是否重複的結果
-            success &= result1 > 0;
-            if (isDuplicateGameId == 1)
-            {
-                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-                throw new Exception("Duplicate GameId");
-            }
-
-            //寫入GameCasinoExtra
-            var parameter2 = new DynamicParameters();
-            parameter2.Add("_TpId", tpId, DbType.Int32);
-            parameter2.Add("_RTP", rtp);
-            parameter2.Add("_Reel", reel);
-            parameter2.Add("_Payline", payline, DbType.Int32);
-            parameter2.Add("_NextId", nextId, DbType.Int32);
-
-            var result2 = _mainDbClient.Execute("Admin_GameCasinoExtra_Set", trans, parameter2);
-            success &= result2 > 0;
-
-            //寫入GameCasinoInfo
-            var parameter3 = new DynamicParameters();
-            parameter3.Add("_TpId", tpId, DbType.Int32);
-            parameter3.Add("_EName", ename);
-            parameter3.Add("_CName", cname);
-            parameter3.Add("_NextId", nextId, DbType.Int32);
-
-            var result3 = _mainDbClient.Execute("Admin_GameCasinoInfo_Set", trans, parameter3);
-            success &= result3 > 0;
-
-            //寫入SlotGameStatus
-            foreach (var currencyId in currencyIdList)
-            {
-                var parameter4 = new DynamicParameters();
-                parameter4.Add("_CurrencyId", currencyId, DbType.Int32);
-                parameter4.Add("_Opencurrency", JsonConvert.SerializeObject(opencurrencyIds));
-                parameter4.Add("_NextId", nextId, DbType.Int32);
-                parameter4.Add("_Operator", Operator);
-                
-
-                var result4 = _mainDbClient.Execute("Admin_NewSlotGameStatus_Set", trans, parameter4);
-                success &= result4 > 0;
-            }
-
-            //寫入SlotGameDetail
-            foreach (var opencurrencyId in opencurrencyIds)
-            {
-                foreach (var categoary in categoryIds)
-                {
-                    var parameter5 = new DynamicParameters();
-                    parameter5.Add("_CurrencyId", opencurrencyId, DbType.Int32);
-                    parameter5.Add("_CategoryId",categoary,DbType.Int32);
-                    parameter5.Add("_NextId", nextId, DbType.Int32);
-                    parameter5.Add("_Operator", Operator);
-
-                    var result5 = _mainDbClient.Execute("Admin_NewSlotGameDetail_Set", trans, parameter5);
-                    success &= result5 > 0;
-                }
-            }
-
-
-            if (success)
-            {
-                _mainDbClient.CommitAndDisposeConnection(conn, trans);
-            }
-            else
-            {
-                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-            }
-
-
-            return success;
         }
 
         public IEnumerable<SlotGame> GetSlotGameCategoryList(int siteId, int tpId, string name, string gameId, SlotGameCategoryEnum category)
@@ -221,6 +130,87 @@ namespace BackendSite.Service.DAL
             parameter.Add("_TpId", TpId, DbType.Int32);
 
             return _reportDbClient.Query<int>("Admin_SlotGameNextId_Get", parameter).FirstOrDefault();
+        }
+
+        public bool SetSlotGame(int tpId, string gameId,int fun, int device, int nextId,MySqlTransaction trans = null)
+        {
+            bool success = true;
+            var parameter = new DynamicParameters();
+            parameter.Add("_TpId", tpId, DbType.Int32);
+            parameter.Add("_GameId", gameId);
+            parameter.Add("_Fun", fun, DbType.Int32);
+            parameter.Add("_Device", device, DbType.Int32);
+            parameter.Add("_NextId", nextId, DbType.Int32);
+            parameter.Add("_Result", dbType: DbType.Boolean, direction: ParameterDirection.Output);
+
+            var result = _mainDbClient.Execute("Admin_SlotGame_Set", trans, parameter);
+            var isDuplicateGameId = parameter.Get<byte>("_Result");//檢查gameId是否重複的結果
+            success &= result > 0;
+            if (isDuplicateGameId == 1)
+            {
+                success = false;
+                throw new Exception("Duplicate GameId");
+            }
+            return success;
+        }
+        public bool SetGameCasinoExtra(int tpId, string rtp, string reel, string payline, int nextId,MySqlTransaction trans = null)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_TpId", tpId, DbType.Int32);
+            parameter.Add("_RTP", rtp);
+            parameter.Add("_Reel", reel);
+            parameter.Add("_Payline", payline, DbType.Int32);
+            parameter.Add("_NextId", nextId, DbType.Int32);
+
+            return  _mainDbClient.Execute("Admin_GameCasinoExtra_Set", trans, parameter)>0;
+        }
+
+        public bool SetGameCasinoInfo(int tpId, string ename, string cname, int nextId, MySqlTransaction trans = null)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_TpId", tpId, DbType.Int32);
+            parameter.Add("_EName", ename);
+            parameter.Add("_CName", cname);
+            parameter.Add("_NextId", nextId, DbType.Int32);
+
+            return _mainDbClient.Execute("Admin_GameCasinoInfo_Set", trans, parameter)>0;
+        }
+
+        public bool SetSlotGameStatus(int nextId, string Operator, IEnumerable<int> currencyIdList, IEnumerable<int> opencurrencyIds, MySqlTransaction trans = null)
+        {
+            bool success = true;
+            foreach (var currencyId in currencyIdList)
+            {
+                var parameter = new DynamicParameters();
+                parameter.Add("_CurrencyId", currencyId, DbType.Int32);
+                parameter.Add("_Opencurrency", JsonConvert.SerializeObject(opencurrencyIds));
+                parameter.Add("_NextId", nextId, DbType.Int32);
+                parameter.Add("_Operator", Operator);
+
+                var result = _mainDbClient.Execute("Admin_NewSlotGameStatus_Set", trans, parameter);
+                success &= result > 0;
+            }
+            return success;
+        }
+
+        public bool SetSlotGameDetail(int nextId, string Operator, IEnumerable<int> opencurrencyIds, IEnumerable<int> categoryIds, MySqlTransaction trans = null)
+        {
+            bool success = true;
+            foreach (var opencurrencyId in opencurrencyIds)
+            {
+                foreach (var categoary in categoryIds)
+                {
+                    var parameter = new DynamicParameters();
+                    parameter.Add("_CurrencyId", opencurrencyId, DbType.Int32);
+                    parameter.Add("_CategoryId", categoary, DbType.Int32);
+                    parameter.Add("_NextId", nextId, DbType.Int32);
+                    parameter.Add("_Operator", Operator);
+
+                    var result5 = _mainDbClient.Execute("Admin_NewSlotGameDetail_Set", trans, parameter);
+                    success &= result5 > 0;
+                }
+            }
+            return success;
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
@@ -10,11 +10,13 @@ namespace BackendSite.Service.BLL
     {
         private readonly SlotGamesManagementService _slotGamesManagementService;
         private readonly ServerInfoService _serverInfoService;
+        private readonly MySqlClient _mainDbClient;
 
-        public SlotGamesManagementBLL(SlotGamesManagementService slotGamesManagementService, ServerInfoService serverInfoService)
+        public SlotGamesManagementBLL(SlotGamesManagementService slotGamesManagementService, ServerInfoService serverInfoService, IEnumerable<MySqlClient> dbClient)
         {
             _slotGamesManagementService = slotGamesManagementService;
             _serverInfoService = serverInfoService;
+            _mainDbClient = dbClient.FirstOrDefault(a => a.DataBase == DataBase.Main);
         }
 
         public IEnumerable<SlotGameData> GetSlotGameList(GetSlotGameListReq request, out IPageInfo pageInfo)
@@ -37,10 +39,38 @@ namespace BackendSite.Service.BLL
         public bool SetNewSlotGame(SetNewSlotGameReq req,string Operator)
         {
             var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
-            //抓TP支援的currency
+            //TP支援的currency
             var currencyIdList = _slotGamesManagementService.GetTpCurrencyLists(req.TpId);
 
-            return _slotGamesManagementService.SetNewSlotGame(req.TpId, req.GameId, req.Ename, req.Cname, req.RTP,req.Reel, req.Fun, req.Device, req.Payline,nextId,Operator,currencyIdList, req.CurrencyIds,req.CategoryIds);
+            using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var success = true;
+
+            try
+            {
+                success &= _slotGamesManagementService.SetSlotGame(req.TpId, req.GameId, req.Fun, req.Device, nextId, trans);
+                success &= _slotGamesManagementService.SetGameCasinoExtra(req.TpId, req.RTP, req.Reel, req.Payline, nextId, trans);
+                success &= _slotGamesManagementService.SetGameCasinoInfo(req.TpId, req.Ename, req.Cname, nextId, trans);
+                success &= _slotGamesManagementService.SetSlotGameStatus(nextId, Operator, currencyIdList, req.CurrencyIds, trans);
+                success &= _slotGamesManagementService.SetSlotGameDetail(nextId, Operator, req.CurrencyIds, req.CategoryIds, trans);
+            }
+            catch (Exception ex)
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                throw new Exception(ex.Message);
+            }
+            
+
+            if (success)
+            {
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
+            }
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            }
+            return success;
         }
 
         public IEnumerable<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request, out IPageInfo pageInfo)
