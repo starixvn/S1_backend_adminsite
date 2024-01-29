@@ -39,8 +39,8 @@ namespace BackendSite.Service.BLL
             var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
             //抓TP支援的currency
             var currencyIdList = _slotGamesManagementService.GetTpCurrencyLists(req.TpId);
-            var opencurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
-            return _slotGamesManagementService.SetNewSlotGame(req.TpId, req.GameId, req.Ename, req.Cname, req.RTP,req.Reel, req.Fun, req.Device, req.Payline,nextId,Operator,currencyIdList, opencurrencyIds);
+
+            return _slotGamesManagementService.SetNewSlotGame(req.TpId, req.GameId, req.Ename, req.Cname, req.RTP,req.Reel, req.Fun, req.Device, req.Payline,nextId,Operator,currencyIdList, req.CurrencyIds,req.CategoryIds);
         }
 
         public IEnumerable<SlotGameData> GetSlotGameCategoryList(GetSlotGameCategoryListReq request, out IPageInfo pageInfo)

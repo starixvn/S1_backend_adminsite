@@ -104,6 +104,7 @@ namespace BackendSite.Service.BLL
             stream.Position = 0;
             request.File = new FormFile(stream, 0, stream.Length, "name", "filename");
 
+            //圖片先放DEV路徑下，避免覆蓋正式環境圖片檔
             var folder = $"{_environmentPrefix}/{request.TpName}/";
             var fileName = $"{OrgFileNameFilter(request.Ename)}-{request.Lang}.jpg";
             var key = Path.Combine(folder, fileName);
