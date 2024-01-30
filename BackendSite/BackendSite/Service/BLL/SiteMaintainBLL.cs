@@ -71,7 +71,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
-            var excludeDomain = _maintainExcludeDomainConfig[$"{request.SiteId.GetDescription()}"];
+            var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
+            var excludeDomain = _maintainExcludeDomainConfig[$"{serverInfo.SiteName}"];
             var siteMaintainObject = new
             {
                 request.Maintain,
@@ -96,9 +97,9 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            var clearCacheList = new List<string> { $"/{request.SiteId.GetDescription().ToUpper()}/{_fileName}" };
+            var clearCacheList = new List<string> { $"/{serverInfo.SiteName.ToUpper()}/{_fileName}" };
 
-            if (_maintainJsonSyncSiteConfig.Contains((int)request.SiteId))
+            if (_maintainJsonSyncSiteConfig.Contains(request.SiteId))
             {
                 //update s3 (前端舊架構的path)
                 var putRequest = new PutObjectRequest
@@ -117,7 +118,6 @@ namespace BackendSite.Service.BLL
             }
 
             //clear cache
-            var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
             var invalidationRequest = new CreateInvalidationRequest()
             {
                 DistributionId = _siteConfig[serverInfo.SiteName].AwsCloudFrontErrorDomainID,
@@ -143,7 +143,7 @@ namespace BackendSite.Service.BLL
                     EndTime = request.EndTime,
                 };
                 var logParam = new DynamicParameters();
-                logParam.Add("_SiteId", (int)request.SiteId);
+                logParam.Add("_SiteId", request.SiteId);
                 logParam.Add("_CurrencyId", 0);
                 logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SiteMaintenance);
                 logParam.Add("_ActionType", (int)ActionType.Update);
