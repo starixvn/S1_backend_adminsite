@@ -315,7 +315,7 @@ namespace BackendSite.Service.BLL
         {
             var custInfo = await _memberService.GetCustomerBasicInfoAsync(custId);
 
-            if (custInfo.SiteId == (int)SiteEnum.NOVA88)
+            if (custInfo.SiteId == 1)
             {
                 var iovationList = await _deviceService.GetCustIovationList(custId);
                 return iovationList.Select(a => new MemberLoginDevice()

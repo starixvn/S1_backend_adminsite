@@ -20,6 +20,7 @@ namespace BackendSite.Service.BLL
         private readonly string _fileName;
         private readonly string _errorPageBucketName;
         private readonly MySqlClient _mainDbClient;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         public SiteMaintainBLL(IServiceProvider provider)
         {
@@ -32,9 +33,10 @@ namespace BackendSite.Service.BLL
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
-        public async Task<SiteMaintainResponse> GetSiteMaintain(SiteEnum site)
+        public async Task<SiteMaintainResponse> GetSiteMaintain(int site)
         {
             var putRequest = new GetObjectRequest
             {
@@ -76,9 +78,10 @@ namespace BackendSite.Service.BLL
             }
 
             //clear cache
+            var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
             var invalidationRequest = new CreateInvalidationRequest()
             {
-                DistributionId = _siteConfig[request.SiteId.GetDescription()].AwsCloudFrontErrorDomainID,
+                DistributionId = _siteConfig[serverInfo.SiteName].AwsCloudFrontErrorDomainID,
                 InvalidationBatch = new InvalidationBatch()
                 {
                     CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
@@ -171,7 +174,7 @@ namespace BackendSite.Service.BLL
 
         public class SiteMaintainRequest
         {
-            public SiteEnum SiteId { get; set; }
+            public int SiteId { get; set; }
             public bool Maintain { get; set; }
             public DateTimeOffset BeginTime { get; set; }
             public DateTimeOffset EndTime { get; set; }

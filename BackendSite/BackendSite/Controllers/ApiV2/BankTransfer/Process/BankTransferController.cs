@@ -22,6 +22,7 @@ public class BankTransferController : ControllerBase
         _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
         _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         _excelBll = provider.GetRequiredService<ExcelBLL>();
+        _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
     }
 
     #endregion
@@ -31,6 +32,7 @@ public class BankTransferController : ControllerBase
     private readonly AuthorizeBLL _authorizeBll;
     private readonly BankFinancialBLL _bankFinancialBll;
     private readonly ExcelBLL _excelBll;
+    private readonly ServerInfoBLL _serverInfoBll;
 
     #endregion
 
@@ -137,16 +139,17 @@ public class BankTransferController : ControllerBase
     public async Task<ApiResult> Set([FromForm] BankTransferInfoSetRequest request)
     {
         var authData = _authorizeBll.GetAuthData();
+        var siteName = _serverInfoBll.GetServerInfo(request.SiteId).SiteName;
         var detail = new BankFinancialTransferInfoTransDetailModel
         {
             TransferId = request.TransferId,
             TransDate = request.TransDate,
             TransactionType = request.TransactionType,
             TransferType = request.TransferType,
-            FromSiteId = (int)request.SiteId,
-            FromSiteName = request.SiteId.GetDescription(),
-            ToSiteId = (int)request.SiteId,
-            ToSiteName = request.SiteId.GetDescription(),
+            FromSiteId = request.SiteId,
+            FromSiteName = siteName,
+            ToSiteId = request.SiteId,
+            ToSiteName = siteName,
             FromChannel = request.FromChannel,
             FromAgent = request.FromAgent,
             FromPayId = request.FromPayId,
