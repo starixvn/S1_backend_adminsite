@@ -1,5 +1,4 @@
 ﻿using System.Net;
-
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -113,7 +112,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<DeviceUser>> GetDeviceUserList(int siteId, string deviceId)
         {
-            if (siteId == (int)SiteEnum.NOVA88)
+            if (siteId == 1)
                 return await _blockService.GetIoavationAssociatedList(deviceId);
             return await _blockService.GetShieldAssociatedList(deviceId);
         }

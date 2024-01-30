@@ -1,5 +1,4 @@
 ﻿using System.Transactions;
-
 using BackendSite.Extensions;
 using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
@@ -8,11 +7,8 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
-
 using Newtonsoft.Json;
-
 using NPOI.XSSF.UserModel;
-
 using NuGet.Packaging;
 using static BackendSite.Controllers.ApiV2.Finance.Adjustment.BalanceAdjustmentController;
 
@@ -32,7 +28,8 @@ namespace BackendSite.Service.BLL
         private readonly string _bucketUrl;
         private readonly string _folder;
         private readonly Cryptor _cryptor;
-
+        private readonly ServerInfoBLL _serverInfoBll;
+        
         #endregion
 
         #region Constructors
@@ -50,6 +47,7 @@ namespace BackendSite.Service.BLL
             _bucketUrl = configBll.GetConfigValue("AWSBackOfficeBucketUrl");
             _folder = configBll.GetConfigValue("AWSFinanceFolderName");
             _cryptor = provider.GetRequiredService<Cryptor>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -116,7 +114,7 @@ namespace BackendSite.Service.BLL
             var affectTransferData = 0;
             var oldData = new BankFinancialTransferAccountDetailModel();
             var isCreate = input.Id == 0;
-            var siteIds = ((SiteEnum[])Enum.GetValues(typeof(SiteEnum))).Select(x => (int)x);
+            var siteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
 
             if (!CheckParameterForSetTransferAccount(input, siteIds, out var message))
             {

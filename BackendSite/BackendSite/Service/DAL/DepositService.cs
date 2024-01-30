@@ -88,14 +88,19 @@ namespace BackendSite.Service.DAL
                 PayIds = payIds.Any() ? JsonConvert.SerializeObject(payIds) : null,
             });
 
-            currencyAmountRecord = _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
+            currencyAmountRecord = _reportbackupDbClient != null
+                ? _reportbackupDbClient.RetryQuery<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList()
+                : _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
+
 
             p.Add("PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
             p.Add("StartIndex", Math.Abs(pageNumber - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V13", p);
+            var depositList = _reportbackupDbClient != null
+                ? _reportbackupDbClient.RetryQuery<DepositRequest>("Admin_DepositList_Get_V13", p)
+                : _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V13", p);
 
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;

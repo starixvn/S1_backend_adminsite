@@ -1598,22 +1598,7 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-    public enum SiteEnum
-    {
-        [Description("Nova88")]
-        NOVA88 = 1,
-        [Description("Goal123")]
-        GOAL123 = 2,
-        [Description("Bwing")]
-        BWING = 3,
-        [Description("Soon88")]
-        SOON88 = 4,
-        [Description("Ivorysport")]
-        IVORYSPORT = 5,
-        [Description("Yashbet")]
-        YASHBET = 6
-    }
-
+    
     public enum AffSiteEnum
     {
         N88 = 1,
