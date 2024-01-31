@@ -940,7 +940,8 @@ namespace BackendSite.Service.Model.enums
         WithdrawalBlockSetting = 95,
         SetBigWinSetting = 96,
         LeaderboardPointCalculation = 97,
-        LeaderboardRankingBonus = 98
+        LeaderboardRankingBonus = 98,
+        SetSlotGame = 99
     }
 
     #region BankFinancialTransferInfoLog

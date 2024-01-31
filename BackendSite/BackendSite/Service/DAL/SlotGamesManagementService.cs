@@ -212,5 +212,29 @@ namespace BackendSite.Service.DAL
             }
             return success;
         }
+
+        public bool SetSlotGameLog(SetNewSlotGameReq req, string Operator, MySqlTransaction trans)
+        {
+            var log = new
+            {
+                TpId = req.TpId,
+                GameId = req.GameId,
+                Currency = req.CurrencyIds,
+                Category = req.CategoryIds,
+            };
+            var logParam = new DynamicParameters();
+            logParam.Add("_SiteId", 0);
+            logParam.Add("_CustId", 0);
+            logParam.Add("_CurrencyId", 0);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.SetSlotGame);
+            logParam.Add("_ActionType",(int)ActionType.Create);
+            logParam.Add("_RefTransId", string.Empty);
+            logParam.Add("_AfterDetailInfo", JsonConvert.SerializeObject(log));
+            logParam.Add("_BeforeDetailInfo", null,DbType.String);
+            logParam.Add("_Operator", Operator);
+
+            var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins_V2", trans, logParam) > 0;
+            return logResult;
+        }
     }
 }

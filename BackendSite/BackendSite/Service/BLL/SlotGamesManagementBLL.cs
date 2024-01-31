@@ -36,8 +36,9 @@ namespace BackendSite.Service.BLL
         {
             return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId, req.Status, Operator);
         }
-        public bool SetNewSlotGame(SetNewSlotGameReq req,string Operator)
+        public bool SetNewSlotGame(SetNewSlotGameReq req, string Operator)
         {
+            //取得下一個slotgameId
             var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
             //TP支援的currency
             var currencyIdList = _slotGamesManagementService.GetTpCurrencyLists(req.TpId);
@@ -60,10 +61,11 @@ namespace BackendSite.Service.BLL
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 throw new Exception(ex.Message);
             }
-            
+
 
             if (success)
             {
+                var logResult = _slotGamesManagementService.SetSlotGameLog(req, Operator, trans);
                 _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
