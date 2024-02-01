@@ -90,28 +90,16 @@ namespace BackendSite.Service.BLL
             }
 
             // 尺寸調整
-            var imageStream = request.File.OpenReadStream();
-            var image = Image.Load(imageStream);
-
-            var resizedImage = image.Clone(ctx => ctx.Resize(new ResizeOptions
-            {
-                Size = new Size(request.size, request.size),
-                Mode = ResizeMode.Max
-            }));
-
-            var stream = new MemoryStream();
-            resizedImage.Save(stream, new JpegEncoder());
-            stream.Position = 0;
-            request.File = new FormFile(stream, 0, stream.Length, "name", "filename");
+            var resizeImg = Resize(request.File, request.size, request.size);
+            
 
             //圖片先放DEV路徑下，避免覆蓋正式環境圖片檔
             var folder = $"{_environmentPrefix}/{request.TpName}/";
-            var fileName = $"{OrgFileNameFilter(request.Ename)}-{request.Lang}.jpg";
+            var fileName = $"{OrgFileNameFilter(request.ENname)}-{request.Lang}.jpg";
             var key = Path.Combine(folder, fileName);
-            var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(request.File, siteCloudFrontImageInfo.UploadSlotImagesBucketName, key);
+            var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(resizeImg, siteCloudFrontImageInfo.UploadSlotImagesBucketName, key);
 
-            stream.Close();
-            stream.Dispose();
+            
 
             return s3UploadSuccess
                 ? UploadSuccess(request, siteCloudFrontImageInfo.OldImageUrl, key)
@@ -206,6 +194,26 @@ namespace BackendSite.Service.BLL
                                        .Replace("?", "")
                                        .Replace("!", "")
                                        .ToLower();
+        }
+
+        private IFormFile Resize(IFormFile file,int widthsize,int hightsize,string name = "name",string filename = "filename")
+        {
+            var imageStream = file.OpenReadStream();
+            var img = Image.Load(imageStream);
+
+            var resizedImage = img.Clone(ctx => ctx.Resize(new ResizeOptions
+            {
+                Size = new Size(widthsize, hightsize),
+                Mode = ResizeMode.BoxPad
+            }));
+
+            var stream = new MemoryStream();
+            resizedImage.Save(stream, new JpegEncoder());
+            stream.Position = 0;
+            file = new FormFile(stream, 0, stream.Length, name, filename);
+            
+
+            return file;
         }
     }
 }

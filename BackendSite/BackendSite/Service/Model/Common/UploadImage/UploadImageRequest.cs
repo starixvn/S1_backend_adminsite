@@ -16,7 +16,7 @@ namespace BackendSite.Service.Model.Common.UploadImage
     public class UploadSlotImageRequest : UploadImageRequest
     {
         public string TpName { get; set; }
-        public string Ename { get; set; }
+        public string ENname { get; set; }
         public string Lang { get; set; }
         public int size { get; set; } 
 

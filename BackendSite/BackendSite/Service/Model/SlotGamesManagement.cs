@@ -108,8 +108,8 @@ namespace BackendSite.Service.Model
     {
         public int TpId { get; set; }
         public string GameId { get; set; }
-        public string Ename { get; set; }
-        public string Cname { get; set; }
+        public string ENname { get; set; }
+        public string CSname { get; set; }
         public string RTP { get; set; }
         public string Reel { get; set; }
         public int Device { get;set; }
@@ -264,5 +264,11 @@ namespace BackendSite.Service.Model
         public int Sort { get; set; } = 99999;
         // 最外層不分TpId排序
         public int Top { get; set; } = 99999;
+    }
+
+    public class SiteCurrencyList
+    {
+        public int SiteId { get;set; }
+        public int CurrencyId { get;set; }
     }
 }

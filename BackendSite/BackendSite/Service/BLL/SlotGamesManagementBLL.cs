@@ -32,17 +32,16 @@ namespace BackendSite.Service.BLL
             return data.GetRange(index, count);
         }
 
-        public int SetSlotGame(SetSlotGameReq req, string Operator)
+        public int SetSlotGame(SetSlotGameReq req, string @operator)
         {
-            return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId, req.Status, Operator);
+            return _slotGamesManagementService.SetSlotGame(req.SiteId, req.CurrencyId, req.SlotGameId, req.Status, @operator);
         }
-        public bool SetNewSlotGame(SetNewSlotGameReq req, string Operator)
+        public bool SetNewSlotGame(SetNewSlotGameReq req, string @operator)
         {
             //取得下一個slotgameId
             var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
-            //TP支援的currency
-            var currencyIdList = _slotGamesManagementService.GetTpCurrencyLists(req.TpId);
-
+            //TP支援的currency & site
+            var sitecurrencyList = _slotGamesManagementService.GetTpSiteCurrencyList(req.TpId);
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -52,9 +51,10 @@ namespace BackendSite.Service.BLL
             {
                 success &= _slotGamesManagementService.SetSlotGame(req.TpId, req.GameId, req.Fun, req.Device, nextId, trans);
                 success &= _slotGamesManagementService.SetGameCasinoExtra(req.TpId, req.RTP, req.Reel, req.Payline, nextId, trans);
-                success &= _slotGamesManagementService.SetGameCasinoInfo(req.TpId, req.Ename, req.Cname, nextId, trans);
-                success &= _slotGamesManagementService.SetSlotGameStatus(nextId, Operator, currencyIdList, req.CurrencyIds, trans);
-                success &= _slotGamesManagementService.SetSlotGameDetail(nextId, Operator, req.CurrencyIds, req.CategoryIds, trans);
+                success &= _slotGamesManagementService.SetGameCasinoInfo(req.TpId, req.ENname, req.CSname, nextId, trans);
+                success &= _slotGamesManagementService.SetSlotGameStatus(nextId, @operator, sitecurrencyList, req.CurrencyIds, trans);
+                success &= _slotGamesManagementService.SetSlotGameDetail(nextId, @operator, sitecurrencyList, req.CurrencyIds, req.CategoryIds, trans);
+                _slotGamesManagementService.SetSlotGameLog(req, @operator, trans);
             }
             catch (Exception ex)
             {
@@ -65,7 +65,6 @@ namespace BackendSite.Service.BLL
 
             if (success)
             {
-                var logResult = _slotGamesManagementService.SetSlotGameLog(req, Operator, trans);
                 _mainDbClient.CommitAndDisposeConnection(conn, trans);
             }
             else
@@ -90,9 +89,9 @@ namespace BackendSite.Service.BLL
             return data.GetRange(index, count);
         }
 
-        public int SetSlotGameCategory(SetSlotGameCategoryReq req, string Operator)
+        public int SetSlotGameCategory(SetSlotGameCategoryReq req, string @operator)
         {
-            return _slotGamesManagementService.SetSlotGameCategory(req.SiteId, req.CurrencyId, req.SlotGameId, (int)req.CategoryId, req.Status, Operator);
+            return _slotGamesManagementService.SetSlotGameCategory(req.SiteId, req.CurrencyId, req.SlotGameId, (int)req.CategoryId, req.Status, @operator);
         }
 
         private IEnumerable<SlotGameData> SortSlotGamesList(IEnumerable<SlotGameData> list)
@@ -100,11 +99,11 @@ namespace BackendSite.Service.BLL
             return list.OrderByDescending(i => i.CurrencyStatusList.Any(i => i.Status == (int)SlotGameStatusEnum.Open));
         }
 
-        public bool SetSlotGameAllCurrency(SetSlotGameReq req, string Operator)
+        public bool SetSlotGameAllCurrency(SetSlotGameReq req, string @operator)
         {
             var userSiteData = _serverInfoService.GetSiteList().First(x => x.SiteId == req.SiteId);
 
-            return _slotGamesManagementService.SetSlotGameAllCurrency(req.SiteId, userSiteData.ICurrencyList, req.SlotGameId, req.Status, Operator);
+            return _slotGamesManagementService.SetSlotGameAllCurrency(req.SiteId, userSiteData.ICurrencyList, req.SlotGameId, req.Status, @operator);
         }
     }
 }
