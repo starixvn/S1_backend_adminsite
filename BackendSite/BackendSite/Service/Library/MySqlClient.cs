@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using MySql.Data.MySqlClient;
 
 using Serilog.Context;
+using BackendSite.Service.Model;
 
 namespace BackendSite.Service.Library
 {
@@ -19,36 +20,56 @@ namespace BackendSite.Service.Library
 
         private readonly string _connectionString;
 
-        private readonly string _backupConnectionString;
+        private readonly IEnumerable<string> _backupConnectionStringList;
 
         private readonly ILogger<MySqlClient> _logger;
 
-        public MySqlClient(IServiceProvider provider, DataBase dataBase, string connectionString, string backupConnectionString = null)
+        public MySqlClient(IServiceProvider provider, DataBase dataBase, string connectionString)
         {
             DataBase = dataBase;
             _logger = provider.GetRequiredService<ILogger<MySqlClient>>();
             _connectionString = connectionString;
-            _backupConnectionString = backupConnectionString;
+            _backupConnectionStringList = null;
+        }
+
+        public MySqlClient(IServiceProvider provider, DataBase dataBase, string connectionString, IEnumerable<string> backupConnectionStringList)
+        {
+            DataBase = dataBase;
+            _logger = provider.GetRequiredService<ILogger<MySqlClient>>();
+            _connectionString = connectionString;
+            _backupConnectionStringList = backupConnectionStringList;
         }
 
         private string HealthCheck()
-        {
-            if (_backupConnectionString == null)
+        {            
+            if (_backupConnectionStringList == null)
             {
                 return _connectionString;
             }
 
-            try
+            foreach (var backupConn in _backupConnectionStringList)
             {
-                using var connection = new MySqlConnection(_connectionString);
-                var check = connection.QueryFirst<bool>("Service_HealthCheck", commandType: CommandType.StoredProcedure);
-                return check ? _connectionString : _backupConnectionString;
+                try
+                {
+                    using var connection = new MySqlConnection(backupConn);
+                    var dbSlaveStatus = connection.QueryFirstOrDefault<DBSlaveStatus>("Service_HealthCheck_V2", commandType: CommandType.StoredProcedure);
+
+                    // 拿不到Status或延遲太久都換下一個連線
+                    if (dbSlaveStatus == null || dbSlaveStatus.Seconds_Behind_Master > 180)
+                    {
+                        continue;
+                    }
+
+                    return backupConn;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"{backupConn} HealthCheck Exception");
+                }           
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "HealthCheck Exception");
-                return _backupConnectionString;
-            }
+
+            // 前面連線檢查都有問題，用最後一個連線
+            return _backupConnectionStringList.Last();
         }
 
         public MySqlConnection GetMySqlConnection()
