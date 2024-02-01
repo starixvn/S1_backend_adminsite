@@ -64,7 +64,7 @@ namespace BackendSite.Service.Library
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, $"{backupConn} HealthCheck Exception");
+                    _logger.LogError(e, $"{ReplaceDBString(backupConn)} HealthCheck Exception");
                 }           
             }
 
@@ -249,14 +249,14 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
+                _logger.LogInformation($"DB {ReplaceDBString(conn)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {ReplaceDBString(conn)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryFirstOrDefaultAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
@@ -279,14 +279,14 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
+                _logger.LogInformation($"DB {ReplaceDBString(conn)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = connection.Query<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {ReplaceDBString(conn)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = connection.Query<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
@@ -308,14 +308,14 @@ namespace BackendSite.Service.Library
             try
             {
                 var conn = HealthCheck();
-                _logger.LogInformation($"DB {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
+                _logger.LogInformation($"DB {ReplaceDBString(conn)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 await using var connection = new MySqlConnection(conn);
                 result = await connection.QueryAsync<T>(name, parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
                 var conn = HealthCheck();
-                _logger.LogError(sqlEx, $"DBRetry {conn.Substring(0, 30)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
+                _logger.LogError(sqlEx, $"DBRetry {ReplaceDBString(conn)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = await connection.QueryAsync<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
@@ -510,6 +510,11 @@ namespace BackendSite.Service.Library
             }
 
             return JsonConvert.SerializeObject(dictionary);
+        }
+
+        private string ReplaceDBString(string conn)
+        {
+            return conn.Substring(0, 28);
         }
     }
 }
