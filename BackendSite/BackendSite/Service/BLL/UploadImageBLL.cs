@@ -196,14 +196,14 @@ namespace BackendSite.Service.BLL
                                        .ToLower();
         }
 
-        private IFormFile Resize(IFormFile file,int widthsize,int hightsize,string name = "name",string filename = "filename")
+        private IFormFile Resize(IFormFile file,int widthSize,int hightSize,string name = "name",string filename = "filename")
         {
             var imageStream = file.OpenReadStream();
             var img = Image.Load(imageStream);
 
             var resizedImage = img.Clone(ctx => ctx.Resize(new ResizeOptions
             {
-                Size = new Size(widthsize, hightsize),
+                Size = new Size(widthSize, hightSize),
                 Mode = ResizeMode.BoxPad
             }));
 

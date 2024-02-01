@@ -41,7 +41,7 @@ namespace BackendSite.Service.BLL
             //取得下一個slotgameId
             var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
             //TP支援的currency & site
-            var sitecurrencyList = _slotGamesManagementService.GetTpSiteCurrencyList(req.TpId);
+            var siteCurrencyList = _slotGamesManagementService.GetTpSiteCurrencyList(req.TpId);
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -52,8 +52,8 @@ namespace BackendSite.Service.BLL
                 success &= _slotGamesManagementService.SetSlotGame(req.TpId, req.GameId, req.Fun, req.Device, nextId, trans);
                 success &= _slotGamesManagementService.SetGameCasinoExtra(req.TpId, req.RTP, req.Reel, req.Payline, nextId, trans);
                 success &= _slotGamesManagementService.SetGameCasinoInfo(req.TpId, req.ENname, req.CSname, nextId, trans);
-                success &= _slotGamesManagementService.SetSlotGameStatus(nextId, @operator, sitecurrencyList, req.CurrencyIds, trans);
-                success &= _slotGamesManagementService.SetSlotGameDetail(nextId, @operator, sitecurrencyList, req.CurrencyIds, req.CategoryIds, trans);
+                success &= _slotGamesManagementService.SetSlotGameStatus(nextId, @operator, siteCurrencyList, req.CurrencyIds, trans);
+                success &= _slotGamesManagementService.SetSlotGameDetail(nextId, @operator, siteCurrencyList, req.CurrencyIds, req.CategoryIds, trans);
                 _slotGamesManagementService.SetSlotGameLog(req, @operator, trans);
             }
             catch (Exception ex)

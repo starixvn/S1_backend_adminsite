@@ -182,42 +182,29 @@ namespace BackendSite.Service.DAL
 
         public bool SetSlotGameStatus(int nextId, string @operator, IEnumerable<SiteCurrencyList> sitecurrencyList, IEnumerable<int> opencurrencyIds, MySqlTransaction trans)
         {
-            bool success = true;
+            var success = true;
 
             foreach (var item in sitecurrencyList)
             {
-                //判斷currency是否開啟
-                if (opencurrencyIds.Contains(item.CurrencyId))
-                {
-                    var parameter = new DynamicParameters();
-                    parameter.Add("_SiteId", item.SiteId, DbType.Int32);
-                    parameter.Add("_CurrencyId", item.CurrencyId, DbType.Int32);
-                    parameter.Add("_Status", 1, DbType.Int32);
-                    parameter.Add("_NextId", nextId, DbType.Int32);
-                    parameter.Add("_Operator", @operator);
+                //判斷currency是否開啟，若開啟status為1
+                var status = opencurrencyIds.Contains(item.CurrencyId) ? 1 : 0;
+                
+                var parameter = new DynamicParameters();
+                parameter.Add("_SiteId", item.SiteId, DbType.Int32);
+                parameter.Add("_CurrencyId", item.CurrencyId, DbType.Int32);
+                parameter.Add("_Status", status, DbType.Int32);
+                parameter.Add("_NextId", nextId, DbType.Int32);
+                parameter.Add("_Operator", @operator);
 
-                    var result = _mainDbClient.Execute("Admin_NewSlotGameStatus_Set", trans, parameter);
-                    success &= result > 0;
-                }
-                else
-                {
-                    var parameter = new DynamicParameters();
-                    parameter.Add("_SiteId", item.SiteId, DbType.Int32);
-                    parameter.Add("_CurrencyId", item.CurrencyId, DbType.Int32);
-                    parameter.Add("_Status", 0, DbType.Int32);
-                    parameter.Add("_NextId", nextId, DbType.Int32);
-                    parameter.Add("_Operator", @operator);
-
-                    var result = _mainDbClient.Execute("Admin_NewSlotGameStatus_Set", trans, parameter);
-                    success &= result > 0;
-                }
+                var result = _mainDbClient.Execute("Admin_NewSlotGameStatus_Set", trans, parameter);
+                success &= result > 0;
             }
             return success;
         }
 
         public bool SetSlotGameDetail(int nextId, string @operator, IEnumerable<SiteCurrencyList> sitecurrencyList, IEnumerable<int> opencurrencyIds, IEnumerable<int> categoryIds, MySqlTransaction trans)
         {
-            bool success = true;
+            var success = true;
 
             foreach(var item in sitecurrencyList) 
             {
