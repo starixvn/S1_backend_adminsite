@@ -1738,7 +1738,8 @@ namespace BackendSite.Service.Model.enums
     public enum SlotGameStatusEnum
     {
         Closed = 0,
-        Open = 1
+        Open = 1,
+        Release = 3
     }
 
     public enum PaymentReportGroupByEnum

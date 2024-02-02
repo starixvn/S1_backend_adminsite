@@ -105,5 +105,11 @@ namespace BackendSite.Service.BLL
 
             return _slotGamesManagementService.SetSlotGameAllCurrency(req.SiteId, userSiteData.ICurrencyList, req.SlotGameId, req.Status, @operator);
         }
+
+        public bool SetSlotGameEnvironment(SetSlotGameEnvironment req, string @operator)
+        {
+            var status = (req.IsPRD) ? (int)SlotGameStatusEnum.Open : (int)SlotGameStatusEnum.Release;
+            return _slotGamesManagementService.SetSlotGameEnvironment(req.SiteId, req.SlotGameId, req.IsPRD,status, @operator);
+        }
     }
 }

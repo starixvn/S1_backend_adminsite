@@ -272,6 +272,35 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
             return apiResult;
         }
+        /// <summary>
+        /// SlotGamesManagement/GoToPRD
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
+        public ApiResult SetSlotGameEnvironment(SetSlotGameEnvironment request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var result = _slotGamesManagementBLL.SetSlotGameEnvironment(request, User.Identity.Name);
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
         #endregion
     }
 }
