@@ -1,4 +1,6 @@
-﻿using BackendSite.Service.Model.enums;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
 using static BackendSite.Service.BLL.Mpa.MpaWinLossBLL;
 using Newtonsoft.Json;
@@ -168,6 +170,64 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
         #region ToExcelFormat
 
+        public static IEnumerable<MpaWinLossGroupByModel> SortThen2ExcelData(this MpaWinLossReportResponse data, IOrderBy orderByOption)
+        {
+            if (orderByOption.OrderBy)
+            {
+                data.Result = data.Result.OrderBy(orderByOption);
+            }
+
+            var exportResult = new List<MpaWinLossGroupByModel>();
+
+            foreach (var item in data.Result)
+            {
+                var child = data.ChildResult.Where(x => x.Key == item.Key);
+                
+                if (orderByOption.OrderBy)
+                {
+                    child = child.OrderBy(orderByOption);
+                }
+                
+                exportResult.Add(item);
+                exportResult.AddRange(child);
+            }
+            
+            exportResult.Add(data.Total);
+            
+            return exportResult;
+        }
+        
+        public static T ToExcelFormat<T>(this MpaWinLossGroupByModel data) where T : IMpaWinLossDisplay, new()
+        {
+            var result = ToExcelFormatSimple<T>(data);
+
+            result.DepositCount = data.DepositCount;
+            result.TotalDepositAmount = data.TotalDepositAmount.ToString("N2");
+            result.WithDrawCount = data.WithdrawalCount;
+            result.TotalWithDrawAmount = data.TotalWithdrawalAmount.ToString("N2");
+            result.TotalBonus = data.TotalBonus.ToString("N2");
+
+            return result;
+        }
+
+        public static T ToExcelFormatSimple<T>(this MpaWinLossGroupByModel data) where T : IMpaWinLossDisplaySimple, new()
+            => new T
+            {
+                TurnOver = data.TurnOver.ToString("N2"),
+                ValidTurnOver = data.ValidTurnOver.ToString("N2"),
+                GGR = data.Ggr.ToString("N2"),
+                PlayerWinLoss = data.PlayerWinLoss.ToString("N2"),
+                BAPlayerWinLoss = data.BaPlayerWinLoss.ToString("N2"),
+                ProgressiveWin = data.ProgressiveWin.ToString("N2"),
+                ProgressiveBet = data.ProgressiveBet.ToString("N2"),
+                Commission = data.Commission.ToString("N2"),
+                BACommission = data.BaCommission.ToString("N2"),
+                BetCount = data.BetCount,
+                AvgBetAmount = data.AvgBetAmount.ToString("N2"),
+                UniquePlayers = data.UniquePlayers,
+                Margin = (data.Margin * 100).ToString("N2%")
+            };
+
         public static IEnumerable<MpaWinLossByDateDtoExport> ToExcelFormat(this List<MpaWinLossByDateDto> originData)
         {
             return originData.GroupBy(x => new { x.Currency, x.Date })
@@ -272,7 +332,6 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2).ToString("N2"),
                 WithDrawCount = item.WithDrawCount,
                 TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2).ToString("N2"),
-                ClosingBalance = Math.Round(item.ClosingBalance, 2).ToString("N2"),
                 TotalBonus = Math.Round(item.TotalBonus, 2).ToString("N2")
             })
                 .ToList();
@@ -363,7 +422,6 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2).ToString("N2"),
                 WithDrawCount = item.WithDrawCount,
                 TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2).ToString("N2"),
-                ClosingBalance = Math.Round(item.ClosingBalance, 2).ToString("N2"),
                 TotalBonus = Math.Round(item.TotalBonus, 2).ToString("N2")
             })
                 .ToList();
@@ -374,47 +432,25 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
         #region ToApiDataFormat
 
-        public static IEnumerable<MpaWinLossByDateResponseToFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByDateResponse> source)
+        public static IEnumerable<MpaWinLossResponseForFrontEnd> SortThen2ApiFormat(this MpaWinLossReportResponse source, IOrderBy orderByOption)
         {
-            var result = new List<MpaWinLossByDateResponseToFrontEnd>();
-
-            foreach (var item in source)
+            if (orderByOption.OrderBy)
             {
-                var data = new MpaWinLossByDateResponseToFrontEnd
-                {
-                    DisplayKey = item.Key,
-                    TurnOver = item.Value.TurnOver,
-                    ValidTurnOver = item.Value.ValidTurnOver,
-                    GGR = item.Value.GGR,
-                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
-                    PlayerWinLoss = item.Value.PlayerWinLoss,
-                    ProgressiveWin = item.Value.ProgressiveWin,
-                    ProgressiveBet = item.Value.ProgressiveBet,
-                    BACommission = item.Value.BACommission,
-                    Commission = item.Value.Commission,
-                    BetCount = item.Value.BetCount,
-                    AvgBetAmount = item.Value.AvgBetAmount,
-                    UniquePlayers = item.Value.UniquePlayers,
-                    Margin = item.Value.Margin,
-                    DepositCount = item.Value.DepositCount,
-                    TotalDepositAmount = item.Value.TotalDepositAmount,
-                    WithDrawCount = item.Value.WithDrawCount,
-                    TotalWithDrawAmount = item.Value.TotalWithDrawAmount,
-                    TotalBonus = item.Value.TotalBonus
-                };
+                source.Result = source.Result.OrderBy(orderByOption);
+            }
+            
+            var result = new List<MpaWinLossResponseForFrontEnd>();
 
-                // 處理 children
-                if (item.Value.CurrencyDetail == null)
+            foreach (var item in source.Result)
+            {
+                var children = source.ChildResult.Where(x => x.Key == item.Key)
+                    .Select(x => new MpaWinLossDetailForFrontEnd(x));
+                if (orderByOption.OrderBy)
                 {
-                    data.Children = new List<MpaWinLossByDayCurrencyDetailDtoToFrontEnd>();
+                    children = children.OrderBy(orderByOption);
                 }
-                else
-                {
-                    var children = item.Value.CurrencyDetail
-                        .Select(childrenItem => new MpaWinLossByDayCurrencyDetailDtoToFrontEnd { DisplayKey = childrenItem.Key, Data = childrenItem.Value })
-                        .ToList();
-                    data.Children = children;
-                }
+                
+                var data = new MpaWinLossResponseForFrontEnd(item, children);
 
                 result.Add(data);
             }

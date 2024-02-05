@@ -139,7 +139,7 @@ namespace BackendSite.Service.DAL
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
 
-            var propertyNames = typeof(TValue).GetProperties().Where(x => x.Name.ToLower() == sortField.ToLower());
+            var propertyNames = typeof(TValue).GetProperties().Where(x => string.Equals(x.Name, sortField, StringComparison.CurrentCultureIgnoreCase));
             var propertyName = propertyNames.Select(x => x.Name).FirstOrDefault() ?? "";
 
             var propertyInfo = typeof(TValue).GetProperty(propertyName);

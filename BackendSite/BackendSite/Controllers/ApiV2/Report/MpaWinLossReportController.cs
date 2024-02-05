@@ -29,9 +29,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>> GetWinLossByDate(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByDate(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request, MpaWinLossGroupByTypeEnum.Date);
@@ -62,9 +62,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>> GetWinLossByMonth(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByMonth(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<MpaWinLossByDateResponseToFrontEnd>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>();
             try
             {
                 var responseData = await _MaMpaWinLossBll.GetMapWinLossByDateResult(request, MpaWinLossGroupByTypeEnum.Month);

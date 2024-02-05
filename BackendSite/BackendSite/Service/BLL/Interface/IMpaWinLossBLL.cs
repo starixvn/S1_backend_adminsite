@@ -19,7 +19,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByDateResponseToFrontEnd>> GetMapWinLossByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossResponseForFrontEnd>> GetMapWinLossByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// excel export
