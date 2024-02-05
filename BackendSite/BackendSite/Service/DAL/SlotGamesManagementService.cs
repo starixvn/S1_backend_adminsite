@@ -252,5 +252,17 @@ namespace BackendSite.Service.DAL
             var logResult = _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins_V2", trans, logParam) > 0;
             return logResult;
         }
+
+        public bool SetSlotGameEnvironment(int siteId, int slotGameId, bool isPRD,int status, string @operator)
+        {
+            var parameter = new DynamicParameters();
+            parameter.Add("_SiteId", siteId, DbType.Int32);
+            parameter.Add("_SlotGameId", slotGameId, DbType.Int32);
+            parameter.Add("_Status", status, DbType.Int32);
+            parameter.Add("_IsPRD", isPRD, DbType.Boolean);
+            parameter.Add("_Operator", @operator);
+
+            return _mainDbClient.Execute("Admin_SlotGameEnvironment_Set", parameter)>0;
+        }
     }
 }

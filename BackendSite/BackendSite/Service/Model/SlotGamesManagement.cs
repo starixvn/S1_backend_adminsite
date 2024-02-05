@@ -104,6 +104,14 @@ namespace BackendSite.Service.Model
         /// </summary>
         public SlotGameStatusEnum Status { get; set; }
     }
+    public class SetSlotGameEnvironment
+    {
+        public int SlotGameId { get; set; }
+        public int SiteId { get; set; }
+
+        public bool IsPRD { get; set; }
+    }
+
     public class SetNewSlotGameReq
     {
         public int TpId { get; set; }
