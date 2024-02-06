@@ -19,8 +19,6 @@ namespace BackendSite.Service.DAL
 {
     public class WithdrawalService
     {
-        #region Fields
-
         private readonly WalletService _walletService;
         private readonly WithdrawalBankAccountingService _withdrawalBankAccountingService;
         private readonly ILogger<WithdrawalService> _logger;
@@ -28,10 +26,6 @@ namespace BackendSite.Service.DAL
         private const int TypePosition = 1000;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-
-        #endregion
-
-        #region Constructors
 
         public WithdrawalService(IServiceProvider provider)
         {
@@ -42,8 +36,6 @@ namespace BackendSite.Service.DAL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-
-        #endregion
 
         public IEnumerable<WithdrawalRequest> GetWithdrawalRequestList(IEnumerable<int> selectSite,
             IEnumerable<int> withdrawalType,
@@ -74,19 +66,6 @@ namespace BackendSite.Service.DAL
                 int.TryParse(m.Value, out withdrawalId);
             }
 
-            // var tempWithdrawalMethod = (int)withdrawalMethod;
-            // if(withdrawalType.Count() > 1)
-            // {
-            //     tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
-            // }
-            // else
-            // {
-            //     if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
-            //     {
-            //         tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
-            //     }
-            // }
-
             var p = new DynamicParameters(new
             {
                 _SiteIds = JsonConvert.SerializeObject(selectSite),
@@ -112,14 +91,14 @@ namespace BackendSite.Service.DAL
 
             #region GetCurrencyTotalAmount
 
-            currencyAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p).ToList();
+            currencyAmount = _mainDbClient.Query<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p).ToList();
 
             #endregion
 
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V12", p);
+            var result = _mainDbClient.Query<WithdrawalRequest>("Admin_WithdrawalList_Get_V12", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
 
@@ -134,7 +113,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WithdrawalComments> GetWithdrawalRequestComment(int withdrawalId, int siteId)
         {
-            return _reportDbClient.Query<WithdrawalComments>("WithdrawalRequestComment_Get_V2",
+            return _mainDbClient.Query<WithdrawalComments>("WithdrawalRequestComment_Get_V2",
                 new { WithdrawalId = withdrawalId, SiteId = siteId });
         }
 
@@ -175,7 +154,7 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalApproveAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
             p.Add("_TotalApproveRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportDbClient.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get_V4", p);
+            var depositList = _mainDbClient.Query<WithdrawalRequest>("Admin_WithdrawalListByCust_Get_V4", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             totalAmount = p.Get<decimal?>("_TotalAmount") ?? 0;
@@ -209,19 +188,6 @@ namespace BackendSite.Service.DAL
                 var m = Regex.Match(WithdrawalId, @"\d+");
                 int.TryParse(m.Value, out withdrawalId);
             }
-
-            // var tempWithdrawalMethod = (int)withdrawalMethod;
-            // if (withdrawalType.Count() > 1)
-            // {
-            //     tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
-            // }
-            // else
-            // {
-            //     if (!withdrawalType.ToList().Exists(x => x == (int)WithdrawalTypeEnum.LocalBank))
-            //     {
-            //         tempWithdrawalMethod = (int)WithdrawalMethodEnum.All;
-            //     }
-            // }
 
             var p = new DynamicParameters(new
             {
@@ -297,7 +263,7 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<WithdrawalMinInfo> GetWithdrawalLimitData(int SiteId)
         {
-            var WithdrawalMinInfo = _reportDbClient.Query<WithdrawalMinInfo>("Admin_WithdrawalMinInfo_Get", new { SiteId });
+            var WithdrawalMinInfo = _mainDbClient.Query<WithdrawalMinInfo>("Admin_WithdrawalMinInfo_Get", new { SiteId });
             return WithdrawalMinInfo;
         }
 
@@ -327,7 +293,7 @@ namespace BackendSite.Service.DAL
 
         public BankSlipPic GetWithdrawalPicCount(string transId)
         {
-            var WithdrawalMinInfo = _reportDbClient.Query<BankSlipPic>("Admin_BankSlipPic_Get", new { TransId = transId }).FirstOrDefault();
+            var WithdrawalMinInfo = _mainDbClient.Query<BankSlipPic>("Admin_BankSlipPic_Get", new { TransId = transId }).FirstOrDefault();
             return WithdrawalMinInfo;
         }
 
@@ -356,8 +322,6 @@ namespace BackendSite.Service.DAL
             props.Add("CurrencyIds", currencyIds);
             props.Add("CustId", custId);
 
-            #region totalSummary
-
             currencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_WithdrawalStatusTimeTotal_Get", props).ToList();
             if (currencyTotalAmount.Count > 0)
             {
@@ -367,8 +331,6 @@ namespace BackendSite.Service.DAL
                     Record = currencyTotalAmount.Sum(r => r.Record)
                 });
             }
-
-            #endregion
 
             props.Add("StartIndex", (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             props.Add("PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.InputOutput);
@@ -597,7 +559,7 @@ namespace BackendSite.Service.DAL
         /// <returns></returns>
         public WithdrawalRequest GetWithdrawalInfo(int withdrawalId, string transId)
         {
-            return _reportDbClient.QueryFirst<WithdrawalRequest>("Admin_WithdrawalInfo_Get_V2",
+            return _mainDbClient.QueryFirst<WithdrawalRequest>("Admin_WithdrawalInfo_Get_V2",
                 new { _WithdrawalId = withdrawalId, _TransId = transId });
         }
 
