@@ -19,7 +19,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByDateResponseToFrontEnd>> GetMapWinLossByDateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossResponseForFrontEnd>> GetMapWinLossResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// excel export
@@ -28,14 +28,6 @@ public interface IMpaWinLossBLL
     /// <param name="groupByType"></param>
     /// <returns></returns>
     Task<IEnumerable<MpaWinLossByTpGameTypeDtoExport>> GetMapWinLossByTpGameTypeExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-
-    /// <summary>
-    /// api
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="groupByType"></param>
-    /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByTpGameTypeResponseToFrontEnd>> GetMapWinLossByTpGameTypeResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// excel export
@@ -51,7 +43,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByTpCategoryResponseToFrontEnd>> GetMapWinLossByTpCategoryResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossResponseForFrontEndSimple>> GetMapWinLossResultSimple(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// excel export
@@ -67,7 +59,7 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<MpaWinLossByPlayerResponseToFrontEndWrapper> GetMpaWinLossByPlayerResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<MpaWinLossResponseToFrontEndWithPlayerWrapper> GetMpaWinLossResultWithPlayerInfo(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
 
     /// <summary>
@@ -77,7 +69,7 @@ public interface IMpaWinLossBLL
     /// <param name="groupByType"></param>
     /// <returns></returns>
 
-    Task<IEnumerable<MpaWinLossByPlayerDetailResponseFrontEnd>> GetMpaWinLossByPlayerDetailResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>> GetMpaWinLossResultWithPlayerDetail(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
     /// <summary>
     /// excel export
@@ -93,29 +85,8 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByCurrencyResponseFrontEnd>> GetMapWinLossByCurrencyResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-
-    /// <summary>
-    /// api
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="groupByType"></param>
-    /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByBrandResponseToFrontEnd>> GetMapWinLossByBrandResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-    /// <summary>
-    /// api
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="groupByType"></param>
-    /// <returns></returns>
     Task<IEnumerable<MpaWinLossByBrandDtoExport>> GetMpaWinLossByBrandExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-    /// <summary>
-    /// api
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="groupByType"></param>
-    /// <returns></returns>
-    Task<MpaWinLossByAffiliateResponseToFrontEndWrapper> GetMapWinLossByAffiliateResult(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    
     /// <summary>
     /// api
     /// </summary>

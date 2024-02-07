@@ -1,122 +1,7 @@
-﻿using System.ComponentModel;
-
-using BackendSite.Service.Model.enums;
-
-using Newtonsoft.Json;
-
-using OfficeOpenXml.Attributes;
+﻿using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss
 {
-    /// <summary>
-    /// BetRecord 日期 or 月份
-    /// </summary>
-    public class MpaTpBetRecordDto
-    {
-        public DateTime Date { get; set; }
-        public int TpId { get; set; }
-        public int CategoryId { get; set; }
-        public int GameType { get; set; }
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
-        public int CustId { get; set; }
-        public string UserName { get; set; }
-        public string TpUserName { get; set; }
-        public byte SettlementType { get; set; }
-        public int BonusId { get; set; }
-        public byte PromotionType { get; set; }
-        public byte TicketStatus { get; set; }
-        public decimal StakeSummary { get; set; }
-        public decimal ValidBetSummary { get; set; }
-        public decimal WinLossSummary { get; set; }
-        public decimal RevenueSummary { get; set; }
-        public decimal ProgressiveWinSummary { get; set; }
-        public decimal ProgressiveBetSummary { get; set; }
-        public decimal ClosingBalance { get; set; }
-        public int RowCount { get; set; }
-        public int IsTest { get; set; }
-        public int SummaryType { get; set; }
-        public decimal BAStakeSummary { get; set; }
-        public decimal BAValidBetSummary { get; set; }
-        public decimal BAWinLossSummary { get; set; }
-        public decimal BARevenueSummary { get; set; }
-        public decimal BAProgressiveWinSummary { get; set; }
-        public decimal BAProgressiveBetSummary { get; set; }
-
-        public string AffiliateName { get; set; }
-    }
-
-    public class MpaTpBetRecordWrapper
-    {
-        public List<MpaTpBetRecordDto> OriginBetRecord { get; set; }
-
-        public List<MpaTpBetRecordDto> AlreadyMultiplyRateBetRecord { get; set; }
-    }
-
-    /// <summary>
-    /// 存提款資訊
-    /// </summary>
-    public class TransactionRelayDto
-    {
-        public DateTime Date { get; set; }
-        public int SiteId { get; set; }
-        public int CurrencyId { get; set; }
-        public int CustId { get; set; }
-
-        public string UserName { get; set; }
-
-        public string TpUserName { get; set; }
-
-        /// <summary>
-        /// Deposit= 1, Withdrawal= 2
-        /// </summary>
-        public MpaTransactionRelaySummaryTypeEnum SummaryType { get; set; }
-
-        /// <summary>
-        /// Deposit:(OnlineBanking = 1, MobilePayment = 2, LocalBank = 3, CryptoPayment = 4, LoadCardPayment = 5,QRPayPayment  = 6, BankAutoChannel = 7)
-        /// Withdrawal: (1. 3RD Online Payment, 2. Local Bank, 4. CryptoPayment)
-        /// </summary>
-        public byte TransactionType { get; set; }
-        public decimal Amount { get; set; }
-        public int RowCount { get; set; }
-        public int IsTest { get; set; }
-    }
-
-    public class TransactionRelayWrapper
-    {
-        public List<TransactionRelayDto> OriginTransaction { get; set; }
-
-        public List<TransactionRelayDto> AlreadyMultiplyRateTransaction { get; set; }
-    }
-
-    /// <summary>
-    /// Bonus 資訊
-    /// </summary>
-    public class MpaWinLossBonusDto
-    {
-        public DateTime Date { get; set; }
-
-        public int CustId { get; set; }
-
-        public string UserName { get; set; }
-
-        public string TpUserName { get; set; }
-
-        public int CurrencyId { get; set; }
-
-        public decimal BonusAmountClaim { get; set; }
-
-        public int IsTest { get; set; }
-        public int SiteId { get; set; }
-    }
-
-    public class MpaWinLossBonusWrapper
-    {
-        public List<MpaWinLossBonusDto> OriginBonus { get; set; }
-
-        public List<MpaWinLossBonusDto> AlreadyMultiplyRateBonus { get; set; }
-    }
-
     public class MpaRateDto
     {
         public DateTime RateDate { get; set; }
@@ -137,467 +22,80 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int CurrencyId { get; set; }
 
         public string IsoCode { get; set; }
-
-        public decimal USDRate { get; set; }
     }
 
-    public class TpGameTypeOptionDto
+    public interface IMpaWinLoss : IMpaWinLossSimple
     {
-        public int Type { get; set; }
-
-        public string TypeName { get; set; }
-    }
-
-    public class Commission9WDto
-    {
-        public int CustId { get; set; }
-
-        public DateTime Date { get; set; }
-
-        public decimal Commission { get; set; }
-    }
-
-    public class TpCategoryDto
-    {
-        public int CategoryId { get; set; }
-
-        public string CategoryName { get; set; }
-    }
-
-    public class MpaWinLossByDayCurrencyDetailDto
-    {
-        [JsonIgnore]
-        public string Date { get; set; }
-
-        [JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
-
-        [JsonIgnore]
-        public int GameType { get; set; }
-
-        [JsonProperty(Order = 0)]
-        public decimal TurnOver { get; set; }
-
-        [JsonProperty(Order = 1)]
-        public decimal ValidTurnOver { get; set; }
-
-        [JsonProperty(Order = 2)]
-        public decimal GGR
-        {
-            get
-            {
-                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
-                {
-                    return _ggrValue;
-                }
-                else // 否則使用一般公式
-                {
-                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
-                }
-            }
-            set
-            {
-                _ggrValue = value;
-            }
-        }
-
-        [JsonProperty(Order = 3)]
-        public decimal PlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 4)]
-        public decimal BAPlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 5)]
-        public decimal ProgressiveWin { get; set; }
-
-        [JsonProperty(Order = 6)]
-        public decimal ProgressiveBet { get; set; }
-
-        [JsonProperty(Order = 7)]
-        public decimal Commission { get; set; }
-
-        [JsonProperty(Order = 8)]
-
-        public decimal BACommission { get; set; }
-
-        [JsonProperty(Order = 9)]
-        public int BetCount { get; set; }
-
-        [JsonProperty(Order = 10)]
-        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
-
-        [JsonProperty(Order = 11)]
-        public int UniquePlayers { get; set; }
-
-        [JsonProperty(Order = 12)]
-        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
-
-        [JsonProperty(Order = 13)]
         public int DepositCount { get; set; }
 
-        [JsonProperty(Order = 14)]
         public decimal TotalDepositAmount { get; set; }
 
-        [JsonProperty(Order = 15)]
         public int WithDrawCount { get; set; }
 
-        [JsonProperty(Order = 16)]
         public decimal TotalWithDrawAmount { get; set; }
 
-        [JsonProperty(Order = 17)]
         public decimal TotalBonus { get; set; }
-        
-        private decimal _ggrValue;
     }
-
-    public class MpaWinLossByTpGameTypeCurrencyDetailDto
+    
+    public interface IMpaWinLossSimple
     {
-        [JsonIgnore]
-        public string Date { get; set; }
-
-        [JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
-
-        [JsonIgnore]
-        public int GameType { get; set; }
-
-        [JsonProperty(Order = 0)]
         public decimal TurnOver { get; set; }
 
-        [JsonProperty(Order = 1)]
         public decimal ValidTurnOver { get; set; }
 
-        [JsonProperty(Order = 2)]
-        public decimal GGR
-        {
-            get
-            {
-                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
-                {
-                    return _ggrValue;
-                }
-                else // 否則使用一般公式
-                {
-                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
-                }
-            }
-            set
-            {
-                _ggrValue = value;
-            }
-        }
+        public decimal GGR { get; set; }
 
-        [JsonProperty(Order = 3)]
-        public decimal PlayerWinLoss { get; set; }
-        [JsonProperty(Order = 4)]
-        public decimal BAPlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 5)]
-        public decimal ProgressiveWin { get; set; }
-
-        [JsonProperty(Order = 6)]
-        public decimal ProgressiveBet { get; set; }
-
-        [JsonProperty(Order = 7)]
-        public decimal Commission { get; set; }
-
-        [JsonProperty(Order = 8)]
-        public decimal BACommission { get; set; }
-
-        [JsonProperty(Order = 9)]
-        public int BetCount { get; set; }
-
-        [JsonProperty(Order = 10)]
-        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
-
-        [JsonProperty(Order = 11)]
-        public int UniquePlayers { get; set; }
-
-        [JsonProperty(Order = 12)]
-        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
-        private decimal _ggrValue;
-        
-        
-    }
-
-    public class MpaWinLossByTpCategoryCurrencyDetailDto
-    {
-
-        [JsonIgnore]
-        public string TpCategoryName { get; set; }
-
-        [JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
-
-        [JsonProperty(Order = 0)]
-        public decimal TurnOver { get; set; }
-
-        [JsonProperty(Order = 1)]
-        public decimal ValidTurnOver { get; set; }
-
-        [JsonProperty(Order = 2)]
-        public decimal GGR
-        {
-            get
-            {
-                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
-                {
-                    return _ggrValue;
-                }
-                else // 否則使用一般公式
-                {
-                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
-                }
-            }
-            set
-            {
-                _ggrValue = value;
-            }
-        }
-
-        [JsonProperty(Order = 3)]
         public decimal PlayerWinLoss { get; set; }
 
-        [JsonProperty(Order = 4)]
         public decimal BAPlayerWinLoss { get; set; }
 
-        [JsonProperty(Order = 5)]
         public decimal ProgressiveWin { get; set; }
 
-        [JsonProperty(Order = 6)]
         public decimal ProgressiveBet { get; set; }
 
-        [JsonProperty(Order = 7)]
         public decimal Commission { get; set; }
 
-        [JsonProperty(Order = 8)]
         public decimal BACommission { get; set; }
 
-        [JsonProperty(Order = 9)]
         public int BetCount { get; set; }
 
-        [JsonProperty(Order = 10)]
-        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
+        public decimal AvgBetAmount { get; set; }
 
-        [JsonProperty(Order = 11)]
         public int UniquePlayers { get; set; }
 
-        [JsonProperty(Order = 12)]
-        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
-
-        private decimal _ggrValue;
-        
+        public decimal Margin { get; set; }
     }
-
-    public class MpaWinLossByPlayerCurrencyDetailDto
+    
+    public class MpaWinLossWithPlayerInfo : MpaWinLoss
     {
+        public MpaWinLossWithPlayerInfo(){}
 
-        [JsonProperty(Order = 0)]
+        public MpaWinLossWithPlayerInfo(MpaWinLossGroupByModel m) : base(m)
+        {
+            UserName = m.UserName;
+            SabaId = m.TpUserName;
+        }
+        
         public string UserName { get; set; }
-
-        [JsonProperty(Order = 1)]
+        
         public string SabaId { get; set; }
-
-        [JsonProperty(Order = 2)]
-        public decimal TurnOver { get; set; }
-
-        [JsonProperty(Order = 3)]
-        public decimal ValidTurnOver { get; set; }
-
-        [JsonProperty(Order = 4)]
-        public decimal GGR
-        {
-            get
-            {
-                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
-                {
-                    return _ggrValue;
-                }
-                else // 否則使用一般公式
-                {
-                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
-                }
-            }
-            set
-            {
-                _ggrValue = value;
-            }
-        }
-
-        [JsonProperty(Order = 5)]
-        public decimal PlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 6)]
-        public decimal BAPlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 7)]
-        public decimal ProgressiveWin { get; set; }
-
-        [JsonProperty(Order = 8)]
-        public decimal ProgressiveBet { get; set; }
-
-        [JsonProperty(Order = 9)]
-        public decimal Commission { get; set; }
-        [JsonProperty(Order = 10)]
-        public decimal BACommission { get; set; }
-
-        [JsonProperty(Order = 11)]
-        public int BetCount { get; set; }
-
-        [JsonProperty(Order = 12)]
-        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
-
-        [JsonProperty(Order = 13)]
-        public int UniquePlayers { get; set; }
-
-        [JsonProperty(Order = 14)]
-        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
-
-        [JsonProperty(Order = 15)]
-        public decimal ClosingBalance { get; set; }
-
-        [JsonProperty(Order = 16)]
-        public int DepositCount { get; set; }
-
-        [JsonProperty(Order = 17)]
-        public decimal TotalDepositAmount { get; set; }
-
-        [JsonProperty(Order = 18)]
-        public int WithDrawCount { get; set; }
-
-        [JsonProperty(Order = 19)]
-        public decimal TotalWithDrawAmount { get; set; }
-
-        [JsonProperty(Order = 20)]
-        public decimal TotalBonus { get; set; }
-        public string Currency { get; set; }
-        private decimal _ggrValue;
         
+        public decimal ClosingBalance { get; set; }
     }
 
-    public class MpaWinLossByCurrencyCurrencyDetailDto
+    public class MpaWinLoss : MpaWinLossSimple, IMpaWinLoss
     {
-        [JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
+        public MpaWinLoss(){}
 
-        [JsonIgnore]
-        public int GameType { get; set; }
-
-        [JsonProperty(Order = 0)]
-        public decimal TurnOver { get; set; }
-
-        [JsonProperty(Order = 1)]
-        public decimal ValidTurnOver { get; set; }
-
-        [JsonProperty(Order = 2)]
-        public decimal GGR
+        public MpaWinLoss(MpaWinLossGroupByModel m) : base(m)
         {
-            get
-            {
-                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
-                {
-                    return _ggrValue;
-                }
-                else // 否則使用一般公式
-                {
-                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
-                }
-            }
-            set
-            {
-                _ggrValue = value;
-            }
+            DepositCount = m.DepositCount;
+            TotalDepositAmount = m.TotalDepositAmount;
+            WithDrawCount = m.WithdrawCount;
+            TotalWithDrawAmount = m.TotalWithdrawAmount;
+            TotalBonus = m.TotalBonus;
         }
-
-        [JsonProperty(Order = 3)]
-        public decimal PlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 4)]
-        public decimal BAPlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 5)]
-        public decimal ProgressiveWin { get; set; }
-
-        [JsonProperty(Order = 6)]
-        public decimal ProgressiveBet { get; set; }
-
-        [JsonProperty(Order = 7)]
-        public decimal Commission { get; set; }
-
-        [JsonProperty(Order = 8)]
-        public decimal BACommission { get; set; }
-
-        [JsonProperty(Order = 9)]
-        public int BetCount { get; set; }
-
-        [JsonProperty(Order = 10)]
-        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
-
-        [JsonProperty(Order = 11)]
-        public int UniquePlayers { get; set; }
-
-        [JsonProperty(Order = 12)]
-        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
-
-        [JsonProperty(Order = 13)]
-        public int DepositCount { get; set; }
-
-        [JsonProperty(Order = 14)]
-        public decimal TotalDepositAmount { get; set; }
-
-        [JsonProperty(Order = 15)]
-        public int WithDrawCount { get; set; }
-
-        [JsonProperty(Order = 16)]
-        public decimal TotalWithDrawAmount { get; set; }
-
-        [JsonProperty(Order = 17)]
-        public decimal TotalBonus { get; set; }
-
-        private decimal _ggrValue;
         
-    }
-
-    public class MpaWinLossByDateDto
-    {
-        //[JsonIgnore]
-        public string Date { get; set; }
-
-        //[JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
-
-        public decimal TurnOver { get; set; }
-
-        public decimal ValidTurnOver { get; set; }
-
-        public decimal GGR { get; set; }
-
-        public decimal PlayerWinLoss { get; set; }
-        public decimal BAPlayerWinLoss { get; set; }
-
-        public decimal ProgressiveWin { get; set; }
-
-        public decimal ProgressiveBet { get; set; }
-
-        public decimal Commission { get; set; }
-        public decimal BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public decimal AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        [EpplusIgnore]
-        public decimal Margin { get; set; }
-
-        public string MarginStr { get; set; }
-
         public int DepositCount { get; set; }
 
         public decimal TotalDepositAmount { get; set; }
@@ -607,372 +105,29 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalWithDrawAmount { get; set; }
 
         public decimal TotalBonus { get; set; }
-        public int SiteId { get; set; } 
-        public int CustId {get; set; }
     }
 
-    public class TpBetRecordByDateWrapper
+    public class MpaWinLossSimple : IMpaWinLossSimple
     {
-        public IEnumerable<MpaWinLossByDateDto> OriginTpBetRecordResult { get; set; }
+        
+        public MpaWinLossSimple(){}
 
-        public IEnumerable<MpaWinLossByDateDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
-
-        public int UniquePlayers { get; set; }
-    }
-
-    public class TransactionByDateWrapper
-    {
-        public IEnumerable<MpaWinLossByDateDto> OriginTransactionResult { get; set; }
-
-        public IEnumerable<MpaWinLossByDateDto> AlreadyMultiplyRateTransactionResult { get; set; }
-    }
-
-    public class BonusByDateWrapper
-    {
-        public IEnumerable<MpaWinLossByDateDto> OriginBonusResult { get; set; }
-
-        public IEnumerable<MpaWinLossByDateDto> AlreadyMultiplyRateBonusResult { get; set; }
-    }
-
-    public class MpaWinLossByTpGameTypeDto
-    {
-        public  int CustId { get; set; }
-        public string TpGameTypeName { get; set; }
-
-        public string Currency { get; set; }
-
-        public decimal TurnOver { get; set; }
-
-        public decimal ValidTurnOver { get; set; }
-
-        public decimal GGR { get; set; }
-
-        public decimal PlayerWinLoss { get; set; }
-        public decimal BAPlayerWinLoss { get; set; }
-
-        public decimal ProgressiveWin { get; set; }
-
-        public decimal ProgressiveBet { get; set; }
-
-        public decimal Commission { get; set; }
-        public decimal BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public decimal AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        [EpplusIgnore]
-
-        public decimal Margin { get; set; }
-        [DisplayName("Margin")]
-
-        public string MarginStr { get; set; }
-    }
-
-    public class TpBetRecordByTpGameTypeWrapper
-    {
-        public IEnumerable<MpaWinLossByTpGameTypeDto> OriginTpBetRecordResult { get; set; }
-
-        public IEnumerable<MpaWinLossByTpGameTypeDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
-
-        public int UniquePlayers { get; set; }
-    }
-
-    public class MpaWinLossByTpCategoryDto
-    {
-        [JsonIgnore]
-        public string TpCategoryName { get; set; }
-
-        //[JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
-
-        public decimal TurnOver { get; set; }
-
-        public decimal ValidTurnOver { get; set; }
-
-        public decimal GGR { get; set; }
-
-        public decimal PlayerWinLoss { get; set; }
-        public decimal BAPlayerWinLoss { get; set; }
-
-        public decimal ProgressiveWin { get; set; }
-
-        public decimal ProgressiveBet { get; set; }
-
-        public decimal Commission { get; set; }
-        public decimal BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public decimal AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        [EpplusIgnore]
-        public decimal Margin { get; set; }
-
-        [DisplayName("Margin")]
-        public string MarginStr { get; set; }
-    }
-
-    public class TpBetRecordByTpCategoryWrapper
-    {
-        public IEnumerable<MpaWinLossByTpCategoryDto> OriginTpBetRecordResult { get; set; }
-
-        public IEnumerable<MpaWinLossByTpCategoryDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
-
-        public int UniquePlayers { get; set; }
-    }
-
-    public class MpaWinLossByPlayerDto
-    {
-        public string UserName { get; set; }
-
-        public string TpUserName { get; set; }
-
-        public string Currency { get; set; }
-
-        public string GameTypeName { get; set; }
-
-        public decimal TurnOver { get; set; }
-
-        public decimal ValidTurnOver { get; set; }
-
-        public decimal GGR { get; set; }
-
-        public decimal PlayerWinLoss { get; set; }
-
-        public decimal ProgressiveWin { get; set; }
-
-        public decimal ProgressiveBet { get; set; }
-
-        public decimal Commission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public decimal AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        [EpplusIgnore]
-        public decimal Margin { get; set; }
-
-        public string MarginStr { get; set; }
-
-        public int DepositCount { get; set; }
-
-        public decimal TotalDepositAmount { get; set; }
-
-        public int WithDrawCount { get; set; }
-
-        public decimal TotalWithDrawAmount { get; set; }
-
-        public decimal ClosingBalance { get; set; }
-
-        public decimal TotalBonus { get; set; }
-        public int SiteId { get; set; }
-
-        public decimal BAPlayerWinLoss { get; set; }
-        public decimal BACommission { get; set; }
-    }
-
-    public class TpBetRecordByPlayerWrapper
-    {
-        public IEnumerable<MpaWinLossByPlayerDto> OriginTpBetRecordResult { get; set; }
-
-        public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
-
-        public int UniquePlayers { get; set; }
-    }
-
-    public class TransactionByPlayerWrapper
-    {
-        public IEnumerable<MpaWinLossByPlayerDto> OriginTransactionResult { get; set; }
-
-        public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateTransactionResult { get; set; }
-    }
-
-    public class BonusByPlayerWrapper
-    {
-        public IEnumerable<MpaWinLossByPlayerDto> OriginBonusResult { get; set; }
-
-        public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateBonusResult { get; set; }
-    }
-
-    public class MpaWinLossByPlayerWrapper
-    {
-        public IEnumerable<MpaWinLossByPlayerDto> OriginData { get; set; }
-
-        public IEnumerable<MpaWinLossByPlayerDto> AlreadyMultiplyRateData { get; set; }
-    }
-
-    public class MpaWinLossByCurrencyDto
-    {
-        [JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
-
-        public decimal TurnOver { get; set; }
-
-        public decimal ValidTurnOver { get; set; }
-
-        public decimal GGR { get; set; }
-
-        public decimal PlayerWinLoss { get; set; }
-
-        public decimal ProgressiveWin { get; set; }
-
-        public decimal ProgressiveBet { get; set; }
-
-        public decimal Commission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public decimal AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        [EpplusIgnore]
-
-        public decimal Margin { get; set; }
-
-        public string MarginStr { get; set; }
-
-        public int DepositCount { get; set; }
-
-        public decimal TotalDepositAmount { get; set; }
-
-        public int WithDrawCount { get; set; }
-
-        public decimal TotalWithDrawAmount { get; set; }
-
-        public decimal TotalBonus { get; set; }
-        public int CustId { get; set; }
-        public decimal BAPlayerWinLoss { get; set; }
-        public decimal BACommission { get; set; }
-    }
-
-    public class TpBetRecordByCurrencyWrapper
-    {
-        public IEnumerable<MpaWinLossByCurrencyDto> OriginBetRecord { get; set; }
-
-        public IEnumerable<MpaWinLossByCurrencyDto> AlreadyMultiplyRateBetRecord { get; set; }
-
-        public int UniquePlayers { get; set; }
-    }
-
-    public class TransactionByCurrencyWrapper
-    {
-        public IEnumerable<MpaWinLossByCurrencyDto> OriginTransaction { get; set; }
-
-        public IEnumerable<MpaWinLossByCurrencyDto> AlreadyMultiplyRateTransaction { get; set; }
-    }
-
-    public class BonusByCurrencyWrapper
-    {
-        public IEnumerable<MpaWinLossByCurrencyDto> OriginBonus { get; set; }
-
-        public IEnumerable<MpaWinLossByCurrencyDto> AlreadyMultiplyRateBonus { get; set; }
-    }
-
-    public class MpaWinLossByBrandCurrencyDetailDto
-    {
-        [JsonIgnore]
-        public string Date { get; set; }
-
-        [JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
-
-        [JsonIgnore]
-        public int GameType { get; set; }
-
-        [JsonProperty(Order = 0)]
-        public decimal TurnOver { get; set; }
-
-        [JsonProperty(Order = 1)]
-        public decimal ValidTurnOver { get; set; }
-
-        [JsonProperty(Order = 2)]
-        public decimal GGR
+        public MpaWinLossSimple(MpaWinLossGroupByModel m)
         {
-            get
-            {
-                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
-                {
-                    return _ggrValue;
-                }
-                else // 否則使用一般公式
-                {
-                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
-                }
-            }
-            set
-            {
-                _ggrValue = value;
-            }
+            TurnOver = m.TurnOver;
+            ValidTurnOver = m.ValidTurnOver;
+            GGR = m.Ggr;
+            PlayerWinLoss = m.PlayerWinLoss;
+            BAPlayerWinLoss = m.BaPlayerWinLoss;
+            ProgressiveWin = m.ProgressiveWin;
+            ProgressiveBet = m.ProgressiveBet;
+            Commission = m.Commission;
+            BACommission = m.BaCommission;
+            AvgBetAmount = m.AvgBetAmount;
+            UniquePlayers = m.UniquePlayers;
+            Margin = m.Margin;
         }
-
-        [JsonProperty(Order = 3)]
-        public decimal PlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 4)]
-        public decimal BAPlayerWinLoss { get; set; }
-
-        [JsonProperty(Order = 5)]
-        public decimal ProgressiveWin { get; set; }
-
-        [JsonProperty(Order = 6)]
-        public decimal ProgressiveBet { get; set; }
-
-        [JsonProperty(Order = 7)]
-        public decimal Commission { get; set; }
-
-        [JsonProperty(Order = 8)]
-        public decimal BACommission { get; set; }
-
-        [JsonProperty(Order = 9)]
-        public int BetCount { get; set; }
-
-        [JsonProperty(Order = 10)]
-        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
-
-        [JsonProperty(Order = 11)]
-        public int UniquePlayers { get; set; }
-
-        [JsonProperty(Order = 12)]
-        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
-
-        [JsonProperty(Order = 13)]
-        public int DepositCount { get; set; }
-
-        [JsonProperty(Order = 14)]
-        public decimal TotalDepositAmount { get; set; }
-
-        [JsonProperty(Order = 15)]
-        public int WithDrawCount { get; set; }
-
-        [JsonProperty(Order = 16)]
-        public decimal TotalWithDrawAmount { get; set; }
-
-        [JsonProperty(Order = 17)]
-        public decimal TotalBonus { get; set; }
-
-        public decimal _ggrValue;
-    }
-
-    public class MpaWinLossByBrandDto
-    {
-        //[JsonIgnore]
-        public string Date { get; set; }
-
-        //[JsonIgnore]
-        //MYR、CNY...etc
-        public string Currency { get; set; }
-
+        
         public decimal TurnOver { get; set; }
 
         public decimal ValidTurnOver { get; set; }
@@ -997,239 +152,107 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public int UniquePlayers { get; set; }
 
-        [EpplusIgnore]
         public decimal Margin { get; set; }
-
-        public string MarginStr { get; set; }
-
+    }
+    
+    public interface IMpaWinLossDisplay : IMpaWinLossDisplaySimple
+    {
         public int DepositCount { get; set; }
 
-        public decimal TotalDepositAmount { get; set; }
+        public string TotalDepositAmount { get; set; }
 
         public int WithDrawCount { get; set; }
 
-        public decimal TotalWithDrawAmount { get; set; }
+        public string TotalWithDrawAmount { get; set; }
 
-        public decimal TotalBonus { get; set; }
-        public int SiteId { get; set; }
-
-        public string SiteName { get; set; }
-        public int CustId { get; set; }
+        public string TotalBonus { get; set; }
     }
-
-    public class MpaWinLossByAffiliateCurrencyDetailDto
+    
+    public interface IMpaWinLossDisplaySimple
     {
-        [JsonProperty(Order = 1)]
-        public string SabaId { get; set; }
+        public string TurnOver { get; set; }
 
-        [JsonProperty(Order = 2)]
-        public decimal TurnOver { get; set; }
+        public string ValidTurnOver { get; set; }
 
-        [JsonProperty(Order = 3)]
-        public decimal ValidTurnOver { get; set; }
+        public string GGR { get; set; }
 
-        [JsonProperty(Order = 4)]
-        public decimal GGR
-        {
-            get
-            {
-                if (_ggrValue != 0) // 如果提供了值，使用提供的值。(客製後的GGR算法不能用一般公式)
-                {
-                    return _ggrValue;
-                }
-                else // 否則使用一般公式
-                {
-                    return -1 * PlayerWinLoss + (ProgressiveWin - ProgressiveBet);
-                }
-            }
-            set
-            {
-                _ggrValue = value;
-            }
-        }
+        public string PlayerWinLoss { get; set; }
 
-        [JsonProperty(Order = 5)]
-        public decimal PlayerWinLoss { get; set; }
+        public string BAPlayerWinLoss { get; set; }
 
-        [JsonProperty(Order = 6)]
-        public decimal BAPlayerWinLoss { get; set; }
+        public string ProgressiveWin { get; set; }
 
-        [JsonProperty(Order = 7)]
-        public decimal ProgressiveWin { get; set; }
+        public string ProgressiveBet { get; set; }
 
-        [JsonProperty(Order = 8)]
-        public decimal ProgressiveBet { get; set; }
+        public string Commission { get; set; }
 
-        [JsonProperty(Order = 9)]
-        public decimal Commission { get; set; }
-        [JsonProperty(Order = 10)]
-        public decimal BACommission { get; set; }
-
-        [JsonProperty(Order = 11)]
-        public int BetCount { get; set; }
-
-        [JsonProperty(Order = 12)]
-        public decimal AvgBetAmount => BetCount != 0 && TurnOver != 0 ? TurnOver / BetCount : 0.00m;
-
-        [JsonProperty(Order = 13)]
-        public int UniquePlayers { get; set; }
-
-        [JsonProperty(Order = 14)]
-        public decimal Margin => GGR != 0 && ValidTurnOver != 0 ? GGR / ValidTurnOver : 0.00m;
-
-        [JsonProperty(Order = 15)]
-        public decimal ClosingBalance { get; set; }
-
-        [JsonProperty(Order = 16)]
-        public int DepositCount { get; set; }
-
-        [JsonProperty(Order = 17)]
-        public decimal TotalDepositAmount { get; set; }
-
-        [JsonProperty(Order = 18)]
-        public int WithDrawCount { get; set; }
-
-        [JsonProperty(Order = 19)]
-        public decimal TotalWithDrawAmount { get; set; }
-
-        [JsonProperty(Order = 20)]
-        public decimal TotalBonus { get; set; }
-        public string Currency { get; set; }
-
-        private decimal _ggrValue;
-    }
-
-    public class MpaWinLossByAffiliateDto
-    {
-        public string UserName { get; set; }
-
-        public string TpUserName { get; set; }
-
-        public string Currency { get; set; }
-
-        public string GameTypeName { get; set; }
-
-        public decimal TurnOver { get; set; }
-
-        public decimal ValidTurnOver { get; set; }
-
-        public decimal GGR { get; set; }
-
-        public decimal PlayerWinLoss { get; set; }
-
-        public decimal ProgressiveWin { get; set; }
-
-        public decimal ProgressiveBet { get; set; }
-
-        public decimal Commission { get; set; }
+        public string BACommission { get; set; }
 
         public int BetCount { get; set; }
 
-        public decimal AvgBetAmount { get; set; }
+        public string AvgBetAmount { get; set; }
 
         public int UniquePlayers { get; set; }
 
-        [EpplusIgnore]
-        public decimal Margin { get; set; }
+        public string Margin { get; set; }
+    }
 
-        public string MarginStr { get; set; }
-
+    public class MpaWinLossDisplay : MpaWinLossDisplaySimple, IMpaWinLossDisplay
+    {
         public int DepositCount { get; set; }
 
-        public decimal TotalDepositAmount { get; set; }
+        public string TotalDepositAmount { get; set; }
 
         public int WithDrawCount { get; set; }
 
-        public decimal TotalWithDrawAmount { get; set; }
+        public string TotalWithDrawAmount { get; set; }
 
-        public decimal ClosingBalance { get; set; }
-
-        public decimal TotalBonus { get; set; }
-        public int SiteId { get; set; }
-
-        public decimal BAPlayerWinLoss { get; set; }
-        public decimal BACommission { get; set; }
-
-        public string AffiliateAccount { get;set; } 
+        public string TotalBonus { get; set; }
     }
 
-    public class TpBetRecordByAffiliateWrapper
+    public class MpaWinLossDisplaySimple : IMpaWinLossDisplaySimple
     {
-        public IEnumerable<MpaWinLossByAffiliateDto> OriginTpBetRecordResult { get; set; }
+        public string TurnOver { get; set; }
 
-        public IEnumerable<MpaWinLossByAffiliateDto> AlreadyMultiplyRateTpBetRecordResult { get; set; }
+        public string ValidTurnOver { get; set; }
+
+        public string GGR { get; set; }
+
+        public string PlayerWinLoss { get; set; }
+
+        public string BAPlayerWinLoss { get; set; }
+
+        public string ProgressiveWin { get; set; }
+
+        public string ProgressiveBet { get; set; }
+
+        public string Commission { get; set; }
+
+        public string BACommission { get; set; }
+
+        public int BetCount { get; set; }
+
+        public string AvgBetAmount { get; set; }
 
         public int UniquePlayers { get; set; }
-    }
-    public class TransactionByAffiliateWrapper
-    {
-        public IEnumerable<MpaWinLossByAffiliateDto> OriginTransactionResult { get; set; }
 
-        public IEnumerable<MpaWinLossByAffiliateDto> AlreadyMultiplyRateTransactionResult { get; set; }
+        public string Margin { get; set; }
     }
 
-    public class BonusByAffiliateWrapper
-    {
-        public IEnumerable<MpaWinLossByAffiliateDto> OriginBonusResult { get; set; }
-
-        public IEnumerable<MpaWinLossByAffiliateDto> AlreadyMultiplyRateBonusResult { get; set; }
-    }
-
-    public class MpaWinLossByAffiliateWrapper
-    {
-        public IEnumerable<MpaWinLossByAffiliateDto> OriginData { get; set; }
-
-        public IEnumerable<MpaWinLossByAffiliateDto> AlreadyMultiplyRateData { get; set; }
-    }
 
     #region To FrontEnd API Formate
-
-    public class MpaWinLossByDayCurrencyDetailDtoToFrontEnd
+    
+    public class MpaWinLossDetailForFrontEnd<T> where T: IMpaWinLossSimple
     {
+        public MpaWinLossDetailForFrontEnd(T data, string key)
+        {
+            DisplayKey = key;
+            Data = data;
+        }
+        
         public string DisplayKey { get; set; }
 
-        public MpaWinLossByDayCurrencyDetailDto Data { get; set; }
-    }
-
-
-    public class MpaWinLossByTpCategoryCurrencyDetailDtoFrontEnd
-    {
-        public string DisplayKey { get; set; }
-
-        public MpaWinLossByTpCategoryCurrencyDetailDto Data { get; set; }
-    }
-
-    public class MpaWinLossByTpGameTypeCurrencyDetailDtoFrontEnd
-    {
-        public string DisplayKey { get; set; }
-
-        public MpaWinLossByTpGameTypeCurrencyDetailDto Data { get; set; }
-    }
-
-    public class MpaWinLossByPlayerCurrencyDetailDtoFrontEnd
-    {
-        public string DisplayKey { get; set; }
-        public MpaWinLossByPlayerCurrencyDetailDto Data { get; set; }
-    }
-
-    public class MpaWinLossByCurrencyCurrencyDetailDtoFrontEnd
-    {
-        public string DisplayKey { get; set; }
-
-        public MpaWinLossByCurrencyCurrencyDetailDto Data { get; set; }
-    }
-
-    public class MpaWinLossByBrandCurrencyDetailDtoToFrontEnd
-    {
-        public string DisplayKey { get; set; }
-
-        public MpaWinLossByBrandCurrencyDetailDto Data { get; set; }
-    }
-
-    public class MpaWinLossByAffiliateCurrencyDetailDtoFrontEnd
-    {
-        public string DisplayKey { get; set; }
-        public MpaWinLossByAffiliateCurrencyDetailDto Data { get; set; }
+        public T Data { get; set; }
     }
 
     #endregion
@@ -1237,248 +260,49 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
     #region To Excel Export Formate
 
-    public class MpaWinLossByDateDtoExport
+    public class MpaWinLossByDateDtoExport : MpaWinLossDisplay
     {
         public string Date { get; set; }
 
         public string Currency { get; set; }
-
-        public string TurnOver { get; set; }
-
-        public string ValidTurnOver { get; set; }
-
-        public string GGR { get; set; }
-
-        public string PlayerWinLoss { get; set; }
-
-        public string BAPlayerWinLoss { get; set; }
-
-        public string ProgressiveWin { get; set; }
-
-        public string ProgressiveBet { get; set; }
-
-        public string Commission { get; set; }
-
-        public string BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public string AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        public string Margin { get; set; }
-
-        public int DepositCount { get; set; }
-
-        public string TotalDepositAmount { get; set; }
-
-        public int WithDrawCount { get; set; }
-
-        public string TotalWithDrawAmount { get; set; }
-
-        public string TotalBonus { get; set; }
-        
     }
 
-    public class MpaWinLossByTpGameTypeDtoExport
+    public class MpaWinLossByTpGameTypeDtoExport : MpaWinLossDisplaySimple
     {
         public string TpGameTypeName { get; set; }
 
         public string Currency { get; set; }
-
-        public string TurnOver { get; set; }
-
-        public string ValidTurnOver { get; set; }
-
-        public string GGR { get; set; }
-
-        public string PlayerWinLoss { get; set; }
-        public string BAPlayerWinLoss { get; set; }
-
-        public string ProgressiveWin { get; set; }
-
-        public string ProgressiveBet { get; set; }
-
-        public string Commission { get; set; }
-        public string BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public string AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        public string Margin { get; set; }
     }
 
-    public class MpaWinLossByTpCategoryDtoExport
+    public class MpaWinLossByTpCategoryDtoExport : MpaWinLossDisplaySimple
     {
         public string TpCategoryName { get; set; }
 
         public string Currency { get; set; }
-
-        public string TurnOver { get; set; }
-
-        public string ValidTurnOver { get; set; }
-
-        public string GGR { get; set; }
-
-        public string PlayerWinLoss { get; set; }
-
-        public string BAPlayerWinLoss { get; set; }
-
-        public string ProgressiveWin { get; set; }
-
-        public string ProgressiveBet { get; set; }
-
-        public string Commission { get; set; }
-
-        public string BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public string AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        public string Margin { get; set; }
     }
 
-    public class MpaWinLossByPlayerDtoExport
+    public class MpaWinLossByPlayerDtoExport : MpaWinLossDisplay
     {
         public string UserName { get; set; }
 
         public string TpUserName { get; set; }
 
         public string Currency { get; set; }
-
-        public string GameTypeName { get; set; }
-
-        public string TurnOver { get; set; }
-
-        public string ValidTurnOver { get; set; }
-
-        public string GGR { get; set; }
-
-        public string PlayerWinLoss { get; set; }
-
-        public string BAPlayerWinLoss { get; set; }
-
-        public string ProgressiveWin { get; set; }
-
-        public string ProgressiveBet { get; set; }
-
-        public string Commission { get; set; }
-
-        public string BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public string AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        public string Margin { get; set; }
-
-        public int DepositCount { get; set; }
-
-        public string TotalDepositAmount { get; set; }
-
-        public int WithDrawCount { get; set; }
-
-        public string TotalWithDrawAmount { get; set; }
-
-        public string ClosingBalance { get; set; }
-
-        public string TotalBonus { get; set; }
     }
 
-    public class MpaWinLossByCurrencyDtoExport
+    public class MpaWinLossByCurrencyDtoExport : MpaWinLossDisplay
     {
         public string Currency { get; set; }
-
-        public string TurnOver { get; set; }
-
-        public string ValidTurnOver { get; set; }
-
-        public string GGR { get; set; }
-
-        public string PlayerWinLoss { get; set; }
-
-        public string BAPlayerWinLoss { get; set; }
-
-        public string ProgressiveWin { get; set; }
-
-        public string ProgressiveBet { get; set; }
-
-        public string Commission { get; set; }
-
-        public string BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public string AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        public string Margin { get; set; }
-
-        public int DepositCount { get; set; }
-
-        public string TotalDepositAmount { get; set; }
-
-        public int WithDrawCount { get; set; }
-
-        public string TotalWithDrawAmount { get; set; }
-
-        public string TotalBonus { get; set; }
     }
 
-    public class MpaWinLossByBrandDtoExport
+    public class MpaWinLossByBrandDtoExport : MpaWinLossDisplay
     {
         public string SiteName { get; set; }
 
         public string Currency { get; set; }
-
-        public string TurnOver { get; set; }
-
-        public string ValidTurnOver { get; set; }
-
-        public string GGR { get; set; }
-
-        public string PlayerWinLoss { get; set; }
-
-        public string BAPlayerWinLoss { get; set; }
-
-        public string ProgressiveWin { get; set; }
-
-        public string ProgressiveBet { get; set; }
-
-        public string Commission { get; set; }
-
-        public string BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public string AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        public string Margin { get; set; }
-
-        public int DepositCount { get; set; }
-
-        public string TotalDepositAmount { get; set; }
-
-        public int WithDrawCount { get; set; }
-
-        public string TotalWithDrawAmount { get; set; }
-
-        public string TotalBonus { get; set; }
     }
 
-    public class MpaWinLossByAffiliateDtoExport
+    public class MpaWinLossByAffiliateDtoExport : MpaWinLossDisplay
     {
         public string AffiliateAccount { get; set; }
         public string UserName { get; set; }
@@ -1486,49 +310,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string TpUserName { get; set; }
 
         public string Currency { get; set; }
-
-        public string TurnOver { get; set; }
-
-        public string ValidTurnOver { get; set; }
-
-        public string GGR { get; set; }
-
-        public string PlayerWinLoss { get; set; }
-
-        public string BAPlayerWinLoss { get; set; }
-
-        public string ProgressiveWin { get; set; }
-
-        public string ProgressiveBet { get; set; }
-
-        public string Commission { get; set; }
-
-        public string BACommission { get; set; }
-
-        public int BetCount { get; set; }
-
-        public string AvgBetAmount { get; set; }
-
-        public int UniquePlayers { get; set; }
-
-        public string Margin { get; set; }
-
-        public int DepositCount { get; set; }
-
-        public string TotalDepositAmount { get; set; }
-
-        public int WithDrawCount { get; set; }
-
-        public string TotalWithDrawAmount { get; set; }
-
-        public string ClosingBalance { get; set; }
-
-        public string TotalBonus { get; set; }
-        
     }
 
     #endregion
-
-
-
 }
