@@ -271,7 +271,7 @@ namespace BackendSite.Service.BLL.Mpa
         private static string GetOrderByProp(IOrderBy orderByOpt)
         {
             if (!orderByOpt.OrderBy)
-                return string.Empty;
+                return "key";
 
             return orderByOpt.OrderByProperty.Equals("sabaId", StringComparison.OrdinalIgnoreCase)
                 ? "tpUserName" : orderByOpt.OrderByProperty;
