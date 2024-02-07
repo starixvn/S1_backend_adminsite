@@ -9,5 +9,6 @@
         public string BonusService { get; set; }
         public string StoreService { get; set; }
         public string BackendService { get; set; }
+        public string ReportService { get; set; }
     }
 }

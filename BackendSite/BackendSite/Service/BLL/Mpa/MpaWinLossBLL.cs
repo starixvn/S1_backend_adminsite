@@ -25,7 +25,7 @@ namespace BackendSite.Service.BLL.Mpa
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
-            _reportApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
+            _reportApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").ReportService;
         }
 
         #region Get Report Result
