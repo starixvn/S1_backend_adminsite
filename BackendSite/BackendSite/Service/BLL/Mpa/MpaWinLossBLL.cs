@@ -1,10 +1,12 @@
 ﻿using BackendSite.ExceptionHandling;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.BLL.Mpa.Extension;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite.Service.BLL.Mpa
 {
@@ -14,6 +16,7 @@ namespace BackendSite.Service.BLL.Mpa
         private readonly ILogger<MpaWinLossBLL> _logger;
         private readonly CourierAdapter _courierAdapter;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly string _reportApiUrl;
 
         public MpaWinLossBLL(IServiceProvider provider)
         {
@@ -21,6 +24,8 @@ namespace BackendSite.Service.BLL.Mpa
             _logger = provider.GetRequiredService<ILogger<MpaWinLossBLL>>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            var configBll = provider.GetRequiredService<ConfigBLL>();
+            _reportApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
         }
 
         #region Get Report Result
@@ -229,8 +234,8 @@ namespace BackendSite.Service.BLL.Mpa
 
         private async Task<MpaWinLossReportResponse> GetWinLossReportAsync(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            var result = await _courierAdapter // 鮮血死借我測試
-                .MyPostAsync<MpaWinLossReportResponse, MpaWinLossReportRequest>("https://reportservice.ailab88.net/api/MpaWinLossReport/Get",
+            var result = await _courierAdapter
+                .MyPostAsync<MpaWinLossReportResponse, MpaWinLossReportRequest>($"{_reportApiUrl}/MpaWinLossReport/Get",
                     new MpaWinLossReportRequest
                     {
                         SiteIds = request.SiteIds,
