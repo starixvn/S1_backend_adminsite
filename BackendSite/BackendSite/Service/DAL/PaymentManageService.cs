@@ -33,7 +33,7 @@ namespace BackendSite.Service.DAL
         }
 
         #region PaymentGateway Setting Renew
-        
+
         public IEnumerable<PayListInfo> GetPayList(IEnumerable<int> siteIds)
         {
             var _siteIds = JsonConvert.SerializeObject(siteIds);
@@ -164,19 +164,16 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<PaySetting> GetPaySettingList(GetPaySettingListParams input, int pageSize, int startIndex, out int totalPages, out int rowCount)
         {
-            var p = new DynamicParameters(new
-            {
-                _SiteId = input.SiteId,
-                _CurrencyIds = input.CurrencyIds == null ? null : JsonConvert.SerializeObject(input.CurrencyIds),
-                _Method = input.Method,
-                _Status = input.Status,
-                _PayStatus = input.PayStatus,
-                _Type = input.Type,
-                _PayId = input.PayId,
-                _PageSize = pageSize,
-                _StartIndex = startIndex
-            });
-
+            var p = new DynamicParameters();
+            p.Add("_SiteId", input.SiteId);
+            p.Add("_CurrencyIds", input.CurrencyIds == null ? null : JsonConvert.SerializeObject(input.CurrencyIds));
+            p.Add("_Method", input.Method);
+            p.Add("_Status", input.Status);
+            p.Add("_PayStatus", input.PayStatus);
+            p.Add("_Type", input.Type);
+            p.Add("_PayId", input.PayId);
+            p.Add("_PageSize", pageSize);
+            p.Add("_StartIndex", startIndex);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
@@ -500,17 +497,17 @@ namespace BackendSite.Service.DAL
         {
             return await _reportDbClient.QueryAsync<PayGroup>("Service_PayGroup_Get");
         }
-        
+
         public IEnumerable<WithdrawalBlockSetting> GetWithdrawalBlockSettingList(int siteId)
         {
             var p = new DynamicParameters(new
             {
                 _SiteId = siteId
             });
-            
+
             return _reportDbClient.Query<WithdrawalBlockSetting>("Service_WithdrawalBlockSetting_Get", p);
         }
-        
+
         public bool SetWithdrawalBlockSetting(SetWithdrawalBlockSettingParams input)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
@@ -532,8 +529,8 @@ namespace BackendSite.Service.DAL
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", input.SiteId);
             logParam.Add("_CurrencyId", input.CurrencyId);
-            logParam.Add("_Menu", (int) AdminAdjustmentLogMenuEnum.WithdrawalBlockSetting);
-            logParam.Add("_ActionType", (int) ActionType.Update);
+            logParam.Add("_Menu", (int)AdminAdjustmentLogMenuEnum.WithdrawalBlockSetting);
+            logParam.Add("_ActionType", (int)ActionType.Update);
             logParam.Add("_RefTransId", string.Empty);
             logParam.Add("_BeforeDetailInfo", JsonConvert.SerializeObject(new
             {
@@ -556,7 +553,7 @@ namespace BackendSite.Service.DAL
                     return true;
                 }
             }
-            
+
             _mainDbClient.RollbackAndDisposeConnection(conn, trans);
             return false;
         }
