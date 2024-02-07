@@ -1,4 +1,5 @@
 using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss;
 
@@ -77,11 +78,16 @@ public class MpaWinLossGroupByModel
 
     public decimal TotalDepositAmount { get; set; }
 
-    public int WithdrawalCount { get; set; }
+    [JsonProperty("WithdrawalCount")]
+    public int WithdrawCount { get; set; }
 
-    public decimal TotalWithdrawalAmount { get; set; }
+    [JsonProperty("TotalWithdrawalAmount")]
+    public decimal TotalWithdrawAmount { get; set; }
 
     public decimal TotalBonus { get; set; }
     public string Key { get; set; }
     public string ChildKey { get; set; }
+    
+    public string TpUserName { get; set; }
+    public string UserName { get; set; }
 }

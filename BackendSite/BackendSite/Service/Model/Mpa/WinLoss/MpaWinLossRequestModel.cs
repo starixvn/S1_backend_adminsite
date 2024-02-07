@@ -1,8 +1,5 @@
-﻿using BackendSite.Extensions;
-using BackendSite.Service.Model.ApiModel;
+﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Mpa.WinLoss
 {
@@ -107,29 +104,5 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public IEnumerable<int> SiteIds { get; set; }
         public int CurrencyId { get; set; }
         public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
-
-        public string MemberTypeJson()
-        {
-            var memberTypeJson = MemberTypes != null && MemberTypes.Any()
-                ? JsonConvert.SerializeObject(MemberTypes.Select(x => (int)x))
-                : JsonConvert.SerializeObject(((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x));
-
-            return memberTypeJson;
-        }
-
-        public string UserNameJson()
-        {
-            var json = string.IsNullOrEmpty(UserName)
-                ? null
-                : JsonConvert.SerializeObject(FormatExtension.SplitRemoveSpace(UserName, ','));
-
-            return json;
-        }
-
-        public string GetWinLossByPlayerRedisKey()
-        {
-            var key = $"SiteId:{SiteId}:{StarTime:yyyy-MM-dd HH:mm:ss}:{EndTime:yyyy-MM-dd HH:mm:ss}:OriginalCurrency:{DisplayGroupBreakdownInOriginalCurrency}:UserName:{UserName}";
-            return key;
-        }
     }
 }
