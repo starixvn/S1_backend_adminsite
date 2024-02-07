@@ -34,6 +34,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
 
@@ -44,7 +45,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
 
@@ -54,7 +55,7 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<MpaWinLossResponseToFrontEndWithPlayerWrapper> GetMpaWinLossResultWithPlayerInfo(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             IPageInfo pageInfo = new PageInfo();
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
             var apiData = data.SortThen2ApiFormatWithPlayer(request).ToList();
@@ -77,7 +78,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
 
             var data = await GetWinLossReportAsync(request, groupByType);
 
@@ -92,7 +93,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
@@ -112,7 +113,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
@@ -132,7 +133,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
@@ -152,7 +153,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
@@ -173,7 +174,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
@@ -192,7 +193,7 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
@@ -210,7 +211,7 @@ namespace BackendSite.Service.BLL.Mpa
 
         public async Task<IEnumerable<MpaWinLossByAffiliateDtoExport>> GetMpaWinLossByAffiliateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            request.OrderByProperty = GetOrderByProp(request);
+            GetOrderByProp(request);
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
             var result = sortedData.Select(x =>
@@ -268,12 +269,17 @@ namespace BackendSite.Service.BLL.Mpa
 
         #endregion
 
-        private static string GetOrderByProp(IOrderBy orderByOpt)
+        private static void GetOrderByProp(IOrderBy orderByOpt)
         {
-            if (!orderByOpt.OrderBy)
-                return "key";
+            if (!orderByOpt.OrderBy || string.IsNullOrEmpty(orderByOpt.OrderByProperty))
+            {
+                orderByOpt.OrderBy = true;
+                orderByOpt.OrderByProperty = "key";
 
-            return orderByOpt.OrderByProperty.Equals("sabaId", StringComparison.OrdinalIgnoreCase)
+                return;
+            }
+
+            orderByOpt.OrderByProperty = orderByOpt.OrderByProperty.Equals("sabaId", StringComparison.OrdinalIgnoreCase)
                 ? "tpUserName" : orderByOpt.OrderByProperty;
         }
     }
