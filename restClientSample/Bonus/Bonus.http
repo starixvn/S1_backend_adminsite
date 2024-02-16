@@ -1,0 +1,33 @@
+# localhost
+@url=http://localhost:5070
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+POST {{url}}/apiV2/Bonus/GetList HTTP/1.1
+Content-Type: application/json
+
+{
+    "startDate": "2024-02-15T00:00:00+00:00",
+    "endDate": "2024-02-17T23:59:59+00:00",
+    "pageNumber": 1,
+    "pageSize": 25,
+    "bonusCode": null,
+    "scratchCardCode": "MHDTE-PHRI49",
+    "isSpecial": true,
+    "currencyIds": [2,4,15,61,74,13,3,51,72],
+    "promotionTypes": [1,2,3,6,7,8,9,10,11],
+    "status": 0,
+    "device": 0
+}
