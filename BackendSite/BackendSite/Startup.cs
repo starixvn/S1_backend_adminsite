@@ -45,6 +45,7 @@ namespace BackendSite
             services.AddSingleton<CourierAdapter>();
             services.AddSingleton<CodeGenerator>();
             services.AddSingleton<CacheHelper>();
+            services.AddSingleton<HttpHelper>();
             services.AddDatabaseConnection(_configuration);
             
             
@@ -170,6 +171,7 @@ namespace BackendSite
             services.AddSiteConfig();
             services.AddCloudFrontImageInfo();
             services.AddAffConfig();
+            services.AddHttpClientWithProxy();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
