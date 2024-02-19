@@ -294,7 +294,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
                             break;
                         }
-                    case (int)PromotionTypeEnum.ReDeposit:
+                    case (int)PromotionTypeEnum.ReDeposit or (int)PromotionTypeEnum.MissionBonus:
                         if (request.PromotionInfo.Specific.Any(specific =>
                                 specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 specific.TierAmountList.Any(tierAmount =>

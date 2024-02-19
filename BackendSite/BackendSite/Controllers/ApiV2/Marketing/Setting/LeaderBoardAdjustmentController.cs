@@ -165,7 +165,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
                                 ActiveDate = Convert.ToDateTime(activeDate),
                                 CategoryId = int.Parse(categoryId),
                                 UserName = username,
-                                ExtraPoint = int.Parse(extraPoint)
+                                ExtraPoint = decimal.Parse(extraPoint)
                             });
                         }
                         rowId += 1;

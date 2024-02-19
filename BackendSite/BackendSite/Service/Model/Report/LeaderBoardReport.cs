@@ -24,6 +24,18 @@ public class GetLeaderboardReportRequest : IApiRequest
     public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
 }
 
+public class Leaderboard
+{
+    public int SiteId { get; set; }
+    public string SiteName { get; set; }
+    public int CurrencyId { get; set; }
+    public string IsoCode { get; set; }
+    public int CustId { get; set; }
+    public string UserName { get; set; }
+    public decimal WTurnover { get; set; }
+    public int Status { get; set; }
+}
+
 public class LeaderboardReportModel
 {
     public DateTime Date { get; set; }

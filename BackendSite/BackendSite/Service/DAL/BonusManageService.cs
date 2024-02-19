@@ -293,6 +293,12 @@ namespace BackendSite.Service.DAL
                         {
                             specific.TierAmountList = JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(specific.TierAmount);
                         }
+                        
+                        if (!string.IsNullOrEmpty(specific.TurnoverTpGameTypes))
+                        {
+                            specific.TurnoverTpGameTypeList = JsonConvert.DeserializeObject<IEnumerable<int>>(specific.TurnoverTpGameTypes);
+                        }
+                        
                     }
                 }
                 
@@ -309,8 +315,6 @@ namespace BackendSite.Service.DAL
         /// </summary>
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
-        /// <param name="connection"></param>
-        /// <param name="transaction"></param>
         /// <returns></returns>
         public PromotionInfo GetPromotion(string bonusCode, int siteId)
         {
@@ -362,13 +366,10 @@ namespace BackendSite.Service.DAL
         /// </summary>
         /// <param name="isAdd"></param>
         /// <param name="promotion"></param>
-        /// <param name="promotionDisplayConditionList"></param>
-        /// <param name="expectedDelSpecificRow"></param>
-        /// <param name="expectedDelRebateRow"></param>
-        /// <param name="expectedDelConditionRow"></param>
+        /// <param name="vipLevelCondition"></param>
+        /// <param name="Operator"></param>
         /// <returns></returns>
-        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition,
-            string Operator)
+        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition, string Operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
@@ -432,7 +433,8 @@ namespace BackendSite.Service.DAL
                         ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(","))
                         : null,
                     TotalUsageLimit = specific.TotalUsageLimit,
-                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]"
+                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]",
+                    TurnoverTpGameTypes = specific.TurnoverTpGameTypeList is not null ? JsonConvert.SerializeObject(specific.TurnoverTpGameTypeList) : "[]",
                 });
             }
 
@@ -692,7 +694,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V6", transaction, p);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V7", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 

@@ -110,14 +110,14 @@ namespace BackendSite.Service.DAL
         {
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
-            return _reportDbClient.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<CurrencyDataV2>("Admin_Currency_GetByCasinoId", props);
         }
         public List<GameCasinoDetail> GetGameCasinoDetailBySiteAndCasinoIdV2(GetGameCasinoDetailPara para, int SiteId)
         {
             var props = new DynamicParameters();
             props.Add("GameCasinoId", para.GameCasinoId);
             props.Add("SiteId", SiteId);
-            return _reportDbClient.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId", props, commandType: CommandType.StoredProcedure).ToList();
+            return _reportDbClient.Query<GameCasinoDetail>("Admin_GameCasinoDetail_GetBySiteAndCasinoId", props).ToList();
         }
     }
 }
