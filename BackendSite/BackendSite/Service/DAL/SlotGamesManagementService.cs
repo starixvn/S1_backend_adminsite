@@ -157,7 +157,7 @@ namespace BackendSite.Service.DAL
 
             return success;
         }
-        public bool SetGameCasinoExtra(int tpId, string rtp, string reel, string payline, int nextId, MySqlTransaction trans)
+        public bool SetGameCasinoExtra(int tpId, double rtp, string reel, string payline, int nextId, MySqlTransaction trans)
         {
             var parameter = new DynamicParameters();
             parameter.Add("_TpId", tpId, DbType.Int32);
