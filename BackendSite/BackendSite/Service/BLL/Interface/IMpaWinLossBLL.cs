@@ -60,17 +60,7 @@ public interface IMpaWinLossBLL
     /// <param name="groupByType"></param>
     /// <returns></returns>
     Task<MpaWinLossResponseToFrontEndWithPlayerWrapper> GetMpaWinLossResultWithPlayerInfo(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-
-
-    /// <summary>
-    /// api
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="groupByType"></param>
-    /// <returns></returns>
-
-    Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>> GetMpaWinLossResultWithPlayerDetail(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-
+    
     /// <summary>
     /// excel export
     /// </summary>

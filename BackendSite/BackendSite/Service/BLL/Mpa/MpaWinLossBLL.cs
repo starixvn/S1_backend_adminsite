@@ -73,18 +73,6 @@ namespace BackendSite.Service.BLL.Mpa
             };
         }
 
-        // todo: 前端拔掉後可砍
-        public async Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>> GetMpaWinLossResultWithPlayerDetail(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
-        {
-            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
-            ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            GetOrderByProp(request);
-
-            var data = await GetWinLossReportAsync(request, groupByType);
-
-            return data.SortThen2ApiFormatWithPlayer(request);
-        }
-
         #endregion
 
         #region Export Result

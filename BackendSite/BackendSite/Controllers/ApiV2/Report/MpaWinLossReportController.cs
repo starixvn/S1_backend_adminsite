@@ -189,27 +189,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             return _excelBll.ExcelFile(stream, "WinLossByPlayerExport");
         }
 
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>>();
-            
-            try
-            {
-                var responseData = await _mpaWinLossBll.GetMpaWinLossResultWithPlayerDetail(request, MpaWinLossGroupByTypeEnum.Player);
-                apiResult.Data = responseData;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
-
         #endregion
 
         #region GroupBy Currency
