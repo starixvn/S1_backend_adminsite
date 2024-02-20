@@ -70,8 +70,9 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             foreach (var item in source.Result)
             {
-                var children = source.ChildResult.Where(x => x.Key == item.Key)
-                    .Select(x => new MpaWinLossDetailForFrontEnd<MpaWinLoss>(new MpaWinLoss(x), x.Key));
+                var children = source.ChildResult
+                    .Where(x => x.Key == item.Key)
+                    .Select(x => new MpaWinLossDetailForFrontEnd<MpaWinLoss>(new MpaWinLoss(x), x.ChildKey));
 
                 var data = new MpaWinLossResponseForFrontEnd(item, children);
 
@@ -89,8 +90,9 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             foreach (var item in source.Result)
             {
-                var children = source.ChildResult.Where(x => x.Key == item.Key)
-                    .Select(x => new MpaWinLossDetailForFrontEnd<MpaWinLossSimple>(new MpaWinLossSimple(x), x.Key));
+                var children = source.ChildResult
+                    .Where(x => x.Key == item.Key)
+                    .Select(x => new MpaWinLossDetailForFrontEnd<MpaWinLossSimple>(new MpaWinLossSimple(x), x.ChildKey));
 
                 var data = new MpaWinLossResponseForFrontEndSimple(item, children);
 
@@ -108,8 +110,9 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             foreach (var item in source.Result)
             {
-                var children = source.ChildResult.Where(x => x.Key == item.Key)
-                    .Select(x => new MpaWinLossDetailForFrontEnd<MpaWinLossWithPlayerInfo>(new MpaWinLossWithPlayerInfo(x), x.Key));
+                var children = source.ChildResult
+                    .Where(x => x.Key == item.Key)
+                    .Select(x => new MpaWinLossDetailForFrontEnd<MpaWinLossWithPlayerInfo>(new MpaWinLossWithPlayerInfo(x), x.ChildKey));
 
                 var data = new MpaWinLossResponseForFrontEndWithPlayer(item, children);
 
