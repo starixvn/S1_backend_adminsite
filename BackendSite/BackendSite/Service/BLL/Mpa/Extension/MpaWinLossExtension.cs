@@ -70,14 +70,17 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             foreach (var item in source.Result)
             {
-                var children = source.ChildResult
-                    .Where(x => x.Key == item.Key)
+                var tmp = source.ChildResult
+                    .Where(x => x.Key == item.Key);
+                var children = tmp
                     .Select(x => new MpaWinLossDetailForFrontEnd<MpaWinLoss>(new MpaWinLoss(x), x.ChildKey));
 
                 var data = new MpaWinLossResponseForFrontEnd(item, children);
 
                 result.Add(data);
             }
+            
+            result.Add(new MpaWinLossResponseForFrontEnd(source.Total, ArraySegment<MpaWinLossDetailForFrontEnd<MpaWinLoss>>.Empty));
 
             return result;
         }
@@ -99,6 +102,8 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 result.Add(data);
             }
 
+            result.Add(new MpaWinLossResponseForFrontEndSimple(source.Total, ArraySegment<MpaWinLossDetailForFrontEnd<MpaWinLossSimple>>.Empty));
+            
             return result;
         }
         
@@ -119,6 +124,8 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 result.Add(data);
             }
 
+            result.Add(new MpaWinLossResponseForFrontEndWithPlayer(source.Total, ArraySegment<MpaWinLossDetailForFrontEnd<MpaWinLossWithPlayerInfo>>.Empty));
+
             return result;
         }
 
@@ -129,7 +136,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             if (orderByOption.OrderByProperty.Equals("key"))
                 orderByOption.OrderByProperty = "childKey";
             
-            source.ChildResult = source.Result.OrderBy(orderByOption);
+            source.ChildResult = source.ChildResult.OrderBy(orderByOption);
         }
 
         #endregion
