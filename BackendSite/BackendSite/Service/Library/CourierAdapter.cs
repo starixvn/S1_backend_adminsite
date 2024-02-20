@@ -10,22 +10,18 @@ namespace BackendSite.Service.Library
     public class CourierAdapter
     {
         private readonly ILogger<CourierAdapter> _logger;
-        private readonly HttpHelper _httpHelper;
 
         public CourierAdapter(IServiceProvider provider)
         {
             _logger = provider.GetRequiredService<ILogger<CourierAdapter>>();
-            _httpHelper = provider.GetRequiredService<HttpHelper>();
         }
 
-        public async Task<ApiResult<T>> MyPostAsync<T, U>(string url, U oTpInfo, int timeout = 0, bool useProxy = false)
+        public async Task<ApiResult<T>> MyPostAsync<T, U>(string url, U oTpInfo, int timeout = 0)
         {
             try
             {
                 ApiResult<T> oApiResult = null;
-                var client = useProxy
-                    ? _httpHelper.GetWithProxyClient()
-                    : _httpHelper.GetClient();
+                using var client = new HttpClient();
                 var fooJSON = JsonConvert.SerializeObject(oTpInfo);
                 var fooContent = new StringContent(fooJSON, Encoding.UTF8, "application/json");
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

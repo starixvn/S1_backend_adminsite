@@ -1,5 +1,4 @@
-﻿using System.Net;
-using BackendSite.Service.BLL;
+﻿using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.BLL.Infrastructure.Model;
 using BackendSite.Service.BLL.Interface;
@@ -114,31 +113,6 @@ namespace BackendSite.Extensions
             var configBll = provider.GetRequiredService<ConfigBLL>();
             var siteCloudFrontImageInfo = configBll.GetConfigValuesBySiteName<SiteCloudFrontImageInfo>("SiteCloudFrontImageInfo");
             services.AddSingleton(siteCloudFrontImageInfo);
-            return services;
-        }
-        
-        public static IServiceCollection AddHttpClientWithProxy(this IServiceCollection services)
-        {
-            var provider = services.BuildServiceProvider();
-            var configBll = provider.GetRequiredService<ConfigBLL>();
-            var proxyConfig = configBll.GetConfigValue<ProxyConfig>("ProxySetting");
-            var proxyHost = proxyConfig.ProxyHost;
-            var proxyPort = proxyConfig.ProxyPort;
-            
-            if (!string.IsNullOrEmpty(proxyHost))
-            {
-                var proxy = new HttpClientHandler
-                {
-                    Proxy = new WebProxy(proxyHost, proxyPort),
-                    UseProxy = true
-                };
-
-                services.AddHttpClient("with_proxy")
-                    .ConfigurePrimaryHttpMessageHandler(() => proxy);
-            }
-            
-            services.AddHttpClient();
-
             return services;
         }
 

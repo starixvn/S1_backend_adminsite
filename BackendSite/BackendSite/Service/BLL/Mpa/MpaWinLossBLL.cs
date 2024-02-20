@@ -257,7 +257,7 @@ namespace BackendSite.Service.BLL.Mpa
                         IncludeFreeSpins = request.IncludeFreeSpins,
                         TpGameTypes = request.TpGameTypes,
                         DisplayGroupBreakdownInOriginalCurrency = request.DisplayGroupBreakdownInOriginalCurrency
-                    }, useProxy: true);
+                    });
 
             if (result.ErrorCode != (int)ErrorCodeEnum.Success)
             {
