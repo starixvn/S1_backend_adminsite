@@ -42,11 +42,12 @@ namespace BackendSite.Service.BLL
 
         public async Task<SiteMaintainResponse> GetSiteMaintain(int site)
         {
+            var serverInfo = _serverInfoBll.GetServerInfo(site);
             //先取新的path json, 取不到取舊的json
             var getNewRequest = new GetObjectRequest
             {
                 BucketName = _errorPageBucketName,
-                Key = $"{site}/{site}/{_fileName}"
+                Key = $"{serverInfo.SiteName.ToUpper()}/{serverInfo.SiteName.ToUpper()}/{_fileName}"
             };
 
             var getResponse = await _s3Helper.GetObjectAsync(getNewRequest);
@@ -56,7 +57,7 @@ namespace BackendSite.Service.BLL
                 var getRequest = new GetObjectRequest
                 {
                     BucketName = _errorPageBucketName,
-                    Key = $"{site}/{_fileName}"
+                    Key = $"{serverInfo.SiteName.ToUpper()}/{_fileName}"
                 };
 
                 getResponse = await _s3Helper.GetObjectAsync(getRequest);
