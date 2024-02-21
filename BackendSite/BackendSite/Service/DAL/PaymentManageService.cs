@@ -166,20 +166,20 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", input.SiteId);
-            p.Add("_CurrencyIds", input.CurrencyIds == null ? null : JsonConvert.SerializeObject(input.CurrencyIds));
-            p.Add("_Method", input.Method);
-            p.Add("_Status", input.Status);
-            p.Add("_PayStatus", input.PayStatus);
-            p.Add("_Type", input.Type);
-            p.Add("_PayId", input.PayId);
+            p.Add("_CurrencyIds", input.CurrencyIds == null ? "[]" : JsonConvert.SerializeObject(input.CurrencyIds));
+            p.Add("_Method", input.Method == null ? -1 : input.Method);
+            p.Add("_Status", input.Status == null ? -1 : input.Status);
+            p.Add("_PayStatus", input.PayStatus == null ? -1 : input.PayStatus);
+            p.Add("_Type", input.Type == null ? -1 : input.Type);
+            p.Add("_PayId", input.PayId == null ? -1 : input.PayId);
             p.Add("_PageSize", pageSize);
             p.Add("_StartIndex", startIndex);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var result = _reportbackupDbClient != null
-                ? _reportbackupDbClient.RetryQuery<PaySetting>("Admin_PaySetting_GetList", p)
-                : _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList", p);
+                ? _reportbackupDbClient.RetryQuery<PaySetting>("Admin_PaySetting_GetList_V2", p)
+                : _reportDbClient.Query<PaySetting>("Admin_PaySetting_GetList_V2", p);
 
             totalPages = p.Get<int>("_TotalPages");
             rowCount = p.Get<int>("_RowCount");
