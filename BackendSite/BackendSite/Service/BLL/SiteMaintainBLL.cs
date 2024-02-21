@@ -89,7 +89,7 @@ namespace BackendSite.Service.BLL
                 BucketName = _errorPageBucketName,
                 ContentType = "application/json",
                 InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
-                Key = $"{request.SiteId}/{request.SiteId}/{_fileName}"
+                Key = $"{serverInfo.SiteName.ToUpper()}/{serverInfo.SiteName.ToUpper()}/{_fileName}"
             };
             var putNewResponse = await _s3Helper.PutObjectAsync(putNewRequest);
             if (!putNewResponse.HttpStatusCode.IsSuccess())
@@ -107,7 +107,7 @@ namespace BackendSite.Service.BLL
                     BucketName = _errorPageBucketName,
                     ContentType = "application/json",
                     InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
-                    Key = $"{request.SiteId}/{_fileName}"
+                    Key = $"{serverInfo.SiteName.ToUpper()}/{_fileName}"
                 };
                 var putResponse = await _s3Helper.PutObjectAsync(putRequest);
                 if (!putResponse.HttpStatusCode.IsSuccess())
