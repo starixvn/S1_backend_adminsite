@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
 
 namespace BackendSite.Service.BLL
@@ -28,6 +29,12 @@ namespace BackendSite.Service.BLL
         public int UpdateHeaderSettingByTpGameId(UpdateHeaderSettingByTpGameIdReq req , string updater)
         {
             return _headerManagementService.UpdateHeaderSettingByTpGameId(req, updater);
+        }
+        
+        public int UpdateHeaderSettingEnvironment(UpdateHeaderHeaderSettingEnvironmentReq req , string updater)
+        {
+            var status = (req.IsPRD) ? (int)SlotGameStatusEnum.Open : (int)SlotGameStatusEnum.ReleaseOpen;
+            return _headerManagementService.UpdateHeaderSettingEnvironment(req, status, updater);
         }
         
         public int UpdateSort(int id,int sort, string updater)

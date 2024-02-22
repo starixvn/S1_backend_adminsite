@@ -133,6 +133,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             };
         }
         
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 150, 3 })]
+        [HttpPost]
+        public ApiResult UpdateHeaderSettingEnvironment(UpdateHeaderHeaderSettingEnvironmentReq req)
+        {
+            var result = _headerManagementBll.UpdateHeaderSettingEnvironment(req, User.Identity.Name);
+
+            if (result <= 0)
+                throw new AdminException(ErrorCodeEnum.Fail);
+
+            return new ApiResult()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
+        
         [HttpPost]
         public ApiResult<IEnumerable<HeaderLobbyCategory>> GetLobbyCategory()
         {

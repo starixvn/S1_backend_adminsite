@@ -42,32 +42,6 @@ namespace BackendSite.Service.Model.Report
         public int Sort { get; set; }
     }
     
-    public class UpdateHeaderPictureReq
-    {
-        public int Id { get; set; }
-        public HeaderPictureEnum HeaderPictureEnum { get; set; }
-        public IFormFile Receipt { get; set; }
-    }
-    
-    public class GetHeaderPictureReq
-    {
-        public int Id { get; set; }
-    }
-    
-    public class HeaderPictureResponse
-    {
-        public HeaderPictureEnum HeaderPictureEnum { get; set; }
-        public string Url { get; set; }
-    }
-    
-    public class HeaderPicture
-    {
-        public string PcHeaderPic { get; set; }
-        public string PcLobbyPic { get; set; }
-        public string MobileHeaderPic { get; set; }
-        public string MobileLobbyPic { get; set; }
-    }
-    
     public class HeaderManagementReport
     {
         public int Id { get; set; }
@@ -107,6 +81,13 @@ namespace BackendSite.Service.Model.Report
     {
         public string Id { get; set; }
         public string Name { get; set; }
+    }
+    
+    public class UpdateHeaderHeaderSettingEnvironmentReq
+    {
+        public bool IsPRD { get; set; }
+        public int SiteId { get; set; }
+        public int TpGameIdNo { get; set; }
     }
 }
 
