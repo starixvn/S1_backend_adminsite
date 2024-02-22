@@ -187,7 +187,9 @@ namespace BackendSite.Service.DAL
             foreach (var item in sitecurrencyList)
             {
                 //判斷currency是否開啟，若開啟status先設為為3(release)
-                var status = opencurrencyIds.Contains(item.CurrencyId) ? 3 : 0;
+                //DEV階段先改1
+                //todo 上release後改成3
+                var status = opencurrencyIds.Contains(item.CurrencyId) ? 1 : 0;
                 
                 var parameter = new DynamicParameters();
                 parameter.Add("_SiteId", item.SiteId, DbType.Int32);
