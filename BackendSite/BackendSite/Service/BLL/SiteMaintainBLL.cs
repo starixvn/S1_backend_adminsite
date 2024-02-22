@@ -21,7 +21,9 @@ namespace BackendSite.Service.BLL
         private readonly string _errorPageBucketName;
         private readonly MySqlClient _mainDbClient;
         private readonly ServerInfoBLL _serverInfoBll;
-
+        private readonly Dictionary<string, IEnumerable<string>> _maintainExcludeDomainConfig;
+        private readonly IEnumerable<int> _maintainJsonSyncSiteConfig;
+        
         public SiteMaintainBLL(IServiceProvider provider)
         {
             _siteConfig = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
