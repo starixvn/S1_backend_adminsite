@@ -1,9 +1,11 @@
 ﻿using System.Data;
 
+using BackendSite.ExceptionHandling;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
+using BackendSite.Service.Model.TpMaintain;
 
 using Dapper;
 
@@ -47,29 +49,23 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<PromotionType>("Admin_PromotionType_Get", new { isPayout, isNew });
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategories(int walletType)
+        public IEnumerable<PromoCategory> GetPromoCategories()
         {
-            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V2", new DynamicParameters(new { _WalletType = walletType }));
+            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V4");
         }
 
-        public IEnumerable<PromoCategory> GetPromoCategoriesV2(int walletType)
+        public IEnumerable<int> GetPromotionCategoryGameTypeList(int PromotionCategoryId)
         {
-            return _reportDbClient.Query<PromoCategory>("Admin_PromotionCategory_Get_V3", new DynamicParameters(new { _WalletType = walletType }));
+            return _reportDbClient.Query<int>("Admin_PromotionCategoryGameType_Get", new { PromotionCategoryId });
         }
 
-        public IEnumerable<TpGameType> GetTpGameList()
+        public IEnumerable<CashBackGame> GetCashBackGameList(string siteIds, int currencyId, int categoryId)
         {
-            return _reportDbClient.Query<TpGameType>("Admin_TpGameType_Get");
-        }
-
-        public IEnumerable<CashBackGame> GetCashBackGameList(string siteIds, int currencyId, int? tpId, int? categoryId)
-        {
-            return _reportDbClient.Query<CashBackGame>("Admin_CashBackGameType_Get_V2", 
+            return _reportDbClient.Query<CashBackGame>("Admin_CashBackGameType_Get_V3", 
                 new DynamicParameters(
                     new { 
                         _SiteIds = siteIds, 
-                        _CurrencyId = currencyId, 
-                        _TpId = tpId, 
+                        _CurrencyId = currencyId,
                         _PromoCategoryId = categoryId }));
         }
 
@@ -168,21 +164,6 @@ namespace BackendSite.Service.DAL
         /// <summary>
         /// 取得促銷資料清單
         /// </summary>
-        /// <param name="siteIds"></param>
-        /// <param name="currencyIds"></param>
-        /// <param name="promotionTypes"></param>
-        /// <param name="status"></param>
-        /// <param name="startDate"></param>
-        /// <param name="endDate"></param>
-        /// <param name="device"></param>
-        /// <param name="bonusCode"></param>
-        /// <param name="permissionSiteIds"></param>
-        /// <param name="isSpecial"></param>
-        /// <param name="startIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="totalPages"></param>
-        /// <param name="rowCount"></param>
-        /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
             string currencyIds,
             string promotionTypes,
@@ -192,6 +173,7 @@ namespace BackendSite.Service.DAL
             int device,
             string bonusCode,
             string permissionSiteIds,
+            string scratchCardCode,
             bool isSpecial,
             int startIndex,
             int pageSize,
@@ -208,13 +190,14 @@ namespace BackendSite.Service.DAL
             p.Add("_Device", device);
             p.Add("_BonusCode", bonusCode);
             p.Add("_PermissionSiteIds", permissionSiteIds);
+            p.Add("_ScratchCardCode", string.IsNullOrEmpty(scratchCardCode) ? null : scratchCardCode);
             p.Add("_IsSpecial", isSpecial ? 1 : 0);
             p.Add("_StartIndex", startIndex);
             p.Add("_PageSize", pageSize);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V6", p);
+            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V7", p);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
@@ -243,9 +226,16 @@ namespace BackendSite.Service.DAL
                     {
                         var cashBackList = GetPromotionCashBack(bonusCode, siteId);
                         var tempCashBackList = cashBackList
-                            .GroupBy(x => new
-                            { x.CurrencyId, x.GameType, x.LossAmount, x.Percentage, x.Status, x.TpId }).Select(x =>
-                            new PromotionCashBack1
+                            .GroupBy(x => new 
+                            { 
+                                x.CurrencyId, 
+                                x.GameType, 
+                                x.LossAmount, 
+                                x.Percentage, 
+                                x.Status, 
+                                x.TpId 
+                            })
+                            .Select(x =>new PromotionCashBackCurrency
                             {
                                 CurrencyId = x.Key.CurrencyId,
                                 GameType = x.Key.GameType,
@@ -266,13 +256,9 @@ namespace BackendSite.Service.DAL
                                 {
                                     CashBackTpInfos = specific.CashBackList.Select(i => new CashBackTpInfo
                                     {
-                                        TpId = (i.TpId == 41)
-                                            ? i.GameType
-                                            : i.TpId,
-
-                                        CategoryId = (i.TpId == 41)
-                                            ? 9
-                                            : i.GameType
+                                        // SBSW特殊邏輯
+                                        TpId = i.TpId == (int)TpEnum.SBSW ? i.GameType : i.TpId,
+                                        CategoryId = i.TpId == (int)TpEnum.SBSW ? (int)PromotionCategoryEnum.SBSW : i.GameType
                                     }),
                                     Percentage = cashBack.Percentage,
                                     LossAmount = cashBack.LossAmount
@@ -294,8 +280,19 @@ namespace BackendSite.Service.DAL
                         {
                             specific.TierAmountList = JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(specific.TierAmount);
                         }
+                        
+                        if (!string.IsNullOrEmpty(specific.TurnoverTpGameTypes))
+                        {
+                            specific.TurnoverTpGameTypeList = JsonConvert.DeserializeObject<IEnumerable<int>>(specific.TurnoverTpGameTypes);
+                        }
+                        
                     }
                 }
+                
+                if (promotion.CategoryId.HasValue)
+                {
+                    promotion.PromotionCategoryGameTypeList = GetPromotionCategoryGameTypeList(promotion.CategoryId.Value);
+                }               
             }
             return promotion;
         }
@@ -305,8 +302,6 @@ namespace BackendSite.Service.DAL
         /// </summary>
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
-        /// <param name="connection"></param>
-        /// <param name="transaction"></param>
         /// <returns></returns>
         public PromotionInfo GetPromotion(string bonusCode, int siteId)
         {
@@ -358,13 +353,10 @@ namespace BackendSite.Service.DAL
         /// </summary>
         /// <param name="isAdd"></param>
         /// <param name="promotion"></param>
-        /// <param name="promotionDisplayConditionList"></param>
-        /// <param name="expectedDelSpecificRow"></param>
-        /// <param name="expectedDelRebateRow"></param>
-        /// <param name="expectedDelConditionRow"></param>
+        /// <param name="vipLevelCondition"></param>
+        /// <param name="Operator"></param>
         /// <returns></returns>
-        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition,
-            string Operator)
+        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition, string Operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
@@ -428,7 +420,8 @@ namespace BackendSite.Service.DAL
                         ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(","))
                         : null,
                     TotalUsageLimit = specific.TotalUsageLimit,
-                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]"
+                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]",
+                    TurnoverTpGameTypes = specific.TurnoverTpGameTypeList is not null ? JsonConvert.SerializeObject(specific.TurnoverTpGameTypeList) : "[]",
                 });
             }
 
@@ -489,12 +482,10 @@ namespace BackendSite.Service.DAL
                     foreach (var tpInfo in specific.CashBackSetting.CashBackTpInfos)
                     {
                         var tpCategoryId = 0;
-                        if (promotion.WalletType == (int)PromotionWalletTypeEnum.Transfer || tpInfo.TpId == (int)TpEnum.SBSW)
+                        
+                        if (tpInfo.CategoryId == (int)PromotionCategoryEnum.SBSW)
                         {
-                            tpCategoryId = tpInfo.CategoryId;
-                        }
-                        else if (promotion.TpId == (int)TpEnum.SBSW)
-                        {
+                            // SBSW的遊戲類型放在TpId內
                             tpCategoryId = tpInfo.TpId;
                         }
                         else
@@ -515,9 +506,7 @@ namespace BackendSite.Service.DAL
                             cashBackList.Add(new PromotionCashBackSetting
                             {
                                 CurrencyId = specific.CurrencyId,
-                                TpId = (promotion.TpId == (int)TpEnum.SBSW)
-                                    ? promotion.TpId
-                                    : tpInfo.TpId,
+                                TpId = tpInfo.CategoryId == (int)PromotionCategoryEnum.SBSW ? (int)TpEnum.SBSW : tpInfo.TpId,
                                 CategoryId = tpCategoryId,
                                 Level = vipLevel,
                                 Percentage = specific.CashBackSetting.Percentage,
@@ -692,7 +681,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V6", transaction, p);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V7", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
@@ -906,14 +895,14 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_PromotionCashBack_Set", transaction, p) > 0;
         }
 
-        public IEnumerable<PromotionCashBack1> GetPromotionCashBack(string bonusCode, int siteId)
+        public IEnumerable<PromotionCashBackCurrency> GetPromotionCashBack(string bonusCode, int siteId)
         {
             var p = new DynamicParameters();
 
             p.Add("_BonusCode", bonusCode);
             p.Add("_SiteId", siteId);
 
-            return _reportDbClient.Query<PromotionCashBack1>("Admin_PromotionCashBack_Get", p);
+            return _reportDbClient.Query<PromotionCashBackCurrency>("Admin_PromotionCashBack_Get", p);
         }
 
         private bool DuplicatePromotionCashBack(string bonusCode, int siteId, string newBonusCode,

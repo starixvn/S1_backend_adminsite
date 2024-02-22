@@ -19,6 +19,18 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 data = data.Where(r => r.UserName == request.UserName || r.TpUserName == request.UserName);
             }
+            //過濾SummaryType
+            
+            if (request.DateType == MpaDateType.SettledDate)
+            {
+                //DateType == SettledDate時，篩選1跟3，3為BA資料
+                data = data.Where(r => r.SummaryType == 1 || r.SummaryType == 3);
+            }
+            else if(request.DateType == MpaDateType.CreatedDate)
+            {
+                //DateType == CreatedDate，篩選2跟4，4為BA資料
+                data = data.Where(r => r.SummaryType == 2 || r.SummaryType == 4);
+            }
 
             if (!request.NoDraw)
             {
@@ -37,6 +49,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             {
                 //istest = 0, test member
                 data = data.Where(x => x.IsTest == 0);
+            }
+
+            if (!string.IsNullOrEmpty(request.AffiliateAccount))
+            {
+                data = data.Where(x => x.AffiliateName == request.AffiliateAccount);
             }
 
             return data;
@@ -67,6 +84,35 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 }
             }
 
+            return data;
+        }
+        /// <summary>
+        /// 區分出BA資料
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static IEnumerable<MpaTpBetRecordDto> SetBAdata(this IEnumerable<MpaTpBetRecordDto> data)
+        {
+            foreach (var item in data)
+            {
+                //BA 只計算 SBSW Sport
+                if (item.GameType == 69 && (item.SummaryType == 3 || item.SummaryType == 4))
+                {
+                    //把BA資料區隔出來，避免影響一般資料計算
+                    item.BAStakeSummary = item.StakeSummary;
+                    item.BAValidBetSummary = item.ValidBetSummary;
+                    item.BARevenueSummary = item.RevenueSummary;
+                    item.BAWinLossSummary = item.WinLossSummary;
+                    item.BAProgressiveBetSummary = item.ProgressiveBetSummary;
+                    item.BAProgressiveWinSummary = item.ProgressiveWinSummary;
+                    item.StakeSummary = 0;
+                    item.ValidBetSummary = 0;
+                    item.RevenueSummary = 0;
+                    item.WinLossSummary = 0;
+                    item.ProgressiveBetSummary= 0;
+                    item.ProgressiveWinSummary= 0;
+                }
+            }
             return data;
         }
 
@@ -133,9 +179,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     ValidTurnOver = item.Sum(x => x.ValidTurnOver).ToString("N2"),
                     GGR = item.Sum(x => x.GGR).ToString("N2"),
                     PlayerWinLoss = item.Sum(x => x.PlayerWinLoss).ToString("N2"),
+                    BAPlayerWinLoss = item.Sum(x => x.BAPlayerWinLoss).ToString("N2"),
                     ProgressiveWin = item.Sum(x => x.ProgressiveWin).ToString("N2"),
                     ProgressiveBet = item.Sum(x => x.ProgressiveBet).ToString("N2"),
                     Commission = item.Sum(x => x.Commission).ToString("N2"),
+                    BACommission = item.Sum(x => x.BACommission).ToString("N2"),
                     BetCount = item.Sum(x => x.BetCount),
                     AvgBetAmount = item.Sum(x => x.BetCount) != 0
                         ? (item.Sum(x => x.TurnOver) / item.Sum(x => x.BetCount)).ToString("N2")
@@ -163,9 +211,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
                 GGR = Math.Round(item.GGR, 2).ToString("N2"),
                 PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                BAPlayerWinLoss = Math.Round(item.BAPlayerWinLoss, 2).ToString("N2"),
                 ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
                 ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
                 Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                BACommission = Math.Round(item.BACommission, 2).ToString("N2"),
                 BetCount = item.BetCount,
                 AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
                 UniquePlayers = item.UniquePlayers,
@@ -184,9 +234,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
                 GGR = Math.Round(item.GGR, 2).ToString("N2"),
                 PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                BAPlayerWinLoss = Math.Round(item.BAPlayerWinLoss, 2).ToString("N2"),
                 ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
                 ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
                 Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                BACommission = Math.Round(item.BACommission, 2).ToString("N2"),
                 BetCount = item.BetCount,
                 AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
                 UniquePlayers = item.UniquePlayers,
@@ -207,9 +259,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
                 GGR = Math.Round(item.GGR, 2).ToString("N2"),
                 PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                BAPlayerWinLoss = Math.Round(item.BAPlayerWinLoss, 2).ToString("N2"),
                 ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
                 ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
                 Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                BACommission = Math.Round(item.BACommission, 2).ToString("N2"),
                 BetCount = item.BetCount,
                 AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
                 UniquePlayers = item.UniquePlayers,
@@ -234,9 +288,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
                 GGR = Math.Round(item.GGR, 2).ToString("N2"),
                 PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                BAPlayerWinLoss = Math.Round(item.BAPlayerWinLoss, 2).ToString("N2"),
                 ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
                 ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
                 Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                BACommission = Math.Round(item.BACommission, 2).ToString("N2"),
                 BetCount = item.BetCount,
                 AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
                 UniquePlayers = item.UniquePlayers,
@@ -248,6 +304,70 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 TotalBonus = Math.Round(item.TotalBonus, 2).ToString("N2")
             })
                 .ToList();
+        }
+        public static IEnumerable<MpaWinLossByBrandDtoExport> ToExcelFormat(this List<MpaWinLossByBrandDto> originData)
+        {
+            return originData.GroupBy(x => new { x.Currency, x.SiteName })
+                .Select(item => new MpaWinLossByBrandDtoExport
+                {
+                    SiteName = item.Key.SiteName,
+                    Currency = item.Key.Currency,
+                    TurnOver = item.Sum(x => x.TurnOver).ToString("N2"),
+                    ValidTurnOver = item.Sum(x => x.ValidTurnOver).ToString("N2"),
+                    GGR = item.Sum(x => x.GGR).ToString("N2"),
+                    PlayerWinLoss = item.Sum(x => x.PlayerWinLoss).ToString("N2"),
+                    BAPlayerWinLoss = item.Sum(x => x.BAPlayerWinLoss).ToString("N2"),
+                    ProgressiveWin = item.Sum(x => x.ProgressiveWin).ToString("N2"),
+                    ProgressiveBet = item.Sum(x => x.ProgressiveBet).ToString("N2"),
+                    Commission = item.Sum(x => x.Commission).ToString("N2"),
+                    BACommission = item.Sum(x => x.BACommission).ToString("N2"),
+                    BetCount = item.Sum(x => x.BetCount),
+                    AvgBetAmount = item.Sum(x => x.BetCount) != 0
+                        ? (item.Sum(x => x.TurnOver) / item.Sum(x => x.BetCount)).ToString("N2")
+                        : "0.00m",
+                    UniquePlayers = item.Sum(x => x.UniquePlayers),
+                    Margin = item.Sum(x => x.ValidTurnOver) != 0
+                        ? (item.Sum(x => x.GGR) / item.Sum(x => x.ValidTurnOver)).ToString("N2")
+                        : "0.00m",
+                    DepositCount = item.Sum(x => x.DepositCount),
+                    TotalDepositAmount = item.Sum(x => x.TotalDepositAmount).ToString("N2"),
+                    WithDrawCount = item.Sum(x => x.WithDrawCount),
+                    TotalWithDrawAmount = item.Sum(x => x.WithDrawCount).ToString("N2"),
+                    TotalBonus = item.Sum(x => x.WithDrawCount).ToString("N2"),
+                })
+                .ToList();
+        }
+
+        public static IEnumerable<MpaWinLossByAffiliateDtoExport> ToExcelFormat(this List<MpaWinLossByAffiliateDto> originData)
+        {
+            var temp = originData.Select(item => new MpaWinLossByAffiliateDtoExport
+            {
+                AffiliateAccount = item.AffiliateAccount,
+                UserName = item.UserName,
+                TpUserName = item.TpUserName,
+                Currency = item.Currency,
+                TurnOver = Math.Round(item.TurnOver, 2).ToString("N2"),
+                ValidTurnOver = Math.Round(item.ValidTurnOver, 2).ToString("N2"),
+                GGR = Math.Round(item.GGR, 2).ToString("N2"),
+                PlayerWinLoss = Math.Round(item.PlayerWinLoss, 2).ToString("N2"),
+                BAPlayerWinLoss = Math.Round(item.BAPlayerWinLoss, 2).ToString("N2"),
+                ProgressiveWin = Math.Round(item.ProgressiveWin, 2).ToString("N2"),
+                ProgressiveBet = Math.Round(item.ProgressiveBet, 2).ToString("N2"),
+                Commission = Math.Round(item.Commission, 2).ToString("N2"),
+                BACommission = Math.Round(item.BACommission, 2).ToString("N2"),
+                BetCount = item.BetCount,
+                AvgBetAmount = Math.Round(item.AvgBetAmount, 2).ToString("N2"),
+                UniquePlayers = item.UniquePlayers,
+                Margin = decimal.Round((item.Margin * 100), 2).ToString() + "%",
+                DepositCount = item.DepositCount,
+                TotalDepositAmount = Math.Round(item.TotalDepositAmount, 2).ToString("N2"),
+                WithDrawCount = item.WithDrawCount,
+                TotalWithDrawAmount = Math.Round(item.TotalWithDrawAmount, 2).ToString("N2"),
+                ClosingBalance = Math.Round(item.ClosingBalance, 2).ToString("N2"),
+                TotalBonus = Math.Round(item.TotalBonus, 2).ToString("N2")
+            })
+                .ToList();
+            return temp;
         }
 
         #endregion
@@ -266,9 +386,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     TurnOver = item.Value.TurnOver,
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
                     PlayerWinLoss = item.Value.PlayerWinLoss,
                     ProgressiveWin = item.Value.ProgressiveWin,
                     ProgressiveBet = item.Value.ProgressiveBet,
+                    BACommission = item.Value.BACommission,
                     Commission = item.Value.Commission,
                     BetCount = item.Value.BetCount,
                     AvgBetAmount = item.Value.AvgBetAmount,
@@ -313,9 +435,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
                     PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
                     ProgressiveWin = item.Value.ProgressiveWin,
                     ProgressiveBet = item.Value.ProgressiveBet,
                     Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
                     BetCount = item.Value.BetCount,
                     AvgBetAmount = item.Value.AvgBetAmount,
                     UniquePlayers = item.Value.UniquePlayers,
@@ -354,9 +478,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
                     PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
                     ProgressiveWin = item.Value.ProgressiveWin,
                     ProgressiveBet = item.Value.ProgressiveBet,
                     Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
                     BetCount = item.Value.BetCount,
                     AvgBetAmount = item.Value.AvgBetAmount,
                     UniquePlayers = item.Value.UniquePlayers,
@@ -404,9 +530,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
                     PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
                     ProgressiveWin = item.Value.ProgressiveWin,
                     ProgressiveBet = item.Value.ProgressiveBet,
                     Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
                     BetCount = item.Value.BetCount,
                     AvgBetAmount = item.Value.AvgBetAmount,
                     UniquePlayers = item.Value.UniquePlayers,
@@ -486,9 +614,11 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     ValidTurnOver = item.Value.ValidTurnOver,
                     GGR = item.Value.GGR,
                     PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
                     ProgressiveWin = item.Value.ProgressiveWin,
                     ProgressiveBet = item.Value.ProgressiveBet,
                     Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
                     BetCount = item.Value.BetCount,
                     AvgBetAmount = item.Value.AvgBetAmount,
                     UniquePlayers = item.Value.UniquePlayers,
@@ -522,6 +652,114 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             }
 
             return result;
+        }
+
+        public static IEnumerable<MpaWinLossByBrandResponseToFrontEnd> ToApiFormat(this Dictionary<string, MpaWinLossByBrandResponse> source)
+        {
+            var result = new List<MpaWinLossByBrandResponseToFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByBrandResponseToFrontEnd
+                {
+                    DisplayKey = item.Key,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin,
+                    DepositCount = item.Value.DepositCount,
+                    TotalDepositAmount = item.Value.TotalDepositAmount,
+                    WithDrawCount = item.Value.WithDrawCount,
+                    TotalWithDrawAmount = item.Value.TotalWithDrawAmount,
+                    TotalBonus = item.Value.TotalBonus
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByBrandCurrencyDetailDtoToFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByBrandCurrencyDetailDtoToFrontEnd { DisplayKey = childrenItem.Key, Data = childrenItem.Value })
+                        .ToList();
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            return result;
+        }
+
+        public static MpaWinLossByAffiliateResponseToFrontEndWrapper ToApiFormat(this Dictionary<string, MpaWinLossByAffiliateResponse> source, int rowCount)
+        {
+            var response = new MpaWinLossByAffiliateResponseToFrontEndWrapper();
+
+            var result = new List<MpaWinLossByAffiliateResponseToFrontEnd>();
+
+            foreach (var item in source)
+            {
+                var data = new MpaWinLossByAffiliateResponseToFrontEnd()
+                {
+                    DisplayKey = item.Key,
+                    Currency = item.Value.Currency,
+                    SabaId = item.Value.SabaId,
+                    TurnOver = item.Value.TurnOver,
+                    ValidTurnOver = item.Value.ValidTurnOver,
+                    GGR = item.Value.GGR,
+                    PlayerWinLoss = item.Value.PlayerWinLoss,
+                    BAPlayerWinLoss = item.Value.BAPlayerWinLoss,
+                    ProgressiveWin = item.Value.ProgressiveWin,
+                    ProgressiveBet = item.Value.ProgressiveBet,
+                    Commission = item.Value.Commission,
+                    BACommission = item.Value.BACommission,
+                    BetCount = item.Value.BetCount,
+                    AvgBetAmount = item.Value.AvgBetAmount,
+                    UniquePlayers = item.Value.UniquePlayers,
+                    Margin = item.Value.Margin,
+                    ClosingBalance = item.Value.ClosingBalance,
+                    DepositCount = item.Value.DepositCount,
+                    TotalDepositAmount = item.Value.TotalDepositAmount,
+                    WithDrawCount = item.Value.WithDrawCount,
+                    TotalWithDrawAmount = item.Value.TotalWithDrawAmount,
+                    TotalBonus = item.Value.TotalBonus
+                };
+
+                // 處理 children
+                if (item.Value.CurrencyDetail == null)
+                {
+                    data.Children = new List<MpaWinLossByAffiliateCurrencyDetailDtoFrontEnd>();
+                }
+                else
+                {
+                    var children = item.Value.CurrencyDetail
+                        .Select(childrenItem => new MpaWinLossByAffiliateCurrencyDetailDtoFrontEnd
+                        {
+                            DisplayKey = childrenItem.Key,
+                            Data = childrenItem.Value
+                        })
+                        .ToList();
+                    data.Children = children;
+                }
+
+                result.Add(data);
+            }
+
+            response.Data = result;
+            response.RowCount = rowCount;
+
+            return response;
         }
 
         #endregion

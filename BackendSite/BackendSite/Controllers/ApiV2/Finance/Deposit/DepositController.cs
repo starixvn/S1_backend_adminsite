@@ -36,13 +36,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly string _awsDepositUrl;
         private readonly string _awsDepositFolder;
         private readonly string _awsDepositBucketName;
-        private readonly IRabbitMQProducer _producer;
+        private readonly VerificationRewardBLL _verificationRewardBLL;
+        
 
         #endregion
 
         #region Constructors
 
-        public DepositController(IServiceProvider provider, IConfiguration configuration)
+        public DepositController(IServiceProvider provider)
         {
             _depositBll = provider.GetRequiredService<DepositBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
@@ -52,7 +53,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
-            _producer = provider.GetRequiredService<IRabbitMQProducer>();
+            _verificationRewardBLL = provider.GetRequiredService<VerificationRewardBLL>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
             _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
@@ -420,7 +421,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     content = string.Format(content, request.TransId);
                     await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
 
-                    _producer.Publish("MemberExchange", "deposit.local", new { depositRequest.CustId });
+                    // verification job queue
+                    var custVerificationReward = _verificationRewardBLL.GetCustVerificationRewardByCust(depositRequest.CustId);
+                    if (custVerificationReward is null or {EmailVerified: true, EmailReward: 0} or {PhoneVerified: true, PhoneReward: 0})
+                    {
+                        _verificationRewardBLL.InsertQueueJob(depositRequest.CustId, QueueJob.Verification, string.Empty);
+                    }
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
@@ -577,20 +583,16 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
             foreach (var receipt in depositReceipt)
             {
-                var picUrl = Redirect($"{_awsDepositUrl}{_awsDepositFolder}/{transId}_{receipt.ReceiptNo}.png").Url;
-                var picRsp = client.GetAsync(picUrl).Result;
-                if (picRsp.StatusCode == HttpStatusCode.OK)
+                var picUrl = $"{_awsDepositUrl}{_awsDepositFolder}/{transId}_{receipt.ReceiptNo}.png";
+                var model = new DepositReceiptModel
                 {
-                    var model = new DepositReceiptModel
-                    {
-                        ReceiptNo = receipt.ReceiptNo,
-                        Receipt = picUrl,
-                        Creator = receipt.Creator,
-                        CreateTime = receipt.CreateTime,
-                        CreateFrom = receipt.CreateFrom
-                    };
-                    result.Add(model);
-                }
+                    ReceiptNo = receipt.ReceiptNo,
+                    Receipt = picUrl,
+                    Creator = receipt.Creator,
+                    CreateTime = receipt.CreateTime,
+                    CreateFrom = receipt.CreateFrom
+                };
+                result.Add(model);
             }
 
             return result;

@@ -8,7 +8,6 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
-using RabbitMQ.Client;
 
 
 namespace BackendSite.Extensions
@@ -17,47 +16,41 @@ namespace BackendSite.Extensions
     {
         public static IServiceCollection AddDatabaseConnection(this IServiceCollection services, IConfiguration config)
         {
-            var provider = services.BuildServiceProvider();
-            var logger = provider.GetRequiredService<ILogger<MySqlClient>>();
             var serviceType = config.GetValue<string>("ServiceType");
+            var reportDBConn = config.GetConnectionString($"{serviceType}_ReportDB");
+            var reportBackupDB1 = config.GetConnectionString($"{serviceType}_ReportBackupDB1");
+            var reportBackupDB2 = config.GetConnectionString($"{serviceType}_ReportBackupDB2");
 
-            return services
-                .AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_MainDB"), logger)
-                {
-                    DataBase = DataBase.Main
-                })
-                .AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_ReportDB"), logger)
-                {
-                    DataBase = DataBase.Report
-                })
-                .AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_WagerDB"), logger)
-                {
-                    DataBase = DataBase.Wager
-                })
-                .AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_LogDB"), logger)
-                {
-                    DataBase = DataBase.Log
-                }).AddSingleton(param => new MySqlClient(config.GetConnectionString($"{serviceType}_IPTable"), logger)
-                {
-                    DataBase = DataBase.IP
-                });
-        }
-        public static void AddMessageQueueConnection(this IServiceCollection services)
-        {
-            var provider = services.BuildServiceProvider();
-            var configBll = provider.GetRequiredService<ConfigBLL>();
-            var rabbitMqConfig = configBll.GetConfigValueByEnvironment<RabbitMqConfig>("RabbitMQ");
-
-            var hostName = rabbitMqConfig.HostName;
-            var userName = rabbitMqConfig.UserName;
-            var password = rabbitMqConfig.Password;
-            services.AddSingleton<IConnectionFactory>(_ => new ConnectionFactory()
+            //檢查是否有BackupDB連線字串
+            if (!string.IsNullOrEmpty(reportBackupDB1) && !string.IsNullOrEmpty(reportBackupDB2))
             {
-                HostName = hostName,
-                UserName = userName,
-                Password = password
-            });
+                // 設定ReportDB連線順序
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, reportDBConn, new List<string>()
+                {
+                    reportDBConn,
+                    reportBackupDB1,
+                    reportBackupDB2,
+                }));
+
+                // 設定ReportBackupDB連線順序
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.ReportBackupDB, reportBackupDB1, new List<string>()
+                {                    
+                    reportBackupDB1,
+                    reportBackupDB2,
+                }));
+            }
+            else
+            {
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, reportDBConn));
+            }
+
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Main, config.GetConnectionString($"{serviceType}_MainDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Wager, config.GetConnectionString($"{serviceType}_WagerDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Log, config.GetConnectionString($"{serviceType}_LogDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.IP, config.GetConnectionString($"{serviceType}_IPTable")));
+            return services;
         }
+
         public static IServiceCollection AddOptionListByDB<T>(this IServiceCollection services, string sql, object parameters = null)
         {
             var provider = services.BuildServiceProvider();

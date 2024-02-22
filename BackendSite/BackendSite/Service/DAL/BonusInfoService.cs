@@ -385,5 +385,16 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
+        
+        public int GetEggTicket(int custId)
+        {
+            var p = new DynamicParameters(new
+            {
+                _CustId = custId,
+            });
+            var eggTicket = _reportDbClient.QueryFirst<int>("Service_CustEggTicket_Get", p);
+            
+            return eggTicket;
+        }
     }
 }

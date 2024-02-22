@@ -73,10 +73,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
             public int PayId { get; set; }
 
             public int SysId { get; set; }
-            /// <summary>
-            /// 1=Deposit、2=Withdrawal
-            /// </summary>
-            public BankInfoPayMethodEnum Method { get; set; }
+            public int ChannelId { get; set; }
 
             /// <summary>
             /// 狀態(1=Enable、2=Disable)
@@ -218,7 +215,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             var authData = _authorizeBll.GetAuthData();
             var result = _paymentManageBll
-                .UpdateBankInfo(request.SiteId, request.PayId, request.SysId, request.Status, request.Method, authData.UserName);
+                .UpdateBankInfo(request.SiteId, request.PayId, request.SysId, request.Status, request.ChannelId, authData.UserName);
 
             return new ApiResult
             {

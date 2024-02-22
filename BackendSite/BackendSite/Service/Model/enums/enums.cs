@@ -18,7 +18,8 @@ namespace BackendSite.Service.Model.enums
         Report, //ConnectionStringReport
         Wager,  //ConnectionStringWager
         Log,    //ConnectionStringLog
-        IP      //ConnectionStringIPTable
+        IP,    //ConnectionStringIPTable
+        ReportBackupDB,
     }
 
     #region Deposit Request / Withdrawal Request For Frontend Use
@@ -267,7 +268,9 @@ namespace BackendSite.Service.Model.enums
         LoadCard = 5,
         QRPay = 6,
         BankAutoChannel = 7,
-        CryptoWallet = 8
+        CryptoWallet = 8,
+        QuickTransfer = 9,
+        ChatTransfer = 10
     }
 
     public enum DepositStatusEnum
@@ -374,7 +377,9 @@ namespace BackendSite.Service.Model.enums
         CryptoPayment = 4,
         LoadCardPayment = 5,
         QrPayPayment = 6,
-        BankAutoChannel = 7
+        BankAutoChannel = 7,
+        QuickTransfer = 9,
+        ChatTransfer = 10
     }
     
     public enum WithdrawalChannelTypeEnum
@@ -659,7 +664,8 @@ namespace BackendSite.Service.Model.enums
         Cashback = 7,
         SpecialBonus = 8,
         RetentionFreeBet = 9,
-        DeviceBonus = 10
+        DeviceBonus = 10,
+        MissionBonus = 11
     }
 
     public enum PromotionCategoryEnum
@@ -667,13 +673,9 @@ namespace BackendSite.Service.Model.enums
         SlotsGame = 1,
         LiveCasino = 2,
         Fish = 3,
-        SabaSports = 4,
         Lottery = 5,
         Sports = 6,
-        PTSlotsGame = 7,
-        PTLiveCasino = 8,
         SBSW = 9,
-        Mega888SlotRNGAndFishing = 10,
         ESports = 11
     }
 
@@ -954,7 +956,10 @@ namespace BackendSite.Service.Model.enums
         AutoPaymentRule = 92,
         DepositReferral = 93,
         EditSystemBankInfo = 94,
-        WithdrawalBlockSetting = 95
+        WithdrawalBlockSetting = 95,
+        SetBigWinSetting = 96,
+        LeaderboardPointCalculation = 97,
+        LeaderboardRankingBonus = 98
     }
 
     #region BankFinancialTransferInfoLog
@@ -1582,8 +1587,8 @@ namespace BackendSite.Service.Model.enums
         SOON88 = 4,
         [Description("Ivorysport")]
         IVORYSPORT = 5,
-        [Description("Leobet")]
-        LEOBET = 6
+        [Description("Yashbet")]
+        YASHBET = 6
     }
 
     public enum AffSiteEnum
@@ -1841,7 +1846,9 @@ namespace BackendSite.Service.Model.enums
         GameType = 3,
         Currency = 4,
         Player = 5,
-        TpCategory = 6
+        TpCategory = 6,
+        Brand = 7,
+        Affiliate = 8
     }
 
     /// <summary>
@@ -2014,5 +2021,11 @@ namespace BackendSite.Service.Model.enums
         BannerManagement = 1,
         BonusManagement = 2,
         NewsManagement = 3
+    }
+    
+    public enum QueueJob
+    {
+        Init = 0 ,
+        Verification = 1
     }
 }

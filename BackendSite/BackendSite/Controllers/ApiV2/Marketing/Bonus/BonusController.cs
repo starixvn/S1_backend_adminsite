@@ -83,6 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             /// </summary>
             public int Device { get; set; }
             public string BonusCode { get; set; }
+            public string ScratchCardCode { get; set; }
             public bool IsSpecial { get; set; }
         }
         public class GetByBonusCodeRequest
@@ -177,6 +178,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.EndDate.ToUnixTimeSeconds(),
                     request.Device,
                     request.BonusCode,
+                    request.ScratchCardCode,
                     request.IsSpecial,
                     request.PageNumber,
                     request.PageSize,
@@ -294,7 +296,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
                             break;
                         }
-                    case (int)PromotionTypeEnum.ReDeposit:
+                    case (int)PromotionTypeEnum.ReDeposit or (int)PromotionTypeEnum.MissionBonus:
                         if (request.PromotionInfo.Specific.Any(specific =>
                                 specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 specific.TierAmountList.Any(tierAmount =>
@@ -310,6 +312,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                             return apiResult;
                         }
                         break;
+                }
+
+                // 檢查CashBack的PromotionCategory類型
+                if (request.PromotionInfo.PromotionType == (int)PromotionTypeEnum.Cashback
+                && !Enum.IsDefined(typeof(PromotionCategoryEnum), request.PromotionInfo.CategoryId))
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                    apiResult.Message = $"This PromotionCategory({request.PromotionInfo.CategoryId}) not support Cashback.";
+                    return apiResult;
                 }
 
                 var errorCode = _bonusManageBll.SetPromotion(request.IsAdd,

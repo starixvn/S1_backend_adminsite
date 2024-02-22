@@ -5,6 +5,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
 using Dapper;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -100,6 +101,18 @@ namespace BackendSite.Service.DAL
             }
 
             return success;
+        }
+
+        public IEnumerable<SlotGameInfo> GetSlotGameList(int siteId, int currencyId)
+        {
+            var statusList = new List<int> { 1 };
+            var parameter = new DynamicParameters();
+            parameter.Add("SiteId", siteId);
+            parameter.Add("CurrencyId", currencyId);
+            parameter.Add("DeviceType", 1);
+            parameter.Add("StatusJson", JsonConvert.SerializeObject(statusList));
+
+            return _reportDbClient.Query<SlotGameInfo>("Service_SlotGame_Get", parameter).ToList();
         }
     }
 }

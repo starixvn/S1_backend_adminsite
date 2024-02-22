@@ -4,7 +4,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,14 +27,15 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
-        public ApiListResult<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
+        public ApiResult<IEnumerable<GetLeaderboardReportResponse>> GetLeaderboardReport(GetLeaderboardReportRequest request)
         {
-            var apiResult = new ApiListResult<GetLeaderboardReportResponse>();
+            var apiResult = new ApiResult<IEnumerable<GetLeaderboardReportResponse>>();
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             try
             {
                 var data = _leaderBoardBll.GetLeaderboardReport(request);
+                
                 apiResult.Data = data;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -47,6 +47,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             return apiResult;
         }
+        
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
         public ApiListResult<LeaderboardReportResponse> GetLeaderboardReportBySiteIds(GetLeaderboardReportRequest request)

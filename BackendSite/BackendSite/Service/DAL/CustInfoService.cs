@@ -1,15 +1,11 @@
-﻿using System.Data;
-
+using System.Data;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
-
 using Dapper;
-
 using MySql.Data.MySqlClient;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
@@ -18,11 +14,13 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly MySqlClient _reportbackupDbClient;
 
         public CustInfoService(IServiceProvider provider)
         {
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
-            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);          
+            _reportbackupDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.ReportBackupDB);
         }
 
         public Customer GetCustInfo(int custId)
@@ -246,7 +244,7 @@ namespace BackendSite.Service.DAL
 
         public CustInfoDetail GetCustInfos(int? custId, string userName, int? siteId)
         {
-            return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId }));
+            return _mainDbClient.QueryFirst<CustInfoDetail>("Admin_CustInfo_Get", new DynamicParameters(new { CustId = custId, UserName = userName, SiteId = siteId}));
         }
 
         public bool SendMessageBatch(BatchPersonalMsg req)
@@ -787,12 +785,23 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<WinLoseSummary> GetWinLoseSummary(int custId, DateTimeOffset dateTime)
         {
-            return _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime }));
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_Date", dateTime.DateTime);
+            return _reportbackupDbClient != null
+                ? _reportbackupDbClient.RetryQuery<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", p)
+                : _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", p);
         }
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
         {
-            return _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", new DynamicParameters(new { _CustId = custId, _Date = dateTime.DateTime, _GameList = GameTypes }));
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            p.Add("_Date", dateTime.DateTime);
+            p.Add("_GameList", GameTypes);
+            return _reportbackupDbClient != null
+                ? _reportbackupDbClient.RetryQuery<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", p)
+                : _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", p);            
         }
 
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
