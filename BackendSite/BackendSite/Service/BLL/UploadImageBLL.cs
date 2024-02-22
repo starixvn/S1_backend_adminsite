@@ -93,8 +93,7 @@ namespace BackendSite.Service.BLL
             var resizeImg = Resize(request.File, request.size, request.size);
             
 
-            //圖片先放DEV路徑下，避免覆蓋正式環境圖片檔
-            var folder = $"{_environmentPrefix}/{request.TpName}/";
+            var folder = $"{request.TpName}/";
             var fileName = $"{OrgFileNameFilter(request.ENname)}-{request.Lang}.jpg";
             var key = Path.Combine(folder, fileName);
             var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(resizeImg, siteCloudFrontImageInfo.UploadSlotImagesBucketName, key);
