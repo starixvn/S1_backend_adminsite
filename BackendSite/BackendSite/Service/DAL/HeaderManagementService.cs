@@ -55,6 +55,18 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public int UpdateHeaderSettingEnvironment(UpdateHeaderHeaderSettingEnvironmentReq req, int status, string updater)
+        {
+            var props = new DynamicParameters();
+            props.Add("_Status", status);
+            props.Add("_SiteId", req.SiteId);
+            props.Add("_TpGameIdNo", req.TpGameIdNo);
+            props.Add("_Updater", updater);
+            var result = _mainDbClient.Execute("Admin_HeaderSettingEnvironment_Set", props);
+            
+            return result;
+        }
+        
         public int UpdateSort(int id, int sort, string updater)
         {
             var props = new DynamicParameters();
