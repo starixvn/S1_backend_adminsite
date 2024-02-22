@@ -224,7 +224,7 @@ namespace BackendSite.Service.BLL.Mpa
         private async Task<MpaWinLossReportResponse> GetWinLossReportAsync(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var result = await _courierAdapter
-                .MyPostAsync<MpaWinLossReportResponse, MpaWinLossReportRequest>($"{_reportApiUrl}/MpaWinLossReport/Get",
+                .MyPostAsync<MpaWinLossReportResponse, MpaWinLossReportRequest>($"{_reportApiUrl}MpaWinLossReport/Get",
                     new MpaWinLossReportRequest
                     {
                         SiteIds = request.SiteIds,
