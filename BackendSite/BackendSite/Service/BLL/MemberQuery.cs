@@ -313,7 +313,7 @@ namespace BackendSite.Service.BLL
         }
         public async Task<IEnumerable<MemberLoginDevice>> GetDeviceListByCustIdAsync(int custId)
         {
-            var custInfo = await _memberService.GetCustomerBasicInfoAsync(custId);
+            var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
 
             if (custInfo.SiteId == 1)
             {

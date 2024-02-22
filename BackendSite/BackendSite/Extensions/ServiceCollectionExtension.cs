@@ -24,10 +24,20 @@ namespace BackendSite.Extensions
             //檢查是否有BackupDB連線字串
             if (!string.IsNullOrEmpty(reportBackupDB1) && !string.IsNullOrEmpty(reportBackupDB2))
             {
-                // 設定主要的ReportDB與BackupDB1
-                services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, reportDBConn, reportBackupDB1));
-                // 設定Backup，使用BackupDB1與BackupDB2
-                services.AddSingleton(provider => new MySqlClient(provider, DataBase.ReportBackupDB, reportBackupDB1, reportBackupDB2));
+                // 設定ReportDB連線順序
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, reportDBConn, new List<string>()
+                {
+                    reportDBConn,
+                    reportBackupDB1,
+                    reportBackupDB2,
+                }));
+
+                // 設定ReportBackupDB連線順序
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.ReportBackupDB, reportBackupDB1, new List<string>()
+                {                    
+                    reportBackupDB1,
+                    reportBackupDB2,
+                }));
             }
             else
             {

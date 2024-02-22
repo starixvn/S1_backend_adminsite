@@ -83,6 +83,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             /// </summary>
             public int Device { get; set; }
             public string BonusCode { get; set; }
+            public string ScratchCardCode { get; set; }
             public bool IsSpecial { get; set; }
         }
         public class GetByBonusCodeRequest
@@ -177,6 +178,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     request.EndDate.ToUnixTimeSeconds(),
                     request.Device,
                     request.BonusCode,
+                    request.ScratchCardCode,
                     request.IsSpecial,
                     request.PageNumber,
                     request.PageSize,

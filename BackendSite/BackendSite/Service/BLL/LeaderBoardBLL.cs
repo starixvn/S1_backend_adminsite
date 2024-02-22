@@ -1,11 +1,10 @@
 ﻿using BackendSite.Extensions;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
-
 using Newtonsoft.Json;
-
 
 namespace BackendSite.Service.BLL
 {
@@ -14,12 +13,14 @@ namespace BackendSite.Service.BLL
         private readonly LeaderBoardService _leaderBoardService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly ILogger<UserBetLimitBLL> _logger;
+        private readonly ICacheHelper _cacheHelper;
 
         public LeaderBoardBLL(IServiceProvider provider)
         {
             _leaderBoardService = provider.GetRequiredService<LeaderBoardService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _logger = provider.GetRequiredService<ILogger<UserBetLimitBLL>>();
+            _cacheHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public IEnumerable<GetLeaderboardReportResponse> GetLeaderboardReport(GetLeaderboardReportRequest request)
@@ -30,14 +31,13 @@ namespace BackendSite.Service.BLL
                 .OrderByDescending(x=>x.Bonus).ToList();
             
             var groupData = data.GroupBy(x => new {x.CustId ,x.SiteId, x.SiteName, x.UserName ,x.CurrencyId ,x.IsoCode})
-                .OrderByDescending(x => x.Sum(i => i.Points))
+                .OrderByDescending(x => x.Sum(i => i.WTurnover))
                 .Select((r, index) =>
                 {
                     var bonusModel = rankingBonus.FirstOrDefault(rb =>
                         rb.SiteId == r.Key.SiteId &&
                         rb.CurrencyId == r.Key.CurrencyId &&
-                        r.Sum(i => i.Points) >= rb.MinPoint);
-                    // && (rb.Ranking == (index + 1).ToString() || rb.Ranking == "9-30"));
+                        r.Sum(i => i.WTurnover) >= rb.MinPoint);
 
                     if (bonusModel is not null && bonusModel.Ranking != "9-30")
                     {
@@ -53,9 +53,9 @@ namespace BackendSite.Service.BLL
                         CurrencyId = r.Key.CurrencyId,
                         IsoCode = r.Key.IsoCode,
                         CustId = r.Key.CustId,
-                        TurnOver = r.Sum(i => i.TurnOver),
-                        Points = r.Sum(i => i.Points),
-                        Reward = request.CategoryId != 0 || r.Sum(i => i.Points) < bonusModel.MinPoint ? 0 : bonusModel.Bonus
+                        Points = r.Sum(i => i.WTurnover),
+                        Reward = bonusModel is null ? 0 :
+                            request.CategoryId != 0 || (r.Sum(i => i.WTurnover) < bonusModel.MinPoint) ? 0 : bonusModel.Bonus
                     };
                 }).Take(30);
                 
@@ -74,14 +74,13 @@ namespace BackendSite.Service.BLL
                 {
                     SiteId = x.Key,
                     detail = x.GroupBy(y => new { y.CustId, y.SiteId, y.SiteName, y.UserName, y.CurrencyId, y.IsoCode })
-                        .OrderByDescending(z => z.Sum(i => i.Points))
+                        .OrderByDescending(z => z.Sum(i => i.WTurnover))
                         .Select((r, index) =>
                         {
                             var bonusModel = rankingBonus.FirstOrDefault(rb =>
                                 rb.SiteId == r.Key.SiteId &&
                                 rb.CurrencyId == r.Key.CurrencyId &&
-                                r.Sum(i => i.Points) >= rb.MinPoint);
-                                // && (rb.Ranking == (index + 1).ToString() || rb.Ranking == "9-30"));
+                                r.Sum(i => i.WTurnover) >= rb.MinPoint);
 
                                 if (bonusModel is not null && bonusModel.Ranking != "9-30")
                                 {
@@ -97,8 +96,7 @@ namespace BackendSite.Service.BLL
                                 CurrencyId = r.Key.CurrencyId,
                                 IsoCode = r.Key.IsoCode,
                                 CustId = r.Key.CustId,
-                                TurnOver = r.Sum(i => i.TurnOver),
-                                Points = r.Sum(i => i.Points),
+                                Points = r.Sum(i => i.WTurnover),
                                 Reward = request.CategoryId != 0 || bonusModel is null ? 0 : bonusModel.Bonus
                             };
                         }).Take(30).ToList()
@@ -107,54 +105,25 @@ namespace BackendSite.Service.BLL
             return groupData;
         }
 
-        private IEnumerable<LeaderboardReportModel> DealLeaderboardReport(GetLeaderboardReportRequest request)
+        private IEnumerable<Leaderboard> DealLeaderboardReport(GetLeaderboardReportRequest request)
         {
-            var data = _leaderBoardService.GetLeaderboardReport(
-                JsonConvert.SerializeObject(request.SiteIds),
-                request.CurrencyId,
-                request.CategoryId,
-                request.StartDate.DateTime,
-                request.EndDate.DateTime).ToList();
-            
+            var dataList = new List<Leaderboard>();
             var date = request.StartDate.DateTime.ToString("yyyyMM");
-            var pointCalculation = _leaderBoardService.GetLeaderboardPointCalculation(JsonConvert.SerializeObject(request.SiteIds) ,date);
 
-            //GroupBy CustId,CategoryId 
-            var groupCategoryIdData = data.GroupBy(x => new
-                {
-                    x.SiteId, x.UserName, x.CurrencyId, x.IsoCode, x.CategoryId, x.CustId, x.SiteName
-                })
-                .Select(x => new LeaderboardReportModel
-                {
-                    SiteId = x.Key.SiteId,
-                    UserName = x.Key.UserName,
-                    CurrencyId = x.Key.CurrencyId,
-                    IsoCode = x.Key.IsoCode,
-                    CategoryId = x.Key.CategoryId,
-                    CustId = x.Key.CustId,
-                    TurnOver = x.Sum(y=>y.TurnOver),
-                    SiteName = x.Key.SiteName
-                }).ToList();
-            
-            // 計算Points with SlotTurnOver,SportTurnOver,LiveCasinoTurnOver
-            foreach (var detail in groupCategoryIdData)
+            foreach (var siteId in request.SiteIds)
             {
-                var cal = pointCalculation.FirstOrDefault(x =>
-                    x.SiteId == detail.SiteId && x.CurrencyId == detail.CurrencyId && x.Status == 1);
-                
-                if (cal != null)
-                {
-                    detail.Points = detail.CategoryId switch
-                    {
-                        (int)TpCategoryEnum.Sports => (int)(detail.TurnOver / cal.SportTurnOver),
-                        (int)TpCategoryEnum.Casino => (int)(detail.TurnOver / cal.SlotTurnOver),
-                        (int)TpCategoryEnum.LiveCasino => (int)( detail.TurnOver / cal.LiveCasinoTurnOver),
-                        _ => 0
-                    };
-                }
+                var data = GetLeaderboardListMonthWithCache(request.CategoryId, siteId, request.CurrencyId, date);
+                dataList.AddRange(data);
             }
-            
-            return groupCategoryIdData;
+        
+            return dataList;
+        }
+        
+        private IEnumerable<Leaderboard> GetLeaderboardListMonthWithCache(int lBCategoryId, int siteId, int currencyId, string yyyyMM)
+        {
+            var key = $"LeaderboardListMonth:{lBCategoryId}:{siteId}:{currencyId}:{yyyyMM}";
+            var json = _cacheHelper.StringGetAsync(key, RedisDataBase.Member).Result;
+            return JsonConvert.DeserializeObject<IEnumerable<Leaderboard>>(json);
         }
         
         public IEnumerable<LeaderboardExtraPointList> GetLeaderboardExtraPointList(

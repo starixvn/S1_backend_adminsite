@@ -164,21 +164,6 @@ namespace BackendSite.Service.DAL
         /// <summary>
         /// 取得促銷資料清單
         /// </summary>
-        /// <param name="siteIds"></param>
-        /// <param name="currencyIds"></param>
-        /// <param name="promotionTypes"></param>
-        /// <param name="status"></param>
-        /// <param name="startDate"></param>
-        /// <param name="endDate"></param>
-        /// <param name="device"></param>
-        /// <param name="bonusCode"></param>
-        /// <param name="permissionSiteIds"></param>
-        /// <param name="isSpecial"></param>
-        /// <param name="startIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="totalPages"></param>
-        /// <param name="rowCount"></param>
-        /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
             string currencyIds,
             string promotionTypes,
@@ -188,6 +173,7 @@ namespace BackendSite.Service.DAL
             int device,
             string bonusCode,
             string permissionSiteIds,
+            string scratchCardCode,
             bool isSpecial,
             int startIndex,
             int pageSize,
@@ -204,13 +190,14 @@ namespace BackendSite.Service.DAL
             p.Add("_Device", device);
             p.Add("_BonusCode", bonusCode);
             p.Add("_PermissionSiteIds", permissionSiteIds);
+            p.Add("_ScratchCardCode", string.IsNullOrEmpty(scratchCardCode) ? null : scratchCardCode);
             p.Add("_IsSpecial", isSpecial ? 1 : 0);
             p.Add("_StartIndex", startIndex);
             p.Add("_PageSize", pageSize);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V6", p);
+            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V7", p);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
