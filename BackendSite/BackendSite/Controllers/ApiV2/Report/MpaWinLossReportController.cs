@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
@@ -15,7 +16,6 @@ namespace BackendSite.Controllers.ApiV2.Report
     [ApiController]
     public class MpaWinLossReportController : ControllerBase
     {
-
         private readonly IMpaWinLossBLL _mpaWinLossBll;
         private readonly ExcelBLL _excelBll;
 
@@ -187,6 +187,27 @@ namespace BackendSite.Controllers.ApiV2.Report
             var exportData = await _mpaWinLossBll.GetMpaWinLossByPlayerExport(request, MpaWinLossGroupByTypeEnum.Player);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByPlayerExport");
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>>();
+            
+            try
+            {
+                var responseData = await _mpaWinLossBll.GetWinLossByPlayerDetail(request, MpaWinLossGroupByTypeEnum.GameType);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
         }
 
         #endregion

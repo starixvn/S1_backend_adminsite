@@ -123,6 +123,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
             ProgressiveBet = m.ProgressiveBet;
             Commission = m.Commission;
             BACommission = m.BaCommission;
+            BetCount = m.BetCount;
             AvgBetAmount = m.AvgBetAmount;
             UniquePlayers = m.UniquePlayers;
             Margin = m.Margin;
