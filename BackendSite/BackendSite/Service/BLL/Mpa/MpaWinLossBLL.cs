@@ -17,6 +17,8 @@ namespace BackendSite.Service.BLL.Mpa
         private readonly CourierAdapter _courierAdapter;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly string _reportApiUrl;
+        private readonly Common _common;
+        private readonly CustInfoBLL _custInfoBll;
 
         public MpaWinLossBLL(IServiceProvider provider)
         {
@@ -24,6 +26,8 @@ namespace BackendSite.Service.BLL.Mpa
             _logger = provider.GetRequiredService<ILogger<MpaWinLossBLL>>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _common = provider.GetRequiredService<Common>();
+            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _reportApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").ReportService;
         }
@@ -73,6 +77,25 @@ namespace BackendSite.Service.BLL.Mpa
             };
         }
 
+        public async Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByPlayerDetail(
+            MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        {
+            var custId = _common.TpIdToCustId(request.SabaId);
+                
+            if (custId == null)
+            {
+                throw new AdminException("GetWinLossByPlayerDetail request.SabaId is incorrect.");
+            }
+                
+            var custInfo = _custInfoBll.GetCustInfoWithCache(custId.Value);
+            request.UserName = custInfo.UserName;
+            request.SiteIds = new[] {custInfo.SiteId};
+            
+            var data = await GetWinLossReportAsync(request, groupByType);
+
+            return data.SortThen2ApiFormatWithPlayer(request);
+        }
+        
         #endregion
 
         #region Export Result
