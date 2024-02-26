@@ -31,22 +31,22 @@ namespace BackendSite.Service.DAL
             var para = new DynamicParameters();
             para.Add("_SiteId", input.SiteId);
             para.Add("_CurrencyId", input.CurrencyId);
-            para.Add("_Purposes", input.Purposes.Any() ? JsonConvert.SerializeObject(input.Purposes) : null, DbType.String);
+            para.Add("_Purposes", input.Purposes.Any() ? JsonConvert.SerializeObject(input.Purposes) : "[]", DbType.String);
             para.Add("_Statuses", JsonConvert.SerializeObject(input.Statuses));
-            para.Add("_SysIds", input.SysIds.Any() ? JsonConvert.SerializeObject(input.SysIds) : null, DbType.String);
-            para.Add("_VipLevels", input.VipLevels.Any() ? JsonConvert.SerializeObject(input.VipLevels) : null, DbType.String);
-            para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : null, DbType.String);
+            para.Add("_SysIds", input.SysIds.Any() ? JsonConvert.SerializeObject(input.SysIds) : "[]", DbType.String);
+            para.Add("_VipLevels", input.VipLevels.Any() ? JsonConvert.SerializeObject(input.VipLevels) : "[]", DbType.String);
+            para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : "[]", DbType.String);
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);
             para.Add("_Agent", input.Agent ?? string.Empty);
-            para.Add("_Channels", input.SupportChannels.Any() ? JsonConvert.SerializeObject(input.SupportChannels) : null, DbType.String);
+            para.Add("_Channels", input.SupportChannels.Any() ? JsonConvert.SerializeObject(input.SupportChannels) : "[]", DbType.String);
             para.Add("_StartIndex", input.StartIndex);
             para.Add("_PageSize", input.PageSize);
             para.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             para.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
             var result = _reportbackupDbClient != null
-                ? await _reportbackupDbClient.RetryQueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para)
-                : await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V2", para);
+                ? await _reportbackupDbClient.RetryQueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V3", para)
+                : await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V3", para);
 
             var totalPages = para.Get<int?>("_TotalPages") ?? 0;
             var rowCount = para.Get<int?>("_RowCount") ?? 0;
