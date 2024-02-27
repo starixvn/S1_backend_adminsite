@@ -233,12 +233,14 @@ namespace BackendSite.Service.DAL
 
         public bool SetSlotGameLog(SetNewSlotGameReq req, string @operator, MySqlTransaction trans)
         {
+            var currencyNames = req.CurrencyIds.Select(id => Enum.GetName(typeof(CurrencyEnum), id));
+            var categoryNames = req.CategoryIds.Select(id => Enum.GetName(typeof(SlotGameCategoryEnum), id));
             var log = new
             {
                 TpId = req.TpId,
                 GameId = req.GameId,
-                Currency = req.CurrencyIds,
-                Category = req.CategoryIds,
+                Currency = string.Join(",", currencyNames),
+                Category = string.Join(",", categoryNames),
             };
             var logParam = new DynamicParameters();
             logParam.Add("_SiteId", 0);
