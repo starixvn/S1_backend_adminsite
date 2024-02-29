@@ -131,6 +131,9 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
         private static void OrderByMpaWinLossReportResponse(this MpaWinLossReportResponse source, IOrderBy orderByOption)
         {
+            if (string.IsNullOrEmpty(orderByOption.OrderByProperty))
+                orderByOption.OrderByProperty = "key";
+            
             source.Result = source.Result.OrderBy(orderByOption);
 
             if (orderByOption.OrderByProperty.Equals("key"))
