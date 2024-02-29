@@ -20,6 +20,8 @@ namespace BackendSite.Service.BLL
         private readonly string _fileName;
         private readonly string _errorPageBucketName;
         private readonly MySqlClient _mainDbClient;
+        private readonly Dictionary<string, IEnumerable<string>> _maintainExcludeDomainConfig;
+        private readonly IEnumerable<int> _maintainJsonSyncSiteConfig;
 
         public SiteMaintainBLL(IServiceProvider provider)
         {
@@ -28,6 +30,8 @@ namespace BackendSite.Service.BLL
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _errorPageBucketName = configBll.GetConfigValue("AWSErrorPageBucketName");
+            _maintainJsonSyncSiteConfig = configBll.GetConfigValue<IEnumerable<int>>("MaintainJsonSyncSite");
+            _maintainExcludeDomainConfig = configBll.GetConfigValuesBySiteName<IEnumerable<string>>("MaintainExcludeDomain");
 
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
@@ -36,14 +40,27 @@ namespace BackendSite.Service.BLL
 
         public async Task<SiteMaintainResponse> GetSiteMaintain(SiteEnum site)
         {
-            var putRequest = new GetObjectRequest
+            //先取新的path json, 取不到取舊的json
+            var getNewRequest = new GetObjectRequest
             {
                 BucketName = _errorPageBucketName,
-                Key = $"{site}/{_fileName}"
+                Key = $"{site}/{site}/{_fileName}"
             };
 
-            var putResponse = await _s3Helper.GetObjectAsync(putRequest);
-            using StreamReader sr = new StreamReader(putResponse.ResponseStream);
+            var getResponse = await _s3Helper.GetObjectAsync(getNewRequest);
+
+            if (!getResponse.HttpStatusCode.IsSuccess())
+            {
+                var getRequest = new GetObjectRequest
+                {
+                    BucketName = _errorPageBucketName,
+                    Key = $"{site}/{_fileName}"
+                };
+
+                getResponse = await _s3Helper.GetObjectAsync(getRequest);
+            }
+
+            using StreamReader sr = new StreamReader(getResponse.ResponseStream);
             using JsonReader reader = new JsonTextReader(sr);
             JsonSerializer serializer = new JsonSerializer();
             var response = serializer.Deserialize<SiteMaintainResponse>(reader);
@@ -52,6 +69,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
+            var excludeDomain = _maintainExcludeDomainConfig[$"{request.SiteId.GetDescription()}"];
             var siteMaintainObject = new
             {
                 request.Maintain,
@@ -59,20 +77,41 @@ namespace BackendSite.Service.BLL
                 UTCTimeStart = request.BeginTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
                 DateTimeEnd = request.EndTime.ToOffset(new TimeSpan(8, 0, 0)).ToString("yyyy-MM-dd HH:mm:ss"),
                 UTCTimeEnd = request.EndTime.ToUniversalTime().ToUnixTimeSeconds().ToString(),
+                ExcludeDomain = excludeDomain
             };
 
-            //update s3
-            var putRequest = new PutObjectRequest
+            //update s3 給前端新架構的path
+            var putNewRequest = new PutObjectRequest
             {
                 BucketName = _errorPageBucketName,
                 ContentType = "application/json",
                 InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
-                Key = $"{request.SiteId}/{_fileName}"
+                Key = $"{request.SiteId}/{request.SiteId}/{_fileName}"
             };
-            var putResponse = await _s3Helper.PutObjectAsync(putRequest);
-            if (!putResponse.HttpStatusCode.IsSuccess())
+            var putNewResponse = await _s3Helper.PutObjectAsync(putNewRequest);
+            if (!putNewResponse.HttpStatusCode.IsSuccess())
             {
                 return false;
+            }
+
+            var clearCacheList = new List<string> { $"/{request.SiteId.GetDescription().ToUpper()}/{_fileName}" };
+
+            if (_maintainJsonSyncSiteConfig.Contains((int)request.SiteId))
+            {
+                //update s3 (前端舊架構的path)
+                var putRequest = new PutObjectRequest
+                {
+                    BucketName = _errorPageBucketName,
+                    ContentType = "application/json",
+                    InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
+                    Key = $"{request.SiteId}/{_fileName}"
+                };
+                var putResponse = await _s3Helper.PutObjectAsync(putRequest);
+                if (!putResponse.HttpStatusCode.IsSuccess())
+                {
+                    return false;
+                }
+                clearCacheList.Add($"/{_fileName}");
             }
 
             //clear cache
@@ -84,8 +123,8 @@ namespace BackendSite.Service.BLL
                     CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
                     Paths = new Paths
                     {
-                        Quantity = 1,
-                        Items = new List<string> { $"/{_fileName}" }
+                        Quantity = clearCacheList.Count,
+                        Items = clearCacheList
                     }
                 }
             };

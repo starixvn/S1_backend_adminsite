@@ -16,31 +16,38 @@ namespace BackendSite.Extensions
     {
         public static IServiceCollection AddDatabaseConnection(this IServiceCollection services, IConfiguration config)
         {
-            var provider = services.BuildServiceProvider();
-            var logger = provider.GetRequiredService<ILogger<MySqlClient>>();
             var serviceType = config.GetValue<string>("ServiceType");
-
             var reportDBConn = config.GetConnectionString($"{serviceType}_ReportDB");
-            var reportDB34Conn = config.GetConnectionString($"{serviceType}_ReportDB_34");       
-            var reportDB32Conn = config.GetConnectionString($"{serviceType}_ReportDB_32");
+            var reportBackupDB1 = config.GetConnectionString($"{serviceType}_ReportBackupDB1");
+            var reportBackupDB2 = config.GetConnectionString($"{serviceType}_ReportBackupDB2");
 
-            //只有PRD環境有設定34跟32的連線字串
-            if (!string.IsNullOrEmpty(reportDB34Conn))
+            //檢查是否有BackupDB連線字串
+            if (!string.IsNullOrEmpty(reportBackupDB1) && !string.IsNullOrEmpty(reportBackupDB2))
             {
-                // PRD ReportDB使用36當Master，34當backup
-                services.AddSingleton(new MySqlClient(DataBase.Report, logger, reportDBConn, reportDB34Conn));
-                // PRD TestReportDB指定使用34當Master，32當backup
-                services.AddSingleton(new MySqlClient(DataBase.TestReport, logger, reportDB34Conn, reportDB32Conn));
+                // 設定ReportDB連線順序
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, reportDBConn, new List<string>()
+                {
+                    reportDBConn,
+                    reportBackupDB1,
+                    reportBackupDB2,
+                }));
+
+                // 設定ReportBackupDB連線順序
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.ReportBackupDB, reportBackupDB1, new List<string>()
+                {                    
+                    reportBackupDB1,
+                    reportBackupDB2,
+                }));
             }
             else
             {
-                services.AddSingleton(new MySqlClient(DataBase.Report, logger, reportDBConn));
+                services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, reportDBConn));
             }
 
-            services.AddSingleton(new MySqlClient(DataBase.Main, logger, config.GetConnectionString($"{serviceType}_MainDB")));
-            services.AddSingleton(new MySqlClient(DataBase.Wager, logger, config.GetConnectionString($"{serviceType}_WagerDB")));
-            services.AddSingleton(new MySqlClient(DataBase.Log, logger, config.GetConnectionString($"{serviceType}_LogDB")));
-            services.AddSingleton(new MySqlClient(DataBase.IP, logger, config.GetConnectionString($"{serviceType}_IPTable")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Main, config.GetConnectionString($"{serviceType}_MainDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Wager, config.GetConnectionString($"{serviceType}_WagerDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Log, config.GetConnectionString($"{serviceType}_LogDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.IP, config.GetConnectionString($"{serviceType}_IPTable")));
             return services;
         }
 

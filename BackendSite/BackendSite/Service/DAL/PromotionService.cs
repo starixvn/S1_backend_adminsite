@@ -20,7 +20,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<Promotion> GetPromotionListByCustId(int custId)
         {
-            return _reportDbClient.Query<Promotion>("Admin_PromotionListByCustId_Get_V2", new { _CustId = custId }, commandType: CommandType.StoredProcedure);
+            return _reportDbClient.Query<Promotion>("Admin_PromotionListByCustId_Get_V2", new { _CustId = custId });
         }
 
         public PromotionListData GetPromotionListByCustIdAndDate(int CustId, DateTimeOffset StartDate, DateTimeOffset EndDate, int PageNumber, int PageSize)
@@ -34,7 +34,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", EndDate.DateTime, DbType.DateTime);
 
             #region GetCurrencyTotalAmount
-            var CurrencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_PromotionTotalAmountByCustIdAndDate_Get_V3", props, commandType: CommandType.StoredProcedure).ToList();
+            var CurrencyTotalAmount = _reportDbClient.Query<TotalAmount>("Admin_PromotionTotalAmountByCustIdAndDate_Get_V3", props).ToList();
             if (CurrencyTotalAmount.Count > 0)
             {
                 CurrencyTotalAmount.ForEach(x =>
@@ -50,7 +50,7 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get_V4", props, commandType: CommandType.StoredProcedure).ToList();
+            var result = _reportDbClient.Query<Promotion>("Admin_PromotionListByCustIdAndDate_Get_V4", props).ToList();
 
             PromotionListData.PromotionList = result;
             PromotionListData.TotalPages = props.Get<int?>("_TotalPages") ?? 0;

@@ -164,21 +164,6 @@ namespace BackendSite.Service.DAL
         /// <summary>
         /// 取得促銷資料清單
         /// </summary>
-        /// <param name="siteIds"></param>
-        /// <param name="currencyIds"></param>
-        /// <param name="promotionTypes"></param>
-        /// <param name="status"></param>
-        /// <param name="startDate"></param>
-        /// <param name="endDate"></param>
-        /// <param name="device"></param>
-        /// <param name="bonusCode"></param>
-        /// <param name="permissionSiteIds"></param>
-        /// <param name="isSpecial"></param>
-        /// <param name="startIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="totalPages"></param>
-        /// <param name="rowCount"></param>
-        /// <returns></returns>
         public IEnumerable<PromotionInfo> GetPromotionList(string siteIds,
             string currencyIds,
             string promotionTypes,
@@ -188,6 +173,7 @@ namespace BackendSite.Service.DAL
             int device,
             string bonusCode,
             string permissionSiteIds,
+            string scratchCardCode,
             bool isSpecial,
             int startIndex,
             int pageSize,
@@ -204,13 +190,14 @@ namespace BackendSite.Service.DAL
             p.Add("_Device", device);
             p.Add("_BonusCode", bonusCode);
             p.Add("_PermissionSiteIds", permissionSiteIds);
+            p.Add("_ScratchCardCode", string.IsNullOrEmpty(scratchCardCode) ? null : scratchCardCode);
             p.Add("_IsSpecial", isSpecial ? 1 : 0);
             p.Add("_StartIndex", startIndex);
             p.Add("_PageSize", pageSize);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V6", p);
+            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V7", p);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
@@ -293,6 +280,12 @@ namespace BackendSite.Service.DAL
                         {
                             specific.TierAmountList = JsonConvert.DeserializeObject<IEnumerable<TierAmount>>(specific.TierAmount);
                         }
+                        
+                        if (!string.IsNullOrEmpty(specific.TurnoverTpGameTypes))
+                        {
+                            specific.TurnoverTpGameTypeList = JsonConvert.DeserializeObject<IEnumerable<int>>(specific.TurnoverTpGameTypes);
+                        }
+                        
                     }
                 }
                 
@@ -309,8 +302,6 @@ namespace BackendSite.Service.DAL
         /// </summary>
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
-        /// <param name="connection"></param>
-        /// <param name="transaction"></param>
         /// <returns></returns>
         public PromotionInfo GetPromotion(string bonusCode, int siteId)
         {
@@ -362,13 +353,10 @@ namespace BackendSite.Service.DAL
         /// </summary>
         /// <param name="isAdd"></param>
         /// <param name="promotion"></param>
-        /// <param name="promotionDisplayConditionList"></param>
-        /// <param name="expectedDelSpecificRow"></param>
-        /// <param name="expectedDelRebateRow"></param>
-        /// <param name="expectedDelConditionRow"></param>
+        /// <param name="vipLevelCondition"></param>
+        /// <param name="Operator"></param>
         /// <returns></returns>
-        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition,
-            string Operator)
+        public bool SetPromotionFlow(bool isAdd, PromotionInfoReq promotion, DisplayConditionAboutVipLevel vipLevelCondition, string Operator)
         {
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
@@ -432,7 +420,8 @@ namespace BackendSite.Service.DAL
                         ? JsonConvert.SerializeObject(specific.VN_AffCodes.Split(","))
                         : null,
                     TotalUsageLimit = specific.TotalUsageLimit,
-                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]"
+                    TierAmount = specific.TierAmountList.Any() ? JsonConvert.SerializeObject(specific.TierAmountList) : "[]",
+                    TurnoverTpGameTypes = specific.TurnoverTpGameTypeList is not null ? JsonConvert.SerializeObject(specific.TurnoverTpGameTypeList) : "[]",
                 });
             }
 
@@ -692,7 +681,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V6", transaction, p);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V7", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
