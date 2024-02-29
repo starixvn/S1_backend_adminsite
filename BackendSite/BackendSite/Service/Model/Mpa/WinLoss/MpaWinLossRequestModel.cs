@@ -31,7 +31,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         /// </summary>
         public string UserName { get; set; }
 
-        public string SabaId { get; set; }
+        public int CustId { get; set; }
 
         /// <summary>
         /// 所有幣別

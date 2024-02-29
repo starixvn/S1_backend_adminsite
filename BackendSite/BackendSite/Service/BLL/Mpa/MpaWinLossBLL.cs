@@ -80,14 +80,7 @@ namespace BackendSite.Service.BLL.Mpa
         public async Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByPlayerDetail(
             MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
-            var custId = _common.TpIdToCustId(request.SabaId);
-                
-            if (custId == null)
-            {
-                throw new AdminException("GetWinLossByPlayerDetail request.SabaId is incorrect.");
-            }
-                
-            var custInfo = _custInfoBll.GetCustInfoWithCache(custId.Value);
+            var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
             request.UserName = custInfo.UserName;
             request.SiteIds = new[] {custInfo.SiteId};
             
