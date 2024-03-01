@@ -87,6 +87,7 @@ public class MpaWinLossGroupByModel
     public decimal TotalBonus { get; set; }
     public string Key { get; set; }
     public string ChildKey { get; set; }
+    public string CustId { get; set; }
     
     public string TpUserName { get; set; }
     public string UserName { get; set; }
