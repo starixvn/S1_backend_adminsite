@@ -74,9 +74,11 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         {
             UserName = m.UserName;
             SabaId = m.TpUserName;
+            CustId = m.CustId;
         }
         
         public string UserName { get; set; }
+        public string CustId { get; set; }
         
         public string SabaId { get; set; }
         
