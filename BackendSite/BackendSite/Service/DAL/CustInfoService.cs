@@ -4,6 +4,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Report;
 using Dapper;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
@@ -853,6 +854,16 @@ namespace BackendSite.Service.DAL
         public IEnumerable<CustCryptoWalletList> GetCryptoList(int custId)
         {
             return _reportDbClient.Query<CustCryptoWalletList>("Admin_CustCryptoWalletList_Get", new DynamicParameters(new { CustId = custId }));
+        }
+        
+        public IEnumerable<LeaderBoardCustInfo> GetCustInfoByCustIds(IEnumerable<int> siteIds , IEnumerable<int> custIds)
+        {
+            return _reportDbClient.Query<LeaderBoardCustInfo>("Common_CustInfoByCustIds_Get", 
+                new DynamicParameters(new
+                {
+                    _SiteIds = JsonConvert.SerializeObject(siteIds) ,
+                    _CustIds = JsonConvert.SerializeObject(custIds)
+                }));
         }
     }
 }

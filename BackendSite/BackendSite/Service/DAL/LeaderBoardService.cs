@@ -1,8 +1,10 @@
 ﻿using System.Data;
 using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Report;
 using Dapper;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -158,6 +160,27 @@ namespace BackendSite.Service.DAL
             var result = _mainDbClient.Execute("Admin_LeaderboardPointCalculation_Set", p);
             
             return result > 0 ;
+        }
+        
+        public LeaderboardTagExcludeList GetLeaderboardTagExcludeList(int siteId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            var result = _reportDbClient.Query<LeaderboardTagExcludeList>("Service_LeaderboardTagExclude_Get", p)
+                .FirstOrDefault();
+
+            return result;
+        }
+        
+        public bool SetLeaderboardTagExcludeList(int siteId ,List<int> tagExcludeList ,string updater)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_TagExcludeList", JsonConvert.SerializeObject(tagExcludeList));
+            p.Add("_Updater", updater);
+            var result = _mainDbClient.Execute("Service_LeaderboardTagExclude_Set", p);
+
+            return result > 0;
         }
     }
 }
