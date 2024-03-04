@@ -44,6 +44,8 @@ namespace BackendSite.Service.BLL
 
             if (result)
             {
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Member);
+                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
                 ClearRedisPaySettingCache("PaymentSetting:*", RedisDataBase.Payment);
             }
 
