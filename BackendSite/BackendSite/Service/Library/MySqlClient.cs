@@ -57,6 +57,7 @@ namespace BackendSite.Service.Library
                     // 拿不到Status或延遲太久都換下一個連線
                     if (dbSlaveStatus == null || dbSlaveStatus.Seconds_Behind_Master > 180)
                     {
+                        _logger.LogWarning($"{ReplaceDBString(backupConn)} | DelayTime = {dbSlaveStatus?.Seconds_Behind_Master}");
                         continue;
                     }
 
@@ -64,7 +65,7 @@ namespace BackendSite.Service.Library
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError(e, $"{ReplaceDBString(backupConn)} HealthCheck Exception");
+                    _logger.LogError(e, $"{ReplaceDBString(backupConn)} | HealthCheck Exception");
                 }           
             }
 
