@@ -1627,10 +1627,13 @@ namespace BackendSite.Service.Model.enums
         THB = 4,
         CNY = 13,
         IDR = 15,
+        JPY = 32,
+        KRW = 45,
         VND = 51,
         INR = 61,
         KHUSD = 72,
-        BDT = 74
+        BDT = 74,
+        BRL = 82
     }
 
     public enum ManualRewardPointCategoryEnum
