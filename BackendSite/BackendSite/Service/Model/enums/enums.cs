@@ -2010,4 +2010,12 @@ namespace BackendSite.Service.Model.enums
         Init = 0 ,
         Verification = 1
     }
+    /// <summary>
+    /// 禮物類型，一般 = 1,FreeSpin = 2
+    /// </summary>
+    public enum GiftTypeEnum 
+    { 
+        common = 1,
+        FreeSpin = 2
+    }
 }

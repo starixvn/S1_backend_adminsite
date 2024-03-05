@@ -41,6 +41,10 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public GeneralStatusEnum ShowStock { get; set; }
         public int Stock { get; set; }
         public IEnumerable<CreateGiftInfo> Infos { get; set; }
+
+        public GiftTypeEnum GiftType { get; set; }
+
+        public string BonusCode { get; set; }
     }
 
     public class UpdateGiftRequest

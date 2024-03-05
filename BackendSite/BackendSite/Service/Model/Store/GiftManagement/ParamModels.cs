@@ -2,7 +2,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
 {
     public class CreateGiftParams
     {
-        public CreateGiftParams(CreateGiftRequest req, string userName)
+        public CreateGiftParams(CreateGiftRequest req, string userName,string bonusCode)
         {
             SiteId = req.SiteId;
             CurrencyId = req.CurrencyId;
@@ -14,7 +14,9 @@ namespace BackendSite.Service.Model.Store.GiftManagement
             ShowStock = (int)req.ShowStock;
             Stock = req.Stock;
             Infos = req.Infos;
+            GiftType = (int)req.GiftType;
             Operator = userName;
+            BonusCode = bonusCode;
         }
 
         public int SiteId { get; set; }
@@ -28,6 +30,8 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int Stock { get; set; }
         public IEnumerable<CreateGiftInfo> Infos { get; set; }
         public string Operator { get; set; }
+        public int GiftType { get; set; }
+        public string BonusCode { get; set; }
     }
 
     public class UpdateGiftParams
