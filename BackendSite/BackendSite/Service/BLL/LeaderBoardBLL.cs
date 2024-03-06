@@ -12,7 +12,6 @@ namespace BackendSite.Service.BLL
     {
         private readonly LeaderBoardService _leaderBoardService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
-        private readonly CustInfoService _custInfoService;
         private readonly ILogger<UserBetLimitBLL> _logger;
         private readonly ICacheHelper _cacheHelper;
 
@@ -20,7 +19,6 @@ namespace BackendSite.Service.BLL
         {
             _leaderBoardService = provider.GetRequiredService<LeaderBoardService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
-            _custInfoService = provider.GetRequiredService<CustInfoService>();
             _logger = provider.GetRequiredService<ILogger<UserBetLimitBLL>>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
         }
@@ -114,58 +112,10 @@ namespace BackendSite.Service.BLL
 
             foreach (var siteId in request.SiteIds)
             {
-                var dataOrigin = GetLeaderboardListMonthWithCache(request.CategoryId, siteId, request.CurrencyId, date);
-                
-                if (dataOrigin is not null)
-                {
-                    List<LeaderBoardCustInfo> filteredList;
-                    var getCount = 50;
-                    
-                    do
-                    {
-                        filteredList = new List<LeaderBoardCustInfo>();
-                    
-                        //先排名
-                        dataOrigin = dataOrigin.OrderByDescending(x => x.WTurnover).ToList();
-                    
-                        //拉 {getCount} 個CustId 出來
-                        var custIds = dataOrigin.Select(x => x.CustId).Take(getCount);
-                    
-                        //找 {getCount} 個custInfo 出來
-                        var custInfoList = _custInfoService.GetCustInfoByCustIds(request.SiteIds, custIds).ToList();
-                
-                        // 要排除掉的Tag清單
-                        var excludeTagBySite = _leaderBoardService.GetLeaderboardTagExcludeList(siteId).TagsExclude;
-                    
-                        // 排除掉Tag清單後的 custInfo清單
-                        var filtered = custInfoList.Where(x => x.Tags is null || x.Tags.All(tag => !excludeTagBySite.Contains(tag))).ToList();
-
-                        if (filtered.Any())
-                        {
-                            filteredList.AddRange(filtered);
-                        }
-                        
-                        // 數量夠了 break
-                        if (filteredList.Count <= 30)
-                        {
-                            break;
-                        }
-                
-                        //篩選後的筆數不夠 重拉
-                        getCount += 50;
-                    } 
-                    while (filteredList.Count < 30);
-
-                    var filterOrigin = dataOrigin.Where(x => filteredList.Select(y => y.CustId).Contains(x.CustId)).ToList();
-                    
-                    if (filterOrigin.Any())
-                    {
-                        dataList.AddRange(filterOrigin);
-                    }
-                    
-                }
+                var data = GetLeaderboardListMonthWithCache(request.CategoryId, siteId, request.CurrencyId, date);
+                dataList.AddRange(data);
             }
-            
+        
             return dataList;
         }
         

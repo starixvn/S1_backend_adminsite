@@ -234,24 +234,3 @@ public class SetLeaderboardTagExcludeReq
     public int SiteId { get; set; }
     public List<int> TagExcludeList { get; set; }
 }
-
-public class LeaderBoardCustInfo
-{
-    public int SiteId { get; set; }
-    public string SiteName { get; set; }
-    public int CustId { get; set; }
-    public string UserName { get; set; }
-    public int CurrencyId { get; set; }
-    public string TagList { get; set; }
-    public IEnumerable<int> Tags
-    {
-        get
-        {
-            if (TagList?.Length > 0)
-            {
-                return JsonConvert.DeserializeObject<IEnumerable<int>>(TagList);
-            }
-            return null;
-        }
-    }
-}
