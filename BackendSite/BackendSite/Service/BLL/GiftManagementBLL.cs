@@ -1,6 +1,7 @@
 using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
 using BackendSite.Service.Model.Store.GiftManagement;
 
@@ -13,11 +14,13 @@ namespace BackendSite.Service.BLL
         private readonly AWSS3Helper _awsS3Helper;
         private readonly string _bucketName;
         private readonly string _folder;
+        private readonly string _tpServiceApiUrl;
 
         public GiftManagementBLL(IServiceProvider provider)
         {
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _storeSiteUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").StoreService;
+            _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;
             _bucketName = configBll.GetConfigValue("AWSBannerBucketName");
             _folder = configBll.GetConfigValue("AWSStoreFolderName");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
@@ -66,11 +69,39 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> CreateGiftAsync(CreateGiftRequest req, string userName)
         {
+            //BonusCode規則。ex.PPFREESPIN100FORNOVA8820240306
+            var bonusCode = $"PPFREESPIN{req.Round}FOR{((SiteEnum)req.SiteId).ToString()}{DateTime.Now.ToString("yyyyMMdd")}";
+            
+            if (req.GiftType == GiftTypeEnum.FreeSpin)
+            {
+                //創建bonuscode
+                await CreateBonusCode(req, bonusCode);
+            }
+
             var url = _storeSiteUrl + "GiftManagement/Create";
-            var data = new CreateGiftParams(req, userName);
+            var data = new CreateGiftParams(req, userName,bonusCode);
             var result = await _courierAdapter.MyPostAsync<object, CreateGiftParams>(url, data);
 
             return new ApiResult(result.ErrorCode, result.Message);
+        }
+
+        private async Task CreateBonusCode(CreateGiftRequest req, string bonusCode)
+        {
+            
+            var inputs = new Dictionary<string, string>();
+            var url = _tpServiceApiUrl + "API/CreateBonusCode";
+            inputs.Add("GameId", "vs20olympnova88");//目前只有PP一款遊戲
+            inputs.Add("BonusCode", bonusCode);
+            inputs.Add("Round", req.Round.ToString());
+            inputs.Add("Currency", ((CurrencyEnum)req.CurrencyId).ToString());
+            var request = new CreateBonusCodeParams()
+            {
+                SiteId = req.SiteId,
+                TpId = 5,//PP
+                inputs = inputs
+            };
+
+            var apiResult = await _courierAdapter.MyPostAsync<object, CreateBonusCodeParams>(url, request);
         }
 
         public async Task<ApiResult> UpdateGiftAsync(UpdateGiftRequest req, string userName)

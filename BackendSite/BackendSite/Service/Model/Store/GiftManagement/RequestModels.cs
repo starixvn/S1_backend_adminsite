@@ -44,7 +44,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
 
         public GiftTypeEnum GiftType { get; set; }
 
-        public string BonusCode { get; set; }
+        public int Round {  get; set; }
     }
 
     public class UpdateGiftRequest
