@@ -71,7 +71,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
-            var excludeDomain = _maintainExcludeDomainConfig[$"{request.SiteId.GetDescription()}"];
+            var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
+            var excludeDomain = _maintainExcludeDomainConfig[serverInfo.SiteName];
             var siteMaintainObject = new
             {
                 request.Maintain,
@@ -96,7 +97,7 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            var clearCacheList = new List<string> { $"/{request.SiteId.GetDescription().ToUpper()}/{_fileName}" };
+            var clearCacheList = new List<string> { $"/{serverInfo.SiteName.ToUpper()}/{_fileName}" };
 
             if (_maintainJsonSyncSiteConfig.Contains((int)request.SiteId))
             {
@@ -117,7 +118,7 @@ namespace BackendSite.Service.BLL
             }
 
             //clear cache
-            var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
+            
             var invalidationRequest = new CreateInvalidationRequest()
             {
                 DistributionId = _siteConfig[serverInfo.SiteName].AwsCloudFrontErrorDomainID,
