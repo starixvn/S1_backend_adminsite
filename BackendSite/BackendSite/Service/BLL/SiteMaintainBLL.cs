@@ -73,7 +73,7 @@ namespace BackendSite.Service.BLL
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
             var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
-            var excludeDomain = _maintainExcludeDomainConfig[$"{serverInfo.SiteName}"];
+            var excludeDomain = _maintainExcludeDomainConfig[serverInfo.SiteName];
             var siteMaintainObject = new
             {
                 request.Maintain,
@@ -119,6 +119,7 @@ namespace BackendSite.Service.BLL
             }
 
             //clear cache
+            
             var invalidationRequest = new CreateInvalidationRequest()
             {
                 DistributionId = _siteConfig[serverInfo.SiteName].AwsCloudFrontErrorDomainID,
