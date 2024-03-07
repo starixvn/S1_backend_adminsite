@@ -15,6 +15,7 @@ namespace BackendSite.Service.BLL
         private readonly string _bucketName;
         private readonly string _folder;
         private readonly string _tpServiceApiUrl;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         public GiftManagementBLL(IServiceProvider provider)
         {
@@ -25,6 +26,7 @@ namespace BackendSite.Service.BLL
             _folder = configBll.GetConfigValue("AWSStoreFolderName");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         public Task<ApiResult<object>> GetGiftListAsync(GetListRequest req)
@@ -69,8 +71,10 @@ namespace BackendSite.Service.BLL
 
         public async Task<ApiResult> CreateGiftAsync(CreateGiftRequest req, string userName)
         {
+            var serverInfo = _serverInfoBll.GetServerInfo(req.SiteId);
+            var siteName = serverInfo.SiteName.ToUpper();
             //BonusCode³W«h¡Cex.PPFREESPIN100FORNOVA8820240306
-            var bonusCode = $"PPFREESPIN{req.Round}FOR{((SiteEnum)req.SiteId).ToString()}{DateTime.Now.ToString("yyyyMMdd")}";
+            var bonusCode = $"PPFREESPIN{req.Round}FOR{siteName}{DateTime.Now.ToString("yyyyMMdd")}";
             
             if (req.GiftType == GiftTypeEnum.FreeSpin)
             {
