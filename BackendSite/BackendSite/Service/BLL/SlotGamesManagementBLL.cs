@@ -108,7 +108,7 @@ namespace BackendSite.Service.BLL
 
         public bool SetSlotGameEnvironment(SetSlotGameEnvironment req, string @operator)
         {
-            var status = (req.IsPRD) ? (int)SlotGameStatusEnum.Open : (int)SlotGameStatusEnum.Release;
+            var status = (req.IsPRD) ? (int)SlotGameStatusEnum.Open : (int)SlotGameStatusEnum.ReleaseOpen;
             return _slotGamesManagementService.SetSlotGameEnvironment(req.SiteId, req.SlotGameId, req.IsPRD,status, @operator);
         }
     }
