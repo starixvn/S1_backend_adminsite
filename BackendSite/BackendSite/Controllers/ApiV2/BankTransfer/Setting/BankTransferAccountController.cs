@@ -22,6 +22,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly ExcelBLL _excelBll;
         private readonly Cryptor _cryptor;
+        private readonly ServerInfoBLL _serverInfoBll;
 
         #endregion
 
@@ -33,6 +34,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _cryptor = provider.GetRequiredService<Cryptor>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion
@@ -156,12 +158,12 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         public ApiResult Set(SetTransferAccountInfoRequest req)
         {
             var authData = _authorizeBll.GetAuthData();
-
+            var siteName = _serverInfoBll.GetServerInfo(req.SiteId).SiteName;
             var (status, count, message) = _bankFinancialBll.SetTransferAccount(new BankFinancialTransferAccountModel
             {
                 Id = req.Id,
                 SiteId = req.SiteId,
-                SiteName = ((SiteEnum)req.SiteId).GetDescription(),
+                SiteName = siteName,
                 CurrencyId = req.CurrencyId,
                 Agent = req.Agent,
                 Channel = req.Channel,

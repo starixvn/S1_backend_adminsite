@@ -1170,6 +1170,7 @@ namespace BackendSite.Service.BLL
                     {
                         var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList.Distinct()), UserNameList = JsonConvert.SerializeObject(userNameList.Distinct()) });
                         var allTagList = await _tagll.GetAllTag();
+                        var serverInfo = _serverInfoBll.GetServerInfo(siteId);
                         var data = custInfo.Select(a => new MemberExportData()
                         {
                             SiteName = a.SiteName,
@@ -1202,7 +1203,7 @@ namespace BackendSite.Service.BLL
                         });
                         var fileBytes = _excelBll.ExportV2(data);
                         var stream = new MemoryStream(fileBytes);
-                        var site = (SiteEnum)siteId;
+                        var site = serverInfo.SiteName;
                         var key = $"{_environment}/{site}/CustInfo/BatchMemberInfoReport_{batchId}.xlsx";
                         var putRequest = new PutObjectRequest
                         {
@@ -1240,11 +1241,12 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BatchCustInfo> GetCustinfoByImportData(int siteId)
         {
             var batchCustInfo = _custInfoService.GetBatchCustInfo(siteId).ToList();
-
+            var siteInfo = _serverInfoBll.GetServerInfo(siteId);
+            
             batchCustInfo.ForEach(x =>
             {
                 x.StatusName = ((BatchCustInfoStatus)x.Status).ToString();
-                x.Url = $"{_backOfficeS3Url}{_environment}/{(SiteEnum)siteId}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
+                x.Url = $"{_backOfficeS3Url}{_environment}/{siteInfo.SiteName}/CustInfo/BatchMemberInfoReport_{x.BatchId}.xlsx";
             });
 
             return batchCustInfo;

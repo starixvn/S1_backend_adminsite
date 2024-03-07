@@ -253,7 +253,7 @@ namespace BackendSite.Service.Model.BankFinancial
             set => _transDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
 
         }
-        public SiteEnum SiteId { get; set; }
+        public int SiteId { get; set; }
 
         #region From Data
 

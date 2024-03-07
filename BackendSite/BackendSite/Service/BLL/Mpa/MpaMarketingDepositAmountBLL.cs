@@ -96,7 +96,7 @@ namespace BackendSite.Service.BLL.Mpa
                         }
 
                         //For the case if member register time < 20/08/2020, also count in main group
-                        if (request.SiteId == (int)SiteEnum.BWING && r.RegTime < new DateTime(2020, 08, 20))
+                        if (request.SiteId == 3 && r.RegTime < new DateTime(2020, 08, 20))
                         {
                             r.SignUpGroupName = mainSiteKey;
                         }
@@ -297,19 +297,19 @@ namespace BackendSite.Service.BLL.Mpa
 
             switch (request.SiteId)
             {
-                case (int)SiteEnum.NOVA88:
+                case 1:
                     config.AppDomain = "app.n17881788.com";
                     config.CreditSiteAgentIds = new List<int>() { 400, 417, 418, 419 }; //'Nova88Ref05','Nova88Ref06','Nova88Ref07','Nova88Ref08'
                     config.CreditSiteName = "Nova88.com";
                     config.MainSiteInfo = _mpaDomainConfig["Nova88"];
                     break;
-                case (int)SiteEnum.GOAL123:
+                case 2:
                     config.AppDomain = "app.goal123.com";
                     config.CreditSiteAgentIds = new List<int>() { 106734 }; //'Goal123Ref01'
                     config.CreditSiteName = "Bong88/Viva88";
                     config.MainSiteInfo = _mpaDomainConfig["Goal123"];
                     break;
-                case (int)SiteEnum.BWING:
+                case 3:
                     config.AppDomain = "app.bwing.com";
                     config.CreditSiteAgentIds = new List<int>() { 106733 }; //'BwingRef01'
                     config.CreditSiteName = "Bong88/Viva88";
