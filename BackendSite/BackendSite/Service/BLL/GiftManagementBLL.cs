@@ -72,9 +72,8 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> CreateGiftAsync(CreateGiftRequest req, string userName)
         {
             var serverInfo = _serverInfoBll.GetServerInfo(req.SiteId);
-            var siteName = serverInfo.SiteName.ToUpper();
             //BonusCode³W«h¡Cex.PPFREESPIN100FORNOVA8820240306
-            var bonusCode = $"PPFREESPIN{req.Round}FOR{siteName}{DateTime.Now.ToString("yyyyMMdd")}";
+            var bonusCode = BonusCodeRule(req,serverInfo.SiteName);
             
             if (req.GiftType == GiftTypeEnum.FreeSpin)
             {
@@ -87,6 +86,12 @@ namespace BackendSite.Service.BLL
             var result = await _courierAdapter.MyPostAsync<object, CreateGiftParams>(url, data);
 
             return new ApiResult(result.ErrorCode, result.Message);
+        }
+
+        private static string BonusCodeRule(CreateGiftRequest req,string siteName)
+        {
+            var bonusCode = $"PPFREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.Now.ToString("yyyyMMdd")}";
+            return bonusCode;
         }
 
         private async Task CreateBonusCode(CreateGiftRequest req, string bonusCode)
