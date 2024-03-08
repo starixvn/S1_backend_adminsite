@@ -86,15 +86,15 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentSetting
         {
             try
             {
-                var (datas, totalPages, rowCount) = await _bankDetailBll.GetOfflineBankingSettingList(
-                    new GetOfflineBankingSettingParams(request));
+                var (datas, pageInfo) = await _bankDetailBll.GetOfflineBankingSettingListWithPageInfo(
+                    new GetOfflineBankingSettingParams(request), request.PageNumber, request.PageSize);
 
                 return new ApiListResult<OfflineBankingSetting>
                 {
                     Data = datas,
                     PageNumber = request.PageNumber,
-                    TotalPages = totalPages,
-                    RowCount = rowCount,
+                    TotalPages = pageInfo.TotalPages,
+                    RowCount = pageInfo.RowCount,
                     ErrorCode = (int)ErrorCodeEnum.Success
                 };
             }
