@@ -1,11 +1,11 @@
-﻿using BackendSite.Extensions;
+﻿
+using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
-using Microsoft.Extensions.Caching.Memory;
 
 using Newtonsoft.Json;
 
@@ -34,7 +34,7 @@ namespace BackendSite.Service.BLL
             IPageInfo pageInfo = new PageInfo();
             var result = await GetOfflineBankingSettingListWithCache(input);
             
-            var (startIndex, _) = pageNumber.GetStartIndexAndPageSize(pageSize);
+            var (startIndex, _) = pageNumber.GetStartIndex(pageSize);
             pageInfo.SetPageInfo(result.Count, pageNumber, pageSize);
             
             var fragment = result
@@ -68,7 +68,7 @@ namespace BackendSite.Service.BLL
                     (x.FinancialAccountChannel == TransferChannelEnum.LocalBank
                      || (x.AccountPurposes.Contains(TransferAccountPurposeEnum.Withdrawal) &&
                          ch.Contains(x.FinancialAccountChannel)))
-                    && (input.Purposes.Intersect(x.AccountPurposes).Any() ||
+                    && (input.Purposes.All(p => x.AccountPurposes.Contains(p)) ||
                         (!input.Purposes.Any() && !x.FinancialAccountPurposes.Equals("[3]")))) // 沒搜尋條件Purposes時排除只支援Transfer的卡
                 .ToList();
             
