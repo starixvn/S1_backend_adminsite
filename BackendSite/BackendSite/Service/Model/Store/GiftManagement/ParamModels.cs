@@ -2,7 +2,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
 {
     public class CreateGiftParams
     {
-        public CreateGiftParams(CreateGiftRequest req, string userName,string bonusCode)
+        public CreateGiftParams(CreateGiftRequest req, string userName)
         {
             SiteId = req.SiteId;
             CurrencyId = req.CurrencyId;
