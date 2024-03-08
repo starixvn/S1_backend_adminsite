@@ -23,7 +23,8 @@ namespace BackendSite.Service.Model.BankCardManagement
         public decimal DailyLimitAmount { set; get; }
         [JsonIgnore]
         public string FinancialAccountPurposes { set; get; }
-        private IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
+        [JsonIgnore]
+        public IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
             JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(FinancialAccountPurposes);
 
         [JsonIgnore]

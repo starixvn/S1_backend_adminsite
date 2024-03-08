@@ -1,6 +1,7 @@
 ﻿using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,19 +27,52 @@ namespace BackendSite.Service.BLL
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
         }
 
-        public async Task<(IEnumerable<OfflineBankingSetting> Datas, int TotalPages, int RowCount)> GetOfflineBankingSettingList
-            (GetOfflineBankingSettingParams input)
+        public async Task<(IEnumerable<OfflineBankingSetting> Datas, IPageInfo PageInfo)> GetOfflineBankingSettingListWithPageInfo
+            (GetOfflineBankingSettingParams input, int pageNumber, int pageSize)
         {
-            var result = await _bankDetailService.GetOfflineBankingSettingListAsync(input);
-            var vip = await _vipLevelService.GetVipLevelSettingAsync(input.SiteId);
+            IPageInfo pageInfo = new PageInfo();
+            var result = await GetOfflineBankingSettingListWithCache(input);
+            
+            var (startIndex, _) = pageInfo.ListPagination(result.Count, pageNumber, pageSize);
+            pageInfo.SetPageInfo(result.Count, pageNumber, pageSize);
+            
+            var fragment = result.GetRange(startIndex, pageSize);
 
-            foreach (var item in result.Datas)
+            return (fragment, pageInfo);
+        }
+        
+        private async Task<List<OfflineBankingSetting>> GetOfflineBankingSettingListWithCache(GetOfflineBankingSettingParams input)
+        {
+            var key = "OfflineBankingSettingList:" + JsonConvert.SerializeObject(input);
+            
+            return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(10),
+                () => GetOfflineBankingSettingList(input));
+        }
+        
+        private async Task<List<OfflineBankingSetting>> GetOfflineBankingSettingList(GetOfflineBankingSettingParams input)
+        {
+            var ch = new[]
             {
-                item.VipLevelNames = vip
-                    .Where(x => item.VipLevels.Contains(x.Level))
-                    .Select(x => x.LevelName);
-            }
-
+                TransferChannelEnum.HeadOffice,
+                TransferChannelEnum.Finance,
+                TransferChannelEnum.MC,
+                TransferChannelEnum.CryptoWallet
+            };
+            
+            var list = await _bankDetailService.GetOfflineBankingSettingListAsync(input);
+            var vip = await _vipLevelService.GetVipLevelSettingAsync(input.SiteId);
+            var result = list.Where(x =>
+                    (x.FinancialAccountChannel == TransferChannelEnum.LocalBank
+                     || (x.AccountPurposes.Contains(TransferAccountPurposeEnum.Withdrawal) &&
+                         ch.Contains(x.FinancialAccountChannel)))
+                    && (input.Purposes.Intersect(x.AccountPurposes).Any() ||
+                        (!input.Purposes.Any() && !x.FinancialAccountPurposes.Equals("[3]")))) // 沒搜尋條件Purposes時排除只支援Transfer的卡
+                .ToList();
+            
+            result.ForEach(item => item.VipLevelNames = vip
+                .Where(x => item.VipLevels.Contains(x.Level))
+                .Select(x => x.LevelName));
+           
             return result;
         }
 

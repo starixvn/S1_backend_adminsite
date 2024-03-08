@@ -3,7 +3,7 @@ using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Model.BankCardManagement
 {
-    public class GetOfflineBankingSettingParams : PagerParamModel
+    public class GetOfflineBankingSettingParams
     {
         public GetOfflineBankingSettingParams() { }
         public GetOfflineBankingSettingParams(GetOfflineBankingSettingRequest req)
@@ -17,10 +17,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             PointLevels = req.PointLevels;
             AccountNo = req.AccountNo;
             Agent = req.Agent;
-            SupportChannels = req.SupportChannels.Select(x => (int) x);
-            var (startIndex, absPageSize) = req.PageNumber.GetStartIndexAndPageSize(req.PageSize);
-            PageSize = absPageSize;
-            StartIndex = startIndex;
+            SupportChannels = req.SupportChannels.Select(x => (int)x);
         }
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
