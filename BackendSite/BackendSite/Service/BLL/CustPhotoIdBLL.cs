@@ -45,7 +45,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         var photos = await _custPhotoIdService.Get(custId);
         var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
         var serverInfo = _serverInfoBll.GetServerInfo(custInfo.SiteId);
-        var site = serverInfo.SiteName;
+        var site = serverInfo.SiteName.ToUpper();
         
         var data = photos.Select(sq => new GetCustPhotoIdResponse()
         {
@@ -88,7 +88,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         var fileBytes = await _imageEditorBll.Resize(uploadedImage);
 
         var serverInfo = _serverInfoBll.GetServerInfo(custInfo.SiteId);
-        var site = serverInfo.SiteName;
+        var site = serverInfo.SiteName.ToUpper();
         var stream = new MemoryStream(fileBytes);
         var key = $"{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg";
         var putRequest = new PutObjectRequest
@@ -115,7 +115,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         {
             var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
             var serverInfo = _serverInfoBll.GetServerInfo(custInfo.SiteId);
-            var site = serverInfo.SiteName;
+            var site = serverInfo.SiteName.ToUpper();
             var key = $"{_environment}/{site}/CustPhotoId/{custId}/{id}.jpeg";
             var deleteObject = new DeleteObjectRequest()
             {
