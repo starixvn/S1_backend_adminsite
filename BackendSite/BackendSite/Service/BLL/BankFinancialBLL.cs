@@ -480,7 +480,7 @@ namespace BackendSite.Service.BLL
             GetTransferInfoListParams input, int pageNumber, int pageSize, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
-            var (startIndex, _) = pageNumber.GetStartIndexAndPageSize(pageSize);
+            var (startIndex, _) = pageNumber.GetStartIndex(pageSize);
             var result =
                 _bankFinancialService.GetFinancialTransferInfoList(input, startIndex, pageSize, out _, out var rowCount);
 

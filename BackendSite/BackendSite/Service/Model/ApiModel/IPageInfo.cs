@@ -46,7 +46,7 @@ namespace BackendSite.Service.Model.ApiModel
             TotalPages = (int)Math.Ceiling(totalCount / (float)pageSize);
             RowCount = totalCount;
             PageNumber = pageNumber;
-            var startIndex = pageNumber.GetStartIndexAndPageSize(pageSize).StartIndex;
+            var startIndex = pageNumber.GetStartIndex(pageSize).StartIndex;
             var count = startIndex + pageSize <= totalCount ? pageSize : totalCount - startIndex;
             PageRange = $"{startIndex + (totalCount == 0 ? 0 : 1)}-{startIndex + count}";
             return (startIndex, count);
@@ -65,7 +65,7 @@ namespace BackendSite.Service.Model.ApiModel
             TotalPages = (int)Math.Ceiling(totalCount / (float)pageSize);
             RowCount = totalCount;
             PageNumber = pageNumber;
-            var startIndex = pageNumber.GetStartIndexAndPageSize(pageSize).StartIndex;
+            var startIndex = pageNumber.GetStartIndex(pageSize).StartIndex;
             var endIndex = startIndex + pageSize <= totalCount ? startIndex + pageSize : totalCount;
             PageRange = $"{startIndex + (totalCount == 0 ? 0 : 1)}-{endIndex}";
             return (startIndex, endIndex - 1);
