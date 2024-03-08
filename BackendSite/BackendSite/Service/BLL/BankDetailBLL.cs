@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL;
+﻿using BackendSite.Extensions;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -33,10 +34,12 @@ namespace BackendSite.Service.BLL
             IPageInfo pageInfo = new PageInfo();
             var result = await GetOfflineBankingSettingListWithCache(input);
             
-            var (startIndex, _) = pageInfo.ListPagination(result.Count, pageNumber, pageSize);
+            var (startIndex, _) = pageNumber.GetStartIndexAndPageSize(pageSize);
             pageInfo.SetPageInfo(result.Count, pageNumber, pageSize);
             
-            var fragment = result.GetRange(startIndex, pageSize);
+            var fragment = result
+                .Skip(startIndex)
+                .Take(pageSize);
 
             return (fragment, pageInfo);
         }
