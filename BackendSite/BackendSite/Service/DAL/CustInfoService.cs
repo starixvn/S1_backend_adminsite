@@ -14,13 +14,11 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        private readonly MySqlClient _reportbackupDbClient;
 
         public CustInfoService(IServiceProvider provider)
         {
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
-            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);          
-            _reportbackupDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.ReportBackupDB);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
         public Customer GetCustInfo(int custId)
@@ -788,9 +786,7 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_CustId", custId);
             p.Add("_Date", dateTime.DateTime);
-            return _reportbackupDbClient != null
-                ? _reportbackupDbClient.RetryQuery<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", p)
-                : _reportDbClient.Query<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", p);
+            return _reportDbClient.RetryQuery<WinLoseSummary>("Admin_WinLoseSummary_Get_V2", p);
         }
 
         public IEnumerable<WinLoseSummaryDetail> GetWinLoseSummaryDetail(int custId, DateTimeOffset dateTime, string GameTypes)
@@ -799,9 +795,7 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", custId);
             p.Add("_Date", dateTime.DateTime);
             p.Add("_GameList", GameTypes);
-            return _reportbackupDbClient != null
-                ? _reportbackupDbClient.RetryQuery<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", p)
-                : _reportDbClient.Query<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", p);            
+            return _reportDbClient.RetryQuery<WinLoseSummaryDetail>("Admin_WinLoseSummaryDetail_Get_V4", p);            
         }
 
         public Task<IEnumerable<EWalletDetail>> GetCustEWalletDetailAsync(int custId)
