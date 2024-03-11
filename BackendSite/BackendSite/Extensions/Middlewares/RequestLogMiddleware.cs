@@ -133,8 +133,10 @@ namespace BackendSite.Extensions.Middlewares
                         }
                     }
 
-                    _logger.LogInformation(
-                        $"REQUEST METHOD: {context.Request.Method}, CodePage: {codePage}, REQUEST BODY: {content}, REQUEST URL: {url}");
+                    var log = new StringBuilder();
+                    log.AppendLine($"REQUEST URL: {url}, Method: {context.Request.Method}, CodePage: {codePage},");
+                    log.AppendLine($"REQUEST BODY: {content}");
+                    _logger.LogInformation(log.ToString());
                 }
             }
 
