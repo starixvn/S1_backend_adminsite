@@ -74,11 +74,11 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> CreateGiftAsync(CreateGiftRequest req, string userName)
         {
             var serverInfo = _serverInfoBll.GetServerInfo(req.SiteId);
-            var bonusCode = BonusCodeRule(req,serverInfo.SiteName);
             
             if (req.GiftType == GiftTypeEnum.FreeSpin)
             {
                 //³Ð«Øbonuscode
+                var bonusCode = BonusCodeRule(req, serverInfo.SiteName);
                 await CreateBonusCode(req, bonusCode);
             }
 
