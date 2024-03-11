@@ -14,7 +14,6 @@ namespace BackendSite.Service.DAL
 {
     public class DepositService
     {
-        private readonly IConfiguration configuration;
         private readonly WalletService walletService;
         private readonly Common common;
         private readonly WithdrawalLimitService withdrawalLimitService;
@@ -23,11 +22,9 @@ namespace BackendSite.Service.DAL
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly ILogger<DepositService> _logger;
-        private readonly MySqlClient _reportbackupDbClient;
 
         public DepositService(IServiceProvider provider)
         {
-            configuration = provider.GetRequiredService<IConfiguration>();
             walletService = provider.GetRequiredService<WalletService>();
             common = provider.GetRequiredService<Common>();
             withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
@@ -35,7 +32,6 @@ namespace BackendSite.Service.DAL
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _logger = provider.GetRequiredService<ILogger<DepositService>>();
-            _reportbackupDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.ReportBackupDB);
         }
 
         public IEnumerable<DepositRequest> GetDepositRequestList(
@@ -88,19 +84,14 @@ namespace BackendSite.Service.DAL
                 PayIds = payIds.Any() ? JsonConvert.SerializeObject(payIds) : null,
             });
 
-            currencyAmountRecord = _reportbackupDbClient != null
-                ? _reportbackupDbClient.RetryQuery<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList()
-                : _reportDbClient.Query<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
-
+            currencyAmountRecord = _reportDbClient.RetryQuery<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
 
             p.Add("PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
             p.Add("StartIndex", Math.Abs(pageNumber - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportbackupDbClient != null
-                ? _reportbackupDbClient.RetryQuery<DepositRequest>("Admin_DepositList_Get_V13", p)
-                : _reportDbClient.Query<DepositRequest>("Admin_DepositList_Get_V13", p);
+            var depositList = _reportDbClient.RetryQuery<DepositRequest>("Admin_DepositList_Get_V13", p);
 
             totalPages = p.Get<int?>("TotalPages") ?? 0;
             rowCount = p.Get<int?>("RowCount") ?? 0;
