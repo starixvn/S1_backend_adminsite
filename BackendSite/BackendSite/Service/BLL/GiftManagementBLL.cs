@@ -103,7 +103,7 @@ namespace BackendSite.Service.BLL
         {
             
             var inputs = new Dictionary<string, string>();
-            var url = _tpServiceApiUrl + "API/CreateBonusCode";
+            var url = _tpServiceApiUrl + "CreateBonusCode";
             inputs.Add("GameId", "vs20olympnova88");//目前只有PP一款遊戲
             inputs.Add("BonusCode", bonusCode);
             inputs.Add("Round", req.Round.ToString());
