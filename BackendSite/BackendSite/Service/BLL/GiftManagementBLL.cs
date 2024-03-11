@@ -79,7 +79,9 @@ namespace BackendSite.Service.BLL
             {
                 //創建bonuscode
                 var bonusCode = BonusCodeRule(req, serverInfo.SiteName);
-                await CreateBonusCode(req, bonusCode);
+                var apiResult = await CreateBonusCode(req, bonusCode);
+                //失敗return
+                if (apiResult.ErrorCode != 0) { return new ApiResult(apiResult.ErrorCode, apiResult.RawMessage); }
             }
 
             var url = _storeSiteUrl + "GiftManagement/Create";
@@ -92,11 +94,11 @@ namespace BackendSite.Service.BLL
         private static string BonusCodeRule(CreateGiftRequest req,string siteName)
         {
             //BonusCode規則。ex.PPFREESPIN100FORNOVA8820240306
-            var bonusCode = $"PPFREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.Now.ToString("yyyyMMdd")}";
+            var bonusCode = $"PPFREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.UtcNow.ToString("yyyyMMdd")}";
             return bonusCode;
         }
 
-        private async Task CreateBonusCode(CreateGiftRequest req, string bonusCode)
+        private async Task<ApiResult> CreateBonusCode(CreateGiftRequest req, string bonusCode)
         {
             
             var inputs = new Dictionary<string, string>();
@@ -116,6 +118,8 @@ namespace BackendSite.Service.BLL
             _logger.LogInformation(apiResult.ErrorCode == 0
                 ? $"BonusCode:{bonusCode} Create Success"
                 : $"BonusCode:{bonusCode} Create Fail");
+
+            return apiResult;
         }
 
         public async Task<ApiResult> UpdateGiftAsync(UpdateGiftRequest req, string userName)

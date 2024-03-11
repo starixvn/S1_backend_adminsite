@@ -2015,7 +2015,7 @@ namespace BackendSite.Service.Model.enums
     /// </summary>
     public enum GiftTypeEnum 
     { 
-        common = 1,
+        Common = 1,
         FreeSpin = 2
     }
 }
