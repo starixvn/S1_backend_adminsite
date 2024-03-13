@@ -114,11 +114,18 @@ namespace BackendSite.Service.Model
 
     public class SetNewSlotGameReq
     {
+        public SetNewSlotGameReq()
+        {
+            //前端若沒傳設為空字串
+            RTP = "";
+            Reel = "";
+            Payline = "";
+        }
         public int TpId { get; set; }
         public string GameId { get; set; }
         public string ENname { get; set; }
         public string CSname { get; set; }
-        public double RTP { get; set; }
+        public string RTP { get; set; }
         public string Reel { get; set; }
         public int Device { get;set; }
         public string Payline { get; set; }
