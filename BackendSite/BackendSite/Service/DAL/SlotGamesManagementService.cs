@@ -157,13 +157,13 @@ namespace BackendSite.Service.DAL
 
             return success;
         }
-        public bool SetGameCasinoExtra(int tpId, double rtp, string reel, string payline, int nextId, MySqlTransaction trans)
+        public bool SetGameCasinoExtra(int tpId, string rtp, string reel, string payline, int nextId, MySqlTransaction trans)
         {
             var parameter = new DynamicParameters();
             parameter.Add("_TpId", tpId, DbType.Int32);
             parameter.Add("_RTP", rtp);
             parameter.Add("_Reel", reel);
-            parameter.Add("_Payline", payline, DbType.Int32);
+            parameter.Add("_Payline", payline);
             parameter.Add("_NextId", nextId, DbType.Int32);
 
             return _mainDbClient.Execute("Admin_GameCasinoExtra_Set", trans, parameter) > 0;
@@ -186,9 +186,7 @@ namespace BackendSite.Service.DAL
 
             foreach (var item in sitecurrencyList)
             {
-                //判斷currency是否開啟，若開啟status先設為為3(release)
-                //DEV階段先改1
-                //todo 上release後改成3
+                //判斷currency是否開啟，若開啟則status設為3(release)。新增後先在release階段
                 var status = opencurrencyIds.Contains(item.CurrencyId) ? 1 : 0;
                 
                 var parameter = new DynamicParameters();
