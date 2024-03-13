@@ -1781,10 +1781,14 @@ namespace BackendSite.Service.Model.enums
         WrongBankSubmitted = 5,
         [Description("Inactive Bank Account submission")]
         InactiveBankAccountSubmission = 6,
-        [Description("System Unstable")]
-        SystemUnstable = 7,
+        [Description("Bank System Unstable")]
+        BankSystemUnstable = 7,
         [Description("Bank Under Maintenance")]
         BankUnderMaintenance = 8,
+        [Description("Deposit Remark Reminder")]
+        DepositRemarkReminder = 9,
+        [Description("Enter Remark Reminder")]
+        EnterRemarkReminder = 10
     }
 
     public enum WithdrawalMessageStatus
@@ -1796,7 +1800,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Withdrawal account cannot receive money")]
         WithdrawalAccountAannotReceiveMoney = 2,
         [Description("Beneficiary's account maintenance")]
-        BeneficiarysAccountMaintenance = 3
+        BeneficiarysAccountMaintenance = 3,
+        [Description("Bank System Unstable")]
+        BankSystemUnstable = 4,
+        [Description("Withdrawal limit exceeded INR")]
+        WithdrawalLimitExceededINR = 5
     }
 
     public enum MpaTransactionRelaySummaryTypeEnum
