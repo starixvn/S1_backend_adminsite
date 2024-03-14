@@ -1,4 +1,5 @@
 using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -17,6 +18,7 @@ namespace BackendSite.Service.BLL
         private readonly string _tpServiceApiUrl;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly ILogger<GiftManagementBLL> _logger;
+        private readonly ThirdPartyService _thirdPartyService;
 
         public GiftManagementBLL(IServiceProvider provider)
         {
@@ -29,6 +31,7 @@ namespace BackendSite.Service.BLL
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<GiftManagementBLL>>();
+            _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
         }
 
         public Task<ApiResult<object>> GetGiftListAsync(GetListRequest req)
@@ -100,13 +103,13 @@ namespace BackendSite.Service.BLL
 
         private async Task<ApiResult> CreateBonusCode(CreateGiftRequest req, string bonusCode)
         {
-            
+            var currency = await _thirdPartyService.GetTpCurrency(5,req.CurrencyId);
             var inputs = new Dictionary<string, string>();
             var url = _tpServiceApiUrl + "CreateBonusCode";
             inputs.Add("GameId", "vs20olympnova88");//目前只有PP一款遊戲
             inputs.Add("BonusCode", bonusCode);
             inputs.Add("Round", req.Round.ToString());
-            inputs.Add("Currency", ((CurrencyEnum)req.CurrencyId).ToString());
+            inputs.Add("Currency",currency.TpCurrencyId);
             var request = new CreateBonusCodeParams()
             {
                 SiteId = req.SiteId,
