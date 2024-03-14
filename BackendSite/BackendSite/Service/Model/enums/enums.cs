@@ -1787,8 +1787,8 @@ namespace BackendSite.Service.Model.enums
         BankUnderMaintenance = 8,
         [Description("Deposit Remark Reminder")]
         DepositRemarkReminder = 9,
-        [Description("Enter Remark Reminder")]
-        EnterRemarkReminder = 10
+        [Description("Fill Up Remark Reminder")]
+        FillUpRemarkReminder = 10
     }
 
     public enum WithdrawalMessageStatus
