@@ -11,14 +11,14 @@ using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
-    public class WorldCupPredictionService : IWorldCupPredictionService
+    public class CupEventService : ICupEventService
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private MySqlConnection _connection;
         private MySqlTransaction _transaction;
 
-        public WorldCupPredictionService(IEnumerable<MySqlClient> sqlClients)
+        public CupEventService(IEnumerable<MySqlClient> sqlClients)
         {
             _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
@@ -52,46 +52,46 @@ namespace BackendSite.Service.DAL
         /// </summary>
         /// <param name="langId">語系Id，看前端傳什語系</param>
         /// <returns></returns>
-        public IEnumerable<WorldCupPredictionSettingDto> GetWorldCupPredictionSetting(string langId)
+        public IEnumerable<CupEventSettingDto> GetCupEventSetting(string langId)
         {
             var p = new DynamicParameters();
             p.Add("LangId", langId, dbType: DbType.String);
-            return _mainDbClient.Query<WorldCupPredictionSettingDto>("Admin_WorldCupPredictionSetting_Get", p);
+            return _mainDbClient.Query<CupEventSettingDto>("Admin_CupEventPredictionSetting_Get", p);
         }
 
         /// <summary>
         /// 取得世界盃國家下拉選單內容
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<WorldCupPredictionOptionsDto> GetWorldCupPredictionOptions()
+        public IEnumerable<CupEventOptionsDto> GetCupEventOptions()
         {
-            return _mainDbClient.Query<WorldCupPredictionOptionsDto>("Admin_WorldCupPredictionOptions_Get");
+            return _mainDbClient.Query<CupEventOptionsDto>("Admin_CupEventPredictionOptions_Get");
         }
 
         /// <summary>
         /// 更新 Status 狀態
         /// </summary>
         /// <returns></returns>
-        public Task<int> SetWorldCupPrediction()
+        public Task<int> SetCupEventPrediction()
         {
-            return _mainDbClient.ExecuteAsync("Admin_WorldCupPredictionSetting_Set", _transaction, null);
+            return _mainDbClient.ExecuteAsync("Admin_CupEventPredictionSetting_Set", _transaction, null);
         }
 
         /// <summary>
-        /// 寫入 WorldCupEventSetting
+        /// 寫入 CupEventSetting
         /// </summary>
         /// <param name="setData"></param>
         /// <returns></returns>
-        public Task<int> InsertWorldCupPrediction(WorldCupPredictionSettingDto setData)
+        public Task<int> InsertCupEventPrediction(CupEventSettingDto setData)
         {
             var parameters = new DynamicParameters();
             parameters.Add("_TeamId", setData.TeamId, dbType: DbType.Int64);
             parameters.Add("_LevelName", setData.LevelName, dbType: DbType.String);
             parameters.Add("_Sort", setData.Sort, dbType: DbType.Int64);
-            return _mainDbClient.ExecuteAsync("Admin_WorldCupPredictionSetting_Ins", _transaction, parameters);
+            return _mainDbClient.ExecuteAsync("Admin_CupEventPredictionSetting_Ins", _transaction, parameters);
         }
 
-        public IEnumerable<WorldCupMemberReportDto> GetMemberReport(GetWorldCupMemberReportRequest request, out int totalPages, out int rowCount)
+        public IEnumerable<CupEventMemberReportDto> GetMemberReport(GetCupEventMemberReportRequest request, out int totalPages, out int rowCount)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", request.SiteId);
@@ -106,13 +106,13 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = _reportDbClient.Query<WorldCupMemberReportDto>("Admin_WorldCupMemberTicketInfo_Get", p);
+            var result = _reportDbClient.Query<CupEventMemberReportDto>("Admin_CupEventMemberTicketInfo_Get", p);
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
         }
 
-        public async Task<IEnumerable<WorldCupMemberReportDto>> GetMemberReport(ExportWorldCupMemberReportRequest request)
+        public async Task<IEnumerable<CupEventMemberReportDto>> GetMemberReport(ExportCupEventMemberReportRequest request)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", request.SiteId);
@@ -123,22 +123,22 @@ namespace BackendSite.Service.DAL
             p.Add("_UserName", request.UserName);
             p.Add("_StartTime", request.StartTime.ToUniversalTime().DateTime);
             p.Add("_EndTime", request.EndTime.ToUniversalTime().DateTime);
-            return await _reportDbClient.QueryAsync<WorldCupMemberReportDto>("Admin_WorldCupMemberTicketInfoWithoutPage_Get", p);
+            return await _reportDbClient.QueryAsync<CupEventMemberReportDto>("Admin_CupEventMemberTicketInfoWithoutPage_Get", p);
         }
 
-        public async Task<IEnumerable<WorldCupPredictiveStatisticsDto>> GetPredictiveStatistics(int siteId)
+        public async Task<IEnumerable<CupEventPredictiveStatisticsDto>> GetPredictiveStatistics(int siteId)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
-            return await _reportDbClient.QueryAsync<WorldCupPredictiveStatisticsDto>("Admin_WorldCupPredictiveStatistics_Get", p);
+            return await _reportDbClient.QueryAsync<CupEventPredictiveStatisticsDto>("Admin_CupEventPredictiveStatistics_Get", p);
         }
 
-        public async Task<IEnumerable<WorldCupPredictDetailDto>> GetPredictDetail(int siteId, int teamId)
+        public async Task<IEnumerable<CupEventPredictDetailDto>> GetPredictDetail(int siteId, int teamId)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
             p.Add("_TeamId", teamId);
-            return await _reportDbClient.QueryAsync<WorldCupPredictDetailDto>("Admin_WorldCupPredictDetail_Get", p);
+            return await _reportDbClient.QueryAsync<CupEventPredictDetailDto>("Admin_CupEventPredictDetail_Get", p);
         }
 
         public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)
@@ -147,7 +147,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", siteId);
             p.Add("_TeamId", teamId);
             p.Add("UpdateOperator", updateOperator);
-            return await _mainDbClient.ExecuteAsync("Admin_WorldCupTeamSettleLog_Ins", p);
+            return await _mainDbClient.ExecuteAsync("Admin_CupEventTeamSettleLog_Ins", p);
         }
     }
 }

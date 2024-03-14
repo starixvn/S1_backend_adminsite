@@ -2,7 +2,6 @@
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,25 +11,25 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
     [ApiController]
-    public class WorldCupPredictionController : ControllerBase
+    public class CupEventController : ControllerBase
     {
-        private readonly WorldCupPredictionBLL _worldCupPredictionBll;
+        private readonly CupEventBLL _cupEventBll;
         private readonly ExcelBLL _excelBll;
 
-        public WorldCupPredictionController(WorldCupPredictionBLL worldCupPredictionBll, ExcelBLL excelBll)
+        public CupEventController(IServiceProvider provider)
         {
-            _excelBll = excelBll;
-            _worldCupPredictionBll = worldCupPredictionBll;
+            _cupEventBll = provider.GetRequiredService<CupEventBLL>();
+            _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
-        public ApiResult<WorldCupPredictionSettingResponse> GetWorldCupPredictionSetting()
+        public ApiResult<CupEventPredictionSettingResponse> GetCupEventPredictionSetting()
         {
-            var apiResult = new ApiResult<WorldCupPredictionSettingResponse>();
+            var apiResult = new ApiResult<CupEventPredictionSettingResponse>();
             try
             {
-                var responseData = _worldCupPredictionBll.GetCupPredictionSettingResponse("en"); //後台不用多語系，統一用英文，有需要可以更改
+                var responseData = _cupEventBll.GetCupPredictionSettingResponse("en"); //後台不用多語系，統一用英文，有需要可以更改
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
@@ -45,12 +44,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
-        public async Task<ApiResult> SetWorldCupPredictionSetting(SetWorldCupPredictionSettingRequest request)
+        public async Task<ApiResult> SetCupEventPredictionSetting(SetCupEventPredictionSettingRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                await _worldCupPredictionBll.SetWorldCupPredictionSetting(request);
+                await _cupEventBll.SetCupEventPredictionSetting(request);
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -64,12 +63,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 115, 1 })]
-        public ApiListResult<GetWorldCupMemberReportResponse> GetMemberReport(GetWorldCupMemberReportRequest request)
+        public ApiListResult<GetCupEventMemberReportResponse> GetCupEventMemberReport(GetCupEventMemberReportRequest request)
         {
-            var apiResult = new ApiListResult<GetWorldCupMemberReportResponse>();
+            var apiResult = new ApiListResult<GetCupEventMemberReportResponse>();
             try
             {
-                apiResult.Data = _worldCupPredictionBll.GetMemberReport(request,
+                apiResult.Data = _cupEventBll.GetMemberReport(request,
                     out var totalPages,
                     out var rowCount); ;
                 apiResult.TotalPages = totalPages;
@@ -87,26 +86,26 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 115, 2 })]
-        public async Task<IActionResult> ExportMemberReport(ExportWorldCupMemberReportRequest request)
+        public async Task<IActionResult> ExportCupEventMemberReport(ExportCupEventMemberReportRequest request)
         {
             var offset = request.StartTime.Offset;
-            var exportData = await _worldCupPredictionBll.GetMemberReport(request);
+            var exportData = await _cupEventBll.GetMemberReport(request);
             foreach (var item in exportData)
             {
                 item.SelectTime = item.SelectTime?.ToOffset(offset);
             }
             var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WorldCupMemberReport");
+            return _excelBll.ExcelFile(stream, "CupEventMemberReport");
         }
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 1 })]
-        public async Task<ApiResult<IEnumerable<GetWorldCupEventReportResponse>>> GetEventReport(GetWorldCupEventReportRequest request)
+        public async Task<ApiResult<IEnumerable<GetCupEventReportResponse>>> GetCupEventReport(GetCupEventReportRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<GetWorldCupEventReportResponse>>();
+            var apiResult = new ApiResult<IEnumerable<GetCupEventReportResponse>>();
             try
             {
-                apiResult.Data = await _worldCupPredictionBll.GetPredictiveStatistics(request.SiteId); ;
+                apiResult.Data = await _cupEventBll.GetPredictiveStatistics(request.SiteId); ;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)
@@ -119,16 +118,16 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 2 })]
-        public async Task<IActionResult> ExportEventReport(ExportWorldCupEventReportRequest request)
+        public async Task<IActionResult> ExportEventReport(ExportCupEventReportRequest request)
         {
             var ts = TimeSpan.Parse(request.Timezone.TrimStart('+'));
-            var exportData = await _worldCupPredictionBll.GetPredictDetail(request.SiteId, request.TeamId);
+            var exportData = await _cupEventBll.GetPredictDetail(request.SiteId, request.TeamId);
             foreach (var item in exportData)
             {
                 item.SelectTime = item.SelectTime.ToOffset(ts);
             }
             var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WorldCupEventReport");
+            return _excelBll.ExcelFile(stream, "CupEventReport");
         }
 
         [HttpPost]
@@ -139,7 +138,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             try
             {
                 var updateOperator = User.Identity.Name;
-                var result = await _worldCupPredictionBll.SetPayoutDone(request.SiteId, request.TeamId, updateOperator);
+                var result = await _cupEventBll.SetPayoutDone(request.SiteId, request.TeamId, updateOperator);
                 apiResult.ErrorCode = result == 1 ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.UpdateFailed;
             }
             catch (Exception ex)

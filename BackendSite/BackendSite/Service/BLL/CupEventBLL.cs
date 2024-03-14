@@ -3,25 +3,25 @@ using BackendSite.Service.Model;
 
 namespace BackendSite.Service.BLL
 {
-    public class WorldCupPredictionBLL
+    public class CupEventBLL
     {
-        private readonly IWorldCupPredictionService _worldCupPredictionService;
-        private readonly ILogger<WorldCupPredictionBLL> _logger;
-        public WorldCupPredictionBLL(IWorldCupPredictionService worldCupPredictionService, ILogger<WorldCupPredictionBLL> logger)
+        private readonly ICupEventService _cupEventService;
+        private readonly ILogger<CupEventBLL> _logger;
+        public CupEventBLL(ICupEventService cupEventService, ILogger<CupEventBLL> logger)
         {
-            this._worldCupPredictionService = worldCupPredictionService;
+            this._cupEventService = cupEventService;
             _logger = logger;
         }
 
-        public WorldCupPredictionSettingResponse GetCupPredictionSettingResponse(string langId)
+        public CupEventPredictionSettingResponse GetCupPredictionSettingResponse(string langId)
         {
-            var dbData = _worldCupPredictionService.GetWorldCupPredictionSetting(langId).ToList();
-            var options = GetWorldCupPredictionSelectOptions();
+            var dbData = _cupEventService.GetCupEventSetting(langId).ToList();
+            var options = GetCupEventPredictionSelectOptions();
 
-            var responseData = new WorldCupPredictionSettingResponse()
+            var responseData = new CupEventPredictionSettingResponse()
             {
                 SelectOptions = options,
-                Top32Team = FilterData(dbData, "top32Team"),
+                Top24Team = FilterData(dbData, "top24Team"),
                 RoundOf16 = FilterData(dbData, "roundOf16"),
                 QuarterFinals = FilterData(dbData, "quarterFinals"),
                 SemiFinals = FilterData(dbData, "semiFinals"),
@@ -32,22 +32,22 @@ namespace BackendSite.Service.BLL
             return responseData;
         }
 
-        public async Task SetWorldCupPredictionSetting(SetWorldCupPredictionSettingRequest request)
+        public async Task SetCupEventPredictionSetting(SetCupEventPredictionSettingRequest request)
         {
-            var updateData = MapToWorldCupPredictionSettingDto(request).ToList();
+            var updateData = MapToCupEventPredictionSettingDto(request).ToList();
             if (updateData.Any())
             {
                 try
                 {
-                    await _worldCupPredictionService.BeginTransaction();
-                    await _worldCupPredictionService.SetWorldCupPrediction(); // 先將原本啟用的資料全部更新未啟用
-                    var tasks = updateData.Select(item => _worldCupPredictionService.InsertWorldCupPrediction(item)).ToList(); // Insert
+                    await _cupEventService.BeginTransaction();
+                    await _cupEventService.SetCupEventPrediction(); // 先將原本啟用的資料全部更新未啟用
+                    var tasks = updateData.Select(item => _cupEventService.InsertCupEventPrediction(item)).ToList(); // Insert
                     await Task.WhenAll(tasks);
-                    await _worldCupPredictionService.Commit();
+                    await _cupEventService.Commit();
                 }
                 catch (Exception ex)
                 {
-                    await _worldCupPredictionService.RollBack();
+                    await _cupEventService.RollBack();
                     _logger.LogError(ex.Message, ex);
                 }
             }
@@ -55,11 +55,11 @@ namespace BackendSite.Service.BLL
             await Task.CompletedTask;
         }
 
-        private IEnumerable<WorldCupPredictionSelectOptions> GetWorldCupPredictionSelectOptions()
+        private IEnumerable<CupEventPredictionSelectOptions> GetCupEventPredictionSelectOptions()
         {
-            var dbData = _worldCupPredictionService.GetWorldCupPredictionOptions();
+            var dbData = _cupEventService.GetCupEventOptions();
 
-            var result = dbData.Select(r => new WorldCupPredictionSelectOptions
+            var result = dbData.Select(r => new CupEventPredictionSelectOptions
             {
                 CountryId = r.TeamId,
                 CountryName = r.TeamName
@@ -68,11 +68,11 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        private IEnumerable<WorldCupEventSetting> FilterData(IEnumerable<WorldCupPredictionSettingDto> sourceData, string levelName)
+        private IEnumerable<CupEventSetting> FilterData(IEnumerable<CupEventSettingDto> sourceData, string levelName)
         {
             return sourceData.Where(r => r.LevelName == levelName)
                 .OrderBy(c => c.Sort)
-                .Select(x => new WorldCupEventSetting
+                .Select(x => new CupEventSetting
                 {
                     CountryId = x.TeamId,
                     CountryName = x.TeamName,
@@ -80,20 +80,20 @@ namespace BackendSite.Service.BLL
                 }).ToList();
         }
 
-        private IEnumerable<WorldCupPredictionSettingDto> MapToWorldCupPredictionSettingDto(SetWorldCupPredictionSettingRequest request)
+        private IEnumerable<CupEventSettingDto> MapToCupEventPredictionSettingDto(SetCupEventPredictionSettingRequest request)
         {
-            var updateData = new List<WorldCupPredictionSettingDto>();
+            var updateData = new List<CupEventSettingDto>();
 
-            if (request.Data.Top32Team.Any()) // 32強
-                updateData.AddRange(request.Data.Top32Team.Select(r => new WorldCupPredictionSettingDto()
+            if (request.Data.Top24Team.Any()) // 24強
+                updateData.AddRange(request.Data.Top24Team.Select(r => new CupEventSettingDto()
                 {
                     TeamId = r.CountryId,
-                    LevelName = "top32Team",
+                    LevelName = "top24Team",
                     Sort = r.Sort
                 }).ToList());
 
             if (request.Data.RoundOf16.Any()) // 16強
-                updateData.AddRange(request.Data.RoundOf16.Select(r => new WorldCupPredictionSettingDto()
+                updateData.AddRange(request.Data.RoundOf16.Select(r => new CupEventSettingDto()
                 {
                     TeamId = r.CountryId,
                     LevelName = "roundOf16",
@@ -101,7 +101,7 @@ namespace BackendSite.Service.BLL
                 }).ToList());
 
             if (request.Data.QuarterFinals.Any())  // 8強
-                updateData.AddRange(request.Data.QuarterFinals.Select(r => new WorldCupPredictionSettingDto()
+                updateData.AddRange(request.Data.QuarterFinals.Select(r => new CupEventSettingDto()
                 {
                     TeamId = r.CountryId,
                     LevelName = "quarterFinals",
@@ -109,7 +109,7 @@ namespace BackendSite.Service.BLL
                 }).ToList());
 
             if (request.Data.SemiFinals.Any()) // 4強
-                updateData.AddRange(request.Data.SemiFinals.Select(r => new WorldCupPredictionSettingDto()
+                updateData.AddRange(request.Data.SemiFinals.Select(r => new CupEventSettingDto()
                 {
                     TeamId = r.CountryId,
                     LevelName = "semiFinals",
@@ -117,7 +117,7 @@ namespace BackendSite.Service.BLL
                 }).ToList());
 
             if (request.Data.ThirdRdPlace.Any()) // 季軍
-                updateData.AddRange(request.Data.ThirdRdPlace.Select(r => new WorldCupPredictionSettingDto()
+                updateData.AddRange(request.Data.ThirdRdPlace.Select(r => new CupEventSettingDto()
                 {
                     TeamId = r.CountryId,
                     LevelName = "3rdPlace",
@@ -125,7 +125,7 @@ namespace BackendSite.Service.BLL
                 }).ToList());
 
             if (request.Data.Final.Any())  // 冠亞
-                updateData.AddRange(request.Data.Final.Select(r => new WorldCupPredictionSettingDto()
+                updateData.AddRange(request.Data.Final.Select(r => new CupEventSettingDto()
                 {
                     TeamId = r.CountryId,
                     LevelName = "final",
@@ -135,10 +135,10 @@ namespace BackendSite.Service.BLL
             return updateData;
         }
 
-        public IEnumerable<GetWorldCupMemberReportResponse> GetMemberReport(GetWorldCupMemberReportRequest request, out int totalPages, out int rowCount)
+        public IEnumerable<GetCupEventMemberReportResponse> GetMemberReport(GetCupEventMemberReportRequest request, out int totalPages, out int rowCount)
         {
-            var memberReport = _worldCupPredictionService.GetMemberReport(request, out totalPages, out rowCount);
-            return memberReport.Select(a => new GetWorldCupMemberReportResponse()
+            var memberReport = _cupEventService.GetMemberReport(request, out totalPages, out rowCount);
+            return memberReport.Select(a => new GetCupEventMemberReportResponse()
             {
                 Currency = a.Currency,
                 UserName = a.UserName,
@@ -148,10 +148,10 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public async Task<IEnumerable<ExportWorldCupMemberReportResponse>> GetMemberReport(ExportWorldCupMemberReportRequest request)
+        public async Task<IEnumerable<ExportCupEventMemberReportResponse>> GetMemberReport(ExportCupEventMemberReportRequest request)
         {
-            var memberReport = await _worldCupPredictionService.GetMemberReport(request);
-            return memberReport.Select(a => new ExportWorldCupMemberReportResponse()
+            var memberReport = await _cupEventService.GetMemberReport(request);
+            return memberReport.Select(a => new ExportCupEventMemberReportResponse()
             {
                 Currency = a.Currency,
                 UserName = a.UserName,
@@ -161,10 +161,10 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public async Task<IEnumerable<GetWorldCupEventReportResponse>> GetPredictiveStatistics(int siteId)
+        public async Task<IEnumerable<GetCupEventReportResponse>> GetPredictiveStatistics(int siteId)
         {
-            var eventReport = await _worldCupPredictionService.GetPredictiveStatistics(siteId);
-            return eventReport.Select(a => new GetWorldCupEventReportResponse()
+            var eventReport = await _cupEventService.GetPredictiveStatistics(siteId);
+            return eventReport.Select(a => new GetCupEventReportResponse()
             {
                 TeamId = a.TeamId,
                 TeamName = a.TeamName,
@@ -175,10 +175,10 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public async Task<IEnumerable<ExportWorldCupEventReportResponse>> GetPredictDetail(int siteId, int teamId)
+        public async Task<IEnumerable<ExportCupEventReportResponse>> GetPredictDetail(int siteId, int teamId)
         {
-            var predictDetail = await _worldCupPredictionService.GetPredictDetail(siteId, teamId);
-            return predictDetail.Select(a => new ExportWorldCupEventReportResponse()
+            var predictDetail = await _cupEventService.GetPredictDetail(siteId, teamId);
+            return predictDetail.Select(a => new ExportCupEventReportResponse()
             {
                 Currency = a.Currency,
                 UserName = a.UserName,
@@ -190,7 +190,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)
         {
-            return await _worldCupPredictionService.SetPayoutDone(siteId, teamId, updateOperator);
+            return await _cupEventService.SetPayoutDone(siteId, teamId, updateOperator);
         }
 
         private string DatetimeFormat(DateTime? dateTime)

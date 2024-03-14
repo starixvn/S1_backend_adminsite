@@ -104,13 +104,13 @@ namespace BackendSite
             services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
 
             services.AddTransient<ReferralManagementDecorator>();
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ICupEventService, CupEventService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
             services.AddTransient<ILiveRegistrationService, LiveRegistrationService>();
             services.AddTransient<IVipLevelService, VipLevelService>();
             services.AddTransient<ITagService, TagService>();
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ICupEventService, CupEventService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
