@@ -18,6 +18,7 @@ namespace BackendSite.Service.BLL
         private readonly Dictionary<string, SiteCloudFrontImageInfo> _siteCloudFrontImageInfo;
         private readonly UploadImageFunctionConfig _uploadImageFunctionConfig;
         private readonly string _environmentPrefix;
+        private readonly Dictionary<string, string> _changeGameImgName;
 
         public UploadImageBLL(IServiceProvider provider)
         {
@@ -27,6 +28,13 @@ namespace BackendSite.Service.BLL
             _uploadImageFunctionConfig = configBll.GetConfigValue<UploadImageFunctionConfig>("UploadImageFunctionConfig");
             _environmentPrefix = _uploadImageFunctionConfig.EnvironmentPrefix;
             _siteCloudFrontImageInfo = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
+            _changeGameImgName = new Dictionary<string, string>()
+            {
+                {"Iconic","AT" },
+                {"Kiss918","918Kiss" },
+                {"END","ES" },
+                {"EBet","WE" },
+            };
         }
 
         public async Task<UploadResultDto> UploadImageAsync(UploadImageRequest request, UploadImageFunctionEnum uploadImageFunction)
@@ -92,7 +100,7 @@ namespace BackendSite.Service.BLL
             // 尺寸調整
             var resizeImg = Resize(request.File, request.size, request.size);
             
-
+            request.TpName = _changeGameImgName.TryGetValue(request.TpName, out var changeName) ? changeName : request.TpName;
             var folder = $"{request.TpName}/";
             var fileName = $"{OrgFileNameFilter(request.ENname)}-{request.Lang}.jpg";
             var key = Path.Combine(folder, fileName);
