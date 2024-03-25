@@ -21,12 +21,10 @@ namespace BackendSite.Service.Model.BankCardManagement
         public decimal MinAmount { set; get; }
         public decimal MaxAmount { set; get; }
         public decimal DailyLimitAmount { set; get; }
-        [JsonIgnore]
         public string FinancialAccountPurposes { set; get; }
-        private IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(FinancialAccountPurposes);
+        public IEnumerable<TransferAccountPurposeEnum> AccountPurposes =>
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(FinancialAccountPurposes ?? "[]");
 
-        [JsonIgnore]
         public TransferChannelEnum FinancialAccountChannel { set; get; }
 
         public string AccountChannel => FinancialAccountChannel.ToString();
@@ -41,11 +39,9 @@ namespace BackendSite.Service.Model.BankCardManagement
         public string BankCode { set; get; }
         public string BankName { set; get; }
         public BankCardManagementStatusEnum Status { set; get; }
-        [JsonIgnore]
         public string JsonPointLevels { set; get; }
         public IEnumerable<int> PointLevels =>
             JsonConvert.DeserializeObject<IEnumerable<int>>(JsonPointLevels ?? "[]");
-        [JsonIgnore]
         public string JsonVipLevels { set; get; }
         public IEnumerable<int> VipLevels =>
             JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels ?? "[]");
@@ -54,13 +50,11 @@ namespace BackendSite.Service.Model.BankCardManagement
         public decimal Dummy { set; get; }
         public string Memo { set; get; }
         public int Sort { set; get; }
-        [JsonIgnore]
         public string JsonSupportChannels { set; get; }
         public IEnumerable<BankCardManagementSupportChannelEnum> SupportChannels
             => JsonConvert.DeserializeObject<IEnumerable<BankCardManagementSupportChannelEnum>>(JsonSupportChannels ?? "[]");
         public IEnumerable<string> SupportChannelNames =>
             SupportChannels.Select(x => x.ToString());
-        [JsonIgnore]
         public string JsonGroupIds { set; get; }
         public IEnumerable<int> GroupIds =>
             JsonConvert.DeserializeObject<IEnumerable<int>>(JsonGroupIds ?? "[]");

@@ -20,9 +20,10 @@ namespace BackendSite.Service.BLL
         private readonly string _fileName;
         private readonly string _errorPageBucketName;
         private readonly MySqlClient _mainDbClient;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly Dictionary<string, IEnumerable<string>> _maintainExcludeDomainConfig;
         private readonly IEnumerable<int> _maintainJsonSyncSiteConfig;
-
+        
         public SiteMaintainBLL(IServiceProvider provider)
         {
             _siteConfig = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
@@ -36,9 +37,10 @@ namespace BackendSite.Service.BLL
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
-        public async Task<SiteMaintainResponse> GetSiteMaintain(SiteEnum site)
+        public async Task<SiteMaintainResponse> GetSiteMaintain(int site)
         {
             //先取新的path json, 取不到取舊的json
             var getNewRequest = new GetObjectRequest
@@ -69,7 +71,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
-            var excludeDomain = _maintainExcludeDomainConfig[$"{request.SiteId.GetDescription()}"];
+            var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
+            var excludeDomain = _maintainExcludeDomainConfig[serverInfo.SiteName];
             var siteMaintainObject = new
             {
                 request.Maintain,
@@ -94,7 +97,7 @@ namespace BackendSite.Service.BLL
                 return false;
             }
 
-            var clearCacheList = new List<string> { $"/{request.SiteId.GetDescription().ToUpper()}/{_fileName}" };
+            var clearCacheList = new List<string> { $"/{serverInfo.SiteName.ToUpper()}/{_fileName}" };
 
             if (_maintainJsonSyncSiteConfig.Contains((int)request.SiteId))
             {
@@ -115,9 +118,10 @@ namespace BackendSite.Service.BLL
             }
 
             //clear cache
+            
             var invalidationRequest = new CreateInvalidationRequest()
             {
-                DistributionId = _siteConfig[request.SiteId.GetDescription()].AwsCloudFrontErrorDomainID,
+                DistributionId = _siteConfig[serverInfo.SiteName].AwsCloudFrontErrorDomainID,
                 InvalidationBatch = new InvalidationBatch()
                 {
                     CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
@@ -210,7 +214,7 @@ namespace BackendSite.Service.BLL
 
         public class SiteMaintainRequest
         {
-            public SiteEnum SiteId { get; set; }
+            public int SiteId { get; set; }
             public bool Maintain { get; set; }
             public DateTimeOffset BeginTime { get; set; }
             public DateTimeOffset EndTime { get; set; }

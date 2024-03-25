@@ -1556,23 +1556,7 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-
-    public enum SiteEnum
-    {
-        [Description("Nova88")]
-        NOVA88 = 1,
-        [Description("Goal123")]
-        GOAL123 = 2,
-        [Description("Bwing")]
-        BWING = 3,
-        [Description("Soon88")]
-        SOON88 = 4,
-        [Description("Ivorysport")]
-        IVORYSPORT = 5,
-        [Description("Yashbet")]
-        YASHBET = 6
-    }
-
+    
     public enum AffSiteEnum
     {
         N88 = 1,
@@ -1800,10 +1784,14 @@ namespace BackendSite.Service.Model.enums
         WrongBankSubmitted = 5,
         [Description("Inactive Bank Account submission")]
         InactiveBankAccountSubmission = 6,
-        [Description("System Unstable")]
-        SystemUnstable = 7,
+        [Description("Bank System Unstable")]
+        BankSystemUnstable = 7,
         [Description("Bank Under Maintenance")]
         BankUnderMaintenance = 8,
+        [Description("Deposit Remark Reminder")]
+        DepositRemarkReminder = 9,
+        [Description("Fill Up Remark Reminder")]
+        FillUpRemarkReminder = 10
     }
 
     public enum WithdrawalMessageStatus
@@ -1815,7 +1803,11 @@ namespace BackendSite.Service.Model.enums
         [Description("Withdrawal account cannot receive money")]
         WithdrawalAccountAannotReceiveMoney = 2,
         [Description("Beneficiary's account maintenance")]
-        BeneficiarysAccountMaintenance = 3
+        BeneficiarysAccountMaintenance = 3,
+        [Description("Bank System Unstable")]
+        BankSystemUnstable = 4,
+        [Description("Withdrawal limit exceeded INR")]
+        WithdrawalLimitExceededINR = 5
     }
 
     public enum MpaTransactionRelaySummaryTypeEnum

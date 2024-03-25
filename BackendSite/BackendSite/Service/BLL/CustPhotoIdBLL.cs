@@ -5,7 +5,6 @@ using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
-using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.BLL;
 
@@ -15,16 +14,19 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
     private readonly CustInfoBLL _custInfoBll;
     private readonly AWSS3Helper _s3Helper;
     private readonly CustPhotoIdService _custPhotoIdService;
+    private readonly ServerInfoBLL _serverInfoBll;
     private readonly ILogger<CustPhotoIdBLL> _logger;
     private readonly string _backOfficeS3Url;
     private readonly string _backOfficeS3BucketName;
     private readonly string _environment;
+    
     public CustPhotoIdBLL(ImageEditorBLL imageEditorBll,
         CustInfoBLL custInfoBll,
         AWSS3Helper s3Helper, 
         CustPhotoIdService custPhotoIdService,
         IWebHostEnvironment env, 
         ILogger<CustPhotoIdBLL> logger,
+        ServerInfoBLL serverInfoBll,
         ConfigBLL configBll)
     {
         _imageEditorBll = imageEditorBll;
@@ -34,6 +36,7 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         _backOfficeS3Url = configBll.GetConfigValue("AWSBackOfficeBucketUrl");
         _backOfficeS3BucketName = configBll.GetConfigValue("AWSBackOfficeBucketName");
         _logger = logger;
+        _serverInfoBll = serverInfoBll;
         _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
     }
 
@@ -41,8 +44,9 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
     {
         var photos = await _custPhotoIdService.Get(custId);
         var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
-        var site = (SiteEnum)custInfo.SiteId;
-
+        var serverInfo = _serverInfoBll.GetServerInfo(custInfo.SiteId);
+        var site = serverInfo.SiteName.ToUpper();
+        
         var data = photos.Select(sq => new GetCustPhotoIdResponse()
         {
             Id = sq,
@@ -83,7 +87,8 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         using var uploadedImage = await SixLabors.ImageSharp.Image.LoadAsync(fileStream);
         var fileBytes = await _imageEditorBll.Resize(uploadedImage);
 
-        var site = (SiteEnum)custInfo.SiteId;
+        var serverInfo = _serverInfoBll.GetServerInfo(custInfo.SiteId);
+        var site = serverInfo.SiteName.ToUpper();
         var stream = new MemoryStream(fileBytes);
         var key = $"{_environment}/{site}/CustPhotoId/{custId}/{sq}.jpeg";
         var putRequest = new PutObjectRequest
@@ -109,7 +114,8 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
         if (result > 0)
         {
             var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
-            var site = (SiteEnum)custInfo.SiteId;
+            var serverInfo = _serverInfoBll.GetServerInfo(custInfo.SiteId);
+            var site = serverInfo.SiteName.ToUpper();
             var key = $"{_environment}/{site}/CustPhotoId/{custId}/{id}.jpeg";
             var deleteObject = new DeleteObjectRequest()
             {

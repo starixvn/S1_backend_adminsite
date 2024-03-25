@@ -71,7 +71,7 @@ namespace BackendSite.Service.BLL
 
             switch (input.SiteId)
             {
-                case (int)SiteEnum.NOVA88:
+                case 1:
 
                     #region NOVA88
 
@@ -179,7 +179,7 @@ namespace BackendSite.Service.BLL
 
                     break;
 
-                case (int)SiteEnum.GOAL123:
+                case 2:
 
                     #region GOAL123
 
@@ -287,7 +287,7 @@ namespace BackendSite.Service.BLL
 
                     break;
 
-                case (int)SiteEnum.BWING:
+                case 3:
 
                     #region BWING
 

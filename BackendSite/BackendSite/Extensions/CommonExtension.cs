@@ -6,7 +6,7 @@ namespace BackendSite.Extensions
     {
         private static IEnumerable<int> _canRewardPointSiteIds = new[]
         {
-            (int) SiteEnum.NOVA88
+            1
         };
         private static IEnumerable<int> _canRewardPointCurrencyIds = new[]
         {

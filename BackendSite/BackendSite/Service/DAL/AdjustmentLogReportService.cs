@@ -14,10 +14,12 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _reportDbClient;
         private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportbackupDbClient;
         public AdjustmentLogReportService(IServiceProvider provider)
         {
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportbackupDbClient = provider.GetServices<MySqlClient>().FirstOrDefault(p => p.DataBase == DataBase.ReportBackupDB);
         }
         public List<AdjustmentInfoLogMenu> GetAdjustmentInfoLogMenu()
         {
@@ -61,8 +63,9 @@ namespace BackendSite.Service.DAL
             props.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             props.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result =
-                _reportDbClient.Query<AdminAdjustmentLogReport>("Admin_AdminAdjustmentInfoLog_Get_V2", props);
+            var result = _reportbackupDbClient != null
+            ? _reportbackupDbClient.RetryQuery<AdminAdjustmentLogReport>("Admin_AdminAdjustmentInfoLog_Get_V2", props)
+            : _reportDbClient.Query<AdminAdjustmentLogReport>("Admin_AdminAdjustmentInfoLog_Get_V2", props);
 
             var logResult = new AdminAdjustmentLogReportResult
             {
