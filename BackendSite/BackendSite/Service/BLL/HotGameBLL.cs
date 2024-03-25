@@ -29,10 +29,13 @@ namespace BackendSite.Service.BLL
             { 4, "th" },
             { 13, "cs" },
             { 15, "id" },
+            { 32, "jp" },
+            { 45, "kr" },
             { 51, "vn" },
             { 61, "hi" },
             { 72, "kh" },
             { 74, "bn" },
+            { 82, "br" },
         };
         private readonly Dictionary<string, SiteCloudFrontImageInfo> _siteCloudFrontImageInfo;
 
