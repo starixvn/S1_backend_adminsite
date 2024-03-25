@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="lbl_WithdrawalApprovedTitle"><value>출금 {0}이 승인되었습니다!</value></data>
+  <data name="lbl_CancelBonusTitle"><value>프로모션 만료 공지.</value></data>
+  <data name="lbl_DepositApprovedContent"><value>축하합니다! 입금 {0}이 승인되었습니다! 이제 금액이 귀하의 계정에 입금됩니다. 베팅에 행운을 빕니다!</value></data>
+  <data name="lbl_WithdrawalRejectTitle"><value>출금 {0}이 승인되었습니다!</value></data>
+  <data name="lbl_WithdrawalRejectContent"><value>입금 {0}이 거부되었음을 알려드리게 되어 죄송합니다. 추가 질문이 있는 경우 자세한 내용은 고객센터에 문의하시기 바랍니다.</value></data>
+  <data name="lbl_CancelBonus1"><value>보너스 프로모션이 취소되었습니다.</value></data>
+  <data name="lbl_DepositRejectTitle"><value>입금 {0}이 거부되었습니다!</value></data>
+  <data name="lbl_WithdrawalApprovedContent"><value>저희와 함께 플레이해주셔서 감사합니다! 출금 {0}이 승인되었으니 다음에 다시 뵙기를 바랍니다!</value></data>
+  <data name="lbl_DepositApprovedTitle"><value>입금 {0}이 승인되었습니다!</value></data>
+  <data name="lbl_DepositRejectContent"><value>일부 게임 제공 업체는 15 분에서 30 분의 보고서 동기화 시간을 요구하므로 필요한 동기화 시간 동안 양해해 주시기 바랍니다.</value></data>
+  <data name="lbl_Success"><value>성공</value></data>
+  <data name="lbl_Paid"><value>지급</value></data>
+  <data name="lbl_Save"><value>저장</value></data>
+  <data name="lbl_Role"><value>역할</value></data>
+  <data name="lbl_Edit"><value>편집</value></data>
+  <data name="lbl_AreYouSure"><value>확실합니까?</value></data>
+  <data name="lbl_MobilePayment"><value>모바일 결제</value></data>
+  <data name="lbl_ConfirmPwd"><value>비밀번호 확인</value></data>
+  <data name="lbl_Finance"><value>금융</value></data>
+  <data name="lbl_DepositStatus4"><value>거부 되었습니다</value></data>
+  <data name="lbl_DepositStatus5"><value>취소되었습니다</value></data>
+  <data name="lbl_DepositStatus6"><value>만료되었습니다</value></data>
+  <data name="lbl_DepositStatus7"><value>보류 중</value></data>
+  <data name="lbl_DepositStatus0"><value>드래프트</value></data>
+  <data name="lbl_DepositStatus1"><value>대기 중인</value></data>
+  <data name="lbl_DepositStatus2"><value>지급</value></data>
+  <data name="lbl_DepositStatus3"><value>인증되었습니다</value></data>
+  <data name="lbl_AccountList"><value>계정 목록</value></data>
+  <data name="lbl_AccountName"><value>계정명</value></data>
+  <data name="lbl_WireTransfer"><value>송금</value></data>
+  <data name="lbl_AdjustCategory10"><value>철수</value></data>
+  <data name="lbl_AdjustCategory11"><value>기타</value></data>
+  <data name="lbl_Approve"><value>인증되었습니다</value></data>
+  <data name="lbl_DepositSubmission"><value>입금 제출</value></data>
+  <data name="Currency_96"><value>USDT</value></data>
+  <data name="Currency_41"><value>CHF</value></data>
+  <data name="Currency_40"><value>WON</value></data>
+  <data name="Currency_45"><value>WON</value></data>
+  <data name="Currency_51"><value>VND</value></data>
+  <data name="Currency_61"><value>INR</value></data>
+  <data name="Currency_74"><value>BDT</value></data>
+  <data name="Currency_15"><value>IDR</value></data>
+  <data name="Currency_12"><value>GBP</value></data>
+  <data name="Currency_13"><value>CNY</value></data>
+  <data name="Currency_20"><value>UUS</value></data>
+  <data name="Currency_32"><value>JPY</value></data>
+  <data name="Currency_72"><value>KHUSD</value></data>
+  <data name="lbl_WithdrawalRequest"><value>출금 요청</value></data>
+  <data name="lbl_WithdrawalType"><value>출금 유형</value></data>
+  <data name="lbl_MessageDepositWithdrawalSender"><value>시스템</value></data>
+  <data name="lbl_AddNewPointLevel"><value>새 포인트 수준 추가</value></data>
+  <data name="lbl_Rejected"><value>거부 되었습니다</value></data>
+  <data name="lbl_PointLevel"><value>포인트 레벨</value></data>
+  <data name="lbl_Expired"><value>만료되었습니다</value></data>
+  <data name="lbl_AddAccount"><value>계정 추가</value></data>
+  <data name="lbl_Postscript"><value>포스트 스크립트</value></data>
+  <data name="lbl_AddBank"><value>새 계좌 카드 추가</value></data>
+  <data name="lbl_EditAccount"><value>계정 편집</value></data>
+  <data name="lbl_BonusStatus1"><value>실행</value></data>
+  <data name="lbl_BonusStatus3"><value>만기</value></data>
+  <data name="lbl_BonusStatus2"><value>취소되었습니다</value></data>
+  <data name="lbl_BonusStatus4"><value>수행하다</value></data>
+  <data name="lbl_Disable"><value>사용 안 함</value></data>
+  <data name="lbl_Running"><value>실행</value></data>
+  <data name="lbl_ActualDeposit"><value>실제 예금액</value></data>
+  <data name="lbl_DepositStatus99"><value>오류</value></data>
+  <data name="lbl_DepositStatus98"><value>조정</value></data>
+  <data name="lbl_Currency"><value>통화</value></data>
+  <data name="lbl_CustomerAdministration"><value>고객 관리</value></data>
+  <data name="lbl_Pending"><value>대기 중인</value></data>
+  <data name="lbl_CSD"><value>CSD</value></data>
+  <data name="lbl_ActStatus2"><value>입금 고객</value></data>
+  <data name="lbl_ActStatus1"><value>비입금 고객</value></data>
+  <data name="lbl_ChangeUserpwd"><value>비밀번호 변경</value></data>
+  <data name="lbl_Process"><value>진행</value></data>
+  <data name="lbl_DepositApproval"><value>입금 승인</value></data>
+  <data name="lbl_ChargeFee"><value>충전 요금</value></data>
+  <data name="lbl_WithdrawalId"><value>출금 ID</value></data>
+  <data name="lbl_Status"><value>상태</value></data>
+  <data name="lbl_Reject"><value>거부</value></data>
+  <data name="lbl_PendingList"><value>기금 보류 목록</value></data>
+  <data name="lbl_WithdrawalStatus3"><value>확인되었습니다.</value></data>
+  <data name="lbl_WithdrawalStatus2"><value>보류 중</value></data>
+  <data name="lbl_WithdrawalStatus1"><value>대기 중인</value></data>
+  <data name="lbl_WithdrawalStatus0"><value>드래프트</value></data>
+  <data name="lbl_WithdrawalStatus7"><value>거부 되었습니다</value></data>
+  <data name="lbl_WithdrawalStatus6"><value>인증되었습니다</value></data>
+  <data name="lbl_WithdrawalStatus5"><value>취소되었습니다</value></data>
+  <data name="lbl_WithdrawalStatus4"><value>진행</value></data>
+  <data name="lbl_WithdrawalStatus8"><value>KYC로</value></data>
+  <data name="lbl_AdjustCategory5"><value>상품 드롭</value></data>
+  <data name="lbl_AdjustCategory4"><value>VIP 업그레이드 보상</value></data>
+  <data name="lbl_AdjustCategory7"><value>시험</value></data>
+  <data name="lbl_AdjustCategory6"><value>테스트 문제는 영향을 받지 않음</value></data>
+  <data name="lbl_AdjustCategory1"><value>없음 - (기본 설정)</value></data>
+  <data name="lbl_AdjustCategory3"><value>수동 보너스 (특별 보너스)</value></data>
+  <data name="lbl_AdjustCategory2"><value>유지 보너스</value></data>
+  <data name="lbl_AdjustCategory9"><value>보증금</value></data>
+  <data name="lbl_AdjustCategory8"><value>공급업체 실수</value></data>
+  <data name="lbl_DepositRequest"><value>입금 요청</value></data>
+  <data name="lbl_Point"><value>포인트</value></data>
+  <data name="lbl_RefNo"><value>참조 번호</value></data>
+  <data name="lbl_Login"><value>로그인</value></data>
+  <data name="lbl_Draft"><value>드래프트</value></data>
+  <data name="lbl_Admin"><value>관리자</value></data>
+  <data name="lbl_CustStatus1"><value>실행</value></data>
+  <data name="lbl_CustStatus3"><value>닫힌</value></data>
+  <data name="lbl_CustStatus2"><value>일시 중지</value></data>
+  <data name="lbl_Error"><value>오류</value></data>
+  <data name="lbl_Comment"><value>댓글</value></data>
+  <data name="lbl_Confirm"><value>확인</value></data>
+  <data name="lbl_MinAmount"><value>최소 금액</value></data>
+  <data name="lbl_Administration"><value>관리</value></data>
+  <data name="lbl_AddBankCard"><value>은행 카드 추가</value></data>
+  <data name="lbl_MessageDepositTitle"><value>입금 {0}이 {1}되었습니다.</value></data>
+  <data name="lbl_PromotionType3"><value>무료베팅</value></data>
+  <data name="lbl_PromotionType2"><value>재입금</value></data>
+  <data name="lbl_PromotionType1"><value>첫 입금</value></data>
+  <data name="lbl_PromotionType7"><value>캐쉬백</value></data>
+  <data name="lbl_PromotionType6"><value>할인</value></data>
+  <data name="lbl_PromotionType5"><value>월렛 보너스</value></data>
+  <data name="lbl_PromotionType4"><value>특별</value></data>
+  <data name="lbl_PromotionType9"><value>유지 보너스</value></data>
+  <data name="lbl_PromotionType8"><value>수동 보너스（정적 페이지)</value></data>
+  <data name="lbl_NewPwd"><value>새 비밀번호</value></data>
+  <data name="lbl_Delete"><value>삭제</value></data>
+  <data name="lbl_Create"><value>만들기</value></data>
+  <data name="lbl_Cancel"><value>취소</value></data>
+  <data name="lbl_Closed"><value>닫힌</value></data>
+  <data name="lbl_AdjustmentType6"><value>3번째 마이너스</value></data>
+  <data name="lbl_AdjustmentType5"><value>3번째 더하다</value></data>
+  <data name="lbl_AdjustmentType4"><value>보너스 감소</value></data>
+  <data name="lbl_AdjustmentType3"><value>보너스 증가</value></data>
+  <data name="lbl_AdjustmentType2"><value>인출액</value></data>
+  <data name="lbl_AdjustmentType1"><value>크레딧</value></data>
+  <data name="lbl_WithdrawalType5"><value>전자 지갑</value></data>
+  <data name="lbl_WithdrawalType4"><value>크립토 결제</value></data>
+  <data name="lbl_WithdrawalType2"><value>현지 은행</value></data>
+  <data name="lbl_WithdrawalType1"><value>온라인 결제</value></data>
+  <data name="lbl_WithdrawalType0"><value>정의</value></data>
+  <data name="lbl_UserStatus1"><value>실행</value></data>
+  <data name="lbl_UserStatus3"><value>닫힌</value></data>
+  <data name="lbl_UserStatus2"><value>일시 중지</value></data>
+  <data name="lbl_Amount"><value>금액</value></data>
+  <data name="lbl_Action"><value>액션</value></data>
+  <data name="lbl_TransId"><value>거래 ID</value></data>
+  <data name="lbl_Enable"><value>사용</value></data>
+  <data name="lbl_DepositType"><value>입금 유형</value></data>
+  <data name="lbl_DepositTime"><value>입금 시간</value></data>
+  <data name="lbl_WithdrawalApproval"><value>출금 승인</value></data>
+  <data name="lbl_ChangeUserPwdAlert"><value>사용자 암호를 변하시겠습니까?</value></data>
+  <data name="lbl_OnlineBanking"><value>온라인 뱅킹</value></data>
+  <data name="lbl_SelectSite"><value>사이트 선택</value></data>
+  <data name="lbl_AccountNo"><value>계좌번호</value></data>
+  <data name="lbl_Userpwd"><value>사용자 비밀번호</value></data>
+  <data name="lbl_ChangePwd"><value>비밀번호 변경</value></data>
+  <data name="lbl_Canceled"><value>취소되었습니다</value></data>
+  <data name="lbl_DepositLeast"><value>최소 입금</value></data>
+  <data name="lbl_BankCardList"><value>은행 카드 관리</value></data>
+  <data name="lbl_DepositType1"><value>온라인 뱅킹</value></data>
+  <data name="lbl_DepositType2"><value>모바일 결제</value></data>
+  <data name="lbl_DepositType3"><value>현지 은행</value></data>
+  <data name="lbl_DepositType4"><value>크립토</value></data>
+  <data name="lbl_DepositType5"><value>충전 카드</value></data>
+  <data name="lbl_DepositType6"><value>QR페이</value></data>
+  <data name="lbl_DepositType7"><value>은행 자동 채널</value></data>
+  <data name="Currency_9"><value>AUD</value></data>
+  <data name="Currency_4"><value>THB</value></data>
+  <data name="Currency_6"><value>EURO</value></data>
+  <data name="Currency_1"><value>SGD</value></data>
+  <data name="Currency_3"><value>USD</value></data>
+  <data name="Currency_2"><value>MYR</value></data>
+  <data name="lbl_OK"><value>OK</value></data>
+  <data name="lbl_No"><value>#</value></data>
+  <data name="lbl_CreateTime"><value>시간 만들기</value></data>
+  <data name="lbl_BankSlip"><value>은행 슬립</value></data>
+  <data name="lbl_BankName"><value>은행명</value></data>
+  <data name="lbl_Approved"><value>인증되었습니다</value></data>
+  <data name="lbl_AddPointLevel"><value>포인트 수준 추가</value></data>
+  <data name="lbl_MessageWithdrawalTitle"><value>출금 {0} {1}되었습니다.</value></data>
+  <data name="lbl_WithdrawalStatus99"><value>오류</value></data>
+  <data name="lbl_UserName"><value>사용자명</value></data>
+  <data name="lbl_BetLeast"><value>최소 베팅</value></data>
+  <data name="lbl_CurrentPwd"><value>현재 비밀번호</value></data>
+  <data name="lbl_Direction1"><value>크레딧</value></data>
+  <data name="lbl_Direction2"><value>인출액</value></data>
+  <data name="lbl_Balance"><value>잔액</value></data>
+  <data name="lbl_AdjustmentStatus3"><value>거부 되었습니다</value></data>
+  <data name="lbl_AdjustmentStatus2"><value>인증되었습니다</value></data>
+  <data name="lbl_AdjustmentStatus1"><value>대기 중인</value></data>
+  <data name="lbl_MaxAmount"><value>최대 금액</value></data>
+  <data name="lbl_Suspend"><value>일시 중지</value></data>
+  </root>
