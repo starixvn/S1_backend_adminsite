@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="lbl_WithdrawalApprovedTitle"><value>Sua retirada {0} foi aprovada!</value></data>
+  <data name="lbl_CancelBonusTitle"><value>Aviso de expiração da promoção.</value></data>
+  <data name="lbl_DepositApprovedContent"><value>Parabéns! Seu depósito {0} foi aprovado! O valor já foi creditado em sua conta. Desejo-lhe boa sorte em suas apostas!</value></data>
+  <data name="lbl_WithdrawalRejectTitle"><value>Seu depósito {0} foi rejeitado!</value></data>
+  <data name="lbl_WithdrawalRejectContent"><value>Lamentamos informar que seu depósito {0} foi rejeitado. Se tiver alguma dúvida, entre em contato com o Departamento de Suporte ao Cliente para obter mais detalhes.</value></data>
+  <data name="lbl_CancelBonus1"><value>Sua promoção de bônus foi cancelada.</value></data>
+  <data name="lbl_DepositRejectTitle"><value>Seu depósito {0} foi rejeitado!</value></data>
+  <data name="lbl_WithdrawalApprovedContent"><value>Obrigado por jogar conosco! Sua retirada {0} foi aprovada, esperamos vê-lo novamente na próxima vez!</value></data>
+  <data name="lbl_DepositApprovedTitle"><value>Seu depósito {0} foi aprovado!</value></data>
+  <data name="lbl_DepositRejectContent"><value>Lamentamos informar que seu depósito {0} foi rejeitado. Se tiver alguma dúvida, entre em contato com o Departamento de Suporte ao Cliente para obter mais detalhes.</value></data>
+  <data name="lbl_Success"><value>sucesso</value></data>
+  <data name="lbl_Paid"><value>Pago</value></data>
+  <data name="lbl_Save"><value>Salvar</value></data>
+  <data name="lbl_Role"><value>Função</value></data>
+  <data name="lbl_Edit"><value>Editar</value></data>
+  <data name="lbl_AreYouSure"><value>Tem certeza?</value></data>
+  <data name="lbl_MobilePayment"><value>Pagamento via celular</value></data>
+  <data name="lbl_ConfirmPwd"><value>Confirmar senha</value></data>
+  <data name="lbl_Finance"><value>Confirmar senha</value></data>
+  <data name="lbl_DepositStatus4"><value>Rejeitado</value></data>
+  <data name="lbl_DepositStatus5"><value>Cancelado</value></data>
+  <data name="lbl_DepositStatus6"><value>Expirado</value></data>
+  <data name="lbl_DepositStatus7"><value>Em espera</value></data>
+  <data name="lbl_DepositStatus0"><value>Rascunho</value></data>
+  <data name="lbl_DepositStatus1"><value>Pendente</value></data>
+  <data name="lbl_DepositStatus2"><value>Pago</value></data>
+  <data name="lbl_DepositStatus3"><value>Aprovado</value></data>
+  <data name="lbl_AccountList"><value>Lista de contas</value></data>
+  <data name="lbl_AccountName"><value>Nome da conta</value></data>
+  <data name="lbl_WireTransfer"><value>Transferência eletrônica</value></data>
+  <data name="lbl_AdjustCategory10"><value>Retirada</value></data>
+  <data name="lbl_AdjustCategory11"><value>Outros</value></data>
+  <data name="lbl_Approve"><value>Aprovar</value></data>
+  <data name="lbl_DepositSubmission"><value>Envio de depósito</value></data>
+  <data name="Currency_96"><value>USDT</value></data>
+  <data name="Currency_41"><value>CHF</value></data>
+  <data name="Currency_40"><value>WON</value></data>
+  <data name="Currency_45"><value>WON</value></data>
+  <data name="Currency_51"><value>VND</value></data>
+  <data name="Currency_61"><value>INR</value></data>
+  <data name="Currency_74"><value>BDT</value></data>
+  <data name="Currency_15"><value>IDR</value></data>
+  <data name="Currency_12"><value>GBP</value></data>
+  <data name="Currency_13"><value>CNY</value></data>
+  <data name="Currency_20"><value>UUS</value></data>
+  <data name="Currency_32"><value>JPY</value></data>
+  <data name="Currency_72"><value>KHUSD</value></data>
+  <data name="lbl_WithdrawalRequest"><value>Solicitação de saque</value></data>
+  <data name="lbl_WithdrawalType"><value>Tipo de retirada</value></data>
+  <data name="lbl_MessageDepositWithdrawalSender"><value>sistema</value></data>
+  <data name="lbl_AddNewPointLevel"><value>Adicionar novo nível de pontos</value></data>
+  <data name="lbl_Rejected"><value>Rejeitado</value></data>
+  <data name="lbl_PointLevel"><value>Nível de pontos</value></data>
+  <data name="lbl_Expired"><value>Expirado</value></data>
+  <data name="lbl_AddAccount"><value>Adicionar conta</value></data>
+  <data name="lbl_Postscript"><value>Pós-escrito</value></data>
+  <data name="lbl_AddBank"><value>Adicionar novo cartão bancário</value></data>
+  <data name="lbl_EditAccount"><value>Editar conta</value></data>
+  <data name="lbl_BonusStatus1"><value>Em execução</value></data>
+  <data name="lbl_BonusStatus3"><value>Expirado</value></data>
+  <data name="lbl_BonusStatus2"><value>Cancelado</value></data>
+  <data name="lbl_BonusStatus4"><value>realizado</value></data>
+  <data name="lbl_Disable"><value>Desativar</value></data>
+  <data name="lbl_Running"><value>Em andamento</value></data>
+  <data name="lbl_ActualDeposit"><value>Depósito real</value></data>
+  <data name="lbl_DepositStatus99"><value>Erro</value></data>
+  <data name="lbl_DepositStatus98"><value>ajuste</value></data>
+  <data name="lbl_Currency"><value>Moeda</value></data>
+  <data name="lbl_CustomerAdministration"><value>Administração do cliente</value></data>
+  <data name="lbl_Pending"><value>Pendente</value></data>
+  <data name="lbl_CSD"><value>suporte ao cliente</value></data>
+  <data name="lbl_ActStatus2"><value>Cliente de depósito</value></data>
+  <data name="lbl_ActStatus1"><value>Cliente sem depósito</value></data>
+  <data name="lbl_ChangeUserpwd"><value>Alterar a senha</value></data>
+  <data name="lbl_Process"><value>Processo</value></data>
+  <data name="lbl_DepositApproval"><value>Aprovação de depósito</value></data>
+  <data name="lbl_ChargeFee"><value>Cobrança de taxa</value></data>
+  <data name="lbl_WithdrawalId"><value>ID da retirada</value></data>
+  <data name="lbl_Status"><value>status</value></data>
+  <data name="lbl_Reject"><value>Rejeitado</value></data>
+  <data name="lbl_PendingList"><value>Lista de fundos pendentes</value></data>
+  <data name="lbl_WithdrawalStatus3"><value>verificado</value></data>
+  <data name="lbl_WithdrawalStatus2"><value>Em espera</value></data>
+  <data name="lbl_WithdrawalStatus1"><value>Pendente</value></data>
+  <data name="lbl_WithdrawalStatus0"><value>Rascunho</value></data>
+  <data name="lbl_WithdrawalStatus7"><value>Rejeitado</value></data>
+  <data name="lbl_WithdrawalStatus6"><value>Aprovado</value></data>
+  <data name="lbl_WithdrawalStatus5"><value>Cancelado</value></data>
+  <data name="lbl_WithdrawalStatus4"><value>Processar</value></data>
+  <data name="lbl_WithdrawalStatus8"><value>Para KYC</value></data>
+  <data name="lbl_AdjustCategory5"><value>Sorteio de Prêmios</value></data>
+  <data name="lbl_AdjustCategory4"><value>Recompensa de upgrade VIP</value></data>
+  <data name="lbl_AdjustCategory7"><value>Teste</value></data>
+  <data name="lbl_AdjustCategory6"><value>Problema técnico não afetado</value></data>
+  <data name="lbl_AdjustCategory1"><value>Nenhum - (Padrão)</value></data>
+  <data name="lbl_AdjustCategory3"><value>Bônus manual (Bônus especial)</value></data>
+  <data name="lbl_AdjustCategory2"><value>Bônus de retenção</value></data>
+  <data name="lbl_AdjustCategory9"><value>Depósito</value></data>
+  <data name="lbl_AdjustCategory8"><value>Erro do fornecedor</value></data>
+  <data name="lbl_DepositRequest"><value>Solicitação de depósito</value></data>
+  <data name="lbl_Point"><value>Ponto</value></data>
+  <data name="lbl_RefNo"><value>Número de referência</value></data>
+  <data name="lbl_Login"><value>Login</value></data>
+  <data name="lbl_Draft"><value>Rascunho</value></data>
+  <data name="lbl_Admin"><value>Admin</value></data>
+  <data name="lbl_CustStatus1"><value>Em andamento</value></data>
+  <data name="lbl_CustStatus3"><value>Fechado</value></data>
+  <data name="lbl_CustStatus2"><value>Suspenso</value></data>
+  <data name="lbl_Error"><value>Erro</value></data>
+  <data name="lbl_Comment"><value>Comentário</value></data>
+  <data name="lbl_Confirm"><value>Confirmar</value></data>
+  <data name="lbl_MinAmount"><value>Valor mínimo</value></data>
+  <data name="lbl_Administration"><value>Administração</value></data>
+  <data name="lbl_AddBankCard"><value>Adicionar cartão bancário</value></data>
+  <data name="lbl_MessageDepositTitle"><value>Seu depósito {0} foi {1}</value></data>
+  <data name="lbl_PromotionType3"><value>Aposta Grátis</value></data>
+  <data name="lbl_PromotionType2"><value>Re-Depósito</value></data>
+  <data name="lbl_PromotionType1"><value>Primeiro depósito</value></data>
+  <data name="lbl_PromotionType7"><value>Reembolso</value></data>
+  <data name="lbl_PromotionType6"><value>Bônus</value></data>
+  <data name="lbl_PromotionType5"><value>Bônus de carteira</value></data>
+  <data name="lbl_PromotionType4"><value>Especial</value></data>
+  <data name="lbl_PromotionType9"><value>Bônus de retenção</value></data>
+  <data name="lbl_PromotionType8"><value>Bônus manual (Página estática)</value></data>
+  <data name="lbl_NewPwd"><value>Nova senha</value></data>
+  <data name="lbl_Delete"><value>Excluir</value></data>
+  <data name="lbl_Create"><value>Criar</value></data>
+  <data name="lbl_Cancel"><value>Cancelar</value></data>
+  <data name="lbl_Closed"><value>Fechado</value></data>
+  <data name="lbl_AdjustmentType6"><value>3º Menos</value></data>
+  <data name="lbl_AdjustmentType5"><value>3º  Adicionar</value></data>
+  <data name="lbl_AdjustmentType4"><value>Reduzir o bônus</value></data>
+  <data name="lbl_AdjustmentType3"><value>Aumentar o bônus</value></data>
+  <data name="lbl_AdjustmentType2"><value>Débito</value></data>
+  <data name="lbl_AdjustmentType1"><value>Crédito</value></data>
+  <data name="lbl_WithdrawalType5"><value>Carteira eletrônica</value></data>
+  <data name="lbl_WithdrawalType4"><value>Pagamento com criptografia</value></data>
+  <data name="lbl_WithdrawalType2"><value>Banco local</value></data>
+  <data name="lbl_WithdrawalType1"><value>Pagamento Online</value></data>
+  <data name="lbl_WithdrawalType0"><value>Indefinido</value></data>
+  <data name="lbl_UserStatus1"><value>Executando</value></data>
+  <data name="lbl_UserStatus3"><value>Fechado</value></data>
+  <data name="lbl_UserStatus2"><value>Suspenso</value></data>
+  <data name="lbl_Amount"><value>Valor</value></data>
+  <data name="lbl_Action"><value>Ação</value></data>
+  <data name="lbl_TransId"><value>ID da Transação</value></data>
+  <data name="lbl_Enable"><value>Ativar</value></data>
+  <data name="lbl_DepositType"><value>Tipo de depósito</value></data>
+  <data name="lbl_DepositTime"><value>Tempo de depósito</value></data>
+  <data name="lbl_WithdrawalApproval"><value>Aprovação de saque</value></data>
+  <data name="lbl_ChangeUserPwdAlert"><value>Tem certeza de que deseja alterar a senha do usuário?</value></data>
+  <data name="lbl_OnlineBanking"><value>Banco on-line</value></data>
+  <data name="lbl_SelectSite"><value>Selecionar local</value></data>
+  <data name="lbl_AccountNo"><value>Número da conta</value></data>
+  <data name="lbl_Userpwd"><value>Senha do usuário</value></data>
+  <data name="lbl_ChangePwd"><value>Alterar senha</value></data>
+  <data name="lbl_Canceled"><value>Cancelada</value></data>
+  <data name="lbl_DepositLeast"><value>Depósito mínimo</value></data>
+  <data name="lbl_BankCardList"><value>Gerenciamento do cartão bancário</value></data>
+  <data name="lbl_DepositType1"><value>Banco on-line</value></data>
+  <data name="lbl_DepositType2"><value>Pagamento via celular</value></data>
+  <data name="lbl_DepositType3"><value>Banco local</value></data>
+  <data name="lbl_DepositType4"><value>Criptografia</value></data>
+  <data name="lbl_DepositType5"><value>Carregar cartão</value></data>
+  <data name="lbl_DepositType6"><value>QRPay Pagamento</value></data>
+  <data name="lbl_DepositType7"><value>Canal automático do banco</value></data>
+  <data name="Currency_9"><value>AUD</value></data>
+  <data name="Currency_4"><value>THB</value></data>
+  <data name="Currency_6"><value>EURO</value></data>
+  <data name="Currency_1"><value>SGD</value></data>
+  <data name="Currency_3"><value>USD</value></data>
+  <data name="Currency_2"><value>MYR</value></data>
+  <data name="lbl_OK"><value>OK</value></data>
+  <data name="lbl_No"><value>#</value></data>
+  <data name="lbl_CreateTime"><value>Tempo de criação</value></data>
+  <data name="lbl_BankSlip"><value>Boleto bancário</value></data>
+  <data name="lbl_BankName"><value>Nome do banco</value></data>
+  <data name="lbl_Approved"><value>Aprovado</value></data>
+  <data name="lbl_AddPointLevel"><value>Adicionar nível de pontos</value></data>
+  <data name="lbl_MessageWithdrawalTitle"><value>Sua retirada {0} foi {1}</value></data>
+  <data name="lbl_WithdrawalStatus99"><value>Erro</value></data>
+  <data name="lbl_UserName"><value>Nome do usuário</value></data>
+  <data name="lbl_BetLeast"><value>Aposta mínima</value></data>
+  <data name="lbl_CurrentPwd"><value>Senha atual</value></data>
+  <data name="lbl_Direction1"><value>Cartão de crédito</value></data>
+  <data name="lbl_Direction2"><value>Débito</value></data>
+  <data name="lbl_Balance"><value>Saldo</value></data>
+  <data name="lbl_AdjustmentStatus3"><value>Rejeitado</value></data>
+  <data name="lbl_AdjustmentStatus2"><value>Aprovado</value></data>
+  <data name="lbl_AdjustmentStatus1"><value>Pendente</value></data>
+  <data name="lbl_MaxAmount"><value>Valor máximo</value></data>
+  <data name="lbl_Suspend"><value>Suspender</value></data>
+  </root>
