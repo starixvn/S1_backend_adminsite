@@ -20,11 +20,13 @@ namespace BackendSite.Service.DAL
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly MySqlClient _reportbackupDbClient;
 
         public BonusManageService(IServiceProvider provider)
         {
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _reportbackupDbClient = provider.GetServices<MySqlClient>().FirstOrDefault(p => p.DataBase == DataBase.ReportBackupDB);
         }
 
         public int SetPromotionStatus(string bonusCode, int siteId, int status, string lastUpdateUser)
@@ -197,7 +199,9 @@ namespace BackendSite.Service.DAL
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V7", p);
+            var result = _reportbackupDbClient != null
+            ? _reportbackupDbClient.RetryQuery<PromotionInfo>("Admin_PromotionList_Get_V7", p)
+            : _reportDbClient.Query<PromotionInfo>("Admin_PromotionList_Get_V7", p);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
