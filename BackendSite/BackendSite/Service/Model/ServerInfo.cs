@@ -73,5 +73,6 @@ namespace BackendSite.Service.Model
         public string UploadImagesBucketName { get; set; }
         public string UploadImagesCloudFrontUrl { get; set; }
         public string UploadSlotImagesBucketName { get; set; }
+        public string AwsCloudFrontGameimgsDomainID { get; set; }
     }
 }
