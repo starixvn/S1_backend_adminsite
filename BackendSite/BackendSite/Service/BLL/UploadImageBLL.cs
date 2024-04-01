@@ -128,7 +128,7 @@ namespace BackendSite.Service.BLL
                 };
                 await _cloudFrontHelper.CreateInvalidationAsync(invalidationRequest);
                 //等待清快取，清完才回url給前端
-                await Task.Delay(4000);
+                await Task.Delay(5000);
             }
             
 
