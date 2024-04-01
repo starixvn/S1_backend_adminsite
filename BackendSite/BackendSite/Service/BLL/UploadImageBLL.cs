@@ -127,14 +127,12 @@ namespace BackendSite.Service.BLL
                     }
                 };
                 await _cloudFrontHelper.CreateInvalidationAsync(invalidationRequest);
-                //等待清快取，清完才回url給前端
-                await Task.Delay(5000);
             }
             
 
 
             return s3UploadSuccess
-                ? UploadSuccess(request, siteCloudFrontImageInfo.OldImageUrl, key)
+                ? UploadSuccess(request, siteCloudFrontImageInfo.OldImageUrl, $"{key}?timestamp={DateTime.Now.ToString("yyyyMMddHHmm")}")//加上timestamp刷新圖片
                 : UploadFailure();
         }
 
