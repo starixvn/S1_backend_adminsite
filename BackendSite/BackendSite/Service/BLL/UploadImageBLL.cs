@@ -8,6 +8,7 @@ using BackendSite.Service.Model.Option;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using Amazon.CloudFront.Model;
 
 namespace BackendSite.Service.BLL
 {
@@ -18,6 +19,8 @@ namespace BackendSite.Service.BLL
         private readonly Dictionary<string, SiteCloudFrontImageInfo> _siteCloudFrontImageInfo;
         private readonly UploadImageFunctionConfig _uploadImageFunctionConfig;
         private readonly string _environmentPrefix;
+        private readonly Dictionary<string, string> _changeGameImgName;
+        private readonly AWSCloudFrontHelper _cloudFrontHelper;
 
         public UploadImageBLL(IServiceProvider provider)
         {
@@ -27,6 +30,14 @@ namespace BackendSite.Service.BLL
             _uploadImageFunctionConfig = configBll.GetConfigValue<UploadImageFunctionConfig>("UploadImageFunctionConfig");
             _environmentPrefix = _uploadImageFunctionConfig.EnvironmentPrefix;
             _siteCloudFrontImageInfo = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
+            _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
+            _changeGameImgName = new Dictionary<string, string>()
+            {
+                {"Iconic","AT" },
+                {"Kiss918","918Kiss" },
+                {"END","ES" },
+                {"EBet","WE" },
+            };
         }
 
         public async Task<UploadResultDto> UploadImageAsync(UploadImageRequest request, UploadImageFunctionEnum uploadImageFunction)
@@ -92,13 +103,33 @@ namespace BackendSite.Service.BLL
             // 尺寸調整
             var resizeImg = Resize(request.File, request.size, request.size);
             
-
+            request.TpName = _changeGameImgName.TryGetValue(request.TpName, out var changeName) ? changeName : request.TpName;
             var folder = $"{request.TpName}/";
             var fileName = $"{OrgFileNameFilter(request.ENname)}-{request.Lang}.jpg";
             var key = Path.Combine(folder, fileName);
             var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(resizeImg, siteCloudFrontImageInfo.UploadSlotImagesBucketName, key);
 
             
+            if (s3UploadSuccess)
+            {
+                //clean cache
+                var invalidationRequest = new CreateInvalidationRequest()
+                {
+                    DistributionId = siteCloudFrontImageInfo.AwsCloudFrontGameimgsDomainID,
+                    InvalidationBatch = new InvalidationBatch()
+                    {
+                        CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+                        Paths = new Paths
+                        {
+                            Quantity = 1,
+                            Items = new List<string> { $"/{key}" }
+                        }
+                    }
+                };
+                await _cloudFrontHelper.CreateInvalidationAsync(invalidationRequest);
+            }
+            
+
 
             return s3UploadSuccess
                 ? UploadSuccess(request, siteCloudFrontImageInfo.OldImageUrl, key)
