@@ -19,6 +19,7 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly ILogger<GiftManagementBLL> _logger;
         private readonly ThirdPartyService _thirdPartyService;
+        private readonly GiftMamagementService _giftMamagementService;
 
         public GiftManagementBLL(IServiceProvider provider)
         {
@@ -32,6 +33,7 @@ namespace BackendSite.Service.BLL
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<GiftManagementBLL>>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
+            _giftMamagementService = provider.GetRequiredService<GiftMamagementService>();
         }
 
         public Task<ApiResult<object>> GetGiftListAsync(GetListRequest req)
@@ -85,6 +87,8 @@ namespace BackendSite.Service.BLL
                 var apiResult = await CreateBonusCode(req, bonusCode);
                 //失敗return
                 if (apiResult.ErrorCode != 0) { return new ApiResult(apiResult.ErrorCode, apiResult.RawMessage); }
+                //成功則寫入WorkerPeriod
+                _giftMamagementService.SetWorkerPeriod(req);
             }
 
             var url = _storeSiteUrl + "GiftManagement/Create";
