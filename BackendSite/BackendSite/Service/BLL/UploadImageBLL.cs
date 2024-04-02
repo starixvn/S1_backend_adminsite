@@ -132,7 +132,7 @@ namespace BackendSite.Service.BLL
 
 
             return s3UploadSuccess
-                ? UploadSuccess(request, siteCloudFrontImageInfo.OldImageUrl, $"{key}?timestamp={DateTime.Now.ToString("yyyyMMddHHmm")}")//加上timestamp刷新圖片
+                ? UploadSuccess(request, siteCloudFrontImageInfo.OldImageUrl, $"{key}?timestamp={DateTime.Now.ToString("yyyyMMddHHmmss")}")//加上timestamp刷新圖片
                 : UploadFailure();
         }
 
