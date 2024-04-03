@@ -217,6 +217,8 @@ namespace BackendSite
                     config.Path = "/redoc";
                 });
 
+
+
                 #endregion
 
                 app.UseDeveloperExceptionPage();
