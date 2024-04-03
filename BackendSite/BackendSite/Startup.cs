@@ -216,15 +216,17 @@ namespace BackendSite
                     config.Path = "/redoc";
                 });
 
-                app.UseHttpMetrics(options =>
-                {
-                    options.AddCustomLabel("host", context => context.Request.Host.Host);
-                });
+
 
                 #endregion
 
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseHttpMetrics(options =>
+            {
+                options.AddCustomLabel("host", context => context.Request.Host.Host);
+            });
 
             app.UseEndpoints(endpoints =>
             {
