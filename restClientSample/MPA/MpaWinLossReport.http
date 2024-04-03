@@ -1,0 +1,40 @@
+# localhost
+@url=http://localhost:5070
+
+# AdminSite DEV
+# @url=http://admin.n88dev.com
+
+###
+# Login V2
+POST {{url}}/apiV2/Home/Signin HTTP/1.1
+Content-Type: application/json
+
+{
+    "userName": "admin",
+    "userPwd": "1q2w3e4r"
+}
+
+###
+POST {{url}}/apiV2/MpaWinLossReport/GetWinLossByPlayerDetail
+Content-Type: application/json
+
+{
+    "siteIds": [1,2,3],
+    "starTime": "2024-02-01T00:00:00+08:00",
+    "endTime": "2024-02-27T23:59:59+08:00",
+    "tpCategorys":[1,2,3,4,5,6,7,8,9,10,11,12],
+    "tpGameTypes":[49,51,69,77,103,7,11,13,14,15,17,29,53,57,64,65,67,68,75,76,78,82,86,95,96,98,99,100,104,105,106,107,108,111,112,6,8,9,10,16,18,28,32,37,45,58,63,79,84,93,94,101,31,44,56,66,85,115,35,36,54,55,70,73,74,88,89,90,91,110,114,71,72,81,42,60,109,87,47,50,52,61,113,97,102],
+    "currencyIds":[2,4,15,61,74,13,3,51,72],
+    "userName": "",
+    "orderBy": false,
+    "orderByProperty": "",
+    "orderByDirection": 0,
+    "dateType": 1,
+    "displayGroupBreakdownInOriginalCurrency": false,
+    "includeFreeSpins": true,
+    "includeTest": true,
+    "noDraw": true,
+    "baseCurrencyId": 2,
+    "memberTypes": [1,2],
+    "custId": 644110 // 只需多帶custId（GetWinLossByPlayer的data[].custId），其餘和當下的搜尋條件一樣
+}
