@@ -358,6 +358,7 @@ namespace BackendSite.Service.Model
         public decimal TotalDeposit { get; set; }
         public decimal ReferralAmount { get; set; }
         public decimal PayoutAmount { get; set; }
+        public int TotalReferee { get; set; }
     }
 
     public class GetDepositReferralListByCustIdResult
@@ -402,6 +403,7 @@ namespace BackendSite.Service.Model
         public decimal TotalDeposit { get; set; }
         public decimal ReferralAmount { get; set; }
         public decimal PayoutAmount { get; set; }
+        public int TotalReferee { get; set; }
     }
 
     public class DepositReferralReport_ReferralReferredForExportDao
