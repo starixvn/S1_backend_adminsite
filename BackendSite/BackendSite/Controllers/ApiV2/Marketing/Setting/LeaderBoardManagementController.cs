@@ -138,6 +138,44 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
             return apiResult;
         }
         
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 151, 1 })]
+        public ApiResult<LeaderboardTagExcludeList> GetLeaderboardTagExcludeList(LeaderboardTagExcludeReq request)
+        {
+            var apiResult = new ApiResult<LeaderboardTagExcludeList>();
+            
+            var data = _leaderBoardBll.GetLeaderboardTagExcludeList(request.SiteId);
+            
+            apiResult.Data = data;
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 151, 3 })]
+        public ApiResult SetLeaderboardTagExcludeList(ApiRequestWithLog<SetLeaderboardTagExcludeReq> req)
+        {
+            var apiResult = new ApiResult();
+
+            try
+            {
+                var authData = _authorizeBll.GetAuthData();
+                var result = _leaderBoardBll.SetLeaderboardTagExcludeList(new ParamsWithLog<SetLeaderboardTagExcludeReq>(req, authData.UserName));
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                apiResult.RawMessage = ex.ToString();
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+            }
+
+            return apiResult;
+        }
         
         #endregion
     }

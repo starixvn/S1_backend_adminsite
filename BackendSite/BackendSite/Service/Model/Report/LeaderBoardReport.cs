@@ -1,4 +1,5 @@
 using BackendSite.Service.Model.ApiModel;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.Report;
 
@@ -202,4 +203,34 @@ public class LeaderboardPointCalculation
     public int Status { get; set; }
     public string Updater { get; set; }
     public DateTimeOffset UpdateTime { get; set; }
+}
+
+public class LeaderboardTagExcludeList
+{
+    public int SiteId { get; set; }
+    public string TagExcludeList { get; set; }
+    public IEnumerable<int> TagsExclude
+    {
+        get
+        {
+            if (TagExcludeList?.Length > 0)
+            {
+                return JsonConvert.DeserializeObject<IEnumerable<int>>(TagExcludeList);
+            }
+            return null;
+        }
+    }
+    public string Updater { get; set; }
+    public DateTimeOffset UpdateTime { get; set; }
+}
+
+public class LeaderboardTagExcludeReq
+{
+    public int SiteId { get; set; }
+}
+
+public class SetLeaderboardTagExcludeReq
+{
+    public int SiteId { get; set; }
+    public List<int> TagExcludeList { get; set; }
 }
