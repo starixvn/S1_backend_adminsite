@@ -16,7 +16,7 @@ namespace BackendSite.Service.BLL
         public CupEventPredictionSettingResponse GetCupPredictionSettingResponse(string langId)
         {
             var dbData = _cupEventService.GetCupEventSetting(langId).ToList();
-            var options = GetCupEventPredictionSelectOptions();
+            var options = GetCupEventPredictionSelectOptions(langId);
 
             var responseData = new CupEventPredictionSettingResponse()
             {
@@ -55,9 +55,9 @@ namespace BackendSite.Service.BLL
             await Task.CompletedTask;
         }
 
-        private IEnumerable<CupEventPredictionSelectOptions> GetCupEventPredictionSelectOptions()
+        private IEnumerable<CupEventPredictionSelectOptions> GetCupEventPredictionSelectOptions(string landId)
         {
-            var dbData = _cupEventService.GetCupEventOptions();
+            var dbData = _cupEventService.GetCupEventOptions(landId);
 
             var result = dbData.Select(r => new CupEventPredictionSelectOptions
             {
