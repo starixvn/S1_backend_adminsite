@@ -1988,6 +1988,12 @@ namespace BackendSite.Service.Model.enums
         Minus = 6
     }
 
+    public enum AdjustReasonEnum
+    {
+        Deposit = 1,
+        Withdrawal = 2
+    }
+    
 
     /// <summary>
     /// 上傳類型 By 功能，對應 SiteConfig 的 UploadImageFunctionConfig
