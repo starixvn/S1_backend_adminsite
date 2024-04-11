@@ -63,8 +63,10 @@ namespace BackendSite.Service.DAL
         /// 取得世界盃國家下拉選單內容
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<CupEventOptionsDto> GetCupEventOptions()
+        public IEnumerable<CupEventOptionsDto> GetCupEventOptions(string langId)
         {
+            var p = new DynamicParameters();
+            p.Add("LangId", langId, dbType: DbType.String);
             return _mainDbClient.Query<CupEventOptionsDto>("Admin_CupEventPredictionOptions_Get");
         }
 

@@ -19,7 +19,7 @@ namespace BackendSite.Service.DAL.Interface
         /// 取得世界盃國家下拉選單內容
         /// </summary>
         /// <returns></returns>
-        IEnumerable<CupEventOptionsDto> GetCupEventOptions();
+        IEnumerable<CupEventOptionsDto> GetCupEventOptions(string langId);
 
         /// <summary>
         /// 更新 Status 狀態
