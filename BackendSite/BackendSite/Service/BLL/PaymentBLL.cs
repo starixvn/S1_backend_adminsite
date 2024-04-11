@@ -5,43 +5,37 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
     public class PaymentBLL
     {
-        private readonly AdjustmentService adjustmentService;
-        private readonly WalletService walletService;
-        private readonly AdminService adminService;
+        private readonly AdjustmentService _adjustmentService;
+        private readonly WalletService _walletService;
+        private readonly AdminService _adminService;
         private readonly BonusManageService _bonusManageService;
         private readonly BetListService _betListBll;
         private readonly IEnumerable<TpGameTypeOption> _tpGameTypeList;
-        private readonly BonusInfoBLL _bonusInfoBLL;
+        private readonly BonusInfoBLL _bonusInfoBll;
         private readonly PartitionService _partitionService;
         private readonly ICacheHelper _cacheHelper;
         private readonly Common _common;
 
-        public PaymentBLL(IServiceProvider provider, IConfiguration configuration)
+        public PaymentBLL(IServiceProvider provider)
         {
-            adjustmentService = provider.GetRequiredService<AdjustmentService>();
-            walletService = provider.GetRequiredService<WalletService>();
-            adminService = provider.GetRequiredService<AdminService>();
+            _adjustmentService = provider.GetRequiredService<AdjustmentService>();
+            _walletService = provider.GetRequiredService<WalletService>();
+            _adminService = provider.GetRequiredService<AdminService>();
             _bonusManageService = provider.GetRequiredService<BonusManageService>();
             _betListBll = provider.GetRequiredService<BetListService>();
             _tpGameTypeList = provider.GetRequiredService<IEnumerable<TpGameTypeOption>>();
-            _bonusInfoBLL = provider.GetRequiredService<BonusInfoBLL>();
+            _bonusInfoBll = provider.GetRequiredService<BonusInfoBLL>();
             _partitionService = provider.GetRequiredService<PartitionService>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _common = provider.GetRequiredService<Common>();
         }
-
-        public int PaymentAdjustment(AdjustmentInfo adjustmentInfo, string Operator, out string transId)
-        {
-            return adjustmentService.PaymentAdjustment(adjustmentInfo, Operator, out transId);
-        }
-
+        
         public IEnumerable<FinancialLog> GetFinancialLog(int custId, DateTime startDate, DateTime endDate, string refTransId, int financialType,
             int pageSize, int pageNumber, out IPageInfo pageInfo, List<int> financialTypeList)
         {
@@ -126,20 +120,18 @@ namespace BackendSite.Service.BLL
         public IEnumerable<BonusLog> GetBonusLog(int custId, IEnumerable<int> promoCategoryIds, DateTime? startDate, DateTime? endDate,
             string refTransId, int pageSize, ref int pageNumber, out int totalPages, out int rowCount)
         {
-            return walletService.GetBonusLog(custId, JsonConvert.SerializeObject(promoCategoryIds), startDate, endDate, refTransId, pageSize,
+            return _walletService.GetBonusLog(custId, JsonConvert.SerializeObject(promoCategoryIds), startDate, endDate, refTransId, pageSize,
                 ref pageNumber, out totalPages, out rowCount);
         }
 
         public IEnumerable<PromotionCategory> GetPromotionCategory()
         {
-            return walletService.GetPromotionCategory();
+            return _walletService.GetPromotionCategory();
         }
 
-        public int AdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit,
-            string Operator, out string transId)
+        public int AdjustmentAndWithdrawalLimit(AdjustmentAndWithdrawalLimit adjustmentAndWithdrawalLimit, string Operator, out string transId)
         {
-            return adjustmentService.SetAdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, Operator,
-                out transId);
+            return _adjustmentService.SetAdjustmentAndWithdrawalLimit(adjustmentAndWithdrawalLimit, Operator, out transId);
         }
 
         public IEnumerable<TpBetRecordListOneDayRes> GetCustTpBetRecordListOneDay(int custId, DateTime selDate, DateTime startDate, DateTime endDate, IEnumerable<int> gameTypes)
@@ -234,7 +226,7 @@ namespace BackendSite.Service.BLL
         {
             var dataList = _betListBll.GetTpBetRecord(custId, startDate, endDate)
                             .Where(i => i.GameType == gameTypeId);
-            var bonusCodeList = _bonusInfoBLL.GetBonusCodeList(dataList.Select(i => i.BonusId));
+            var bonusCodeList = _bonusInfoBll.GetBonusCodeList(dataList.Select(i => i.BonusId));
 
             var result = dataList.Join(bonusCodeList,
                               tpBetRecord => tpBetRecord.BonusId,
@@ -276,7 +268,7 @@ namespace BackendSite.Service.BLL
             var spPayoutStatus = 2; //All
             if (payoutStatuses.Count() == 1)
                 spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
-            return walletService.GetVipRebateInfoList(JsonConvert.SerializeObject(multiSiteRequest),
+            return _walletService.GetVipRebateInfoList(JsonConvert.SerializeObject(multiSiteRequest),
                 startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
                 baseCurrencyId, spPayoutStatus,
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
@@ -289,12 +281,12 @@ namespace BackendSite.Service.BLL
             var spPayoutStatus = 2; //All
             if (payoutStatuses.Count() == 1)
                 spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
-            return walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, spPayoutStatus, pageSize, pageNumber);
+            return _walletService.GetVipRebateInfoListByCustId(custId, startDate, endDate, spPayoutStatus, pageSize, pageNumber);
         }
 
         public IEnumerable<VipRebateDetail> GetVipRebateDetail(int custId, int tpCategoryId, string refId)
         {
-            return walletService.GetVipRebateDetail(custId, tpCategoryId, refId);
+            return _walletService.GetVipRebateDetail(custId, tpCategoryId, refId);
         }
 
         public VipRebateInfoData GetVipRebateInfoListExport(IEnumerable<MultiSiteRequestDto> multiSiteRequest,
@@ -303,7 +295,7 @@ namespace BackendSite.Service.BLL
             var spPayoutStatus = 2; //All
             if (payoutStatuses.Count() == 1)
                 spPayoutStatus = (int)payoutStatuses.FirstOrDefault(); //reference:VipRebateStatusEnum
-            return walletService.GetVipRebateInfoListExport(JsonConvert.SerializeObject(multiSiteRequest),
+            return _walletService.GetVipRebateInfoListExport(JsonConvert.SerializeObject(multiSiteRequest),
                 startDate, endDate, userName, JsonConvert.SerializeObject(categoryIds),
                 baseCurrencyId, spPayoutStatus);
         }
@@ -311,7 +303,7 @@ namespace BackendSite.Service.BLL
         public IEnumerable<AdjustmentLimitData> GetAdjustmentData(IEnumerable<int> siteId, IEnumerable<int> currencyId,
             int pageNumber, int pageSize, out int totalPages, out int rowCount)
         {
-            return adjustmentService.GetAdjustmentData(JsonConvert.SerializeObject(siteId),
+            return _adjustmentService.GetAdjustmentData(JsonConvert.SerializeObject(siteId),
                 JsonConvert.SerializeObject(currencyId),
                 (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
                 Math.Abs(pageSize),
@@ -321,12 +313,12 @@ namespace BackendSite.Service.BLL
 
         public bool SetAdjustmentLimitInfo(ParamsWithLog<AdjustmentLimit> input)
         {
-            return adjustmentService.SetAdjustmentLimitInfo(input);
+            return _adjustmentService.SetAdjustmentLimitInfo(input);
         }
 
         public bool CheckPassWord(string password, int siteId)
         {
-            var result = adminService.GetSpecialPasswordData(siteId);
+            var result = _adminService.GetSpecialPasswordData(siteId);
             if (result == null)
             {
                 return true;
@@ -363,7 +355,7 @@ namespace BackendSite.Service.BLL
         public BalanceAdjustBonusCodeRep CheckBalanceAdjustBonusCode(string bonusCode, int promotionType, int siteId, int currencyId)
         {
             var result = new BalanceAdjustBonusCodeRep();
-            var balanceAdjustBonusCodeData = adjustmentService.CheckBalanceAdjustBonusCode(bonusCode, promotionType, siteId, currencyId);
+            var balanceAdjustBonusCodeData = _adjustmentService.CheckBalanceAdjustBonusCode(bonusCode, promotionType, siteId, currencyId);
 
             if (balanceAdjustBonusCodeData != null)
             {
@@ -388,7 +380,7 @@ namespace BackendSite.Service.BLL
         {
             var result = new BalanceAdjustBonusCodeBatchRep();
             var detail = new List<BalanceAdjustBonusCodeBatchDetail>();
-            var balanceAdjustBonusCodeBatchData = adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, promotionType, siteId).ToList();
+            var balanceAdjustBonusCodeBatchData = _adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, promotionType, siteId).ToList();
 
             if (balanceAdjustBonusCodeBatchData.Count != 0)
             {
@@ -420,17 +412,17 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<CheckBalanceAdjustData> CheckRententionBonusAdjustmentLimit(string bonusCode, int siteId)
         {
-            return adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
+            return _adjustmentService.CheckBalanceAdjustBonusCodeBatch(bonusCode, 9, siteId);
         }
 
         public AdjustmentDepositLog GetAdjustmentDepositLogByTransId(string transId)
         {
-            return adjustmentService.GetAdjustmentDepositLogByTransId(transId);
+            return _adjustmentService.GetAdjustmentDepositLogByTransId(transId);
         }
 
         public CheckPayoutBonusCodeRep CheckPayoutBonusCode(string bonusCode, int siteId, int currencyId)
         {
-            var checkData = adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
+            var checkData = _adjustmentService.CheckPayoutBonusCode(bonusCode, siteId, currencyId);
             if (checkData == null)
             {
                 return new CheckPayoutBonusCodeRep
