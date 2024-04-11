@@ -67,7 +67,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("LangId", langId, dbType: DbType.String);
-            return _mainDbClient.Query<CupEventOptionsDto>("Admin_CupEventPredictionOptions_Get");
+            return _mainDbClient.Query<CupEventOptionsDto>("Admin_CupEventPredictionOptions_Get" ,p);
         }
 
         /// <summary>
