@@ -60,9 +60,9 @@ public interface IMpaWinLossBLL
     /// <param name="groupByType"></param>
     /// <returns></returns>
     Task<MpaWinLossResponseToFrontEndWithPlayerWrapper> GetMpaWinLossResultWithPlayerInfo(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-    
+
     Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByPlayerDetail(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-    
+
     /// <summary>
     /// excel export
     /// </summary>
@@ -78,7 +78,7 @@ public interface IMpaWinLossBLL
     /// <param name="groupByType"></param>
     /// <returns></returns>
     Task<IEnumerable<MpaWinLossByBrandDtoExport>> GetMpaWinLossByBrandExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-    
+
     /// <summary>
     /// api
     /// </summary>
@@ -86,4 +86,13 @@ public interface IMpaWinLossBLL
     /// <param name="groupByType"></param>
     /// <returns></returns>
     Task<IEnumerable<MpaWinLossByAffiliateDtoExport>> GetMpaWinLossByAffiliateExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+
+    /// <summary>
+    /// excel download btn
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="groupByType"></param>
+    /// <returns></returns>
+    Task<IEnumerable<MpaWinLossByDateDtoExport>> GetMpaWinLossByDateDownload(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+
 }
