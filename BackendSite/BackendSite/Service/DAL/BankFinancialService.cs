@@ -14,25 +14,16 @@ namespace BackendSite.Service.DAL
 {
     public class BankFinancialService
     {
-
-        #region Fields
-
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-
-        #endregion
-
-        #region Constructors
+        private readonly MySqlClient _reportbackupDbClient;
 
         public BankFinancialService(IServiceProvider provider)
-        {
-            _configuration = provider.GetRequiredService<IConfiguration>();
+        {            
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _reportbackupDbClient = provider.GetServices<MySqlClient>().FirstOrDefault(p => p.DataBase == DataBase.ReportBackupDB);
         }
-
-        #endregion
 
         #region Library Methods
 
@@ -96,8 +87,9 @@ namespace BackendSite.Service.DAL
                     _Id = input.Id
                 });
 
-            var spName = "Admin_BankFinancialTransferAccount_Get_V3";
-            return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(spName, parameters);
+            return _reportbackupDbClient != null
+                    ? _reportbackupDbClient.RetryQuery<BankFinancialTransferAccountDetailModel>("Admin_BankFinancialTransferAccount_Get_V4", parameters)
+                    : _reportDbClient.Query<BankFinancialTransferAccountDetailModel>("Admin_BankFinancialTransferAccount_Get_V4", parameters);
         }
 
         public IEnumerable<string> GetTransferAccountAgentList(int siteId)
