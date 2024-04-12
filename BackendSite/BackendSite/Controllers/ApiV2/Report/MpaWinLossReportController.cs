@@ -91,6 +91,32 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         #endregion
 
+        #region GroupBy Date Download Btn
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
+        public async Task<IActionResult> GetWinLossByDateDownload(MpaWinLossRequest request)
+        {
+            var exportData = await _mpaWinLossBll.GetMpaWinLossByDateDownload(request, MpaWinLossGroupByTypeEnum.DateDownload);
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "WinLossByDateDownload");
+        }
+
+        #endregion
+
+        #region GroupBy Month Download Btn
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
+        public async Task<IActionResult> GetWinLossByMonthDownload(MpaWinLossRequest request)
+        {
+            var exportData = await _mpaWinLossBll.GetMpaWinLossByDateDownload(request, MpaWinLossGroupByTypeEnum.MonthDownload);
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "WinLossByMonthDownload");
+        }
+
+        #endregion
+
         #region GroupBy TpGameType
 
         [HttpPost]
@@ -188,13 +214,12 @@ namespace BackendSite.Controllers.ApiV2.Report
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByPlayerExport");
         }
-        
+
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
         public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>();
-            
             try
             {
                 var responseData = await _mpaWinLossBll.GetWinLossByPlayerDetail(request, MpaWinLossGroupByTypeEnum.GameType);

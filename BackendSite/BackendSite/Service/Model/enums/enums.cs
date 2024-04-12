@@ -381,7 +381,7 @@ namespace BackendSite.Service.Model.enums
         QrPayPayment = 6,
         BankAutoChannel = 7
     }
-    
+
     public enum DepositChannelTypeEnum
     {
         OnlineBanking = 1,
@@ -393,7 +393,7 @@ namespace BackendSite.Service.Model.enums
         QuickTransfer = 9,
         ChatTransfer = 10
     }
-    
+
     public enum WithdrawalChannelTypeEnum
     {
         OnlineBanking = 1,
@@ -461,7 +461,7 @@ namespace BackendSite.Service.Model.enums
         CryptoPay = 4,
         CryptoWallet = 5 // Local
     }
-    
+
     public enum WithdrawalBlockTypeEnum
     {
         BankCard = 1,
@@ -1599,7 +1599,7 @@ namespace BackendSite.Service.Model.enums
         Disable = 0,
         Enable = 1
     }
-    
+
     public enum AffSiteEnum
     {
         N88 = 1,
@@ -1872,7 +1872,9 @@ namespace BackendSite.Service.Model.enums
         Player = 5,
         TpCategory = 6,
         Brand = 7,
-        Affiliate = 8
+        Affiliate = 8,
+        DateDownload = 9,
+        MonthDownload = 10
     }
 
     /// <summary>
@@ -2054,10 +2056,10 @@ namespace BackendSite.Service.Model.enums
         NewsManagement = 3,
         SlotGameManagement = 4
     }
-    
+
     public enum QueueJob
     {
-        Init = 0 ,
+        Init = 0,
         Verification = 1
     }
     /// <summary>

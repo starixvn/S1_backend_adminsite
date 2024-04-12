@@ -113,6 +113,27 @@ namespace BackendSite.Service.BLL.Mpa
             return result;
         }
 
+        public async Task<IEnumerable<MpaWinLossByDateDtoExport>> GetMpaWinLossByDateDownload(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
+        {
+            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
+            ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
+            GetOrderByProp(request);
+
+            var data = await GetWinLossReportAsync(request, groupByType);
+            var sortedData = data.SortThen2ExcelData(request);
+            var result = sortedData.Select(x =>
+            {
+                var r = x.ToExcelFormat<MpaWinLossByDateDtoExport>();
+                r.Date = x.Key;
+                r.Currency = x.ChildKey;
+
+                return r;
+            });
+
+            return result;
+        }
+
+
         public async Task<IEnumerable<MpaWinLossByTpGameTypeDtoExport>> GetMapWinLossByTpGameTypeExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
