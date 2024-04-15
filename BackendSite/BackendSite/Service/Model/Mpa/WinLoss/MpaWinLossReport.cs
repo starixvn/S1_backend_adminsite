@@ -91,4 +91,11 @@ public class MpaWinLossGroupByModel
     
     public string TpUserName { get; set; }
     public string UserName { get; set; }
+
+    public string Date { get; set; }
+
+    public string TpGameType { get; set; }
+    public string TpCategory { get; set; }
+
+    public string Brand { get; set; }
 }

@@ -99,7 +99,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateDownload(request, MpaWinLossGroupByTypeEnum.DateDownload);
             var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByDateDownload");
+            return _excelBll.ExcelFile(stream, "WinLossReportByDateDownload");
         }
 
         #endregion
@@ -112,7 +112,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateDownload(request, MpaWinLossGroupByTypeEnum.MonthDownload);
             var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByMonthDownload");
+            return _excelBll.ExcelFile(stream, "WinLossReportByMonthDownload");
         }
 
         #endregion

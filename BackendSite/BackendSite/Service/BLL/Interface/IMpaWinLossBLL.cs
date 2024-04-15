@@ -93,6 +93,6 @@ public interface IMpaWinLossBLL
     /// <param name="request"></param>
     /// <param name="groupByType"></param>
     /// <returns></returns>
-    Task<IEnumerable<MpaWinLossByDateDtoExport>> GetMpaWinLossByDateDownload(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    Task<IEnumerable<MpaWinLossByDateDownloadDtoExport>> GetMpaWinLossByDateDownload(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
 }
