@@ -1,4 +1,4 @@
-using BackendSite.Service.BLL.Infrastructure;
+ï»¿using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -83,12 +83,12 @@ namespace BackendSite.Service.BLL
             
             if (req.GiftType == GiftTypeEnum.FreeSpin)
             {
-                //³Ğ«Øbonuscode
+                //å‰µå»ºbonuscode
                 var bonusCode = BonusCodeRule(req, serverInfo.SiteName);
                 var apiResult = await CreateBonusCode(req, bonusCode);
-                //¥¢±Ñreturn
+                //å¤±æ•—return
                 if (apiResult.ErrorCode != 0) { return new ApiResult(apiResult.ErrorCode, apiResult.RawMessage); }
-                //¦¨¥\«h¼g¤JWorkerPeriod
+                //æˆåŠŸå‰‡å¯«å…¥WorkerPeriod
                 _giftMamagementService.SetWorkerPeriod(req);
             }
 
@@ -101,7 +101,7 @@ namespace BackendSite.Service.BLL
 
         private static string BonusCodeRule(CreateGiftRequest req,string siteName)
         {
-            //BonusCode³W«h¡Cex.PPFREESPIN100FORNOVA8820240306
+            //BonusCodeè¦å‰‡ã€‚ex.PPFREESPIN100FORNOVA8820240306
             var bonusCode = $"PPFREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.UtcNow.ToString("yyyyMMdd")}";
             return bonusCode;
         }
@@ -111,7 +111,7 @@ namespace BackendSite.Service.BLL
             var currency = await _thirdPartyService.GetTpCurrency(5,req.CurrencyId);
             var inputs = new Dictionary<string, string>();
             var url = _tpServiceApiUrl + "CreateBonusCode";
-            inputs.Add("GameId", "vs20olympnova88");//¥Ø«e¥u¦³PP¤@´Ú¹CÀ¸
+            inputs.Add("GameId", "vs20olympnova88");//ç›®å‰åªæœ‰PPä¸€æ¬¾éŠæˆ²
             inputs.Add("BonusCode", bonusCode);
             inputs.Add("Round", req.Round.ToString());
             inputs.Add("Currency",currency.TpCurrencyId);
