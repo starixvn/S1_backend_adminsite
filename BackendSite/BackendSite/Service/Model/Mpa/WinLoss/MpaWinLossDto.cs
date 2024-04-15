@@ -36,7 +36,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public decimal TotalBonus { get; set; }
     }
-    
+
     public interface IMpaWinLossSimple
     {
         public decimal TurnOver { get; set; }
@@ -65,10 +65,10 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public decimal Margin { get; set; }
     }
-    
+
     public class MpaWinLossWithPlayerInfo : MpaWinLoss
     {
-        public MpaWinLossWithPlayerInfo(){}
+        public MpaWinLossWithPlayerInfo() { }
 
         public MpaWinLossWithPlayerInfo(MpaWinLossGroupByModel m) : base(m)
         {
@@ -76,18 +76,18 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
             SabaId = m.TpUserName;
             CustId = m.CustId;
         }
-        
+
         public string UserName { get; set; }
         public string CustId { get; set; }
-        
+
         public string SabaId { get; set; }
-        
+
         public decimal ClosingBalance { get; set; }
     }
 
     public class MpaWinLoss : IMpaWinLoss
     {
-        public MpaWinLoss(){}
+        public MpaWinLoss() { }
 
         public MpaWinLoss(MpaWinLossGroupByModel m)
         {
@@ -110,7 +110,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
             TotalWithDrawAmount = m.TotalWithdrawAmount;
             TotalBonus = m.TotalBonus;
         }
-        
+
         public decimal TurnOver { get; set; }
 
         public decimal ValidTurnOver { get; set; }
@@ -136,7 +136,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int UniquePlayers { get; set; }
 
         public decimal Margin { get; set; }
-        
+
         public int DepositCount { get; set; }
 
         public decimal TotalDepositAmount { get; set; }
@@ -150,8 +150,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
     public class MpaWinLossSimple : IMpaWinLossSimple
     {
-        
-        public MpaWinLossSimple(){}
+
+        public MpaWinLossSimple() { }
 
         public MpaWinLossSimple(MpaWinLossGroupByModel m)
         {
@@ -169,7 +169,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
             UniquePlayers = m.UniquePlayers;
             Margin = m.Margin;
         }
-        
+
         public decimal TurnOver { get; set; }
 
         public decimal ValidTurnOver { get; set; }
@@ -196,7 +196,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public decimal Margin { get; set; }
     }
-    
+
     public interface IMpaWinLossDisplay : IMpaWinLossDisplaySimple
     {
         public int DepositCount { get; set; }
@@ -209,7 +209,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string TotalBonus { get; set; }
     }
-    
+
     public interface IMpaWinLossDisplaySimple
     {
         public string TurnOver { get; set; }
@@ -239,7 +239,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string Margin { get; set; }
     }
 
-    public class MpaWinLossDisplay: IMpaWinLossDisplay
+    public class MpaWinLossDisplay : IMpaWinLossDisplay
     {
         public string TurnOver { get; set; }
 
@@ -308,15 +308,15 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
 
     #region To FrontEnd API Formate
-    
-    public class MpaWinLossDetailForFrontEnd<T> where T: IMpaWinLossSimple
+
+    public class MpaWinLossDetailForFrontEnd<T> where T : IMpaWinLossSimple
     {
         public MpaWinLossDetailForFrontEnd(T data, string key)
         {
             DisplayKey = key;
             Data = data;
         }
-        
+
         public string DisplayKey { get; set; }
 
         public T Data { get; set; }
@@ -379,5 +379,18 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string Currency { get; set; }
     }
 
+
+    public class MpaWinLossByDateDownloadDtoExport : MpaWinLossDisplay
+    {
+        public string Date { get; set; }
+        public string Currency { get; set; }
+        public string TpUserName { get; set; }
+        public string UserName { get; set; }
+
+        public string TpGameType { get; set; }
+        public string TpCategory { get; set; }
+
+        public string Brand { get; set; }
+    }
     #endregion
 }
