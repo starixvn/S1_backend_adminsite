@@ -4,65 +4,65 @@ using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
-    public class WorldCupPredictionSettingBase
+    public class CupEventPredictionSettingBase
     {
         /// <summary>
         /// 32強
         /// </summary>
-        [JsonProperty("top32Team")]
-        public IEnumerable<WorldCupEventSetting> Top32Team { get; set; }
+        [JsonProperty("top24Team")]
+        public IEnumerable<CupEventSetting> Top24Team { get; set; }
 
         /// <summary>
         /// 16 強
         /// </summary>
         [JsonProperty("roundOf16")]
-        public IEnumerable<WorldCupEventSetting> RoundOf16 { get; set; }
+        public IEnumerable<CupEventSetting> RoundOf16 { get; set; }
 
         /// <summary>
         /// 8強
         /// </summary>
         [JsonProperty("quarterFinals")]
-        public IEnumerable<WorldCupEventSetting> QuarterFinals { get; set; }
+        public IEnumerable<CupEventSetting> QuarterFinals { get; set; }
 
 
         /// <summary>
         /// 4強
         /// </summary>
         [JsonProperty("semiFinals")]
-        public IEnumerable<WorldCupEventSetting> SemiFinals { get; set; }
+        public IEnumerable<CupEventSetting> SemiFinals { get; set; }
 
         /// <summary>
         /// 季軍戰爭奪隊伍
         /// </summary>
         [JsonProperty("3rdPlace")]
-        public IEnumerable<WorldCupEventSetting> ThirdRdPlace { get; set; }
+        public IEnumerable<CupEventSetting> ThirdRdPlace { get; set; }
 
         /// <summary>
         /// 冠軍戰爭奪隊伍
         /// </summary>
         [JsonProperty("final")]
-        public IEnumerable<WorldCupEventSetting> Final { get; set; }
+        public IEnumerable<CupEventSetting> Final { get; set; }
     }
 
-    public class SetWorldCupPredictionSettingRequest
+    public class SetCupEventPredictionSettingRequest
     {
         [JsonProperty("data")]
-        public WorldCupPredictionSettingBase Data { get; set; }
+        public CupEventPredictionSettingBase Data { get; set; }
     }
-
-    public class WorldCupPredictionSettingResponse : WorldCupPredictionSettingBase
+    
+    public class CupEventPredictionSettingResponse : CupEventPredictionSettingBase
     {
         /// <summary>
-        /// 畫面下拉選單內容，會有 36 隊
+        /// 畫面下拉選單內容，會有 24 隊
         /// </summary>
         [JsonProperty("selectOptions")]
-        public IEnumerable<WorldCupPredictionSelectOptions> SelectOptions { get; set; }
+        public IEnumerable<CupEventPredictionSelectOptions> SelectOptions { get; set; }
     }
 
     /// <summary>
     /// 世界盃模型預測下拉選單內容
     /// </summary>
-    public class WorldCupPredictionSelectOptions
+    public class CupEventPredictionSelectOptions
     {
         /// <summary>
         /// 國家Id
@@ -78,9 +78,9 @@ namespace BackendSite.Service.Model
     }
 
     /// <summary>
-    /// User 設定置 WorldCupEventSetting Table 的資料
+    /// User 設定置 CupEventSetting Table 的資料
     /// </summary>
-    public class WorldCupEventSetting
+    public class CupEventSetting
     {
         /// <summary>
         /// 國家Id
@@ -103,9 +103,9 @@ namespace BackendSite.Service.Model
 
 
     /// <summary>
-    /// 對應 SP => Admin_WorldCupPredictionOptions_Get
+    /// 對應 SP => Admin_CupEventPredictionOptions_Get
     /// </summary>
-    public class WorldCupPredictionOptionsDto
+    public class CupEventOptionsDto
     {
         /// <summary>
         /// 隊伍Id
@@ -119,9 +119,9 @@ namespace BackendSite.Service.Model
     }
 
     /// <summary>
-    /// 對應 SP => Admin_WorldCupPredictionSetting_Get、Admin_WorldCupPredictionSetting_Set
+    /// 對應 SP => Admin_CupEventPredictionSetting_Get、Admin_CupEventPredictionSetting_Set
     /// </summary>
-    public class WorldCupPredictionSettingDto
+    public class CupEventSettingDto
     {
         /// <summary>
         /// 隊伍Id
@@ -144,7 +144,7 @@ namespace BackendSite.Service.Model
         public int Sort { get; set; }
     }
 
-    public class GetWorldCupMemberReportRequest : ApiRequestPageModel
+    public class GetCupEventMemberReportRequest : ApiRequestPageModel
     {
         [JsonProperty("siteId")]
         public int SiteId { get; set; }
@@ -164,7 +164,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset EndTime { get; set; }
     }
 
-    public class GetWorldCupMemberReportResponse
+    public class GetCupEventMemberReportResponse
     {
         public string Currency { get; set; }
         public string UserName { get; set; }
@@ -173,7 +173,7 @@ namespace BackendSite.Service.Model
         public string SelectTime { get; set; }
     }
 
-    public class WorldCupMemberReportDto
+    public class CupEventMemberReportDto
     {
         public string Currency { get; set; }
         public string UserName { get; set; }
@@ -182,7 +182,7 @@ namespace BackendSite.Service.Model
         public DateTime? SelectTime { get; set; }
     }
 
-    public class ExportWorldCupMemberReportRequest
+    public class ExportCupEventMemberReportRequest
     {
         [JsonProperty("siteId")]
         public int SiteId { get; set; }
@@ -204,7 +204,7 @@ namespace BackendSite.Service.Model
         public int Timezone { get; set; }
     }
 
-    public class ExportWorldCupMemberReportResponse
+    public class ExportCupEventMemberReportResponse
     {
         public string Currency { get; set; }
         public string UserName { get; set; }
@@ -213,7 +213,7 @@ namespace BackendSite.Service.Model
         public DateTimeOffset? SelectTime { get; set; }
     }
 
-    public class WorldCupPredictiveStatisticsDto
+    public class CupEventPredictiveStatisticsDto
     {
         public int TeamId { get; set; }
         public string TeamName { get; set; }
@@ -221,12 +221,12 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public DateTime? UpdateTime { get; set; }
     }
-    public class GetWorldCupEventReportRequest
+    public class GetCupEventReportRequest
     {
         [JsonProperty("siteId")]
         public int SiteId { get; set; }
     }
-    public class GetWorldCupEventReportResponse
+    public class GetCupEventReportResponse
     {
         public int TeamId { get; set; }
         public string TeamName { get; set; }
@@ -235,7 +235,7 @@ namespace BackendSite.Service.Model
         public string Operator { get; set; }
         public string UpdateTime { get; set; }
     }
-    public class WorldCupPredictDetailDto
+    public class CupEventPredictDetailDto
     {
         public string Currency { get; set; }
         public string UserName { get; set; }
@@ -243,7 +243,7 @@ namespace BackendSite.Service.Model
         public int TicketType { get; set; }
         public DateTime SelectTime { get; set; }
     }
-    public class ExportWorldCupEventReportRequest
+    public class ExportCupEventReportRequest
     {
         [JsonProperty("siteId")]
         public int SiteId { get; set; }
@@ -252,7 +252,7 @@ namespace BackendSite.Service.Model
         [JsonProperty("timezone")]
         public string Timezone { get; set; }
     }
-    public class ExportWorldCupEventReportResponse
+    public class ExportCupEventReportResponse
     {
         public string Currency { get; set; }
         public string UserName { get; set; }
