@@ -268,11 +268,6 @@ namespace BackendSite.Service.Model
         public int TeamId { get; set; }
     }
     
-    public class ExportCupEventPredictScoreRequest
-    {
-        public string Timezone { get; set; }
-    }
-    
     public class CupEventPredictScore
     {
         public string SiteName { get; set; }

@@ -152,10 +152,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 2 })]
-        public async Task<IActionResult> ExportCupEventPredictScore(ExportCupEventPredictScoreRequest request)
+        public async Task<IActionResult> ExportCupEventPredictScore()
         {
             var exportData = await _cupEventBll.GetCupEventPredictScore();
-            var stream = _excelBll.ExportV2(exportData);
+            var stream =  _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "CupEventPredictScore");
         }
     }
