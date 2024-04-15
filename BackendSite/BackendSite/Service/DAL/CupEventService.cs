@@ -151,5 +151,11 @@ namespace BackendSite.Service.DAL
             p.Add("UpdateOperator", updateOperator);
             return await _mainDbClient.ExecuteAsync("Admin_CupEventTeamSettleLog_Ins", p);
         }
+        
+        public async Task<IEnumerable<CupEventPredictScore>> GetCupEventPredictScore()
+        {
+            return await _reportDbClient.QueryAsync<CupEventPredictScore>("Admin_CupEventPredictScore_Get");
+        }
+        
     }
 }

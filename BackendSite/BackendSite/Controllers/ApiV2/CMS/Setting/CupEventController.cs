@@ -1,4 +1,5 @@
 ﻿using BackendSite.Attributes;
+using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
@@ -147,6 +148,15 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 apiResult.Message = ex.Message;
             }
             return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 116, 2 })]
+        public async Task<IActionResult> ExportCupEventPredictScore(ExportCupEventPredictScoreRequest request)
+        {
+            var exportData = await _cupEventBll.GetCupEventPredictScore();
+            var stream = _excelBll.ExportV2(exportData);
+            return _excelBll.ExcelFile(stream, "CupEventPredictScore");
         }
     }
 }

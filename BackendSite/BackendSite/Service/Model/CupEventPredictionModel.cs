@@ -267,4 +267,31 @@ namespace BackendSite.Service.Model
         [JsonProperty("teamId")]
         public int TeamId { get; set; }
     }
+    
+    public class ExportCupEventPredictScoreRequest
+    {
+        public string Timezone { get; set; }
+    }
+    
+    public class CupEventPredictScore
+    {
+        public string SiteName { get; set; }
+        public string Currency { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int HomeScore { get; set; }
+        public int AwayScore { get; set; }
+        public DateTime CreateTime { get; set; }
+    }
+    
+    public class ExportCupEventPredictScoreResponse
+    {
+        public string SiteName { get; set; }
+        public string Currency { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public int HomeScore { get; set; }
+        public int AwayScore { get; set; }
+        public DateTimeOffset CreateTime { get; set; }
+    }
 }
