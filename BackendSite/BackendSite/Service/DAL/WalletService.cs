@@ -31,6 +31,16 @@ namespace BackendSite.Service.DAL
             afterAmount = p.Get<decimal?>("AfterAmount") ?? 0;
             return afterAmount >= 0 ? 1 : 0;
         }
+        public int AdjustmentSetBalance(int custId, int siteId, string userName, decimal amount, int type, string memo, string refTransId,int reasonId, out decimal afterAmount, out byte is1StDeposit, MySqlTransaction trans)
+        {
+            var p = new DynamicParameters(new { CustId = custId, SiteId = siteId, UserName = userName, Amount = amount, Type = type, Memo = memo, RefTransId = refTransId , ReasonId = reasonId });
+            p.Add("Is1stDepoist", dbType: DbType.Boolean, direction: ParameterDirection.Output);
+            p.Add("AfterAmount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
+            _mainDbClient.Execute("Service_AdjustWallet_Set", trans, p);
+            is1StDeposit = p.Get<byte?>("Is1stDepoist") ?? 0;
+            afterAmount = p.Get<decimal?>("AfterAmount") ?? 0;
+            return afterAmount >= 0 ? 1 : 0;
+        }
         public decimal GetBalance(int custId)
         {
             return _mainDbClient.ExecuteScalar<decimal>("Balance_Get", new { CustId = custId });
