@@ -1,32 +1,28 @@
 ﻿using System.Data;
 using System.Text.RegularExpressions;
-
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
 using Dapper;
-
 using MySql.Data.MySqlClient;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
     public class AdjustmentService
     {
-        private readonly Common common;
-        private readonly WalletService walletService;
-        private readonly WithdrawalLimitService withdrawalLimitService;
+        private readonly Common _common;
+        private readonly WalletService _walletService;
+        private readonly WithdrawalLimitService _withdrawalLimitService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly ILogger<AdjustmentService> _logger;
 
         public AdjustmentService(IServiceProvider provider)
         {
-            common = provider.GetRequiredService<Common>();
-            walletService = provider.GetRequiredService<WalletService>();
-            withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _common = provider.GetRequiredService<Common>();
+            _walletService = provider.GetRequiredService<WalletService>();
+            _withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
             _logger = provider.GetRequiredService<ILogger<AdjustmentService>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
@@ -36,9 +32,10 @@ namespace BackendSite.Service.DAL
         {
             var type = adjustmentInfo.AdjustType switch
             {
+                AdjustmentInfoAdjustTypeEnum.BalancePlus => 2,
+                AdjustmentInfoAdjustTypeEnum.BalanceMinus => 3,
                 AdjustmentInfoAdjustTypeEnum.BonusMinus => 7,
-                AdjustmentInfoAdjustTypeEnum.BonusPlus => 8,
-                _ => 1 + (int)adjustmentInfo.AdjustType
+                AdjustmentInfoAdjustTypeEnum.BonusPlus => 8
             };
 
             var m = Regex.Match(transId, @"\d+");
@@ -62,7 +59,7 @@ namespace BackendSite.Service.DAL
                         var adjustAmount = adjustmentInfo.AdjustType is AdjustmentInfoAdjustTypeEnum.BalanceMinus or AdjustmentInfoAdjustTypeEnum.BonusMinus ?
                             adjustmentInfo.Amount * -1 : adjustmentInfo.Amount;
                         
-                        result = walletService.SetBalance(adjustmentInfo.CustId, siteId, adjustmentInfo.UserName, adjustAmount, type, $"Payment Adjustment: {adjustAmount}", transId, out _, out var is1StDeposit, trans);
+                        result = _walletService.AdjustmentSetBalance(adjustmentInfo.CustId, siteId, adjustmentInfo.UserName, adjustAmount, type, $"Payment Adjustment: {adjustAmount}", transId, adjustmentInfo.Category, out _, out var is1StDeposit, trans);
 
                         if (is1StDeposit == 1 && result > 0)
                         {
@@ -131,7 +128,7 @@ namespace BackendSite.Service.DAL
                 _UserName = input.UserName,
                 _Amount = input.Amount,
                 _Memo = input.Memo,
-                _Prefix = $"L{common.GetEnv()}",
+                _Prefix = $"L{_common.GetEnv()}",
                 _Operator = input.Operator
             });
             p.Add("_TransId", dbType: DbType.String, direction: ParameterDirection.Output);
@@ -149,7 +146,7 @@ namespace BackendSite.Service.DAL
             }
 
             var amount = input.AdjustType == WithdrawalLimitAdjustmentAdjustTypeEnum.Debit ? input.Amount * -1 : input.Amount;
-            var result = withdrawalLimitService.SetWithdrawalLimit(input.CustId, input.UserName, input.SiteId,
+            var result = _withdrawalLimitService.SetWithdrawalLimit(input.CustId, input.UserName, input.SiteId,
                 amount, (int)input.ReasonId, input.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment, input.Operator, out var afterAmount, trans);
 
             if (result < 1)
@@ -225,7 +222,7 @@ namespace BackendSite.Service.DAL
                     SiteId = SiteId,
                     Amount = withdrawalLimitInfo.Amount,
                     Memo = withdrawalLimitInfo.Memo,
-                    Prefix = $"L{common.GetEnv()}"
+                    Prefix = $"L{_common.GetEnv()}"
                 });
                 p.Add("TransId", dbType: DbType.String, direction: ParameterDirection.Output);
 
@@ -240,7 +237,7 @@ namespace BackendSite.Service.DAL
                 else
                 {
                     var amount = withdrawalLimitInfo.AdjustType == 2 ? withdrawalLimitInfo.Amount * -1 : withdrawalLimitInfo.Amount;
-                    withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, (int)WithdrawalLimitAdjustmentReasonEnum.None, withdrawalLimitInfo.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment, Operator, out var AfterAmount, trans);
+                    _withdrawalLimitService.SetWithdrawalLimit(withdrawalLimitInfo.CustId, UserName, SiteId, amount, (int)WithdrawalLimitAdjustmentReasonEnum.None, withdrawalLimitInfo.Memo, transId, (int)WithdrawalLimitLogCreateFromEnum.LimitAdjustment, Operator, out var AfterAmount, trans);
 
                     #region propsLog
                     var propsLog = new DynamicParameters();
@@ -287,7 +284,7 @@ namespace BackendSite.Service.DAL
                 adjustmentAndWithdrawalLimit.SiteId,
                 adjustmentAndWithdrawalLimit.AdjustIdInfo,
                 adjustmentAndWithdrawalLimit.Amount,
-                Prefix = $"A{common.GetEnv()}",
+                Prefix = $"A{_common.GetEnv()}",
                 adjustmentAndWithdrawalLimit.Memo,
                 adjustmentAndWithdrawalLimit.Category,
                 adjustmentAndWithdrawalLimit.MethodType,
@@ -316,7 +313,7 @@ namespace BackendSite.Service.DAL
                     if (adjustmentAndWithdrawalLimit.Category == (int)AdjustReasonEnum.Deposit && adjustmentAndWithdrawalLimit.MethodType == (int)MethodTypeIDEnum.MainWallet && isBalance)
                     {
                         //判斷是否為調帳對象的存款單號
-                        var isCustDeposit = getAdjustmentInfo(adjustmentAndWithdrawalLimit.CustId).Any(x => x == adjustmentAndWithdrawalLimit.RefId);
+                        var isCustDeposit = GetAdjustmentInfo(adjustmentAndWithdrawalLimit.CustId).Any(x => x == adjustmentAndWithdrawalLimit.RefId);
                         if (isCustDeposit)
                         {
                             result = AdjustmentActualDeposit(adjustmentAndWithdrawalLimit, adjustmentTransId, adjustAmount, trans);
@@ -342,7 +339,7 @@ namespace BackendSite.Service.DAL
                             _UserName = adjustmentAndWithdrawalLimit.UserName,
                             _Amount = adjustmentAndWithdrawalLimit.Amount,
                             _Memo = adjustmentAndWithdrawalLimit.Memo,
-                            _Prefix = $"L{common.GetEnv()}",
+                            _Prefix = $"L{_common.GetEnv()}",
                             _Operator = adjustmentAndWithdrawalLimit.Operator
                         });
                         p.Add("_TransId", dbType: DbType.String, direction: ParameterDirection.Output);
@@ -355,7 +352,7 @@ namespace BackendSite.Service.DAL
 
                         if (!string.IsNullOrEmpty(transId) && resultCode == 0)
                         {
-                            result = withdrawalLimitService.SetWithdrawalLimit(
+                            result = _withdrawalLimitService.SetWithdrawalLimit(
                                 adjustmentAndWithdrawalLimit.CustId,
                                 adjustmentAndWithdrawalLimit.UserName, 
                                 adjustmentAndWithdrawalLimit.SiteId,
@@ -381,13 +378,13 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        private IEnumerable<string> getAdjustmentInfo(int custId)
+        private IEnumerable<string> GetAdjustmentInfo(int custId)
         {
             var props = new DynamicParameters();
             props.Add("_CustId", custId);
 
-            var Result = _reportDbClient.Query<string>("Admin_DepositInfoTransId_Get", props);
-            return Result;
+            var result = _reportDbClient.Query<string>("Admin_DepositInfoTransId_Get", props);
+            return result;
         }
 
         public int AdjustmentActualDeposit(AdjustmentAndWithdrawalLimit input, string transId, decimal adjustAmount, MySqlTransaction trans)
