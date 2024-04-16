@@ -409,7 +409,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                                             WithdrawalLimitAmount = withdrawalLimitAmount,
                                             WithdrawalLimitAmountAdjustType = request.WithdrawalLimitOption,
                                             Memo = memo,
-                                            Category = request.ReasonId
+                                            Category = request.ReasonId,
+                                            MethodType = (int)MethodTypeIDEnum.MainWalletBatch
                                         };
 
                                         if (adjustmentAndWithdrawalLimit.AdjustType == AdjustmentInfoAdjustTypeEnum.BalanceMinus)
@@ -625,8 +626,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
                         };
                         return new SelectListItem(x.ReasonId, x.Description,x.Type);
                     });
-            var apiResult =
-                new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
+            var apiResult = new ApiResult<IEnumerable<SelectListItem>>((int)ErrorCodeEnum.Success, string.Empty, data);
             return apiResult;
         }
         #endregion
