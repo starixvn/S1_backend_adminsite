@@ -1078,7 +1078,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 if (withdrawalRequest.Status is WithdrawalStatusEnum.Approved &&
                     IsLocalPayment(withdrawalRequest.WithdrawalType))
                 {
-                    usableActionButton.Add(WithdrawalActionEnum.ManualRejected);
+                    usableActionButton.Add(WithdrawalActionEnum.Rejected);
                     usableActionButton.Remove(WithdrawalActionEnum.Receive);
                 }
 
