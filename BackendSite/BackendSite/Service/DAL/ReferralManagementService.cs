@@ -272,7 +272,7 @@ namespace BackendSite.Service.DAL
             p.Add("_CustIds", custIds);
             p.Add("_StartDate", startDate);
             p.Add("_EndDate", endDate);
-            return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferralReferredList_Get", p);
+            return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferralReferredList_Get_V2", p);
         }
 
         public async Task<IEnumerable<DepositReferralReport_ReferralReferredForExportDao>> GetDepositReferralReferredListForExport(string custIds, DateTime startDate, DateTime endDate)
