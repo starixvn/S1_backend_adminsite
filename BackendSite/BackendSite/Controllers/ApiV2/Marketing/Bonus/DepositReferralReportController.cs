@@ -134,7 +134,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
             var stream = _excelBll.ExportV2(
                 new Dictionary<string, IEnumerable<DepositReferralReportForExportDao>>() { { "Referrer", result.ReferrerResult } },
-                new Dictionary<string, IEnumerable<DepositReferralReport_ReferralReferredForExportDao>>() { { "Referred", result.ReferredResult } });
+                new Dictionary<string, IEnumerable<DepositReferralReport_ReferralReferredForExportDao>>() { { "Referred", result.ReferredResult } },
+                new Dictionary<string, IEnumerable<DepositReferralReport_ReferralReferredByDateForExportDao>>() { { "Referred", result.ReferredByDateResult } });
+
 
             return _excelBll.ExcelFile(stream, "NewReferralReport");
         }
