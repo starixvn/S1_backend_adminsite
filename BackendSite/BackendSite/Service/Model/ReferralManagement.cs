@@ -434,4 +434,18 @@ namespace BackendSite.Service.Model
             Reg_Time = RegTime.ToString("dd/MM/yyyy HH:mm:ss zzz");
         }
     }
+
+    public class DepositReferralReport_ReferralReferredByDateForExportDao
+    {
+        public string SiteName { get; set; }
+        public string AgentUserName { get; set; }
+        public string UserName { get; set; }
+        public string Currency { get; set; }
+        public decimal Deposit { get; set; }
+        public decimal ReferralAmount { get; set; }
+        [EpplusIgnore]
+        public DateTimeOffset RegTime { get; set; }
+        public string DepositDate { get; set; }
+        
+    }
 }

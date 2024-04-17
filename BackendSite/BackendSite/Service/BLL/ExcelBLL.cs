@@ -353,6 +353,101 @@ namespace BackendSite.Service.BLL
             return ms.ToArray();
         }
 
+        public byte[] ExportV2<T, S, U>(Dictionary<string, IEnumerable<T>> t, Dictionary<string, IEnumerable<S>> s, Dictionary<string, IEnumerable<U>> u, IEnumerable<PropertyInfo> properties = null)
+        {
+            using var ms = new MemoryStream();
+            using var p = new ExcelPackage(ms);
+
+            // 第一個 sheet
+            foreach (var item in t)
+            {
+                var ws = p.Workbook.Worksheets.Add(item.Key);
+
+                if (item.Value.Any())
+                {
+                    if (properties == null)
+                    {
+                        properties = item.Value.FirstOrDefault().GetType().GetProperties();
+                    }
+                    var rows = item.Value.Count() + 1;
+                    var cols = properties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws.Cells[1, 1].LoadFromCollection(item.Value, true);
+
+                        using (var range = ws.Cells[1, 1, rows, cols])
+                        {
+                            // 標題列
+                            var title = ws.Cells[1, 1, 1, cols];
+                            title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                            title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        }
+                    }
+                }
+            }
+
+            // 第二個 sheet
+            foreach (var item in s)
+            {
+                var ws = p.Workbook.Worksheets.Add(item.Key);
+
+                if (item.Value.Any())
+                {
+                    if (properties == null)
+                    {
+                        properties = item.Value.FirstOrDefault().GetType().GetProperties();
+                    }
+                    var rows = item.Value.Count() + 1;
+                    var cols = properties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws.Cells[1, 1].LoadFromCollection(item.Value, true);
+
+                        using (var range = ws.Cells[1, 1, rows, cols])
+                        {
+                            // 標題列
+                            var title = ws.Cells[1, 1, 1, cols];
+                            title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                            title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        }
+                    }
+                }
+            }
+
+            // 第三個 sheet
+            foreach (var item in u)
+            {
+                var ws = p.Workbook.Worksheets.Add(item.Key);
+
+                if (item.Value.Any())
+                {
+                    if (properties == null)
+                    {
+                        properties = item.Value.FirstOrDefault().GetType().GetProperties();
+                    }
+                    var rows = item.Value.Count() + 1;
+                    var cols = properties.Count();
+                    if (rows > 0 && cols > 0)
+                    {
+                        ws.Cells[1, 1].LoadFromCollection(item.Value, true);
+
+                        using (var range = ws.Cells[1, 1, rows, cols])
+                        {
+                            // 標題列
+                            var title = ws.Cells[1, 1, 1, cols];
+                            title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                            title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
+                            title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
+                        }
+                    }
+                }
+            }
+
+            p.Save();
+            return ms.ToArray();
+        }
         private void ExportBody<T>(
             ExcelWorksheet ws,
             IEnumerable<T> data,
