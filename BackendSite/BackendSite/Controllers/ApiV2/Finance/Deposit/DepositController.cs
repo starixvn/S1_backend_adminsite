@@ -5,6 +5,7 @@ using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Infrastructure;
+using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
@@ -37,7 +38,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly string _awsDepositFolder;
         private readonly string _awsDepositBucketName;
         private readonly VerificationRewardBLL _verificationRewardBLL;
-        
+        private readonly IGaBLL _gaBll;
+
 
         #endregion
 
@@ -54,11 +56,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _verificationRewardBLL = provider.GetRequiredService<VerificationRewardBLL>();
+            _gaBll = provider.GetRequiredService<IGaBLL>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
             _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
             _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
-            
+
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
                 { DepositStatusEnum.Pending,
@@ -423,10 +426,28 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
                     // verification job queue
                     var custVerificationReward = _verificationRewardBLL.GetCustVerificationRewardByCust(depositRequest.CustId);
-                    if (custVerificationReward is null or {EmailVerified: true, EmailReward: 0} or {PhoneVerified: true, PhoneReward: 0})
+                    if (custVerificationReward is null or { EmailVerified: true, EmailReward: 0 } or { PhoneVerified: true, PhoneReward: 0 })
                     {
                         _verificationRewardBLL.InsertQueueJob(depositRequest.CustId, QueueJob.Verification, string.Empty);
                     }
+
+                    // send GA Purchase
+                    _  = Task.Run(async () =>
+                    {
+                        await _gaBll.PurchaseEventSendAsync(new PurchaseRequest()
+                        {
+                            SiteId = depositRequest.SiteId,
+                            CustId = depositRequest.CustId,
+                            TransId = depositRequest.TransId,
+                            DepositAmount = depositRequest.ActualDeposit,
+                            CurrencyName = depositRequest.IsoCode,
+                            ItemId = depositRequest.TransId,
+                            ItemName = depositRequest.FirstDeposit == 1
+                            ? "firstDeposit Approve"
+                            : "reDeposit Approve",
+                            EventName = "DepositApprove"
+                        });
+                    });
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)

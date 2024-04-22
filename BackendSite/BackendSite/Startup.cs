@@ -103,6 +103,7 @@ namespace BackendSite
             services.AddTransient<IWithdrawalReceiveBLL, WithdrawalReceiveBLL>();
             services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
             services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
+            services.AddTransient<IGaBLL,GaBLL>();
 
 
             services.AddTransient<ReferralManagementDecorator>();
