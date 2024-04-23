@@ -186,7 +186,8 @@ namespace BackendSite.Service.BLL
                 WithdrawalStatusEnum.OnHold,
                 WithdrawalStatusEnum.Verify,
                 WithdrawalStatusEnum.ToKyc,
-                WithdrawalStatusEnum.Pending
+                WithdrawalStatusEnum.Pending,
+                WithdrawalStatusEnum.Approved
             };
 
             var withdrawalRequest = GetWithdrawalRequest(transId);

@@ -41,6 +41,13 @@ namespace BackendSite.Controllers.ApiV2.Upload
             return await HandleUploadActionAsync(uploadImageRequest, UploadImageFunctionEnum.NewsManagement);
         }
 
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
+        public async Task<ApiResult<UploadImageResponse>> SlotGameManagementAsync([FromForm] UploadSlotImageRequest uploadImageRequest)
+        {
+            return await HandleUploadSlotActionAsync(uploadImageRequest, UploadImageFunctionEnum.SlotGameManagement);
+        }
+
         #region private method
 
         private async Task<ApiResult<UploadImageResponse>> HandleUploadActionAsync(UploadImageRequest uploadImageRequest,
@@ -49,6 +56,20 @@ namespace BackendSite.Controllers.ApiV2.Upload
             try
             {
                 var responseResult = await _uploadImageBll.UploadImageAsync(uploadImageRequest, functionEnum);
+                return HandleResponse(responseResult);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        private async Task<ApiResult<UploadImageResponse>> HandleUploadSlotActionAsync(UploadSlotImageRequest uploadImageRequest,
+            UploadImageFunctionEnum functionEnum)
+        {
+            try
+            {
+                var responseResult = await _uploadImageBll.UploadSlotImageAsync(uploadImageRequest, functionEnum);
                 return HandleResponse(responseResult);
             }
             catch (Exception ex)

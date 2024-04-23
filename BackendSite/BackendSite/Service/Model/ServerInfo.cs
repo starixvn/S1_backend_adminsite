@@ -67,10 +67,12 @@ namespace BackendSite.Service.Model
     {
         public string OldImageUrl { get; set; }
         public string MaintainUrl { get; set; }
-        public string HotEventImageUrl {get; set; }
+        public string HotEventImageUrl { get; set; }
         public string BannerImageUrl { get; set; }
         public string AwsCloudFrontErrorDomainID { get; set; }
         public string UploadImagesBucketName { get; set; }
         public string UploadImagesCloudFrontUrl { get; set; }
+        public string UploadSlotImagesBucketName { get; set; }
+        public string AwsCloudFrontGameimgsDomainID { get; set; }
     }
 }

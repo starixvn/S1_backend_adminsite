@@ -241,5 +241,36 @@ namespace BackendSite.Service.BLL
            
             return result;
         }
+        
+        public LeaderboardTagExcludeList GetLeaderboardTagExcludeList(int siteId)
+        {
+            return _leaderBoardService.GetLeaderboardTagExcludeList(siteId);
+        }
+        
+        public bool SetLeaderboardTagExcludeList(ParamsWithLog<SetLeaderboardTagExcludeReq> req )
+        {
+            var result = _leaderBoardService.SetLeaderboardTagExcludeList(req.SiteId ,req.After.TagExcludeList  ,req.Operator);
+            
+            if (result)
+            {
+                var logParam = new CreateAdminAdjustmentInfoLogInput
+                {
+                    SiteId = req.SiteId,
+                    CurrencyId = 0,
+                    MenuEnum = AdminAdjustmentLogMenuEnum.LeaderboardRankingBonus,
+                    ActionType = ActionType.Update,
+                    BeforeDetailInfo = req.Before.ToLog(),
+                    AfterDetailInfo = req.After.ToLog(),
+                    Operator = req.Operator
+                };
+
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParam))
+                {
+                    _logger.LogError("SetLeaderboardTagExcludeList failed. params: " + JsonConvert.SerializeObject(logParam));
+                }
+            }
+            
+            return result;
+        }
     }
 }

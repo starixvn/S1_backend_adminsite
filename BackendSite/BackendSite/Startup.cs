@@ -17,6 +17,7 @@ using Elastic.Apm.StackExchange.Redis;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using NSwag;
+using Prometheus;
 using StackExchange.Redis;
 
 namespace BackendSite
@@ -102,15 +103,16 @@ namespace BackendSite
             services.AddTransient<IWithdrawalReceiveBLL, WithdrawalReceiveBLL>();
             services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
             services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
+            services.AddTransient<IGaBLL,GaBLL>();
 
             services.AddTransient<ReferralManagementDecorator>();
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ICupEventService, CupEventService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
             services.AddTransient<ILiveRegistrationService, LiveRegistrationService>();
             services.AddTransient<IVipLevelService, VipLevelService>();
             services.AddTransient<ITagService, TagService>();
-            services.AddTransient<IWorldCupPredictionService, WorldCupPredictionService>();
+            services.AddTransient<ICupEventService, CupEventService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
@@ -177,6 +179,7 @@ namespace BackendSite
         {
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseHttpMetrics();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
@@ -214,13 +217,21 @@ namespace BackendSite
                     config.Path = "/redoc";
                 });
 
+
+
                 #endregion
 
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpMetrics(options =>
+            {
+                options.AddCustomLabel("host", context => context.Request.Host.Host);
+            });
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapMetrics();
                 endpoints.MapGet("/health", async context =>
                 {
                     await context.Response.WriteAsync($"{env.EnvironmentName}-{DateTime.Now:yyyy/MM/dd HH:mm:ss}");

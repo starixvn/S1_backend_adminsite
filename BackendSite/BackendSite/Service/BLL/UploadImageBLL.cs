@@ -5,6 +5,10 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.Common.UploadImage;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using Amazon.CloudFront.Model;
 
 namespace BackendSite.Service.BLL
 {
@@ -15,6 +19,8 @@ namespace BackendSite.Service.BLL
         private readonly Dictionary<string, SiteCloudFrontImageInfo> _siteCloudFrontImageInfo;
         private readonly UploadImageFunctionConfig _uploadImageFunctionConfig;
         private readonly string _environmentPrefix;
+        private readonly Dictionary<string, string> _changeGameImgName;
+        private readonly AWSCloudFrontHelper _cloudFrontHelper;
 
         public UploadImageBLL(IServiceProvider provider)
         {
@@ -24,6 +30,14 @@ namespace BackendSite.Service.BLL
             _uploadImageFunctionConfig = configBll.GetConfigValue<UploadImageFunctionConfig>("UploadImageFunctionConfig");
             _environmentPrefix = _uploadImageFunctionConfig.EnvironmentPrefix;
             _siteCloudFrontImageInfo = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
+            _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
+            _changeGameImgName = new Dictionary<string, string>()
+            {
+                {"Iconic","AT" },
+                {"Kiss918","918Kiss" },
+                {"END","ES" },
+                {"EBet","WE" },
+            };
         }
 
         public async Task<UploadResultDto> UploadImageAsync(UploadImageRequest request, UploadImageFunctionEnum uploadImageFunction)
@@ -57,7 +71,68 @@ namespace BackendSite.Service.BLL
             var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(request.File, siteCloudFrontImageInfo.UploadImagesBucketName, key);
 
             return s3UploadSuccess
-                ? UploadSuccess(request, siteCloudFrontImageInfo, key)
+                ? UploadSuccess(request, siteCloudFrontImageInfo.UploadImagesCloudFrontUrl, key)
+                : UploadFailure();
+        }
+
+        public async Task<UploadResultDto> UploadSlotImageAsync(UploadSlotImageRequest request, UploadImageFunctionEnum uploadImageFunction)
+        {
+            var siteInfo = _serverInfo.GetServerInfoWithSiteId(request.SiteId);
+            var siteCloudFrontImageInfo = _siteCloudFrontImageInfo[siteInfo.SiteName];
+            var uploadFunction = _uploadImageFunctionConfig.UploadFunctions.FirstOrDefault(r => r.UploadFunctionType == (int)uploadImageFunction);
+
+            // 檢查有沒有附夾檔案
+            if (request.File is null)
+            {
+                return NoPictureAttachedResult();
+            }
+
+            // 檢查 SiteConfig 有沒有相對應設定
+            if (uploadFunction is null)
+            {
+                return NotFoundUploadFunctionResult();
+            }
+
+            // 檢查圖片副檔名是否支援
+            var ext = Path.GetExtension(request.File.FileName);
+            if (!uploadFunction.AllowFileExtension.Contains(ext))
+            {
+                return NotSupportImageExtension();
+            }
+
+            // 尺寸調整
+            var resizeImg = Resize(request.File, request.size, request.size);
+            
+            request.TpName = _changeGameImgName.TryGetValue(request.TpName, out var changeName) ? changeName : request.TpName;
+            var folder = $"{request.TpName}/";
+            var fileName = $"{OrgFileNameFilter(request.ENname)}-{request.Lang}.jpg";
+            var key = Path.Combine(folder, fileName);
+            var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(resizeImg, siteCloudFrontImageInfo.UploadSlotImagesBucketName, key);
+
+            
+            if (s3UploadSuccess)
+            {
+                //clean cache
+                var invalidationRequest = new CreateInvalidationRequest()
+                {
+                    DistributionId = siteCloudFrontImageInfo.AwsCloudFrontGameimgsDomainID,
+                    InvalidationBatch = new InvalidationBatch()
+                    {
+                        CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+                        Paths = new Paths
+                        {
+                            Quantity = 1,
+                            Items = new List<string> { $"/{key}" }
+                        }
+                    }
+                };
+                await _cloudFrontHelper.CreateInvalidationAsync(invalidationRequest);
+            }
+            
+
+
+            return s3UploadSuccess
+                ? UploadSuccess(request, siteCloudFrontImageInfo.OldImageUrl, $"{key}?timestamp={DateTime.Now.ToString("yyyyMMddHHmmss")}")//加上timestamp刷新圖片
                 : UploadFailure();
         }
 
@@ -69,10 +144,10 @@ namespace BackendSite.Service.BLL
         /// <param name="key"></param>
         /// <returns></returns>
         private static UploadResultDto UploadSuccess(UploadImageRequest request,
-            SiteCloudFrontImageInfo siteCloudFrontImageInfo, string key)
+            string siteCloudFrontImageInfo, string key)
         {
             var returnPath = request.ReturnFullPath
-                ? $"{siteCloudFrontImageInfo.UploadImagesCloudFrontUrl}/{key}"
+                ? $"{siteCloudFrontImageInfo}/{key}"
                 : $"/{key}";
 
             return new UploadResultDto(
@@ -127,6 +202,48 @@ namespace BackendSite.Service.BLL
                 success: false,
                 imagePath: string.Empty,
                 message: "image extension not supported");
+        }
+        /// <summary>
+        /// 圖檔上傳S3檔名格式
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static string OrgFileNameFilter(string fileName)
+        {
+            return fileName.Replace(" ", "-")
+                                       .Replace("&", "-")
+                                       .Replace(":", "-")
+                                       .Replace("'", "")
+                                       .Replace("’", "")
+                                       .Replace(".", "")
+                                       .Replace("™", "")
+                                       .Replace("---", "-")
+                                       .Replace("--", "-")
+                                       .Replace("\u200B", "")
+                                       .Replace(",", "")
+                                       .Replace("?", "")
+                                       .Replace("!", "")
+                                       .ToLower();
+        }
+
+        private IFormFile Resize(IFormFile file,int widthSize,int hightSize,string name = "name",string filename = "filename")
+        {
+            var imageStream = file.OpenReadStream();
+            var img = Image.Load(imageStream);
+
+            var resizedImage = img.Clone(ctx => ctx.Resize(new ResizeOptions
+            {
+                Size = new Size(widthSize, hightSize),
+                Mode = ResizeMode.BoxPad
+            }));
+
+            var stream = new MemoryStream();
+            resizedImage.Save(stream, new JpegEncoder());
+            stream.Position = 0;
+            file = new FormFile(stream, 0, stream.Length, name, filename);
+            
+
+            return file;
         }
     }
 }

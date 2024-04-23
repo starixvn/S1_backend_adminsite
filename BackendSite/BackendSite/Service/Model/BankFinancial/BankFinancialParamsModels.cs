@@ -11,7 +11,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrChannels = "[]";
             StrStatus = "[]";
             StrPurposes = "[]";
-            StrSysIds = null;
+            StrSysIds = "[]";
             Agent = string.Empty;
             AccountNo = string.Empty;
             Id = id;
@@ -23,8 +23,8 @@ namespace BackendSite.Service.Model.BankFinancial
             StrCurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
             StrChannels = JsonConvert.SerializeObject(req.Channels);
             StrStatus = JsonConvert.SerializeObject(req.Status);
-            StrPurposes = req.Purposes.Any() ? JsonConvert.SerializeObject(req.Purposes) : null;
-            StrSysIds = req.SysIds.Any() ? JsonConvert.SerializeObject(req.SysIds) : null;
+            StrPurposes = req.Purposes.Any() ? JsonConvert.SerializeObject(req.Purposes) : "[]";
+            StrSysIds = req.SysIds.Any() ? JsonConvert.SerializeObject(req.SysIds) : "[]";
             Agent = req.Agent ?? string.Empty;
             AccountNo = req.AccountNo ?? string.Empty;
         }

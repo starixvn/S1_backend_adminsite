@@ -941,7 +941,8 @@ namespace BackendSite.Service.Model.enums
         WithdrawalBlockSetting = 95,
         SetBigWinSetting = 96,
         LeaderboardPointCalculation = 97,
-        LeaderboardRankingBonus = 98
+        LeaderboardRankingBonus = 98,
+        SetSlotGame = 99
     }
 
     #region BankFinancialTransferInfoLog
@@ -1725,6 +1726,7 @@ namespace BackendSite.Service.Model.enums
     public enum SlotGameStatusEnum
     {
         Closed = 0,
+        ReleaseOpen = 3,
         Open = 1
     }
 
@@ -1997,7 +1999,8 @@ namespace BackendSite.Service.Model.enums
     {
         BannerManagement = 1,
         BonusManagement = 2,
-        NewsManagement = 3
+        NewsManagement = 3,
+        SlotGameManagement = 4
     }
     
     public enum QueueJob
