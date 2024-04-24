@@ -58,6 +58,18 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                 Margin = (data.Margin * 100).ToString("N2") + "%"
             };
 
+        public static T ToExcelFormatDownload<T>(this MpaWinLossGroupByModel data) where T : IMpaWinLossBaseDisplaySimple, new()
+    => new T
+    {
+        TurnOver = data.TurnOver.ToString("N2"),
+        ValidTurnOver = data.ValidTurnOver.ToString("N2"),
+        GGR = data.Ggr.ToString("N2"),
+        BetCount = data.BetCount,
+        AvgBetAmount = data.AvgBetAmount.ToString("N2"),
+        UniquePlayers = data.UniquePlayers,
+        Margin = (data.Margin * 100).ToString("N2") + "%"
+    };
+
         #endregion
 
         #region ToApiDataFormat
