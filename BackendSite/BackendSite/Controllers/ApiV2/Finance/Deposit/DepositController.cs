@@ -432,9 +432,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
 
                     // send GA Purchase
-                    _  = Task.Run(async () =>
+                    _  = Task.Run(() =>
                     {
-                        await _gaBll.PurchaseEventSendAsync(new PurchaseRequest()
+                        _gaBll.PurchaseEventSendAsync(new PurchaseRequest()
                         {
                             SiteId = depositRequest.SiteId,
                             CustId = depositRequest.CustId,
