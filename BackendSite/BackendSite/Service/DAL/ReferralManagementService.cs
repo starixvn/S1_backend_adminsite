@@ -243,7 +243,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", startIndex);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var data = await _reportDbClient.QueryAsync<DepositReferralReportDao>("Admin_DepositReferralCustList_Get", p);
+            var data = await _reportDbClient.QueryAsync<DepositReferralReportDao>("Admin_DepositReferralCustList_Get_V2", p);
 
             return (Data: data,
                 TotalPages: p.Get<int?>("_TotalPages") ?? 0,
@@ -263,7 +263,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartDate", startDate);
             p.Add("_EndDate", endDate);
             p.Add("_UserName", userName);
-            return await _reportDbClient.QueryAsync<DepositReferralReportForExportDao>("Admin_DepositReferralCustList_Export", p);
+            return await _reportDbClient.QueryAsync<DepositReferralReportForExportDao>("Admin_DepositReferralCustList_Export_V2", p);
         }
 
         public async Task<IEnumerable<DepositReferralReport_ReferralReferredDao>> GetDepositReferralReferredList(string custIds, DateTime startDate, DateTime endDate)
@@ -272,7 +272,7 @@ namespace BackendSite.Service.DAL
             p.Add("_CustIds", custIds);
             p.Add("_StartDate", startDate);
             p.Add("_EndDate", endDate);
-            return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferralReferredList_Get", p);
+            return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredDao>("Admin_DepositReferralReferredList_Get_V2", p);
         }
 
         public async Task<IEnumerable<DepositReferralReport_ReferralReferredForExportDao>> GetDepositReferralReferredListForExport(string custIds, DateTime startDate, DateTime endDate)
@@ -283,5 +283,15 @@ namespace BackendSite.Service.DAL
             p.Add("_EndDate", endDate);
             return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredForExportDao>("Admin_DepositReferralReferredList_Export", p);
         }
+
+        public async Task<IEnumerable<DepositReferralReport_ReferralReferredByDateForExportDao>> GetDepositReferralReferredListByDateForExport(string custIds, DateTime startDate, DateTime endDate)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustIds", custIds);
+            p.Add("_StartDate", startDate);
+            p.Add("_EndDate", endDate);
+            return await _reportDbClient.QueryAsync<DepositReferralReport_ReferralReferredByDateForExportDao>("Admin_DepositReferralReferredListByDate_Get", p);
+        }
+
     }
 }

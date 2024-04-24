@@ -358,6 +358,7 @@ namespace BackendSite.Service.Model
         public decimal TotalDeposit { get; set; }
         public decimal ReferralAmount { get; set; }
         public decimal PayoutAmount { get; set; }
+        public int TotalReferee { get; set; }
     }
 
     public class GetDepositReferralListByCustIdResult
@@ -399,6 +400,7 @@ namespace BackendSite.Service.Model
         public string Currency { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
+        public int TotalReferee { get; set; }
         public decimal TotalDeposit { get; set; }
         public decimal ReferralAmount { get; set; }
         public decimal PayoutAmount { get; set; }
@@ -431,5 +433,19 @@ namespace BackendSite.Service.Model
             RegTime = new DateTimeOffset(dao.RegTime.DateTime, TimeSpan.Zero).ToOffset(timeSpan);
             Reg_Time = RegTime.ToString("dd/MM/yyyy HH:mm:ss zzz");
         }
+    }
+
+    public class DepositReferralReport_ReferralReferredByDateForExportDao
+    {
+        public string SiteName { get; set; }
+        public string AgentUserName { get; set; }
+        public string UserName { get; set; }
+        public string Currency { get; set; }
+        public decimal Deposit { get; set; }
+        public decimal ReferralAmount { get; set; }
+        [EpplusIgnore]
+        public DateTimeOffset RegTime { get; set; }
+        public string DepositDate { get; set; }
+        
     }
 }
