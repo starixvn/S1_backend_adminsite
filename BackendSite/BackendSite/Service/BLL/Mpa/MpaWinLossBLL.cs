@@ -123,14 +123,13 @@ namespace BackendSite.Service.BLL.Mpa
             var sortedData = data.SortThen2ExcelData(request);
             var result = sortedData.Select(x =>
             {
-                var r = x.ToExcelFormat<MpaWinLossByDateDownloadDtoExport>();
+                var r = x.ToExcelFormatDownload<MpaWinLossByDateDownloadDtoExport>();
                 r.Date = x.Key;
                 r.Currency = x.ChildKey;
                 r.Brand = x.Brand;
-                r.TpCategory = x.TpCategory;
-                r.TpGameType = x.TpGameType;
+                r.Product = x.TpGameType;
                 r.UserName = x.UserName;
-                r.TpUserName = x.TpUserName;
+                r.SabaId = x.TpUserName;
                 return r;
             });
 

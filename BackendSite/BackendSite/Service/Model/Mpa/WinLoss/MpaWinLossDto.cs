@@ -37,15 +37,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal TotalBonus { get; set; }
     }
 
-    public interface IMpaWinLossSimple
+    public interface IMpaWinLossSimple : IMpaWinLossBase
     {
-        public decimal TurnOver { get; set; }
-
-        public decimal ValidTurnOver { get; set; }
-
-        public decimal GGR { get; set; }
-
-        public decimal PlayerWinLoss { get; set; }
 
         public decimal BAPlayerWinLoss { get; set; }
 
@@ -56,6 +49,18 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public decimal Commission { get; set; }
 
         public decimal BACommission { get; set; }
+
+    }
+
+    public interface IMpaWinLossBase
+    {
+        public decimal TurnOver { get; set; }
+
+        public decimal ValidTurnOver { get; set; }
+
+        public decimal GGR { get; set; }
+
+        public decimal PlayerWinLoss { get; set; }
 
         public int BetCount { get; set; }
 
@@ -210,15 +215,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string TotalBonus { get; set; }
     }
 
-    public interface IMpaWinLossDisplaySimple
+    public interface IMpaWinLossDisplaySimple : IMpaWinLossBaseDisplaySimple
     {
-        public string TurnOver { get; set; }
-
-        public string ValidTurnOver { get; set; }
-
-        public string GGR { get; set; }
-
-        public string PlayerWinLoss { get; set; }
 
         public string BAPlayerWinLoss { get; set; }
 
@@ -229,6 +227,19 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string Commission { get; set; }
 
         public string BACommission { get; set; }
+
+    }
+
+    public interface IMpaWinLossBaseDisplaySimple
+    {
+        public string TurnOver { get; set; }
+
+        public string ValidTurnOver { get; set; }
+
+        public string GGR { get; set; }
+
+        public string PlayerWinLoss { get; set; }
+
 
         public int BetCount { get; set; }
 
@@ -296,6 +307,25 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string Commission { get; set; }
 
         public string BACommission { get; set; }
+
+        public int BetCount { get; set; }
+
+        public string AvgBetAmount { get; set; }
+
+        public int UniquePlayers { get; set; }
+
+        public string Margin { get; set; }
+    }
+
+    public class MpaWinLossBaseDisplaySimple : IMpaWinLossBaseDisplaySimple
+    {
+        public string TurnOver { get; set; }
+
+        public string ValidTurnOver { get; set; }
+
+        public string GGR { get; set; }
+
+        public string PlayerWinLoss { get; set; }
 
         public int BetCount { get; set; }
 
@@ -380,15 +410,14 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
     }
 
 
-    public class MpaWinLossByDateDownloadDtoExport : MpaWinLossDisplay
+    public class MpaWinLossByDateDownloadDtoExport : MpaWinLossBaseDisplaySimple
     {
         public string Date { get; set; }
         public string Currency { get; set; }
-        public string TpUserName { get; set; }
+        public string SabaId { get; set; }
         public string UserName { get; set; }
 
-        public string TpGameType { get; set; }
-        public string TpCategory { get; set; }
+        public string Product { get; set; }
 
         public string Brand { get; set; }
     }
