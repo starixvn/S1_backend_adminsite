@@ -64,6 +64,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         TurnOver = data.TurnOver.ToString("N2"),
         ValidTurnOver = data.ValidTurnOver.ToString("N2"),
         GGR = data.Ggr.ToString("N2"),
+        PlayerWinLoss = data.PlayerWinLoss.ToString("N2"),
         BetCount = data.BetCount,
         AvgBetAmount = data.AvgBetAmount.ToString("N2"),
         UniquePlayers = data.UniquePlayers,
