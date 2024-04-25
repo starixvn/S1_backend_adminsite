@@ -38,7 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly string _awsDepositBucketName;
         private readonly VerificationRewardBLL _verificationRewardBLL;
         private readonly IGaBLL _gaBll;
-
+        private readonly ILogger<DepositController> _logger;
 
         #endregion
 
@@ -46,6 +46,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
         public DepositController(IServiceProvider provider)
         {
+            _logger = provider.GetRequiredService<ILogger<DepositController>>();
             _depositBll = provider.GetRequiredService<DepositBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
@@ -432,20 +433,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
 
                     // send GA Purchase
-                    var gaItemName = GetGaItemName(depositRequest);
+                    var eventData = GetGaEventData(depositRequest);
+                    _logger.LogInformation($"GA EventData：{JsonConvert.SerializeObject(eventData)}");
                     _ = Task.Run(async () =>
                     {
-                        await _gaBll.PurchaseEventSendAsync(new PurchaseRequest()
-                        {
-                            SiteId = depositRequest.SiteId,
-                            CustId = depositRequest.CustId,
-                            TransId = depositRequest.TransId,
-                            DepositAmount = depositRequest.ActualDeposit,
-                            CurrencyName = depositRequest.IsoCode,
-                            ItemId = depositRequest.TransId,
-                            ItemName = gaItemName,
-                            EventName = "DepositApprove"
-                        });
+                        await _gaBll.PurchaseEventSendAsync(eventData);
                     });
                 }
             }
@@ -918,9 +910,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             return selectSites;
         }
 
-        private string GetGaItemName(DepositRequest depositRequest)
+
+        private PurchaseRequest GetGaEventData(DepositRequest depositRequest)
         {
-            return depositRequest is { FirstDeposit: 1 } ? "firstDeposit Approve" : "reDeposit Approve";
+            var eventData = new PurchaseRequest()
+            {
+                SiteId = depositRequest.SiteId,
+                CustId = depositRequest.CustId,
+                TransId = depositRequest.TransId,
+                DepositAmount = depositRequest.ActualDeposit,
+                CurrencyName = depositRequest.IsoCode,
+                ItemId = depositRequest.TransId,
+                ItemName = depositRequest is { FirstDeposit: 1 } ? "firstDeposit Approve" : "reDeposit Approve",
+                EventName = "DepositApprove"
+            };
+            return eventData;
         }
 
         #endregion
