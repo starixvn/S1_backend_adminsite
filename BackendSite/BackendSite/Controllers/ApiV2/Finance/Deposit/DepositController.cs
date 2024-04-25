@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Ocsp;
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
@@ -433,6 +432,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
 
                     // send GA Purchase
+                    var gaItemName = GetGaItemName(depositRequest);
                     _ = Task.Run(async () =>
                     {
                         await _gaBll.PurchaseEventSendAsync(new PurchaseRequest()
@@ -443,7 +443,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                             DepositAmount = depositRequest.ActualDeposit,
                             CurrencyName = depositRequest.IsoCode,
                             ItemId = depositRequest.TransId,
-                            ItemName = GetGaItemName(depositRequest),
+                            ItemName = gaItemName,
                             EventName = "DepositApprove"
                         });
                     });
