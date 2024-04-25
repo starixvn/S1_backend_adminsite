@@ -434,7 +434,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
                     // send GA Purchase
                     var eventData = GetGaEventData(depositRequest);
-                    _logger.LogInformation($"GA EventData：{JsonConvert.SerializeObject(eventData)}");
+                    _logger.LogInformation($"GA EventData：{JsonConvert.SerializeObject(eventData)} Original firstDeposit value：{depositRequest.FirstDeposit}");
                     _ = Task.Run(async () =>
                     {
                         await _gaBll.PurchaseEventSendAsync(eventData);
