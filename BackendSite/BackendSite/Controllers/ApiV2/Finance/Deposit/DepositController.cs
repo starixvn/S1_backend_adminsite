@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Amazon.S3.Model;
+﻿using Amazon.S3.Model;
 using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Extensions;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Ocsp;
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Deposit
@@ -413,6 +413,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         depositConfirmResult = _depositBll.DepositApproved(request.TransId, request.ActualDeposit, request.Comment, User.Identity.Name, calCodeInfo, di);
                 }
 
+
                 if (depositConfirmResult > 0)
                 {
                     var userLang = _custInfoBll.GetCustInfoWithCache(depositRequest.CustId).UserLang;
@@ -432,9 +433,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
 
                     // send GA Purchase
-                    _  = Task.Run(() =>
+                    _ = Task.Run(async () =>
                     {
-                        _gaBll.PurchaseEventSendAsync(new PurchaseRequest()
+                        await _gaBll.PurchaseEventSendAsync(new PurchaseRequest()
                         {
                             SiteId = depositRequest.SiteId,
                             CustId = depositRequest.CustId,
@@ -442,9 +443,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                             DepositAmount = depositRequest.ActualDeposit,
                             CurrencyName = depositRequest.IsoCode,
                             ItemId = depositRequest.TransId,
-                            ItemName = depositRequest.FirstDeposit == 1
-                            ? "firstDeposit Approve"
-                            : "reDeposit Approve",
+                            ItemName = GetGaItemName(depositRequest),
                             EventName = "DepositApprove"
                         });
                     });
@@ -917,6 +916,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var selectSites = result.Select(x => x.SiteId).ToList();
 
             return selectSites;
+        }
+
+        private string GetGaItemName(DepositRequest depositRequest)
+        {
+            return depositRequest is { FirstDeposit: 1 } ? "firstDeposit Approve" : "reDeposit Approve";
         }
 
         #endregion
