@@ -433,8 +433,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     }
 
                     // send GA Purchase
-                    var eventData = GetGaEventData(depositRequest);
-                    _logger.LogInformation($"GA EventData：{JsonConvert.SerializeObject(eventData)} Original firstDeposit value：{depositRequest.FirstDeposit}");
+                    // refreshDepositInfoData 重新拿一次，因為首存款會在 Approve 成功之後，異動完錢包餘額才會更新 FirstDeposit 這個欄位
+                    // 若使用 depositRequest 的 FirstDeposit 永遠會是 0
+                    var refreshDepositInfoData = _depositBll.GetDepositRequest(request.TransId);
+                    var eventData = GetGaEventData(refreshDepositInfoData);
                     _ = Task.Run(async () =>
                     {
                         await _gaBll.PurchaseEventSendAsync(eventData);
