@@ -28,7 +28,7 @@ public interface IMemberCommand
     Task<int> DeleteOnUserAsync(int custId, string @operator);
     Task<bool> SetCustPromotionWhiteListAsync(int custId, bool ipEnable, bool deviceEnable, bool realNameEnable, string @operator);
     Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
-        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,
+        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,string realName,
         string @operator);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, CustTpGameTypeSettingGetType setDataType, IEnumerable<int> tpGameTypes, string @operator);
     Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status, string @operator);

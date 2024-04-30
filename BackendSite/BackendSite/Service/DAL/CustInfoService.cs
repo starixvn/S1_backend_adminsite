@@ -21,9 +21,11 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
 
-        public Customer GetCustInfo(int custId)
+        public Customer GetCustInfo(int custId,bool forceUseMainDb = false)
         {
-            return _reportDbClient.QueryFirst<Customer>("Customer_Get", new DynamicParameters(new { CustId = custId }));
+            return forceUseMainDb
+            ? _mainDbClient.QueryFirst<Customer>("Customer_Get", new DynamicParameters(new { CustId = custId }))
+            : _reportDbClient.QueryFirst<Customer>("Customer_Get", new DynamicParameters(new { CustId = custId }));
         }
 
         public int GetPointLevel(int custId)

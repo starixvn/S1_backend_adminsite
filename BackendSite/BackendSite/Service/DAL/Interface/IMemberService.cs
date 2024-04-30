@@ -50,7 +50,7 @@ public interface IMemberService
     Task<int> SetCustPromotionWhiteListAsync(CustPromotionWhiteList input);
     Task<IEnumerable<PromotionReceiveFailLog>> GetPromotionReceiveFailLogAsync(int custId, DateTime startTime, DateTime endTime);
     Task<(int IsSuccess, int CustId)> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
-        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl);
+        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,string realName);
     Task<IEnumerable<CustTpGameTypeSettingDto>> GetCustTpGameTypeSettingAsync(int custId);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type);
     Task<int> SwitchEnableTurnoverRewardPointAsync(int custId, int status);

@@ -28,6 +28,7 @@ namespace BackendSite.Service.Model
         public string Aff { get; set; }
         public string AffCode { get; set; }
         public string Token { get; set; }
+        public string TagList { get; set; }
     }
 
     public class CustInfoDetail

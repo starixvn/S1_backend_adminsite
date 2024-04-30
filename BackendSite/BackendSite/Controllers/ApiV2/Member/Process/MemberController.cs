@@ -11,6 +11,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -41,6 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly DateTimeHelper _dateTimeHelper;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly TpBLL _tpBll;
+        private readonly StringVaildHelper _stringVaildHelper;
 
         public MemberController(IServiceProvider provider)
         {
@@ -66,6 +68,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
+            _stringVaildHelper = provider.GetRequiredService<StringVaildHelper>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -1479,6 +1482,11 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> RegisterMember(RegisterCustomerRequest request)
         {
+            if (string.IsNullOrWhiteSpace(request.RealName)
+                || !_stringVaildHelper.VaildAccountNameForSetProfile(request.RealName))
+            {
+                throw new AdminException(ErrorCodeEnum.Fail, "RealName Wrong Format.");
+            }
             var result = await _memberCommand.RegisterMemberAsync(request.SiteId,
                 request.UserName,
                 _tools.MD5Encrypt(request.Userpwd),
@@ -1489,6 +1497,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.PhoneNo,
                 request.AffCode,
                 _tools.GetFromUrl(HttpContext, false),
+                request.RealName,
                 User.Identity.Name);
 
             if (result > 0)

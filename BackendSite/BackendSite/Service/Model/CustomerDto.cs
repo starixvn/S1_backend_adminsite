@@ -661,6 +661,11 @@ public class CustTagList
     public IEnumerable<int> TagList { get; set; }
 }
 
+public class CustAccountNameInfo : CustTagList
+{
+    public string AccountName { get; set; }
+}
+
 public class CustRealNameChangeLog
 {
     public string BeforeName { get; set; }
@@ -726,6 +731,8 @@ public class RegisterCustomerRequest
     public string PhoneNo { get; set; }
     public string AreaCode { get; set; }
     public string AffCode { get; set; }
+
+    public string RealName { get; set; }
 
 }
 

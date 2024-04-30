@@ -17,11 +17,13 @@ public class MemberService : IMemberService
 {
     private readonly MySqlClient _reportDbClient;
     private readonly MySqlClient _mainDbClient;
+    private readonly CustInfoService _custInfoService;
 
-    public MemberService(IEnumerable<MySqlClient> sqlCliencts)
+    public MemberService(IEnumerable<MySqlClient> sqlCliencts, IServiceProvider provider)
     {
         _reportDbClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Report);
         _mainDbClient = sqlCliencts.FirstOrDefault(a => a.DataBase == DataBase.Main);
+        _custInfoService = provider.GetRequiredService<CustInfoService>();
     }
 
     public async Task<GetMemberListPageData<MemberListDto>> GetList(int siteId, IEnumerable<int> currencyList,
@@ -426,7 +428,7 @@ public class MemberService : IMemberService
     }
 
     public async Task<(int IsSuccess, int CustId)> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
-        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl)
+        string userLang, MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl, string realName)
     {
         string nullValue = null;
         var custId = 0;
@@ -502,16 +504,25 @@ public class MemberService : IMemberService
                     await conn.DisposeAsync();
                     return (IsSuccess: -10, CustId: custId);
                 }
+                var profileDic = new Dictionary<string, string>();
+                if (!string.IsNullOrEmpty(realName)) profileDic.Add("AccountName", realName);
+
+                var profile = profileDic.Count <= 0 ? null : JsonConvert.SerializeObject(profileDic);
 
                 isSuccess = _mainDbClient.Execute("Member_CustProfile_Ins", trans, new DynamicParameters(new
                 {
                     CustId = custId,
                     SiteId = siteId,
                     Email = email,
-                    Profile = nullValue,
+                    Profile = profile,
                     PhoneNo = phoneNo,
                     AreaCode = areaCode
                 }));
+            }
+
+            if (!string.IsNullOrEmpty(realName))
+            {
+                SetCustBankInfo(custId, siteId, realName, true, trans);
             }
 
             if (isSuccess > 0 && !string.IsNullOrEmpty(signupUrl))
@@ -543,6 +554,155 @@ public class MemberService : IMemberService
         }
         return (IsSuccess: isSuccess, CustId: custId);
     }
+
+    public bool SetCustBankInfo(int custId, int siteId, string accountName, bool isRegister = false, IDbTransaction trans = null)
+    {
+        var result = false;
+        var p = new DynamicParameters(new
+        {
+            CustId = custId,
+            SiteId = siteId,
+            AccountName = accountName
+        });
+
+        var duplicateList =
+            GetDuplicateAccountNameInfo(siteId, custId, accountName);
+
+        if (!duplicateList.Any())
+        {
+            return trans == null
+                ? _mainDbClient.Execute("Service_CustBankInfo_SetV3", p) > 0
+                : _mainDbClient.Execute("Service_CustBankInfo_SetV3", trans, p) > 0;
+        }
+
+        using var conn = _mainDbClient.GetMySqlConnection();
+        if (trans == null)
+        {
+            conn.Open();
+            trans = conn.BeginTransaction();
+        }
+
+        try
+        {
+            var success = _mainDbClient.Execute("Service_CustBankInfo_SetV3", trans, p) > 0;
+
+            if (success)
+            {
+                var tags = new List<int>();
+
+                if (!isRegister)
+                {
+                    var custInfo = _custInfoService.GetCustInfo(custId, true);
+                    tags = string.IsNullOrEmpty(custInfo.TagList)
+                        ? new List<int>()
+                        : System.Text.Json.JsonSerializer.Deserialize<List<int>>(custInfo.TagList);
+                }
+
+                var custTags = duplicateList
+                    .Where(x => !x.TagList.Contains((int)CustTagEnum.Duplicate))
+                    .ToList();
+
+                if (!tags.Contains((int)CustTagEnum.Duplicate))
+                {
+                    custTags.Add(new CustAccountNameInfo { CustId = custId, TagList = tags });
+                }
+
+                if (!custTags.Any())
+                {
+                    result = true;
+                    return true;
+                }
+
+                foreach (var item in custTags)
+                {
+                    item.TagList = item.TagList.Append((int)CustTagEnum.Duplicate);
+                }
+
+                success = SetCustInfoTagList(custTags, trans);
+                if (success)
+                {
+                    result = true;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        finally
+        {
+            if (!isRegister)
+            {
+                if (result)
+                {
+                    _mainDbClient.CommitAndDisposeConnection(conn, trans);
+                }
+                else
+                {
+                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                }
+            }
+            else
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+    }
+
+    private IEnumerable<CustAccountNameInfo> GetDuplicateAccountNameInfo(int siteId, int custId, string accountName)
+    {
+        /* 相同定義：
+         * * 大小寫不同
+         * * 去空格相同
+         * 舉例：
+         * Cheong wai Choon
+         * CheongwaiChoon（相同）
+         * cheong Wai Choon（相同）
+         * Ho thai nhat
+         * Hồ thái nhật（不同）
+         * HoThaiNhat（相同）
+         */
+
+        var patterns = new[]
+        {
+                accountName,
+                accountName.Replace(" ", string.Empty)
+            };
+        var similarAccList = this.GetSimilarAccountName(siteId, patterns);
+        var result = similarAccList
+            .Where(x => x.CustId != custId
+                        && patterns.Any(y => y.Equals(x.AccountName, StringComparison.CurrentCultureIgnoreCase)));
+
+        foreach (var info in result)
+        {
+            info.TagList = string.IsNullOrEmpty(info.StrTagList)
+                ? Array.Empty<int>() : JsonConvert.DeserializeObject<IEnumerable<int>>(info.StrTagList);
+        }
+
+        return result;
+    }
+
+    public IEnumerable<CustAccountNameInfo> GetSimilarAccountName(int siteId, IEnumerable<string> accountNames)
+    {
+        return _mainDbClient.Query<CustAccountNameInfo>("Member_SimilarAccountName_Get",
+            new
+            {
+                _SiteId = siteId,
+                _AccountNames = System.Text.Json.JsonSerializer.Serialize(accountNames)
+            });
+    }
+
+    public bool SetCustInfoTagList(IEnumerable<CustTagList> tagList, IDbTransaction trans)
+    {
+        var result = 0;
+        var parameter = new DynamicParameters(new
+        {
+            _Infos = System.Text.Json.JsonSerializer.Serialize(tagList)
+        });
+
+        return _mainDbClient.Execute("Service_CustInfoTagList_Set", trans, parameter) > 0;
+    }
+
     public async Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type)
     {
         await using var conn = _mainDbClient.GetMySqlConnection();
@@ -586,7 +746,7 @@ public class MemberService : IMemberService
     public async Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId)
     {
         return await _reportDbClient.QueryFirstAsync<CustomerForRisk>("Admin_CustInfo_Get",
-            new { CustId = custId, UserName = userName, SiteId = siteId});
+            new { CustId = custId, UserName = userName, SiteId = siteId });
     }
-    
+
 }
