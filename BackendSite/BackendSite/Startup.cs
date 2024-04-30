@@ -54,7 +54,7 @@ namespace BackendSite
             services.AddSingleton<Cryptor>();
             
             services.AddSingleton<DateTimeHelper>();
-            
+            services.AddSingleton<StringVaildHelper>();
             /*DAL*/
             var dalAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 
