@@ -14,7 +14,9 @@ namespace BackendSite.Service.Model.Store.GiftManagement
             ShowStock = (int)req.ShowStock;
             Stock = req.Stock;
             Infos = req.Infos;
+            GiftType = (int)req.GiftType;
             Operator = userName;
+            Round = req.Round;
         }
 
         public int SiteId { get; set; }
@@ -28,6 +30,8 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int Stock { get; set; }
         public IEnumerable<CreateGiftInfo> Infos { get; set; }
         public string Operator { get; set; }
+        public int GiftType { get; set; }
+        public int Round { get; set; }
     }
 
     public class UpdateGiftParams
@@ -96,5 +100,13 @@ namespace BackendSite.Service.Model.Store.GiftManagement
     {
         public int GiftId { get; set; }
         public int Sort { get; set; }
+    }
+
+    public class CreateBonusCodeParams
+    {
+        public int TpId { set; get; }
+        public int SiteId { set; get; }
+
+        public Dictionary<string, string> inputs { set; get; }
     }
 }
