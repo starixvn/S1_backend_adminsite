@@ -42,6 +42,17 @@
         public IEnumerable<MpaWinLossDetailForFrontEnd<MpaWinLossWithPlayerInfo>> Children { get; set; }
     }
     
+    public class MpaWinLossResponseForFrontEndWithPlayerDetail : MpaWinLossWithPlayerInfo
+    {
+        public MpaWinLossResponseForFrontEndWithPlayerDetail(MpaWinLossGroupByModel m)
+            : base(m)
+        {
+            DisplayKey = m.Key;
+        }
+        
+        public string DisplayKey { get; set; }
+    }
+    
     public class MpaWinLossResponseToFrontEndWithPlayerWrapper
     {
         public IEnumerable<MpaWinLossResponseForFrontEndWithPlayer> Data { get; set; }

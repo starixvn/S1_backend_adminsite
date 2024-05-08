@@ -77,7 +77,7 @@ namespace BackendSite.Service.BLL.Mpa
             };
         }
 
-        public async Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByPlayerDetail(
+        public async Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>> GetWinLossByPlayerDetail(
             MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
@@ -86,7 +86,7 @@ namespace BackendSite.Service.BLL.Mpa
             
             var data = await GetWinLossReportAsync(request, groupByType);
 
-            return data.SortThen2ApiFormatWithPlayer(request);
+            return data.Result.Select(x => new MpaWinLossResponseForFrontEndWithPlayerDetail(x));
         }
         
         #endregion
