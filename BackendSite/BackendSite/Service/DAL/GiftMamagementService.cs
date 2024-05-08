@@ -26,6 +26,6 @@ public class GiftMamagementService
             _CurrencyId = req.CurrencyId,
             _WorkerName = "CreatePPBonusCode"
         });
-        return _mainDbClient.Execute("Service_WorkerPeriod_New_Set", p);
+        return _mainDbClient.Execute("Service_FreeSpinWorkerPeriod_Set", p);
     }
 }
