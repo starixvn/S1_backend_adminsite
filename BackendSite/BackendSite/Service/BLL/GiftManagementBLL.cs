@@ -115,6 +115,7 @@ namespace BackendSite.Service.BLL
             inputs.Add("BonusCode", bonusCode);
             inputs.Add("Round", req.Round.ToString());
             inputs.Add("Currency",currency.TpCurrencyId);
+            inputs.Add("ExpirationDay", "8");//freespin有效期限8天
             var request = new CreateBonusCodeParams()
             {
                 SiteId = req.SiteId,
