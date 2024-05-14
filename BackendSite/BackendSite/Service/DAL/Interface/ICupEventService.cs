@@ -39,5 +39,6 @@ namespace BackendSite.Service.DAL.Interface
         Task<IEnumerable<CupEventPredictiveStatisticsDto>> GetPredictiveStatistics(int siteId);
         Task<IEnumerable<CupEventPredictDetailDto>> GetPredictDetail(int siteId, int teamId);
         Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator);
+        Task<IEnumerable<CupEventPredictScore>> GetCupEventPredictScore();
     }
 }
