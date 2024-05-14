@@ -96,6 +96,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         {
             public string UserName { get; set; }
             public int SiteId { get; set; }
+            public bool Status { get; set; }
         }
 
         //public class SetPermission
@@ -875,7 +876,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                     Message = "Missing cookies"
                 };
             }
-            var result = _permissionBll.GetAdminUserList(request.UserName, request.SiteId).ToList();
+            var result = _permissionBll.GetAdminUserList(request.UserName, request.SiteId, request.Status).ToList();
             return new ApiResult<IEnumerable<UserList>>
             {
                 Data = result,

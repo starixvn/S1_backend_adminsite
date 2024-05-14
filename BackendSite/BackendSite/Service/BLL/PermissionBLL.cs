@@ -604,7 +604,7 @@ namespace BackendSite.Service.BLL
                 }
                 if (x.UserList != null)
                 {
-                    x.iuserList = JsonConvert.DeserializeObject<List<string>>(x.UserList);
+                    x.iuserList = JsonConvert.DeserializeObject<List<UserStatus>>(x.UserList);
                 }
             });
             return result;
@@ -617,9 +617,9 @@ namespace BackendSite.Service.BLL
         {
             return _permissionService.GetUserPermissionData(userId, siteId);
         }
-        public IEnumerable<UserList> GetAdminUserList(string userName, int siteId)
+        public IEnumerable<UserList> GetAdminUserList(string userName, int siteId, bool status)
         {
-            var result = _permissionService.GetAdminUserList(userName, siteId).ToList();
+            var result = _permissionService.GetAdminUserList(userName, siteId, status).ToList();
             result.ForEach(x =>
             {
                 if (x.CurrencyList != null)
