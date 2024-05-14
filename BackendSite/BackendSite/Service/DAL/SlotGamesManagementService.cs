@@ -30,7 +30,7 @@ namespace BackendSite.Service.DAL
             parameter.Add("GameId", string.IsNullOrWhiteSpace(gameId) ? null : gameId);
             parameter.Add("Status", (int)status, DbType.Int32);
 
-            return _reportDbClient.Query<SlotGame>("Admin_SlotGame_Get_V2", parameter).ToList();
+            return _reportDbClient.Query<SlotGame>("Admin_SlotGame_Get_V3", parameter).ToList();
         }
 
         public int SetSlotGame(int siteId, int currencyId, int slotGameId, SlotGameStatusEnum status, string @operator)

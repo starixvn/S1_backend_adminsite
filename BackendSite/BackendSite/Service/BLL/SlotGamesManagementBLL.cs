@@ -31,6 +31,15 @@ namespace BackendSite.Service.BLL
             var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
             return data.GetRange(index, count);
         }
+        public IEnumerable<ExportSlotGameList> ExportSlotGameList(ExportSlotGameListReq request)
+        {
+            var userSiteData = _serverInfoService.GetSiteList().First(x => x.SiteId == request.SiteId);
+            var result = _slotGamesManagementService.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.GameId, request.Status);
+            var slotGames = result.Select(i => i.GetSlotGameData(userSiteData));
+            var data = SortSlotGamesList(slotGames).Select(x =>new ExportSlotGameList { TpName = x.TpName,GameId=x.GameId,Name = x.EName});
+            
+            return data;
+        }
 
         public int SetSlotGame(SetSlotGameReq req, string @operator)
         {
