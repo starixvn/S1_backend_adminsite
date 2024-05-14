@@ -129,13 +129,13 @@ namespace BackendSite.Service.DAL
 
         public IEnumerable<RoleList> GetRoleList(string roleName, int siteId)
         {
-            return _reportDbClient.Query<RoleList>("Admin_RoleList_Get",
+            return _reportDbClient.Query<RoleList>("Admin_RoleList_Get_V2",
                 new DynamicParameters(new { RoleName = string.IsNullOrWhiteSpace(roleName) ? null : roleName, SiteId = siteId }));
         }
-        public IEnumerable<UserList> GetAdminUserList(string userName, int siteId)
+        public IEnumerable<UserList> GetAdminUserList(string userName, int siteId, bool status)
         {
-            return _reportDbClient.Query<UserList>("Admin_UserList_Get",
-                new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName, SiteId = siteId }));
+            return _reportDbClient.Query<UserList>("Admin_UserList_Get_V2",
+                new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName, SiteId = siteId, Status = status }));
         }
 
         public int AddAdminUser(int siteId, int role, string userName, string password, IEnumerable<int> currencyList, List<SetPermission> permission, string Operator)
