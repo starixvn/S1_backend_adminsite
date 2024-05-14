@@ -38,6 +38,7 @@ namespace BackendSite.Service.Model
         public string Name { get; set; }
         public string Status { get; set; }
         public string Operator { get; set; }
+        public string TpName { get; set; }
 
         public SlotGameData GetSlotGameData(ServerInfo userSiteData)
         {
@@ -59,6 +60,7 @@ namespace BackendSite.Service.Model
             {
                 UpdateTime = UpdateTime,
                 TpId = TpId,
+                TpName = TpName,
                 GameId = GameId,
                 Id = Id,
                 Operator = string.IsNullOrWhiteSpace(Operator) ? string.Empty : Operator,
@@ -80,6 +82,7 @@ namespace BackendSite.Service.Model
     {
         public DateTimeOffset UpdateTime { get; set; }
         public int TpId { get; set; }
+        public string TpName { get; set; }
         public int Id { get; set; }
         public string GameId { get; set; }
         public string EName { get; set; }
