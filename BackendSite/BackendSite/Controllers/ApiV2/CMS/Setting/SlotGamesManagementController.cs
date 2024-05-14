@@ -18,6 +18,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
         private readonly SlotGamesManagementBLL _slotGamesManagementBLL;
         private readonly GameCasinoManageBLL _gameCasinoManageBLL;
+        private readonly ExcelBLL _excelBLL;
         #endregion
 
         #region Constructors
@@ -25,6 +26,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             _slotGamesManagementBLL = provider.GetRequiredService<SlotGamesManagementBLL>();
             _gameCasinoManageBLL = provider.GetRequiredService<GameCasinoManageBLL>();
+            _excelBLL = provider.GetRequiredService<ExcelBLL>();
         }
         #endregion
 
@@ -111,6 +113,16 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             {
                 return new ApiListResult<SlotGameData>((int)ErrorCodeEnum.SystemException, ex.Message);
             }
+        }
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 1 })]
+        public IActionResult ExportSlotGameList(ExportSlotGameListReq request)
+        {
+
+            var data = _slotGamesManagementBLL.ExportSlotGameList(request);
+            var stream = _excelBLL.ExportV2(data);
+            return _excelBLL.ExcelFile(stream, "SlotGameReport");
+
         }
 
         /// <summary>

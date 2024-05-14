@@ -23,6 +23,21 @@ namespace BackendSite.Service.Model
             PageSize = 100;
         }
     }
+    public class ExportSlotGameListReq
+    {
+        public int SiteId { get; set; }
+        public int TpId { get; set; }
+        public string Name { get; set; }
+        public string GameId { get; set; }
+        public SlotGameFilterStatusEnum Status { get; set; }
+    }
+
+    public class ExportSlotGameList
+    {
+        public string TpName { get; set; }
+        public string Name { get; set; }
+        public string GameId { get; set; }
+    }
 
     public class SlotGame
     {
