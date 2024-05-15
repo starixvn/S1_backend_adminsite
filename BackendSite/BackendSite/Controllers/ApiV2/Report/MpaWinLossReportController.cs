@@ -191,9 +191,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
         {
-            var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>>();
+            var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>();
             
             try
             {
