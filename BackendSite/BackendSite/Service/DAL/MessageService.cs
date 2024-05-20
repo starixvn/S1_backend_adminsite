@@ -354,7 +354,10 @@ namespace BackendSite.Service.DAL
         public async Task BeginTransaction()
         {
             _connection = _mainDbClient.GetMySqlConnection();
-            await _connection.OpenAsync();
+            if (_connection.State == ConnectionState.Closed)
+            {
+                await _connection.OpenAsync();
+            }
             _transaction = await _connection.BeginTransactionAsync();
         }
         public async Task Commit()
