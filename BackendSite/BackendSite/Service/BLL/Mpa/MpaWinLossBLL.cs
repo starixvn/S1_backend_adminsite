@@ -39,28 +39,28 @@ namespace BackendSite.Service.BLL.Mpa
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
 
             return data.SortThen2ApiFormat(request);
         }
-        
+
         public async Task<IEnumerable<MpaWinLossResponseForFrontEndSimple>> GetMapWinLossResultSimple(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
 
             return data.SortThen2ApiFormatSimple(request);
         }
-        
+
         public async Task<MpaWinLossResponseToFrontEndWithPlayerWrapper> GetMpaWinLossResultWithPlayerInfo(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             IPageInfo pageInfo = new PageInfo();
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
             var apiData = data.SortThen2ApiFormatWithPlayer(request).ToList();
 
@@ -69,7 +69,7 @@ namespace BackendSite.Service.BLL.Mpa
                 var (index, count) = pageInfo.ListPagination(apiData.Count, request.PageNumber, request.PageSize);
                 apiData = apiData.GetRange(index, count);
             }
-            
+
             return new MpaWinLossResponseToFrontEndWithPlayerWrapper
             {
                 Data = apiData,
@@ -82,13 +82,13 @@ namespace BackendSite.Service.BLL.Mpa
         {
             var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
             request.UserName = custInfo.UserName;
-            request.SiteIds = new[] {custInfo.SiteId};
+            request.SiteIds = new[] { custInfo.SiteId };
 
             var data = await GetWinLossReportAsync(request, groupByType);
 
             return data.ChildResult.Select(x => new MpaWinLossResponseForFrontEndWithPlayerDetail(x));
         }
-        
+
         #endregion
 
         #region Export Result
@@ -98,7 +98,7 @@ namespace BackendSite.Service.BLL.Mpa
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
             var result = sortedData.Select(x =>
@@ -109,7 +109,7 @@ namespace BackendSite.Service.BLL.Mpa
 
                 return r;
             });
-            
+
             return result;
         }
 
@@ -118,7 +118,7 @@ namespace BackendSite.Service.BLL.Mpa
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
             var result = sortedData.Select(x =>
@@ -132,13 +132,13 @@ namespace BackendSite.Service.BLL.Mpa
 
             return result;
         }
-        
+
         public async Task<IEnumerable<MpaWinLossByTpCategoryDtoExport>> GetMapWinLossByTpCategoryExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
             var result = sortedData.Select(x =>
@@ -152,15 +152,15 @@ namespace BackendSite.Service.BLL.Mpa
 
             return result;
         }
-        
+
         public async Task<IEnumerable<MpaWinLossByPlayerDtoExport>> GetMpaWinLossByPlayerExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
-            var sortedData = data.SortThen2ExcelData(request);
+            var sortedData = data.SortThen2ExcelData(request, true);
             var result = sortedData.Select(x =>
             {
                 var r = x.ToExcelFormat<MpaWinLossByPlayerDtoExport>();
@@ -170,16 +170,16 @@ namespace BackendSite.Service.BLL.Mpa
 
                 return r;
             });
-            
+
             return result;
         }
-        
+
         public async Task<IEnumerable<MpaWinLossByCurrencyDtoExport>> GetMapWinLossByCurrencyExport(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType)
         {
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
             var result = sortedData.Select(x =>
@@ -198,7 +198,7 @@ namespace BackendSite.Service.BLL.Mpa
             var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
             ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
             GetOrderByProp(request);
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
             var sortedData = data.SortThen2ExcelData(request);
             var result = sortedData.Select(x =>
@@ -228,7 +228,7 @@ namespace BackendSite.Service.BLL.Mpa
 
                 return r;
             });
-            
+
             return result;
         }
 
@@ -245,10 +245,10 @@ namespace BackendSite.Service.BLL.Mpa
                     {
                         SiteIds = request.SiteIds,
                         CurrencyIds = request.CurrencyIds,
-                        AffiliateNames = string.IsNullOrEmpty(request.AffiliateAccount) 
-                            ? ArraySegment<string>.Empty : new []{request.AffiliateAccount},
-                        UserNames = string.IsNullOrEmpty(request.UserName) 
-                            ? ArraySegment<string>.Empty : new []{request.UserName},
+                        AffiliateNames = string.IsNullOrEmpty(request.AffiliateAccount)
+                            ? ArraySegment<string>.Empty : new[] { request.AffiliateAccount },
+                        UserNames = string.IsNullOrEmpty(request.UserName)
+                            ? ArraySegment<string>.Empty : new[] { request.UserName },
                         DateType = request.DateType,
                         StartTime = request.StarTime,
                         EndTime = request.EndTime,
