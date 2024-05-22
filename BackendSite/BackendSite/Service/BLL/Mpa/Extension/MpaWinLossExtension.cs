@@ -8,25 +8,27 @@ namespace BackendSite.Service.BLL.Mpa.Extension
     {
         #region ToExcelFormat
 
-        public static IEnumerable<MpaWinLossGroupByModel> SortThen2ExcelData(this MpaWinLossReportResponse data, IOrderBy orderByOption)
+        public static IEnumerable<MpaWinLossGroupByModel> SortThen2ExcelData(this MpaWinLossReportResponse data, IOrderBy orderByOption, bool isCurrencyDisplayAll = false)
         {
             OrderByMpaWinLossReportResponse(data, orderByOption);
-        
+
             var exportResult = new List<MpaWinLossGroupByModel>();
 
             foreach (var item in data.Result)
             {
                 var child = data.ChildResult.Where(x => x.Key == item.Key);
 
+                if (isCurrencyDisplayAll) item.ChildKey = "ALL";
+
                 exportResult.Add(item);
                 exportResult.AddRange(child);
             }
-            
+
             exportResult.Add(data.Total);
-            
+
             return exportResult;
         }
-        
+
         public static T ToExcelFormat<T>(this MpaWinLossGroupByModel data) where T : IMpaWinLossDisplay, new()
         {
             var result = ToExcelFormatSimple<T>(data);
@@ -78,7 +80,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         public static IEnumerable<MpaWinLossResponseForFrontEnd> SortThen2ApiFormat(this MpaWinLossReportResponse source, IOrderBy orderByOption)
         {
             OrderByMpaWinLossReportResponse(source, orderByOption);
-            
+
             var result = new List<MpaWinLossResponseForFrontEnd>();
 
             foreach (var item in source.Result)
@@ -92,12 +94,12 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
                 result.Add(data);
             }
-            
+
             result.Add(new MpaWinLossResponseForFrontEnd(source.Total, ArraySegment<MpaWinLossDetailForFrontEnd<MpaWinLoss>>.Empty));
 
             return result;
         }
-        
+
         public static IEnumerable<MpaWinLossResponseForFrontEndSimple> SortThen2ApiFormatSimple(this MpaWinLossReportResponse source, IOrderBy orderByOption)
         {
             OrderByMpaWinLossReportResponse(source, orderByOption);
@@ -116,14 +118,14 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             }
 
             result.Add(new MpaWinLossResponseForFrontEndSimple(source.Total, ArraySegment<MpaWinLossDetailForFrontEnd<MpaWinLossSimple>>.Empty));
-            
+
             return result;
         }
-        
+
         public static IEnumerable<MpaWinLossResponseForFrontEndWithPlayer> SortThen2ApiFormatWithPlayer(this MpaWinLossReportResponse source, IOrderBy orderByOption)
         {
             OrderByMpaWinLossReportResponse(source, orderByOption);
-            
+
             var result = new List<MpaWinLossResponseForFrontEndWithPlayer>();
 
             foreach (var item in source.Result)
@@ -146,12 +148,12 @@ namespace BackendSite.Service.BLL.Mpa.Extension
         {
             if (string.IsNullOrEmpty(orderByOption.OrderByProperty))
                 orderByOption.OrderByProperty = "key";
-            
+
             source.Result = source.Result.OrderBy(orderByOption);
 
             if (orderByOption.OrderByProperty.Equals("key"))
                 orderByOption.OrderByProperty = "childKey";
-            
+
             source.ChildResult = source.ChildResult.OrderBy(orderByOption);
         }
 
