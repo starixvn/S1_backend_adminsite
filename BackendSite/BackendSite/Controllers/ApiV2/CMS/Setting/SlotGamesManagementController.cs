@@ -115,7 +115,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
         }
         [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 2 })]
         public IActionResult ExportSlotGameList(ExportSlotGameListReq request)
         {
 
