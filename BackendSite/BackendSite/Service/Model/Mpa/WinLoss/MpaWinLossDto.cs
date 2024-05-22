@@ -146,9 +146,9 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public decimal TotalWithDrawAmount { get; set; }
 
-        public decimal TotalBonus { get; set; }
+        public decimal NetCash { get; set; }
 
-        public decimal NetCash {  get; set; }
+        public decimal TotalBonus { get; set; }
     }
 
     public class MpaWinLossSimple : IMpaWinLossSimple
