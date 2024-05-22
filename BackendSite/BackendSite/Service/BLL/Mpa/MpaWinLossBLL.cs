@@ -86,7 +86,7 @@ namespace BackendSite.Service.BLL.Mpa
 
             var data = await GetWinLossReportAsync(request, groupByType);
 
-            return data.Result.Select(x => new MpaWinLossResponseForFrontEndWithPlayerDetail(x));
+            return data.ChildResult.Select(x => new MpaWinLossResponseForFrontEndWithPlayerDetail(x));
         }
 
         #endregion
