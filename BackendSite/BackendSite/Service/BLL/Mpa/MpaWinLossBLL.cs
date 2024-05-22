@@ -83,10 +83,10 @@ namespace BackendSite.Service.BLL.Mpa
             var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
             request.UserName = custInfo.UserName;
             request.SiteIds = new[] {custInfo.SiteId};
-            
+
             var data = await GetWinLossReportAsync(request, groupByType);
 
-            return data.Result.Select(x => new MpaWinLossResponseForFrontEndWithPlayerDetail(x));
+            return data.ChildResult.Select(x => new MpaWinLossResponseForFrontEndWithPlayerDetail(x));
         }
         
         #endregion
