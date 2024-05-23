@@ -92,5 +92,11 @@ public class MpaWinLossGroupByModel
     public string TpUserName { get; set; }
     public string UserName { get; set; }
 
-    public decimal NetCash {  get; set; }
+    public decimal NetCash
+    {
+        get
+        {
+            return TotalDepositAmount - TotalWithdrawAmount;
+        }
+    }
 }
