@@ -61,8 +61,9 @@ public interface IMpaWinLossBLL
     /// <returns></returns>
     Task<MpaWinLossResponseToFrontEndWithPlayerWrapper> GetMpaWinLossResultWithPlayerInfo(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
 
-    Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByPlayerDetail(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
-
+    
+    Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>> GetWinLossByPlayerDetail(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+    
     /// <summary>
     /// excel export
     /// </summary>

@@ -132,7 +132,12 @@ namespace BackendSite.Service.Model
         public string CurrencyList { get; set; }
         public string UserList { get; set; }
         public List<int> icurrencyList { get; set; }
-        public List<string> iuserList { get; set; }
+        public List<UserStatus> iuserList { get; set; }
+    }
+    public class UserStatus
+    {
+        public string UserName { get; set; }
+        public int Status { get; set; }
     }
     public class UserList
     {

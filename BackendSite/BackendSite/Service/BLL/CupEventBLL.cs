@@ -197,5 +197,19 @@ namespace BackendSite.Service.BLL
         {
             return dateTime.HasValue ? $"{dateTime.Value:yyyy-MM-ddTHH:mm:ss}+00:00" : null;
         }
+        public async Task<IEnumerable<ExportCupEventPredictScoreResponse>> GetCupEventPredictScore()
+        {
+            var predictDetail = await _cupEventService.GetCupEventPredictScore();
+            return predictDetail.Select(a => new ExportCupEventPredictScoreResponse
+            {
+                SiteName = a.SiteName,
+                Currency = a.Currency,
+                CustId = a.CustId,
+                UserName = a.UserName,
+                HomeScore = a.HomeScore,
+                AwayScore = a.AwayScore,
+                CreateTime = new DateTimeOffset(a.CreateTime, TimeSpan.Zero)
+            });
+        }
     }
 }
