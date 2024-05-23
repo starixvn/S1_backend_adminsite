@@ -210,6 +210,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string TotalWithDrawAmount { get; set; }
 
+        public string NetCash { get; set; }
+
         public string TotalBonus { get; set; }
     }
     
@@ -277,18 +279,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string TotalWithDrawAmount { get; set; }
 
-        public string Netcash
-        {
-            get
-            {
-                if (decimal.TryParse(TotalDepositAmount, out decimal depositAmount) &&
-                    decimal.TryParse(TotalWithDrawAmount, out decimal withdrawAmount))
-                {
-                    return (depositAmount - withdrawAmount).ToString("0.##");
-                }
-                return null;
-            }
-        }
+        public string NetCash { get; set; }
+        
         public string TotalBonus { get; set; }
 
         

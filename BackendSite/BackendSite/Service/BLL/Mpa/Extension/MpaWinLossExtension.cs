@@ -36,6 +36,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
             result.WithDrawCount = data.WithdrawCount;
             result.TotalWithDrawAmount = data.TotalWithdrawAmount.ToString("N2");
             result.TotalBonus = data.TotalBonus.ToString("N2");
+            result.NetCash = data.NetCash.ToString("N2");
 
             return result;
         }
