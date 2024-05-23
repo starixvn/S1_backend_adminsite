@@ -490,7 +490,7 @@ public class MemberCommand : IMemberCommand
     }
 
     public async Task<int> RegisterMemberAsync(int siteId, string userName, string userPwd, string email, int currencyId,
-        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl, string @operator)
+        MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,string realName, string @operator)
     {
         var result = await _memberService.RegisterMemberAsync(siteId,
                 userName,
@@ -502,7 +502,8 @@ public class MemberCommand : IMemberCommand
                 areaCode,
                 phoneNo,
                 affCode,
-                signupUrl);
+                signupUrl,
+                realName);
 
         if (result.IsSuccess > 0) //Success
         {
