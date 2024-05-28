@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="lbl_WithdrawalApprovedTitle"><value>あなたの引き出し {0} は承認されました！</value></data>
+  <data name="lbl_CancelBonusTitle"><value>プロモーション終了のお知らせ。</value></data>
+  <data name="lbl_DepositApprovedContent"><value>おめでとうございます！{0}の入金が承認されました！あなたのアカウントに入金されました。ベッティングの幸運をお祈りします！</value></data>
+  <data name="lbl_WithdrawalRejectTitle"><value>お引き出し {0} は拒否されました！</value></data>
+  <data name="lbl_WithdrawalRejectContent"><value>{0}のお引き出しは拒否されました。ご不明な点がございましたら、CSDまでお問い合わせください。</value></data>
+  <data name="lbl_CancelBonus1"><value>ボーナスプロモーションはキャンセルされました。</value></data>
+  <data name="lbl_DepositRejectTitle"><value>あなたのデポジット {0} は拒否されました！</value></data>
+  <data name="lbl_WithdrawalApprovedContent"><value>この度はご利用ありがとうございました！お引き出し{0}は承認されました！</value></data>
+  <data name="lbl_DepositApprovedTitle"><value>お客様のデポジット {0} が承認されました！</value></data>
+  <data name="lbl_DepositRejectContent"><value>申し訳ございませんが、ご入金{0}は拒否されました。ご不明な点がございましたら、CSDまでお問い合わせください。</value></data>
+  <data name="lbl_Success"><value>成功</value></data>
+  <data name="lbl_Paid"><value>支払い済み</value></data>
+  <data name="lbl_Save"><value>セーブ</value></data>
+  <data name="lbl_Role"><value>役割</value></data>
+  <data name="lbl_Edit"><value>編集</value></data>
+  <data name="lbl_AreYouSure"><value>確かですか？</value></data>
+  <data name="lbl_MobilePayment"><value>モバイル決済</value></data>
+  <data name="lbl_ConfirmPwd"><value>パスワードの確認</value></data>
+  <data name="lbl_Finance"><value>ファイナンス</value></data>
+  <data name="lbl_DepositStatus4"><value>拒否</value></data>
+  <data name="lbl_DepositStatus5"><value>キャンセル済</value></data>
+  <data name="lbl_DepositStatus6"><value>期限切れ</value></data>
+  <data name="lbl_DepositStatus7"><value>保留中</value></data>
+  <data name="lbl_DepositStatus0"><value>下書き</value></data>
+  <data name="lbl_DepositStatus1"><value>保留</value></data>
+  <data name="lbl_DepositStatus2"><value>支払い済み</value></data>
+  <data name="lbl_DepositStatus3"><value>承認</value></data>
+  <data name="lbl_AccountList"><value>アカウント一覧</value></data>
+  <data name="lbl_AccountName"><value>口座名</value></data>
+  <data name="lbl_WireTransfer"><value>電子送金</value></data>
+  <data name="lbl_AdjustCategory10"><value>引き出し</value></data>
+  <data name="lbl_AdjustCategory11"><value>その他</value></data>
+  <data name="lbl_Approve"><value>承認</value></data>
+  <data name="lbl_DepositSubmission"><value>入金の提出</value></data>
+  <data name="Currency_96"><value>USDT</value></data>
+  <data name="Currency_41"><value>CHF</value></data>
+  <data name="Currency_40"><value>WON</value></data>
+  <data name="Currency_45"><value>WON</value></data>
+  <data name="Currency_51"><value>VND</value></data>
+  <data name="Currency_61"><value>INR</value></data>
+  <data name="Currency_74"><value>BDT</value></data>
+  <data name="Currency_15"><value>IDR</value></data>
+  <data name="Currency_12"><value>GBP</value></data>
+  <data name="Currency_13"><value>CNY</value></data>
+  <data name="Currency_20"><value>UUS</value></data>
+  <data name="Currency_32"><value>JPY</value></data>
+  <data name="Currency_72"><value>KHUSD</value></data>
+  <data name="lbl_WithdrawalRequest"><value>出金申請</value></data>
+  <data name="lbl_WithdrawalType"><value>出金タイプ</value></data>
+  <data name="lbl_MessageDepositWithdrawalSender"><value>システム</value></data>
+  <data name="lbl_AddNewPointLevel"><value>新しいポイントレベルの追加</value></data>
+  <data name="lbl_Rejected"><value>拒否済</value></data>
+  <data name="lbl_PointLevel"><value>ポイントレベル</value></data>
+  <data name="lbl_Expired"><value>期限切れ</value></data>
+  <data name="lbl_AddAccount"><value>口座追加</value></data>
+  <data name="lbl_Postscript"><value>ポストスクリプト</value></data>
+  <data name="lbl_AddBank"><value>新しい銀行カードの追加</value></data>
+  <data name="lbl_EditAccount"><value>アカウント編集</value></data>
+  <data name="lbl_BonusStatus1"><value>ランニング</value></data>
+  <data name="lbl_BonusStatus3"><value>期限</value></data>
+  <data name="lbl_BonusStatus2"><value>キャンセル済</value></data>
+  <data name="lbl_BonusStatus4"><value>フルフィル</value></data>
+  <data name="lbl_Disable"><value>無効</value></data>
+  <data name="lbl_Running"><value>ランニング</value></data>
+  <data name="lbl_ActualDeposit"><value>実際の入金</value></data>
+  <data name="lbl_DepositStatus99"><value>エラー</value></data>
+  <data name="lbl_DepositStatus98"><value>調整</value></data>
+  <data name="lbl_Currency"><value>通貨</value></data>
+  <data name="lbl_CustomerAdministration"><value>顧客管理</value></data>
+  <data name="lbl_Pending"><value>保留</value></data>
+  <data name="lbl_CSD"><value>CSD</value></data>
+  <data name="lbl_ActStatus2"><value>入金のお客様</value></data>
+  <data name="lbl_ActStatus1"><value>デポジットなしのお客様</value></data>
+  <data name="lbl_ChangeUserpwd"><value>パスワード変更</value></data>
+  <data name="lbl_Process"><value>プロセス</value></data>
+  <data name="lbl_DepositApproval"><value>入金承認</value></data>
+  <data name="lbl_ChargeFee"><value>チャージ料金</value></data>
+  <data name="lbl_WithdrawalId"><value>出金ID</value></data>
+  <data name="lbl_Status"><value>状態</value></data>
+  <data name="lbl_Reject"><value>拒否</value></data>
+  <data name="lbl_PendingList"><value>ファンド申請中リスト</value></data>
+  <data name="lbl_WithdrawalStatus3"><value>認証済</value></data>
+  <data name="lbl_WithdrawalStatus2"><value>保留中</value></data>
+  <data name="lbl_WithdrawalStatus1"><value>保留</value></data>
+  <data name="lbl_WithdrawalStatus0"><value>下書き</value></data>
+  <data name="lbl_WithdrawalStatus7"><value>拒否済</value></data>
+  <data name="lbl_WithdrawalStatus6"><value>承認</value></data>
+  <data name="lbl_WithdrawalStatus5"><value>キャンセル済</value></data>
+  <data name="lbl_WithdrawalStatus4"><value>プロセス</value></data>
+  <data name="lbl_WithdrawalStatus8"><value>KYCまで</value></data>
+  <data name="lbl_AdjustCategory5"><value>賞品ドロップ</value></data>
+  <data name="lbl_AdjustCategory4"><value>VIPアップグレード報酬</value></data>
+  <data name="lbl_AdjustCategory7"><value>テスト</value></data>
+  <data name="lbl_AdjustCategory6"><value>技術的な問題は影響を受けません</value></data>
+  <data name="lbl_AdjustCategory1"><value>なし-(デフォルト)</value></data>
+  <data name="lbl_AdjustCategory3"><value>手動ボーナス (特別ボーナス)</value></data>
+  <data name="lbl_AdjustCategory2"><value>保持ボーナス</value></data>
+  <data name="lbl_AdjustCategory9"><value>デポジット</value></data>
+  <data name="lbl_AdjustCategory8"><value>販売業者のミス</value></data>
+  <data name="lbl_DepositRequest"><value>入金依頼</value></data>
+  <data name="lbl_Point"><value>ポイント</value></data>
+  <data name="lbl_RefNo"><value>参照番号</value></data>
+  <data name="lbl_Login"><value>ログイン</value></data>
+  <data name="lbl_Draft"><value>下書き</value></data>
+  <data name="lbl_Admin"><value>管理</value></data>
+  <data name="lbl_CustStatus1"><value>ランニング</value></data>
+  <data name="lbl_CustStatus3"><value>削除</value></data>
+  <data name="lbl_CustStatus2"><value>サスペンド</value></data>
+  <data name="lbl_Error"><value>エラー</value></data>
+  <data name="lbl_Comment"><value>登録完了</value></data>
+  <data name="lbl_Confirm"><value>確認</value></data>
+  <data name="lbl_MinAmount"><value>最小金額</value></data>
+  <data name="lbl_Administration"><value>管理</value></data>
+  <data name="lbl_AddBankCard"><value>銀行カードの追加</value></data>
+  <data name="lbl_MessageDepositTitle"><value>お客様のデポジット額{0}は{1}となりました。</value></data>
+  <data name="lbl_PromotionType3"><value>フリーベット</value></data>
+  <data name="lbl_PromotionType2"><value>再入金</value></data>
+  <data name="lbl_PromotionType1"><value>ファースト・デポジット</value></data>
+  <data name="lbl_PromotionType7"><value>キャッシュバック</value></data>
+  <data name="lbl_PromotionType6"><value>リベート</value></data>
+  <data name="lbl_PromotionType5"><value>ウォレットボーナス</value></data>
+  <data name="lbl_PromotionType4"><value>特別</value></data>
+  <data name="lbl_PromotionType9"><value>リテンションボーナス</value></data>
+  <data name="lbl_PromotionType8"><value>手動ボーナス (静的ページ)</value></data>
+  <data name="lbl_NewPwd"><value>新しいパスワード</value></data>
+  <data name="lbl_Delete"><value>削除</value></data>
+  <data name="lbl_Create"><value>作成</value></data>
+  <data name="lbl_Cancel"><value>キャンセル</value></data>
+  <data name="lbl_Closed"><value>クローズ</value></data>
+  <data name="lbl_AdjustmentType6"><value>3番目 マイナス</value></data>
+  <data name="lbl_AdjustmentType5"><value>3番目 加える</value></data>
+  <data name="lbl_AdjustmentType4"><value>ボーナスを減らす</value></data>
+  <data name="lbl_AdjustmentType3"><value>ボーナスを増やす</value></data>
+  <data name="lbl_AdjustmentType2"><value>負債</value></data>
+  <data name="lbl_AdjustmentType1"><value>クレジット</value></data>
+  <data name="lbl_WithdrawalType5"><value>電子財布</value></data>
+  <data name="lbl_WithdrawalType4"><value>暗号通貨支払い</value></data>
+  <data name="lbl_WithdrawalType2"><value>現地銀行</value></data>
+  <data name="lbl_WithdrawalType1"><value>オンライン決済</value></data>
+  <data name="lbl_WithdrawalType0"><value>未定義</value></data>
+  <data name="lbl_UserStatus1"><value>ランニング</value></data>
+  <data name="lbl_UserStatus3"><value>クローズ</value></data>
+  <data name="lbl_UserStatus2"><value>サスペンド</value></data>
+  <data name="lbl_Amount"><value>金額</value></data>
+  <data name="lbl_Action"><value>アクション</value></data>
+  <data name="lbl_TransId"><value>取引ID</value></data>
+  <data name="lbl_Enable"><value>有効化</value></data>
+  <data name="lbl_DepositType"><value>入金の種類</value></data>
+  <data name="lbl_DepositTime"><value>入金時間</value></data>
+  <data name="lbl_WithdrawalApproval"><value>出金承認</value></data>
+  <data name="lbl_ChangeUserPwdAlert"><value>ユーザーパスワードを変更してよろしいですか？</value></data>
+  <data name="lbl_OnlineBanking"><value>オンライン・バンキング</value></data>
+  <data name="lbl_SelectSite"><value>サイトを選択</value></data>
+  <data name="lbl_AccountNo"><value>アカウントNo</value></data>
+  <data name="lbl_Userpwd"><value>ユーザーパスワード</value></data>
+  <data name="lbl_ChangePwd"><value>パスワード変更</value></data>
+  <data name="lbl_Canceled"><value>キャンセル済</value></data>
+  <data name="lbl_DepositLeast"><value>最低入金額</value></data>
+  <data name="lbl_BankCardList"><value>銀行カード管理</value></data>
+  <data name="lbl_DepositType1"><value>オンライン・バンキング</value></data>
+  <data name="lbl_DepositType2"><value>モバイル決済</value></data>
+  <data name="lbl_DepositType3"><value>現地銀行</value></data>
+  <data name="lbl_DepositType4"><value>暗号</value></data>
+  <data name="lbl_DepositType5"><value>ロードカード</value></data>
+  <data name="lbl_DepositType6"><value>QRペイ</value></data>
+  <data name="lbl_DepositType7"><value>銀行自動チャネル</value></data>
+  <data name="Currency_9"><value>AUD</value></data>
+  <data name="Currency_4"><value>THB</value></data>
+  <data name="Currency_6"><value>EURO</value></data>
+  <data name="Currency_1"><value>SGD</value></data>
+  <data name="Currency_3"><value>USD</value></data>
+  <data name="Currency_2"><value>MYR</value></data>
+  <data name="lbl_OK"><value>OK</value></data>
+  <data name="lbl_No"><value>#</value></data>
+  <data name="lbl_CreateTime"><value>作成時間</value></data>
+  <data name="lbl_BankSlip"><value>銀行QR</value></data>
+  <data name="lbl_BankName"><value>銀行名</value></data>
+  <data name="lbl_Approved"><value>承認</value></data>
+  <data name="lbl_AddPointLevel"><value>ポイントレベルの追加</value></data>
+  <data name="lbl_MessageWithdrawalTitle"><value>あなたの引き出し{0}は{1}となりました。</value></data>
+  <data name="lbl_WithdrawalStatus99"><value>エラー</value></data>
+  <data name="lbl_UserName"><value>ユーザー名</value></data>
+  <data name="lbl_BetLeast"><value>最低ベット額</value></data>
+  <data name="lbl_CurrentPwd"><value>現在のパスワード</value></data>
+  <data name="lbl_Direction1"><value>クレジット</value></data>
+  <data name="lbl_Direction2"><value>負債</value></data>
+  <data name="lbl_Balance"><value>バランス</value></data>
+  <data name="lbl_AdjustmentStatus3"><value>拒否済</value></data>
+  <data name="lbl_AdjustmentStatus2"><value>承認</value></data>
+  <data name="lbl_AdjustmentStatus1"><value>保留</value></data>
+  <data name="lbl_MaxAmount"><value>最高額</value></data>
+  <data name="lbl_Suspend"><value>サスペンド</value></data>
+  </root>
