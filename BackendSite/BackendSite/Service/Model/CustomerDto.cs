@@ -595,6 +595,13 @@ public class CustomerBalanceInfo
             return eligibleWithdrawal < 0 ? 0 : eligibleWithdrawal;
         }
     }
+    public decimal NetCash
+    {
+        get
+        {
+            return DepositSum - WithdrawlSum;
+        }
+    }
 }
 
 public class GetLoginLogRequest : ApiRequestPageModel

@@ -114,6 +114,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
             WithDrawCount = m.WithdrawCount;
             TotalWithDrawAmount = m.TotalWithdrawAmount;
             TotalBonus = m.TotalBonus;
+            NetCash = TotalDepositAmount - TotalWithDrawAmount;
         }
 
         public decimal TurnOver { get; set; }
@@ -149,6 +150,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int WithDrawCount { get; set; }
 
         public decimal TotalWithDrawAmount { get; set; }
+
+        public decimal NetCash { get; set; }
 
         public decimal TotalBonus { get; set; }
     }
@@ -211,6 +214,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public int WithDrawCount { get; set; }
 
         public string TotalWithDrawAmount { get; set; }
+
+        public string NetCash { get; set; }
 
         public string TotalBonus { get; set; }
     }
@@ -285,7 +290,12 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
 
         public string TotalWithDrawAmount { get; set; }
 
+        public string NetCash { get; set; }
+        
         public string TotalBonus { get; set; }
+
+        
+
     }
 
     public class MpaWinLossDisplaySimple : IMpaWinLossDisplaySimple
