@@ -60,6 +60,7 @@ public interface IMpaWinLossBLL
     /// <param name="groupByType"></param>
     /// <returns></returns>
     Task<MpaWinLossResponseToFrontEndWithPlayerWrapper> GetMpaWinLossResultWithPlayerInfo(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
+
     
     Task<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>> GetWinLossByPlayerDetail(MpaWinLossRequest request, MpaWinLossGroupByTypeEnum groupByType);
     

@@ -13,6 +13,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 {
     [Authorize(AuthenticationSchemes = "backendV2")]
     [Route("apiV2/[controller]/[action]")]
+    [Route("apiV2/[controller]/[action]/{version}")]
     [ApiController]
     public class MpaWinLossReportController : ControllerBase
     {
@@ -29,11 +30,12 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByDate(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByDate(MpaWinLossRequest request, int version = 0)
         {
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>();
             try
             {
+                request.Version = version;
                 var responseData = await _mpaWinLossBll.GetMapWinLossResult(request, MpaWinLossGroupByTypeEnum.Date);
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -49,8 +51,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByDateExport(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByDateExport(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Date);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByDateExport");
@@ -62,11 +65,12 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByMonth(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByMonth(MpaWinLossRequest request, int version = 0)
         {
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>();
             try
             {
+                request.Version = version;
                 var responseData = await _mpaWinLossBll.GetMapWinLossResult(request, MpaWinLossGroupByTypeEnum.Month);
                 apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -82,8 +86,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByMonthExport(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByMonthExport(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Month);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByMonthExport");
@@ -95,8 +100,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByDateDownload(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByDateDownload(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateDownload(request, MpaWinLossGroupByTypeEnum.DateDownload);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossReportByDateDownload");
@@ -108,8 +114,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByMonthDownload(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByMonthDownload(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateDownload(request, MpaWinLossGroupByTypeEnum.MonthDownload);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossReportByMonthDownload");
@@ -121,8 +128,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndSimple>>> GetWinLossByTpGameType(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndSimple>>> GetWinLossByTpGameType(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndSimple>>();
             try
             {
@@ -141,8 +149,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByTpGameTypeExport(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByTpGameTypeExport(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMapWinLossByTpGameTypeExport(request, MpaWinLossGroupByTypeEnum.GameType);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByTpGameTypeExport");
@@ -154,8 +163,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndSimple>>> GetWinLossByTpCategoryType(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndSimple>>> GetWinLossByTpCategoryType(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndSimple>>();
             try
             {
@@ -174,8 +184,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByTpCategoryTypeExport(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByTpCategoryTypeExport(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMapWinLossByTpCategoryExport(request, MpaWinLossGroupByTypeEnum.TpCategory);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByTpCategoryExport");
@@ -187,8 +198,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiListResult<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByPlayer(MpaWinLossRequest request)
+        public async Task<ApiListResult<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByPlayer(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var apiResult = new ApiListResult<MpaWinLossResponseForFrontEndWithPlayer>();
             try
             {
@@ -208,8 +220,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByPlayerExport(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByPlayerExport(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMpaWinLossByPlayerExport(request, MpaWinLossGroupByTypeEnum.Player);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByPlayerExport");
@@ -217,8 +230,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>> GetWinLossByPlayerDetail(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>();
             try
             {
@@ -241,8 +255,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByCurrency(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByCurrency(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>();
             try
             {
@@ -261,8 +276,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByCurrencyExport(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByCurrencyExport(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMapWinLossByCurrencyExport(request, MpaWinLossGroupByTypeEnum.Currency);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByCurrencyExport");
@@ -274,8 +290,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByBrand(MpaWinLossRequest request)
+        public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>> GetWinLossByBrand(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEnd>>();
             try
             {
@@ -294,8 +311,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByBrandExport(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByBrandExport(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMpaWinLossByBrandExport(request, MpaWinLossGroupByTypeEnum.Brand);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByBrandExport");
@@ -306,8 +324,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         #region GroupBy Affiliate
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 1 })]
-        public async Task<ApiListResult<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByAffiliate(MpaWinLossRequest request)
+        public async Task<ApiListResult<MpaWinLossResponseForFrontEndWithPlayer>> GetWinLossByAffiliate(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var apiResult = new ApiListResult<MpaWinLossResponseForFrontEndWithPlayer>();
             try
             {
@@ -327,8 +346,9 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 79, 2 })]
-        public async Task<IActionResult> GetWinLossByAffiliateExport(MpaWinLossRequest request)
+        public async Task<IActionResult> GetWinLossByAffiliateExport(MpaWinLossRequest request, int version = 0)
         {
+            request.Version = version;
             var exportData = await _mpaWinLossBll.GetMpaWinLossByAffiliateExport(request, MpaWinLossGroupByTypeEnum.Affiliate);
             var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "WinLossByAffiliateExport");
