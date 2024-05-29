@@ -105,5 +105,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public IEnumerable<int> SiteIds { get; set; }
         public int CurrencyId { get; set; }
         public IEnumerable<MultiSiteAndCurrencyIds> MultiSiteAndCurrencyIds { get; set; }
+
+        public int Version { get; set; }
     }
 }
