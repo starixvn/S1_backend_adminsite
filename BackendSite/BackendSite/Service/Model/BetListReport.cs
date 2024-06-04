@@ -87,6 +87,8 @@ namespace BackendSite.Service.Model
         private IntPtr _nativeResource = Marshal.AllocHGlobal(100);
 
         public string SiteId { get; set; }
+
+        public string SiteName {  get; set; }
         public string CurrencyId { get; set; }
         public string UserName { get; set; }
         public string TpUserName { get; set; }
@@ -184,5 +186,9 @@ namespace BackendSite.Service.Model
 
             _isDisposed = true;
         }
+    }
+    public class SportTypeList
+    {
+        public string Name { get; set; }
     }
 }
