@@ -76,6 +76,26 @@ namespace BackendSite.Controllers.ApiV2.Report
             return _excelBll.ExcelFile(stream, "BetListReport");
         }
 
+        /// <summary>
+        /// 提供Game下拉選單
+        /// </summary>
+        public ApiResult<IEnumerable<SportTypeList>> GetGameList()
+        {
+            var data = _betListBll.GetGameList();
+
+            if (!data.Any())
+            {
+                throw new AdminException(ErrorCodeEnum.NoData);
+            }
+            else
+            {
+                return new ApiResult<IEnumerable<SportTypeList>>
+                {
+                    Data = data,
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+        }
         private void DateCheck(GetBetListRequest request)
         {
             var startDate = new DateTimeOffset(request.StartTime.ToUniversalTime().DateTime, TimeSpan.Zero);

@@ -84,7 +84,7 @@ namespace BackendSite.Service.BLL
                 : JsonConvert.SerializeObject(((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x)),
             });
 
-            var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V4", parameters);
+            var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V5", parameters);
 
             //Sort
             var list = input.OrderBy ? data.OrderBy(input) : data.OrderByDescending(i => i.SettledTime).AsQueryable();
@@ -134,6 +134,13 @@ namespace BackendSite.Service.BLL
                     _cacheHelper.StringSetAsync(sortKey, sortKey, cacheTime);
                 }
             });
+        }
+
+        public IEnumerable<SportTypeList> GetGameList()
+        {
+            var sportTypes = Enum.GetValues(typeof(SportType)).Cast<SportType>();
+            var sportTypeList = sportTypes.Select(st => new SportTypeList { Name = st.ToString() });
+            return sportTypeList;
         }
     }
 }
