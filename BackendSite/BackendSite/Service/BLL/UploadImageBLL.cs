@@ -232,6 +232,12 @@ namespace BackendSite.Service.BLL
             var imageStream = file.OpenReadStream();
             using var img = Image.Load<Rgba32>(imageStream);
 
+            img.Mutate(ctx => ctx.Resize(new ResizeOptions
+            {
+                Size = new Size(widthSize, hightSize),
+                Mode = ResizeMode.BoxPad
+            }));
+
             Image<Rgba32> processedImage;
             if (file.FileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             {
@@ -245,12 +251,6 @@ namespace BackendSite.Service.BLL
                 // 如果是 JPEG 或 JPG，直接使用原圖
                 processedImage = img.Clone();
             }
-
-            processedImage.Mutate(ctx => ctx.Resize(new ResizeOptions
-            {
-                Size = new Size(widthSize, hightSize),
-                Mode = ResizeMode.BoxPad
-            }));
 
             var stream = new MemoryStream();
             processedImage.Save(stream, new JpegEncoder());
