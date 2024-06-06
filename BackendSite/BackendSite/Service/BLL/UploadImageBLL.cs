@@ -236,7 +236,7 @@ namespace BackendSite.Service.BLL
             if (file.FileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             {
                 // 創建一個新的圖像，使用白色背景填充
-                processedImage = new Image<Rgba32>(img.Width, img.Height);
+                processedImage = new Image<Rgba32>(widthSize, hightSize);
                 processedImage.Mutate(ctx => ctx.BackgroundColor(Color.White));
                 processedImage.Mutate(ctx => ctx.DrawImage(img, 1f));
             }
