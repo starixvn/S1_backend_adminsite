@@ -39,6 +39,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly VerificationRewardBLL _verificationRewardBLL;
         private readonly IGaBLL _gaBll;
         private readonly ILogger<DepositController> _logger;
+        private readonly FaceBookPixelBLL _faceBookPixelBll;
 
         #endregion
 
@@ -61,6 +62,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
             _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
             _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
+            _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
 
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
@@ -441,6 +443,25 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     {
                         await _gaBll.PurchaseEventSendAsync(eventData);
                     });
+
+                    #region 埋點
+                    var data = new List<PixelData>
+                    {
+                        new PixelData
+                        {
+                            PixelEvent = depositRequest.FirstDeposit == 1 ? FaceBookPixel.firstDeposit : FaceBookPixel.redeposit,
+                            Value = depositRequest.ActualDeposit
+                        },
+                        new PixelData
+                        {
+                            PixelEvent = FaceBookPixel.deposit,
+                            Value = depositRequest.ActualDeposit
+                        }
+                    };
+
+                    var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, data);
+                    _ = Task.Run(() => _faceBookPixelBll.Send(pixelRequest));
+                    #endregion
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
