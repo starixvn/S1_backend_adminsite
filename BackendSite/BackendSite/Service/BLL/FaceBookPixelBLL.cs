@@ -8,14 +8,12 @@ namespace BackendSite.Service.BLL;
 public class FaceBookPixelBLL
 {
     private readonly string _commonServiceUrl;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly CourierAdapter _courierAdapter;
 
     public FaceBookPixelBLL(IServiceProvider provider)
     {
         var configBll = provider.GetRequiredService<ConfigBLL>();
         _commonServiceUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").CommonService;
-        _httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
         _courierAdapter = provider.GetRequiredService<CourierAdapter>();
     }
     
@@ -27,14 +25,14 @@ public class FaceBookPixelBLL
         return result;
     }
 
-    public PixelRequest CreatePixelRequest(int custId,int currencyId, List<PixelData> data,string url = null)
+    public PixelRequest CreatePixelRequest(int custId, int currencyId, decimal? value, IEnumerable<FaceBookPixel> pixelEvent)
     {
         return new PixelRequest
         {
             CustId = custId,
             CurrencyId = currencyId,
-            Url = url,
-            Data = data
+            Value = value,
+            PixelEvent = pixelEvent
         };
     }
 }
