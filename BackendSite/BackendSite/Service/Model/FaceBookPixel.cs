@@ -1,0 +1,23 @@
+﻿using static BackendSite.Service.BLL.FaceBookPixelBLL;
+
+namespace BackendSite.Service.Model;
+
+public class PixelRequest
+{
+    public int CustId { get; set; }
+    public string Url { get; set; }
+    public int? CurrencyId { get; set; }
+    public decimal? Value { get; set; }
+    public IEnumerable<FaceBookPixel> PixelEvent { get; set; }
+}
+public enum FaceBookPixel
+{
+    registerSubmit = 1,
+    register = 2,
+    depositSubmit = 3,
+    firstDeposit = 4,
+    withdraw = 5,
+    firstDepositArrival = 6,
+    deposit = 7,
+    redeposit = 8
+}
