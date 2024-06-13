@@ -82,6 +82,7 @@ namespace BackendSite.Service.BLL
                 MemberTypeJson = input.MemberTypes != null && input.MemberTypes.Any()
                 ? JsonConvert.SerializeObject(input.MemberTypes.Select(x => (int)x))
                 : JsonConvert.SerializeObject(((MemberTypeEnum[])Enum.GetValues(typeof(MemberTypeEnum))).Select(x => (int)x)),
+                CategoryJson = JsonConvert.SerializeObject(input.Category),
             });
 
             var data = _partitionService.DailyQuery<BetListReport>(StartDate, EndDate, "Admin_TpBetRecordExtend_Get_V5", parameters);
