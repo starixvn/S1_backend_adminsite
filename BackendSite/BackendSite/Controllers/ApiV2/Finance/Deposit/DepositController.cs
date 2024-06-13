@@ -445,16 +445,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     });
 
                     #region 埋點
-                    _ = Task.Run(() =>
+                    if (depositRequest.SiteId == 1)
                     {
-                        var pixelEvent = new List<FaceBookPixel>
+                        _ = Task.Run(() =>
                         {
-                            FaceBookPixel.Purchase,
-                            depositRequest.FirstDeposit == 1 ? FaceBookPixel.firstDeposit : FaceBookPixel.redeposit
-                        };
-                        var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
-                        _ = _faceBookPixelBll.Send(pixelRequest);
-                    });
+                            var pixelEvent = new List<FaceBookPixel>
+                            {
+                                FaceBookPixel.Purchase,
+                                depositRequest.FirstDeposit == 1 ? FaceBookPixel.firstDeposit : FaceBookPixel.redeposit
+                            };
+                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
+                            _ = _faceBookPixelBll.Send(pixelRequest);
+                        });
+                    }
                     #endregion
                 }
             }
