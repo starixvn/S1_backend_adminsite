@@ -35,8 +35,8 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; } = string.Empty;
         public string TpUserName { get; set; } = string.Empty;
         public string RefNo { get; set; } = string.Empty;
-        public IEnumerable<string> Category { get; set; } = new List<string>();
-        public string Game { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public IEnumerable<string> Game { get; set; } = new List<string>();
         public string Title { get; set; } = string.Empty;
         public string MatchID { get; set; } = string.Empty;
         public string BetType { get; set; } = string.Empty;
