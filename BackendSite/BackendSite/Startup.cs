@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag;
 using Prometheus;
 using StackExchange.Redis;
-
+ 
 namespace BackendSite
 {
     public class Startup
