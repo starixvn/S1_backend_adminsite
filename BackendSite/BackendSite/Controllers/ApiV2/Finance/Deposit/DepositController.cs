@@ -451,8 +451,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         {
                             var pixelEvent = new List<FaceBookPixel>
                             {
-                                FaceBookPixel.Purchase,
-                                depositRequest.FirstDeposit == 1 ? FaceBookPixel.firstDeposit : FaceBookPixel.redeposit
+                                FaceBookPixel.purchase,
+                                refreshDepositInfoData.FirstDeposit == 1 ? FaceBookPixel.startTrial : FaceBookPixel.redeposit
                             };
                             var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
                             _ = _faceBookPixelBll.Send(pixelRequest);
