@@ -8,7 +8,7 @@ public class QuestionnairList
     public int Id { get; set; }
     public string Currency { get; set; }
     public string UserName { get; set; }
-    public string Contact { get; set; }
+    public string ContactInfo { get; set; }
     public string Content { get; set; }
     public DateTimeOffset CreateTime { get; set; }
     public string Feedback { get; set; }
@@ -37,7 +37,7 @@ public class QuestionnaireRequest : ApiRequestPageModel
 
     public int SiteId { get; set; }
     public int CurrencyId { get; set; }
-    public string UserName { get; set; }
+    public string UserName { get; set; } = "";
 }
 
 public class QuestionnaireExportRequest
