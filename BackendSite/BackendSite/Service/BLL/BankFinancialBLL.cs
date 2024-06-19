@@ -281,7 +281,7 @@ namespace BackendSite.Service.BLL
                 message = "Update Transfer Account And Insert Log Success.";
             }
 
-            _ = _cacheHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Member);
+            _ = _cacheHelper.KeyDeleteByPattern($"LocalPaySetting:{input.SiteId}:{input.CurrencyId}*", RedisDataBase.Member);
 
             return (true, count, message);
         }
