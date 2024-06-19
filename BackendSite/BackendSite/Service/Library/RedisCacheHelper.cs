@@ -328,6 +328,7 @@ namespace BackendSite.Service.Library
         public async Task<bool> KeyDeleteAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            
             try
             {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
@@ -343,6 +344,13 @@ namespace BackendSite.Service.Library
         public long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
+            
+            if (!WaitAMoment(keyPattern, 5))
+            {
+                _logger.LogInformation($"KeyDeleteByPattern={keyPattern} waiting");
+                return 1;
+            }
+            
             try
             {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
@@ -360,6 +368,13 @@ namespace BackendSite.Service.Library
         public async Task<long> KeyDeleteByPatternAsync(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
+            
+            if (!WaitAMoment(keyPattern, 5))
+            {
+                _logger.LogInformation($"KeyDeleteByPatternAsync={keyPattern} waiting");
+                return 1;
+            }
+            
             try
             {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
@@ -434,6 +449,22 @@ namespace BackendSite.Service.Library
                 string str => !string.IsNullOrEmpty(str),
                 _ => true
             };
+        }
+
+        private bool WaitAMoment(string key, int sec)
+        {
+            key = $"{key}:Wait";
+            
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)RedisDataBase.Admin);
+                return db.StringSet(key, "", TimeSpan.FromSeconds(sec), When.NotExists);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return default;
+            }
         }
     }
 }
