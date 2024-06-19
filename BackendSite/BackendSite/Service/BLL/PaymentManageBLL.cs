@@ -44,9 +44,8 @@ namespace BackendSite.Service.BLL
 
             if (result)
             {
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Member);
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
-                ClearRedisPaySettingCache("PaymentSetting:*", RedisDataBase.Payment);
+                ClearRedisPaySettingCache($"PaySetting:{siteId}:*", RedisDataBase.Shared);
+                _ = _redisHelper.KeyDelete($"PayList:{siteId}", RedisDataBase.Payment);
             }
 
             return result;
@@ -79,11 +78,7 @@ namespace BackendSite.Service.BLL
             var result = _paymentManageService.UpdatePaySetting(input, @operator);
 
             if (result)
-            {
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Member);
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Payment);
-            }
+                ClearRedisPaySettingCache($"PaySetting:{input.SiteId}:*", RedisDataBase.Shared);
 
             return result;
         }
@@ -93,11 +88,7 @@ namespace BackendSite.Service.BLL
             var result = _paymentManageService.UpdatePaySettingStatus(input, @operator);
 
             if (result)
-            {
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Member);
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Payment);
-            }
+                ClearRedisPaySettingCache($"PaySetting:{input.SiteId}:*", RedisDataBase.Shared);
 
             return result;
         }
@@ -105,13 +96,6 @@ namespace BackendSite.Service.BLL
         public bool UpdatePaySettingChargeFee(UpdatePaySettingChargeFeeParams input, string @operator)
         {
             var result = _paymentManageService.UpdatePaySettingChargeFee(input, @operator);
-
-            if (result)
-            {
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Member);
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Shared);
-                ClearRedisPaySettingCache("PaySetting:*", RedisDataBase.Payment);
-            }
 
             return result;
         }
@@ -143,7 +127,7 @@ namespace BackendSite.Service.BLL
 
             if (result)
             {
-                _ = _redisHelper.KeyDeleteByPattern($"PaySetting:SupportCrypto:{siteId}", RedisDataBase.Member);
+                _ = _redisHelper.KeyDelete($"PaySetting:SupportCrypto:{siteId}", RedisDataBase.Member);
             }
 
             return result;
