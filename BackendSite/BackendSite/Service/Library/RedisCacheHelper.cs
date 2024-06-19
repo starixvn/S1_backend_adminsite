@@ -345,7 +345,7 @@ namespace BackendSite.Service.Library
         {
             keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
             
-            if (!WaitAMoment(keyPattern, 5))
+            if (!WaitAMoment(keyPattern, 3))
             {
                 _logger.LogInformation($"KeyDeleteByPattern={keyPattern} waiting");
                 return 1;
@@ -369,7 +369,7 @@ namespace BackendSite.Service.Library
         {
             keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
             
-            if (!WaitAMoment(keyPattern, 5))
+            if (!WaitAMoment(keyPattern, 3))
             {
                 _logger.LogInformation($"KeyDeleteByPatternAsync={keyPattern} waiting");
                 return 1;
