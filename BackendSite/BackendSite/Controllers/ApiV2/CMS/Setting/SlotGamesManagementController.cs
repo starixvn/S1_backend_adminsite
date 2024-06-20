@@ -327,6 +327,63 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
             return apiResult;
         }
+        /// <summary>
+        /// SlotGamesManagement/Set
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CMS >  Slot Games Management  > edit > save
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
+        public ApiResult Set(EditSlotGameReq request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var result = _slotGamesManagementBLL.Set(request, User.Identity.Name);
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
+        /// <summary>
+        /// SlotGamesManagement/GetById
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CMS >  Slot Games Management  > edit
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
+        public ApiResult GetById(SetNewSlotGameReq request)
+        {
+            try
+            {
+                var data = _slotGamesManagementBLL.GetById(request.Id);
+                return new ApiResult<SlotGameResult> { Data = data,ErrorCode = (int)ErrorCodeEnum.Success};
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult<SlotGameData> { ErrorCode = (int)ErrorCodeEnum.Fail,Message = ex.Message};
+            }
+
+        }
         #endregion
     }
 }

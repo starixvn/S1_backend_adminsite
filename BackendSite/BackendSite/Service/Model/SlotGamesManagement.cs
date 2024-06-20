@@ -132,25 +132,79 @@ namespace BackendSite.Service.Model
 
     public class SetNewSlotGameReq
     {
-        public SetNewSlotGameReq()
+        public int Id { get; set; }
+        public int TpId { get; set; }
+        public string GameId { get; set; }
+        public string ENname { get; set; }
+        public string CSname { get; set; }
+        public string RTP { get; set; } = "";
+        public string Reel { get; set; } = "";
+        public int Device { get; set; }
+        public string Payline { get; set; } = "";
+        public int Fun { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public IEnumerable<int> CategoryIds { get; set; }
+        public SetNewSlotGameReq After { get; set; }
+        public SetNewSlotGameReq Before { get; set; }
+        public void CopyToAfter()
         {
-            //前端若沒傳設為空字串
-            RTP = "";
-            Reel = "";
-            Payline = "";
+            After = new SetNewSlotGameReq
+            {
+                Id = this.Id,
+                TpId = this.TpId,
+                GameId = this.GameId,
+                ENname = this.ENname,
+                CSname = this.CSname,
+                RTP = this.RTP,
+                Reel = this.Reel,
+                Device = this.Device,
+                Payline = this.Payline,
+                Fun = this.Fun,
+                CurrencyIds = this.CurrencyIds,
+                CategoryIds = this.CategoryIds
+            };
         }
+
+        public object getLog()
+        {
+            return new
+            {
+                Id = this.Id,
+                TpId = this.TpId,
+                GameId = this.GameId,
+                ENname = this.ENname,
+                CSname = this.CSname,
+                RTP = this.RTP,
+                Reel = this.Reel,
+                Device = this.Device,
+                Payline = this.Payline,
+                Fun = this.Fun,
+                currencyNames = this.CurrencyIds != null ? string.Join(",", this.CurrencyIds.Select(id => Enum.GetName(typeof(CurrencyEnum), id))) : "",
+                categoryNames = this.CategoryIds != null ? string.Join(",", this.CategoryIds.Select(id => Enum.GetName(typeof(SlotGameCategoryEnum), id))) : ""
+            };
+        }
+    }
+    public class EditSlotGameReq 
+    {
+        public int Id { get; set; }
+        public SetNewSlotGameReq Before { get; set; }
+        public SetNewSlotGameReq After { get; set; }
+    }
+
+    public class SlotGameResult
+    {
+        public int Id { get; set; }
         public int TpId { get; set; }
         public string GameId { get; set; }
         public string ENname { get; set; }
         public string CSname { get; set; }
         public string RTP { get; set; }
         public string Reel { get; set; }
-        public int Device { get;set; }
+        public int Device { get; set; }
         public string Payline { get; set; }
         public int Fun { get; set; }
-        public IEnumerable<int> CurrencyIds { get; set; }
-        public IEnumerable<int> CategoryIds { get;set; }
     }
+
     public class GetSlotGameCategoryListReq : ApiRequestPageModel
     {
         public int SiteId { get; set; }
