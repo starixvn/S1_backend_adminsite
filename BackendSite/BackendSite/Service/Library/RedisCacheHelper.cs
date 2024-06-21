@@ -356,6 +356,10 @@ namespace BackendSite.Service.Library
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 var server = _multiplexer.GetServer(_multiplexer.GetEndPoints().First());
                 var keys = server.Keys((int)redisDataBase, keyPattern).ToArray();
+                if (keys.Length == 0)
+                {
+                    return 0;
+                }
                 return db.KeyDelete(keys);
             }
             catch (Exception ex)
@@ -380,7 +384,15 @@ namespace BackendSite.Service.Library
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 var server = _multiplexer.GetServer(_multiplexer.GetEndPoints().First());
                 var keys = server.Keys((int)redisDataBase, keyPattern).ToArray();
-                return await db.KeyDeleteAsync(keys);
+                if (keys.Length == 0)
+                {
+                    return 0;
+                }
+
+                var deleteTasks = keys.Select(key => db.KeyDeleteAsync(key));
+                var results = await Task.WhenAll(deleteTasks);
+
+                return results.Count(result => result);
             }
             catch (Exception ex)
             {

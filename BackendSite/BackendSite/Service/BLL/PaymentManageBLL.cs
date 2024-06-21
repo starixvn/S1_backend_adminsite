@@ -135,8 +135,7 @@ namespace BackendSite.Service.BLL
 
         private void ClearRedisPaySettingCache(string pattern, RedisDataBase db)
         {
-            _ = Task.Run(() => _redisHelper.KeyDeleteByPattern(pattern, db))
-                .ConfigureAwait(false);
+            _ = _redisHelper.KeyDeleteByPatternAsync(pattern, db).ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<PayGroup>> GetPayGroupWithCache()
