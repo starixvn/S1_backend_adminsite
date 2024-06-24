@@ -89,14 +89,7 @@ namespace BackendSite.Service.BLL
         public async Task<bool> SetOfflineBankingSettingAsync(SetOfflineBankingSettingParams input)
         {
             var result = await _bankDetailService.SetOfflineBankingSettingAsync(input);
-            var success = result > 0;
-
-            if (success)
-            {
-                _ = await _redisHelper.KeyDeleteByPatternAsync("LocalPaySetting:*");
-            }
-
-            return success;
+            return result > 0;
         }
 
         public async Task<IEnumerable<LocalPaySetting>> GetLocalPaySettingAsync()
