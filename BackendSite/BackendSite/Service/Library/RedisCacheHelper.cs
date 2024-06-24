@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 
 using StackExchange.Redis;
 
+using YamlDotNet.Core.Tokens;
+
 namespace BackendSite.Service.Library
 {
     public class RedisCacheHelper : ICacheHelper
@@ -389,10 +391,7 @@ namespace BackendSite.Service.Library
                     return 0;
                 }
 
-                var deleteTasks = keys.Select(key => db.KeyDeleteAsync(key));
-                var results = await Task.WhenAll(deleteTasks);
-
-                return results.Count(result => result);
+                return await db.KeyDeleteAsync(keys);
             }
             catch (Exception ex)
             {
