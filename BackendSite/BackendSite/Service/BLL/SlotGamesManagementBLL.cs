@@ -123,9 +123,9 @@ namespace BackendSite.Service.BLL
 
             try
             {
-                success &= _slotGamesManagementService.SetSlotGame(requestInfo.TpId, requestInfo.GameId, requestInfo.Fun, requestInfo.Device, requestInfo.Id, trans);
-                success &= _slotGamesManagementService.SetGameCasinoExtra(requestInfo.TpId, requestInfo.RTP, requestInfo.Reel, requestInfo.Payline, requestInfo.Id, trans);
-                success &= _slotGamesManagementService.SetGameCasinoInfo(requestInfo.TpId, requestInfo.ENname, requestInfo.CSname, requestInfo.Id, trans);
+                success &= _slotGamesManagementService.SetSlotGame(requestInfo.TpId, requestInfo.GameId, requestInfo.Fun, requestInfo.Device, req.Id, trans);
+                success &= _slotGamesManagementService.SetGameCasinoExtra(requestInfo.TpId, requestInfo.RTP, requestInfo.Reel, requestInfo.Payline, req.Id, trans);
+                success &= _slotGamesManagementService.SetGameCasinoInfo(requestInfo.TpId, requestInfo.ENname, requestInfo.CSname, req.Id, trans);
                 
                 _slotGamesManagementService.SetSlotGameLog(req.After, req.Before, ActionType.Update, @operator, trans);
             }
