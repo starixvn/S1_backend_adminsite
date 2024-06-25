@@ -100,7 +100,9 @@ namespace BackendSite.Service.Model
         public string TpName { get; set; }
         public int Id { get; set; }
         public string GameId { get; set; }
+        [JsonProperty("enName")]
         public string EName { get; set; }
+        [JsonProperty("csName")]
         public string CName { get; set; }
         public string Operator { get; set; }
         public List<CurrencyStatus> CurrencyStatusList { get; set; }
@@ -169,7 +171,6 @@ namespace BackendSite.Service.Model
         {
             return new
             {
-                Id = this.Id,
                 TpId = this.TpId,
                 GameId = this.GameId,
                 ENname = this.ENname,
@@ -196,7 +197,9 @@ namespace BackendSite.Service.Model
         public int Id { get; set; }
         public int TpId { get; set; }
         public string GameId { get; set; }
+        [JsonProperty("enName")]
         public string ENname { get; set; }
+        [JsonProperty("csName")]
         public string CSname { get; set; }
         public string RTP { get; set; }
         public string Reel { get; set; }
