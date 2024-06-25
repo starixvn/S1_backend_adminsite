@@ -37,4 +37,21 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int Round { get; set; }
         public int GiftType { get; set; }
     }
+
+    public class ProvideGameListDto
+    {
+        public int SlotId { get; set; }
+        public int TpId { get; set; }
+        public string TpName { get; set; }
+        public string GameName { get; set; }
+        public string GameId { get; set; }
+    }
+
+    public class ProvideGameList
+    {
+        public int TpId { get; set; }
+
+        public string TpName { get; set; }
+        public IEnumerable<ProvideGameListDto> data { get; set; }
+    }
 }
