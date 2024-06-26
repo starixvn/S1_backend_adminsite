@@ -547,10 +547,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     case WithdrawalStatusEnum.Process:
                         {
                             var withdrawalInfo = JsonConvert.DeserializeObject<WithdrawalInfo>(request.WithdrawalInfo);
-                            // 這段先寫死，前端改傳正確的WithdrawalType後拿掉
-                            if (request.WithdrawalType == WithdrawalTypeEnum.OnlineBanking &&
-                                withdrawalInfo.AccountType == "ewallet")
-                                request.WithdrawalType = WithdrawalTypeEnum.EWalletPayment;
                             var checkWithdrawalTypeFailResult = CheckWithdrawalTypeAndSetObject(request, apiResult, withdrawalInfo);
                             if (checkWithdrawalTypeFailResult != null) return checkWithdrawalTypeFailResult;
 
@@ -1161,10 +1157,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 case WithdrawalTypeEnum.OnlineBanking:
                 case WithdrawalTypeEnum.EWalletPayment:
                 case WithdrawalTypeEnum.CryptoPay:
+                case WithdrawalTypeEnum.Settlement:
                     withdrawalInfo.PayId = request.SelId;
                     withdrawalInfo.ChannelId = request.ChannelId;
                     break;
-
+                
                 case WithdrawalTypeEnum.LocalBank:
                 case WithdrawalTypeEnum.CryptoWallet:
                     {
@@ -1211,9 +1208,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             => type is (WithdrawalTypeEnum.CryptoPay
                 or WithdrawalTypeEnum.OnlineBanking
                 or WithdrawalTypeEnum.EWalletPayment);
+
         private static bool IsLocalPayment(WithdrawalTypeEnum type)
             => type is (WithdrawalTypeEnum.LocalBank
-                or WithdrawalTypeEnum.CryptoWallet);
+                or WithdrawalTypeEnum.CryptoWallet
+                or WithdrawalTypeEnum.Settlement);
 
         #endregion
 

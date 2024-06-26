@@ -459,7 +459,8 @@ namespace BackendSite.Service.Model.enums
         LocalBank = 2,
         EWalletPayment = 3,
         CryptoPay = 4,
-        CryptoWallet = 5 // Local
+        CryptoWallet = 5, // Local
+        Settlement = 6 //財務手動從三方後台下發，類Local流程
     }
 
     public enum WithdrawalBlockTypeEnum

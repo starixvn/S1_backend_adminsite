@@ -109,6 +109,10 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 支付Id，帶null可取全部
             /// </summary>
             public int? PayId { get; set; }
+            /// <summary>
+            /// CurrencyId，帶null可取全部
+            /// </summary>
+            public int? CurrencyId { get; set; }
         }
 
         public class GetCryptoPayListRequest
@@ -224,19 +228,6 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         {
             public int LeaguesId { get; set; }
         }
-
-        public class GetBySiteIdAndUserNameRequest
-        {
-            /// <summary>
-            /// 品牌ID
-            /// </summary>
-            public int SiteId { get; set; }
-            /// <summary>
-            /// 幣別
-            /// </summary>
-            public string UserName { get; set; }
-        }
-
         public class GetReasonByFuncKeyRequest
         {
             public string FuncKey { get; set; }
@@ -417,7 +408,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
-
+        
         /// <summary>
         /// 取得金流商資訊列表
         /// </summary>
@@ -427,7 +418,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ApiResult GetPaymentList(GetPaymentListRequest request)
         {
             var authData = _authorizeBll.GetAuthData();
-            var data = _paymentManageBll.GetPayList(authData.SiteId)
+            var data = _paymentManageBll.GetPayList(authData.SiteId, request.CurrencyId)
                 .Where(x => x.PayStatus == PayListStatusEnum.Enable
                     && (request.PayId == null || x.PayId == request.PayId));
 
