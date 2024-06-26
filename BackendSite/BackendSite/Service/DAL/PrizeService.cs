@@ -29,8 +29,8 @@ namespace BackendSite.Service.DAL
             var tempCurrencyTotalAmount = new List<string>();
             var props = new DynamicParameters();
 
-            props.Add("_StartDate", $"{prizeSelect.StartDate} 00:00:00.000");
-            props.Add("_EndDate", $"{prizeSelect.EndDate} 23:59:59.999");
+            props.Add("_StartDate", $"{prizeSelect.StartDate} 00:00:00");
+            props.Add("_EndDate", $"{prizeSelect.EndDate} 23:59:59");
             props.Add("_SiteIds", JsonConvert.SerializeObject(prizeSelect.SelectSite));
             props.Add("_CurrencyIds", JsonConvert.SerializeObject(prizeSelect.CurrencyId));
             props.Add("_EventNames", JsonConvert.SerializeObject(prizeSelect.EventName));

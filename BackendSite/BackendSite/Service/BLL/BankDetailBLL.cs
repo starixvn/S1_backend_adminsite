@@ -46,10 +46,10 @@ namespace BackendSite.Service.BLL
         
         private async Task<List<OfflineBankingSetting>> GetOfflineBankingSettingListWithCache(GetOfflineBankingSettingParams input)
         {
-            var key = "OfflineBankingSettingList:" + JsonConvert.SerializeObject(input);
+            var key = "LocalPaySetting:OfflineBankingSetting:" + JsonConvert.SerializeObject(input);
             
             return await _redisHelper.TryGetOrCreateAsync(key, TimeSpan.FromMinutes(10),
-                () => GetOfflineBankingSettingList(input));
+                () => GetOfflineBankingSettingList(input), RedisDataBase.Shared);
         }
         
         private async Task<List<OfflineBankingSetting>> GetOfflineBankingSettingList(GetOfflineBankingSettingParams input)
@@ -89,12 +89,7 @@ namespace BackendSite.Service.BLL
         public async Task<bool> SetOfflineBankingSettingAsync(SetOfflineBankingSettingParams input)
         {
             var result = await _bankDetailService.SetOfflineBankingSettingAsync(input);
-            var success = result > 0;
-            
-            if (success)
-                _ = await _redisHelper.KeyDeleteByPatternAsync("OfflineBankingSettingList:*");
-
-            return success;
+            return result > 0;
         }
 
         public async Task<IEnumerable<LocalPaySetting>> GetLocalPaySettingAsync()
@@ -129,11 +124,10 @@ namespace BackendSite.Service.BLL
         {
             var before = GetSysBankList().First(x => x.SysId == input.SysId);
             var result = _bankDetailService.SetBankSysInfo(input, before, @operator);
-            _ = _redisHelper.KeyDeleteByPattern("BankInfoSysList:*", RedisDataBase.Member);
-            _ = _redisHelper.KeyDeleteByPattern("PaySetting:LocalBank:*", RedisDataBase.Member);
+            _ = _redisHelper.KeyDeleteByPattern("PaySetting:*", RedisDataBase.Shared);
+            _ = _redisHelper.KeyDelete("Admin:BankInfoSysList");
 
-            return result 
-                   && _redisHelper.KeyDelete("Admin:BankInfoSysList");
+            return result;
         }
 
         public IEnumerable<BankInfoSys> GetSysBankList(int currencyId)

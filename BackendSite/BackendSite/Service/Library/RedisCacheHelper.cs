@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 
 using StackExchange.Redis;
 
+using YamlDotNet.Core.Tokens;
+
 namespace BackendSite.Service.Library
 {
     public class RedisCacheHelper : ICacheHelper
@@ -328,6 +330,7 @@ namespace BackendSite.Service.Library
         public async Task<bool> KeyDeleteAsync(string key, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             key = $"{redisDataBase}:{RemoveSpecialChars(key)}";
+            
             try
             {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
@@ -343,11 +346,22 @@ namespace BackendSite.Service.Library
         public long KeyDeleteByPattern(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
+            
+            if (!WaitAMoment(keyPattern, 3))
+            {
+                _logger.LogInformation($"KeyDeleteByPattern={keyPattern} waiting");
+                return 1;
+            }
+            
             try
             {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 var server = _multiplexer.GetServer(_multiplexer.GetEndPoints().First());
                 var keys = server.Keys((int)redisDataBase, keyPattern).ToArray();
+                if (keys.Length == 0)
+                {
+                    return 0;
+                }
                 return db.KeyDelete(keys);
             }
             catch (Exception ex)
@@ -360,11 +374,23 @@ namespace BackendSite.Service.Library
         public async Task<long> KeyDeleteByPatternAsync(string keyPattern, RedisDataBase redisDataBase = RedisDataBase.Admin)
         {
             keyPattern = $"{redisDataBase}:{RemoveSpecialChars(keyPattern)}";
+            
+            if (!WaitAMoment(keyPattern, 3))
+            {
+                _logger.LogInformation($"KeyDeleteByPatternAsync={keyPattern} waiting");
+                return 1;
+            }
+            
             try
             {
                 var db = _multiplexer.GetDatabase((int)redisDataBase);
                 var server = _multiplexer.GetServer(_multiplexer.GetEndPoints().First());
                 var keys = server.Keys((int)redisDataBase, keyPattern).ToArray();
+                if (keys.Length == 0)
+                {
+                    return 0;
+                }
+
                 return await db.KeyDeleteAsync(keys);
             }
             catch (Exception ex)
@@ -434,6 +460,22 @@ namespace BackendSite.Service.Library
                 string str => !string.IsNullOrEmpty(str),
                 _ => true
             };
+        }
+
+        private bool WaitAMoment(string key, int sec)
+        {
+            key = $"{key}:Wait";
+            
+            try
+            {
+                var db = _multiplexer.GetDatabase((int)RedisDataBase.Admin);
+                return db.StringSet(key, "", TimeSpan.FromSeconds(sec), When.NotExists);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"{key} | {ex.Message}");
+                return default;
+            }
         }
     }
 }

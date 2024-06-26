@@ -207,6 +207,8 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             /// 0=All, 1=Seamless Wallet, 2=Transfer Wallet
             /// </summary>
             public int? WalletType { get; set; }
+
+            public int? PromotionType { get; set; }
         }
 
         public class GetSportLeaguesRequest
@@ -785,7 +787,16 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
 
             try
             {
-                apiResult.Data = _bonusManageBll.GetPromoCategories();
+                var result = _bonusManageBll.GetPromoCategories().ToList();
+
+                //移除Cashback不支援的PromotionCategory
+                if (request.PromotionType.HasValue && request.PromotionType == (int)PromotionTypeEnum.Cashback)
+                {
+                    var supportCategory = Enum.GetValues(typeof(PromotionCategoryEnum)).Cast<int>().ToList();
+                    result.RemoveAll(item => !supportCategory.Contains(item.Id));
+                }
+
+                apiResult.Data = result;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

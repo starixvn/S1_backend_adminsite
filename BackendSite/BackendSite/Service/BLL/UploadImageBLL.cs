@@ -9,6 +9,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using Amazon.CloudFront.Model;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace BackendSite.Service.BLL
 {
@@ -226,24 +227,35 @@ namespace BackendSite.Service.BLL
                                        .ToLower();
         }
 
-        private IFormFile Resize(IFormFile file,int widthSize,int hightSize,string name = "name",string filename = "filename")
+        private IFormFile Resize(IFormFile file, int widthSize, int hightSize, string name = "name", string filename = "filename")
         {
             var imageStream = file.OpenReadStream();
-            var img = Image.Load(imageStream);
+            using var img = Image.Load<Rgba32>(imageStream);
 
-            var resizedImage = img.Clone(ctx => ctx.Resize(new ResizeOptions
+            img.Mutate(ctx => ctx.Resize(new ResizeOptions
             {
                 Size = new Size(widthSize, hightSize),
                 Mode = ResizeMode.BoxPad
             }));
 
-            var stream = new MemoryStream();
-            resizedImage.Save(stream, new JpegEncoder());
-            stream.Position = 0;
-            file = new FormFile(stream, 0, stream.Length, name, filename);
-            
+            Image<Rgba32> processedImage;
+            if (file.FileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+            {
+                // 創建一個新的圖像，使用白色背景填充
+                processedImage = new Image<Rgba32>(widthSize, hightSize);
+                processedImage.Mutate(ctx => ctx.BackgroundColor(Color.White));
+                processedImage.Mutate(ctx => ctx.DrawImage(img, 1f));
+            }
+            else
+            {
+                // 如果是 JPEG 或 JPG，直接使用原圖
+                processedImage = img.Clone();
+            }
 
-            return file;
+            var stream = new MemoryStream();
+            processedImage.Save(stream, new JpegEncoder());
+            stream.Position = 0;
+            return new FormFile(stream, 0, stream.Length, name, filename);
         }
     }
 }

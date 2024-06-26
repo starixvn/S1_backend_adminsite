@@ -56,6 +56,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly string _awsWithdrawalAccountingFolder;
         private readonly string _awsWithdrawalUrl;
         private readonly string _awsWithdrawalBucketName;
+        private readonly FaceBookPixelBLL _faceBookPixelBll;
 
         #endregion
 
@@ -87,6 +88,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _awsWithdrawalUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
             _awsWithdrawalFolder = configBll.GetConfigValue("AWSWithdrawalFolderName");
             _awsWithdrawalAccountingFolder = configBll.GetConfigValue("AWSWithdrawalAccountingFolder");
+            _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
 
             _usableActionType = new Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>>
             {
@@ -600,7 +602,17 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                 {
                                     await CopyWithdrawalPictureAsync(withdrawalRequest.TransId);
                                 }
-
+                                #endregion
+                                #region 埋點
+                                if (withdrawalData.SiteId == 1)
+                                {
+                                    _ = Task.Run(() =>
+                                    {
+                                        var pixelEvent = new List<FaceBookPixel> { FaceBookPixel.withdraw };
+                                        var pixelRequest = _faceBookPixelBll.CreatePixelRequest(withdrawalData.CustId, withdrawalData.CurrencyId, withdrawalData.Amount, pixelEvent);
+                                        _ = _faceBookPixelBll.Send(pixelRequest);
+                                    });
+                                }
                                 #endregion
                             }
                             break;
