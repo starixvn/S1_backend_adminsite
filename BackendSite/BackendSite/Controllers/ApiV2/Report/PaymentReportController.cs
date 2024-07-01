@@ -96,7 +96,13 @@ namespace BackendSite.Controllers.ApiV2.Report
         public ApiResult GetWithdrawalType()
         {
             var data = EnumExtension
-                .EnumToSelectListItem(new[] { WithdrawalTypeEnum.Undefined, WithdrawalTypeEnum.LocalBank });
+                .EnumToSelectListItem(new[]
+                {
+                    WithdrawalTypeEnum.Undefined,
+                    WithdrawalTypeEnum.LocalBank,
+                    WithdrawalTypeEnum.CryptoWallet,
+                    WithdrawalTypeEnum.Settlement
+                });
 
             return new ApiResult<IEnumerable<SelectListItem>>
             {

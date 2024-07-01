@@ -28,10 +28,9 @@ namespace BackendSite.Service.BLL
                 .Distinct(new PayChannelInfoComparer());
         }
 
-        public IEnumerable<PayListInfo> GetPayList(int siteId)
+        public IEnumerable<PayListInfo> GetPayList(int siteId, int? currencyId = null)
         {
-            IEnumerable<int> _siteIds = Enumerable.Repeat(siteId, 1);
-            return _paymentManageService.GetPayList(_siteIds);
+            return _paymentManageService.GetPayList(Enumerable.Repeat(siteId, 1), currencyId);
         }
         public IEnumerable<PayListInfo> GetPayListByMultiSite(IEnumerable<int> siteIds)
         {
