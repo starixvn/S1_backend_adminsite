@@ -387,11 +387,13 @@ namespace BackendSite.Service.DAL
             return result.ToList();
         }
         
-        public int GetEggTicket(int custId)
+        public int GetEggTicket(int siteId,int custId,int currencyId)
         {
             var p = new DynamicParameters(new
             {
+                _SiteId = siteId,
                 _CustId = custId,
+                _CurrencyId = currencyId
             });
             var eggTicket = _reportDbClient.QueryFirst<int>("Service_CustEggTicket_Get", p);
             

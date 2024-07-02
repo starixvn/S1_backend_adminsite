@@ -182,7 +182,7 @@ namespace BackendSite.Service.Model
         public CustBonusSum CustBonusSum { get; set; }
         public CustRebateSum CustRebateSum { get; set; }
         public CustRewardSum CustRewardSum { get; set; }
-        public int EggTickets { get; set; }
+        public int EventItemCounts { get; set; }
     }
 
     #region CustBonusTotalSum
