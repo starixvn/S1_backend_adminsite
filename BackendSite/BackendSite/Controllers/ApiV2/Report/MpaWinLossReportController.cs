@@ -1,7 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
-using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.WinLoss;
@@ -220,7 +219,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>> GetWinLossByPlayerDetail(MpaWinLossRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<MpaWinLossResponseForFrontEndWithPlayerDetail>>();
-            
+
             try
             {
                 var responseData = await _mpaWinLossBll.GetWinLossByPlayerDetail(request, MpaWinLossGroupByTypeEnum.GameType);
