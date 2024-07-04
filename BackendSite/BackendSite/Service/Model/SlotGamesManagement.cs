@@ -35,7 +35,8 @@ namespace BackendSite.Service.Model
     public class ExportSlotGameList
     {
         public string TpName { get; set; }
-        public string Name { get; set; }
+        public string EName { get; set; }
+        public string CName { get; set; }
         public string GameId { get; set; }
     }
 
