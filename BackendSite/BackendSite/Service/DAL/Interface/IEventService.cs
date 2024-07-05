@@ -2,7 +2,7 @@
 
 namespace BackendSite.Service.DAL.Interface
 {
-    public interface ICupEventService
+    public interface IEventService
     {
         Task BeginTransaction();
         Task Commit();
@@ -40,5 +40,19 @@ namespace BackendSite.Service.DAL.Interface
         Task<IEnumerable<CupEventPredictDetailDto>> GetPredictDetail(int siteId, int teamId);
         Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator);
         Task<IEnumerable<CupEventPredictScore>> GetCupEventPredictScore();
+
+        #region Lottery
+
+        public IEnumerable<LotteryEventResponse> GetLotteryEventSetting(GetLotteryEventRequest request);
+
+        public LotteryEventResponse GetLotteryEventSettingBySq(int sq);
+        public Task<int> SetLotteryEventSetting(int sq, DateTime startDate, DateTime endDate, DateTime drawDate, int isSuspend, string excludeSetting, string updator);
+        public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request);
+        public Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request, string updator);
+        public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request);
+        public Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator);
+        public Task<int> DelEventRestriction(int custId);
+
+        #endregion
     }
 }

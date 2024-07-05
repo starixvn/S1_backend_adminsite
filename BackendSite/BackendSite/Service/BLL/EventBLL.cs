@@ -1,21 +1,24 @@
 ﻿using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
 {
-    public class CupEventBLL
+    public class EventBLL
     {
-        private readonly ICupEventService _cupEventService;
-        private readonly ILogger<CupEventBLL> _logger;
-        public CupEventBLL(ICupEventService cupEventService, ILogger<CupEventBLL> logger)
+        private readonly IEventService _eventService;
+        private readonly ILogger<EventBLL> _logger;
+        public EventBLL(IEventService eventService, ILogger<EventBLL> logger)
         {
-            this._cupEventService = cupEventService;
+            _eventService = eventService;
             _logger = logger;
         }
 
+        #region CupEvent
+        
         public CupEventPredictionSettingResponse GetCupPredictionSettingResponse(string langId)
         {
-            var dbData = _cupEventService.GetCupEventSetting(langId).ToList();
+            var dbData = _eventService.GetCupEventSetting(langId).ToList();
             var options = GetCupEventPredictionSelectOptions(langId);
 
             var responseData = new CupEventPredictionSettingResponse()
@@ -39,15 +42,15 @@ namespace BackendSite.Service.BLL
             {
                 try
                 {
-                    await _cupEventService.BeginTransaction();
-                    await _cupEventService.SetCupEventPrediction(); // 先將原本啟用的資料全部更新未啟用
-                    var tasks = updateData.Select(item => _cupEventService.InsertCupEventPrediction(item)).ToList(); // Insert
+                    await _eventService.BeginTransaction();
+                    await _eventService.SetCupEventPrediction(); // 先將原本啟用的資料全部更新未啟用
+                    var tasks = updateData.Select(item => _eventService.InsertCupEventPrediction(item)).ToList(); // Insert
                     await Task.WhenAll(tasks);
-                    await _cupEventService.Commit();
+                    await _eventService.Commit();
                 }
                 catch (Exception ex)
                 {
-                    await _cupEventService.RollBack();
+                    await _eventService.RollBack();
                     _logger.LogError(ex.Message, ex);
                 }
             }
@@ -57,7 +60,7 @@ namespace BackendSite.Service.BLL
 
         private IEnumerable<CupEventPredictionSelectOptions> GetCupEventPredictionSelectOptions(string landId)
         {
-            var dbData = _cupEventService.GetCupEventOptions(landId);
+            var dbData = _eventService.GetCupEventOptions(landId);
 
             var result = dbData.Select(r => new CupEventPredictionSelectOptions
             {
@@ -137,7 +140,7 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<GetCupEventMemberReportResponse> GetMemberReport(GetCupEventMemberReportRequest request, out int totalPages, out int rowCount)
         {
-            var memberReport = _cupEventService.GetMemberReport(request, out totalPages, out rowCount);
+            var memberReport = _eventService.GetMemberReport(request, out totalPages, out rowCount);
             return memberReport.Select(a => new GetCupEventMemberReportResponse()
             {
                 Currency = a.Currency,
@@ -150,7 +153,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<ExportCupEventMemberReportResponse>> GetMemberReport(ExportCupEventMemberReportRequest request)
         {
-            var memberReport = await _cupEventService.GetMemberReport(request);
+            var memberReport = await _eventService.GetMemberReport(request);
             return memberReport.Select(a => new ExportCupEventMemberReportResponse()
             {
                 Currency = a.Currency,
@@ -163,7 +166,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<GetCupEventReportResponse>> GetPredictiveStatistics(int siteId)
         {
-            var eventReport = await _cupEventService.GetPredictiveStatistics(siteId);
+            var eventReport = await _eventService.GetPredictiveStatistics(siteId);
             return eventReport.Select(a => new GetCupEventReportResponse()
             {
                 TeamId = a.TeamId,
@@ -177,7 +180,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<ExportCupEventReportResponse>> GetPredictDetail(int siteId, int teamId)
         {
-            var predictDetail = await _cupEventService.GetPredictDetail(siteId, teamId);
+            var predictDetail = await _eventService.GetPredictDetail(siteId, teamId);
             return predictDetail.Select(a => new ExportCupEventReportResponse()
             {
                 Currency = a.Currency,
@@ -190,7 +193,7 @@ namespace BackendSite.Service.BLL
 
         public async Task<int> SetPayoutDone(int siteId, int teamId, string updateOperator)
         {
-            return await _cupEventService.SetPayoutDone(siteId, teamId, updateOperator);
+            return await _eventService.SetPayoutDone(siteId, teamId, updateOperator);
         }
 
         private string DatetimeFormat(DateTime? dateTime)
@@ -199,7 +202,7 @@ namespace BackendSite.Service.BLL
         }
         public async Task<IEnumerable<ExportCupEventPredictScoreResponse>> GetCupEventPredictScore()
         {
-            var predictDetail = await _cupEventService.GetCupEventPredictScore();
+            var predictDetail = await _eventService.GetCupEventPredictScore();
             return predictDetail.Select(a => new ExportCupEventPredictScoreResponse
             {
                 SiteName = a.SiteName,
@@ -211,5 +214,76 @@ namespace BackendSite.Service.BLL
                 CreateTime = new DateTimeOffset(a.CreateTime, TimeSpan.Zero)
             });
         }
+
+        #endregion
+        
+        #region Lottery
+
+        public IEnumerable<LotteryEventResponse> GetLotteryEventSetting(GetLotteryEventRequest request)
+        {
+            var responses = _eventService.GetLotteryEventSetting(request);
+           
+            return responses;
+        }
+
+        public LotteryEventResponse GetLotteryEventSettingBySq(int sq)
+        {
+            var responses = _eventService.GetLotteryEventSettingBySq(sq);
+           
+            return responses;
+        }
+        
+        public async Task<int> SetLotteryEventSetting(SetLotteryEventRequest request , string updator)
+        {
+            var setting = new List<int>
+            {
+                request.FirstPrize, 
+                request.SecondPrize, 
+                request.ThirdPrize, 
+                request.Consolation, 
+                request.Small
+            };
+            var excludeSetting = JsonConvert.SerializeObject(setting);
+            var result = await _eventService.SetLotteryEventSetting(request.Sq, request.StartDate, request.EndDate ,request.DrawDate ,request.IsSuspend , excludeSetting ,updator);
+            
+            return result;
+        }
+        
+        public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
+        {
+            var responses = _eventService.GetRaffleTicketStickerSetting(request);
+           
+            return responses;
+        }
+        
+        public async Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request , string updator)
+        {
+            var result = await _eventService.SetRaffleTicketStickerSetting(request ,updator);
+            
+            return result;
+        }
+        
+        public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request)
+        {
+            var responses = _eventService.GetEventRestrictionList(request);
+           
+            return responses;
+        }
+        
+        public async Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator)
+        {
+            var result = await _eventService.InsEventRestriction(siteId ,currencyId ,custId , reason ,creator);
+            
+            return result;
+        }
+        
+        public async Task<int> DelEventRestriction(int custId)
+        {
+            var result = await _eventService.DelEventRestriction(custId);
+            
+            return result;
+        }
+        
+        #endregion
     }
 }
