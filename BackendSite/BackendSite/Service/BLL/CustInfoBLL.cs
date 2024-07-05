@@ -1199,7 +1199,8 @@ namespace BackendSite.Service.BLL
                             AffiliateId = a.AffiliateId,
                             AffiliateCode = a.AffiliateCode,
                             LastActivityIp = a.LastActivityIp,
-                            Tag = GetTag(allTagList, a.TagList)
+                            Tag = GetTag(allTagList, a.TagList),
+                            UserType = a.UserType
                         });
                         var fileBytes = _excelBll.ExportV2(data);
                         var stream = new MemoryStream(fileBytes);
