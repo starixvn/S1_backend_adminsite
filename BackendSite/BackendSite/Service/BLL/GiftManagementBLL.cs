@@ -118,7 +118,7 @@ namespace BackendSite.Service.BLL
             var currency = await _thirdPartyService.GetTpCurrency(req.TpId,req.CurrencyId);
             var inputs = new Dictionary<string, string>();
             var url = _tpServiceApiUrl + "CreateBonusCode";
-            inputs.Add("GameId", req.GameId);//目前只有PP一款遊戲
+            inputs.Add("GameId", req.GameId);
             inputs.Add("BonusCode", bonusCode);
             inputs.Add("Round", req.Round.ToString());
             inputs.Add("Currency",currency.TpCurrencyId);
