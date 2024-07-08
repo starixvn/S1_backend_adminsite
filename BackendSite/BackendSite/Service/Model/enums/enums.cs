@@ -2072,4 +2072,11 @@ namespace BackendSite.Service.Model.enums
         Common = 1,
         FreeSpin = 2
     }
+    
+    public enum LotteryEventEnum 
+    { 
+        Running = 0,
+        Done = 1 ,
+        Suspned = 2
+    }
 }

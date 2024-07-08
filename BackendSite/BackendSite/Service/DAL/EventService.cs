@@ -1,24 +1,22 @@
 ﻿using System.Data;
-
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
-
 using Dapper;
 
 using MySql.Data.MySqlClient;
 
 namespace BackendSite.Service.DAL
 {
-    public class CupEventService : ICupEventService
+    public class EventService : IEventService
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private MySqlConnection _connection;
         private MySqlTransaction _transaction;
 
-        public CupEventService(IEnumerable<MySqlClient> sqlClients)
+        public EventService(IEnumerable<MySqlClient> sqlClients)
         {
             _mainDbClient = sqlClients.First(p => p.DataBase == DataBase.Main);
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
@@ -156,6 +154,84 @@ namespace BackendSite.Service.DAL
         {
             return await _reportDbClient.QueryAsync<CupEventPredictScore>("Admin_CupEventPredictScore_Get");
         }
+
+        #region Lottery
+
+        public IEnumerable<LotteryEventResponse> GetLotteryEventSetting(GetLotteryEventRequest request)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
+            p.Add("_StartDate", request.StartDate, dbType: DbType.DateTime);
+            p.Add("_EndDate", request.EndDate, dbType: DbType.DateTime);
+            return _reportDbClient.Query<LotteryEventResponse>("Admin_LotteryEventDrawSetting_Get", p);
+        }
+        
+        public LotteryEventResponse GetLotteryEventSettingBySq(int sq)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SQ", sq, dbType: DbType.Int32);
+            return _reportDbClient.QueryFirst<LotteryEventResponse>("Admin_LotteryEventDrawSettingBySQ_Get", p);
+        }
+        
+        public async Task<int> SetLotteryEventSetting(int sq, DateTime startDate , DateTime endDate , DateTime drawDate , int isSuspend , string excludeSetting ,string updator)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SQ", sq, dbType: DbType.Int32);
+            p.Add("_StartDate", startDate, dbType: DbType.DateTime);
+            p.Add("_EndDate", endDate, dbType: DbType.DateTime);
+            p.Add("_DrawDate", drawDate, dbType: DbType.DateTime);
+            p.Add("_IsSuspend", isSuspend, dbType: DbType.String);
+            p.Add("_ExcludeSetting", excludeSetting, dbType: DbType.String);
+            p.Add("_Updator", updator, dbType: DbType.String);
+            return await _mainDbClient.ExecuteAsync("Admin_LotteryEventDrawSetting_Set", p);
+        }
+
+        public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
+            return _reportDbClient.Query<RaffleTicketStickerResponse>("Admin_RaffleTicketSticker_Get" , p);
+        }
+        
+        public async Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request ,string updator)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
+            p.Add("_CurrencyId", request.CurrencyId, dbType: DbType.Int32);
+            p.Add("_StickerPrize", request.StickerPrize, dbType: DbType.Decimal);
+            p.Add("_TurnOver", request.TurnOver, dbType: DbType.Decimal);
+            p.Add("_Updator", updator, dbType: DbType.String);
+            return await _mainDbClient.ExecuteAsync("Admin_RaffleTicketSticker_Set", p);
+        }
+        
+        public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
+            p.Add("_CurrencyId", request.CurrencyId, dbType: DbType.Int32);
+            p.Add("_UserName", request.UserName, dbType: DbType.String);
+            return _reportDbClient.Query<EventRestrictionResponse>("Admin_EventRestriction_Get" , p);
+        }
+        
+        public async Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_CurrencyId", currencyId, dbType: DbType.Int32);
+            p.Add("_CustId", custId, dbType: DbType.Int32);
+            p.Add("_Reason", reason, dbType: DbType.String);
+            p.Add("_Creator", creator, dbType: DbType.String);
+            return await _mainDbClient.ExecuteAsync("Admin_EventRestriction_Ins", p);
+        }
+        
+        public async Task<int> DelEventRestriction(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId, dbType: DbType.Int32);
+            return await _mainDbClient.ExecuteAsync("Admin_EventRestriction_Del", p);
+        }
+        
+        #endregion
         
     }
 }

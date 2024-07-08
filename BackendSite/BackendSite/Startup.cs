@@ -103,13 +103,13 @@ namespace BackendSite
 
             services.AddTransient<ReferralManagementDecorator>();
             services.AddTransient<ILiveRegistrationBLL, LiveRegistrationBLL>();
-            services.AddTransient<ICupEventService, CupEventService>();
+            services.AddTransient<IEventService, EventService>();
             services.AddTransient<ISocialNetworkService, SocialNetworkService>();
             services.AddTransient<IMemberService, MemberService>();
             services.AddTransient<ILiveRegistrationService, LiveRegistrationService>();
             services.AddTransient<IVipLevelService, VipLevelService>();
             services.AddTransient<ITagService, TagService>();
-            services.AddTransient<ICupEventService, CupEventService>();
+            services.AddTransient<IEventService, EventService>();
             services.AddTransient<IBonusReportService, BonusReportService>();
             services.AddTransient<IHotEventService, HotEventService>();
             services.AddTransient<IDeviceService, DeviceService>();

@@ -14,12 +14,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     [ApiController]
     public class CupEventController : ControllerBase
     {
-        private readonly CupEventBLL _cupEventBll;
+        private readonly EventBLL _cupEventBll;
         private readonly ExcelBLL _excelBll;
 
         public CupEventController(IServiceProvider provider)
         {
-            _cupEventBll = provider.GetRequiredService<CupEventBLL>();
+            _cupEventBll = provider.GetRequiredService<EventBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
