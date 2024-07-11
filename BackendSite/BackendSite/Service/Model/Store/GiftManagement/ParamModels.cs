@@ -18,6 +18,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
             Operator = userName;
             Round = req.Round;
             GameId = req.GameId;
+            TpId = req.TpId;
         }
 
         public int SiteId { get; set; }
@@ -34,6 +35,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public int GiftType { get; set; }
         public int Round { get; set; }
         public string GameId { get; set; }
+        public int TpId { get; set; }
     }
 
     public class UpdateGiftParams

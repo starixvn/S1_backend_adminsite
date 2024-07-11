@@ -108,8 +108,8 @@ namespace BackendSite.Service.BLL
 
         private static string BonusCodeRule(CreateGiftRequest req,string siteName)
         {
-            //BonusCode規則。ex.PP2FREESPIN100FORNOVA8820240306
-            var bonusCode = $"PP{req.CurrencyId}FREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.UtcNow.ToString("yyyyMMdd")}";
+            //BonusCode規則。ex.52FREESPIN100FORNOVA8820240306
+            var bonusCode = $"{req.TpId}{req.CurrencyId}FREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.UtcNow.ToString("yyyyMMdd")}";
             return bonusCode;
         }
 
