@@ -225,7 +225,8 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<ProvideGameList> GetGameName()
         {
-            return _giftMamagementService.GetGameName().GroupBy(p => p.TpId)
+            return _giftMamagementService.GetGameName()
+                .GroupBy(p => p.TpId)
                 .Select(g => new ProvideGameList
                 {
                     TpId = g.Key,
@@ -237,8 +238,9 @@ namespace BackendSite.Service.BLL
                         TpName = _changeGameImgName.TryGetValue(p.TpName,out var changeName) ? changeName : p.TpName,
                         GameName = p.GameName,
                         GameId = p.GameId,
-                    }),
-                });
+                    }).Where(p => g.Key == 10 ? p.GameId.StartsWith("S") : true), // 當 TpId = 10,只取出slot類型遊戲
+                }
+                );
         }
     }
 }
