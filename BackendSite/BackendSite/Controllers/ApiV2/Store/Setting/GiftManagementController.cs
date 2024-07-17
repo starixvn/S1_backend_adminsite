@@ -75,6 +75,17 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
         }
 
         [HttpPost]
+        public ApiResult<IEnumerable<ProvideGameList>> GetGameName()
+        {
+            var apiResult = new ApiResult<IEnumerable<ProvideGameList>>
+            {
+                Data = _giftManagementBll.GetGameName(),
+                ErrorCode = 0
+            };
+            return apiResult;
+        }
+
+        [HttpPost]
         public async Task<ApiResult> UpdateAsync(UpdateGiftRequest request)
         {
             var user = User.Identity.Name;

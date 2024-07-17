@@ -21,6 +21,7 @@ namespace BackendSite.Service.BLL
         private readonly ILogger<GiftManagementBLL> _logger;
         private readonly ThirdPartyService _thirdPartyService;
         private readonly GiftMamagementService _giftMamagementService;
+        private readonly Dictionary<string, string> _changeGameImgName;
 
         public GiftManagementBLL(IServiceProvider provider)
         {
@@ -35,6 +36,13 @@ namespace BackendSite.Service.BLL
             _logger = provider.GetRequiredService<ILogger<GiftManagementBLL>>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _giftMamagementService = provider.GetRequiredService<GiftMamagementService>();
+            _changeGameImgName = new Dictionary<string, string>()
+            {
+                {"Iconic","AT" },
+                {"Kiss918","918Kiss" },
+                {"END","ES" },
+                {"EBet","WE" },
+            };
         }
 
         public Task<ApiResult<object>> GetGiftListAsync(GetListRequest req)
@@ -101,17 +109,17 @@ namespace BackendSite.Service.BLL
 
         private static string BonusCodeRule(CreateGiftRequest req,string siteName)
         {
-            //BonusCode規則。ex.PP2FREESPIN100FORNOVA8820240306
-            var bonusCode = $"PP{req.CurrencyId}FREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.UtcNow.ToString("yyyyMMdd")}";
+            //BonusCode規則。ex.52FREESPIN100FORNOVA8820240306
+            var bonusCode = $"{req.TpId}{req.CurrencyId}FREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.UtcNow.ToString("yyyyMMdd")}";
             return bonusCode;
         }
 
         private async Task<ApiResult> CreateBonusCode(CreateGiftRequest req, string bonusCode)
         {
-            var currency = await _thirdPartyService.GetTpCurrency(5,req.CurrencyId);
+            var currency = await _thirdPartyService.GetTpCurrency(req.TpId,req.CurrencyId);
             var inputs = new Dictionary<string, string>();
             var url = _tpServiceApiUrl + "CreateBonusCode";
-            inputs.Add("GameId", "vs20olympnova88");//目前只有PP一款遊戲
+            inputs.Add("GameId", req.GameId);
             inputs.Add("BonusCode", bonusCode);
             inputs.Add("Round", req.Round.ToString());
             inputs.Add("Currency",currency.TpCurrencyId);
@@ -119,7 +127,7 @@ namespace BackendSite.Service.BLL
             var request = new CreateBonusCodeParams()
             {
                 SiteId = req.SiteId,
-                TpId = 5,//PP
+                TpId = req.TpId,
                 inputs = inputs
             };
 
@@ -215,5 +223,25 @@ namespace BackendSite.Service.BLL
 
         private bool CheckIsImage(IFormFile file)
             => file.ContentType.StartsWith("image/");
+
+        public IEnumerable<ProvideGameList> GetGameName()
+        {
+            return _giftMamagementService.GetGameName()
+                .GroupBy(p => p.TpId)
+                .Select(g => new ProvideGameList
+                {
+                    TpId = g.Key,
+                    TpName = _changeGameImgName.TryGetValue(g.First().TpName, out var changeName) ? changeName : g.First().TpName,
+                    data = g.Select(p => new ProvideGameListDto
+                    {
+                        SlotId = p.SlotId,
+                        TpId = p.TpId,
+                        TpName = _changeGameImgName.TryGetValue(p.TpName,out var changeName) ? changeName : p.TpName,
+                        GameName = p.GameName,
+                        GameId = p.GameId,
+                    }).Where(p => g.Key == 10 ? p.GameId.StartsWith("S") : true), // 當 TpId = 10,只取出slot類型遊戲
+                }
+                );
+        }
     }
 }

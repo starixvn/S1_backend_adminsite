@@ -45,6 +45,9 @@ namespace BackendSite.Service.Model.Store.GiftManagement
         public GiftTypeEnum GiftType { get; set; }
 
         public int Round {  get; set; }
+
+        public int TpId { get; set; }
+        public string GameId { get; set; }
     }
 
     public class UpdateGiftRequest

@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Library;
+using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.GiftManagement;
 using Dapper;
@@ -27,5 +28,10 @@ public class GiftMamagementService
             _WorkerName = "CreatePPBonusCode"
         });
         return _mainDbClient.Execute("Service_FreeSpinWorkerPeriod_Set", p);
+    }
+
+    public IEnumerable<ProvideGameListDto> GetGameName()
+    {
+        return _reportDbClient.Query<ProvideGameListDto>("Admin_FreeSpinProviderList_Get", null);
     }
 }
