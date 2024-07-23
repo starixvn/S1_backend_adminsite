@@ -83,7 +83,8 @@ namespace BackendSite.Service.BLL
                         // 設置每行的樣式
                         for (int row = startRow + 1; row <= rows; row++)
                         {
-                            if (string.Equals(ws.Cells[row, 2].Value?.ToString(), "ALL", StringComparison.OrdinalIgnoreCase))
+                            var currencyCell = ws.Cells[row, properties.ToList().FindIndex(p => p.Name == "Currency") + 1];
+                            if (string.Equals(currencyCell.Value?.ToString(), "ALL", StringComparison.OrdinalIgnoreCase))
                             {
                                 using (var range = ws.Cells[row, 1, row, cols])
                                 {

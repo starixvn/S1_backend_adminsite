@@ -14,14 +14,27 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             var exportResult = new List<MpaWinLossGroupByModel>();
 
-            foreach (var item in data.Result)
+            if (isCurrencyDisplayAll)
             {
-                var child = data.ChildResult.Where(x => x.Key == item.Key);
+                foreach (var item in data.Result)
+                {
+                    var child = data.ChildResult.Where(x => x.Key == item.Key);
 
-                if (isCurrencyDisplayAll) item.ChildKey = "ALL";
+                    item.ChildKey = $"ALL";
 
-                exportResult.Add(item);
-                exportResult.AddRange(child);
+                    exportResult.Add(item);
+                    exportResult.AddRange(child);
+                }
+            }
+            else
+            {
+                foreach (var item in data.Result)
+                {
+                    var child = data.ChildResult.Where(x => x.Key == item.Key);
+
+                    exportResult.Add(item);
+                    exportResult.AddRange(child);
+                }
             }
 
             exportResult.Add(data.Total);
