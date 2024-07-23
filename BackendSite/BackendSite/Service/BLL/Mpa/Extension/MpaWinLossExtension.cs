@@ -8,19 +8,19 @@ namespace BackendSite.Service.BLL.Mpa.Extension
     {
         #region ToExcelFormat
 
-        public static IEnumerable<MpaWinLossGroupByModel> SortThen2ExcelData(this MpaWinLossReportResponse data, IOrderBy orderByOption, bool isGroupByCurrency = false)
+        public static IEnumerable<MpaWinLossGroupByModel> SortThen2ExcelData(this MpaWinLossReportResponse data, IOrderBy orderByOption, bool isCurrencyDisplayAll = false)
         {
             OrderByMpaWinLossReportResponse(data, orderByOption);
 
             var exportResult = new List<MpaWinLossGroupByModel>();
 
-            if (isGroupByCurrency)
+            if (isCurrencyDisplayAll)
             {
                 foreach (var item in data.Result)
                 {
                     var child = data.ChildResult.Where(x => x.Key == item.Key);
 
-                    item.Key = $"ALL-{item.Key}";
+                    item.ChildKey = $"ALL";
 
                     exportResult.Add(item);
                     exportResult.AddRange(child);
