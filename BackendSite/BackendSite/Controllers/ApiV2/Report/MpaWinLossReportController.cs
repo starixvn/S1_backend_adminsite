@@ -16,12 +16,14 @@ namespace BackendSite.Controllers.ApiV2.Report
     public class MpaWinLossReportController : ControllerBase
     {
         private readonly IMpaWinLossBLL _mpaWinLossBll;
-        private readonly ExcelBLL _excelBll;
+        private readonly MpaExcelBLL _mpaExcelBll;
+        private readonly ReportBLL _reportBll;
 
-        public MpaWinLossReportController(IMpaWinLossBLL mpaWinLossBll, ExcelBLL excelBll)
+        public MpaWinLossReportController(IMpaWinLossBLL mpaWinLossBll, MpaExcelBLL mpaExcelBll, ReportBLL reportBll)
         {
             _mpaWinLossBll = mpaWinLossBll;
-            _excelBll = excelBll;
+            _mpaExcelBll = mpaExcelBll;
+            _reportBll = reportBll;
         }
 
         #region GroupBy Date
@@ -51,8 +53,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByDateExport(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Date);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByDateExport");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossByDateExport");
         }
 
         #endregion
@@ -84,8 +87,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByMonthExport(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateExport(request, MpaWinLossGroupByTypeEnum.Month);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByMonthExport");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossByMonthExport");
         }
 
         #endregion
@@ -97,8 +101,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByDateDownload(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateDownload(request, MpaWinLossGroupByTypeEnum.DateDownload);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossReportByDateDownload");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossReportByDateDownload");
         }
 
         #endregion
@@ -110,8 +115,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByMonthDownload(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByDateDownload(request, MpaWinLossGroupByTypeEnum.MonthDownload);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossReportByMonthDownload");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossReportByMonthDownload");
         }
 
         #endregion
@@ -143,8 +149,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByTpGameTypeExport(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMapWinLossByTpGameTypeExport(request, MpaWinLossGroupByTypeEnum.GameType);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByTpGameTypeExport");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossByTpGameTypeExport");
         }
 
         #endregion
@@ -176,8 +183,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByTpCategoryTypeExport(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMapWinLossByTpCategoryExport(request, MpaWinLossGroupByTypeEnum.TpCategory);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByTpCategoryExport");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossByTpCategoryExport");
         }
 
         #endregion
@@ -210,8 +218,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByPlayerExport(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByPlayerExport(request, MpaWinLossGroupByTypeEnum.Player);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByPlayerExport");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossByPlayerExport");
         }
 
         [HttpPost]
@@ -263,8 +272,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByCurrencyExport(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMapWinLossByCurrencyExport(request, MpaWinLossGroupByTypeEnum.Currency);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByCurrencyExport");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossByCurrencyExport");
         }
 
         #endregion
@@ -296,8 +306,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByBrandExport(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByBrandExport(request, MpaWinLossGroupByTypeEnum.Brand);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByBrandExport");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossByBrandExport");
         }
 
         #endregion
@@ -329,8 +340,9 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<IActionResult> GetWinLossByAffiliateExport(MpaWinLossRequest request)
         {
             var exportData = await _mpaWinLossBll.GetMpaWinLossByAffiliateExport(request, MpaWinLossGroupByTypeEnum.Affiliate);
-            var stream = _excelBll.ExportV2(exportData);
-            return _excelBll.ExcelFile(stream, "WinLossByAffiliateExport");
+            var baseCurrency = _reportBll.GetCurrency().First(x => x.CurrencyId == request.BaseCurrencyId);
+            var stream = _mpaExcelBll.ExportV2(exportData, request, baseCurrency.IsoCode);
+            return _mpaExcelBll.ExcelFile(stream, request.StarTime.DateTime, request.EndTime.DateTime, "WinLossByAffiliateExport");
         }
         #endregion
     }

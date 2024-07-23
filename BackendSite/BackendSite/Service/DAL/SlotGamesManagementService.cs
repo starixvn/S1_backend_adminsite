@@ -261,11 +261,6 @@ namespace BackendSite.Service.DAL
             return _mainDbClient.Execute("Admin_SlotGameEnvironment_Set", parameter)>0;
         }
 
-        public bool Edit(int Id, ICloneable eNname, string cSname, string rtp, string reel, int device, string payline, int fun)
-        {
-            throw new NotImplementedException();
-        }
-
         public SlotGameResult GetById(int id)
         {
             var p = new DynamicParameters();
