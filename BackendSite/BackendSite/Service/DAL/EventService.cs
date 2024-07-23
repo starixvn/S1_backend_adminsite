@@ -6,6 +6,7 @@ using BackendSite.Service.Model.enums;
 using Dapper;
 
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -229,6 +230,48 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters();
             p.Add("_CustId", custId, dbType: DbType.Int32);
             return await _mainDbClient.ExecuteAsync("Admin_EventRestriction_Del", p);
+        }
+
+        public async Task<GetStickerReportReponse> GetStickerReport(GetStickerReportRequest request)
+        {
+            var result = new GetStickerReportReponse
+            {
+                StickerReportData = new List<GetStickerReportDto>()
+            };
+
+            var p = new DynamicParameters(new
+            {
+                _SiteList = JsonConvert.SerializeObject(request.SiteIds),
+                _CurrencyList = JsonConvert.SerializeObject(request.CurrencyIds),
+                _UserName = request.UserName,
+                _RoundId = request.RoundId,
+                _StartTime = request.StartDate,
+                _EndTime = request.EndDate,
+                _PageNumber = request.pageNumber
+            });
+
+            var startIndex = (Math.Abs(request.pageNumber) - 1) * Math.Abs(request.pageSize);
+            if (startIndex == 0)
+            {
+                startIndex = 1;
+            }
+            p.Add("_PageSize", request.pageSize, DbType.Int32, ParameterDirection.Input);
+            p.Add("_StartIndex", startIndex, DbType.Int32, ParameterDirection.Input);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            
+            var getData = await _mainDbClient.QueryAsync<GetStickerReportDto>("Admin_StickerReport_Get" , p);
+
+            if (getData.Count() != 0)
+            {
+                result.StickerReportData.AddRange(getData);
+            }
+            
+            result.TotalPages = p.Get<int?>("_TotalPages") ?? 0;
+            result.RowCount = p.Get<int?>("_RowCount") ?? 0;
+            result.PageNumber = request.pageNumber;
+            
+            return result;
         }
         
         #endregion

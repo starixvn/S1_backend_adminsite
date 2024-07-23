@@ -226,5 +226,46 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
+        
+        #region Sticker Report
+        
+        [HttpPost]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        public async Task<ApiResult> GetStickerReport(GetStickerReportRequest request)
+        {
+            var apiResult = new ApiResult<GetStickerReportReponse>();
+            try
+            {
+                var result = await _eventBll.GetStickerReport(request);
+
+                if (result != null)
+                {
+                    apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                    apiResult.Data = result;
+                }
+                else 
+                { 
+                    apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        public async Task<IActionResult> GetStickerReportExport(GetStickerReportRequest request)
+        {
+            var result = await _eventBll.GetStickerReportExport(request);
+            var stream = _excelBll.ExportV2(result);
+            return _excelBll.ExcelFile(stream, "StickerReportExport");
+        }
+        
+        #endregion
     }
 }

@@ -101,6 +101,48 @@
     {
         public string UserName { get; set; }
     }
+
+    public class GetStickerReportRequest
+    {
+        public IEnumerable<int> SiteIds { get; set; }
+        public string UserName { get; set; }
+        public int RoundId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public DateTime StartDate{ get; set; }
+        public DateTime EndDate{ get; set; }
+        public int pageSize { get; set; }
+        public int pageNumber { get; set; }
+    }
+    
+    public class GetStickerReportReponse
+    {
+        public List<GetStickerReportDto> StickerReportData { get; set; }
+        public List<StickerReportCurrencyTotal> StickerReportCurrencyTotal { get; set; }
+        public int PageNumber { get; set; }
+        public int RowCount { get; set; }
+        public int TotalPages { get; set; }
+    }
+
+    public class GetStickerReportDto
+    {
+        public int SiteId { get; set; }
+        public int Round { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public int CurrencyId { get; set; }
+        public int StickerId { get; set; }
+        public decimal StickerAmount { get; set; }
+        public DateTime PurchaseTime { get; set; }
+        public DateTime RoundStartDate{ get; set; }
+        public DateTime RoundEndDate{ get; set; }
+    }
+    
+    public class StickerReportCurrencyTotal
+    {
+        public int CurrencyId { get; set; }
+        public decimal CurrencyAmount { get; set; }
+    }
     
     #endregion
 }

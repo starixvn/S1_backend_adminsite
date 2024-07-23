@@ -52,6 +52,7 @@ namespace BackendSite.Service.DAL.Interface
         public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request);
         public Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator);
         public Task<int> DelEventRestriction(int custId);
+        public Task<GetStickerReportReponse> GetStickerReport(GetStickerReportRequest request);
 
         #endregion
     }
