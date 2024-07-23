@@ -36,7 +36,7 @@ namespace BackendSite.Service.Model
         public string TpUserName { get; set; } = string.Empty;
         public string RefNo { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
-        public string Game { get; set; } = string.Empty;
+        public IEnumerable<string> Game { get; set; } = new List<string>();
         public string Title { get; set; } = string.Empty;
         public string MatchID { get; set; } = string.Empty;
         public string BetType { get; set; } = string.Empty;
@@ -87,6 +87,8 @@ namespace BackendSite.Service.Model
         private IntPtr _nativeResource = Marshal.AllocHGlobal(100);
 
         public string SiteId { get; set; }
+
+        public string SiteName {  get; set; }
         public string CurrencyId { get; set; }
         public string UserName { get; set; }
         public string TpUserName { get; set; }
@@ -184,5 +186,9 @@ namespace BackendSite.Service.Model
 
             _isDisposed = true;
         }
+    }
+    public class SportTypeList
+    {
+        public string Name { get; set; }
     }
 }
