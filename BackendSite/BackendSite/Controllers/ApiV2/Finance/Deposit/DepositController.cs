@@ -40,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly IGaBLL _gaBll;
         private readonly ILogger<DepositController> _logger;
         private readonly FaceBookPixelBLL _faceBookPixelBll;
+        private readonly TaskSettingBLL _TaskSettingBll;
 
         #endregion
 
@@ -63,6 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
             _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
             _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
+            _TaskSettingBll = provider.GetRequiredService<TaskSettingBLL>();
 
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
@@ -442,12 +444,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     _ = Task.Run(async () =>
                     {
                         await _gaBll.PurchaseEventSendAsync(eventData);
-                    });
 
-                    #region 埋點
-                    if (depositRequest.SiteId == 1)
-                    {
-                        _ = Task.Run(() =>
+                        #region 埋點
+                        if (depositRequest.SiteId == 1)
                         {
                             var pixelEvent = new List<FaceBookPixel>
                             {
@@ -456,9 +455,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                             };
                             var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
                             _ = _faceBookPixelBll.Send(pixelRequest);
-                        });
-                    }
-                    #endregion
+                        }
+                        #endregion
+
+                        #region CustTaskTime
+                        if (refreshDepositInfoData.FirstDeposit == 1)
+                        {
+                            _ =_TaskSettingBll.Set(refreshDepositInfoData.CustId, TaskSetting.FirstDepositTime);
+                        }
+                        #endregion
+                    });
+
+                    
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)

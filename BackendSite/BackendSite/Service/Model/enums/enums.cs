@@ -2038,4 +2038,14 @@ namespace BackendSite.Service.Model.enums
         Common = 1,
         FreeSpin = 2
     }
+    public enum TaskSetting 
+    {
+        LastReadPopupMessage = 1,
+        LastStatusUpdateTime = 2,
+        PhoneVerifyTime = 3,
+        EmailVerifyTime = 4,
+        MemberTypeUpdateTime = 5,
+        FirstDepositTime = 6
+    }
+
 }
