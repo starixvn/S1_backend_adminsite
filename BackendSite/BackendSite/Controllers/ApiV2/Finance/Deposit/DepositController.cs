@@ -441,6 +441,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     // 若使用 depositRequest 的 FirstDeposit 永遠會是 0
                     var refreshDepositInfoData = _depositBll.GetDepositRequest(request.TransId);
                     var eventData = GetGaEventData(refreshDepositInfoData);
+
+                    #region CustTaskTime
+                    if (refreshDepositInfoData.FirstDeposit == 1)
+                    {
+                        _ = _TaskSettingBll.Set(refreshDepositInfoData.CustId, TaskSetting.FirstDepositTime, refreshDepositInfoData.CreateTime);
+                    }
+                    #endregion
+
                     _ = Task.Run(async () =>
                     {
                         await _gaBll.PurchaseEventSendAsync(eventData);
@@ -455,13 +463,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                             };
                             var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
                             _ = _faceBookPixelBll.Send(pixelRequest);
-                        }
-                        #endregion
-
-                        #region CustTaskTime
-                        if (refreshDepositInfoData.FirstDeposit == 1)
-                        {
-                            _ =_TaskSettingBll.Set(refreshDepositInfoData.CustId, TaskSetting.FirstDepositTime);
                         }
                         #endregion
                     });
