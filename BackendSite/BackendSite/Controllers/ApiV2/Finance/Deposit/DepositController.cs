@@ -40,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly IGaBLL _gaBll;
         private readonly ILogger<DepositController> _logger;
         private readonly FaceBookPixelBLL _faceBookPixelBll;
+        private readonly TaskSettingBLL _TaskSettingBll;
 
         #endregion
 
@@ -63,6 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
             _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
             _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
+            _TaskSettingBll = provider.GetRequiredService<TaskSettingBLL>();
 
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
@@ -439,15 +441,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     // 若使用 depositRequest 的 FirstDeposit 永遠會是 0
                     var refreshDepositInfoData = _depositBll.GetDepositRequest(request.TransId);
                     var eventData = GetGaEventData(refreshDepositInfoData);
+
+                    #region CustTaskTime
+                    if (refreshDepositInfoData.FirstDeposit == 1)
+                    {
+                        _ = _TaskSettingBll.Set(refreshDepositInfoData.CustId, TaskSetting.FirstDepositTime, refreshDepositInfoData.CreateTime);
+                    }
+                    #endregion
+
                     _ = Task.Run(async () =>
                     {
                         await _gaBll.PurchaseEventSendAsync(eventData);
-                    });
 
-                    #region 埋點
-                    if (depositRequest.SiteId == 1)
-                    {
-                        _ = Task.Run(() =>
+                        #region 埋點
+                        if (depositRequest.SiteId == 1)
                         {
                             var pixelEvent = new List<FaceBookPixel>
                             {
@@ -456,9 +463,11 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                             };
                             var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
                             _ = _faceBookPixelBll.Send(pixelRequest);
-                        });
-                    }
-                    #endregion
+                        }
+                        #endregion
+                    });
+
+                    
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)
