@@ -16,15 +16,15 @@ namespace BackendSite.Service.BLL.Mpa.Extension
 
             if (isCurrencyDisplayAll)
             {
+                var childResult = Enumerable.Empty<MpaWinLossGroupByModel>();
                 foreach (var item in data.Result)
                 {
-                    var child = data.ChildResult.Where(x => x.Key == item.Key);
-
-                    item.ChildKey = $"ALL";
-                    item.Key = $"ALL";
+                    childResult = data.ChildResult.Where(x => x.Key == item.Key).ToList();
+                    item.ChildKey = $"ALL-{item.ChildKey}";
+                    item.Key = $"ALL-{item.Key}";
 
                     exportResult.Add(item);
-                    exportResult.AddRange(child);
+                    exportResult.AddRange(childResult);
                 }
             }
             else
