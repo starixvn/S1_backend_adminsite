@@ -134,7 +134,7 @@ namespace BackendSite.Service.DAL
         }
         public IEnumerable<UserList> GetAdminUserList(string userName, int siteId, bool status)
         {
-            return _reportDbClient.Query<UserList>("Admin_UserList_Get_V2",
+            return _reportDbClient.Query<UserList>("Admin_UserList_Get_V3",
                 new DynamicParameters(new { UserName = string.IsNullOrWhiteSpace(userName) ? null : userName, SiteId = siteId, Status = status }));
         }
 

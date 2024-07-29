@@ -877,6 +877,17 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
                 };
             }
             var result = _permissionBll.GetAdminUserList(request.UserName, request.SiteId, request.Status).ToList();
+
+            //讓yashbet市場看不到公司人員帳號，先暫時針對正式環境做特別處理
+            var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
+            if (loginUser.SiteId == 6)
+            {
+                if (loginUser.Role != "[1]" && loginUser.Role != "[10]")//如果不是admin-role&On Call就看不到
+                {
+                    result.RemoveAll(x => x.Role == 1 || x.Role == 10);
+                }
+            }
+
             return new ApiResult<IEnumerable<UserList>>
             {
                 Data = result,
