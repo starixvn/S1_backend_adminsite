@@ -80,11 +80,10 @@ namespace BackendSite.Service.BLL
 
                         int lastRow = ws.Dimension.End.Row;
 
-                        // 設置每行的樣式
                         for (int row = startRow + 1; row <= rows; row++)
                         {
                             var currencyCell = ws.Cells[row, properties.ToList().FindIndex(p => p.Name == "Currency") + 1];
-                            if (string.Equals(currencyCell.Value?.ToString(), "ALL", StringComparison.OrdinalIgnoreCase))
+                            if (currencyCell.Value?.ToString().Substring(0, 3).Equals("ALL", StringComparison.OrdinalIgnoreCase) == true)
                             {
                                 using (var range = ws.Cells[row, 1, row, cols])
                                 {
@@ -92,14 +91,12 @@ namespace BackendSite.Service.BLL
                                     range.Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFACD"));
                                 }
                             }
-                            if (row == lastRow)
-                            {
-                                using (var range = ws.Cells[row, 1, row, cols])
-                                {
-                                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                    range.Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFB6C1"));
-                                }
-                            }
+                        }
+
+                        using (var range = ws.Cells[rows, 1, rows, cols])
+                        {
+                            range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                            range.Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFB6C1"));
                         }
                     }
                 }
