@@ -21,6 +21,7 @@ namespace BackendSite.Service.BLL.Mpa.Extension
                     var child = data.ChildResult.Where(x => x.Key == item.Key);
 
                     item.ChildKey = $"ALL";
+                    item.Key = $"ALL";
 
                     exportResult.Add(item);
                     exportResult.AddRange(child);
