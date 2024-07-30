@@ -157,6 +157,7 @@ public class LeaderboardRankingBonusData
     public string Ranking { get; set; }
     public decimal MinPoint { get; set; }
     public decimal Bonus { get; set; }
+    public int UserCount { get; set; }
 }
 
 public class LeaderboardRankingBonusList

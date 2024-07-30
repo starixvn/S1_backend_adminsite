@@ -35,6 +35,8 @@ public class MpaWinLossReportRequest
     public MpaWinLossGroupByTypeEnum GroupByType { get; set; }
 
     public bool DisplayGroupBreakdownInOriginalCurrency;
+
+    public int Version { get; set; }
 }
 
 public class MpaWinLossReportResponse
@@ -88,7 +90,7 @@ public class MpaWinLossGroupByModel
     public string Key { get; set; }
     public string ChildKey { get; set; }
     public string CustId { get; set; }
-    
+
     public string TpUserName { get; set; }
     public string UserName { get; set; }
 

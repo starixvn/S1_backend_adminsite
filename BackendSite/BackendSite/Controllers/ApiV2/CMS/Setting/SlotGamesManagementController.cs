@@ -18,6 +18,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
         private readonly SlotGamesManagementBLL _slotGamesManagementBLL;
         private readonly GameCasinoManageBLL _gameCasinoManageBLL;
+        private readonly ExcelBLL _excelBLL;
         #endregion
 
         #region Constructors
@@ -25,6 +26,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             _slotGamesManagementBLL = provider.GetRequiredService<SlotGamesManagementBLL>();
             _gameCasinoManageBLL = provider.GetRequiredService<GameCasinoManageBLL>();
+            _excelBLL = provider.GetRequiredService<ExcelBLL>();
         }
         #endregion
 
@@ -111,6 +113,16 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             {
                 return new ApiListResult<SlotGameData>((int)ErrorCodeEnum.SystemException, ex.Message);
             }
+        }
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 2 })]
+        public IActionResult ExportSlotGameList(ExportSlotGameListReq request)
+        {
+
+            var data = _slotGamesManagementBLL.ExportSlotGameList(request);
+            var stream = _excelBLL.ExportV2(data);
+            return _excelBLL.ExcelFile(stream, "SlotGameReport");
+
         }
 
         /// <summary>
@@ -300,6 +312,63 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 apiResult.Message = ex.Message;
             }
             return apiResult;
+        }
+        /// <summary>
+        /// SlotGamesManagement/Set
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CMS >  Slot Games Management  > edit > save
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
+        public ApiResult Set(EditSlotGameReq request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var result = _slotGamesManagementBLL.Set(request, User.Identity.Name);
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+            return apiResult;
+        }
+        /// <summary>
+        /// SlotGamesManagement/GetById
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CMS >  Slot Games Management  > edit
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 126, 3 })]
+        public ApiResult GetById(SetNewSlotGameReq request)
+        {
+            try
+            {
+                var data = _slotGamesManagementBLL.GetById(request.Id);
+                return new ApiResult<SlotGameResult> { Data = data,ErrorCode = (int)ErrorCodeEnum.Success};
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult<SlotGameData> { ErrorCode = (int)ErrorCodeEnum.Fail,Message = ex.Message};
+            }
+
         }
         #endregion
     }

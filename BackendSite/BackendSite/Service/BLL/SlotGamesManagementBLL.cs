@@ -31,6 +31,15 @@ namespace BackendSite.Service.BLL
             var (index, count) = pageInfo.ListPagination(data.Count, request.PageNumber, request.PageSize);
             return data.GetRange(index, count);
         }
+        public IEnumerable<ExportSlotGameList> ExportSlotGameList(ExportSlotGameListReq request)
+        {
+            var userSiteData = _serverInfoService.GetSiteList().First(x => x.SiteId == request.SiteId);
+            var result = _slotGamesManagementService.GetSlotGameList(request.SiteId, request.TpId, request.Name, request.GameId, request.Status);
+            var slotGames = result.Select(i => i.GetSlotGameData(userSiteData));
+            var data = SortSlotGamesList(slotGames).Select(x =>new ExportSlotGameList { TpName = x.TpName,GameId=x.GameId,EName = x.EName,CName = x.CName});
+            
+            return data;
+        }
 
         public int SetSlotGame(SetSlotGameReq req, string @operator)
         {
@@ -42,6 +51,7 @@ namespace BackendSite.Service.BLL
             var nextId = _slotGamesManagementService.QueryNextGameId(req.TpId);
             //TP支援的currency & site
             var siteCurrencyList = _slotGamesManagementService.GetTpSiteCurrencyList(req.TpId);
+            req.CopyToAfter();
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
@@ -54,7 +64,7 @@ namespace BackendSite.Service.BLL
                 success &= _slotGamesManagementService.SetGameCasinoInfo(req.TpId, req.ENname, req.CSname, nextId, trans);
                 success &= _slotGamesManagementService.SetSlotGameStatus(nextId, @operator, siteCurrencyList, req.CurrencyIds, trans);
                 success &= _slotGamesManagementService.SetSlotGameDetail(nextId, @operator, siteCurrencyList, req.CurrencyIds, req.CategoryIds, trans);
-                _slotGamesManagementService.SetSlotGameLog(req, @operator, trans);
+                _slotGamesManagementService.SetSlotGameLog(req.After, req.Before, ActionType.Create, @operator, trans);
             }
             catch (Exception ex)
             {
@@ -110,6 +120,48 @@ namespace BackendSite.Service.BLL
         {
             var status = (req.IsPRD) ? (int)SlotGameStatusEnum.Open : (int)SlotGameStatusEnum.ReleaseOpen;
             return _slotGamesManagementService.SetSlotGameEnvironment(req.SiteId, req.SlotGameId, req.IsPRD,status, @operator);
+        }
+
+        public bool Set(EditSlotGameReq req, string @operator)
+        {
+            using var conn = _mainDbClient.GetMySqlConnection();
+            conn.Open();
+            using var trans = conn.BeginTransaction();
+            var success = true;
+            var requestInfo = req.After;
+
+            try
+            {
+                success &= _slotGamesManagementService.SetSlotGame(requestInfo.TpId, requestInfo.GameId, requestInfo.Fun, requestInfo.Device, req.Id, trans);
+                success &= _slotGamesManagementService.SetGameCasinoExtra(requestInfo.TpId, requestInfo.RTP, requestInfo.Reel, requestInfo.Payline, req.Id, trans);
+                success &= _slotGamesManagementService.SetGameCasinoInfo(requestInfo.TpId, requestInfo.ENname, requestInfo.CSname, req.Id, trans);
+                
+                _slotGamesManagementService.SetSlotGameLog(req.After, req.Before, ActionType.Update, @operator, trans);
+            }
+            catch (Exception ex)
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+                throw new Exception(ex.Message);
+            }
+
+
+            if (success)
+            {
+                _mainDbClient.CommitAndDisposeConnection(conn, trans);
+            }
+            else
+            {
+                _mainDbClient.RollbackAndDisposeConnection(conn, trans);
+            }
+            return success;
+        }
+
+        public SlotGameResult GetById(int id)
+        {
+            var result = _slotGamesManagementService.GetById(id);
+            result.RTP = result.RTP.Replace("%", "");
+
+            return result;
         }
     }
 }

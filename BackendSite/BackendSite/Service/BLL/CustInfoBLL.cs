@@ -226,8 +226,9 @@ namespace BackendSite.Service.BLL
                 custInfoDetail.CustRebateSum = _bonusInfoService.GetCustRebateSum(custInfoDetail.SiteId, custId);
                 custInfoDetail.CustRewardSum = _bonusInfoService.GetCustRewardSum(custInfoDetail.SiteId, custId);
 
-                // 2024 New Year Egg
-                custInfoDetail.EggTickets = _bonusInfoService.GetEggTicket(custId);
+                // event item Count
+                //TODO:需改共用名稱
+                custInfoDetail.EventItemCounts = _bonusInfoService.GetEggTicket(custInfoDetail.SiteId,custId,custInfoDetail.CurrencyId);
             }
 
             return custInfoDetail;
@@ -1199,7 +1200,8 @@ namespace BackendSite.Service.BLL
                             AffiliateId = a.AffiliateId,
                             AffiliateCode = a.AffiliateCode,
                             LastActivityIp = a.LastActivityIp,
-                            Tag = GetTag(allTagList, a.TagList)
+                            Tag = GetTag(allTagList, a.TagList),
+                            UserType = a.UserType
                         });
                         var fileBytes = _excelBll.ExportV2(data);
                         var stream = new MemoryStream(fileBytes);

@@ -24,29 +24,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
-
-        [HttpPost]
-        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
-        public ApiResult<IEnumerable<GetLeaderboardReportResponse>> GetLeaderboardReport(GetLeaderboardReportRequest request)
-        {
-            var apiResult = new ApiResult<IEnumerable<GetLeaderboardReportResponse>>();
-            var userServerInfo = _serverInfoBll.GetSiteListByLoginUserV2();
-            ((IApiRequest)request).ConvertToMultiSiteParam(userServerInfo);
-            try
-            {
-                var data = _leaderBoardBll.GetLeaderboardReport(request);
-                
-                apiResult.Data = data;
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-            }
-            catch (Exception ex)
-            {
-                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
-                apiResult.Message = ex.Message;
-            }
-
-            return apiResult;
-        }
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 1 })]
@@ -74,7 +51,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 143, 2 })]
         public IActionResult GetLeaderboardReportExport(GetLeaderboardReportRequest request)
         {
-            var data = _leaderBoardBll.GetLeaderboardReport(request);
+            var data = _leaderBoardBll.ExportLeaderboardReport(request);
 
             var stream = _excelBll.ExportV2(data);
             return _excelBll.ExcelFile(stream, "LeaderboardReport");

@@ -1,5 +1,5 @@
 # localhost
-@url=http://localhost:9158
+@url=http://localhost:5070
 
 # AdminSite DEV
 # @url=http://admin.n88dev.com
@@ -10,7 +10,7 @@ POST {{url}}/apiV2/Home/Signin HTTP/1.1
 Content-Type: application/json
 
 {
-    "userName": "ricktest",
+    "userName": "admin",
     "userPwd": "1q2w3e4r"
 }
 
@@ -64,4 +64,32 @@ Content-Type: application/json
 {
     "currencyId": 0,
     "purpose": 2
+}
+
+###
+# 取得 Settlement 下拉選單
+POST {{url}}/apiV2/BaseData/GetPaymentList HTTP/1.1
+Content-Type: application/json
+
+{
+    "payId": null,
+    "currencyId": 4
+}
+
+###
+# Settlement 送出PROCESS
+# channelId固定帶0
+# withdrawalType固定帶6
+# selId來源為GetPaymentList選擇的payId
+POST {{url}}/apiV2/Withdrawal/SendToNext HTTP/1.1
+Content-Type: application/json
+
+{
+  "comment": "",
+  "transId": "WD137877",
+  "withdrawalInfo": "{\"SysId\": 8, \"IFSCCode\": null, \"AccountNo\": \"1123344566789111\", \"AccountName\": \"Hồ thái nhậts\"}",
+  "action": 4,
+  "selId": 22,
+  "withdrawalType": 6,
+  "channelId": 0
 }

@@ -1,12 +1,10 @@
-﻿
-using BackendSite.Extensions;
+﻿using BackendSite.Extensions;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.BankCardManagement;
 using BackendSite.Service.Model.enums;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -32,7 +30,7 @@ namespace BackendSite.Service.BLL
             (GetOfflineBankingSettingParams input, int pageNumber, int pageSize)
         {
             IPageInfo pageInfo = new PageInfo();
-            var result = await GetOfflineBankingSettingListWithCache(input);
+            var result = await GetOfflineBankingSettingList(input);
             
             var (startIndex, _) = pageNumber.GetStartIndex(pageSize);
             pageInfo.SetPageInfo(result.Count, pageNumber, pageSize);
