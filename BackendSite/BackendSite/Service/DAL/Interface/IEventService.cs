@@ -53,6 +53,7 @@ namespace BackendSite.Service.DAL.Interface
         public Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator);
         public Task<int> DelEventRestriction(int custId);
         public Task<GetStickerReportReponse> GetStickerReport(GetStickerReportRequest request);
+        public IEnumerable<GetCustLotteryTicket> GetCustLotteryTicket(int siteId, string currencyIds, string userName, int roundId, string ticketNo);
 
         #endregion
     }

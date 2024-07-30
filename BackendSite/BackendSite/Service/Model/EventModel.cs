@@ -144,5 +144,26 @@
         public decimal CurrencyAmount { get; set; }
     }
     
+    public class GetCustLotteryTicketRequest
+    {
+        public int SiteId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public string UserName { get; set; }
+        public int RoundId { get; set; }
+        public string TicketNo { get; set; }
+    }
+    
+    public class GetCustLotteryTicket
+    {
+        public int CustId { get; set; }
+        public int CurrencyId { get; set; }
+        public string UserName { get; set; }
+        public int RoundId { get; set; }
+        public string TicketNo { get; set; }
+        public DateTime PeriodStartTime{ get; set; }
+        public DateTime PeriodEndTime{ get; set; }
+        public DateTime ReceivedTime{ get; set; }
+    }
+    
     #endregion
 }

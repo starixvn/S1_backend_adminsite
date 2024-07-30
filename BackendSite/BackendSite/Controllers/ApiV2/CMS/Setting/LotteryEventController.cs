@@ -1,8 +1,10 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
@@ -25,8 +27,10 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
         }
 
+        #region Event -> Lotterry Event -> Event Management
+        
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
         public ApiResult<IEnumerable<LotteryEventResponse>> GetLotteryEventSetting(GetLotteryEventRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<LotteryEventResponse>>();
@@ -46,7 +50,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
         public async Task<ApiResult> SetLotteryEventSetting(SetLotteryEventRequest request)
         {
             var apiResult = new ApiResult();
@@ -81,7 +85,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
         public ApiResult<IEnumerable<RaffleTicketStickerResponse>> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<RaffleTicketStickerResponse>>();
@@ -101,7 +105,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
         public async Task<ApiResult> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request)
         {
             var apiResult = new ApiResult();
@@ -127,8 +131,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
         
+        #endregion
+        
+        #region Restriction Report
+        
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 159, 1 })]
         public ApiResult<IEnumerable<EventRestrictionResponse>> GetEventRestrictionList(GetEventRestrictionRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<EventRestrictionResponse>>();
@@ -148,7 +156,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 159, 3 })]
         public async Task<ApiResult> SetEventRestriction(SetEventRestrictionRequest request)
         {
             var apiResult = new ApiResult();
@@ -191,7 +199,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 159, 3 })]
         public async Task<ApiResult> DelEventRestriction(DelEventRestrictionRequest request)
         {
             var apiResult = new ApiResult();
@@ -227,10 +235,12 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             return apiResult;
         }
         
+        #endregion
+        
         #region Sticker Report
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 160, 1 })]
         public async Task<ApiResult> GetStickerReport(GetStickerReportRequest request)
         {
             var apiResult = new ApiResult<GetStickerReportReponse>();
@@ -258,12 +268,57 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 160, 2 })]
         public async Task<IActionResult> GetStickerReportExport(GetStickerReportRequest request)
         {
             var result = await _eventBll.GetStickerReportExport(request);
             var stream = _excelBll.ExportV2(result);
             return _excelBll.ExcelFile(stream, "StickerReportExport");
+        }
+        
+        #endregion
+
+        #region LotteryTicketReport
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 161, 1 })]
+        public ApiResult<IEnumerable<GetCustLotteryTicket>> GetCustLotteryTicket(GetCustLotteryTicketRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<GetCustLotteryTicket>>();
+            try
+            {
+                var responseData = _eventBll.GetCustLotteryTicket(
+                    request.SiteId,
+                    JsonConvert.SerializeObject(request.CurrencyIds),
+                    request.UserName,
+                    request.RoundId,
+                    request.TicketNo);
+                
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 161, 2 })]
+        public IActionResult GetCustLotteryTicketExport(GetCustLotteryTicketRequest request)
+        {
+            var responseData = _eventBll.GetCustLotteryTicket(
+                request.SiteId,
+                JsonConvert.SerializeObject(request.CurrencyIds),
+                request.UserName,
+                request.RoundId,
+                request.TicketNo);
+            
+            var stream = _excelBll.ExportV2(responseData);
+            return _excelBll.ExcelFile(stream, "LotteryTicketReportExport");
         }
         
         #endregion

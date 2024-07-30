@@ -274,6 +274,17 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public IEnumerable<GetCustLotteryTicket> GetCustLotteryTicket(int siteId , string currencyIds, string userName , int roundId ,string ticketNo)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_CurrencyIds", currencyIds, dbType: DbType.String);
+            p.Add("_UserName", userName, dbType: DbType.String);
+            p.Add("_RoundId", roundId, dbType: DbType.Int32);
+            p.Add("_TicketNo", ticketNo, dbType: DbType.String);
+            return _reportDbClient.Query<GetCustLotteryTicket>("Admin_CustLotteryTicket_Get", p);
+        }
+        
         #endregion
         
     }

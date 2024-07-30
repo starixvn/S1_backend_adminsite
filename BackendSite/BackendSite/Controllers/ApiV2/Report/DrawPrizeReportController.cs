@@ -156,18 +156,18 @@ namespace BackendSite.Controllers.ApiV2.Report
 
             try
             {
-                _tools.StringConvertDateTimeOffset(request.EventTime.ToString(), out DateTimeOffset _, out TimeSpan timeSpan);
+                _tools.StringConvertDateTimeOffset(request.EventTime.ToString(), out _, out _);
                 var param = new PrizeLogPara()
                 {
                     EventId = request.EventId,
                     PrizeId = request.PrizeId,
-                    EventTime = request.EventTime.ToString("yyyy-MM-dd"),
+                    EventTime = request.EventTime,
                     PrizeName = request.PrizeName,
                     PageNumber = request.PageNumber,
                     PageSize = request.PageSize,
                 };
 
-                var logResult = _prizeBll.GetPrizeLog(param, 0);
+                var logResult = _prizeBll.GetPrizeLog(param);
                 foreach (var data in logResult.PrizeLogData)
                 {
                     data.DrawTime = new DateTimeOffset(data.DrawTime.DateTime, TimeSpan.Zero);

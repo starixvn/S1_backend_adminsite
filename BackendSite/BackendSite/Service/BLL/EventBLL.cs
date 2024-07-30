@@ -313,6 +313,13 @@ namespace BackendSite.Service.BLL
             return result.StickerReportData;
         }
 
+        public IEnumerable<GetCustLotteryTicket> GetCustLotteryTicket(int siteId , string currencyIds, string userName , int roundId ,string ticketNo)
+        {
+            var responses = _eventService.GetCustLotteryTicket(siteId, currencyIds, userName, roundId, ticketNo);
+           
+            return responses;
+        }
+        
         #endregion
     }
 }
