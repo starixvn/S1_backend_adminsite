@@ -56,13 +56,33 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var apiResult = new ApiResult();
             try
             {
-                var data = _eventBll.GetLotteryEventSettingBySq(request.Sq);
-                if (data.Status == (int)LotteryEventEnum.Done)
+                if (request.EndDate <= request.StartDate)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "Done status can not edit";
+                    apiResult.Message = "EndDate must be later than StartDate";
                 }
                 
+                if (request.DrawDate <= request.EndDate)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "DrawDate must be later than EndDate";
+                }
+                
+                var data = _eventBll.GetLotteryEventSettingBySq(request.Sq);
+                if (data.Status is (int)LotteryEventEnum.Done  or (int)LotteryEventEnum.PayOut)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Done or PayOut status can not be edited";
+                }
+
+                //can't edit running period time
+                var now = DateTime.UtcNow.AddHours(8);
+                if (now >= data.StartDate && now <= data.EndDate)
+                {
+                    request.StartDate = data.StartDate;
+                    request.EndDate = data.EndDate;
+                }
+                    
                 var result = await _eventBll.SetLotteryEventSetting(request , User.Identity.Name) > 0;
                 if (result)
                 {
@@ -71,8 +91,29 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 else
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "there's running period round exists";
                 }
                 
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
+        public ApiResult<LotteryTicketHistory> GetLotteryTicketHistory(LotteryTicketHistoryRequest request)
+        {
+            var apiResult = new ApiResult<LotteryTicketHistory>();
+            try
+            {
+                var responseData = _eventBll.GetLotteryTicketHistory(request.SiteId ,request.RoundId);
+                apiResult.Data = responseData;
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
             }
             catch (Exception ex)

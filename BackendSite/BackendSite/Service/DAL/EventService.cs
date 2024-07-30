@@ -186,6 +186,11 @@ namespace BackendSite.Service.DAL
             p.Add("_Updator", updator, dbType: DbType.String);
             return await _mainDbClient.ExecuteAsync("Admin_LotteryEventDrawSetting_Set", p);
         }
+        
+        public LotteryTicketHistory GetLotteryTicketHistory(int siteId ,int roundId)
+        {
+            return _reportDbClient.QueryFirst<LotteryTicketHistory>("Service_LotteryTicketHistory_Get", new { _SiteId = siteId , _RoundId = roundId });
+        }
 
         public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
         {

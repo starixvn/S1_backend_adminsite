@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using Newtonsoft.Json;
+
+namespace BackendSite.Service.Model
 {
     #region Lottery
     
@@ -36,6 +38,29 @@
         public int ThirdPrize { get; set; }
         public int Consolation { get; set; }
         public int Small { get; set; }
+    }
+    
+    public class LotteryTicketHistoryRequest
+    {
+        public int SiteId { get; set; }
+        public int RoundId { get; set; }
+    }
+    
+    public class LotteryTicketHistory
+    {
+        public int SiteId { get; set; }
+        public int RoundId { get; set; }
+        public string FirstPrize { get; set; }
+        public string SecondPrize { get; set; }
+        public string ThirdPrize { get; set; }
+        public string ConsolationPrize { get; set; }
+        public string SmallPrize { get; set; }
+        public List<string> FirstPrizeList => JsonConvert.DeserializeObject<List<string>>(FirstPrize);
+        public List<string> SecondPrizeList => JsonConvert.DeserializeObject<List<string>>(SecondPrize);
+        public List<string> ThirdPrizeList => JsonConvert.DeserializeObject<List<string>>(ThirdPrize);
+        public List<string> ConsolationPrizeList => JsonConvert.DeserializeObject<List<string>>(ConsolationPrize);
+        public List<string> SmallPrizeList => JsonConvert.DeserializeObject<List<string>>(SmallPrize);
+        public int StickerId { get; set; }
     }
     
     public class GetRaffleTicketStickerRequest

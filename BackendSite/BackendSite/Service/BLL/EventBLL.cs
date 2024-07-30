@@ -249,6 +249,13 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
+        public LotteryTicketHistory GetLotteryTicketHistory(int siteId, int roundId)
+        {
+            var responses = _eventService.GetLotteryTicketHistory(siteId, roundId);
+           
+            return responses;
+        }
+        
         public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
         {
             var responses = _eventService.GetRaffleTicketStickerSetting(request);
