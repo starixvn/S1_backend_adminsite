@@ -291,11 +291,10 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<GetStickerReportReponse> GetStickerReport(GetStickerReportRequest request)
+        public async Task<GetStickerReportResponse> GetStickerReport(GetStickerReportRequest request)
         {
-            var result = new GetStickerReportReponse();
             var currencyTotalAmount = new List<StickerReportCurrencyTotal>();
-            result = await _eventService.GetStickerReport(request);
+            var result = await _eventService.GetStickerReport(request);
             
             var totalAmounts = result.StickerReportData
                 .GroupBy(p => p.CurrencyId)
@@ -315,7 +314,7 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<GetStickerReportDto>> GetStickerReportExport(GetStickerReportRequest request)
         {
             //先拉10000筆
-            request.pageSize = 10000;
+            request.PageSize = 10000;
             var result = await _eventService.GetStickerReport(request);
             return result.StickerReportData;
         }

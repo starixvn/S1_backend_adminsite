@@ -237,9 +237,9 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_EventRestriction_Del", p);
         }
 
-        public async Task<GetStickerReportReponse> GetStickerReport(GetStickerReportRequest request)
+        public async Task<GetStickerReportResponse> GetStickerReport(GetStickerReportRequest request)
         {
-            var result = new GetStickerReportReponse
+            var result = new GetStickerReportResponse
             {
                 StickerReportData = new List<GetStickerReportDto>()
             };
@@ -252,15 +252,15 @@ namespace BackendSite.Service.DAL
                 _RoundId = request.RoundId,
                 _StartTime = request.StartDate,
                 _EndTime = request.EndDate,
-                _PageNumber = request.pageNumber
+                _PageNumber = request.PageNumber
             });
 
-            var startIndex = (Math.Abs(request.pageNumber) - 1) * Math.Abs(request.pageSize);
+            var startIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize);
             if (startIndex == 0)
             {
                 startIndex = 1;
             }
-            p.Add("_PageSize", request.pageSize, DbType.Int32, ParameterDirection.Input);
+            p.Add("_PageSize", request.PageSize, DbType.Int32, ParameterDirection.Input);
             p.Add("_StartIndex", startIndex, DbType.Int32, ParameterDirection.Input);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
@@ -274,7 +274,7 @@ namespace BackendSite.Service.DAL
             
             result.TotalPages = p.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = p.Get<int?>("_RowCount") ?? 0;
-            result.PageNumber = request.pageNumber;
+            result.PageNumber = request.PageNumber;
             
             return result;
         }

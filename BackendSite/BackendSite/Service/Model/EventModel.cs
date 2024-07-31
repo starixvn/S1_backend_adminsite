@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using BackendSite.Service.Model.ApiModel;
+using BackendSite.Service.Model.enums;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -127,7 +129,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
     }
 
-    public class GetStickerReportRequest
+    public class GetStickerReportRequest : ApiRequestPageModel
     {
         public IEnumerable<int> SiteIds { get; set; }
         public string UserName { get; set; }
@@ -135,11 +137,9 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> CurrencyIds { get; set; }
         public DateTime StartDate{ get; set; }
         public DateTime EndDate{ get; set; }
-        public int pageSize { get; set; }
-        public int pageNumber { get; set; }
     }
     
-    public class GetStickerReportReponse
+    public class GetStickerReportResponse
     {
         public List<GetStickerReportDto> StickerReportData { get; set; }
         public List<StickerReportCurrencyTotal> StickerReportCurrencyTotal { get; set; }
@@ -151,12 +151,13 @@ namespace BackendSite.Service.Model
     public class GetStickerReportDto
     {
         public int SiteId { get; set; }
-        public int Round { get; set; }
+        public int RoundId { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public string SabaId { get; set; }
         public int CurrencyId { get; set; }
-        public int StickerId { get; set; }
+        public ChineseZodiacStickerId StickerId { get; set; }
+        public string StickerName => StickerId.ToString();
         public decimal StickerAmount { get; set; }
         public DateTime PurchaseTime { get; set; }
         public DateTime RoundStartDate{ get; set; }

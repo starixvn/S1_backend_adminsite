@@ -356,9 +356,9 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 160, 1 })]
-        public async Task<ApiResult> GetStickerReport(GetStickerReportRequest request)
+        public async Task<ApiResult<GetStickerReportResponse>> GetStickerReport(GetStickerReportRequest request)
         {
-            var apiResult = new ApiResult<GetStickerReportReponse>();
+            var apiResult = new ApiResult<GetStickerReportResponse>();
             try
             {
                 var result = await _eventBll.GetStickerReport(request);
