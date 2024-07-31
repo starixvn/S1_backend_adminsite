@@ -1,5 +1,6 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +19,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         private readonly ExcelBLL _excelBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly AuthorizeBLL _authorizeBll;
+        private readonly ICacheHelper _redisHelper;
         
         public LotteryEventController(IServiceProvider provider)
         {
@@ -25,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         #region Event -> Lotterry Event -> Event Management
@@ -170,6 +173,77 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             }
 
             return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
+        public async Task<ApiResult<LotteryMaintainModel>> GetLotteryMaintainAsync()
+        {
+            var apiResult = new ApiResult<LotteryMaintainModel>();
+            var authData = _authorizeBll.GetAuthData();
+            var key = $"LotteryMaintain:{authData.SiteId}";
+            
+            var exists = await _redisHelper.KeyExistsAsync(key , RedisDataBase.Shared);
+
+            if (exists)
+            {
+                var dataString = await _redisHelper.StringGetAsync(key , RedisDataBase.Shared);
+                var data = JsonConvert.DeserializeObject<LotteryMaintainModel>(dataString);
+                
+                apiResult.Data = data;
+            }
+            
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;   
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
+        public async Task<ApiResult> CreateLotteryMaintainAsync(LotteryMaintainCreateRequest request)
+        {
+            try
+            {
+                var key = $"LotteryMaintain:{request.SiteId}";
+                
+                var reqModel = new LotteryMaintainModel
+                {
+                    BeginDate = request.BeginDate.DateTime,
+                    EndDate = request.EndDate.DateTime,
+                    IsMaintain = request.IsMaintain,
+                    UpdateUser = _authorizeBll.GetAuthData().UserName
+                };
+                var value = JsonConvert.SerializeObject(reqModel);
+                
+                if (request.IsMaintain)
+                {
+                    var result = await _redisHelper.StringSetAsync(key, value, null, RedisDataBase.Shared);
+                    if (!result)
+                    {
+                        return new ApiResult
+                        {
+                            ErrorCode = (int)ErrorCodeEnum.Fail,
+                            Message = "LotteryMaintain set failed!"
+                        };
+                    }
+                }
+                else
+                {
+                    _redisHelper.KeyDelete(key , RedisDataBase.Shared);
+                }
+                
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
+                    Message = ex.Message,
+                };
+            }
         }
         
         #endregion

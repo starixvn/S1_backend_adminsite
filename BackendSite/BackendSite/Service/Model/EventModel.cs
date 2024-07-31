@@ -190,5 +190,31 @@ namespace BackendSite.Service.Model
         public DateTime ReceivedTime{ get; set; }
     }
     
+    public class LotteryMaintainModel
+    {
+        public DateTime BeginDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public bool IsMaintain { get; set; }
+        public string UpdateUser { get; set; }
+    }
+    
+    public class LotteryMaintainCreateRequest
+    {
+        private DateTimeOffset _beginDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        public int SiteId { get; set; }
+        public DateTimeOffset BeginDate
+        {
+            get => _beginDate;
+            set => _beginDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public bool IsMaintain { get; set; }
+    }
+    
     #endregion
 }
