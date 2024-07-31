@@ -6,19 +6,33 @@ namespace BackendSite.Service.BLL
     public class PrizeBLL
     {
         private readonly PrizeService _prizeService;
-
-        public PrizeBLL(PrizeService prizeService)
+        private readonly MpaCommonService _mpaCommonService;
+        
+        public PrizeBLL(IServiceProvider provider)
         {
-            this._prizeService = prizeService;
+            _prizeService = provider.GetRequiredService<PrizeService>();
+            _mpaCommonService = provider.GetRequiredService<MpaCommonService>();
         }
-
+        
         public DrawPrizeReportResult PrizeSearch(PrizeSelect prizeSelect, int timeZone, out List<string> currencyAmount)
         {
             return _prizeService.PrizeSearch(prizeSelect, timeZone, out currencyAmount);
         }
-        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara, int timeZone)
+        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara)
         {
-            return _prizeService.GetPrizeLog(prizeLogPara, timeZone);
+            var resultList = _prizeService.GetPrizeLog(prizeLogPara);
+
+            var rateList = _mpaCommonService.GetMpaExchangeRateByRateType(prizeLogPara.EventTime, prizeLogPara.EventTime, 2).Result.ToList();
+            foreach (var result in resultList.PrizeLogData)
+            {
+                var rateDto = rateList.FirstOrDefault(x => x.CurrencyId == 3 && x.TargetCurrencyId == result.CurrencyId);
+                if (rateDto is not null)
+                {
+                    result.UsdRate = rateDto.Rate;
+                }
+            }
+            
+            return resultList;
         }
         public IEnumerable<EventDraw> GetEventName()
         {

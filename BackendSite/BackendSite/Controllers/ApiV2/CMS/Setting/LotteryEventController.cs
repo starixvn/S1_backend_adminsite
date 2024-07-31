@@ -1,8 +1,11 @@
-﻿using BackendSite.Service.BLL;
+﻿using BackendSite.Attributes;
+using BackendSite.Service.BLL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.CMS.Setting
 {
@@ -16,6 +19,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         private readonly ExcelBLL _excelBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly AuthorizeBLL _authorizeBll;
+        private readonly ICacheHelper _redisHelper;
         
         public LotteryEventController(IServiceProvider provider)
         {
@@ -23,10 +27,13 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
+        #region Event -> Lotterry Event -> Event Management
+        
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
         public ApiResult<IEnumerable<LotteryEventResponse>> GetLotteryEventSetting(GetLotteryEventRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<LotteryEventResponse>>();
@@ -46,19 +53,39 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
         public async Task<ApiResult> SetLotteryEventSetting(SetLotteryEventRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                var data = _eventBll.GetLotteryEventSettingBySq(request.Sq);
-                if (data.Status == (int)LotteryEventEnum.Done)
+                if (request.EndDate <= request.StartDate)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "Done status can not edit";
+                    apiResult.Message = "EndDate must be later than StartDate";
                 }
                 
+                if (request.DrawDate <= request.EndDate)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "DrawDate must be later than EndDate";
+                }
+                
+                var data = _eventBll.GetLotteryEventSettingBySq(request.Sq);
+                if (data.Status is (int)LotteryEventEnum.Done  or (int)LotteryEventEnum.PayOut)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Done or PayOut status can not be edited";
+                }
+
+                //can't edit running period time
+                var now = DateTime.UtcNow.AddHours(8);
+                if (now >= data.StartDate && now <= data.EndDate)
+                {
+                    request.StartDate = data.StartDate;
+                    request.EndDate = data.EndDate;
+                }
+                    
                 var result = await _eventBll.SetLotteryEventSetting(request , User.Identity.Name) > 0;
                 if (result)
                 {
@@ -67,6 +94,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 else
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "there's running period round exists";
                 }
                 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
@@ -81,7 +109,27 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
+        public ApiResult<LotteryTicketHistory> GetLotteryTicketHistory(LotteryTicketHistoryRequest request)
+        {
+            var apiResult = new ApiResult<LotteryTicketHistory>();
+            try
+            {
+                var responseData = _eventBll.GetLotteryTicketHistory(request.SiteId ,request.RoundId);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
         public ApiResult<IEnumerable<RaffleTicketStickerResponse>> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<RaffleTicketStickerResponse>>();
@@ -101,7 +149,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
         public async Task<ApiResult> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request)
         {
             var apiResult = new ApiResult();
@@ -128,7 +176,82 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 1 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
+        public async Task<ApiResult<LotteryMaintainModel>> GetLotteryMaintainAsync()
+        {
+            var apiResult = new ApiResult<LotteryMaintainModel>();
+            var authData = _authorizeBll.GetAuthData();
+            var key = $"LotteryMaintain:{authData.SiteId}";
+            
+            var exists = await _redisHelper.KeyExistsAsync(key , RedisDataBase.Shared);
+
+            if (exists)
+            {
+                var dataString = await _redisHelper.StringGetAsync(key , RedisDataBase.Shared);
+                var data = JsonConvert.DeserializeObject<LotteryMaintainModel>(dataString);
+                
+                apiResult.Data = data;
+            }
+            
+            apiResult.ErrorCode = (int)ErrorCodeEnum.Success;   
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
+        public async Task<ApiResult> CreateLotteryMaintainAsync(LotteryMaintainCreateRequest request)
+        {
+            try
+            {
+                var key = $"LotteryMaintain:{request.SiteId}";
+                
+                var reqModel = new LotteryMaintainModel
+                {
+                    BeginDate = request.BeginDate.DateTime,
+                    EndDate = request.EndDate.DateTime,
+                    IsMaintain = request.IsMaintain,
+                    UpdateUser = _authorizeBll.GetAuthData().UserName
+                };
+                var value = JsonConvert.SerializeObject(reqModel);
+                
+                if (request.IsMaintain)
+                {
+                    var result = await _redisHelper.StringSetAsync(key, value, null, RedisDataBase.Shared);
+                    if (!result)
+                    {
+                        return new ApiResult
+                        {
+                            ErrorCode = (int)ErrorCodeEnum.Fail,
+                            Message = "LotteryMaintain set failed!"
+                        };
+                    }
+                }
+                else
+                {
+                    _redisHelper.KeyDelete(key , RedisDataBase.Shared);
+                }
+                
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.SystemException,
+                    Message = ex.Message,
+                };
+            }
+        }
+        
+        #endregion
+        
+        #region Restriction Report
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 159, 1 })]
         public ApiResult<IEnumerable<EventRestrictionResponse>> GetEventRestrictionList(GetEventRestrictionRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<EventRestrictionResponse>>();
@@ -148,7 +271,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 159, 3 })]
         public async Task<ApiResult> SetEventRestriction(SetEventRestrictionRequest request)
         {
             var apiResult = new ApiResult();
@@ -191,7 +314,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         }
         
         [HttpPost]
-        //[TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 114, 3 })]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 159, 3 })]
         public async Task<ApiResult> DelEventRestriction(DelEventRestrictionRequest request)
         {
             var apiResult = new ApiResult();
@@ -226,5 +349,93 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
             return apiResult;
         }
+        
+        #endregion
+        
+        #region Sticker Report
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 160, 1 })]
+        public async Task<ApiResult> GetStickerReport(GetStickerReportRequest request)
+        {
+            var apiResult = new ApiResult<GetStickerReportReponse>();
+            try
+            {
+                var result = await _eventBll.GetStickerReport(request);
+
+                if (result != null)
+                {
+                    apiResult.ErrorCode = (int) ErrorCodeEnum.Success;
+                    apiResult.Data = result;
+                }
+                else 
+                { 
+                    apiResult.ErrorCode = (int) ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 160, 2 })]
+        public async Task<IActionResult> GetStickerReportExport(GetStickerReportRequest request)
+        {
+            var result = await _eventBll.GetStickerReportExport(request);
+            var stream = _excelBll.ExportV2(result);
+            return _excelBll.ExcelFile(stream, "StickerReportExport");
+        }
+        
+        #endregion
+
+        #region LotteryTicketReport
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 161, 1 })]
+        public ApiResult<IEnumerable<GetCustLotteryTicket>> GetCustLotteryTicket(GetCustLotteryTicketRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<GetCustLotteryTicket>>();
+            try
+            {
+                var responseData = _eventBll.GetCustLotteryTicket(
+                    request.SiteId,
+                    JsonConvert.SerializeObject(request.CurrencyIds),
+                    request.UserName,
+                    request.RoundId,
+                    request.TicketNo);
+                
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 161, 2 })]
+        public IActionResult GetCustLotteryTicketExport(GetCustLotteryTicketRequest request)
+        {
+            var responseData = _eventBll.GetCustLotteryTicket(
+                request.SiteId,
+                JsonConvert.SerializeObject(request.CurrencyIds),
+                request.UserName,
+                request.RoundId,
+                request.TicketNo);
+            
+            var stream = _excelBll.ExportV2(responseData);
+            return _excelBll.ExcelFile(stream, "LotteryTicketReportExport");
+        }
+        
+        #endregion
     }
 }

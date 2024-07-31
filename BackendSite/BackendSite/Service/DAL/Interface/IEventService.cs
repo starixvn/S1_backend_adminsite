@@ -47,11 +47,14 @@ namespace BackendSite.Service.DAL.Interface
 
         public LotteryEventResponse GetLotteryEventSettingBySq(int sq);
         public Task<int> SetLotteryEventSetting(int sq, DateTime startDate, DateTime endDate, DateTime drawDate, int isSuspend, string excludeSetting, string updator);
+        public LotteryTicketHistory GetLotteryTicketHistory(int siteId, int roundId);
         public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request);
         public Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request, string updator);
         public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request);
         public Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator);
         public Task<int> DelEventRestriction(int custId);
+        public Task<GetStickerReportReponse> GetStickerReport(GetStickerReportRequest request);
+        public IEnumerable<GetCustLotteryTicket> GetCustLotteryTicket(int siteId, string currencyIds, string userName, int roundId, string ticketNo);
 
         #endregion
     }

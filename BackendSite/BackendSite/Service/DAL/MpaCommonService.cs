@@ -166,7 +166,39 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.QueryAsync<MpaRateDto>("Admin_ExchangeRate_Get", p);
         }
+        
+        public async Task<IEnumerable<MpaRateDto>> GetMpaExchangeRateByRateType(DateTimeOffset starTime, DateTimeOffset endTime, int rateType, int baseCurrencyId = 0)
+        {
+            var redisKey = $"GetMpaExchangeRateByRateType:{starTime:yyyy-MM-dd HH:mm:ss}:{endTime:yyyy-MM-dd HH:mm:ss}:{rateType}:{baseCurrencyId}";
 
+            if (baseCurrencyId == 0)
+            {
+                var exchangeRate = await _redisHelper.TryGetOrCreateAsync(redisKey,
+                    TimeSpan.FromMinutes(10),
+                    () => GetRate(starTime, endTime ,rateType));
+
+                return exchangeRate;
+            }
+            else
+            {
+                var exchangeRate = await _redisHelper.TryGetOrCreateAsync(redisKey,
+                    TimeSpan.FromMinutes(10),
+                    async () => (await GetRate(starTime, endTime ,rateType)).Where(x => x.TargetCurrencyId == baseCurrencyId));
+
+                return exchangeRate;
+            }
+        }
+        
+        public Task<IEnumerable<MpaRateDto>> GetRate(DateTimeOffset starTime, DateTimeOffset endTime , int rateType)
+        {
+            var p = new DynamicParameters();
+            p.Add("_RateDateStart", starTime.Date, dbType: DbType.DateTime);
+            p.Add("_RateDateEnd", endTime.Date, dbType: DbType.DateTime);
+            p.Add("_RateType", rateType, dbType: DbType.Int32);
+
+            return _reportDbClient.QueryAsync<MpaRateDto>("Admin_ExchangeRate_Get_V2", p);
+        }
+        
         private Task<IEnumerable<MpaCurrencyDto>> GetMpaCurrencyInfo()
         {
             return _reportDbClient.QueryAsync<MpaCurrencyDto>("Admin_CurrencyInfo_Get");

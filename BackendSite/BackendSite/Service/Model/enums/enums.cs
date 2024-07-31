@@ -2077,7 +2077,8 @@ namespace BackendSite.Service.Model.enums
     { 
         Running = 0,
         Done = 1 ,
-        Suspned = 2
+        Suspend = 2,
+        PayOut = 3
     }
     public enum TaskSetting 
     {

@@ -64,15 +64,14 @@ namespace BackendSite.Service.DAL
             return searchResult;
         }
 
-        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara, int timeZone)
+        public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara)
         {
             var logResult = new PrizeLogResult();
-            var eventTime = new DateTimeOffset(Convert.ToDateTime(prizeLogPara.EventTime), TimeSpan.FromHours(timeZone)).ToUniversalTime();
-
+      
             var props = new DynamicParameters();
             props.Add("_EventId", prizeLogPara.EventId);
             props.Add("_PrizeId", prizeLogPara.PrizeId);
-            props.Add("_EventTime", eventTime.Date);
+            props.Add("_EventTime", prizeLogPara.EventTime.DateTime);
             props.Add("_PrizeName", prizeLogPara.PrizeName);
 
             props.Add("_StartIndex", (Math.Abs(prizeLogPara.PageNumber) - 1) * Math.Abs(prizeLogPara.PageSize), DbType.Int32, ParameterDirection.Input);

@@ -40,7 +40,7 @@
         public int PageSize { get; set; }
         public int EventId { get; set; }
         public int PrizeId { get; set; }
-        public string EventTime { get; set; }
+        public DateTimeOffset EventTime { get; set; }
         public string PrizeName { get; set; }
         public PrizeLogPara()
         {
@@ -71,6 +71,10 @@
     {
         public string UserName { get; set; }
         public DateTimeOffset DrawTime { get; set; }
+        public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
+        public decimal Amount { get; set; }
+        public decimal UsdRate { get; set; }
     }
 
     public class DrawPrizeReportResult

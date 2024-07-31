@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using Newtonsoft.Json;
+
+namespace BackendSite.Service.Model
 {
     #region Lottery
     
@@ -36,6 +38,29 @@
         public int ThirdPrize { get; set; }
         public int Consolation { get; set; }
         public int Small { get; set; }
+    }
+    
+    public class LotteryTicketHistoryRequest
+    {
+        public int SiteId { get; set; }
+        public int RoundId { get; set; }
+    }
+    
+    public class LotteryTicketHistory
+    {
+        public int SiteId { get; set; }
+        public int RoundId { get; set; }
+        public string FirstPrize { get; set; }
+        public string SecondPrize { get; set; }
+        public string ThirdPrize { get; set; }
+        public string ConsolationPrize { get; set; }
+        public string SmallPrize { get; set; }
+        public List<string> FirstPrizeList => JsonConvert.DeserializeObject<List<string>>(FirstPrize);
+        public List<string> SecondPrizeList => JsonConvert.DeserializeObject<List<string>>(SecondPrize);
+        public List<string> ThirdPrizeList => JsonConvert.DeserializeObject<List<string>>(ThirdPrize);
+        public List<string> ConsolationPrizeList => JsonConvert.DeserializeObject<List<string>>(ConsolationPrize);
+        public List<string> SmallPrizeList => JsonConvert.DeserializeObject<List<string>>(SmallPrize);
+        public int StickerId { get; set; }
     }
     
     public class GetRaffleTicketStickerRequest
@@ -100,6 +125,95 @@
     public class DelEventRestrictionRequest
     {
         public string UserName { get; set; }
+    }
+
+    public class GetStickerReportRequest
+    {
+        public IEnumerable<int> SiteIds { get; set; }
+        public string UserName { get; set; }
+        public int RoundId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public DateTime StartDate{ get; set; }
+        public DateTime EndDate{ get; set; }
+        public int pageSize { get; set; }
+        public int pageNumber { get; set; }
+    }
+    
+    public class GetStickerReportReponse
+    {
+        public List<GetStickerReportDto> StickerReportData { get; set; }
+        public List<StickerReportCurrencyTotal> StickerReportCurrencyTotal { get; set; }
+        public int PageNumber { get; set; }
+        public int RowCount { get; set; }
+        public int TotalPages { get; set; }
+    }
+
+    public class GetStickerReportDto
+    {
+        public int SiteId { get; set; }
+        public int Round { get; set; }
+        public int CustId { get; set; }
+        public string UserName { get; set; }
+        public string SabaId { get; set; }
+        public int CurrencyId { get; set; }
+        public int StickerId { get; set; }
+        public decimal StickerAmount { get; set; }
+        public DateTime PurchaseTime { get; set; }
+        public DateTime RoundStartDate{ get; set; }
+        public DateTime RoundEndDate{ get; set; }
+    }
+    
+    public class StickerReportCurrencyTotal
+    {
+        public int CurrencyId { get; set; }
+        public decimal CurrencyAmount { get; set; }
+    }
+    
+    public class GetCustLotteryTicketRequest
+    {
+        public int SiteId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public string UserName { get; set; }
+        public int RoundId { get; set; }
+        public string TicketNo { get; set; }
+    }
+    
+    public class GetCustLotteryTicket
+    {
+        public int CustId { get; set; }
+        public int CurrencyId { get; set; }
+        public string UserName { get; set; }
+        public int RoundId { get; set; }
+        public string TicketNo { get; set; }
+        public DateTime PeriodStartTime{ get; set; }
+        public DateTime PeriodEndTime{ get; set; }
+        public DateTime ReceivedTime{ get; set; }
+    }
+    
+    public class LotteryMaintainModel
+    {
+        public DateTime BeginDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public bool IsMaintain { get; set; }
+        public string UpdateUser { get; set; }
+    }
+    
+    public class LotteryMaintainCreateRequest
+    {
+        private DateTimeOffset _beginDate { get; set; }
+        private DateTimeOffset _endDate { get; set; }
+        public int SiteId { get; set; }
+        public DateTimeOffset BeginDate
+        {
+            get => _beginDate;
+            set => _beginDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public DateTimeOffset EndDate
+        {
+            get => _endDate;
+            set => _endDate = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
+        }
+        public bool IsMaintain { get; set; }
     }
     
     #endregion
