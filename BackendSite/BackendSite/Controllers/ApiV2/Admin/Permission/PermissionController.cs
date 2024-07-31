@@ -1,6 +1,7 @@
 ﻿using BackendSite.Attributes;
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.AdminMenu;
 using BackendSite.Service.Model.ApiModel;
@@ -26,6 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         private readonly MenuBLL _menuBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
+        private readonly ConfigBLL _adminRole;
 
         #endregion
 
@@ -39,6 +41,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             _menuBll = provider.GetRequiredService<MenuBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
+            _adminRole = provider.GetRequiredService<ConfigBLL>();
         }
 
         #endregion
@@ -134,6 +137,12 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         //    public AdminBrandTypeEnum Status { get; set; }
         //    public int UserId { get; set; }
         //}
+
+        public class adminRole
+        {
+            [JsonProperty("InternalAdminRole")]
+            public IEnumerable<int> InternalAdminRole { get; set; }
+        }
         #endregion
 
         /// <summary>
@@ -878,13 +887,17 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             }
             var result = _permissionBll.GetAdminUserList(request.UserName, request.SiteId, request.Status).ToList();
 
-            //讓yashbet市場看不到公司人員帳號，先暫時針對正式環境做特別處理
+            //可於siteconfig設定role為內部帳號
+            //如果本身權限不是internal帳號，隱藏內部帳號
             var loginUser = _adminBll.GetUserV2(authInfo.UserId, request.SiteId);
-            if (loginUser.SiteId == 6)
+            var internalAdminRole = JsonConvert.DeserializeObject<adminRole>(_adminRole.GetConfigValue("AdminRole", loginUser.SiteId));
+            var userRoleList = JsonConvert.DeserializeObject<List<int>>(loginUser.Role);
+
+            if (internalAdminRole != null)
             {
-                if (loginUser.Role != "[1]" && loginUser.Role != "[10]")//如果不是admin-role&On Call就看不到
+                if (userRoleList.All(role => !internalAdminRole.InternalAdminRole.Contains(role)))
                 {
-                    result.RemoveAll(x => x.Role == 1 || x.Role == 10);
+                    result.RemoveAll(x => internalAdminRole.InternalAdminRole.Contains(x.Role));
                 }
             }
 
