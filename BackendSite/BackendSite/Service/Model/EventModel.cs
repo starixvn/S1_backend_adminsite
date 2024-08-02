@@ -68,6 +68,7 @@ namespace BackendSite.Service.Model
     public class GetRaffleTicketStickerRequest
     {
         public int SiteId { get; set; }
+        public DateTime Time => DateTime.UtcNow.AddHours(8);
     }
     
     public class SetRaffleTicketStickerRequest
