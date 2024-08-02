@@ -196,7 +196,8 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
-            return _reportDbClient.Query<RaffleTicketStickerResponse>("Admin_RaffleTicketSticker_Get" , p);
+            p.Add("_Time", request.Time, dbType: DbType.DateTime);
+            return _reportDbClient.Query<RaffleTicketStickerResponse>("Service_RaffleTicketStickerSetting_Get" , p);
         }
         
         public async Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request ,string updator)
