@@ -154,11 +154,13 @@ namespace BackendSite.Service.Model
     public class GetStickerReportDto
     {
         public int SiteId { get; set; }
+        public string SiteName { get; set; }
         public int RoundId { get; set; }
         public int CustId { get; set; }
         public string UserName { get; set; }
         public string SabaId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public ChineseZodiacStickerId StickerId { get; set; }
         public string StickerName => StickerId.ToString();
         public decimal StickerAmount { get; set; }
@@ -184,8 +186,11 @@ namespace BackendSite.Service.Model
     
     public class GetCustLotteryTicket
     {
+        public int SiteId { get; set; }
+        public string SiteName { get; set; }
         public int CustId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public string UserName { get; set; }
         public int RoundId { get; set; }
         public string TicketNo { get; set; }
