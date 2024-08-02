@@ -83,7 +83,9 @@ namespace BackendSite.Service.Model
     {
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public decimal StickerPrize { get; set; }
+        public decimal NextTurnOver { get; set; }
         public decimal TurnOver { get; set; }
         public string Updator { get; set; }
         private DateTimeOffset _updateTime { get; set; }
