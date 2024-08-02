@@ -172,6 +172,7 @@ namespace BackendSite.Service.Model
     public class StickerReportCurrencyTotal
     {
         public int CurrencyId { get; set; }
+        public string IsoCode { get; set; }
         public decimal CurrencyAmount { get; set; }
     }
     

@@ -297,10 +297,11 @@ namespace BackendSite.Service.BLL
             var result = await _eventService.GetStickerReport(request);
             
             var totalAmounts = result.StickerReportData
-                .GroupBy(p => p.CurrencyId)
+                .GroupBy(p => new {p.CurrencyId , p.IsoCode} )
                 .Select(g => new StickerReportCurrencyTotal
                 {
-                    CurrencyId = g.Key,
+                    CurrencyId = g.Key.CurrencyId,
+                    IsoCode = g.Key.IsoCode,
                     CurrencyAmount = g.Sum(p => p.StickerAmount)
                 })
                 .ToList();
