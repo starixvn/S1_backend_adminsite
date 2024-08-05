@@ -313,11 +313,22 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public async Task<IEnumerable<GetStickerReportDto>> GetStickerReportExport(GetStickerReportRequest request)
+        public async Task<IEnumerable<GetStickerReportDto>> GetStickerReportExport(GetStickerReportExportRequest request)
         {
             //先拉10000筆
-            request.PageSize = 10000;
-            var result = await _eventService.GetStickerReport(request);
+            var gerRequest = new GetStickerReportRequest
+            {
+                PageNumber = 1,
+                PageSize = 10000,
+                SiteIds = request.SiteIds,
+                UserName = request.UserName,
+                RoundId = request.RoundId,
+                CurrencyIds = request.CurrencyIds,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate
+            };
+            
+            var result = await _eventService.GetStickerReport(gerRequest);
             return result.StickerReportData;
         }
 

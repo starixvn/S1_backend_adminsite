@@ -142,6 +142,16 @@ namespace BackendSite.Service.Model
         public DateTime EndDate{ get; set; }
     }
     
+    public class GetStickerReportExportRequest
+    {
+        public IEnumerable<int> SiteIds { get; set; }
+        public string UserName { get; set; }
+        public int RoundId { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public DateTime StartDate{ get; set; }
+        public DateTime EndDate{ get; set; }
+    }
+    
     public class GetStickerReportResponse
     {
         public List<GetStickerReportDto> StickerReportData { get; set; }
