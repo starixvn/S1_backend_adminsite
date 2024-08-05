@@ -95,7 +95,7 @@ namespace BackendSite.Service.BLL
                             for (int col = 1; col <= cols; col++)
                             {
                                 var cell = ws.Cells[row, col];
-                                if (cell.Value is double value && value < 0)
+                                if (cell.Value?.ToString().Substring(0, 1).Equals("-", StringComparison.OrdinalIgnoreCase) == true)
                                 {
                                     cell.Style.Font.Color.SetColor(Color.Red);
                                 }
