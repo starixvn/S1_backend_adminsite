@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
                 // 設定背景顏色和文字樣式
                 var requestCell = ws.Cells[1, 1, 1, propCount];
                 requestCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                requestCell.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#F4A460"));
+                requestCell.Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#F4A460"));
                 requestCell.Style.Font.Bold = true;
                 requestCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
@@ -91,6 +91,15 @@ namespace BackendSite.Service.BLL
                                     range.Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml("#FFFACD"));
                                 }
                             }
+
+                            for (int col = 1; col <= cols; col++)
+                            {
+                                var cell = ws.Cells[row, col];
+                                if (cell.Value is double value && value < 0)
+                                {
+                                    cell.Style.Font.Color.SetColor(Color.Red);
+                                }
+                            }
                         }
 
                         using (var range = ws.Cells[rows, 1, rows, cols])
@@ -108,40 +117,6 @@ namespace BackendSite.Service.BLL
             p.Save();
             return ms.ToArray();
         }
-
-        //public virtual byte[] ExportV2<T>(IEnumerable<T> t, MpaWinLossRequest request, IEnumerable<PropertyInfo> properties = null) where T : notnull, new()
-        //{
-        //    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-        //    using var ms = new MemoryStream();
-        //    using var p = new ExcelPackage(ms);
-        //    var ws = p.Workbook.Worksheets.Add(nameof(t));
-
-        //    if (t.Any())
-        //    {
-        //        if (properties == null)
-        //        {
-        //            properties = t.FirstOrDefault().GetType().GetProperties();
-        //        }
-
-        //        var rows = t.Count() + 2;
-        //        var cols = properties.Count();
-        //        if (rows > 0 && cols > 0)
-        //        {
-        //            ws.Cells[1, 1].LoadFromCollection(t, true);
-
-        //            using (var range = ws.Cells[2, 1, rows, cols])
-        //            {
-        //                // 標題列
-        //                var title = ws.Cells[2, 1, 1, cols];
-        //                title.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-        //                title.Style.Fill.PatternType = ExcelFillStyle.Solid; // 設定背景填色方法
-        //                title.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#B7DEE8"));
-        //            }
-        //        }
-        //    }
-        //    p.Save();
-        //    return ms.ToArray();
-        //}
 
         public FileContentResult ExcelFile(byte[] data, DateTime from, DateTime to, string fileName)
         {
