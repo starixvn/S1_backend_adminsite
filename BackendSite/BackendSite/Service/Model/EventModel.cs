@@ -173,6 +173,7 @@ namespace BackendSite.Service.Model
     {
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
+        public int CurrencyCount { get; set; }
         public decimal CurrencyAmount { get; set; }
     }
     

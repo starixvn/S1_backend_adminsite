@@ -302,6 +302,7 @@ namespace BackendSite.Service.BLL
                 {
                     CurrencyId = g.Key.CurrencyId,
                     IsoCode = g.Key.IsoCode,
+                    CurrencyCount = g.Count(),
                     CurrencyAmount = g.Sum(p => p.StickerAmount)
                 })
                 .ToList();
