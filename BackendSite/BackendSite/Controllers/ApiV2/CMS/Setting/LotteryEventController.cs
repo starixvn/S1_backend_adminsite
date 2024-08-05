@@ -384,7 +384,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 160, 2 })]
-        public async Task<IActionResult> GetStickerReportExport(GetStickerReportRequest request)
+        public async Task<IActionResult> GetStickerReportExport(GetStickerReportExportRequest request)
         {
             var result = await _eventBll.GetStickerReportExport(request);
             var stream = _excelBll.ExportV2(result);
