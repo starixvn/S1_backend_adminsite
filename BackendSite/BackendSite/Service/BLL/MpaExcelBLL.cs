@@ -22,7 +22,8 @@ namespace BackendSite.Service.BLL
             var ws = p.Workbook.Worksheets.Add(nameof(t));
 
             // 將 request 轉換為 JSON 字符串
-            var requestJson = $"WIN LOST REPORT {request.StarTime.DateTime.ToString("yyyy/MM/dd")} - {request.EndTime.DateTime.ToString("yyyy/MM/dd")}, View In {IsoCode}, GMT{FormatTimeZoneOffset(request.StarTime.Offset)}";
+            var requestJson = $"WIN LOST REPORT {request.StarTime.DateTime.ToString("yyyy/MM/dd")} - {request.EndTime.DateTime.ToString("yyyy/MM/dd")}," +
+                $" View In {IsoCode}, GMT{FormatTimeZoneOffset(request.StarTime.Offset)}";
 
             // 在第一行寫入 request JSON
             ws.Cells[1, 1].Value = requestJson;
@@ -95,7 +96,8 @@ namespace BackendSite.Service.BLL
                             for (int col = 1; col <= cols; col++)
                             {
                                 var cell = ws.Cells[row, col];
-                                if (cell.Value?.ToString().Substring(0, 1).Equals("-", StringComparison.OrdinalIgnoreCase) == true)
+                                var value = cell.Value?.ToString();
+                                if (value.Length > 0 && value.Substring(0, 1).Equals("-", StringComparison.OrdinalIgnoreCase) == true)
                                 {
                                     cell.Style.Font.Color.SetColor(Color.Red);
                                 }
