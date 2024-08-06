@@ -874,9 +874,9 @@ namespace BackendSite.Service.Model.enums
         Init = 0,
         New = 1
     }
-    
+
     #endregion
-    
+
     public enum BonusStatus
     {
         Running = 1,
@@ -1904,6 +1904,13 @@ namespace BackendSite.Service.Model.enums
         CreatedDate = 2
     }
 
+    public enum MpaRatioType
+    {
+        ViewFull = 0,
+        ViewHouseSharing = 1,
+        ViewShareholderSharing = 2
+    }
+
     public enum CustTagEnum
     {
         Duplicate = 6
@@ -2046,7 +2053,7 @@ namespace BackendSite.Service.Model.enums
         Deposit = 1,
         Withdrawal = 2
     }
-    
+
 
     /// <summary>
     /// 上傳類型 By 功能，對應 SiteConfig 的 UploadImageFunctionConfig
@@ -2067,8 +2074,8 @@ namespace BackendSite.Service.Model.enums
     /// <summary>
     /// 禮物類型，一般 = 1,FreeSpin = 2
     /// </summary>
-    public enum GiftTypeEnum 
-    { 
+    public enum GiftTypeEnum
+    {
         Common = 1,
         FreeSpin = 2
     }

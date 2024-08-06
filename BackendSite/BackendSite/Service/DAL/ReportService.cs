@@ -294,7 +294,7 @@ namespace BackendSite.Service.DAL
                     _MultiSiteAndCurrencyIds = multiSiteRequest,
                 });
 
-            return _reportDbClient.Query<PaymentReportDepositDetail>("Admin_PaymentReport_Deposit_Get_V2", parameters);
+            return _reportDbClient.Query<PaymentReportDepositDetail>("Admin_PaymentReport_Deposit_Get_V2", parameters,600);
         }
         
         public IEnumerable<PaymentReportWithdrawalDetail> GetPaymentReportWithdrawalDetail(GetPaymentReportParams input, string multiSiteRequest)
