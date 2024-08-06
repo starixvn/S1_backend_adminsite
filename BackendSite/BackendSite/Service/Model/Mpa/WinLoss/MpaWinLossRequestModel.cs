@@ -73,6 +73,13 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public MpaDateType DateType { get; set; }
 
         /// <summary>
+        /// ViewFull = 0,
+        /// ViewHouseSharing = 1,
+        ///ViewShareholderSharing = 2
+        /// </summary>
+        public MpaRatioType RatioType { get; set; }
+
+        /// <summary>
         /// 第 x 分頁
         /// </summary>
         public int PageNumber { get; set; }
