@@ -23,6 +23,8 @@ public class MpaWinLossReportRequest
 
     public MpaDateType DateType { get; set; }
 
+    public MpaRatioType RatioType { get; set; }
+
     public IEnumerable<MemberTypeEnum> MemberTypes { get; set; }
 
     public bool IncludeTest { get; set; }

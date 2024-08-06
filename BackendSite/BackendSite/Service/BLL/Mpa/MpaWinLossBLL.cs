@@ -284,6 +284,7 @@ namespace BackendSite.Service.BLL.Mpa
                         TpGameTypes = request.TpGameTypes,
                         DisplayGroupBreakdownInOriginalCurrency = request.DisplayGroupBreakdownInOriginalCurrency,
                         Version = request.Version,
+                        RatioType = request.RatioType
                     }, timeout: 1200);
 
             if (result.ErrorCode != (int)ErrorCodeEnum.Success)
