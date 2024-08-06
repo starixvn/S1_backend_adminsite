@@ -257,10 +257,10 @@ namespace BackendSite.Service.DAL
             });
 
             var startIndex = (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize);
-            if (startIndex == 0)
-            {
-                startIndex = 1;
-            }
+            // if (startIndex == 0)
+            // {
+            //     startIndex = 1;
+            // }
             p.Add("_PageSize", request.PageSize, DbType.Int32, ParameterDirection.Input);
             p.Add("_StartIndex", startIndex, DbType.Int32, ParameterDirection.Input);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
