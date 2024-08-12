@@ -70,9 +70,13 @@ namespace BackendSite.Service.BLL
             decimal startAmount,
             decimal endAmount,
             IEnumerable<int> payIds,
+            bool hasReceipt,
             int pageNumber, out int totalPages, out int rowCount, ref List<TotalAmount> currencyAmountRecord)
         {
-            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode, startDate, endDate, dateType, depositId, userNames, agent, currencyId, status, levelStatus, pageSize, startAmount, endAmount, payIds, pageNumber, out totalPages, out rowCount, ref currencyAmountRecord);
+            return depositService.GetDepositRequestList(selectSite, depositType, selectBankCode, selectCalCode,
+                startDate, endDate, dateType, depositId, userNames, agent, currencyId, status, levelStatus, 
+                startAmount, endAmount, payIds, hasReceipt,
+                pageSize, pageNumber, out totalPages, out rowCount, ref currencyAmountRecord);
         }
 
         public IEnumerable<DepositRequest> GetDepositListByCust(int CustId,
