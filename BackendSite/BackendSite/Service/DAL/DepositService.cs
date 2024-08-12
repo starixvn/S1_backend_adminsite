@@ -42,59 +42,60 @@ namespace BackendSite.Service.DAL
             DateTime startDate,
             DateTime endDate,
             DepositDateTypeEnum dateType,
-            string DepositId,
+            string transId,
             IEnumerable<string> userNames,
             string agent,
             IEnumerable<int> currencyId,
             IEnumerable<int> status,
             IEnumerable<int> levelStatus,
-            int pageSize,
             decimal startAmount,
             decimal endAmount,
             IEnumerable<int> payIds,
-            int pageNumber, out int totalPages, out int rowCount,
+            bool hasReceipt,
+            int pageSize, int pageNumber, out int totalPages, out int rowCount,
             ref List<TotalAmount> currencyAmountRecord)
         {
             var depositId = 0;
 
-            if (!string.IsNullOrWhiteSpace(DepositId))
+            if (!string.IsNullOrWhiteSpace(transId))
             {
-                var m = Regex.Match(DepositId, @"\d+");
-                int.TryParse(m.Value, out depositId);
+                var m = Regex.Match(transId, @"\d+");
+                _ = int.TryParse(m.Value, out depositId);
             }
 
             var p = new DynamicParameters(new
             {
-                SelectSite = JsonConvert.SerializeObject(selectSite),
-                DepositType = JsonConvert.SerializeObject(depositType),
-                SelectBankCode = selectBankCode.Any() ? JsonConvert.SerializeObject(selectBankCode) : null,
-                SelectCalCode = selectCalCode.Any() ? JsonConvert.SerializeObject(selectCalCode) : null,
-                StartDate = startDate,
-                EndDate = endDate,
-                DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int)dateType,
-                DepositId = depositId,
-                TransId = string.IsNullOrEmpty(DepositId) ? null : DepositId,
-                UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
-                Agent = string.IsNullOrEmpty(agent) ? null : agent,
-                CurrencyId = currencyId.Any() ? JsonConvert.SerializeObject(currencyId) : null,
-                Status = JsonConvert.SerializeObject(status),
-                VipStatus = levelStatus.Any() ? JsonConvert.SerializeObject(levelStatus) : null,
-                StartAmount = startAmount,
-                EndAmount = endAmount,
-                PayIds = payIds.Any() ? JsonConvert.SerializeObject(payIds) : null,
+                _SelectSite = JsonConvert.SerializeObject(selectSite),
+                _DepositType = JsonConvert.SerializeObject(depositType),
+                _SelectBankCode = selectBankCode.Any() ? JsonConvert.SerializeObject(selectBankCode) : null,
+                _SelectCalCode = selectCalCode.Any() ? JsonConvert.SerializeObject(selectCalCode) : null,
+                _StartDate = startDate,
+                _EndDate = endDate,
+                _DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int)dateType,
+                _DepositId = depositId,
+                _TransId = string.IsNullOrEmpty(transId) ? null : transId,
+                _UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
+                _Agent = string.IsNullOrEmpty(agent) ? null : agent,
+                _CurrencyId = currencyId.Any() ? JsonConvert.SerializeObject(currencyId) : null,
+                _Status = JsonConvert.SerializeObject(status),
+                _VipStatus = levelStatus.Any() ? JsonConvert.SerializeObject(levelStatus) : null,
+                _StartAmount = startAmount,
+                _EndAmount = endAmount,
+                _HasReceipt = hasReceipt,
+                _PayIds = payIds.Any() ? JsonConvert.SerializeObject(payIds) : null
             });
 
-            currencyAmountRecord = _reportDbClient.RetryQuery<TotalAmount>("Admin_DepositTotalAmount_Get_V9", p).ToList();
+            currencyAmountRecord = _reportDbClient.RetryQuery<TotalAmount>("Admin_DepositTotalAmount_Get_V10", p).ToList();
 
-            p.Add("PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
-            p.Add("StartIndex", Math.Abs(pageNumber - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
-            p.Add("TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            p.Add("RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
+            p.Add("_StartIndex", Math.Abs(pageNumber - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
+            p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportDbClient.RetryQuery<DepositRequest>("Admin_DepositList_Get_V13", p);
+            var depositList = _reportDbClient.RetryQuery<DepositRequest>("Admin_DepositList_Get_V14", p);
 
-            totalPages = p.Get<int?>("TotalPages") ?? 0;
-            rowCount = p.Get<int?>("RowCount") ?? 0;
+            totalPages = p.Get<int?>("_TotalPages") ?? 0;
+            rowCount = p.Get<int?>("_RowCount") ?? 0;
             return depositList;
         }
 
