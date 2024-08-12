@@ -146,6 +146,7 @@ namespace BackendSite.Service.Model
         public string CurrencyList { get; set; }
         public string SiteName { get; set; }
         public int SiteId { get; set; }
+        public int Role { get; set; }
         public string RoleName { get; set; }
         public List<int> icurrencyList { get; set; }
         public int Status { get; set; }

@@ -165,7 +165,7 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public IEnumerable<T> Query<T>(string sql, object parameters = null)
+        public IEnumerable<T> Query<T>(string sql, object parameters = null, int? commandTimeout = null)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
@@ -176,6 +176,7 @@ namespace BackendSite.Service.Library
                 using var connection = new MySqlConnection(conn);
                 var command = new CommandDefinition(sql, parameters, // 使用 CommandDefinition 不讓 Dapper 用預設值建立
                     commandType: CommandType.StoredProcedure,
+                    commandTimeout: commandTimeout,
                     flags: CommandFlags.Buffered);
 
                 result = connection.Query<T>(command);
