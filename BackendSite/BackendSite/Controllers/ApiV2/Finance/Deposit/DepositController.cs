@@ -445,7 +445,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     #region CustTaskTime
                     if (refreshDepositInfoData.FirstDeposit == 1)
                     {
-                        _ = _TaskSettingBll.Set(refreshDepositInfoData.CustId, TaskSetting.FirstDepositTime, refreshDepositInfoData.CreateTime);
+                        _ = _TaskSettingBll.Set(refreshDepositInfoData.CustId, TaskSetting.FirstDepositTime, refreshDepositInfoData.FlowEndTime);
                     }
                     #endregion
 
