@@ -99,6 +99,7 @@ namespace BackendSite
             services.AddTransient<IWithdrawalAccountBLL, WithdrawalAccountBLL>();
             services.AddTransient<IAutoWithdrawalPaymentGateWayBLL, AutoWithdrawalPaymentGateWayBLL>();
             services.AddTransient<IGaBLL,GaBLL>();
+            services.AddTransient<IFPSReportBLL, FPSReportBLL>();
 
 
             services.AddTransient<ReferralManagementDecorator>();
@@ -128,6 +129,7 @@ namespace BackendSite
             services.DecoratorLiveRegistration();
             services.AddSingleton<ConfigBLL>();
             services.AddTransient<IUploadImageBLL, UploadImageBLL>();
+            services.AddTransient<IFPSReportService, FPSReportService>();
 
             services.AddControllersWithViews().AddJsonOptions(options =>
             {

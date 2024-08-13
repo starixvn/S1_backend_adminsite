@@ -29,5 +29,12 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", custId);
             return await _sqlClienct.QueryAsync<CustShieldRiskInfoData>("Admin_CustShieldRiskInfo_Get", p);
         }
+
+        public async Task<IEnumerable<CustFPSData>> GetCustFPSList(int custId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId);
+            return await _sqlClienct.QueryAsync<CustFPSData>("Admin_CustFPS_Get", p);
+        }
     }
 }

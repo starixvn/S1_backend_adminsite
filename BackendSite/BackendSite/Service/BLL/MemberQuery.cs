@@ -343,6 +343,20 @@ namespace BackendSite.Service.BLL
             }).OrderByDescending(x => x.LastUpdateTime);
         }
 
+        public async Task<IEnumerable<MemberLoginDeviceFPS>> GetFPSDeviceListByCustIdAsync(int custId)
+        {
+            var fpsList = await _deviceService.GetCustFPSList(custId);
+            return fpsList.Select(x => new MemberLoginDeviceFPS()
+            {
+                DeviceId = x.DeviceId,
+                RiskLevel = x.RiskLevel,
+                DeviceType = x.DeviceType,
+                Frequency = x.Frequency,
+                AssociateCount = x.AssociateCount,
+                LastUpdateTime = x.LastUpdateTime
+            }).OrderByDescending(x => x.LastUpdateTime);
+        }
+
         public async Task<IEnumerable<CustomerLoginIp>> GetIpListByCustIdAsync(int custId)
         {
             return await _memberService.GetCustomerIpListByCustIdAsync(custId);

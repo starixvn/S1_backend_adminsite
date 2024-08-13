@@ -231,6 +231,12 @@ namespace BackendSite.Service.DAL
             var p = new DynamicParameters(new { _DeviceId = deviceId });
             return await _reportDbClient.QueryAsync<DeviceUser>("Admin_ShieldAssociatedList_Get", p);
         }
+        
+        public async Task<IEnumerable<DeviceUser>> GetFPSAssociatedList(string deviceId)
+        {
+            var p = new DynamicParameters(new { _DeviceId = deviceId });
+            return await _reportDbClient.QueryAsync<DeviceUser>("Admin_FPSAssociatedList_Get", p);
+        }
 
         public int BlockAccountSet(ParamsWithLog<BlockAccountSetRequest> input)
         {

@@ -557,6 +557,17 @@ public class MemberLoginDevice
     public DateTimeOffset LastUpdateTime { get; set; }
 }
 
+public class MemberLoginDeviceFPS
+{
+    public string DeviceId { get; set; }
+    public string RiskLevel { get; set; }
+    public int Frequency { get; set; }
+    public int AssociateCount { get; set; }
+    public string DeviceType { get; set; }
+    public DateTimeOffset LastUpdateTime { get; set; }
+}
+
+
 public class CustomerLoginIp
 {
     public string LoginIp { get; set; }
