@@ -40,7 +40,7 @@ namespace BackendSite.Service.BLL
             var result = _adjustmentLogReportService.GetAdminAdjustmentInfoLog(input);
             var authData = _newAuthorizeBLL.GetAuthData();
             var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
-            var hasPermission = _permissionBll.CheckPermission(loginUser, 131, 39);
+            var hasPermission = _permissionBll.CheckPermission(loginUser, 93, 39);
 
             if (!hasPermission)
             {
