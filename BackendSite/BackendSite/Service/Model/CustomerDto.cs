@@ -431,12 +431,14 @@ public class SetEmailRequest
 {
     public int CustId { get; set; }
     public string Email { get; set; }
+    public string VerifyEmail { get; set; }
 }
 
 public class SetPhoneNoRequest
 {
     public int CustId { get; set; }
     public string PhoneNo { get; set; }
+    public string VerifyPhoneNo { get; set; }
 }
 
 public class SetBirthdayRequest
