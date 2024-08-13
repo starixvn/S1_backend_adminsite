@@ -1165,6 +1165,29 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             };
             return apiResult;
         }
+        
+        /// <summary>
+        /// FPS Member/GetDeviceList 取得會員使用過的裝置
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Member Administration > Click[UserName] > CustInfo
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 1 })]
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<MemberLoginDeviceFPS>>> GetFPSDeviceList(GetIpListRequest request)
+        {
+            var data = await _memberQuery.GetFPSDeviceListByCustIdAsync(request.CustId);
+            var apiResult = new ApiResult<IEnumerable<MemberLoginDeviceFPS>>()
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+                Data = data
+            };
+            return apiResult;
+        }
 
         /// <summary>
         /// Member/GetIpList 取得會員登入過的Ip
