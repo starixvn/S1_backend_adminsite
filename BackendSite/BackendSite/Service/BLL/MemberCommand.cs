@@ -20,6 +20,8 @@ public class MemberCommand : IMemberCommand
     private readonly IBonusApiService _bonusApi;
     private readonly ILogger<MemberCommand> _logger;
     private readonly ServerInfoBLL _ServerInfoBll;
+    private readonly AdminBLL _adminBll;
+    private readonly PermissionBLL _permissionBll;
 
     public MemberCommand(IMemberService memberService,
         CodeGenerator codeGenerator,
@@ -28,7 +30,10 @@ public class MemberCommand : IMemberCommand
         ILogger<MemberCommand> logger,
         IBonusApiService bonusApi,
         CustInfoBLL custInfoBll,
-        VerificationRewardService verificationRewardService, ServerInfoBLL serverInfoBll)
+        VerificationRewardService verificationRewardService,
+        ServerInfoBLL serverInfoBll,
+        AdminBLL adminBll,
+        PermissionBLL permissionBll)
     {
         _memberService = memberService;
         _codeGenerator = codeGenerator;
@@ -39,6 +44,8 @@ public class MemberCommand : IMemberCommand
         _custInfoBll = custInfoBll;
         _verificationRewardService = verificationRewardService;
         _ServerInfoBll = serverInfoBll;
+        _adminBll = adminBll;
+        _permissionBll = permissionBll;
     }
 
     public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
@@ -150,12 +157,17 @@ public class MemberCommand : IMemberCommand
         return true;
     }
 
-    public async Task<int> EditEmailAsync(int custId, string email, string @operator)
+    public async Task<int> EditEmailAsync(int custId, string email,string verifyEmail, string @operator,AuthData authData)
     {
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var loginUser = _adminBll.GetUserV2(authData.UserId,authData.SiteId);
+        var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
 
         if (await _memberService.IsExistsEmail(custId, email, customer.SiteId))
             return -1;
+        if (!hasPermission && customer.Email != verifyEmail)
+            return - 2;
+        
 
         var beforeEmail = customer.Email;
         var result = await _memberService.EditEmailAsync(custId, email);
@@ -170,10 +182,17 @@ public class MemberCommand : IMemberCommand
         return result;
     }
 
-    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator)
+
+    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo,string verifyPhone, string @operator, AuthData authData)
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
-        if (await _memberService.IsExistsPhoneNo(custId, customer.SiteId, customer.AreaCode, phoneNo)) return -1;
+        var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
+        var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
+
+        if (await _memberService.IsExistsPhoneNo(custId, customer.SiteId, customer.AreaCode, phoneNo)) 
+            return -1;
+        if (!hasPermission && customer.PhoneNo != verifyPhone)
+            return -2;
 
         var beforePhone = customer.PhoneNo;
         var result = await _memberService.SetPhoneNoAsync(custId, phoneNo);
@@ -186,6 +205,7 @@ public class MemberCommand : IMemberCommand
 
         return result;
     }
+
 
     public async Task<int> EditBirthdayAsync(int custId, int year, int month, int date, string @operator)
     {

@@ -724,7 +724,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditEmail(SetEmailRequest request)
         {
-            var result = await _memberCommand.EditEmailAsync(request.CustId, request.Email, User.Identity.Name);
+            var authData = _newAuthorizeBll.GetAuthData();
+            var result = await _memberCommand.EditEmailAsync(request.CustId, request.Email,request.VerifyEmail, User.Identity.Name, authData);
 
             if (result > 0)
             {
@@ -732,6 +733,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Update Success."
+                };
+            }
+
+            if (result == -2)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Verification Error."
                 };
             }
 
@@ -752,7 +762,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
         {
-            var result = await _memberCommand.EditPhoneNoAsync(request.CustId, request.PhoneNo, User.Identity.Name);
+            var authData = _newAuthorizeBll.GetAuthData();
+            var result = await _memberCommand.EditPhoneNoAsync(request.CustId, request.PhoneNo,request.VerifyPhoneNo, User.Identity.Name, authData);
 
             if (result > 0)
             {
@@ -760,6 +771,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 {
                     ErrorCode = (int)ErrorCodeEnum.Success,
                     Message = "Update Success."
+                };
+            }
+
+            if (result == -2)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Verification Error."
                 };
             }
 
