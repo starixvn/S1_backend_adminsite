@@ -164,9 +164,20 @@ namespace BackendSite.Service.Model.enums
         Running = 1,
         Suspend = 2,
         Closed = 3,
-        Lock = 4,
+        Lock = 4
     }
 
+    public enum LockCustomerStatusEnum
+    {
+        Running = 1,
+        Suspend = 2,
+        Closed = 3,
+        Lock = 4,
+        FreezeOneWeek = 97,
+        FreezeOneMonth = 98,
+        FreezeThreeMonth = 99 
+    }
+    
     public enum EnablePromotionEnum
     {
         Disable = 0,
