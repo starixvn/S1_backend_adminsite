@@ -326,11 +326,29 @@ public class MemberCommand : IMemberCommand
         return newPassword;
     }
 
-    public async Task<int> SetCustStatusAsync(int custId, CustomerStatusEnum status, string reason, string @operator)
+    public async Task<int> SetCustStatusAsync(int custId, LockCustomerStatusEnum status, string reason, string @operator)
     {
-        var customer = _custInfoBll.GetCustInfoWithCache(custId);
-        var beforeStatus = (CustomerStatusEnum)customer.Status;
-        var result = await _memberService.SetCustStatusAsync(custId, (int)status, (int)CustTaskType.LastStatusUpdateTime);
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        var beforeStatus = (LockCustomerStatusEnum)customer.Status;
+
+        var setStatus = status;
+        var daysToAdd = status switch
+        {
+            LockCustomerStatusEnum.FreezeOneWeek => 7,
+            LockCustomerStatusEnum.FreezeOneMonth => 30,
+            LockCustomerStatusEnum.FreezeThreeMonth => 90,
+            _ => 0
+        };
+        
+        if (daysToAdd > 0 )
+        {
+            setStatus = LockCustomerStatusEnum.Suspend;
+            var expiredTime =  DateTime.UtcNow.AddDays(daysToAdd);
+            await _memberService.SetCustTemporaryStatusAsync(custId, (int)status, expiredTime, @operator);
+            await AddCustTagAsync(custId, 35, @operator);
+        }
+        
+        var result = await _memberService.SetCustStatusAsync(custId, (int)setStatus, (int)CustTaskType.LastStatusUpdateTime);
         if (result <= 0) return 0;
 
         var afterStatus = status;
