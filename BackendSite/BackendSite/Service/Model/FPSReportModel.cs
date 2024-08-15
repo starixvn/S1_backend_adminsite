@@ -24,6 +24,7 @@ namespace BackendSite.Service.Model
     public class FPSReportData
     {
         public DateTime UpdateTime { get; set; }
+        public int CustId { get; set; }
         public string IsoCode { get; set; }
         public string UserName { get; set; }
         public string Action { get; set; }
@@ -41,6 +42,7 @@ namespace BackendSite.Service.Model
     public class FPSReport
     {
         public DateTimeOffset LastUsedTime { get; set; }
+        public int CustId { get; set; }
         public string IsoCode { get; set; }
         public string UserName { get; set; }
         public string Action { get; set; }

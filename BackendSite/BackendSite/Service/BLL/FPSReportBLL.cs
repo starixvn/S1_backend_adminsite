@@ -24,6 +24,7 @@ namespace BackendSite.Service.BLL
             var data = await _fpsReportService.GetFPSListAsync(request.CurrencyId, deviceType, request.DeviceId, request.UserName, startTime, endTime, request.PageNumber, request.PageSize);
             var fpsReport = data.FPSDataReport.Select(x => new FPSReport()
             {
+                CustId = x.CustId,
                 UserName = x.UserName,
                 IsoCode = x.IsoCode,
                 Action = x.Action,
