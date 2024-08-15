@@ -73,6 +73,22 @@ namespace BackendSite.Controllers.ApiV2.Report
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
+        
+        /// <summary>
+        /// 取得FPS相關連裝置ID
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<AssociatedDevice>>> GetAssociateDevices(GetAssociateDevicesRequest request)
+        {
+            var deviceUserList = await _fpsReportBLL.GetFPSAssociateDevices(request.CustId);
+            return new ApiResult<IEnumerable<AssociatedDevice>>
+            {
+                Data = deviceUserList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
 
     }
 }

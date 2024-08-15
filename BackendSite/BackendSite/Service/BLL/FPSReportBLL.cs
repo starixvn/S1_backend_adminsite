@@ -33,7 +33,7 @@ namespace BackendSite.Service.BLL
                 DeviceType = x.DeviceType,
                 IPAddress = x.IPAddress,
                 RobotTracking = x.RobotTracking,
-                Frequency = x.Frequency,
+                AssociateDevices = x.AssociateDevices,
                 AssociateCount = x.AssociateCount,
                 LastUsedTime = new DateTimeOffset(x.UpdateTime, TimeSpan.Zero),
             });
@@ -63,7 +63,7 @@ namespace BackendSite.Service.BLL
                 DeviceType = x.DeviceType,
                 IPAddress = x.IPAddress,
                 RobotTracking = x.RobotTracking,
-                Frequency = x.Frequency,
+                AssociateDevices = x.AssociateDevices,
                 AssociateCount = x.AssociateCount,
                 LastUsedTime = new DateTimeOffset(x.UpdateTime, TimeSpan.Zero),
             });
@@ -74,6 +74,11 @@ namespace BackendSite.Service.BLL
         public async Task<IEnumerable<DeviceUser>> GetFPSAssociateAccount(string deviceId)
         {
             return await _blockService.GetFPSAssociatedList(deviceId);
+        }
+
+        public async Task<IEnumerable<AssociatedDevice>> GetFPSAssociateDevices(int custId)
+        {
+            return await _blockService.GetFPSAssociatedDevicesList(custId);
         }
     }
 }

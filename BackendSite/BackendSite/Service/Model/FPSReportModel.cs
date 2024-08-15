@@ -6,7 +6,7 @@ namespace BackendSite.Service.Model
     public class FPSReportGetListRequest : ApiRequestPageModel
     {
         public int CurrencyId { get; set; }
-        public FPSDeviceTypeEnum DeviceType { get; set; }
+        public FpsDeviceType DeviceType { get; set; }
         public string UserName { get; set; }
         public string DeviceId { get; set; }
         public DateTimeOffset StartTime { get; set; }
@@ -33,7 +33,7 @@ namespace BackendSite.Service.Model
         public string DeviceType { get; set; }
         public string IPAddress { get; set; }
         public string RobotTracking { get; set; }
-        public int Frequency { get; set; }
+        public int AssociateDevices { get; set; }
         public int AssociateCount { get; set; }
     }
     
@@ -50,7 +50,7 @@ namespace BackendSite.Service.Model
         public string DeviceType { get; set; }
         public string IPAddress { get; set; }
         public string RobotTracking { get; set; }
-        public int Frequency { get; set; }
+        public int AssociateDevices { get; set; }
         public int AssociateCount { get; set; }
     }
     
