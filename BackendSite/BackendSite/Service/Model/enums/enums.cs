@@ -2125,7 +2125,7 @@ namespace BackendSite.Service.Model.enums
     }
 
 
-    public enum FPSDeviceTypeEnum
+    public enum FpsDeviceType
     {
         Android = 1,
         Windows,

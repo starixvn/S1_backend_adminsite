@@ -62,3 +62,8 @@ public class GetAssociateAccountRequest
     public string DeviceId { get; set; }
 }
 
+public class GetAssociateDevicesRequest
+{
+    public int CustId { get; set; }
+}
+
