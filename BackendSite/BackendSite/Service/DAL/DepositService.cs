@@ -339,11 +339,11 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string Operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest, DepositCalCodeSetRequest calCodeInfo, bool canReward = false, string depositInfo = null)
+        public int SetDepositInfo(string transId, int siteId, decimal actualDeposit, string comment, string @operator, IEnumerable<int> forStatus, DepositStatusEnum status, DepositRequest depositRequest, DepositCalCodeSetRequest calCodeInfo, bool canReward = false, string depositInfo = null)
         {
             var type = 1;
             var m = Regex.Match(transId, @"\d+");
-            int.TryParse(m.Value, out var depositId);
+            _ = int.TryParse(m.Value, out var depositId);
 
             var result = 0;
             try
@@ -353,21 +353,20 @@ namespace BackendSite.Service.DAL
                 using var conn = _mainDbClient.GetMySqlConnection();
                 conn.Open();
                 using var trans = conn.BeginTransaction();
-                var sForStatus = JsonConvert.SerializeObject(forStatus);
                 var p = new DynamicParameters(new
                 {
-                    DepositId = depositId,
-                    SiteId = siteId,
-                    ActualDeposit = actualDeposit,
-                    Comment = comment,
-                    ForStatus = sForStatus,
-                    Status = (int)status,
-                    ThirdId = (string)null,
-                    Operator = Operator
+                    _DepositId = depositId,
+                    _SiteId = siteId,
+                    _ActualDeposit = actualDeposit,
+                    _ForStatus = JsonConvert.SerializeObject(forStatus),
+                    _Status = (int)status,
+                    _RefId = (string)null,
+                    _ThirdId = (string)null,
+                    _Operator = @operator
                 });
-                p.Add("CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                p.Add("UserName", dbType: DbType.String, direction: ParameterDirection.Output);
-                result = _mainDbClient.Execute("Admin_DepositInfo_Set_V2", trans, p);
+                p.Add("_CustId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                p.Add("_UserName", dbType: DbType.String, direction: ParameterDirection.Output);
+                result = _mainDbClient.Execute("Service_DepositInfo_Set_V4", trans, p);
 
                 if (result > 0)
                 {
@@ -386,66 +385,68 @@ namespace BackendSite.Service.DAL
                         }
                     }
 
-                    SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, Operator);
-
-                    if (status == DepositStatusEnum.Approved)
+                    result = SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, @operator);
+                    
+                    if (result > 0)
                     {
-                        if (depositRequest.DepositType is not (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet))
+                        if (status == DepositStatusEnum.Approved)
                         {
-                            var pay = (IPay)depositRequest.oDepositInfo;
-                            type = payTypePosition + pay.PayId;
-                        }
-
-                        var custId = p.Get<int?>("CustId") ?? 0;
-                        var userName = p.Get<string>("UserName");
-                        result = walletService.SetBalance(custId, siteId, userName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out _, out var is1stDepoist, trans);
-
-                        if (result >= 0)
-                        {
-                            result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, (int)WithdrawalLimitAdjustmentReasonEnum.Deposit, $"WithdrawalLimit: {actualDeposit}", transId, (int)WithdrawalLimitLogCreateFromEnum.Deposit, Operator, out _, trans);
-                        }
-
-                        if (is1stDepoist == 1 && result > 0)
-                        {
-                            result = SetDepositInfoFirstDeposit(depositId, siteId, trans);
-                        }
-
-                        if (result > 0 && !string.IsNullOrEmpty(depositInfo))
-                        {
-                            result = UpdateDepositInfo(depositRequest.TransId, depositInfo, trans);
-                            if (result < 1)
+                            if (depositRequest.DepositType is not (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet))
                             {
-                                _logger.LogError($"UpdateDepositInfo Failed. TransId: {transId}, depositInfo: {depositInfo}");
+                                var pay = (IPay)depositRequest.oDepositInfo;
+                                type = payTypePosition + pay.PayId;
+                            }
+
+                            var custId = p.Get<int?>("_CustId") ?? 0;
+                            var userName = p.Get<string>("_UserName");
+                            result = walletService.SetBalance(custId, siteId, userName, actualDeposit, type, $"Deposit Approved: {actualDeposit}", transId, out _, out var is1stDepoist, trans);
+
+                            if (result >= 0)
+                            {
+                                result = withdrawalLimitService.SetWithdrawalLimit(custId, userName, siteId, actualDeposit, (int)WithdrawalLimitAdjustmentReasonEnum.Deposit, $"WithdrawalLimit: {actualDeposit}", transId, (int)WithdrawalLimitLogCreateFromEnum.Deposit, @operator, out _, trans);
+                            }
+
+                            if (is1stDepoist == 1 && result > 0)
+                            {
+                                result = SetDepositInfoFirstDeposit(depositId, siteId, trans);
+                            }
+
+                            if (result > 0 && !string.IsNullOrEmpty(depositInfo))
+                            {
+                                result = UpdateDepositInfo(depositRequest.TransId, depositInfo, trans);
+                                if (result < 1)
+                                {
+                                    _logger.LogError($"UpdateDepositInfo Failed. TransId: {transId}, depositInfo: {depositInfo}");
+                                }
+                            }
+
+                            if (result > 0 && canReward)
+                            {
+                                var resultCode = InsertDepositRewardPointQueue(transId, trans);
+                                if (resultCode != (int)ErrorCodeEnum.Success)
+                                {
+                                    _logger.LogError($"InsertDepositRewardPointQueue Failed. ResultCode({resultCode}), TransId: {transId}");
+                                }
+                                else
+                                {
+                                    result = 1;
+                                }
                             }
                         }
-
-                        if (result > 0 && canReward)
+                        
+                        if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null)
                         {
-                            var resultCode = InsertDepositRewardPointQueue(transId, trans);
-                            if (resultCode != (int)ErrorCodeEnum.Success)
+                            var p2 = new DynamicParameters(new
                             {
-                                _logger.LogError($"InsertDepositRewardPointQueue Failed. ResultCode({resultCode}), TransId: {transId}");
-                            }
-                            else
-                            {
-                                result = 1;
-                            }
+                                DepositId = depositId,
+                                SiteId = siteId,
+                                StatementTime = status == DepositStatusEnum.Draft ? calCodeInfo.StatementTime?.DateTime : null,
+                                BankId = calCodeInfo.BankId,
+                                Operator = @operator
+                            });
+                            result = _mainDbClient.Execute("Admin_DepositInfoDraft_Set", trans, p2);
                         }
                     }
-
-                    if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null)
-                    {
-                        var p2 = new DynamicParameters(new
-                        {
-                            DepositId = depositId,
-                            SiteId = siteId,
-                            StatementTime = status == DepositStatusEnum.Draft ? calCodeInfo.StatementTime?.DateTime : null,
-                            BankId = calCodeInfo.BankId,
-                            Operator = Operator
-                        });
-                        result = _mainDbClient.Execute("Admin_DepositInfoDraft_Set", trans, p2);
-                    }
-
                     if (result > 0)
                     {
                         _mainDbClient.CommitAndDisposeConnection(conn, trans);
@@ -460,7 +461,7 @@ namespace BackendSite.Service.DAL
             catch (Exception ex)
             {
                 _logger.LogError(ex, MethodExtension.GetCurrentMethod());
-                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, actualDeposit, Operator);
+                SetDepositLog(depositId, siteId, ex.Message, (int)DepositStatusEnum.Error, actualDeposit, @operator);
             }
 
             return result;
