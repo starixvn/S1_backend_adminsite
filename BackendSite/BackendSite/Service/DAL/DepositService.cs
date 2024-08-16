@@ -451,7 +451,7 @@ namespace BackendSite.Service.DAL
                     if (result > 0)
                     {
                         _mainDbClient.CommitAndDisposeConnection(conn, trans);
-                        result = p.Get<int?>("CustId") ?? result;
+                        result = p.Get<int?>("_CustId") ?? result;
                     }
                     else
                     {
