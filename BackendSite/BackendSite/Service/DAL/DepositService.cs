@@ -229,7 +229,7 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
-                    result = SetDepositLog(depositId, siteId, $"Upload Receipt , picFileName:{picFileName}  ", (int)DepositStatusEnum.UploadReceipt, 0, creator);
+                    result = SetDepositLog(depositId, siteId, $"Upload Receipt , picFileName:{picFileName}  ", (int)DepositStatusEnum.UploadReceipt, 0, creator, trans);
                 }
 
                 if (result > 0)
@@ -270,7 +270,7 @@ namespace BackendSite.Service.DAL
 
                 if (result > 0)
                 {
-                    result = SetDepositLog(depositId, siteId, $"Delete Receipt, picFileName:{picFileName}", (int)DepositStatusEnum.DeleteReceipt, 0, Operator);
+                    result = SetDepositLog(depositId, siteId, $"Delete Receipt, picFileName:{picFileName}", (int)DepositStatusEnum.DeleteReceipt, 0, Operator, trans);
                 }
 
                 if (result > 0)
@@ -305,19 +305,19 @@ namespace BackendSite.Service.DAL
                 props.Add("_DepositId", depositId);
                 props.Add("_Status", status);
                 props.Add("_Operator", Operator);
-                result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set_V2", props);
+                result = _mainDbClient.Execute("Admin_DepositCheckReceipt_Set_V2", trans, props);
 
                 if (result > 0)
                 {
                     if (status)
                     {
                         result = SetDepositLog(depositId, siteId, "Check DepositReceipt",
-                            (int)DepositStatusEnum.CheckDepositReceipt, 0, Operator);
+                            (int)DepositStatusEnum.CheckDepositReceipt, 0, Operator, trans);
                     }
                     else
                     {
                         result = SetDepositLog(depositId, siteId, "UnCheck DepositReceipt",
-                            (int)DepositStatusEnum.UnCheckDepositReceipt, 0, Operator);
+                            (int)DepositStatusEnum.UnCheckDepositReceipt, 0, Operator, trans);
                     }
                 }
 
@@ -385,7 +385,7 @@ namespace BackendSite.Service.DAL
                         }
                     }
 
-                    result = SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, @operator);
+                    result = SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, @operator, trans);
                     
                     if (result > 0)
                     {
@@ -489,18 +489,21 @@ namespace BackendSite.Service.DAL
                 }));
         }
 
-        public int SetDepositLog(int depositId, int siteId, string comment, int status, decimal actualDeposit, string Operator)
+        public int SetDepositLog(int depositId, int siteId, string comment, int status, decimal actualDeposit, string @operator, IDbTransaction trans = null)
         {
-            return _mainDbClient.Execute("DepositLog_Ins",
-                new DynamicParameters(new
-                {
-                    DepositId = depositId,
-                    SiteId = siteId,
-                    Comment = comment,
-                    Action = status,
-                    ActualDeposit = actualDeposit,
-                    Operator
-                }));
+            var p = new DynamicParameters(new
+            {
+                DepositId = depositId,
+                SiteId = siteId,
+                Comment = comment,
+                Action = status,
+                ActualDeposit = actualDeposit,
+                Operator = @operator
+            });
+            
+            return trans == null
+                ?  _mainDbClient.Execute("DepositLog_Ins", p)
+                : _mainDbClient.Execute("DepositLog_Ins", trans, p);
         }
 
         public IEnumerable<DepositReceipt> GetDepositReceipt(int depositId, int siteId)
