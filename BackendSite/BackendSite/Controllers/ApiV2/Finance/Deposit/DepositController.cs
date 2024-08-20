@@ -445,7 +445,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     });
 
                     #region 埋點
-                    if (depositRequest.SiteId == 1)
+                    if (depositRequest.SiteId is 1 or 2 or 3)
                     {
                         _ = Task.Run(() =>
                         {
