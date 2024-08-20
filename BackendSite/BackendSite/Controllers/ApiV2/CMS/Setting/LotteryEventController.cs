@@ -63,12 +63,14 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "EndDate must be later than StartDate";
+                    return apiResult;
                 }
                 
                 if (request.DrawDate <= request.EndDate)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "DrawDate must be later than EndDate";
+                    return apiResult;
                 }
                 
                 var data = _eventBll.GetLotteryEventSettingBySq(request.Sq);
@@ -76,6 +78,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "Done or PayOut status can not be edited";
+                    return apiResult;
                 }
 
                 //can't edit running period time
@@ -95,6 +98,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
                     apiResult.Message = "there's running period round exists";
+                    return apiResult;
                 }
                 
                 apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
