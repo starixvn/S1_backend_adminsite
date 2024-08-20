@@ -138,7 +138,7 @@ namespace BackendSite.Service.DAL
 
         public DepositRequest GetDepositRequest(int depositId)
         {
-            return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V4", new DynamicParameters(new { DepositId = depositId }));
+            return _mainDbClient.QueryFirst<DepositRequest>("Admin_DepositRequestTransID_Get_V5", new DynamicParameters(new { DepositId = depositId }));
         }
 
         public IEnumerable<DepositComments> GetDepositRequestComment(int depositId, int siteId)
