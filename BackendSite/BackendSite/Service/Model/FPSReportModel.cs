@@ -5,7 +5,8 @@ namespace BackendSite.Service.Model
 {
     public class FPSReportGetListRequest : ApiRequestPageModel
     {
-        public int CurrencyId { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
         public FpsDeviceType DeviceType { get; set; }
         public string UserName { get; set; }
         public string DeviceId { get; set; }
@@ -24,6 +25,7 @@ namespace BackendSite.Service.Model
     public class FPSReportData
     {
         public DateTime UpdateTime { get; set; }
+        public int SiteId { get; set; }
         public int CustId { get; set; }
         public string IsoCode { get; set; }
         public string UserName { get; set; }
@@ -42,6 +44,7 @@ namespace BackendSite.Service.Model
     public class FPSReport
     {
         public DateTimeOffset LastUsedTime { get; set; }
+        public int SiteId { get; set; }
         public int CustId { get; set; }
         public string IsoCode { get; set; }
         public string UserName { get; set; }
@@ -58,8 +61,9 @@ namespace BackendSite.Service.Model
     
     public class FPSReportExportRequest
     {
-        public int CurrencyId { get; set; }
-        public IovationDeviceType DeviceType { get; set; }
+        public IEnumerable<int> SiteIds { get; set; }
+        public IEnumerable<int> CurrencyIds { get; set; }
+        public FpsDeviceType DeviceType { get; set; }
         public string UserName { get; set; }
         public string DeviceId { get; set; }
         public DateTimeOffset StartTime { get; set; }
