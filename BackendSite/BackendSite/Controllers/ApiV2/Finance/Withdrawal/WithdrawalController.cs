@@ -596,7 +596,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                 }
                                 #endregion
                                 #region 埋點
-                                if (withdrawalData.SiteId == 1)
+                                if (withdrawalData.SiteId is 1 or 2 or 3)
                                 {
                                     _ = Task.Run(() =>
                                     {

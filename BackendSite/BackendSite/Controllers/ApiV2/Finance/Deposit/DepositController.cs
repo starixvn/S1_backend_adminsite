@@ -456,7 +456,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                         await _gaBll.PurchaseEventSendAsync(eventData);
 
                         #region 埋點
-                        if (depositRequest.SiteId == 1)
+                        if (depositRequest.SiteId is 1 or 2 or 3)
                         {
                             var pixelEvent = new List<FaceBookPixel>
                             {
