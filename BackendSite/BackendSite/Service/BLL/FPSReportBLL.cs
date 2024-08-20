@@ -21,9 +21,10 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartTime.ToUniversalTime().DateTime;
             var endTime = request.EndTime.ToUniversalTime().DateTime;
             var deviceType = request.DeviceType == 0 ? null : request.DeviceType.ToString();
-            var data = await _fpsReportService.GetFPSListAsync(request.CurrencyId, deviceType, request.DeviceId, request.UserName, startTime, endTime, request.PageNumber, request.PageSize);
+            var data = await _fpsReportService.GetFPSListAsync(request.SiteIds,request.CurrencyIds, deviceType, request.DeviceId, request.UserName, startTime, endTime, request.PageNumber, request.PageSize);
             var fpsReport = data.FPSDataReport.Select(x => new FPSReport()
             {
+                SiteId = x.SiteId,
                 CustId = x.CustId,
                 UserName = x.UserName,
                 IsoCode = x.IsoCode,
@@ -52,9 +53,10 @@ namespace BackendSite.Service.BLL
             var startTime = request.StartTime.ToUniversalTime().DateTime;
             var endTime = request.EndTime.ToUniversalTime().DateTime;
             var deviceType = request.DeviceType == 0 ? null : request.DeviceType.ToString();
-            var data = await _fpsReportService.GetFPSListWithoutPageAsync(request.CurrencyId, deviceType, request.DeviceId, request.UserName, startTime, endTime);
+            var data = await _fpsReportService.GetFPSListWithoutPageAsync(request.SiteIds,request.CurrencyIds, deviceType, request.DeviceId, request.UserName, startTime, endTime);
             var fpsReport = data.Select(x => new FPSReport()
             {
+                SiteId = x.SiteId,
                 UserName = x.UserName,
                 IsoCode = x.IsoCode,
                 Action = x.Action,

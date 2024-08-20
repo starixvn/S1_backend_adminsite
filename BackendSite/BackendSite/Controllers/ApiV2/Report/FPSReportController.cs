@@ -53,7 +53,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             var exportData = await _fpsReportBLL.GetFPSListWithoutPageAsync(request);
             
-            var stream = _excelBll.Export(exportData, offset: request.StartTime.Offset);
+            var stream = _excelBll.ExportV2(exportData);
             return _excelBll.ExcelFile(stream, "FPSReport");
             return null;
         }

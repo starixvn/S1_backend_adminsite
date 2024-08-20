@@ -4,6 +4,7 @@ using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using Dapper;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -15,11 +16,13 @@ namespace BackendSite.Service.DAL
         {
             _reportDbClient = dbClient.FirstOrDefault(a => a.DataBase == DataBase.Report);
         }
-        public async Task<FPSReportPageResult<FPSReportData>> GetFPSListAsync(int currencyId, string deviceType, string deviceId, string userName, DateTime startTime,
+        public async Task<FPSReportPageResult<FPSReportData>> GetFPSListAsync(IEnumerable<int> siteIds,IEnumerable<int> currencyIds, string deviceType, string deviceId, string userName, DateTime startTime,
             DateTime endTime, int pageNumber, int pageSize)
         {
+
             var p = new DynamicParameters();
-            p.Add("_CurrencyId", currencyId);
+            p.Add("_SiteList", JsonConvert.SerializeObject(siteIds));
+            p.Add("_CurrencyList", JsonConvert.SerializeObject(currencyIds));
             p.Add("_DeviceType", deviceType);
             p.Add("_UserName", userName);
             p.Add("_DeviceId", deviceId);
@@ -40,11 +43,12 @@ namespace BackendSite.Service.DAL
             return data;
         }
 
-        public async Task<IEnumerable<FPSReportData>> GetFPSListWithoutPageAsync(int currencyId, string deviceType, string deviceId, string userName, DateTime startTime,
+        public async Task<IEnumerable<FPSReportData>> GetFPSListWithoutPageAsync(IEnumerable<int> siteIds,IEnumerable<int> currencyIds, string deviceType, string deviceId, string userName, DateTime startTime,
             DateTime endTime)
         {
             var p = new DynamicParameters();
-            p.Add("_CurrencyId", currencyId);
+            p.Add("_SiteList", JsonConvert.SerializeObject(siteIds));
+            p.Add("_CurrencyList", JsonConvert.SerializeObject(currencyIds));
             p.Add("_DeviceType", deviceType);
             p.Add("_UserName", userName);
             p.Add("_DeviceId", deviceId);
