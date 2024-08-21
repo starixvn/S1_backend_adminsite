@@ -54,6 +54,50 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
+        public async Task<ApiResult> AddLotteryEvent(AddLotteryEventRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                if (request.EndDate <= request.StartDate)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "EndDate must be later than StartDate";
+                    return apiResult;
+                }
+                
+                if (request.DrawDate <= request.EndDate)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "DrawDate must be later than EndDate";
+                    return apiResult;
+                }
+               
+                var result = await _eventBll.AddLotteryEventSetting(request , User.Identity.Name) > 0;
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "there's running period round exists";
+                    return apiResult;
+                }
+                
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
         public async Task<ApiResult> SetLotteryEventSetting(SetLotteryEventRequest request)
         {
             var apiResult = new ApiResult();

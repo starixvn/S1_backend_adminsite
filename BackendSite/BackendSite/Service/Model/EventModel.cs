@@ -42,6 +42,19 @@ namespace BackendSite.Service.Model
         public int Small { get; set; }
     }
     
+    public class AddLotteryEventRequest
+    {
+        public int SiteId { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public DateTime DrawDate { get; set; }
+        public int FirstPrize { get; set; }
+        public int SecondPrize { get; set; }
+        public int ThirdPrize { get; set; }
+        public int Consolation { get; set; }
+        public int Small { get; set; }
+    }
+    
     public class LotteryTicketHistoryRequest
     {
         public int SiteId { get; set; }

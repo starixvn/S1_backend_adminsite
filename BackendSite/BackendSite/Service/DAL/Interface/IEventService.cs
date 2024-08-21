@@ -47,6 +47,7 @@ namespace BackendSite.Service.DAL.Interface
 
         public LotteryEventResponse GetLotteryEventSettingBySq(int sq);
         public Task<int> SetLotteryEventSetting(int sq, DateTime startDate, DateTime endDate, DateTime drawDate, int isSuspend, string excludeSetting, string updator);
+        public Task<int> AddLotteryEvent(int siteId, DateTime startDate, DateTime endDate, DateTime drawDate, string excludeSetting, string updator);
         public LotteryTicketHistory GetLotteryTicketHistory(int siteId, int roundId);
         public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request);
         public Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request, string updator);
