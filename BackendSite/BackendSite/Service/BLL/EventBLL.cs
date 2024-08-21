@@ -249,6 +249,22 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
+        public async Task<int> AddLotteryEventSetting(AddLotteryEventRequest request , string updator)
+        {
+            var setting = new List<int>
+            {
+                request.FirstPrize, 
+                request.SecondPrize, 
+                request.ThirdPrize, 
+                request.Consolation, 
+                request.Small
+            };
+            var excludeSetting = JsonConvert.SerializeObject(setting);
+            var result = await _eventService.AddLotteryEvent(request.SiteId, request.StartDate, request.EndDate ,request.DrawDate , excludeSetting ,updator);
+            
+            return result;
+        }
+        
         public LotteryTicketHistory GetLotteryTicketHistory(int siteId, int roundId)
         {
             var responses = _eventService.GetLotteryTicketHistory(siteId, roundId);

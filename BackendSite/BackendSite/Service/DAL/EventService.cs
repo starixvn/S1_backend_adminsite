@@ -187,6 +187,18 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_LotteryEventDrawSetting_Set", p);
         }
         
+        public async Task<int> AddLotteryEvent(int siteId, DateTime startDate , DateTime endDate , DateTime drawDate , string excludeSetting ,string updator)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_StartDate", startDate, dbType: DbType.DateTime);
+            p.Add("_EndDate", endDate, dbType: DbType.DateTime);
+            p.Add("_DrawDate", drawDate, dbType: DbType.DateTime);
+            p.Add("_ExcludeSetting", excludeSetting, dbType: DbType.String);
+            p.Add("_Updator", updator, dbType: DbType.String);
+            return await _mainDbClient.ExecuteAsync("Admin_LotteryEventDrawSetting_Ins", p);
+        }
+        
         public LotteryTicketHistory GetLotteryTicketHistory(int siteId ,int roundId)
         {
             return _reportDbClient.QueryFirst<LotteryTicketHistory>("Service_LotteryTicketHistory_Get", new { _SiteId = siteId , _RoundId = roundId });
