@@ -57,6 +57,7 @@ namespace BackendSite.Service.BLL
             var fpsReport = data.Select(x => new FPSReport()
             {
                 SiteId = x.SiteId,
+                CustId = x.CustId,
                 UserName = x.UserName,
                 IsoCode = x.IsoCode,
                 Action = x.Action,

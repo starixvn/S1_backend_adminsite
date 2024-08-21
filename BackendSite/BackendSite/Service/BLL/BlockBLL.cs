@@ -116,6 +116,11 @@ namespace BackendSite.Service.BLL
                 return await _blockService.GetIoavationAssociatedList(deviceId);
             return await _blockService.GetShieldAssociatedList(deviceId);
         }
+        
+        public async Task<IEnumerable<DeviceUser>> GetFPSDeviceUserList(int siteId,string deviceId)
+        {
+            return await _blockService.GetFPSAssociatedList(deviceId);
+        }
 
         public IEnumerable<BlockCryptoWallet> GetBlockCryptoWallet(DateTime startDate, DateTime endDate, int status, string address, IEnumerable<int> currencyId, string userName, IEnumerable<int> cryptoType, IEnumerable<string> netWork, int siteId)
         {
