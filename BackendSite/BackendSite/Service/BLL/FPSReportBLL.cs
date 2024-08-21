@@ -8,11 +8,13 @@ namespace BackendSite.Service.BLL
     public class FPSReportBLL :　IFPSReportBLL 
     {
         private readonly IFPSReportService _fpsReportService;
+        private readonly ServerInfoBLL _serverInfoBll;
         private readonly BlockService _blockService;
 
         public FPSReportBLL(IServiceProvider provider)
         {
             _fpsReportService = provider.GetRequiredService<IFPSReportService>();
+            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _blockService = provider.GetRequiredService<BlockService>();
         }
         
@@ -20,11 +22,13 @@ namespace BackendSite.Service.BLL
         {
             var startTime = request.StartTime.ToUniversalTime().DateTime;
             var endTime = request.EndTime.ToUniversalTime().DateTime;
-            var deviceType = request.DeviceType == 0 ? null : request.DeviceType.ToString();
+            var deviceType = request.DeviceType == 0 ? null : request.DeviceType.ToString().Replace("_", " ");;
+            var siteList = _serverInfoBll.GetSiteList();
             var data = await _fpsReportService.GetFPSListAsync(request.SiteIds,request.CurrencyIds, deviceType, request.DeviceId, request.UserName, startTime, endTime, request.PageNumber, request.PageSize);
             var fpsReport = data.FPSDataReport.Select(x => new FPSReport()
             {
                 SiteId = x.SiteId,
+                SiteName = siteList.FirstOrDefault(x => x.SiteId == x.SiteId).SiteName,
                 CustId = x.CustId,
                 UserName = x.UserName,
                 IsoCode = x.IsoCode,
