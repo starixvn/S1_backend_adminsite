@@ -463,7 +463,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                                 FaceBookPixel.purchase,
                                 refreshDepositInfoData.FirstDeposit == 1 ? FaceBookPixel.startTrial : FaceBookPixel.redeposit
                             };
-                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
+                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.SiteId ,depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
                             _ = _faceBookPixelBll.Send(pixelRequest);
                         }
                         #endregion
