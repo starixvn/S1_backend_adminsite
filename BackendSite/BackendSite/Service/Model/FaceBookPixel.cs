@@ -1,9 +1,8 @@
-﻿using static BackendSite.Service.BLL.FaceBookPixelBLL;
-
-namespace BackendSite.Service.Model;
+﻿namespace BackendSite.Service.Model;
 
 public class PixelRequest
 {
+    public int SiteId { get; set; }
     public int CustId { get; set; }
     public string Url { get; set; }
     public int? CurrencyId { get; set; }
