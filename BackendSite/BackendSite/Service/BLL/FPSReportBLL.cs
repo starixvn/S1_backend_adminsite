@@ -22,7 +22,7 @@ namespace BackendSite.Service.BLL
         {
             var startTime = request.StartTime.ToUniversalTime().DateTime;
             var endTime = request.EndTime.ToUniversalTime().DateTime;
-            var deviceType = request.DeviceType == 0 ? null : request.DeviceType.ToString().Replace("_", " ");;
+            var deviceType = request.DeviceType == 0 ? "" : request.DeviceType.ToString().Replace("_", " ");
             var siteList = _serverInfoBll.GetSiteList();
             var data = await _fpsReportService.GetFPSListAsync(request.SiteIds,request.CurrencyIds, deviceType, request.DeviceId, request.UserName, startTime, endTime, request.PageNumber, request.PageSize);
             var fpsReport = data.FPSDataReport.Select(x => new FPSReport()
