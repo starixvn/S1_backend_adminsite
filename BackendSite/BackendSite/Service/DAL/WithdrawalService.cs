@@ -388,7 +388,7 @@ namespace BackendSite.Service.DAL
                 using var trans = conn.BeginTransaction();
 
                 //step1:Set WithdrawalInfo
-                result = SetWithdrawalInfo(withdrawalId, siteId, comment,
+                result = SetWithdrawalInfo(withdrawalId, siteId,
                     forStatus, updater, status,
                     /*Approved don't to Set WithdrawalInfo*/
                     (status == WithdrawalStatusEnum.Approved && withdrawalType != (int)WithdrawalTypeEnum.CryptoWallet
@@ -429,12 +429,10 @@ namespace BackendSite.Service.DAL
                             case WithdrawalStatusEnum.Rejected:
                                 var type = 2 + TypePosition; /*Rejected  Withdrawal 1002*/
 
-                                updateFlowEndResult = SetWithdrawalInfoFlowEndTime(withdrawalId, trans);
-
                                 var balanceResult = _walletService.SetBalance(custId, siteId, userName, amount, type,
                                     $"Withdrawal Rejected: {amount}", transId, out _, out _, trans);
 
-                                specialResult = (updateFlowEndResult == 0 || balanceResult == 0) ? 0 : 1;
+                                specialResult = balanceResult == 0 ? 0 : 1;
                                 break;
 
                             case WithdrawalStatusEnum.Draft:
@@ -457,11 +455,6 @@ namespace BackendSite.Service.DAL
                                 {
                                     specialResult = 1;
                                 }
-
-                                break;
-
-                            case WithdrawalStatusEnum.Approved:
-                                specialResult = SetWithdrawalInfoFlowEndTime(withdrawalId, trans) == 0 ? 0 : 1;
 
                                 break;
 
@@ -494,7 +487,6 @@ namespace BackendSite.Service.DAL
 
         private int SetWithdrawalInfo(int withdrawalId,
             int siteId,
-            string comment,
             string forStatus,
             string updater,
             WithdrawalStatusEnum status,
@@ -517,7 +509,6 @@ namespace BackendSite.Service.DAL
             {
                 _WithdrawalId = withdrawalId,
                 _SiteId = siteId,
-                _Comment = comment,
                 _ForStatus = forStatus,
                 _Status = (int)status,
                 _WithdrawalInfo = withdrawalInfo,
@@ -530,7 +521,7 @@ namespace BackendSite.Service.DAL
             p.Add("_UserName", dbType: DbType.String, direction: ParameterDirection.Output);
             p.Add("_Amount", dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
-            const string spName = "Admin_WithdrawalInfo_Set_V2";
+            const string spName = "Service_WithdrawalInfo_Set";
             result = trans != null
                 ? _mainDbClient.Execute(spName, trans, p)
                 : _mainDbClient.Execute(spName, p);
@@ -558,18 +549,6 @@ namespace BackendSite.Service.DAL
         {
             return _mainDbClient.QueryFirst<WithdrawalRequest>("Admin_WithdrawalInfo_Get_V2",
                 new { _WithdrawalId = withdrawalId, _TransId = transId });
-        }
-
-        private int SetWithdrawalInfoFlowEndTime(int withdrawalId, MySqlTransaction trans = null)
-        {
-            var p = new DynamicParameters(new
-            {
-                _WithdrawalId = withdrawalId
-            });
-            const string spName = "Admin_WithdrawalInfo_FlowEndTime_Set";
-            return trans != null
-                ? _mainDbClient.Execute(spName, trans, p)
-                : _mainDbClient.Execute(spName, p);
         }
 
         private int SetWithdrawalAccounting(string transId, string accountingModels, int userId, MySqlTransaction trans = null)
