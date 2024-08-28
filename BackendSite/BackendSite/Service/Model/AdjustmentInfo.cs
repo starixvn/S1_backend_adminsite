@@ -7,7 +7,7 @@ namespace BackendSite.Service.Model
     public class AdjustmentInfo
     {
         public string TransId { set; get; }
-        public int AdjustType { set; get; }
+        public AdjustmentInfoAdjustTypeEnum AdjustType { set; get; }
         public int CustId { set; get; }
         public string UserName { set; get; }
         public int CurrencyId { set; get; }

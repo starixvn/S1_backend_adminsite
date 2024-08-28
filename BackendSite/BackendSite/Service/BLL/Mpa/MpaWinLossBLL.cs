@@ -182,7 +182,7 @@ namespace BackendSite.Service.BLL.Mpa
             GetOrderByProp(request);
 
             var data = await GetWinLossReportAsync(request, groupByType);
-            var sortedData = data.SortThen2ExcelData(request);
+            var sortedData = data.SortThen2ExcelData(request,true);
             var result = sortedData.Select(x =>
             {
                 var r = x.ToExcelFormat<MpaWinLossByPlayerDtoExport>();
@@ -203,7 +203,7 @@ namespace BackendSite.Service.BLL.Mpa
             GetOrderByProp(request);
 
             var data = await GetWinLossReportAsync(request, groupByType);
-            var sortedData = data.SortThen2ExcelData(request);
+            var sortedData = data.SortThen2ExcelData(request,true);
             var result = sortedData.Select(x =>
             {
                 var r = x.ToExcelFormat<MpaWinLossByCurrencyDtoExport>();

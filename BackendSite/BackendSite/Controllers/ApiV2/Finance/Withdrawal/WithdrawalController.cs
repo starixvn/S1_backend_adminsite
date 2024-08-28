@@ -600,12 +600,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                 }
                                 #endregion
                                 #region 埋點
-                                if (withdrawalData.SiteId == 1)
+                                if (withdrawalData.SiteId is 1 or 2 or 3)
                                 {
                                     _ = Task.Run(() =>
                                     {
                                         var pixelEvent = new List<FaceBookPixel> { FaceBookPixel.withdraw };
-                                        var pixelRequest = _faceBookPixelBll.CreatePixelRequest(withdrawalData.CustId, withdrawalData.CurrencyId, withdrawalData.Amount, pixelEvent);
+                                        var pixelRequest = _faceBookPixelBll.CreatePixelRequest(withdrawalData.SiteId ,withdrawalData.CustId, withdrawalData.CurrencyId, withdrawalData.Amount, pixelEvent);
                                         _ = _faceBookPixelBll.Send(pixelRequest);
                                     });
                                 }
