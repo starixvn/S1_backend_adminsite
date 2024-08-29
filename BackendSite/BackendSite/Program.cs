@@ -6,7 +6,7 @@ using Serilog.Formatting.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var remoteUrls = builder.Configuration.GetSection("ConfigService").Get<string[]>();
+var remoteUrls = GetRemoteUrls();
 remoteUrls = builder.Configuration.CheckLocalConfig(builder.Environment, args, remoteUrls);
 builder.Configuration.AddRemoteJsonConfig(remoteUrls);
 
@@ -22,9 +22,21 @@ builder.Host.UseSerilog((context, Configuration) =>
                 excludesApiEndpoints.Any(item => p.Value.ToString().Contains(item))
                 || excludesMessage.Any(item => c.MessageTemplate.ToString().Contains(item))))
         .Enrich.WithExceptionDetails();
-
     OverrideLoggerWriteToLFile(Configuration);
 });
+
+var startup = new Startup(builder.Configuration);
+startup.ConfigureServices(builder.Services);
+
+var app = builder.Build();
+startup.Configure(app, builder.Environment);
+
+var minWorkers = 64;
+var minIOCPs = 4;
+ThreadPool.SetMinThreads(minWorkers, minIOCPs);
+
+app.Run();
+return;
 
 void OverrideLoggerWriteToLFile(LoggerConfiguration configuration)
 {
@@ -43,14 +55,11 @@ void OverrideLoggerWriteToLFile(LoggerConfiguration configuration)
             rollOnFileSizeLimit: true);
 }
 
-var startup = new Startup(builder.Configuration);
-startup.ConfigureServices(builder.Services);
-
-var app = builder.Build();
-startup.Configure(app, builder.Environment);
-
-var minWorkers = 64;
-var minIOCPs = 4;
-ThreadPool.SetMinThreads(minWorkers, minIOCPs);
-
-app.Run();
+string[] GetRemoteUrls()
+{
+    // 如果有 Runtime Environment Variable 優先使用
+    // 沒有則使用預設 AppSetting
+    return Environment.GetEnvironmentVariable("ConfigServiceUrl") is null
+        ? builder.Configuration.GetSection("ConfigService").Get<string[]>()
+        : new List<string>() { Environment.GetEnvironmentVariable("ConfigServiceUrl") }.ToArray();
+}
