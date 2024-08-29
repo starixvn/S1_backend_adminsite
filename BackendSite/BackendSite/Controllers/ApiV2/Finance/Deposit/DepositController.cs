@@ -40,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly IGaBLL _gaBll;
         private readonly ILogger<DepositController> _logger;
         private readonly FaceBookPixelBLL _faceBookPixelBll;
+        private readonly CRMBLL _cRMBLL;
 
         #endregion
 
@@ -63,6 +64,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
             _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
             _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
+            _cRMBLL = provider.GetRequiredService<CRMBLL>();
 
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
@@ -454,8 +456,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                                 FaceBookPixel.purchase,
                                 refreshDepositInfoData.FirstDeposit == 1 ? FaceBookPixel.startTrial : FaceBookPixel.redeposit
                             };
-                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.SiteId ,depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
+                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.SiteId, depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
                             _ = _faceBookPixelBll.Send(pixelRequest);
+                        });
+
+                        _ = Task.Run(() =>
+                        {
+                            var para = new CRMRequest()
+                            {
+                                Event = (int)CRMEvent.Deposit_successful,
+                                CustId = depositRequest.CustId,
+                                SiteId = depositRequest.SiteId,
+                                OrderAmount = depositRequest.Amount
+                            };
+                            _ = _cRMBLL.Send(para);
                         });
                     }
                     #endregion
