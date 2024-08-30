@@ -72,7 +72,11 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                     apiResult.Message = "DrawDate must be later than EndDate";
                     return apiResult;
                 }
-               
+                
+                //寫死小時
+                request.EndDate = new DateTime(request.EndDate.Year,request.EndDate.Month,request.EndDate.Day, 23, 59, 59);
+                request.DrawDate = new DateTime(request.DrawDate.Year,request.DrawDate.Month,request.DrawDate.Day, 20, 0, 0);
+                
                 var result = await _eventBll.AddLotteryEventSetting(request , User.Identity.Name) > 0;
                 if (result)
                 {
