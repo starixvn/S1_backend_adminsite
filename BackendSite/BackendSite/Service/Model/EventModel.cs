@@ -187,9 +187,24 @@ namespace BackendSite.Service.Model
         public ChineseZodiacStickerId StickerId { get; set; }
         public string StickerName => StickerId.ToString();
         public decimal StickerAmount { get; set; }
-        public DateTime PurchaseTime { get; set; }
-        public DateTime RoundStartDate{ get; set; }
-        public DateTime RoundEndDate{ get; set; }
+        private DateTimeOffset _purchaseTime { set; get; }
+        public DateTimeOffset PurchaseTime
+        {
+            get => _purchaseTime;
+            set => _purchaseTime = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+        }
+        private DateTimeOffset _roundStartDate { set; get; }
+        public DateTimeOffset RoundStartDate
+        {
+            get => _roundStartDate;
+            set => _roundStartDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+        }
+        private DateTimeOffset _roundEndDate { set; get; }
+        public DateTimeOffset RoundEndDate
+        {
+            get => _roundEndDate;
+            set => _roundEndDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+        }
     }
     
     public class StickerReportCurrencyTotal
@@ -219,9 +234,24 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int RoundId { get; set; }
         public string TicketNo { get; set; }
-        public DateTime PeriodStartTime{ get; set; }
-        public DateTime PeriodEndTime{ get; set; }
-        public DateTime ReceivedTime{ get; set; }
+        private DateTimeOffset _periodStartTime { set; get; }
+        private DateTimeOffset _periodEndTime { set; get; }
+        private DateTimeOffset _receivedTime { set; get; }
+        public DateTimeOffset PeriodStartTime
+        {
+            get => _periodStartTime;
+            set => _periodStartTime = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+        }
+        public DateTimeOffset PeriodEndTime
+        {
+            get => _periodEndTime;
+            set => _periodEndTime = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+        }
+        public DateTimeOffset ReceivedTime
+        {
+            get => _receivedTime;
+            set => _receivedTime = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+        }
     }
     
     public class LotteryMaintainModel
