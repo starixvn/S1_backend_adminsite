@@ -33,7 +33,7 @@ namespace BackendSite.Service.DAL
             p.Add("_PageNumber", Math.Abs(pageNumber), DbType.Int32, ParameterDirection.Input);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = await _reportDbClient.QueryAsync<FPSReportData>("Admin_FPSReport_Get", p);
+            var result = await _reportDbClient.QueryAsync<FPSReportData>("Admin_FPSReport_Get_V2", p);
             var data = new FPSReportPageResult<FPSReportData>
             {
                 FPSDataReport = result,

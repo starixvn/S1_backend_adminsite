@@ -82,5 +82,34 @@ namespace BackendSite.Service.Library
                 throw;
             }
         }
+        
+        public async Task<HttpResponseMessage> GetAsync(string url, Dictionary<string, string> headerParams, string contentType)
+        {
+            HttpClientHandler handler;
+            
+                handler = new HttpClientHandler();
+            
+
+            using var client = new HttpClient(handler);
+            if (contentType != null)
+            {
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(contentType));
+            }
+
+            if (headerParams != null)
+            {
+                foreach (var param in headerParams)
+                {
+                    client.DefaultRequestHeaders.Add(param.Key, param.Value);
+                }
+            }
+            
+            _logger.LogInformation($"url:{url}");
+            using var data = new HttpRequestMessage(HttpMethod.Get, url);
+            data.Content = new StringContent("", Encoding.UTF8, contentType);
+            var response = await client.SendAsync(data);
+            _logger.LogInformation($"HttpHelper.Request.Response:{response.Content.ReadAsStringAsync().Result}");
+            return response;
+        }
     }
 }
