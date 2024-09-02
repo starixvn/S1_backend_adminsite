@@ -1,6 +1,5 @@
 ﻿using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model
 {
@@ -39,8 +38,6 @@ namespace BackendSite.Service.Model
         public string RobotTracking { get; set; }
         public int AssociateDevices { get; set; }
         public int AssociateCount { get; set; }
-        public List<AssociatedDevice> AssociatedDevice { get; set; }
-        public List<DeviceUser> DeviceUser { get; set; }
     }
     
     
@@ -61,8 +58,6 @@ namespace BackendSite.Service.Model
         public string RobotTracking { get; set; }
         public int AssociateDevices { get; set; }
         public int AssociateCount { get; set; }
-        public List<DeviceUser> DeviceUser { get; set; }
-        public List<AssociatedDevice> AssociatedDevice { get; set; }
     }
     
     public class FPSReportExportRequest
@@ -75,39 +70,4 @@ namespace BackendSite.Service.Model
         public DateTimeOffset StartTime { get; set; }
         public DateTimeOffset EndTime { get; set; }
     }
-    
-    #region API
-    public class FPSServicesConfig
-    {
-        public string ResourceURL { get; set; }
-        public string Subscriber { get; set; }
-        public string Token { get; set; }
-        public string ApiUrl { get; set; }
-
-    }
-
-    public class FPSGetAssociationByAccountResponse
-    {
-        public int statusCode { get; set; }
-        public string errorMessage { get; set; }
-        public int associatedDevices { get; set; }
-        public List<FPSAssociatedDeviceDetail> associatedDeviceDetails { get; set; }
-        public int associatedAccounts { get; set; }
-        public List<FPSAssociatedAccountDetail> associatedAccountDetails { get; set; }
-    }
-    
-    public class FPSAssociatedAccountDetail
-    {
-        [JsonProperty("account")]
-        public string UserName { get; set; }
-        public DateTime firstAssociationDate { get; set; }
-    }
-
-    public class FPSAssociatedDeviceDetail
-    {
-        [JsonProperty("device")]
-        public string DeviceId { get; set; }
-        public DateTime firstSeenDate { get; set; }
-    }
-    #endregion
 }
