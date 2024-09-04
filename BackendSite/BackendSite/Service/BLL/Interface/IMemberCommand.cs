@@ -18,7 +18,7 @@ public interface IMemberCommand
     Task<int> SwitchPhoneVerifiedAsync(int custId, int status, string @operator);
     Task<int> SwitchEmailVerifiedAsync(int custId, int status, string @operator);
     Task<string> ResetPasswordAsync(int custId, string @operator);
-    Task<int> SetCustStatusAsync(int custId, CustomerStatusEnum status, string reason, string @operator);
+    Task<int> SetCustStatusAsync(int custId, LockCustomerStatusEnum status, string reason, string @operator);
     Task<int> SwitchRebatePayoutAsync(int custId, int status, string @operator);
     Task<int> ResetBankInfoAsync(int custId, string @operator);
     Task<int> ResetCryptoInfoAsync(int custId, string @operator);

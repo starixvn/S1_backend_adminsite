@@ -952,13 +952,18 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Lock(LockMemberRequest request)
         {
-            if (request.Status == CustomerStatusEnum.Suspend)
+            switch (request.Status)
             {
-                await _tpBll.TransferAllTpWalletAsync(request.CustId);
+                case LockCustomerStatusEnum.Suspend or LockCustomerStatusEnum.FreezeOneWeek or LockCustomerStatusEnum.FreezeOneMonth or LockCustomerStatusEnum.FreezeThreeMonth:
+                    await _tpBll.TransferAllTpWalletAsync(request.CustId);
+                    break;
+                case LockCustomerStatusEnum.Running:
+                    await _memberCommand.RemoveCustTagAsync(request.CustId, 35, User.Identity.Name);
+                    break;
             }
 
             var setResult = await _memberCommand.SetCustStatusAsync(request.CustId, request.Status, request.Reason, User.Identity.Name) > 0;
-
+            
             if (setResult)
             {
                 return new ApiResult
@@ -970,7 +975,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
             throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
         }
-
+        
         /// <summary>
         /// Member/KickOut 強制讓客戶登出
         /// </summary>
@@ -1009,7 +1014,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> Close(CloseMemberRequest request)
         {
-            if (await _memberCommand.SetCustStatusAsync(request.CustId, CustomerStatusEnum.Closed, request.Reason, User.Identity.Name) > 0)
+            if (await _memberCommand.SetCustStatusAsync(request.CustId, LockCustomerStatusEnum.Closed, request.Reason, User.Identity.Name) > 0)
             {
                 return new ApiResult
                 {

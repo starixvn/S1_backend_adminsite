@@ -490,7 +490,7 @@ public class ResetMemberPasswordRequest
 public class LockMemberRequest
 {
     public int CustId { get; set; }
-    public CustomerStatusEnum Status { get; set; }
+    public LockCustomerStatusEnum Status { get; set; }
     public string Reason { get; set; }
 }
 
