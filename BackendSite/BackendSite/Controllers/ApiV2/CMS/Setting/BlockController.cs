@@ -290,6 +290,27 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
                 ErrorCode = (int)ErrorCodeEnum.Success
             };
         }
+        
+        /// <summary>
+        /// FPS Block/GetDeviceUserList 取得相同DeviceId關聯帳號
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// </remarks>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult<IEnumerable<DeviceUser>>> GetFPSDeviceUserList(GetDeviceUserListRequest request)
+        {
+            var customer = _custInfoBll.GetCustInfoWithCache(request.CustId);
+
+            var deviceUserList = await _blockBLL.GetFPSDeviceUserList(customer.SiteId, request.DeviceId);
+            return new ApiResult<IEnumerable<DeviceUser>>
+            {
+                Data = deviceUserList,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
+        }
 
         /// <summary>
         /// Block/ReleaseAccount 解除CustBankDetail跟user的連結

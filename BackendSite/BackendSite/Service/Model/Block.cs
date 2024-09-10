@@ -95,6 +95,11 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public string UserName { get; set; }
     }
+
+    public class AssociatedDevice
+    {
+        public string DeviceId { get; set; }
+    }
     public class BlockAccountSetRequest
     {
         public int SysId { get; set; }
