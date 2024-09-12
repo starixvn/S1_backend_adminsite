@@ -357,6 +357,16 @@ public class MemberService : IMemberService
         return await _mainDbClient.ExecuteAsync("Admin_CustStatus_Set_V2", p);
     }
 
+    public async Task<int> SetCustTemporaryStatusAsync(int custId, int status ,DateTime expiredTime , string @operator)
+    {
+        var p = new DynamicParameters();
+        p.Add("_CustId", custId);
+        p.Add("_Status", status);
+        p.Add("_ExpiredTime", expiredTime);
+        p.Add("_Operator", @operator);
+        return await _mainDbClient.ExecuteAsync("Admin_CustTemporaryStatus_Ins", p);
+    }
+    
     public async Task<int> DeleteOnUserAsync(int custId)
     {
         var p = new DynamicParameters();

@@ -6,5 +6,7 @@ namespace BackendSite.Service.DAL.Interface
     {
         Task<IEnumerable<CustIovationData>> GetCustIovationList(int custId);
         Task<IEnumerable<CustShieldRiskInfoData>> GetCustShieldRiskInfoList(int custId);
+        Task<IEnumerable<CustFPSData>> GetCustFPSList(int custId);
+
     }
 }

@@ -164,9 +164,20 @@ namespace BackendSite.Service.Model.enums
         Running = 1,
         Suspend = 2,
         Closed = 3,
-        Lock = 4,
+        Lock = 4
     }
 
+    public enum LockCustomerStatusEnum
+    {
+        Running = 1,
+        Suspend = 2,
+        Closed = 3,
+        Lock = 4,
+        FreezeOneWeek = 97,
+        FreezeOneMonth = 98,
+        FreezeThreeMonth = 99 
+    }
+    
     public enum EnablePromotionEnum
     {
         Disable = 0,
@@ -2043,5 +2054,64 @@ namespace BackendSite.Service.Model.enums
     { 
         Common = 1,
         FreeSpin = 2
+    }
+    public enum TaskSetting 
+    {
+        LastReadPopupMessage = 1,
+        LastStatusUpdateTime = 2,
+        PhoneVerifyTime = 3,
+        EmailVerifyTime = 4,
+        MemberTypeUpdateTime = 5,
+        FirstDepositTime = 6
+    }
+
+
+    public enum FpsDeviceType
+    {
+        Android = 1,
+        Windows,
+        iOS,
+        Mac_OS_X,
+        Linux,
+        Other,
+        Ubuntu,
+        Chrome_OS,
+        BlackBerry_OS,
+        Tizen,
+        Windows_Phone,
+        Fedora,
+        FirefoxOS,
+        Symbian_Anna,
+        Symbian_OS,
+        FreeBSD,
+        OpenBSD,
+        NetBSD,
+        Null,
+        BlackBerry_Tablet_OS,
+        Solaris,
+        Kubuntu,
+        webOS,
+        Maemo,
+        Mac_OS,
+        KaiOS,
+        BSD,
+        Linux_Mint,
+        Debian,
+        Roku,
+        Symbian,
+        Gentoo,
+        Slackware,
+        Sailfish,
+        CentOS,
+        Red_Hat,
+        MeeGo,
+        Kindle,
+        BREW,
+        Chromecast,
+        Unknown,
+        ATV_OS_X,
+        openSUSE,
+        TESLA,
+        Web0S,
     }
 }
