@@ -467,7 +467,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                                 Event = (int)CRMEvent.Deposit_successful,
                                 CustId = depositRequest.CustId,
                                 SiteId = depositRequest.SiteId,
-                                OrderAmount = depositRequest.Amount
+                                OrderAmount = depositRequest.Amount,
+                                CurrencyId = depositRequest.CurrencyId
                             };
                             _ = _cRMBLL.Send(para);
                         });
