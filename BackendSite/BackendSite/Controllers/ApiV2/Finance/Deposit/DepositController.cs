@@ -42,6 +42,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly FaceBookPixelBLL _faceBookPixelBll;
         private readonly TaskSettingBLL _TaskSettingBll;
         private readonly CRMBLL _cRMBLL;
+        private readonly IWebHostEnvironment _environment;
 
         #endregion
 
@@ -67,6 +68,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
             _TaskSettingBll = provider.GetRequiredService<TaskSettingBLL>();
             _cRMBLL = provider.GetRequiredService<CRMBLL>();
+            _environment = provider.GetRequiredService<IWebHostEnvironment>();
 
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
@@ -470,11 +472,12 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
 
                             var para = new CRMRequest()
                             {
-                                Event = (int)CRMEvent.Deposit_successful,
+                                Event = (int)CRMEvent.deposit_successful,
                                 CustId = depositRequest.CustId,
                                 SiteId = depositRequest.SiteId,
                                 OrderAmount = depositRequest.Amount,
-                                CurrencyId = depositRequest.CurrencyId
+                                CurrencyId = depositRequest.CurrencyId,
+                                Environment = _environment.IsProduction() ? "P" : "D"
                             };
                             _ = _cRMBLL.Send(para);
                         }
