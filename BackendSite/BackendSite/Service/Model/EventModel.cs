@@ -23,6 +23,7 @@ namespace BackendSite.Service.Model
         public DateTime DrawDate { get; set; }
         public int Status { get; set; }
         public string ExcludeSetting { get; set; }
+        public List<string> ExcludeSettingList => JsonConvert.DeserializeObject<List<string>>(ExcludeSetting);
         public string Updator { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }
