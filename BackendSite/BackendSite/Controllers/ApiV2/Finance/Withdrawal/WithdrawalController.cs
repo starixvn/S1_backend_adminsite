@@ -57,6 +57,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly string _awsWithdrawalUrl;
         private readonly string _awsWithdrawalBucketName;
         private readonly FaceBookPixelBLL _faceBookPixelBll;
+        private readonly CRMBLL _cRMBLL;
+        private readonly IWebHostEnvironment _environment;
 
         #endregion
 
@@ -89,6 +91,8 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _awsWithdrawalFolder = configBll.GetConfigValue("AWSWithdrawalFolderName");
             _awsWithdrawalAccountingFolder = configBll.GetConfigValue("AWSWithdrawalAccountingFolder");
             _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
+            _cRMBLL = provider.GetRequiredService<CRMBLL>();
+            _environment = provider.GetRequiredService<IWebHostEnvironment>();
 
             _usableActionType = new Dictionary<WithdrawalStatusEnum, List<WithdrawalActionEnum>>
             {
@@ -605,9 +609,23 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                     _ = Task.Run(() =>
                                     {
                                         var pixelEvent = new List<FaceBookPixel> { FaceBookPixel.withdraw };
-                                        var pixelRequest = _faceBookPixelBll.CreatePixelRequest(withdrawalData.SiteId ,withdrawalData.CustId, withdrawalData.CurrencyId, withdrawalData.Amount, pixelEvent);
+                                        var pixelRequest = _faceBookPixelBll.CreatePixelRequest(withdrawalData.SiteId, withdrawalData.CustId, withdrawalData.CurrencyId, withdrawalData.Amount, pixelEvent);
                                         _ = _faceBookPixelBll.Send(pixelRequest);
                                     });
+
+                                    _ = Task.Run(() =>
+                                    {
+                                        var para = new CRMRequest()
+                                        {
+                                            Event = (int)CRMEvent.withdrawal_sucessful,
+                                            CustId = withdrawalData.CustId,
+                                            SiteId = withdrawalData.SiteId,
+                                            OrderAmount = withdrawalData.Amount,
+                                            CurrencyId = withdrawalData.CurrencyId,
+                                            Environment = _environment.IsProduction() ? "P" : "D"
+                                        };
+                                        _ = _cRMBLL.Send(para);
+                                    });                                  
                                 }
                                 #endregion
                             }
