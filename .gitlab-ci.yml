@@ -1,4 +1,4 @@
 include:
   - project: "sre/gitlab-ci-configs"
     ref: "main"
-    file: "/backend/.gitlab-ci.yaml"
+    file: "/adminsite/.gitlab-ci.yaml"
