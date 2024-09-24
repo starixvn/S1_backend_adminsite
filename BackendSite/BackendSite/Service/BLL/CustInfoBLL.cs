@@ -138,53 +138,6 @@ namespace BackendSite.Service.BLL
             return custInfoList;
         }
 
-        public IEnumerable<T> GetCustInfoExportList<T>(IEnumerable<int> selectSite,
-            int? birDate,
-            int? birMonth,
-            int? birYear,
-            string userName,
-            string accountName,
-            string loginIp,
-            string transId,
-            string tpUserName,
-            string email,
-            string phoneNo,
-            DateTime? startDate,
-            DateTime? endDate,
-            DateTime? tagStartDate,
-            DateTime? tagEndDate,
-            DateTime? statusStartDate,
-            DateTime? statusEndDate,
-            string affCode,
-            IEnumerable<int> selectCurrency,
-            string bankAccountNumber,
-            IEnumerable<int> selectStatus,
-            IEnumerable<int> selectTag)
-        {
-            var siteList = _serverInfoBll.GetSiteListByLoginUserV2().SelectMany(x => new int[] { x.SiteId });
-
-            var currencyList = new List<int>();
-            _serverInfoBll.GetSiteListByLoginUserV2().ToList().ForEach(x =>
-            {
-                currencyList.AddRange(JsonConvert.DeserializeObject<List<int>>(x.CurrencyList));
-            });
-
-            var wTransId = IsWithdrawalInfoTransId(transId) ? transId : null;
-            var dTransId = IsDepositInfoTransId(transId) ? transId : null;
-            var tTransId = IsTpTransferInfoTransId(transId) ? transId : null;
-
-            var result = _custInfoService.GetCustInfoExportList<T>(selectSite, birDate, birMonth, birYear, userName, accountName, loginIp, wTransId, dTransId, tTransId, tpUserName, email, phoneNo, startDate, endDate, tagStartDate, tagEndDate, statusStartDate, statusEndDate, JsonConvert.SerializeObject(siteList), affCode, selectCurrency, bankAccountNumber, JsonConvert.SerializeObject(currencyList.Select(x => x).Distinct().ToList()), selectStatus, selectTag);
-
-
-            return result;
-        }
-
-        public CustInfoDetail GetCustInfoDetail(int custId, string userName)
-        {
-            var siteList = _serverInfoBll.GetSiteListByLoginUserV2()?.SelectMany(x => new int[] { x.SiteId });
-            return siteList is null ? null : GetCustInfoDetail(custId, userName, siteList);
-        }
-
         public CustInfoDetail GetCustInfoDetail(int custId, string userName, int siteId)
         {
             var siteList = new int[] { siteId };
