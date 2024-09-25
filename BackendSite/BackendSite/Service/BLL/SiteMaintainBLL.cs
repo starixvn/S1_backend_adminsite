@@ -23,6 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly Dictionary<string, IEnumerable<string>> _maintainExcludeDomainConfig;
         private readonly IEnumerable<int> _maintainJsonSyncSiteConfig;
         private readonly ServerInfoBLL _serverInfoBll;
+        private readonly ILogger<SiteMaintainBLL> _logger;
 
         public SiteMaintainBLL(IServiceProvider provider)
         {
@@ -38,11 +39,13 @@ namespace BackendSite.Service.BLL
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _logger = provider.GetRequiredService<ILogger<SiteMaintainBLL>>();
         }
 
         public async Task<SiteMaintainResponse> GetSiteMaintain(int site)
         {
             var serverInfo = _serverInfoBll.GetServerInfo(site);
+            _logger.LogInformation($"serverinfo={JsonConvert.SerializeObject(serverInfo)}");
             //先取新的path json, 取不到取舊的json
             var getNewRequest = new GetObjectRequest
             {
@@ -51,7 +54,7 @@ namespace BackendSite.Service.BLL
             };
 
             var getResponse = await _s3Helper.GetObjectAsync(getNewRequest);
-
+            _logger.LogInformation($"old getResponse={JsonConvert.SerializeObject(getResponse)}");
             if (!getResponse.HttpStatusCode.IsSuccess())
             {
                 var getRequest = new GetObjectRequest
@@ -59,7 +62,7 @@ namespace BackendSite.Service.BLL
                     BucketName = _errorPageBucketName,
                     Key = $"{serverInfo.SiteName.ToUpper()}/{_fileName}"
                 };
-
+                _logger.LogInformation($"new getResponse={JsonConvert.SerializeObject(getResponse)}");
                 getResponse = await _s3Helper.GetObjectAsync(getRequest);
             }
 
@@ -67,12 +70,14 @@ namespace BackendSite.Service.BLL
             using JsonReader reader = new JsonTextReader(sr);
             JsonSerializer serializer = new JsonSerializer();
             var response = serializer.Deserialize<SiteMaintainResponse>(reader);
+            _logger.LogInformation($"final response={JsonConvert.SerializeObject(response)}");
             return response;
         }
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
             var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
+            _logger.LogInformation($"serverinfo={JsonConvert.SerializeObject(serverInfo)}");
             var excludeDomain = _maintainExcludeDomainConfig[serverInfo.SiteName];
             var siteMaintainObject = new
             {
@@ -92,7 +97,9 @@ namespace BackendSite.Service.BLL
                 InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
                 Key = $"{serverInfo.SiteName.ToUpper()}/{serverInfo.SiteName.ToUpper()}/{_fileName}"
             };
+            _logger.LogInformation($"putNewRequest={JsonConvert.SerializeObject(putNewRequest)}");
             var putNewResponse = await _s3Helper.PutObjectAsync(putNewRequest);
+            _logger.LogInformation($"putNewResponse={JsonConvert.SerializeObject(putNewResponse)}");
             if (!putNewResponse.HttpStatusCode.IsSuccess())
             {
                 return false;
@@ -110,7 +117,9 @@ namespace BackendSite.Service.BLL
                     InputStream = new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(siteMaintainObject))),
                     Key = $"{serverInfo.SiteName.ToUpper()}/{_fileName}"
                 };
+                _logger.LogInformation($"putRequest={JsonConvert.SerializeObject(putRequest)}");
                 var putResponse = await _s3Helper.PutObjectAsync(putRequest);
+                _logger.LogInformation($"putResponse={JsonConvert.SerializeObject(putResponse)}");
                 if (!putResponse.HttpStatusCode.IsSuccess())
                 {
                     return false;
