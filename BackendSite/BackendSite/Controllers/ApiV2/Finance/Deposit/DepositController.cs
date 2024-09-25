@@ -136,6 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public IEnumerable<int> SelectPayId { get; set; }
             public decimal StartAmount { get; set; }
             public decimal EndAmount { get; set; }
+            public bool HasReceipt { get; set; }
         }
 
         public class GetListExportRequest
@@ -240,6 +241,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.StartAmount,
                 request.EndAmount,
                 request.SelectPayId,
+                request.HasReceipt,
                 request.PageNumber, out var totalPages, out var rowCount, ref currencyAmountRecord);
 
             if (depositList.Any())
