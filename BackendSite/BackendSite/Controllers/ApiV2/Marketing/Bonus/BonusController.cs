@@ -283,20 +283,22 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
                 switch (request.PromotionInfo.PromotionType)
                 {
-                    case (int)PromotionTypeEnum.FstDeposit
-                        or (int)PromotionTypeEnum.FreeBet or (int)PromotionTypeEnum.Cashback
+                    case   (int)PromotionTypeEnum.FreeBet 
+                        or (int)PromotionTypeEnum.Cashback
                         or (int)PromotionTypeEnum.RetentionFreeBet:
-                        {
-                            if (request.PromotionInfo.Specific.Any(specific =>
+                        
+                        if (request.PromotionInfo.Specific.Any(specific =>
                                     specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                     CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
                             {
                                 return apiResult;
                             }
 
-                            break;
-                        }
-                    case (int)PromotionTypeEnum.ReDeposit or (int)PromotionTypeEnum.MissionBonus:
+                        break;
+                    case   (int)PromotionTypeEnum.FstDeposit
+                        or (int)PromotionTypeEnum.ReDeposit 
+                        or (int)PromotionTypeEnum.MissionBonus:
+                        
                         if (request.PromotionInfo.Specific.Any(specific =>
                                 specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 specific.TierAmountList.Any(tierAmount =>
