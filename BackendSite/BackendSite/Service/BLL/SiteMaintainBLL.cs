@@ -52,7 +52,7 @@ namespace BackendSite.Service.BLL
                 BucketName = _errorPageBucketName,
                 Key = $"{serverInfo.SiteName.ToUpper()}/{serverInfo.SiteName.ToUpper()}/{_fileName}"
             };
-
+            _logger.LogInformation($"getNewRequest={JsonConvert.SerializeObject(getNewRequest)}");
             var getResponse = await _s3Helper.GetObjectAsync(getNewRequest);
             _logger.LogInformation($"old getResponse={JsonConvert.SerializeObject(getResponse)}");
             if (!getResponse.HttpStatusCode.IsSuccess())
@@ -62,8 +62,9 @@ namespace BackendSite.Service.BLL
                     BucketName = _errorPageBucketName,
                     Key = $"{serverInfo.SiteName.ToUpper()}/{_fileName}"
                 };
-                _logger.LogInformation($"new getResponse={JsonConvert.SerializeObject(getResponse)}");
+                _logger.LogInformation($"new getRequest={JsonConvert.SerializeObject(getResponse)}");
                 getResponse = await _s3Helper.GetObjectAsync(getRequest);
+                _logger.LogInformation($"new getResponse={JsonConvert.SerializeObject(getResponse)}");
             }
 
             using StreamReader sr = new StreamReader(getResponse.ResponseStream);
