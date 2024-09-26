@@ -19,9 +19,11 @@ namespace BackendSite.Service.Library
             var proxyHost = proxyConfig.ProxyHost;
             var proxyPort = proxyConfig.ProxyPort;
 
+            var region = configBll.GetConfigValue("AWSRegion");
+
             var config = new AmazonCloudFrontConfig
             {
-                RegionEndpoint = RegionEndpoint.APSoutheast1
+                RegionEndpoint = RegionEndpoint.GetBySystemName(region)
             };
 
             if (!string.IsNullOrEmpty(proxyHost))
