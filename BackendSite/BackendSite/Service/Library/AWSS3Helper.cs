@@ -15,16 +15,18 @@ namespace BackendSite.Service.Library
 
         public AWSS3Helper(IServiceProvider provider)
         {
-            
+
             var configBll = provider.GetRequiredService<ConfigBLL>();
             var awsKeyConfig = configBll.GetConfigValue<AWSKeyConfig>("AWSS3Key");
             var proxyConfig = configBll.GetConfigValue<ProxyConfig>("ProxySetting");
             var proxyHost = proxyConfig.ProxyHost;
             var proxyPort = proxyConfig.ProxyPort;
 
+            var region = configBll.GetConfigValue("AWSRegion");
+
             var config = new AmazonS3Config
             {
-                RegionEndpoint = RegionEndpoint.APSoutheast1
+                RegionEndpoint = RegionEndpoint.GetBySystemName(region)
             };
 
             if (!string.IsNullOrEmpty(proxyHost))
@@ -62,7 +64,7 @@ namespace BackendSite.Service.Library
             try
             {
                 await using var fileStream = file.OpenReadStream();
-                
+
                 var putRequest = new PutObjectRequest
                 {
                     BucketName = bucketName,
@@ -113,7 +115,7 @@ namespace BackendSite.Service.Library
                 return false;
             }
         }
-        
+
         public bool CheckIsImage(IFormFile file)
             => file.ContentType.StartsWith("image/");
     }
