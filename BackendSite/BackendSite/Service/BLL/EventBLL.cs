@@ -310,6 +310,12 @@ namespace BackendSite.Service.BLL
         public async Task<GetStickerReportResponse> GetStickerReport(GetStickerReportRequest request)
         {
             var currencyTotalAmount = new List<StickerReportCurrencyTotal>();
+
+            if (string.IsNullOrEmpty(request.RoundId))
+            {
+                request.RoundId = "0";
+            }
+            
             var result = await _eventService.GetStickerReport(request);
             
             var totalAmounts = result.StickerReportData
@@ -331,6 +337,11 @@ namespace BackendSite.Service.BLL
 
         public async Task<IEnumerable<GetStickerReportDto>> GetStickerReportExport(GetStickerReportExportRequest request)
         {
+            if (string.IsNullOrEmpty(request.RoundId))
+            {
+                request.RoundId = "0";
+            }
+            
             //先拉10000筆
             var gerRequest = new GetStickerReportRequest
             {

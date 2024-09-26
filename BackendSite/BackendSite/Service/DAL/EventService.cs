@@ -262,7 +262,7 @@ namespace BackendSite.Service.DAL
                 _SiteList = JsonConvert.SerializeObject(request.SiteIds),
                 _CurrencyList = JsonConvert.SerializeObject(request.CurrencyIds),
                 _UserName = request.UserName,
-                _RoundId = request.RoundId,
+                _RoundId = int.TryParse(request.RoundId, out var roundId) ? roundId : 0,
                 _StartTime = request.StartDate,
                 _EndTime = request.EndDate,
                 _PageNumber = request.PageNumber

@@ -150,7 +150,7 @@ namespace BackendSite.Service.Model
     {
         public IEnumerable<int> SiteIds { get; set; }
         public string UserName { get; set; }
-        public int RoundId { get; set; }
+        public string RoundId { get; set; }
         public IEnumerable<int> CurrencyIds { get; set; }
         public DateTime StartDate{ get; set; }
         public DateTime EndDate{ get; set; }
@@ -160,7 +160,7 @@ namespace BackendSite.Service.Model
     {
         public IEnumerable<int> SiteIds { get; set; }
         public string UserName { get; set; }
-        public int RoundId { get; set; }
+        public string RoundId { get; set; }
         public IEnumerable<int> CurrencyIds { get; set; }
         public DateTime StartDate{ get; set; }
         public DateTime EndDate{ get; set; }
@@ -189,22 +189,25 @@ namespace BackendSite.Service.Model
         public string StickerName => StickerId.ToString();
         public decimal StickerAmount { get; set; }
         private DateTimeOffset _purchaseTime { set; get; }
-        public DateTimeOffset PurchaseTime
+        public string PurchaseTime
         {
-            get => _purchaseTime;
-            set => _purchaseTime = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+            // get => _purchaseTime;
+            // set => _purchaseTime = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+            get; set;
         }
         private DateTimeOffset _roundStartDate { set; get; }
-        public DateTimeOffset RoundStartDate
+        public string RoundStartDate
         {
-            get => _roundStartDate;
-            set => _roundStartDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+            // get => _roundStartDate;
+            // set => _roundStartDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+            get; set;
         }
         private DateTimeOffset _roundEndDate { set; get; }
-        public DateTimeOffset RoundEndDate
+        public string RoundEndDate
         {
-            get => _roundEndDate;
-            set => _roundEndDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+            // get => _roundEndDate;
+            // set => _roundEndDate = new DateTimeOffset(value.DateTime, new TimeSpan(8, 0, 0));
+            get; set;
         }
     }
     
