@@ -28,9 +28,9 @@ public class BonusCodeBLL
     }
 
 
-    public IEnumerable<TpBonusCodeList> GetList(int SiteId,int tpId, string gameId, DateTime startTime, DateTime endTime)
+    public IEnumerable<TpBonusCodeList> GetList(int SiteId,int tpId, int currencyId, string gameId, DateTime startTime, DateTime endTime)
     {
-        return _bonusCodeService.GetList(SiteId,tpId,gameId,startTime,endTime);
+        return _bonusCodeService.GetList(SiteId,tpId,currencyId,gameId,startTime,endTime);
     }
 
     public async Task<ApiResult> CreateBonusCode(int siteId, int currencyId, int tpId, string gameId, int round, string bonusCode)
@@ -42,16 +42,17 @@ public class BonusCodeBLL
         inputs.Add("BonusCode", bonusCode);
         inputs.Add("Round", round.ToString());
         inputs.Add("Currency", currency.TpCurrencyId);
+        inputs.Add("CurrencyId", currencyId.ToString());
         inputs.Add("ExpirationDay", "8");//freespin有效期限8天
 
-        var request1 = new CreateBonusCodeParams()
+        var request = new CreateBonusCodeParams()
         {
             SiteId = siteId,
             TpId = tpId,
             inputs = inputs
         };
 
-        var apiResult = await _courierAdapter.MyPostAsync<object, CreateBonusCodeParams>(url, request1);
+        var apiResult = await _courierAdapter.MyPostAsync<object, CreateBonusCodeParams>(url, request);
         _logger.LogInformation(apiResult.ErrorCode == 0
             ? $"BonusCode:{bonusCode} Create Success"
             : $"BonusCode:{bonusCode} Create Fail");

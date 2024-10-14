@@ -17,11 +17,12 @@ namespace BackendSite.Service.DAL
             _reportDbClient = dbClient.FirstOrDefault(a => a.DataBase == DataBase.Report);
         }
 
-        public IEnumerable<TpBonusCodeList> GetList(int siteId, int tpId, string gameId, DateTime startTime, DateTime endTime)
+        public IEnumerable<TpBonusCodeList> GetList(int siteId, int tpId, int currencyId, string gameId, DateTime startTime, DateTime endTime)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
             p.Add("_TpId", tpId);
+            p.Add("_CurrencyId", currencyId);
             p.Add("_GameId", gameId);
             p.Add("_StartTime", startTime);
             p.Add("_EndTime", endTime);

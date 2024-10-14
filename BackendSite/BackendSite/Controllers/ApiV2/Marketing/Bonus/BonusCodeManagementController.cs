@@ -40,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         {
             public int TpId { get; set; }
             public string GameId { get; set; }
+            public int CurrencyId { get; set; }
             public DateTimeOffset StartDate { get; set; }
             public DateTimeOffset EndDate { get; set; }
         }
@@ -66,7 +67,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var startTime = request.StartDate.ToUniversalTime().DateTime;
             var endTime = request.EndDate.ToUniversalTime().DateTime;
 
-            var data = _bonusCodeBll.GetList(siteId,request.TpId,request.GameId,startTime,endTime);
+            var data = _bonusCodeBll.GetList(siteId,request.TpId,request.CurrencyId,request.GameId,startTime,endTime);
 
             return new ApiResult<IEnumerable<TpBonusCodeList>>
             {
