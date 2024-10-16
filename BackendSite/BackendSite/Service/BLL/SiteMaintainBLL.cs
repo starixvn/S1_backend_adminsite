@@ -16,6 +16,7 @@ namespace BackendSite.Service.BLL
     {
         private readonly Dictionary<string, SiteCloudFrontImageInfo> _siteConfig;
         private readonly AWSS3Helper _s3Helper;
+        private readonly AWSS3WithMFAHelper _s3WithMFAHelper;
         private readonly AWSCloudFrontHelper _cloudFrontHelper;
         private readonly string _fileName;
         private readonly string _errorPageBucketName;
@@ -28,6 +29,7 @@ namespace BackendSite.Service.BLL
         {
             _siteConfig = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _s3WithMFAHelper = provider.GetRequiredService<AWSS3WithMFAHelper>();
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _errorPageBucketName = configBll.GetConfigValue("AWSErrorPageBucketName");
