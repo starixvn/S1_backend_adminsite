@@ -200,9 +200,9 @@ namespace BackendSite.Service.BLL
         private bool CheckIsImage(IFormFile file)
             => file.ContentType.StartsWith("image/");
 
-        public IEnumerable<ProvideGameList> GetGameName()
+        public IEnumerable<ProvideGameList> GetGameName(CreateGiftRequest req)
         {
-            return _giftMamagementService.GetGameName()
+            return _giftMamagementService.GetGameName(req.SiteId,req.CurrencyId)
                 .GroupBy(p => p.TpId)
                 .Select(g => new ProvideGameList
                 {
