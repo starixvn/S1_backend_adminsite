@@ -22,6 +22,7 @@ namespace BackendSite.Service.BLL
         private readonly ThirdPartyService _thirdPartyService;
         private readonly GiftMamagementService _giftMamagementService;
         private readonly Dictionary<string, string> _changeGameImgName;
+        private readonly BonusCodeBLL _bonusCodeBll;
 
         public GiftManagementBLL(IServiceProvider provider)
         {
@@ -36,6 +37,7 @@ namespace BackendSite.Service.BLL
             _logger = provider.GetRequiredService<ILogger<GiftManagementBLL>>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _giftMamagementService = provider.GetRequiredService<GiftMamagementService>();
+            _bonusCodeBll = provider.GetRequiredService<BonusCodeBLL>();
             _changeGameImgName = new Dictionary<string, string>()
             {
                 {"Iconic","AT" },
@@ -93,7 +95,7 @@ namespace BackendSite.Service.BLL
             {
                 //創建bonuscode
                 var bonusCode = BonusCodeRule(req, serverInfo.SiteName);
-                var apiResult = await CreateBonusCode(req, bonusCode);
+                var apiResult = await _bonusCodeBll.CreateBonusCode(req.SiteId,req.CurrencyId,req.TpId,req.GameId,req.Round,bonusCode);
                 //失敗return
                 if (apiResult.ErrorCode != 0) { return new ApiResult(apiResult.ErrorCode, apiResult.RawMessage); }
                 //成功則寫入WorkerPeriod
@@ -112,31 +114,6 @@ namespace BackendSite.Service.BLL
             //BonusCode規則。ex.52FREESPIN100FORNOVA8820240306
             var bonusCode = $"{req.TpId}{req.CurrencyId}FREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.UtcNow.ToString("yyyyMMdd")}";
             return bonusCode;
-        }
-
-        private async Task<ApiResult> CreateBonusCode(CreateGiftRequest req, string bonusCode)
-        {
-            var currency = await _thirdPartyService.GetTpCurrency(req.TpId,req.CurrencyId);
-            var inputs = new Dictionary<string, string>();
-            var url = _tpServiceApiUrl + "CreateBonusCode";
-            inputs.Add("GameId", req.GameId);
-            inputs.Add("BonusCode", bonusCode);
-            inputs.Add("Round", req.Round.ToString());
-            inputs.Add("Currency",currency.TpCurrencyId);
-            inputs.Add("ExpirationDay", "8");//freespin有效期限8天
-            var request = new CreateBonusCodeParams()
-            {
-                SiteId = req.SiteId,
-                TpId = req.TpId,
-                inputs = inputs
-            };
-
-            var apiResult = await _courierAdapter.MyPostAsync<object, CreateBonusCodeParams>(url, request);
-            _logger.LogInformation(apiResult.ErrorCode == 0
-                ? $"BonusCode:{bonusCode} Create Success"
-                : $"BonusCode:{bonusCode} Create Fail");
-
-            return apiResult;
         }
 
         public async Task<ApiResult> UpdateGiftAsync(UpdateGiftRequest req, string userName)
@@ -224,9 +201,9 @@ namespace BackendSite.Service.BLL
         private bool CheckIsImage(IFormFile file)
             => file.ContentType.StartsWith("image/");
 
-        public IEnumerable<ProvideGameList> GetGameName()
+        public IEnumerable<ProvideGameList> GetGameName(CreateGiftRequest req)
         {
-            return _giftMamagementService.GetGameName()
+            return _giftMamagementService.GetGameName(req.SiteId,req.CurrencyId)
                 .GroupBy(p => p.TpId)
                 .Select(g => new ProvideGameList
                 {

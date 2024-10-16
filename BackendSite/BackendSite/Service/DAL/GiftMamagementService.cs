@@ -1,8 +1,8 @@
 ﻿using BackendSite.Service.Library;
-using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Store.GiftManagement;
 using Dapper;
+
 
 namespace BackendSite.Service.DAL;
 
@@ -30,8 +30,13 @@ public class GiftMamagementService
         return _mainDbClient.Execute("Service_FreeSpinWorkerPeriod_Set", p);
     }
 
-    public IEnumerable<ProvideGameListDto> GetGameName()
+    public IEnumerable<ProvideGameListDto> GetGameName(int siteId, int currencyId)
     {
-        return _reportDbClient.Query<ProvideGameListDto>("Admin_FreeSpinProviderList_Get", null);
+        var p = new DynamicParameters(new
+        {
+            _SiteId = siteId,
+            _CurrencyId = currencyId,
+        });
+        return _reportDbClient.Query<ProvideGameListDto>("Admin_FreeSpinProviderList_Get", p);
     }
 }
