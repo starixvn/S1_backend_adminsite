@@ -47,29 +47,25 @@ namespace BackendSite.Service.Library
 
         public async Task<PutObjectResponse> PutObjectAsync(PutObjectRequest request)
         {
-            var credentials = await GetCredentialsAsync();
-            var client = new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+            var client = await GetClientAsync();
             return await client.PutObjectAsync(request);
         }
 
         public async Task<DeleteObjectResponse> DeleteObjectAsync(DeleteObjectRequest request)
         {
-            var credentials = await GetCredentialsAsync();
-            var client = new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+            var client = await GetClientAsync();
             return await client.DeleteObjectAsync(request);
         }
 
         public async Task<GetObjectResponse> GetObjectAsync(GetObjectRequest request)
         {
-            var credentials = await GetCredentialsAsync();
-            var client = new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+            var client = await GetClientAsync();
             return await client.GetObjectAsync(request);
         }
 
         public async Task<CopyObjectResponse> CopyObjectAsync(CopyObjectRequest request)
         {
-            var credentials = await GetCredentialsAsync();
-            var client = new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+            var client = await GetClientAsync();
             return await client.CopyObjectAsync(request);
         }
 
@@ -85,8 +81,7 @@ namespace BackendSite.Service.Library
                     InputStream = fileStream,
                     Key = key
                 };
-                var credentials = await GetCredentialsAsync();
-                var client = new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+                var client = await GetClientAsync();
                 var putResponse = await client.PutObjectAsync(putRequest);
                 var success = putResponse.HttpStatusCode.IsSuccess();
                 if (!success)
@@ -113,9 +108,7 @@ namespace BackendSite.Service.Library
                     BucketName = bucketName,
                     Key = key
                 };
-
-                var credentials = await GetCredentialsAsync();
-                var client = new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+                var client = await GetClientAsync();
                 var putResponse = await client.DeleteObjectAsync(putRequest);
                 var success = putResponse.HttpStatusCode.IsSuccess();
                 if (!success)
@@ -134,6 +127,12 @@ namespace BackendSite.Service.Library
         }
 
         #region Private Methods
+
+        private async Task<AmazonS3Client> GetClientAsync()
+        {
+            var credentials = await GetCredentialsAsync();
+            return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+        }
 
         private async Task<Credentials> GetCredentialsAsync()
         {
