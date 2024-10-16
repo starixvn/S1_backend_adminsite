@@ -21,17 +21,6 @@ namespace BackendSite.Service.BLL
         public PrizeLogResult GetPrizeLog(PrizeLogPara prizeLogPara)
         {
             var resultList = _prizeService.GetPrizeLog(prizeLogPara);
-
-            var rateList = _mpaCommonService.GetMpaExchangeRateByRateType(prizeLogPara.EventTime, prizeLogPara.EventTime, 2).Result.ToList();
-            foreach (var result in resultList.PrizeLogData)
-            {
-                var rateDto = rateList.FirstOrDefault(x => x.CurrencyId == 3 && x.TargetCurrencyId == result.CurrencyId);
-                if (rateDto is not null)
-                {
-                    result.UsdRate = rateDto.Rate;
-                }
-            }
-            
             return resultList;
         }
         public IEnumerable<EventDraw> GetEventName()
