@@ -51,11 +51,17 @@ namespace BackendSite.Service.Library
             {
                 try
                 {
+                    // 設定相同連線不用檢查
+                    if (_connectionString == backupConn)
+                    {
+                        return _connectionString;
+                    }
+
                     using var connection = new MySqlConnection(backupConn);
                     var dbSlaveStatus = connection.QueryFirstOrDefault<DBSlaveStatus>("Service_HealthCheck_V2", commandType: CommandType.StoredProcedure);
 
                     // 拿不到Status或延遲太久都換下一個連線
-                    if (dbSlaveStatus == null || dbSlaveStatus.Seconds_Behind_Master > 180)
+                    if (dbSlaveStatus == null || dbSlaveStatus.Seconds_Behind_Master > 15)
                     {
                         _logger.LogWarning($"{ReplaceDBString(backupConn)} | DelayTime = {dbSlaveStatus?.Seconds_Behind_Master}");
                         continue;

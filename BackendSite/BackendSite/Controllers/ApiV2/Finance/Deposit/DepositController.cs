@@ -40,6 +40,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly IGaBLL _gaBll;
         private readonly ILogger<DepositController> _logger;
         private readonly FaceBookPixelBLL _faceBookPixelBll;
+        private readonly TaskSettingBLL _TaskSettingBll;
+        private readonly CRMBLL _cRMBLL;
+        private readonly IWebHostEnvironment _environment;
 
         #endregion
 
@@ -63,6 +66,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _awsDepositUrl = configBll.GetConfigValue("AWSPaymentBucketUrl");
             _awsDepositFolder = configBll.GetConfigValue("AWSDepositFolderName");
             _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
+            _TaskSettingBll = provider.GetRequiredService<TaskSettingBLL>();
+            _cRMBLL = provider.GetRequiredService<CRMBLL>();
+            _environment = provider.GetRequiredService<IWebHostEnvironment>();
 
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
@@ -130,6 +136,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public IEnumerable<int> SelectPayId { get; set; }
             public decimal StartAmount { get; set; }
             public decimal EndAmount { get; set; }
+            public bool HasReceipt { get; set; }
         }
 
         public class GetListExportRequest
@@ -234,6 +241,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.StartAmount,
                 request.EndAmount,
                 request.SelectPayId,
+                request.HasReceipt,
                 request.PageNumber, out var totalPages, out var rowCount, ref currencyAmountRecord);
 
             if (depositList.Any())
@@ -439,26 +447,44 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     // 若使用 depositRequest 的 FirstDeposit 永遠會是 0
                     var refreshDepositInfoData = _depositBll.GetDepositRequest(request.TransId);
                     var eventData = GetGaEventData(refreshDepositInfoData);
+
+                    #region CustTaskTime
+                    if (refreshDepositInfoData.FirstDeposit == 1)
+                    {
+                        _ = _TaskSettingBll.Set(refreshDepositInfoData.CustId, TaskSetting.FirstDepositTime, refreshDepositInfoData.FlowEndTime);
+                    }
+                    #endregion
+
                     _ = Task.Run(async () =>
                     {
                         await _gaBll.PurchaseEventSendAsync(eventData);
-                    });
 
-                    #region 埋點
-                    if (depositRequest.SiteId == 1)
-                    {
-                        _ = Task.Run(() =>
+                        #region 埋點
+                        if (depositRequest.SiteId is 1 or 2 or 3)
                         {
                             var pixelEvent = new List<FaceBookPixel>
                             {
                                 FaceBookPixel.purchase,
                                 refreshDepositInfoData.FirstDeposit == 1 ? FaceBookPixel.startTrial : FaceBookPixel.redeposit
                             };
-                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
+                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.SiteId, depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
                             _ = _faceBookPixelBll.Send(pixelRequest);
-                        });
-                    }
-                    #endregion
+
+                            var para = new CRMRequest()
+                            {
+                                Event = (int)CRMEvent.deposit_successful,
+                                CustId = depositRequest.CustId,
+                                SiteId = depositRequest.SiteId,
+                                OrderAmount = depositRequest.Amount,
+                                CurrencyId = depositRequest.CurrencyId,
+                                Environment = _environment.IsProduction() ? "P" : "D"
+                            };
+                            _ = _cRMBLL.Send(para);
+                        }
+                        #endregion
+                    });
+
+                    
                 }
             }
             else if (request.Action == (int)DepositStatusEnum.Rejected)

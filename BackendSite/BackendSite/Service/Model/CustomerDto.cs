@@ -490,7 +490,7 @@ public class ResetMemberPasswordRequest
 public class LockMemberRequest
 {
     public int CustId { get; set; }
-    public CustomerStatusEnum Status { get; set; }
+    public LockCustomerStatusEnum Status { get; set; }
     public string Reason { get; set; }
 }
 
@@ -548,6 +548,17 @@ public class MemberLoginDevice
     public string DeviceType { get; set; }
     public DateTimeOffset LastUpdateTime { get; set; }
 }
+
+public class MemberLoginDeviceFPS
+{
+    public string DeviceId { get; set; }
+    public string RiskLevel { get; set; }
+    public int Frequency { get; set; }
+    public int AssociateCount { get; set; }
+    public string DeviceType { get; set; }
+    public DateTimeOffset LastUpdateTime { get; set; }
+}
+
 
 public class CustomerLoginIp
 {
