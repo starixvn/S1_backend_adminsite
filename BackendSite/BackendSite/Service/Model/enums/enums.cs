@@ -677,7 +677,8 @@ namespace BackendSite.Service.Model.enums
         SpecialBonus = 8,
         RetentionFreeBet = 9,
         DeviceBonus = 10,
-        MissionBonus = 11
+        MissionBonus = 11,
+        PredictionEvent = 12
     }
 
     public enum PromotionCategoryEnum
