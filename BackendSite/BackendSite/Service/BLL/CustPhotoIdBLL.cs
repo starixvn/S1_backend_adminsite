@@ -69,11 +69,11 @@ public class CustPhotoIdBLL : ICustPhotoIdBLL
             return 0;
         }
 
-        if (await _custPhotoIdService.GetCount(custId) >= 10)
-        {
-            _logger.LogError("reach the upload photo limit");
-            return 0;
-        }
+        //if (await _custPhotoIdService.GetCount(custId) >= 10)
+        //{
+        //    _logger.LogError("reach the upload photo limit");
+        //    return 0;
+        //}
 
         var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
         var sq = await _custPhotoIdService.Add(custId, custInfo.SiteId);

@@ -10,6 +10,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.Option;
 
 using OtpNet;
+using BackendSite.ExceptionHandling;
 
 namespace BackendSite.Service.Library
 {
@@ -26,7 +27,7 @@ namespace BackendSite.Service.Library
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _awsKeyConfig = configBll.GetConfigValue<AWSKeyConfig>("AWSS3Key");
             _awsMFAKeyConfig = configBll.GetConfigValue<AWSMFAConfig>("AWSS3WithMFA");
-            
+
             //設定region & config
             var region = configBll.GetConfigValue("AWSRegion");
             var proxyConfig = configBll.GetConfigValue<ProxyConfig>("ProxySetting");
@@ -43,7 +44,7 @@ namespace BackendSite.Service.Library
                 _amazonS3Config.ProxyHost = proxyHost;
                 _amazonS3Config.ProxyPort = proxyPort;
             }
-         
+
             _logger = provider.GetRequiredService<ILogger<AWSS3Helper>>();
         }
 
@@ -131,22 +132,30 @@ namespace BackendSite.Service.Library
 
         private async Task<AmazonS3Client> GetClientAsync()
         {
-            if (_awsMFAKeyConfig != null)
+            try
             {
-                var stsClient = new AmazonSecurityTokenServiceClient(_awsMFAKeyConfig.AccessKey, _awsMFAKeyConfig.SecretAccessKey);
-                var response = await stsClient.GetSessionTokenAsync(new GetSessionTokenRequest
+                if (_awsMFAKeyConfig != null)
                 {
-                    DurationSeconds = _awsMFAKeyConfig.DurationSeconds,
-                    SerialNumber = _awsMFAKeyConfig.SerialNumber,
-                    TokenCode = new Totp(Base32Encoding.ToBytes(_awsMFAKeyConfig.SecretKey)).ComputeTotp()
-                });
-                var credentials = response.Credentials;
-                return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+                    var stsClient = new AmazonSecurityTokenServiceClient(_awsMFAKeyConfig.AccessKey, _awsMFAKeyConfig.SecretAccessKey);
+                    var request = new GetSessionTokenRequest
+                    {
+                        DurationSeconds = _awsMFAKeyConfig.DurationSeconds,
+                        SerialNumber = _awsMFAKeyConfig.SerialNumber,
+                        TokenCode = new Totp(Base32Encoding.ToBytes(_awsMFAKeyConfig.SecretKey)).ComputeTotp()
+                    };
+                    var response = await stsClient.GetSessionTokenAsync(request);
+                    var credentials = response.Credentials;
+                    return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+                }
+                else
+                {
+                    return new AmazonS3Client(_awsKeyConfig.AccessKey, _awsKeyConfig.SecretKey, _amazonS3Config);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return new AmazonS3Client(_awsKeyConfig.AccessKey, _awsKeyConfig.SecretKey, _amazonS3Config);
-            }           
+                return null;
+            }
         }
     }
 }
