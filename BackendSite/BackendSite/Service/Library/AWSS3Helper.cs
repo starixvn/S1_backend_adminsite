@@ -132,36 +132,42 @@ namespace BackendSite.Service.Library
 
         private async Task<AmazonS3Client> GetClientAsync()
         {
-            try
-            {
-                if (_awsMFAKeyConfig != null)
-                {
-                    _logger.LogInformation($"AwsMFAKeyConfig={JsonConvert.SerializeObject(_awsMFAKeyConfig)}");
-                    var stsClient = new AmazonSecurityTokenServiceClient(_awsMFAKeyConfig.AccessKey, _awsMFAKeyConfig.SecretAccessKey);
-                    var tokenCode = new Totp(Base32Encoding.ToBytes(_awsMFAKeyConfig.SecretKey), mode: OtpHashMode.Sha1).ComputeTotp();
-                    _logger.LogInformation($"TokenCode={tokenCode}");
-                    var request = new GetSessionTokenRequest
-                    {
-                        DurationSeconds = _awsMFAKeyConfig.DurationSeconds,
-                        SerialNumber = _awsMFAKeyConfig.SerialNumber,
-                        TokenCode = tokenCode
-                    };
-                    _logger.LogInformation($"GetSessionTokenRequest={JsonConvert.SerializeObject(request)}");
-                    var response = await stsClient.GetSessionTokenAsync(request);
-                    _logger.LogInformation($"GetSessionTokenResponse={JsonConvert.SerializeObject(response)}");
 
-                    var credentials = response.Credentials;
-                    return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
-                }
-                else
-                {
-                    return new AmazonS3Client(_awsKeyConfig.AccessKey, _awsKeyConfig.SecretKey, _amazonS3Config);
-                }
-            }
-            catch (Exception ex)
+            if (_awsMFAKeyConfig != null)
             {
-                _logger.LogError(ex.Message, ex);
-                return null;
+                _logger.LogInformation($"AwsMFAKeyConfig={JsonConvert.SerializeObject(_awsMFAKeyConfig)}");
+                var stsClient = new AmazonSecurityTokenServiceClient(_awsMFAKeyConfig.AccessKey, _awsMFAKeyConfig.SecretAccessKey);
+                var pass = false;
+                var credentials = new Credentials();
+                while (!pass)
+                {
+                    try
+                    {
+                        var tokenCode = new Totp(Base32Encoding.ToBytes(_awsMFAKeyConfig.SecretKey), mode: OtpHashMode.Sha1).ComputeTotp();
+                        //_logger.LogInformation($"TokenCode={tokenCode}");
+                        var request = new GetSessionTokenRequest
+                        {
+                            DurationSeconds = _awsMFAKeyConfig.DurationSeconds,
+                            SerialNumber = _awsMFAKeyConfig.SerialNumber,
+                            TokenCode = tokenCode
+                        };
+                        //_logger.LogInformation($"GetSessionTokenRequest={JsonConvert.SerializeObject(request)}");
+                        var response = await stsClient.GetSessionTokenAsync(request);
+                        //_logger.LogInformation($"GetSessionTokenResponse={JsonConvert.SerializeObject(response)}");
+
+                        credentials = response.Credentials;
+                        pass = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex.Message, ex);
+                    }
+                }
+                return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
+            }
+            else
+            {
+                return new AmazonS3Client(_awsKeyConfig.AccessKey, _awsKeyConfig.SecretKey, _amazonS3Config);
             }
         }
     }
