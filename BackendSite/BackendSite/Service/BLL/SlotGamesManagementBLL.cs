@@ -159,7 +159,10 @@ namespace BackendSite.Service.BLL
         public SlotGameResult GetById(int id)
         {
             var result = _slotGamesManagementService.GetById(id);
-            result.RTP = result.RTP.Replace("%", "");
+            if (!string.IsNullOrEmpty(result?.RTP))
+            {
+                result.RTP = result.RTP.Replace("%", "");
+            }
 
             return result;
         }

@@ -14,6 +14,7 @@ namespace BackendSite.Service.DAL
         private readonly Common _common;
         private readonly WalletService _walletService;
         private readonly WithdrawalLimitService _withdrawalLimitService;
+        private readonly DepositService _depositService;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
         private readonly ILogger<AdjustmentService> _logger;
@@ -23,6 +24,7 @@ namespace BackendSite.Service.DAL
             _common = provider.GetRequiredService<Common>();
             _walletService = provider.GetRequiredService<WalletService>();
             _withdrawalLimitService = provider.GetRequiredService<WithdrawalLimitService>();
+            _depositService = provider.GetRequiredService<DepositService>();
             _logger = provider.GetRequiredService<ILogger<AdjustmentService>>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
@@ -313,7 +315,9 @@ namespace BackendSite.Service.DAL
                     if (adjustmentAndWithdrawalLimit.Category == (int)AdjustReasonEnum.Deposit && adjustmentAndWithdrawalLimit.MethodType == (int)MethodTypeIDEnum.MainWallet && isBalance)
                     {
                         //判斷是否為調帳對象的存款單號
-                        var isCustDeposit = GetAdjustmentInfo(adjustmentAndWithdrawalLimit.CustId).Any(x => x == adjustmentAndWithdrawalLimit.RefId);
+                        var m = Regex.Match(adjustmentAndWithdrawalLimit.RefId, @"\d+");
+                        _ = int.TryParse(m.Value, out var depositId);
+                        var isCustDeposit = _depositService.GetDepositRequest(depositId)?.CustId == adjustmentAndWithdrawalLimit.CustId;
                         if (isCustDeposit)
                         {
                             result = AdjustmentActualDeposit(adjustmentAndWithdrawalLimit, adjustmentTransId, adjustAmount, trans);

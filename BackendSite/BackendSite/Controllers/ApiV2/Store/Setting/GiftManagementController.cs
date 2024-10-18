@@ -75,11 +75,11 @@ namespace BackendSite.Controllers.ApiV2.Store.Setting
         }
 
         [HttpPost]
-        public ApiResult<IEnumerable<ProvideGameList>> GetGameName()
+        public ApiResult<IEnumerable<ProvideGameList>> GetGameName(CreateGiftRequest req)
         {
             var apiResult = new ApiResult<IEnumerable<ProvideGameList>>
             {
-                Data = _giftManagementBll.GetGameName(),
+                Data = _giftManagementBll.GetGameName(req),
                 ErrorCode = 0
             };
             return apiResult;

@@ -409,7 +409,7 @@ namespace BackendSite.Service.DAL
 
                             if (is1stDepoist == 1 && result > 0)
                             {
-                                result = SetDepositInfoFirstDeposit(depositId, siteId, trans);
+                                result = SetDepositInfoFirstDeposit(depositId, trans);
                             }
 
                             if (result > 0 && !string.IsNullOrEmpty(depositInfo))
@@ -479,14 +479,13 @@ namespace BackendSite.Service.DAL
                 });
         }
 
-        private int SetDepositInfoFirstDeposit(int depositId, int siteId, IDbTransaction trans)
+        private int SetDepositInfoFirstDeposit(int depositId, IDbTransaction trans)
         {
-            return _mainDbClient.Execute("DepositInfoFirstDeposit_Set",
+            return _mainDbClient.Execute("Service_DepositInfo1stDeposit_Set",
                 trans,
                 new DynamicParameters(new
                 {
-                    DepositId = depositId,
-                    SiteId = siteId
+                    _DepositId = depositId
                 }));
         }
 
