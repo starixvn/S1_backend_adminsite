@@ -10,7 +10,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.Option;
 
 using OtpNet;
-using BackendSite.ExceptionHandling;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.Library
 {
@@ -143,6 +143,7 @@ namespace BackendSite.Service.Library
                         SerialNumber = _awsMFAKeyConfig.SerialNumber,
                         TokenCode = new Totp(Base32Encoding.ToBytes(_awsMFAKeyConfig.SecretKey)).ComputeTotp()
                     };
+                    _logger.LogInformation($"GetSessionTokenRequest={JsonConvert.SerializeObject(request)}");
                     var response = await stsClient.GetSessionTokenAsync(request);
                     var credentials = response.Credentials;
                     return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
@@ -154,6 +155,7 @@ namespace BackendSite.Service.Library
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 return null;
             }
         }
