@@ -146,16 +146,16 @@ namespace BackendSite.Service.Library
                     try
                     {
                         var tokenCode = new Totp(Base32Encoding.ToBytes(_awsMFAKeyConfig.SecretKey), mode: OtpHashMode.Sha1).ComputeTotp();
-                        //_logger.LogInformation($"TokenCode={tokenCode}");
+                        _logger.LogInformation($"TokenCode={tokenCode}");
                         var request = new GetSessionTokenRequest
                         {
                             DurationSeconds = _awsMFAKeyConfig.DurationSeconds,
                             SerialNumber = _awsMFAKeyConfig.SerialNumber,
                             TokenCode = tokenCode
                         };
-                        //_logger.LogInformation($"GetSessionTokenRequest={JsonConvert.SerializeObject(request)}");
+                        _logger.LogInformation($"GetSessionTokenRequest={JsonConvert.SerializeObject(request)}");
                         var response = await stsClient.GetSessionTokenAsync(request);
-                        //_logger.LogInformation($"GetSessionTokenResponse={JsonConvert.SerializeObject(response)}");
+                        _logger.LogInformation($"GetSessionTokenResponse={JsonConvert.SerializeObject(response)}");
 
                         credentials = response.Credentials;
                         pass = true;
