@@ -139,7 +139,8 @@ namespace BackendSite.Service.Library
                 var stsClient = new AmazonSecurityTokenServiceClient(_awsMFAKeyConfig.AccessKey, _awsMFAKeyConfig.SecretAccessKey);
                 var pass = false;
                 var credentials = new Credentials();
-                while (!pass)
+                int getTimes = 5;
+                while (!pass && getTimes > 0)
                 {
                     try
                     {
@@ -161,6 +162,7 @@ namespace BackendSite.Service.Library
                     catch (Exception ex)
                     {
                         _logger.LogError(ex.Message, ex);
+                        getTimes --;
                     }
                 }
                 return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
