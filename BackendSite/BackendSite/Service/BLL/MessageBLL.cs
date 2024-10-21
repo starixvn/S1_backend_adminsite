@@ -319,6 +319,10 @@ namespace BackendSite.Service.BLL
             catch (Exception ex)
             {
                 await messageService.RollBack();
+                _ = Task.Run(async () =>
+                {
+                    await messageService.DeleteBatchMessage(batchId);
+                });
                 _logger.LogError(ex, ex.Message);
                 return 0;
             }

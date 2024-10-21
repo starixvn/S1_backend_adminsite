@@ -215,7 +215,7 @@ namespace BackendSite.Service.DAL
         }
         public async Task<bool> DeleteBatchMessage(int batchId)
         {
-            using var conn = _mainDbClient.GetMySqlConnection();
+            await using var conn = _mainDbClient.GetMySqlConnection();
             await conn.OpenAsync();
             await using var trans = await conn.BeginTransactionAsync();
 
