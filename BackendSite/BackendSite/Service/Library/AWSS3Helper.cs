@@ -139,23 +139,22 @@ namespace BackendSite.Service.Library
                 var stsClient = new AmazonSecurityTokenServiceClient(_awsMFAKeyConfig.AccessKey, _awsMFAKeyConfig.SecretAccessKey);
                 var pass = false;
                 var credentials = new Credentials();
-                //int getTimes = 5;
-                //while (!pass && getTimes > 0)
-                while (!pass)
+                int getTimes = 5;
+                while (!pass && getTimes > 0)
                 {
                     try
                     {
                         var tokenCode = new Totp(Base32Encoding.ToBytes(_awsMFAKeyConfig.SecretKey), mode: OtpHashMode.Sha1).ComputeTotp();
-                        _logger.LogInformation($"TokenCode={tokenCode}");
+                        //_logger.LogInformation($"TokenCode={tokenCode}");
                         var request = new GetSessionTokenRequest
                         {
                             DurationSeconds = _awsMFAKeyConfig.DurationSeconds,
                             SerialNumber = _awsMFAKeyConfig.SerialNumber,
                             TokenCode = tokenCode
                         };
-                        _logger.LogInformation($"GetSessionTokenRequest={JsonConvert.SerializeObject(request)}");
+                        //_logger.LogInformation($"GetSessionTokenRequest={JsonConvert.SerializeObject(request)}");
                         var response = await stsClient.GetSessionTokenAsync(request);
-                        _logger.LogInformation($"GetSessionTokenResponse={JsonConvert.SerializeObject(response)}");
+                        //_logger.LogInformation($"GetSessionTokenResponse={JsonConvert.SerializeObject(response)}");
 
                         credentials = response.Credentials;
                         pass = true;
@@ -163,7 +162,7 @@ namespace BackendSite.Service.Library
                     catch (Exception ex)
                     {
                         _logger.LogError(ex.Message, ex);
-                        //getTimes --;
+                        getTimes --;
                     }
                 }
                 return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
