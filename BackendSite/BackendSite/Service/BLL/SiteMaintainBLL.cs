@@ -23,7 +23,7 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly Dictionary<string, IEnumerable<string>> _maintainExcludeDomainConfig;
         private readonly IEnumerable<int> _maintainJsonSyncSiteConfig;
-        private readonly IEnumerable<int> _useCloudfrontSiteConfig;
+        private readonly int _useCloudfront;
 
         public SiteMaintainBLL(IServiceProvider provider)
         {
@@ -39,7 +39,7 @@ namespace BackendSite.Service.BLL
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _useCloudfrontSiteConfig = configBll.GetConfigValue<IEnumerable<int>>("UseCloudfrontSite");
+            _useCloudfront = configBll.GetConfigValue<int>("UseCloudfront");
         }
 
         public async Task<SiteMaintainResponse> GetSiteMaintain(int site)
@@ -124,7 +124,7 @@ namespace BackendSite.Service.BLL
             uploadFileToS3 = true;
 
             //clear cache
-            if (_useCloudfrontSiteConfig.Contains((int)request.SiteId))
+            if (_useCloudfront is 1)
             {
                 var invalidationRequest = new CreateInvalidationRequest()
                 {

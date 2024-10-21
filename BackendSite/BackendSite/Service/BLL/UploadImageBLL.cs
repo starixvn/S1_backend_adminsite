@@ -22,8 +22,7 @@ namespace BackendSite.Service.BLL
         private readonly string _environmentPrefix;
         private readonly Dictionary<string, string> _changeGameImgName;
         private readonly AWSCloudFrontHelper _cloudFrontHelper;
-        private readonly IEnumerable<int> _useCloudfrontSiteConfig;
-
+        private readonly int _useCloudfront;
         public UploadImageBLL(IServiceProvider provider)
         {
             _serverInfo = provider.GetRequiredService<ServerInfoBLL>();
@@ -33,7 +32,7 @@ namespace BackendSite.Service.BLL
             _environmentPrefix = _uploadImageFunctionConfig.EnvironmentPrefix;
             _siteCloudFrontImageInfo = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
             _cloudFrontHelper = provider.GetRequiredService<AWSCloudFrontHelper>();
-            _useCloudfrontSiteConfig = configBll.GetConfigValue<IEnumerable<int>>("UseCloudfrontSite");
+            _useCloudfront = configBll.GetConfigValue<int>("UseCloudfront");
             _changeGameImgName = new Dictionary<string, string>()
             {
                 {"Iconic","AT" },
@@ -113,7 +112,7 @@ namespace BackendSite.Service.BLL
             var s3UploadSuccess = await _awsS3Helper.UploadFileAsync(resizeImg, siteCloudFrontImageInfo.UploadSlotImagesBucketName, key);
 
             
-            if (s3UploadSuccess && _useCloudfrontSiteConfig.Contains((int)request.SiteId))
+            if (s3UploadSuccess && _useCloudfront is 1)
             {
                 //clean cache
                 var invalidationRequest = new CreateInvalidationRequest()
