@@ -403,7 +403,8 @@ namespace BackendSite.Service.Model.enums
         QrPayPayment = 6,
         BankAutoChannel = 7,
         QuickTransfer = 9,
-        ChatTransfer = 10
+        ChatTransfer = 10,
+        DigitalWallet = 11
     }
 
     public enum WithdrawalChannelTypeEnum
