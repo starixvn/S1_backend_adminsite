@@ -138,7 +138,7 @@ namespace BackendSite.Service.Library
             var key = $"BackEndSite:{_redisKey}";
             if (_awsMFAKeyConfig != null)
             {
-                var credentials = _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(5),
+                var credentials = _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(30),
                 () => GetCredentialsAsync().Result);
 
                 return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
