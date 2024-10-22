@@ -59,7 +59,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_SQ", id);
-            return _reportDbClient.QueryFirstAsync<HotEventDetailDto>("Admin_HotEventDetail_Get", p);
+            return _reportDbClient.QueryFirstAsync<HotEventDetailDto>("Admin_HotEventDetail_Get_V2", p);
         }
 
         public Task CreateHotEventAsync(CreateHotEventRequest request, string createUser)
@@ -79,8 +79,9 @@ namespace BackendSite.Service.DAL
             p.Add("_AwaySportTeamId", request.AwayTeamNameId);
             p.Add("_CreateUser", createUser);
             p.Add("_IsLiveStreaming", request.IsLiveStreaming);
+            p.Add("_IsPrediction", request.IsPrediction);
             p.Add("_Currency", JsonConvert.SerializeObject(request.ICurrencyList));
-            return _mainDbClient.ExecuteAsync("Admin_HotEventInfo_Ins_V2", p);
+            return _mainDbClient.ExecuteAsync("Admin_HotEventInfo_Ins_V3", p);
         }
 
         public Task SetHotEventDataAsync(SetHotEventDataRequest request, string updateUser)
@@ -98,8 +99,9 @@ namespace BackendSite.Service.DAL
             p.Add("_AwaySportTeamId", request.AwaySportTeamId);
             p.Add("_UpdateUser", updateUser);
             p.Add("_IsLiveStreaming", request.IsLiveStreaming);
+            p.Add("_IsPrediction", request.IsPrediction);
             p.Add("_Currency", JsonConvert.SerializeObject(request.ICurrencyList));
-            return _mainDbClient.ExecuteAsync("Admin_HotEventData_Set_V2", p);
+            return _mainDbClient.ExecuteAsync("Admin_HotEventData_Set_V3", p);
         }
 
         public Task SetHotEventStatusAsync(SetHotEventStatusRequest request, string updateUser)
