@@ -476,20 +476,6 @@ namespace BackendSite.Service.DAL
                 DeletePromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList, trans);
             }
             #endregion
-
-            if (promotion.PromotionType == (int) PromotionTypeEnum.PredictionEvent)
-            {
-                if (!SetPromotionPrediction(promotion.BonusCode, promotion.SiteId, promotion.PredictionSetting, trans))
-                {
-                    _mainDbClient.RollbackAndDisposeConnection(conn, trans);
-                    return false;
-                }
-                
-                if (isUpdate)
-                {
-                    DeletePromotionPrediction(promotion.BonusCode, promotion.SiteId, promotion.PredictionSetting, trans);
-                }
-            }
             
             if (promotion.PromotionType == (int)PromotionTypeEnum.Cashback)
             {
@@ -713,30 +699,7 @@ namespace BackendSite.Service.DAL
 
             return affectCount > 0;
         }
-
-        /// <summary>
-        /// 預測隊伍promotion
-        /// </summary>
-        /// <param name="bonusCode"></param>
-        /// <param name="siteId"></param>
-        /// <param name="predictionList"></param>
-        /// <param name="transaction"></param>
-        /// <returns></returns>
-        private bool SetPromotionPrediction(string bonusCode, int siteId, IEnumerable<PromotionPrediction> predictionList, MySqlTransaction transaction)
-        {
-            var p = new DynamicParameters();
-            p.Add("_BonusCode", bonusCode);
-            p.Add("_SiteId", siteId);
-            p.Add("_PredictionList", JsonConvert.SerializeObject(predictionList));
-            p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            _mainDbClient.Execute("Admin_PromotionPrediction_Set", transaction, p);
-
-            var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
-
-            return affectCount > 0;
-        }
-
+        
         /// <summary>
         /// 刪除促銷規則??
         /// </summary>
@@ -761,21 +724,6 @@ namespace BackendSite.Service.DAL
             return affectCount;
         }
         
-        private int DeletePromotionPrediction(string bonusCode, int siteId, IEnumerable<PromotionPrediction> predictionList, MySqlTransaction transaction)
-        {
-            var p = new DynamicParameters();
-            p.Add("_BonusCode", bonusCode);
-            p.Add("_SiteId", siteId);
-            p.Add("_PredictionList", JsonConvert.SerializeObject(predictionList));
-            p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            _mainDbClient.Execute("Admin_PromotionPrediction_Del", transaction, p);
-
-            var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
-
-            return affectCount;
-        }
-
         /// <summary>
         /// 設定促銷顯示條件
         /// </summary>

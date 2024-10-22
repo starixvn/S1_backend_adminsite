@@ -224,7 +224,6 @@ namespace BackendSite.Service.Model
         public int AutoExtend { get; set; }
         public string LastUpdateUser { get; set; }
         public IEnumerable<PromotionSpecific> Specific { get; set; }
-        public IEnumerable<PromotionPrediction> PredictionSetting { get; set; }
 
         [Description("啟用相同DeviceID領取限制: 0.不限制 1.限制")]
         public bool SameDeviceIDRestrict { get; set; }
@@ -319,46 +318,6 @@ namespace BackendSite.Service.Model
         [Description("MissionBonus 計算Turnover的GameType")]
         public string TurnoverTpGameTypes { get; set; } = string.Empty;
         public IEnumerable<int> TurnoverTpGameTypeList { get; set; } = new List<int>();
-    }
-    
-    public class PromotionPrediction
-    {
-        private DateTimeOffset _startTime;
-        private DateTimeOffset _endTime;
-        private DateTimeOffset _battleDateTime;
-        
-        [Description("聯賽標題Id")]
-        public int SportLeaguesTitleId { get; set; }
-        [Description("Saba提供的比賽局號")]
-        public int MatchId { get; set; }
-        [Description("運動種類 : 足球,籃球 等等")]
-        public int GameId { get; set; }
-        [Description("預測開始時間")]
-        public DateTimeOffset StartTime
-        {
-            get => _startTime;
-            set => _startTime = value.ToUniversalTime();
-        }
-        [Description("預測結束時間")]
-        public DateTimeOffset EndTime
-        {
-            get => _endTime;
-            set => _endTime = value.ToUniversalTime();
-        }
-        [Description("比賽時間")]
-        public DateTimeOffset BattleDateTime
-        {
-            get => _battleDateTime;
-            set => _battleDateTime = value.ToUniversalTime();
-        }
-        [Description("主隊聯賽Id，紀錄主隊屬於哪一個聯賽的")]
-        public int HomeSportLeaguesId { get; set; }
-        [Description("客隊聯賽Id，紀錄客隊屬於哪一個聯賽的")]
-        public int AwaySportLeaguesId { get; set; }
-        [Description("主隊聯賽隊伍Id")]
-        public int HomeSportTeamId { get; set; }
-        [Description("客隊聯賽隊伍Id")]
-        public int AwaySportTeamId { get; set; }
     }
     
     public class TpGameType
