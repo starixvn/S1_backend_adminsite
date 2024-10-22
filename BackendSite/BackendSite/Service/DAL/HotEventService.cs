@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            result.Data = await _reportDbClient.QueryAsync<HotEventDataListDto>("Admin_HotEventDataList_Get", p);
+            result.Data = await _reportDbClient.QueryAsync<HotEventDataListDto>("Admin_HotEventDataList_Get_V2", p);
             result.TotalPages = p.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
