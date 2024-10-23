@@ -215,7 +215,7 @@ namespace BackendSite.Service.BLL
                         TpName = _changeGameImgName.TryGetValue(p.TpName,out var changeName) ? changeName : p.TpName,
                         GameName = p.GameName,
                         GameId = p.GameId,
-                    }).Where(p => g.Key == 10 ? p.GameId.StartsWith("S") : true), // 當 TpId = 10,只取出slot類型遊戲
+                    })
                 }
                 );
         }
