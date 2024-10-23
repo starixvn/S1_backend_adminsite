@@ -11,6 +11,7 @@ using BackendSite.Service.Model.Option;
 
 using OtpNet;
 using Newtonsoft.Json;
+using BackendSite.Service.Model.enums;
 
 namespace BackendSite.Service.Library
 {
@@ -53,25 +54,25 @@ namespace BackendSite.Service.Library
 
         public async Task<PutObjectResponse> PutObjectAsync(PutObjectRequest request)
         {
-            var client = GetClient();
+            var client = await GetClientAsync();
             return await client.PutObjectAsync(request);
         }
 
         public async Task<DeleteObjectResponse> DeleteObjectAsync(DeleteObjectRequest request)
         {
-            var client = GetClient();
+            var client = await GetClientAsync();
             return await client.DeleteObjectAsync(request);
         }
 
         public async Task<GetObjectResponse> GetObjectAsync(GetObjectRequest request)
         {
-            var client = GetClient();
+            var client = await GetClientAsync();
             return await client.GetObjectAsync(request);
         }
 
         public async Task<CopyObjectResponse> CopyObjectAsync(CopyObjectRequest request)
         {
-            var client = GetClient();
+            var client = await GetClientAsync();
             return await client.CopyObjectAsync(request);
         }
 
@@ -87,7 +88,7 @@ namespace BackendSite.Service.Library
                     InputStream = fileStream,
                     Key = key
                 };
-                var client = GetClient();
+                var client = await GetClientAsync();
                 var putResponse = await client.PutObjectAsync(putRequest);
                 var success = putResponse.HttpStatusCode.IsSuccess();
                 if (!success)
@@ -115,7 +116,7 @@ namespace BackendSite.Service.Library
                     Key = key
                 };
 
-                var client = GetClient();
+                var client = await GetClientAsync();
                 var putResponse = await client.DeleteObjectAsync(putRequest);
                 var success = putResponse.HttpStatusCode.IsSuccess();
                 if (!success)
@@ -133,13 +134,19 @@ namespace BackendSite.Service.Library
             }
         }
 
-        private AmazonS3Client GetClient()
+        private async Task<AmazonS3Client> GetClientAsync()
         {
             var key = $"BackEndSite:{_redisKey}";
             if (_awsMFAKeyConfig != null)
             {
-                var credentials = _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(30),
+                var credentials = _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(20),
                 () => GetCredentialsAsync().Result);
+
+                if (credentials.AccessKeyId is null)
+                {
+                    credentials = GetCredentialsAsync().Result;
+                    await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(credentials), TimeSpan.FromMinutes(20));
+                }
 
                 return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
             }
