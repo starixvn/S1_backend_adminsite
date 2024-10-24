@@ -140,17 +140,16 @@ namespace BackendSite.Service.Library
 
         private async Task<AmazonS3Client> GetClientAsync()
         {
-            var key = $"AWS:{_redisKey}";
             if (_awsMFAKeyConfig != null)
             {
                 var credentials = new Credentials();
 
-                if (_cacheHelper.KeyExists($"{key}_1"))
-                    credentials = await _cacheHelper.StringGetAsync<Credentials>($"{key}_1", RedisDataBase.Shared);
+                if (_cacheHelper.KeyExists($"{_redisKey}_1"))
+                    credentials = await _cacheHelper.StringGetAsync<Credentials>($"{_redisKey}_1", RedisDataBase.Shared);
                 if (credentials.AccessKeyId is null)
                 {
-                    if (_cacheHelper.KeyExists($"{key}_2"))
-                        credentials = await _cacheHelper.StringGetAsync<Credentials>($"{key}_2", RedisDataBase.Shared);
+                    if (_cacheHelper.KeyExists($"{_redisKey}_2"))
+                        credentials = await _cacheHelper.StringGetAsync<Credentials>($"{_redisKey}_2", RedisDataBase.Shared);
                 }
 
                 return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
