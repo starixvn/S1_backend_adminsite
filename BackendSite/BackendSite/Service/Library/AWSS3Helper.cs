@@ -2,19 +2,11 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.SecurityToken.Model;
-using Amazon.SecurityToken;
-
 using BackendSite.Extensions;
 using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.Option;
-
-using OtpNet;
-using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;
-using System.Collections.Concurrent;
-using Org.BouncyCastle.Utilities;
-using System.Net;
 
 namespace BackendSite.Service.Library
 {
@@ -144,11 +136,11 @@ namespace BackendSite.Service.Library
             {
                 var credentials = new Credentials();
 
-                if (_cacheHelper.KeyExists($"{_redisKey}_1"))
+                if (_cacheHelper.KeyExists($"{_redisKey}_1", RedisDataBase.Shared))
                     credentials = await _cacheHelper.StringGetAsync<Credentials>($"{_redisKey}_1", RedisDataBase.Shared);
                 if (credentials.AccessKeyId is null)
                 {
-                    if (_cacheHelper.KeyExists($"{_redisKey}_2"))
+                    if (_cacheHelper.KeyExists($"{_redisKey}_2", RedisDataBase.Shared))
                         credentials = await _cacheHelper.StringGetAsync<Credentials>($"{_redisKey}_2", RedisDataBase.Shared);
                 }
 
