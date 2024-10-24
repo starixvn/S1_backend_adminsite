@@ -13,6 +13,8 @@ using OtpNet;
 using Newtonsoft.Json;
 using BackendSite.Service.Model.enums;
 using System.Collections.Concurrent;
+using Org.BouncyCastle.Utilities;
+using System.Net;
 
 namespace BackendSite.Service.Library
 {
@@ -23,9 +25,7 @@ namespace BackendSite.Service.Library
         private readonly AWSMFAConfig _awsMFAKeyConfig;
         private readonly AmazonS3Config _amazonS3Config;
         private readonly ICacheHelper _cacheHelper;
-        private readonly string _redisKey = "AWSS3WithMFACredential";
-        private readonly SemaphoreSlim _lock;
-        private ConcurrentDictionary<string, Task<Credentials>> _credentialTasks = new ConcurrentDictionary<string, Task<Credentials>>();
+        private readonly string _redisKey = "AWSS3Credential";
 
 
         public AWSS3Helper(IServiceProvider provider)
@@ -54,7 +54,6 @@ namespace BackendSite.Service.Library
             }
 
             _logger = provider.GetRequiredService<ILogger<AWSS3Helper>>();
-            _lock = new SemaphoreSlim(1, 1);
         }
 
         public async Task<PutObjectResponse> PutObjectAsync(PutObjectRequest request)
@@ -141,89 +140,25 @@ namespace BackendSite.Service.Library
 
         private async Task<AmazonS3Client> GetClientAsync()
         {
-            var key = $"BackEndSite:{_redisKey}";
+            var key = $"AWS:{_redisKey}";
             if (_awsMFAKeyConfig != null)
             {
-                //var credentials = _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(20),
-                //() => GetCredentialsAsync().Result);
+                var credentials = new Credentials();
 
-                //if (credentials.AccessKeyId is null)
-                //{
-                //    credentials = GetCredentialsAsync().Result;
-                //    await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(credentials), TimeSpan.FromMinutes(20));
-                //}
-
-                //return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
-                // Try getting in-progress task first
-                if (!_credentialTasks.TryGetValue(key, out var credentialTask))
+                if (_cacheHelper.KeyExists($"{key}_1"))
+                    credentials = await _cacheHelper.StringGetAsync<Credentials>($"{key}_1", RedisDataBase.Shared);
+                if (credentials.AccessKeyId is null)
                 {
-                    // Lock to prevent race conditions
-                    await _lock.WaitAsync();
-                    try
-                    {
-                        // Recheck cache inside the lock
-                        credentialTask = _credentialTasks.GetOrAdd(key, async _ =>
-                        {
-                            var cachedCredentials = _cacheHelper.TryGetOrCreate(key, TimeSpan.FromMinutes(20), () => GetCredentialsAsync().Result);
-
-                            if (cachedCredentials.AccessKeyId is null)
-                            {
-                                var newCredentials = await GetCredentialsAsync();
-                                await _cacheHelper.StringSetAsync(key, JsonConvert.SerializeObject(newCredentials), TimeSpan.FromMinutes(20));
-                                return newCredentials;
-                            }
-
-                            return cachedCredentials;
-                        });
-                    }
-                    finally
-                    {
-                        _lock.Release();
-                    }
+                    if (_cacheHelper.KeyExists($"{key}_2"))
+                        credentials = await _cacheHelper.StringGetAsync<Credentials>($"{key}_2", RedisDataBase.Shared);
                 }
 
-                var credentials = await credentialTask;
                 return new AmazonS3Client(credentials.AccessKeyId, credentials.SecretAccessKey, credentials.SessionToken, _amazonS3Config);
             }
             else
             {
                 return new AmazonS3Client(_awsKeyConfig.AccessKey, _awsKeyConfig.SecretKey, _amazonS3Config);
             }
-        }
-
-        private async Task<Credentials> GetCredentialsAsync()
-        {
-            _logger.LogInformation($"AwsMFAKeyConfig={JsonConvert.SerializeObject(_awsMFAKeyConfig)}");
-            var stsClient = new AmazonSecurityTokenServiceClient(_awsMFAKeyConfig.AccessKey, _awsMFAKeyConfig.SecretAccessKey);
-            var pass = false;
-            var credentials = new Credentials();
-            int getTimes = 5;
-            while (!pass && getTimes > 0)
-            {
-                try
-                {
-                    var tokenCode = new Totp(Base32Encoding.ToBytes(_awsMFAKeyConfig.SecretKey), mode: OtpHashMode.Sha1).ComputeTotp();
-                    //_logger.LogInformation($"TokenCode={tokenCode}");
-                    var request = new GetSessionTokenRequest
-                    {
-                        DurationSeconds = _awsMFAKeyConfig.DurationSeconds,
-                        SerialNumber = _awsMFAKeyConfig.SerialNumber,
-                        TokenCode = tokenCode
-                    };
-                    //_logger.LogInformation($"GetSessionTokenRequest={JsonConvert.SerializeObject(request)}");
-                    var response = await stsClient.GetSessionTokenAsync(request);
-                    //_logger.LogInformation($"GetSessionTokenResponse={JsonConvert.SerializeObject(response)}");
-
-                    credentials = response.Credentials;
-                    pass = true;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex.Message, ex);
-                    getTimes--;
-                }
-            }
-            return credentials;
         }
     }
 }
