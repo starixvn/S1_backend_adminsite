@@ -189,11 +189,19 @@ public class MemberCommand : IMemberCommand
         var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
         var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
 
-        if (await _memberService.IsExistsPhoneNo(custId, customer.SiteId, customer.AreaCode, phoneNo)) 
-            return -1;
-        if (!hasPermission && customer.PhoneNo != verifyPhone)
-            return -2;
-
+        if (long.TryParse(phoneNo, out var phoneNoLong))
+        {
+            phoneNo = phoneNoLong.ToString();
+            if (await _memberService.IsExistsPhoneNo(custId, customer.SiteId, customer.AreaCode, phoneNo)) 
+                return -1;
+            if (!hasPermission && customer.PhoneNo != verifyPhone)
+                return -2;
+        }
+        else
+        {
+            return -3;
+        }
+        
         var beforePhone = customer.PhoneNo;
         var result = await _memberService.SetPhoneNoAsync(custId, phoneNo);
         if (result <= 0) return 0;
