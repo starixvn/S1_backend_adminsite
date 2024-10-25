@@ -173,6 +173,15 @@ public class MemberCommand : IMemberCommand
     public async Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator)
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
+        if (long.TryParse(phoneNo, out var phoneNoLong))
+        {
+            phoneNo = phoneNoLong.ToString();
+        }
+        else
+        {
+            return -2;
+        }
+        
         if (await _memberService.IsExistsPhoneNo(custId, customer.SiteId, customer.AreaCode, phoneNo)) return -1;
 
         var beforePhone = customer.PhoneNo;
