@@ -20,7 +20,7 @@ namespace BackendSite.Service.BLL
         private readonly ILogger<GiftManagementBLL> _logger;
         private readonly ThirdPartyService _thirdPartyService;
         private readonly GiftMamagementService _giftMamagementService;
-
+        private readonly Dictionary<int, string> _siteStoreImageUrl;
         public GiftManagementBLL(IServiceProvider provider)
         {
             var configBll = provider.GetRequiredService<ConfigBLL>();
@@ -34,6 +34,7 @@ namespace BackendSite.Service.BLL
             _logger = provider.GetRequiredService<ILogger<GiftManagementBLL>>();
             _thirdPartyService = provider.GetRequiredService<ThirdPartyService>();
             _giftMamagementService = provider.GetRequiredService<GiftMamagementService>();
+            _siteStoreImageUrl = configBll.GetConfigValuesBySiteId<string>("StoreImageUrl");
         }
 
         public Task<ApiResult<object>> GetGiftListAsync(GetListRequest req)
@@ -68,10 +69,16 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public Task<ApiResult<IEnumerable<GiftInfo>>> GetGiftAsync(GetGiftRequest req)
+        public async Task<ApiResult<IEnumerable<GiftInfo>>> GetGiftAsync(GetGiftRequest req)
         {
             var url = _storeSiteUrl + "GiftManagement/Get";
-            var result = _courierAdapter.MyPostAsync<IEnumerable<GiftInfo>, GetGiftRequest>(url, req);
+            var result = _courierAdapter.MyPostAsync<IEnumerable<GiftInfo>, GetGiftRequest>(url, req).Result;
+
+            foreach (var item in result.Data)
+            {
+                var storeImageUrl = _siteStoreImageUrl[item.SiteId];
+                item.PictureUrl = $"{storeImageUrl}/{item.PictureUrl}";
+            }
 
             return result;
         }
@@ -79,7 +86,7 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> CreateGiftAsync(CreateGiftRequest req, string userName)
         {
             var serverInfo = _serverInfoBll.GetServerInfo(req.SiteId);
-            
+
             if (req.GiftType == GiftTypeEnum.FreeSpin)
             {
                 //創建bonuscode
@@ -98,7 +105,7 @@ namespace BackendSite.Service.BLL
             return new ApiResult(result.ErrorCode, result.Message);
         }
 
-        private static string BonusCodeRule(CreateGiftRequest req,string siteName)
+        private static string BonusCodeRule(CreateGiftRequest req, string siteName)
         {
             //BonusCode規則。ex.PP2FREESPIN100FORNOVA8820240306
             var bonusCode = $"PP{req.CurrencyId}FREESPIN{req.Round}FOR{siteName.ToUpper()}{DateTime.UtcNow.ToString("yyyyMMdd")}";
@@ -107,13 +114,13 @@ namespace BackendSite.Service.BLL
 
         private async Task<ApiResult> CreateBonusCode(CreateGiftRequest req, string bonusCode)
         {
-            var currency = await _thirdPartyService.GetTpCurrency(5,req.CurrencyId);
+            var currency = await _thirdPartyService.GetTpCurrency(5, req.CurrencyId);
             var inputs = new Dictionary<string, string>();
             var url = _tpServiceApiUrl + "CreateBonusCode";
             inputs.Add("GameId", "vs20olympnova88");//目前只有PP一款遊戲
             inputs.Add("BonusCode", bonusCode);
             inputs.Add("Round", req.Round.ToString());
-            inputs.Add("Currency",currency.TpCurrencyId);
+            inputs.Add("Currency", currency.TpCurrencyId);
             inputs.Add("ExpirationDay", "8");//freespin有效期限8天
             var request = new CreateBonusCodeParams()
             {
