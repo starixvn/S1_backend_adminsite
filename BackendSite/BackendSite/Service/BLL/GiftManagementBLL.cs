@@ -89,7 +89,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in result.Data)
             {
                 var storeImageUrl = _siteStoreImageUrl[item.SiteId];
-                item.PictureUrl = $"{storeImageUrl}/{item.PictureUrl}";
+                item.PictureUrl = $"{storeImageUrl}{item.PictureUrl}";
             }
 
             return result;
