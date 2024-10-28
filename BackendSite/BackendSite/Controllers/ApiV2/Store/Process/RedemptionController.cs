@@ -43,7 +43,7 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
         }
 
         [HttpPost]
-        public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
+        public Task<ApiResult<GetRedemptionDetail>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
         {
             var result = _redemptionBll.GetRedemptionDetailAsync(req);
 
