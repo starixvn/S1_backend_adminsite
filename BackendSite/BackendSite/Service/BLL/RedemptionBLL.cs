@@ -74,12 +74,15 @@ namespace BackendSite.Service.BLL
             var storeImageUrl = _siteStoreImageUrl[result.Data.SiteId];
             List<string> NewReceiptUrls = new List<string>();
 
-            foreach (var item in result.Data.ReceiptUrls)
+            if (result.Data.ReceiptUrls is not null)
             {
-                NewReceiptUrls.Add($"{storeImageUrl}{item}");
-            }
+                foreach (var item in result.Data.ReceiptUrls)
+                {
+                    NewReceiptUrls.Add($"{storeImageUrl}{item}");
+                }
 
-            result.Data.ReceiptUrls = NewReceiptUrls;
+                result.Data.ReceiptUrls = NewReceiptUrls;
+            }
             return result;
         }
 
