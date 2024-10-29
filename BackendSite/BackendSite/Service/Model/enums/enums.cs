@@ -1003,7 +1003,8 @@ namespace BackendSite.Service.Model.enums
         SetBigWinSetting = 96,
         LeaderboardPointCalculation = 97,
         LeaderboardRankingBonus = 98,
-        SetSlotGame = 99
+        SetSlotGame = 99,
+        ClaimPredictPromotion = 100
     }
 
     #region BankFinancialTransferInfoLog

@@ -46,5 +46,15 @@ namespace BackendSite.Service.DAL
             return result.ToList();
         }
         
+        public int SetClaimPredictPromotionStatus(int custId, int matchId )
+        {
+            var p = new DynamicParameters();
+            p.Add("_CustId", custId, dbType: DbType.Int64);
+            p.Add("_MatchId", matchId, dbType: DbType.Int64);
+
+            var result = _mainDbClient.Execute("Admin_CustPromotionPredictScorePayout_Set", p);
+            return result;
+        }
+        
     }
 }

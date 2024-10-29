@@ -1,16 +1,24 @@
 ﻿using System.Globalization;
+using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.Option;
 
 namespace BackendSite.Service.BLL
 {
     public class PredictionBLL
     {
         private readonly PredictionService _predictionService;
+        private readonly CourierAdapter _courierAdapter;
+        private readonly string _bonusApiUrl;
 
         public PredictionBLL(IServiceProvider provider)
         {
             _predictionService = provider.GetRequiredService<PredictionService>();
+            _courierAdapter = provider.GetRequiredService<CourierAdapter>();
+            _bonusApiUrl =  provider.GetRequiredService<ConfigBLL>().GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").BonusService;
         }
 
         public List<GetCustPromotionPredictScoreResponse> GetCustPromotionPredictScore(GetCustPromotionPredictScoreRequest request)
@@ -102,6 +110,35 @@ namespace BackendSite.Service.BLL
             }
             
             return dataList;
+        }
+        
+        public async Task<ApiResult> ClaimPredictPromotion(Customer custInfo , AuthData authData, string bonusCode , int matchId)
+        {
+            var apiResult = new ApiResult();
+            var bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
+            
+            var setAdjustBonusReq = new SetAdjustBonusReq
+            {
+                CustId = custInfo.CustId,
+                BonusCode = bonusCode,
+                Operator = authData.UserName,
+                PromotionType = (int)PromotionTypeEnum.PredictionEvent
+            };
+            
+            var apiOnlineResult = await _courierAdapter.MyPostAsync<ApiResult, SetAdjustBonusReq>(bonusUrl, setAdjustBonusReq);
+            if (apiOnlineResult.ErrorCode == (int)ErrorCodeEnum.Success)
+            {
+                _predictionService.SetClaimPredictPromotionStatus(custInfo.CustId, matchId);
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                apiResult.Message = "Success.";
+            }
+            else
+            {
+                apiResult.ErrorCode = apiOnlineResult.ErrorCode;
+                apiResult.Message = apiOnlineResult.Message;
+            }
+
+            return apiResult;
         }
     }
 }

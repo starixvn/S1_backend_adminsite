@@ -1,5 +1,4 @@
-﻿
-using OfficeOpenXml.Attributes;
+﻿using OfficeOpenXml.Attributes;
 
 namespace BackendSite.Service.Model
 {
@@ -43,7 +42,7 @@ namespace BackendSite.Service.Model
         public DateTime PredictTime { get; set; }
         public decimal Bonus { get; set; }
         public string BonusCode { get; set; }
-        public string MatchId { get; set; }
+        public int MatchId { get; set; }
         public int DepositCountAchieved { get; set; }
         public int DepositTermPeriodDays { get; set; }
         /// <summary>
@@ -81,7 +80,7 @@ namespace BackendSite.Service.Model
     public class GetCustPromotionPredictScoreResponse
     {
         public string BonusCode { get; set; }
-        public string MatchId { get; set; }
+        public int MatchId { get; set; }
         /// <summary>
         /// 主隊結果比分
         /// </summary>
@@ -179,5 +178,12 @@ namespace BackendSite.Service.Model
         public int AwayScore { get; set; }
         [EpplusIgnore]
         public int PredictStatusEnum { get; set; }
+    }
+    
+    public class ClaimPredictPromotionReq
+    {
+        public int CustId { get; set; }
+        public int MatchId { get; set; }
+        public string BonusCode { get; set; }
     }
 }
