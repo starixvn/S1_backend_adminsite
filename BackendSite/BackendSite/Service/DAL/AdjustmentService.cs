@@ -382,15 +382,6 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        private IEnumerable<string> GetAdjustmentInfo(int custId)
-        {
-            var props = new DynamicParameters();
-            props.Add("_CustId", custId);
-
-            var result = _reportDbClient.Query<string>("Admin_DepositInfoTransId_Get", props);
-            return result;
-        }
-
         public int AdjustmentActualDeposit(AdjustmentAndWithdrawalLimit input, string transId, decimal adjustAmount, MySqlTransaction trans)
         {
             var props = new DynamicParameters();
