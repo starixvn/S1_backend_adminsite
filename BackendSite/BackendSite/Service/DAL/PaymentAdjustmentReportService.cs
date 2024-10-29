@@ -85,35 +85,6 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public IEnumerable<PaymentAdjustment> GetPaymentAdjustmentExportReport(string siteIds,
-            string currencyIds,
-            bool getFromAdjustmentInfo,
-            string AdjustTypesForAI,
-            bool getFromLogAdminAdjustWallet,
-            string AdjustTypesForLAAW,
-            string userName,
-            DateTime startDate,
-            DateTime endDate,
-            string transId)
-        {
-            var props = new DynamicParameters();
-            props.Add("_SiteIds", siteIds);
-            props.Add("_CurrencyIds", currencyIds);
-            props.Add("_GetFromAdjustmentInfo", getFromAdjustmentInfo);
-            props.Add("_AdjustTypesForAI", AdjustTypesForAI);
-            props.Add("_GetFromLogAdminAdjustWallet", getFromLogAdminAdjustWallet);
-            props.Add("_AdjustTypesForLAAW", AdjustTypesForLAAW);
-            props.Add("_UserName", string.IsNullOrWhiteSpace(userName) ? null : userName);
-            props.Add("_StartDate", startDate);
-            props.Add("_EndDate", endDate);
-            props.Add("_TransId", string.IsNullOrWhiteSpace(transId) ? null : transId);
-
-            var result = _reportDbClient.Query<PaymentAdjustment>("Admin_AdjustmentInfoExport_Get_V5", props);
-
-            return result;
-        }
-
-
         public async Task<IEnumerable<PaymentAdjustmentV2>> GetPaymentAdjustmentExportReportV2(string siteIds,
             string currencyIds,
             bool getFromAdjustmentInfo,
