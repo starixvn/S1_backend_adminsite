@@ -140,5 +140,12 @@ namespace BackendSite.Service.BLL
 
             return apiResult;
         }
+        
+        public List<CustPromotionPredictScoreBase> GetCustPromotionPredictScoreByCust(int custId, int matchId )
+        {
+            var result = _predictionService.GetCustPromotionPredictScoreByCust(custId, matchId);
+            
+            return result;
+        }
     }
 }

@@ -76,6 +76,23 @@ namespace BackendSite.Controllers.ApiV2.Report
                     PromotionType = PromotionTypeEnum.PredictionEvent.ToString()
                 };
 
+                var custPromotionPredictScore = _predictionBll.GetCustPromotionPredictScoreByCust(request.CustId, request.MatchId);
+                var matchData = custPromotionPredictScore.FirstOrDefault(x => x.BonusCode == request.BonusCode && x.MatchId == request.MatchId);
+
+                if (matchData is null || !matchData.Result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "No Match Found or Match not end.";
+                    return apiResult;
+                }
+
+                if (matchData.IsPayout)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                    apiResult.Message = "Already claimed.";
+                    return apiResult;
+                }
+                
                 var logResult =
                     _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
                     {
