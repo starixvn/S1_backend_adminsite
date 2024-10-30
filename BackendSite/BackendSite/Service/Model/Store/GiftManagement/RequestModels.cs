@@ -50,6 +50,7 @@ namespace BackendSite.Service.Model.Store.GiftManagement
     public class UpdateGiftRequest
     {
         public int GiftId { get; set; }
+        public int SiteId { get; set; }
         public GeneralStatusEnum Status { get; set; }
         public int CategoryId { get; set; }
         public IEnumerable<int> Tags { get; set; }
