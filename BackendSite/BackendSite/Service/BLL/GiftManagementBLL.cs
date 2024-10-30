@@ -154,6 +154,12 @@ namespace BackendSite.Service.BLL
         public async Task<ApiResult> UpdateGiftAsync(UpdateGiftRequest req, string userName)
         {
             var url = _storeSiteUrl + "GiftManagement/Update";
+            var storeImageUrl = _siteStoreImageUrl[req.SiteId];
+            foreach (var item in req.Infos)
+            {
+                int count = (item.PictureUrl.Length- item.PictureUrl.Replace(storeImageUrl, "").Length) / storeImageUrl.Length;
+                item.PictureUrl = item.PictureUrl.Substring(count * storeImageUrl.Length);
+            }
             var data = new UpdateGiftParams(req, userName);
             var result = await _courierAdapter.MyPostAsync<object, UpdateGiftParams>(url, data);
 

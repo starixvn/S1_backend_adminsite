@@ -97,6 +97,14 @@ namespace BackendSite.Service.BLL
         public Task<ApiResult<object>> SetRedemptionInfoAsync(SetRedemptionInfoRequest req)
         {
             var url = _storeSiteUrl + "Redemption/SetRedemptionInfo";
+            var storeImageUrl = _siteStoreImageUrl[req.SiteId];
+            var newReceiptUrls = new List<string>();
+            foreach (var item in req.ReceiptUrls)
+            {
+                int count = (item.Length - item.Replace(storeImageUrl, "").Length) / storeImageUrl.Length;
+                newReceiptUrls.Add(item.Substring(count * storeImageUrl.Length));
+            }
+            req.ReceiptUrls = newReceiptUrls;
             var result = _courierAdapter.PostAsync<ApiResult<object>, SetRedemptionInfoRequest>(url, req);
 
             return result;
