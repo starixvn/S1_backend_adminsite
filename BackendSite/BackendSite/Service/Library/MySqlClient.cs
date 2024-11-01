@@ -40,7 +40,7 @@ namespace BackendSite.Service.Library
             _backupConnectionStringList = backupConnectionStringList;
         }
 
-        private string HealthCheck()
+        private string HealthCheck(int delayCheckTime = 15)
         {            
             if (_backupConnectionStringList == null)
             {
@@ -61,7 +61,7 @@ namespace BackendSite.Service.Library
                     var dbSlaveStatus = connection.QueryFirstOrDefault<DBSlaveStatus>("Service_HealthCheck_V2", commandType: CommandType.StoredProcedure);
 
                     // 拿不到Status或延遲太久都換下一個連線
-                    if (dbSlaveStatus == null || dbSlaveStatus.Seconds_Behind_Master > 15)
+                    if (dbSlaveStatus == null || dbSlaveStatus.Seconds_Behind_Master > delayCheckTime)
                     {
                         _logger.LogWarning($"{ReplaceDBString(backupConn)} | DelayTime = {dbSlaveStatus?.Seconds_Behind_Master}");
                         continue;
@@ -279,21 +279,21 @@ namespace BackendSite.Service.Library
             return result;
         }
 
-        public IEnumerable<T> RetryQuery<T>(string name, DynamicParameters parameters)
+        public IEnumerable<T> RetryQuery<T>(string name, DynamicParameters parameters, int delayCheckTime = 15)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
 
             try
             {
-                var conn = HealthCheck();
+                var conn = HealthCheck(delayCheckTime);
                 _logger.LogInformation($"DB {ReplaceDBString(conn)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = connection.Query<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
             }
             catch (MySqlException sqlEx)
             {
-                var conn = HealthCheck();
+                var conn = HealthCheck(delayCheckTime);
                 _logger.LogError(sqlEx, $"DBRetry {ReplaceDBString(conn)} | {name} {sw.Elapsed:c}| {SerializeDynamicParameters(parameters)}");
                 using var connection = new MySqlConnection(conn);
                 result = connection.Query<T>(name, param: parameters, commandType: CommandType.StoredProcedure);
