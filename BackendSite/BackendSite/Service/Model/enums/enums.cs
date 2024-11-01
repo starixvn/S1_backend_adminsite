@@ -1871,7 +1871,9 @@ namespace BackendSite.Service.Model.enums
         [Description("Bank System Unstable")]
         BankSystemUnstable = 4,
         [Description("Withdrawal limit exceeded INR")]
-        WithdrawalLimitExceededINR = 5
+        WithdrawalLimitExceededINR = 5,
+        [Description("Withdrawal Restrictions Bank Card Withdrawals")]
+        WithdrawalRestrictionsBankCardWithdrawals = 6,
     }
 
     public enum MpaTransactionRelaySummaryTypeEnum

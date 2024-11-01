@@ -49,70 +49,7 @@ namespace BackendSite.Service.DAL
         }
 
         #endregion
-
-        public Dictionary<string, IEnumerable<PartcialSummeryModel>> GetMainFinancialReport(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
-        {
-            var partialSummeryModels = new Dictionary<string, IEnumerable<PartcialSummeryModel>>();
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    CurrencyIds = currencyIds,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    TimeZone = timeZone
-                });
-
-            #region Get Data StoreProcedure
-
-            var reportDepositList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportDeposit_GroupByDay_Get_V2", parameters);
-            partialSummeryModels.Add("Deposit", reportDepositList);
-
-            var reportWithdrawalList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportWithdrawal_GroupByDay_Get_V2", parameters);
-            partialSummeryModels.Add("Withdrawal", reportWithdrawalList);
-
-            var reportAdjustmentList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportAdjustment_GroupByDay_Get_V2", parameters);
-            partialSummeryModels.Add("Adjustment", reportAdjustmentList);
-
-            var reportBonusList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportBonus_GroupByDay_Get_V2", parameters);
-            partialSummeryModels.Add("Bonus", reportBonusList);
-
-            var reportRebateList = _reportDbClient.Query<PartcialSummeryModel>("Admin_ReportRebate_GroupByDay_Get_V2", parameters);
-            partialSummeryModels.Add("Rebate", reportRebateList);
-
-            #endregion
-
-            return partialSummeryModels;
-        }
-
-        public IEnumerable<TurnoverAndWinlossSummeryModel> GetTurnoverAndWinLossSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    CurrencyIds = currencyIds,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    TimeZone = timeZone
-                });
-
-            return _reportDbClient.Query<TurnoverAndWinlossSummeryModel>("Admin_ReportTurnOverAndWinlost_GroupByDay_Get_V3", parameters);
-        }
-
-        public IEnumerable<StatisticalPartialSummeryModel> GetStatisticalReport(string siteIds, string timeZone, string startDate, string endDate)
-        {
-            var parameters = new DynamicParameters(new
-            {
-                _SiteIds = siteIds,
-                _TimeZone = timeZone,
-                _StartDate = startDate,
-                _EndDate = endDate
-            });
-
-            return _reportDbClient.Query<StatisticalPartialSummeryModel>("Admin_ReportTurnOverValidBet_Statistical_Get_V3", parameters);
-        }
-
+        
         public IEnumerable<UserOnlinePartcialSummaryModel> GetUserOnlineReport(string siteIds,
             DateTime startTime,
             DateTime endTime,
@@ -128,42 +65,6 @@ namespace BackendSite.Service.DAL
                 });
 
             return _reportDbClient.Query<UserOnlinePartcialSummaryModel>("Admin_OnlineReport_Get_V3", parameters);
-        }
-
-        public IEnumerable<DepositReportParticalModel> GetDepositReport(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    CurrencyIds = currencyIds,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    TimeZone = timeZone
-                });
-            return _reportDbClient.Query<DepositReportParticalModel>("Admin_Report_DepositDetailByDay_Get_V2", parameters);
-        }
-
-        public IEnumerable<CustomerStatisticalPartcialSummeryModel> GetCustomerStatisticalReport(string siteIds,
-                                                                                                 string currencyIds,
-                                                                                                 string startDate,
-                                                                                                 string endDate,
-                                                                                                 string userName,
-                                                                                                 string timeZone)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    CurrencyIds = currencyIds,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    CustomerName = userName,
-                    TimeZone = timeZone
-                });
-
-            var SpName = "Admin_ReportTurnOverAndWinlost_CustomerStatistical_Get_V3";
-            return _reportDbClient.Query<CustomerStatisticalPartcialSummeryModel>(SpName, parameters);
         }
 
         public IEnumerable<TpFailRecordReport> GetTpFailRecordReport(GetTpFailRecordReportInput input,

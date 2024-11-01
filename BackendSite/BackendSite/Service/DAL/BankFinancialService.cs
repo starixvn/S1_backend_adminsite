@@ -516,54 +516,6 @@ namespace BackendSite.Service.DAL
 
         #region Bank Financial Report
 
-        public IEnumerable<BankFinancialDepositSummaryModel> GetDepositSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    CurrencyIds = currencyIds,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    TimeZone = timeZone
-                });
-
-            var SpName = "Admin_BankFinancialReport_Deposit_Get_V2";
-            return _reportDbClient.Query<BankFinancialDepositSummaryModel>(SpName, parameters);
-        }
-
-        public IEnumerable<BankFinancialWithdrawalSummaryModel> GetWithdrawalSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    CurrencyIds = currencyIds,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    TimeZone = timeZone
-                });
-
-            var SpName = "Admin_BankFinancialReport_Withdrawal_Get_V2";
-            return _reportDbClient.Query<BankFinancialWithdrawalSummaryModel>(SpName, parameters);
-        }
-
-        public IEnumerable<BankFinancialTransferSummaryModel> GetTransferSummary(string siteIds, string currencyIds, string startDate, string endDate, string timeZone)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    SiteIds = siteIds,
-                    CurrencyIds = currencyIds,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    TimeZone = timeZone
-                });
-
-            var SpName = "Admin_BankFinancialReport_Transfer_Get_V2";
-            return _reportDbClient.Query<BankFinancialTransferSummaryModel>(SpName, parameters);
-        }
-
         public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportDepositAsync(GetFinancialReportParams input)
         {
             var parameters = new DynamicParameters(
