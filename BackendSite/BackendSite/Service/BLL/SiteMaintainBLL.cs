@@ -23,7 +23,8 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly Dictionary<string, IEnumerable<string>> _maintainExcludeDomainConfig;
         private readonly IEnumerable<int> _maintainJsonSyncSiteConfig;
-        
+        private readonly int _useCloudfront;
+
         public SiteMaintainBLL(IServiceProvider provider)
         {
             _siteConfig = provider.GetRequiredService<Dictionary<string, SiteCloudFrontImageInfo>>();
@@ -38,6 +39,7 @@ namespace BackendSite.Service.BLL
             _fileName = env.IsProduction() ? "maintain.json" : "maintain_test.json";
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _useCloudfront = configBll.GetConfigValue<int>("UseCloudfront");
         }
 
         public async Task<SiteMaintainResponse> GetSiteMaintain(int site)
@@ -71,6 +73,8 @@ namespace BackendSite.Service.BLL
 
         public async Task<bool> UpdateSiteMaintain(SiteMaintainRequest request, string Operator)
         {
+            var uploadFileToS3 = false;
+            var clearCloundFront = false;
             var serverInfo = _serverInfoBll.GetServerInfo(request.SiteId);
             var excludeDomain = _maintainExcludeDomainConfig[serverInfo.SiteName];
             var siteMaintainObject = new
@@ -117,23 +121,35 @@ namespace BackendSite.Service.BLL
                 clearCacheList.Add($"/{_fileName}");
             }
 
+            uploadFileToS3 = true;
+
             //clear cache
-            
-            var invalidationRequest = new CreateInvalidationRequest()
+            if (_useCloudfront is 1)
             {
-                DistributionId = _siteConfig[serverInfo.SiteName].AwsCloudFrontErrorDomainID,
-                InvalidationBatch = new InvalidationBatch()
+                var invalidationRequest = new CreateInvalidationRequest()
                 {
-                    CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
-                    Paths = new Paths
+                    DistributionId = _siteConfig[serverInfo.SiteName].AwsCloudFrontErrorDomainID,
+                    InvalidationBatch = new InvalidationBatch()
                     {
-                        Quantity = clearCacheList.Count,
-                        Items = clearCacheList
+                        CallerReference = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString(),
+                        Paths = new Paths
+                        {
+                            Quantity = clearCacheList.Count,
+                            Items = clearCacheList
+                        }
                     }
+                };
+                var createResponse = await _cloudFrontHelper.CreateInvalidationAsync(invalidationRequest);
+
+                if (!createResponse.HttpStatusCode.IsSuccess())
+                {
+                    return false;
                 }
-            };
-            var createResponse = await _cloudFrontHelper.CreateInvalidationAsync(invalidationRequest);
-            if (createResponse.HttpStatusCode.IsSuccess())
+            }
+
+            clearCloundFront = true;
+
+            if (uploadFileToS3 && clearCloundFront)
             {
                 #region InfoLog
 
@@ -157,7 +173,8 @@ namespace BackendSite.Service.BLL
 
                 _mainDbClient.Execute("Admin_AdminAdjustmentInfoLog_Ins", logParam);
             }
-            return createResponse.HttpStatusCode.IsSuccess();
+
+            return true;
         }
 
         public class SiteMaintainResponse
