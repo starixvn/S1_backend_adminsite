@@ -215,8 +215,6 @@ namespace BackendSite.Service.BLL
             var batcjMsg = messageService.GetBatchMessage(batchId);
             if (batcjMsg == null) return -1;
 
-            if (batcjMsg.Status == 0) return -2;
-
             var isSuccess = await messageService.DeleteBatchMessage(batchId);
             if (isSuccess)
             {
