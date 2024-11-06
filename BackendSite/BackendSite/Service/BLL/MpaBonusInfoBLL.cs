@@ -1,4 +1,5 @@
-﻿using BackendSite.Controllers.ApiV2.Report;
+﻿using System.Diagnostics;
+using BackendSite.Controllers.ApiV2.Report;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
@@ -24,6 +25,7 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly ICacheHelper _cacheHelper;
         private readonly ICacheHelper _redisHelper;
+        private readonly ILogger<MySqlClient> _logger;
 
         public MpaBonusInfoBLL(IServiceProvider provider)
         {
@@ -36,6 +38,7 @@ namespace BackendSite.Service.BLL
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
+            _logger = provider.GetRequiredService<ILogger<MySqlClient>>();
         }
 
         #region MpaBonusInfo
@@ -460,6 +463,8 @@ namespace BackendSite.Service.BLL
 
             var data = getMpaBonusInfoListTask.Result;
 
+            _logger.LogInformation($"Step for Task Run !");
+            
             #endregion
 
             #region GGR
@@ -494,6 +499,8 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
+            _logger.LogInformation($"Step for data GroupJoin !");
+            
             #region Payment
 
             var withData = withdrawalAmountSummaryTask.Result;
@@ -588,6 +595,8 @@ namespace BackendSite.Service.BLL
                     break;
             }
 
+            _logger.LogInformation($"Step for BonusGroupByType GroupBy !");
+            
             return result;
         }
 
@@ -662,7 +671,7 @@ namespace BackendSite.Service.BLL
             DateTime startDate, DateTime endDate,
             string claimStatuses, int baseCurrencyId, string timeZone)
         {
-            var data = _bonusInfoService.GetMpaBonusInfoList(
+            var data = await _bonusInfoService.GetMpaBonusInfoList(
                 multiSiteRequests,
                 bonusStatuses, bonusTypes, bonusCode,
                 startDate, endDate,
@@ -680,7 +689,7 @@ namespace BackendSite.Service.BLL
             DateTime startDate, DateTime endDate,
             int baseCurrencyId, string timeZone)
         {
-            var ggrData = _bonusInfoService.GetMpaBonusGGRList(multiSiteRequests, startDate, endDate, timeZone);
+            var ggrData = await _bonusInfoService.GetMpaBonusGGRList(multiSiteRequests, startDate, endDate, timeZone);
             if (baseCurrencyId != 0)
             {
                 MultiplyExchangeRateGGRSummary(ggrData, startDate, GetEndDate(endDate), baseCurrencyId).Wait();
