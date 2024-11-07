@@ -23,7 +23,6 @@ namespace BackendSite.Service.BLL
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly ICacheHelper _cacheHelper;
         private readonly ICacheHelper _redisHelper;
-        private readonly ILogger<MySqlClient> _logger;
 
         public MpaBonusInfoBLL(IServiceProvider provider)
         {
@@ -36,7 +35,6 @@ namespace BackendSite.Service.BLL
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _logger = provider.GetRequiredService<ILogger<MySqlClient>>();
         }
 
         #region MpaBonusInfo
@@ -352,7 +350,7 @@ namespace BackendSite.Service.BLL
                     GroupByCurrencySum = groupByCurrencySum,
                     GroupByBonusCode = list,
                     GroupByBonusCodeSum = groupByBonusCodeSum,
-                    TotalBonusClaimants = originData.Where(x => x.SiteId == site).Count()
+                    TotalBonusClaimants = originData.Count(x => x.SiteId == site)
                 });
             }
             return result;
@@ -415,7 +413,7 @@ namespace BackendSite.Service.BLL
             }
 
             var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
-            return list.GetRange(index, count);
+            return list.AsEnumerable().GetRange(index, count);
         }
 
         #endregion
@@ -481,6 +479,7 @@ namespace BackendSite.Service.BLL
                         StartTime = dg.d.StartTime,
                         EndTime = dg.d.EndTime,
                         BonusStatus = dg.d.BonusStatus,
+                        ClaimStatus = dg.d.ClaimStatus,
                         BonusAmountClaim = dg.d.BonusAmountClaim,
                         GGR = g?.GGR ?? 0
                     })
