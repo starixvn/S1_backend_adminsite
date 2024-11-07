@@ -56,13 +56,13 @@ namespace BackendSite.Controllers.ApiV2.Report
                     if (StartDate.Offset >= TimeSpan.Zero)
                     {
                         timezone = "+" + timezone;
-                        return timezone;
                     }
                     else
                     {
                         timezone = "-" + timezone;
-                        return timezone;
                     }
+
+                    return timezone;
                 }
             }
             public int SiteId { get; set; }
