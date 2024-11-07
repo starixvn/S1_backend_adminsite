@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using BackendSite.Controllers.ApiV2.Report;
+﻿using BackendSite.Controllers.ApiV2.Report;
 using BackendSite.Extensions;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.DAL;
@@ -43,15 +42,14 @@ namespace BackendSite.Service.BLL
 
         #region MpaBonusInfo
 
-        public IEnumerable<MpaBonusInfo> GetMpaBonusInfoList(
-            MpaBonusInfoReportController.GetDataRequest input,
-            out IPageInfo pageInfo)
+        public IEnumerable<MpaBonusInfo> GetMpaBonusInfoList(MpaBonusInfoReportController.GetDataRequest input, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusInfoList:{input.GetRedisKey()}";
             var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
             var cacheTime = TimeSpan.FromSeconds(1);
-
+            //todo
+            
             if (_cacheHelper.KeyExists(masterKey))
             {
                 //Sort
@@ -160,9 +158,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<MpaBonusDetail> GetMpaBonusDetailList(
-            MpaBonusInfoReportController.GetDetailRequest input,
-            out IPageInfo pageInfo)
+        public IEnumerable<MpaBonusDetail> GetMpaBonusDetailList(MpaBonusInfoReportController.GetDetailRequest input, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusDetailList:{input.GetRedisKey()}";
@@ -228,8 +224,7 @@ namespace BackendSite.Service.BLL
 
         #region MpaMarketingBonus
 
-        public IEnumerable<MpaMarketingBonusInfo> GetMpaMarketingBonus(IEnumerable<MultiSiteRequestDto> multiSiteRequest,
-            MpaBonusInfoReportController.GetMarketingDataRequest input)
+        public IEnumerable<MpaMarketingBonusInfo> GetMpaMarketingBonus(IEnumerable<MultiSiteRequestDto> multiSiteRequest, MpaBonusInfoReportController.GetMarketingDataRequest input)
         {
             var key = $"MpaMarketingBonus:{JsonConvert.SerializeObject(multiSiteRequest)}:" +
                       $"{input.StartDate.DateTime:yyyyMMddHHmmssfff}:" +
@@ -365,9 +360,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(
-            MpaBonusInfoReportController.GetMarketingDetailRequest input,
-            out IPageInfo pageInfo)
+        public IEnumerable<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(MpaBonusInfoReportController.GetMarketingDetailRequest input, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var masterKey = $"MpaMarketingBonusDetail:{input.GetRedisKey()}";
@@ -463,7 +456,7 @@ namespace BackendSite.Service.BLL
 
             var data = getMpaBonusInfoListTask.Result;
 
-            _logger.LogInformation($"Step for Task Run !");
+            _logger.LogInformation($"Step for Task Run End!");
             
             #endregion
 
@@ -499,7 +492,7 @@ namespace BackendSite.Service.BLL
 
             #endregion
 
-            _logger.LogInformation($"Step for data GroupJoin !");
+            _logger.LogInformation($"Step for data GroupJoin End!");
             
             #region Payment
 
@@ -510,7 +503,6 @@ namespace BackendSite.Service.BLL
 
             var serverInfoList = _serverInfoBll.GetSiteList();
             var siteNameDict = serverInfoList.ToDictionary(y => y.SiteId, y => y.SiteName);
-            var distinctCustIds = result.Select(y => y.CustId).Distinct().ToList();
             var runningList = result.Where(x => x.ClaimStatus == (int)BonusStatus.Running).ToList();
             var cancelList = result.Where(x => x.ClaimStatus is (int)BonusStatus.Canceled or (int)BonusStatus.Expiry).ToList();
             var fulfillList = result.Where(x => x.ClaimStatus == (int)BonusStatus.Fulfill).ToList();
@@ -544,8 +536,8 @@ namespace BackendSite.Service.BLL
                                   OtherPlatformCount = otherPlatformList.Count(y => y.BonusCode == x.Key.BonusCode),
                                   TotalClaimants = x.Count(),
                                   TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                                  TotalDeposit = distinctCustIds.Sum(custId => depositDict.TryGetValue(custId, out var deposit) ? deposit : 0),
-                                  TotalWithdrawal = distinctCustIds.Sum(custId => withdrawalDict.TryGetValue(custId, out var withdrawal) ? withdrawal : 0)
+                                  TotalDeposit = depositDict.Where(d => x.Select(y => y.CustId).Contains(d.Key)).Sum( v => v.Value),
+                                  TotalWithdrawal = withdrawalDict.Where(w => x.Select(y => y.CustId).Contains(w.Key)).Sum( v => v.Value)
                               };
                           }).ToList();
                     
@@ -601,8 +593,11 @@ namespace BackendSite.Service.BLL
                                    OtherPlatformCount = otherPlatformList.Count(y => y.RecordDate == x.Key.RecordDate && y.BonusCode == x.Key.BonusCode),
                                    TotalClaimants = x.Count(),
                                    TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                                   TotalDeposit = distinctCustIds.Sum(custId => depositDictByDate.TryGetValue(new { Date = x.Key.RecordDate, CustId = custId }, out var deposit) ? deposit : 0),
-                                   TotalWithdrawal = distinctCustIds.Sum(custId => withdrawalDictByDate.TryGetValue(new { Date = x.Key.RecordDate, CustId = custId }, out var withdrawal) ? withdrawal : 0)
+                                   TotalDeposit = x.Select(y => y.CustId).Distinct()
+                                       .Sum(custId => depositDictByDate.TryGetValue(new { Date = x.Key.RecordDate, CustId = custId }, out var deposit) ? deposit : 0),
+                                   TotalWithdrawal = x.Select(y => y.CustId).Distinct()
+                                       .Sum(custId => withdrawalDictByDate.TryGetValue(new { Date = x.Key.RecordDate, CustId = custId }, out var withdrawal) ? withdrawal : 0)
+                                   
                                };
                            }).ToList();
                             
@@ -658,8 +653,10 @@ namespace BackendSite.Service.BLL
                                    OtherPlatformCount = otherPlatformList.Count(y => y.RecordDate.Year == x.Key.Year && y.RecordDate.Month == x.Key.Month && y.BonusCode == x.Key.BonusCode),
                                    TotalClaimants = x.Count(),
                                    TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                                   TotalDeposit = distinctCustIds.Sum(custId => depositDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month, CustId = custId }, out var deposit) ? deposit : 0),
-                                   TotalWithdrawal = distinctCustIds.Sum(custId => withdrawalDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month, CustId = custId }, out var withdrawal) ? withdrawal : 0)
+                                   TotalDeposit = x.Select(y => y.CustId).Distinct()
+                                       .Sum(custId => depositDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month , CustId = custId }, out var deposit) ? deposit : 0),
+                                   TotalWithdrawal = x.Select(y => y.CustId).Distinct()
+                                       .Sum(custId => withdrawalDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month , CustId = custId }, out var withdrawal) ? withdrawal : 0)
                                };
                            }).ToList();
                     
@@ -800,8 +797,7 @@ namespace BackendSite.Service.BLL
             return ggrData;
         }
 
-        private async Task<List<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountDetailTask(
-            IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
+        private async Task<List<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountDetailTask(IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
         {
             var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(siteList, startDate.DateTime, endDate.DateTime).Result
                 .Where(x => multiSiteRequests.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId));
@@ -821,8 +817,7 @@ namespace BackendSite.Service.BLL
             return withData;
         }
 
-        private async Task<List<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryTask(
-            IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
+        private async Task<List<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryTask(IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
         {
             var depositDetails = _depositAmountService.GetDepositAmountSummaryAsync(siteList, startDate.DateTime, endDate.DateTime).Result
                 .Where(x => multiSiteRequests.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId));
