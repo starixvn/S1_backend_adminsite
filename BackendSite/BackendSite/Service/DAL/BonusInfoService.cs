@@ -122,7 +122,7 @@ namespace BackendSite.Service.DAL
             return (result, custId);
         }
         
-        public List<MpaBonusInfo> GetMpaBonusInfoList(
+        public async Task<List<MpaBonusInfo>> GetMpaBonusInfoList(
             string multiSiteRequests,
             string bonusStatuses,
             string bonusTypes,
@@ -136,18 +136,18 @@ namespace BackendSite.Service.DAL
             props.Add("_MultiSiteRequest", multiSiteRequests);
             props.Add("_Statuses", bonusStatuses);
             props.Add("_BonusTypes", bonusTypes);
-            props.Add("_BonusCode", bonusCode);
+            props.Add("_BonusCode", string.IsNullOrEmpty(bonusCode) ? null : bonusCode);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_ClaimStatuses", claimStatuses);
             props.Add("_TimeZone", timeZone);
 
-            var result = _reportDbClient.Query<MpaBonusInfo>("Admin_BonusSummaryInfo_Get_V3", props);
+            var result = await _reportDbClient.QueryAsync<MpaBonusInfo>("Admin_BonusSummaryInfo_Get_V3", props);
 
             return result.ToList();
         }
 
-        public List<MpaBonusGGR> GetMpaBonusGGRList(
+        public async Task<List<MpaBonusGGR>> GetMpaBonusGGRList(
             string multiSiteRequests,
             DateTime startDate,
             DateTime endDate,
@@ -159,7 +159,7 @@ namespace BackendSite.Service.DAL
             props.Add("_EndDate", endDate);
             props.Add("_TimeZone", timeZone);
 
-            var result = _reportDbClient.Query<MpaBonusGGR>("Admin_BonusSummaryGGR_Get_V2", props);
+            var result = await _reportDbClient.QueryAsync<MpaBonusGGR>("Admin_BonusSummaryGGR_Get_V2", props);
 
             return result.ToList();
         }
