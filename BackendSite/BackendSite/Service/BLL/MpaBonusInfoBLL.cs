@@ -44,7 +44,7 @@ namespace BackendSite.Service.BLL
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusInfoList:{input.GetRedisKey()}";
             var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
-            var cacheTime = TimeSpan.FromMinutes(15);
+            var cacheTime = TimeSpan.FromSeconds(1);
             
             if (_cacheHelper.KeyExists(masterKey))
             {
@@ -159,7 +159,7 @@ namespace BackendSite.Service.BLL
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusDetailList:{input.GetRedisKey()}";
             var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
-            var cacheTime = TimeSpan.FromMinutes(15);
+            var cacheTime = TimeSpan.FromSeconds(1);
 
             if (_cacheHelper.KeyExists(masterKey))
             {
@@ -195,8 +195,8 @@ namespace BackendSite.Service.BLL
             var data = _bonusInfoService.GetMpaBonusDetailList(
                 JsonConvert.SerializeObject(input.MultiSiteRequest),
                 input.BonusCode,
-                input.StartDate.DateTime,
-                input.EndDate.DateTime,
+                input.StartDate.UtcDateTime,
+                input.EndDate.UtcDateTime,
                 JsonConvert.SerializeObject(input.ClaimStatuses),
                 input.BaseCurrencyId,
                 input.TimeZone);
