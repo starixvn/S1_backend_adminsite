@@ -18,7 +18,7 @@ namespace BackendSite.Service.BLL
         private readonly AWSS3Helper _awsS3Helper;
         private readonly string _bucketName;
         private readonly string _folder;
-
+        private readonly Dictionary<int, string> _siteStoreImageUrl;
 
         public RedemptionBLL(IServiceProvider provider)
         {
@@ -29,6 +29,7 @@ namespace BackendSite.Service.BLL
             _folder = configBll.GetConfigValue("AWSStoreFolderName");
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
+            _siteStoreImageUrl = configBll.GetConfigValuesBySiteId<string>("StoreImageUrl");
         }
 
         public Task<ApiResult<object>> GetRedemptionListAsync(GetRedemptionListRequest req)
@@ -66,11 +67,22 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public Task<ApiResult<object>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
+        public async Task<ApiResult<GetRedemptionDetail>> GetRedemptionDetailAsync(GetRedemptionDetailRequest req)
         {
             var url = _storeSiteUrl + "Redemption/GetRedemptionDetail";
-            var result = _courierAdapter.PostAsync<ApiResult<object>, GetRedemptionDetailRequest>(url, req);
+            var result = _courierAdapter.MyPostAsync<GetRedemptionDetail, GetRedemptionDetailRequest>(url, req).Result;
+            var storeImageUrl = _siteStoreImageUrl[result.Data.SiteId];
+            List<string> NewReceiptUrls = new List<string>();
 
+            if (result.Data.ReceiptUrls is not null)
+            {
+                foreach (var item in result.Data.ReceiptUrls)
+                {
+                    NewReceiptUrls.Add($"{storeImageUrl}{item}");
+                }
+
+                result.Data.ReceiptUrls = NewReceiptUrls;
+            }
             return result;
         }
 
@@ -85,6 +97,14 @@ namespace BackendSite.Service.BLL
         public Task<ApiResult<object>> SetRedemptionInfoAsync(SetRedemptionInfoRequest req)
         {
             var url = _storeSiteUrl + "Redemption/SetRedemptionInfo";
+            var storeImageUrl = _siteStoreImageUrl[req.SiteId];
+            var newReceiptUrls = new List<string>();
+            foreach (var item in req.ReceiptUrls)
+            {
+                int count = (item.Length - item.Replace(storeImageUrl, "").Length) / storeImageUrl.Length;
+                newReceiptUrls.Add(item.Substring(count * storeImageUrl.Length));
+            }
+            req.ReceiptUrls = newReceiptUrls;
             var result = _courierAdapter.PostAsync<ApiResult<object>, SetRedemptionInfoRequest>(url, req);
 
             return result;
