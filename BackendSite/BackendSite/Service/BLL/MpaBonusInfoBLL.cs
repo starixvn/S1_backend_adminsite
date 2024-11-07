@@ -44,7 +44,7 @@ namespace BackendSite.Service.BLL
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusInfoList:{input.GetRedisKey()}";
             var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
-            var cacheTime = TimeSpan.FromSeconds(1);
+            var cacheTime = TimeSpan.FromMinutes(15);
             
             if (_cacheHelper.KeyExists(masterKey))
             {
@@ -159,7 +159,7 @@ namespace BackendSite.Service.BLL
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusDetailList:{input.GetRedisKey()}";
             var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
-            var cacheTime = TimeSpan.FromSeconds(1);
+            var cacheTime = TimeSpan.FromMinutes(15);
 
             if (_cacheHelper.KeyExists(masterKey))
             {

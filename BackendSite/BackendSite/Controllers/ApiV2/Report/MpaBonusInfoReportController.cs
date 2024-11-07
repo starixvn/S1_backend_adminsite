@@ -104,8 +104,6 @@ namespace BackendSite.Controllers.ApiV2.Report
             public string GetRedisKey()
             {
                 var jObject = JObject.Parse(JsonConvert.SerializeObject(this));
-                jObject[nameof(StartDate)] = StartDate.ToString("yyyyMMdd");
-                jObject[nameof(EndDate)] = EndDate.ToString("yyyyMMdd");
                 //移除排序跟分頁
                 jObject.Remove(nameof(PageSize));
                 jObject.Remove(nameof(PageNumber));
