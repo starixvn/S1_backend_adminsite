@@ -46,8 +46,7 @@ namespace BackendSite.Service.BLL
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusInfoList:{input.GetRedisKey()}";
             var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
-            var cacheTime = TimeSpan.FromSeconds(1);
-            //todo
+            var cacheTime = TimeSpan.FromMinutes(15);
             
             if (_cacheHelper.KeyExists(masterKey))
             {
@@ -216,7 +215,7 @@ namespace BackendSite.Service.BLL
             }
 
             var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
-            return list.GetRange(index, count);
+            return list.AsEnumerable().GetRange(index, count);
         }
 
         #endregion
@@ -435,21 +434,21 @@ namespace BackendSite.Service.BLL
             var getMpaBonusInfoListTask = Task.Run(() => GetMpaBonusInfoListTask(
                 JsonConvert.SerializeObject(multiSiteRequests),
                 bonusStatuses, bonusTypes, bonusCode,
-                startDate.DateTime, endDate.DateTime,
+                startDate.UtcDateTime, endDate.UtcDateTime,
                 claimStatuses, baseCurrencyId, timeZone)
             );
 
             var mpaBonusGgrListTask = Task.Run(() => GetMpaBonusGGRListTask(
                 JsonConvert.SerializeObject(multiSiteRequests),
-                startDate.DateTime, endDate.DateTime,
+                startDate.UtcDateTime, endDate.UtcDateTime,
                 baseCurrencyId, timeZone));
 
             var siteList = multiSiteRequests.Select(x => x.SiteId).Distinct();
             var withdrawalAmountSummaryTask = Task.Run(() => GetWithdrawalAmountDetailTask(
-                multiSiteRequests, JsonConvert.SerializeObject(siteList), startDate, endDate, baseCurrencyId));
+                multiSiteRequests, JsonConvert.SerializeObject(siteList), startDate.UtcDateTime, endDate.UtcDateTime, baseCurrencyId));
 
             var depositAmountSummaryTask = Task.Run(() => GetDepositAmountSummaryTask(
-                multiSiteRequests, JsonConvert.SerializeObject(siteList), startDate, endDate, baseCurrencyId));
+                multiSiteRequests, JsonConvert.SerializeObject(siteList), startDate.UtcDateTime, endDate.UtcDateTime, baseCurrencyId));
 
             await Task.WhenAll(getMpaBonusInfoListTask, mpaBonusGgrListTask, withdrawalAmountSummaryTask, depositAmountSummaryTask);
 
@@ -498,8 +497,6 @@ namespace BackendSite.Service.BLL
 
             var serverInfoList = _serverInfoBll.GetSiteList();
             var siteNameDict = serverInfoList.ToDictionary(y => y.SiteId, y => y.SiteName);
-            
-            _logger.LogInformation($"Step for BonusGroupByType GroupBy Start !");
             
             switch (groupByType)
             {
@@ -623,8 +620,6 @@ namespace BackendSite.Service.BLL
                     
                     break;
             }
-
-            _logger.LogInformation($"Step for BonusGroupByType GroupBy END !");
             
             return result;
         }
@@ -652,7 +647,7 @@ namespace BackendSite.Service.BLL
                 .ToDictionary(g => g.Key, g => g.Count());
         }
         
-        public DateTimeOffset GetEndDate(DateTimeOffset EndDate)
+        private DateTimeOffset GetEndDate(DateTimeOffset EndDate)
         {
             //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
             var endDate = EndDate.AddMonths(1).AddDays(EndDate.AddMonths(1).Day);
@@ -670,7 +665,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.RecordDate, item.CurrencyId, baseCurrencyId);
-                item.BonusAmountClaim = item.BonusAmountClaim * rate;
+                item.BonusAmountClaim *= rate;
             }
         }
 
@@ -685,7 +680,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
-                item.BonusAmountClaim = item.BonusAmountClaim * rate;
+                item.BonusAmountClaim *= rate;
             }
         }
 
@@ -700,7 +695,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.RecordDate, item.CurrencyId, baseCurrencyId);
-                item.GGR = item.GGR * rate;
+                item.GGR *= rate;
             }
         }
 
@@ -744,9 +739,9 @@ namespace BackendSite.Service.BLL
             return ggrData;
         }
 
-        private async Task<List<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountDetailTask(IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
+        private async Task<List<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountDetailTask(IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTime startDate, DateTime endDate, int baseCurrencyId)
         {
-            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(siteList, startDate.DateTime, endDate.DateTime).Result
+            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(siteList, startDate, endDate).Result
                 .Where(x => multiSiteRequests.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId));
             var withData = withDetails.GroupBy(x => new { x.Date, x.CustId, x.CurrencyId })
                 .Select(x => new MpaMarketingWithdrawalAmountSummaryDto
@@ -758,15 +753,15 @@ namespace BackendSite.Service.BLL
                 }).ToList();
             if (baseCurrencyId != 0)
             {
-                _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(withData, startDate, GetEndDate(endDate), baseCurrencyId);
+                await _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(withData, startDate, GetEndDate(endDate), baseCurrencyId);
             }
 
             return withData;
         }
 
-        private async Task<List<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryTask(IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
+        private async Task<List<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryTask(IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTime startDate, DateTime endDate, int baseCurrencyId)
         {
-            var depositDetails = _depositAmountService.GetDepositAmountSummaryAsync(siteList, startDate.DateTime, endDate.DateTime).Result
+            var depositDetails = _depositAmountService.GetDepositAmountSummaryAsync(siteList, startDate, endDate).Result
                 .Where(x => multiSiteRequests.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId));
             var depositData = depositDetails.GroupBy(x => new { x.Date, x.CustId, x.CurrencyId })
                 .Select(x => new MpaMarketingDepositAmountSummaryDto
@@ -779,7 +774,7 @@ namespace BackendSite.Service.BLL
 
             if (baseCurrencyId != 0)
             {
-                _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(depositData, startDate, GetEndDate(endDate), baseCurrencyId);
+                await _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(depositData, startDate, GetEndDate(endDate), baseCurrencyId);
             }
             return depositData;
         }

@@ -141,7 +141,7 @@ namespace BackendSite.Service.DAL
             props.Add("_MultiSiteRequest", multiSiteRequests);
             props.Add("_Statuses", bonusStatuses);
             props.Add("_BonusTypes", bonusTypes);
-            props.Add("_BonusCode", bonusCode);
+            props.Add("_BonusCode", string.IsNullOrEmpty(bonusCode) ? null : bonusCode);
             props.Add("_StartDate", startDate);
             props.Add("_EndDate", endDate);
             props.Add("_ClaimStatuses", claimStatuses);
