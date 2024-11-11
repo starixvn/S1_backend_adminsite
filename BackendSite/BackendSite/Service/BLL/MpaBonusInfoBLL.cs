@@ -8,7 +8,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Mpa.Marketing;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -40,15 +39,13 @@ namespace BackendSite.Service.BLL
 
         #region MpaBonusInfo
 
-        public IEnumerable<MpaBonusInfo> GetMpaBonusInfoList(
-            MpaBonusInfoReportController.GetDataRequest input,
-            out IPageInfo pageInfo)
+        public IEnumerable<MpaBonusInfo> GetMpaBonusInfoList(MpaBonusInfoReportController.GetDataRequest input, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusInfoList:{input.GetRedisKey()}";
             var sortKey = $"{masterKey}:{input.OrderByProperty}:{input.OrderByDirection}";
-            var cacheTime = TimeSpan.FromSeconds(1);
-
+            var cacheTime = TimeSpan.FromMinutes(15);
+            
             if (_cacheHelper.KeyExists(masterKey))
             {
                 //Sort
@@ -104,7 +101,7 @@ namespace BackendSite.Service.BLL
             }
 
             var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
-            return list.GetRange(index, count);
+            return list.AsEnumerable().GetRange(index, count);
         }
 
         public MpaBonusInfoSummary GetMpaBonusInfoListSummary(MpaBonusInfoReportController.GetDataRequest input)
@@ -157,9 +154,7 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        public IEnumerable<MpaBonusDetail> GetMpaBonusDetailList(
-            MpaBonusInfoReportController.GetDetailRequest input,
-            out IPageInfo pageInfo)
+        public IEnumerable<MpaBonusDetail> GetMpaBonusDetailList(MpaBonusInfoReportController.GetDetailRequest input, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var masterKey = $"MpaBonusDetailList:{input.GetRedisKey()}";
@@ -200,8 +195,8 @@ namespace BackendSite.Service.BLL
             var data = _bonusInfoService.GetMpaBonusDetailList(
                 JsonConvert.SerializeObject(input.MultiSiteRequest),
                 input.BonusCode,
-                input.StartDate.DateTime,
-                input.EndDate.DateTime,
+                input.StartDate.UtcDateTime,
+                input.EndDate.UtcDateTime,
                 JsonConvert.SerializeObject(input.ClaimStatuses),
                 input.BaseCurrencyId,
                 input.TimeZone);
@@ -218,15 +213,14 @@ namespace BackendSite.Service.BLL
             }
 
             var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
-            return list.GetRange(index, count);
+            return list.AsEnumerable().GetRange(index, count);
         }
 
         #endregion
 
         #region MpaMarketingBonus
 
-        public IEnumerable<MpaMarketingBonusInfo> GetMpaMarketingBonus(IEnumerable<MultiSiteRequestDto> multiSiteRequest,
-            MpaBonusInfoReportController.GetMarketingDataRequest input)
+        public IEnumerable<MpaMarketingBonusInfo> GetMpaMarketingBonus(IEnumerable<MultiSiteRequestDto> multiSiteRequest, MpaBonusInfoReportController.GetMarketingDataRequest input)
         {
             var key = $"MpaMarketingBonus:{JsonConvert.SerializeObject(multiSiteRequest)}:" +
                       $"{input.StartDate.DateTime:yyyyMMddHHmmssfff}:" +
@@ -356,15 +350,13 @@ namespace BackendSite.Service.BLL
                     GroupByCurrencySum = groupByCurrencySum,
                     GroupByBonusCode = list,
                     GroupByBonusCodeSum = groupByBonusCodeSum,
-                    TotalBonusClaimants = originData.Where(x => x.SiteId == site).Count()
+                    TotalBonusClaimants = originData.Count(x => x.SiteId == site)
                 });
             }
             return result;
         }
 
-        public IEnumerable<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(
-            MpaBonusInfoReportController.GetMarketingDetailRequest input,
-            out IPageInfo pageInfo)
+        public IEnumerable<MpaMarketingBonusDetail> GetMpaMarketingBonusDetail(MpaBonusInfoReportController.GetMarketingDetailRequest input, out IPageInfo pageInfo)
         {
             pageInfo = new PageInfo();
             var masterKey = $"MpaMarketingBonusDetail:{input.GetRedisKey()}";
@@ -421,7 +413,7 @@ namespace BackendSite.Service.BLL
             }
 
             var (index, count) = pageInfo.ListPagination(list.Count(), input.PageNumber, input.PageSize);
-            return list.GetRange(index, count);
+            return list.AsEnumerable().GetRange(index, count);
         }
 
         #endregion
@@ -440,26 +432,26 @@ namespace BackendSite.Service.BLL
             var getMpaBonusInfoListTask = Task.Run(() => GetMpaBonusInfoListTask(
                 JsonConvert.SerializeObject(multiSiteRequests),
                 bonusStatuses, bonusTypes, bonusCode,
-                startDate.DateTime, endDate.DateTime,
+                startDate.UtcDateTime, endDate.UtcDateTime,
                 claimStatuses, baseCurrencyId, timeZone)
             );
 
             var mpaBonusGgrListTask = Task.Run(() => GetMpaBonusGGRListTask(
                 JsonConvert.SerializeObject(multiSiteRequests),
-                startDate.DateTime, endDate.DateTime,
+                startDate.UtcDateTime, endDate.UtcDateTime,
                 baseCurrencyId, timeZone));
 
             var siteList = multiSiteRequests.Select(x => x.SiteId).Distinct();
             var withdrawalAmountSummaryTask = Task.Run(() => GetWithdrawalAmountDetailTask(
-                multiSiteRequests, JsonConvert.SerializeObject(siteList), startDate, endDate, baseCurrencyId));
+                multiSiteRequests, JsonConvert.SerializeObject(siteList), startDate.UtcDateTime, endDate.UtcDateTime, baseCurrencyId));
 
             var depositAmountSummaryTask = Task.Run(() => GetDepositAmountSummaryTask(
-                multiSiteRequests, JsonConvert.SerializeObject(siteList), startDate, endDate, baseCurrencyId));
+                multiSiteRequests, JsonConvert.SerializeObject(siteList), startDate.UtcDateTime, endDate.UtcDateTime, baseCurrencyId));
 
             await Task.WhenAll(getMpaBonusInfoListTask, mpaBonusGgrListTask, withdrawalAmountSummaryTask, depositAmountSummaryTask);
 
             var data = getMpaBonusInfoListTask.Result;
-
+            
             #endregion
 
             #region GGR
@@ -487,13 +479,14 @@ namespace BackendSite.Service.BLL
                         StartTime = dg.d.StartTime,
                         EndTime = dg.d.EndTime,
                         BonusStatus = dg.d.BonusStatus,
+                        ClaimStatus = dg.d.ClaimStatus,
                         BonusAmountClaim = dg.d.BonusAmountClaim,
                         GGR = g?.GGR ?? 0
                     })
                 .ToList();
 
             #endregion
-
+            
             #region Payment
 
             var withData = withdrawalAmountSummaryTask.Result;
@@ -502,92 +495,131 @@ namespace BackendSite.Service.BLL
             #endregion
 
             var serverInfoList = _serverInfoBll.GetSiteList();
-
+            var siteNameDict = serverInfoList.ToDictionary(y => y.SiteId, y => y.SiteName);
+            
             switch (groupByType)
             {
                 case BonusGroupByType.BonusCode:
-
+                    
+                    var depositDict = depositData.GroupBy(d => d.CustId).ToDictionary(g => g.Key, g => g.Sum(d => d.DepositAmount));
+                    var withdrawalDict = withData.GroupBy(w => w.CustId).ToDictionary(g => g.Key, g => g.Sum(w => w.WithdrawalAmount));
+                    var runningCountDictByBonusCode = GetClaimCountByGroup(result, x => x.BonusCode, x => x.ClaimStatus == (int)BonusStatus.Running);
+                    var cancelCountDictByBonusCode = GetClaimCountByGroup(result, x => x.BonusCode, x => x.ClaimStatus is (int)BonusStatus.Canceled or (int)BonusStatus.Expiry);
+                    var fulfillCountDictByBonusCode = GetClaimCountByGroup(result, x => x.BonusCode, x => x.ClaimStatus == (int)BonusStatus.Fulfill);
+                    var otherPlatformCountDictByBonusCode = GetClaimCountByGroup(result, x => x.BonusCode, x => x.ClaimStatus == 5);
+                    
                     result = result.GroupBy(x => new { x.SiteId, x.BonusCode, x.BonusName, x.BonusType, x.TypeName, x.StartTime, x.EndTime, x.BonusStatus })
-                        .Select(x => new MpaBonusInfo
-                        {
-                            SiteId = x.Key.SiteId,
-                            SiteName = serverInfoList.FirstOrDefault(y => y.SiteId == x.Key.SiteId).SiteName,
-                            BonusCode = x.Key.BonusCode,
-                            BonusName = x.Key.BonusName,
-                            BonusType = x.Key.BonusType,
-                            TypeName = x.Key.TypeName,
-                            StartTime = x.Key.StartTime,
-                            EndTime = x.Key.EndTime,
-                            BonusStatus = x.Key.BonusStatus,
-                            GGR = x.Sum(y => y.GGR),
-                            RunningCount = result.Count(x => x.ClaimStatus == (int)BonusStatus.Running),
-                            CancelCount = result.Count(x => x.ClaimStatus is (int)BonusStatus.Canceled or (int)BonusStatus.Expiry),
-                            FulFillCount = result.Count(x => x.ClaimStatus == (int)BonusStatus.Fulfill),
-                            OtherPlatformCount = result.Count(x => x.ClaimStatus == 5),
-                            TotalClaimants = result.Count(y => y.BonusCode == x.Key.BonusCode),
-                            TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                            TotalDeposit = depositData.Where(a => x.Select(y => y.CustId).Distinct().Contains(a.CustId)).Sum(b => b.DepositAmount),
-                            TotalWithdrawal = withData.Where(a => x.Select(y => y.CustId).Distinct().Contains(a.CustId)).Sum(b => b.WithdrawalAmount)
-                        }).ToList();
-
+                          .Select(x => 
+                          { 
+                              var distinctCustIds = x.Select(y => y.CustId).ToHashSet();
+                              
+                              return new MpaBonusInfo
+                              {
+                                  SiteId = x.Key.SiteId,
+                                  SiteName = siteNameDict.TryGetValue(x.Key.SiteId, out var siteName) ? siteName : string.Empty,
+                                  BonusCode = x.Key.BonusCode,
+                                  BonusName = x.Key.BonusName,
+                                  BonusType = x.Key.BonusType,
+                                  TypeName = x.Key.TypeName,
+                                  StartTime = x.Key.StartTime,
+                                  EndTime = x.Key.EndTime,
+                                  BonusStatus = x.Key.BonusStatus,
+                                  GGR = x.Sum(y => y.GGR),
+                                  RunningCount = runningCountDictByBonusCode.TryGetValue(x.Key.BonusCode, out var runningCount) ? runningCount : 0,
+                                  CancelCount = cancelCountDictByBonusCode.TryGetValue(x.Key.BonusCode, out var cancelCount) ? cancelCount : 0,
+                                  FulFillCount = fulfillCountDictByBonusCode.TryGetValue(x.Key.BonusCode, out var fulfillCount) ? fulfillCount : 0,
+                                  OtherPlatformCount = otherPlatformCountDictByBonusCode.TryGetValue(x.Key.BonusCode, out var otherPlatformCount) ? otherPlatformCount : 0,
+                                  TotalClaimants = x.Count(),
+                                  TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
+                                  TotalDeposit = distinctCustIds.Sum(custId => depositDict.TryGetValue(custId, out var deposit) ? deposit : 0),
+                                  TotalWithdrawal = distinctCustIds.Sum(custId => withdrawalDict.TryGetValue(custId, out var withdrawal) ? withdrawal : 0)
+                              };
+                          }).ToList();
+                    
                     break;
 
                 case BonusGroupByType.Date:
-
+                    
+                    var depositDictByDate = depositData.GroupBy(d => new { d.Date.Date, d.CustId }).ToDictionary(g => g.Key, g => g.Sum(d => d.DepositAmount));
+                    var withdrawalDictByDate = withData.GroupBy(w => new { w.Date.Date, w.CustId }).ToDictionary(g => g.Key, g => g.Sum(w => w.WithdrawalAmount));
+                    var runningCountDictByDate = GetClaimCountByGroup(result, x => new { x.RecordDate, x.BonusCode }, x => x.ClaimStatus == (int)BonusStatus.Running);
+                    var cancelCountDictByDate = GetClaimCountByGroup(result, x => new { x.RecordDate, x.BonusCode }, x => x.ClaimStatus is (int)BonusStatus.Canceled or (int)BonusStatus.Expiry);
+                    var fulfillCountDictByDate = GetClaimCountByGroup(result, x => new { x.RecordDate, x.BonusCode }, x => x.ClaimStatus == (int)BonusStatus.Fulfill);
+                    var otherPlatformCountDictByDate = GetClaimCountByGroup(result, x => new { x.RecordDate, x.BonusCode }, x => x.ClaimStatus == 5);
+                    
                     result = result.GroupBy(x => new { x.SiteId, x.RecordDate, x.BonusCode, x.BonusName, x.BonusType, x.TypeName, x.StartTime, x.EndTime, x.BonusStatus })
-                        .Select(x => new MpaBonusInfo
-                        {
-                            SiteId = x.Key.SiteId,
-                            SiteName = serverInfoList.FirstOrDefault(y => y.SiteId == x.Key.SiteId).SiteName,
-                            RecordDate = x.Key.RecordDate,
-                            BonusCode = x.Key.BonusCode,
-                            BonusName = x.Key.BonusName,
-                            BonusType = x.Key.BonusType,
-                            TypeName = x.Key.TypeName,
-                            StartTime = x.Key.StartTime,
-                            EndTime = x.Key.EndTime,
-                            BonusStatus = x.Key.BonusStatus,
-                            GGR = x.Sum(y => y.GGR),
-                            RunningCount = result.Count(y => y.ClaimStatus == (int)BonusStatus.Running && y.RecordDate == x.Key.RecordDate),
-                            CancelCount = result.Count(y => y.ClaimStatus is (int)BonusStatus.Canceled or (int)BonusStatus.Expiry && y.RecordDate == x.Key.RecordDate),
-                            FulFillCount = result.Count(y => y.ClaimStatus == (int)BonusStatus.Fulfill && y.RecordDate == x.Key.RecordDate),
-                            OtherPlatformCount = result.Count(y => y.ClaimStatus == 5 && y.RecordDate == x.Key.RecordDate),
-                            TotalClaimants = result.Count(y => y.BonusCode == x.Key.BonusCode && y.RecordDate == x.Key.RecordDate),
-                            TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                            TotalDeposit = depositData.Where(b => x.Key.RecordDate == b.Date.Date).Where(a => x.Select(y => y.CustId).Distinct().Contains(a.CustId)).Sum(b => b.DepositAmount),
-                            TotalWithdrawal = withData.Where(b => x.Key.RecordDate == b.Date.Date).Where(a => x.Select(y => y.CustId).Distinct().Contains(a.CustId)).Sum(b => b.WithdrawalAmount)
-                        }).ToList();
+                           .Select(x => 
+                           {
+                               var distinctCustIds = x.Select(y => y.CustId).ToHashSet();
+                               
+                               return new MpaBonusInfo
+                               {
+                                   SiteId = x.Key.SiteId,
+                                   SiteName = siteNameDict.TryGetValue(x.Key.SiteId, out var siteName) ? siteName : string.Empty,
+                                   RecordDate = x.Key.RecordDate,
+                                   BonusCode = x.Key.BonusCode,
+                                   BonusName = x.Key.BonusName,
+                                   BonusType = x.Key.BonusType,
+                                   TypeName = x.Key.TypeName,
+                                   StartTime = x.Key.StartTime,
+                                   EndTime = x.Key.EndTime,
+                                   BonusStatus = x.Key.BonusStatus,
+                                   GGR = x.Sum(y => y.GGR),
+                                   RunningCount = runningCountDictByDate.TryGetValue(new { x.Key.RecordDate, x.Key.BonusCode }, out var runningCount) ? runningCount : 0,
+                                   CancelCount = cancelCountDictByDate.TryGetValue(new { x.Key.RecordDate, x.Key.BonusCode }, out var cancelCount) ? cancelCount : 0,
+                                   FulFillCount = fulfillCountDictByDate.TryGetValue(new { x.Key.RecordDate, x.Key.BonusCode }, out var fulfillCount) ? fulfillCount : 0,
+                                   OtherPlatformCount = otherPlatformCountDictByDate.TryGetValue(new { x.Key.RecordDate, x.Key.BonusCode }, out var otherPlatformCount) ? otherPlatformCount : 0,
+                                   TotalClaimants = x.Count(),
+                                   TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
+                                   TotalDeposit = distinctCustIds.Sum(custId => depositDictByDate.TryGetValue(new { Date = x.Key.RecordDate, CustId = custId }, out var deposit) ? deposit : 0),
+                                   TotalWithdrawal = distinctCustIds.Sum(custId => withdrawalDictByDate.TryGetValue(new { Date = x.Key.RecordDate, CustId = custId }, out var withdrawal) ? withdrawal : 0)
+                                   
+                               };
+                           }).ToList();
+                    
                     break;
 
                 case BonusGroupByType.Month:
-
+                    
+                    var depositDictByMonth = depositData.GroupBy(d => new { d.Date.Year, d.Date.Month, d.CustId }).ToDictionary(g => g.Key, g => g.Sum(d => d.DepositAmount));
+                    var withdrawalDictByMonth = withData.GroupBy(w => new { w.Date.Year, w.Date.Month, w.CustId }).ToDictionary(g => g.Key, g => g.Sum(w => w.WithdrawalAmount));
+                    var runningCountDictByMonth = GetClaimCountByGroup(result, x => new { x.RecordDate.Year, x.RecordDate.Month, x.BonusCode }, x => x.ClaimStatus == (int)BonusStatus.Running);
+                    var cancelCountDictByMonth = GetClaimCountByGroup(result, x => new { x.RecordDate.Year, x.RecordDate.Month, x.BonusCode }, x => x.ClaimStatus is (int)BonusStatus.Canceled or (int)BonusStatus.Expiry);
+                    var fulfillCountDictByMonth = GetClaimCountByGroup(result, x => new { x.RecordDate.Year, x.RecordDate.Month, x.BonusCode }, x => x.ClaimStatus == (int)BonusStatus.Fulfill);
+                    var otherPlatformCountDictByMonth = GetClaimCountByGroup(result, x => new { x.RecordDate.Year, x.RecordDate.Month, x.BonusCode }, x => x.ClaimStatus == 5);
+                    
                     result = result.GroupBy(x => new { x.SiteId, x.RecordDate.Year, x.RecordDate.Month, x.BonusCode, x.BonusName, x.BonusType, x.TypeName, x.StartTime, x.EndTime, x.BonusStatus })
-                        .Select(x => new MpaBonusInfo
-                        {
-                            SiteId = x.Key.SiteId,
-                            SiteName = serverInfoList.FirstOrDefault(y => y.SiteId == x.Key.SiteId).SiteName,
-                            RecordDate = new DateTime(x.Key.Year, x.Key.Month, 1),
-                            BonusCode = x.Key.BonusCode,
-                            BonusName = x.Key.BonusName,
-                            BonusType = x.Key.BonusType,
-                            TypeName = x.Key.TypeName,
-                            StartTime = x.Key.StartTime,
-                            EndTime = x.Key.EndTime,
-                            BonusStatus = x.Key.BonusStatus,
-                            GGR = x.Sum(y => y.GGR),
-                            RunningCount = result.Count(y => y.ClaimStatus == (int)BonusStatus.Running && y.RecordDate.Year == x.Key.Year && y.RecordDate.Month == x.Key.Month),
-                            CancelCount = result.Count(y => y.ClaimStatus is (int)BonusStatus.Canceled or (int)BonusStatus.Expiry && y.RecordDate.Year == x.Key.Year && y.RecordDate.Month == x.Key.Month),
-                            FulFillCount = result.Count(y => y.ClaimStatus == (int)BonusStatus.Fulfill && y.RecordDate.Year == x.Key.Year && y.RecordDate.Month == x.Key.Month),
-                            OtherPlatformCount = result.Count(y => y.ClaimStatus == 5 && y.RecordDate.Year == x.Key.Year && y.RecordDate.Month == x.Key.Month),
-                            TotalClaimants = result.Count(y => y.BonusCode == x.Key.BonusCode && y.RecordDate.Year == x.Key.Year && y.RecordDate.Month == x.Key.Month),
-                            TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
-                            TotalDeposit = depositData.Where(b => new DateTime(x.Key.Year, x.Key.Month, 1) == new DateTime(b.Date.Year, b.Date.Month, 1)).Where(a => x.Select(y => y.CustId).Distinct().Contains(a.CustId)).Sum(b => b.DepositAmount),
-                            TotalWithdrawal = withData.Where(b => new DateTime(x.Key.Year, x.Key.Month, 1) == new DateTime(b.Date.Year, b.Date.Month, 1)).Where(a => x.Select(y => y.CustId).Distinct().Contains(a.CustId)).Sum(b => b.WithdrawalAmount)
-                        }).ToList();
-
+                           .Select(x => 
+                           {
+                               var distinctCustIds = x.Select(y => y.CustId).ToHashSet();
+                               
+                               return new MpaBonusInfo
+                               {
+                                   SiteId = x.Key.SiteId,
+                                   SiteName = siteNameDict.TryGetValue(x.Key.SiteId, out var siteName) ? siteName : string.Empty,
+                                   RecordDate = new DateTime(x.Key.Year, x.Key.Month, 1),
+                                   BonusCode = x.Key.BonusCode,
+                                   BonusName = x.Key.BonusName,
+                                   BonusType = x.Key.BonusType,
+                                   TypeName = x.Key.TypeName,
+                                   StartTime = x.Key.StartTime,
+                                   EndTime = x.Key.EndTime,
+                                   BonusStatus = x.Key.BonusStatus,
+                                   GGR = x.Sum(y => y.GGR),
+                                   RunningCount = runningCountDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month, x.Key.BonusCode }, out var runningCount) ? runningCount : 0,
+                                   CancelCount = cancelCountDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month, x.Key.BonusCode }, out var cancelCount) ? cancelCount : 0,
+                                   FulFillCount = fulfillCountDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month, x.Key.BonusCode }, out var fulfillCount) ? fulfillCount : 0,
+                                   OtherPlatformCount = otherPlatformCountDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month, x.Key.BonusCode }, out var otherPlatformCount) ? otherPlatformCount : 0,
+                                   TotalClaimants = x.Count(),
+                                   TotalClaimedAmount = x.Sum(y => y.BonusAmountClaim),
+                                   TotalDeposit = distinctCustIds.Sum(custId => depositDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month, CustId = custId }, out var deposit) ? deposit : 0),
+                                   TotalWithdrawal = distinctCustIds.Sum(custId => withdrawalDictByMonth.TryGetValue(new { x.Key.Year, x.Key.Month, CustId = custId }, out var withdrawal) ? withdrawal : 0)
+                               };
+                           }).ToList();
+                    
                     break;
             }
-
+            
             return result;
         }
 
@@ -604,7 +636,17 @@ namespace BackendSite.Service.BLL
             });
         }
 
-        public DateTimeOffset GetEndDate(DateTimeOffset EndDate)
+        private Dictionary<TKey, int> GetClaimCountByGroup<TSource, TKey>(
+            IEnumerable<TSource> data,
+            Func<TSource, TKey> groupKeySelector,
+            Func<TSource, bool> statusPredicate)
+        {
+            return data.Where(statusPredicate)
+                .GroupBy(groupKeySelector)
+                .ToDictionary(g => g.Key, g => g.Count());
+        }
+        
+        private DateTimeOffset GetEndDate(DateTimeOffset EndDate)
         {
             //因為過去日期要查月底最後天，假設今天 12/1 去查  11/1 ~ 11/18 的資料，一律用 11/30的匯率 
             var endDate = EndDate.AddMonths(1).AddDays(EndDate.AddMonths(1).Day);
@@ -622,7 +664,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.RecordDate, item.CurrencyId, baseCurrencyId);
-                item.BonusAmountClaim = item.BonusAmountClaim * rate;
+                item.BonusAmountClaim *= rate;
             }
         }
 
@@ -637,7 +679,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.Date, item.CurrencyId, baseCurrencyId);
-                item.BonusAmountClaim = item.BonusAmountClaim * rate;
+                item.BonusAmountClaim *= rate;
             }
         }
 
@@ -652,7 +694,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in source)
             {
                 var rate = _mapMpaCommonService.MapperExchangeRate(rateList, item.RecordDate, item.CurrencyId, baseCurrencyId);
-                item.GGR = item.GGR * rate;
+                item.GGR *= rate;
             }
         }
 
@@ -662,7 +704,7 @@ namespace BackendSite.Service.BLL
             DateTime startDate, DateTime endDate,
             string claimStatuses, int baseCurrencyId, string timeZone)
         {
-            var data = _bonusInfoService.GetMpaBonusInfoList(
+            var data = await _bonusInfoService.GetMpaBonusInfoList(
                 multiSiteRequests,
                 bonusStatuses, bonusTypes, bonusCode,
                 startDate, endDate,
@@ -680,7 +722,7 @@ namespace BackendSite.Service.BLL
             DateTime startDate, DateTime endDate,
             int baseCurrencyId, string timeZone)
         {
-            var ggrData = _bonusInfoService.GetMpaBonusGGRList(multiSiteRequests, startDate, endDate, timeZone);
+            var ggrData = await _bonusInfoService.GetMpaBonusGGRList(multiSiteRequests, startDate, endDate, timeZone);
             if (baseCurrencyId != 0)
             {
                 MultiplyExchangeRateGGRSummary(ggrData, startDate, GetEndDate(endDate), baseCurrencyId).Wait();
@@ -696,10 +738,9 @@ namespace BackendSite.Service.BLL
             return ggrData;
         }
 
-        private async Task<List<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountDetailTask(
-            IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
+        private async Task<List<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountDetailTask(IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTime startDate, DateTime endDate, int baseCurrencyId)
         {
-            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(siteList, startDate.DateTime, endDate.DateTime).Result
+            var withDetails = _withdrawalAmountService.GetWithdrawalAmountDetailAsync(siteList, startDate, endDate).Result
                 .Where(x => multiSiteRequests.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId));
             var withData = withDetails.GroupBy(x => new { x.Date, x.CustId, x.CurrencyId })
                 .Select(x => new MpaMarketingWithdrawalAmountSummaryDto
@@ -711,16 +752,15 @@ namespace BackendSite.Service.BLL
                 }).ToList();
             if (baseCurrencyId != 0)
             {
-                _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(withData, startDate, GetEndDate(endDate), baseCurrencyId);
+                await _mpaMarketingWithdrawalAmountBll.MultiplyExchangeRate(withData, startDate, GetEndDate(endDate), baseCurrencyId);
             }
 
             return withData;
         }
 
-        private async Task<List<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryTask(
-            IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTimeOffset startDate, DateTimeOffset endDate, int baseCurrencyId)
+        private async Task<List<MpaMarketingDepositAmountSummaryDto>> GetDepositAmountSummaryTask(IEnumerable<MultiSiteRequestDto> multiSiteRequests, string siteList, DateTime startDate, DateTime endDate, int baseCurrencyId)
         {
-            var depositDetails = _depositAmountService.GetDepositAmountSummaryAsync(siteList, startDate.DateTime, endDate.DateTime).Result
+            var depositDetails = _depositAmountService.GetDepositAmountSummaryAsync(siteList, startDate, endDate).Result
                 .Where(x => multiSiteRequests.Any(y => x.SiteId == y.SiteId && x.CurrencyId == y.CurrencyId));
             var depositData = depositDetails.GroupBy(x => new { x.Date, x.CustId, x.CurrencyId })
                 .Select(x => new MpaMarketingDepositAmountSummaryDto
@@ -733,7 +773,7 @@ namespace BackendSite.Service.BLL
 
             if (baseCurrencyId != 0)
             {
-                _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(depositData, startDate, GetEndDate(endDate), baseCurrencyId);
+                await _mpaMarketingDepositAmountBll.MultiplyExchangeRateAmountSummary(depositData, startDate, GetEndDate(endDate), baseCurrencyId);
             }
             return depositData;
         }
