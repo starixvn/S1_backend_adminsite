@@ -253,6 +253,54 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
+        public async Task<ApiResult<GetStickerCountResponse>> GetStickerCount(GetStickerCountRequest request)
+        {
+            var apiResult = new ApiResult<GetStickerCountResponse>();
+            try
+            {
+                var result = await _eventBll.GetStickerCount(request);
+                
+                apiResult.Data = result;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 3 })]
+        public async Task<ApiResult> SetStickerCount(SetStickerCountRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var result = await _eventBll.SetStickerCount(request) > 0;
+                
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
         public async Task<ApiResult<LotteryMaintainModel>> GetLotteryMaintainAsync()
         {
             var apiResult = new ApiResult<LotteryMaintainModel>();

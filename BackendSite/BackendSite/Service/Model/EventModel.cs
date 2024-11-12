@@ -110,8 +110,23 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public decimal StickerPrize { get; set; }
-        public int StickerCount { get; set; }
         public decimal TurnOver { get; set; }
+    }
+    
+    public class GetStickerCountRequest
+    {
+        public int SiteId { get; set; }
+    }
+    
+    public class GetStickerCountResponse
+    {
+        public int StickerCount { get; set; }
+    }
+    
+    public class SetStickerCountRequest
+    {
+        public int SiteId { get; set; }
+        public int StickerCount { get; set; }
     }
     
     public class RaffleTicketStickerResponse

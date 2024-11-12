@@ -50,6 +50,8 @@ namespace BackendSite.Service.DAL.Interface
         public LotteryTicketHistory GetLotteryTicketHistory(int siteId, int roundId);
         public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(int siteId);
         public Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request, string updator);
+        public Task<GetStickerCountResponse> GetStickerCount(GetStickerCountRequest request);
+        public Task<int> SetStickerCount(SetStickerCountRequest request);
         public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request);
         public Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator);
         public Task<int> DelEventRestriction(int custId);

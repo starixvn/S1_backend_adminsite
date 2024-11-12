@@ -220,10 +220,25 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
             p.Add("_CurrencyId", request.CurrencyId, dbType: DbType.Int32);
             p.Add("_StickerPrize", request.StickerPrize, dbType: DbType.Decimal);
-            p.Add("_StickerCount", request.StickerCount, dbType: DbType.Int32);
             p.Add("_TurnOver", request.TurnOver, dbType: DbType.Decimal);
             p.Add("_Updator", updator, dbType: DbType.String);
             return await _mainDbClient.ExecuteAsync("Admin_RaffleTicketSticker_Set", p);
+        }
+        
+        public async Task<GetStickerCountResponse> GetStickerCount(GetStickerCountRequest request)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
+            var result = await _mainDbClient.QueryFirstAsync<GetStickerCountResponse>("Admin_LotteryStickerCount_Get", p);
+            return result;
+        }
+        
+        public async Task<int> SetStickerCount(SetStickerCountRequest request)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
+            p.Add("_StickerCount", request.StickerCount, dbType: DbType.Int32);
+            return await _mainDbClient.ExecuteAsync("Admin_LotteryStickerCount_Set", p);
         }
         
         public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request)

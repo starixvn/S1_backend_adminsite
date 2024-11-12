@@ -326,6 +326,20 @@ namespace BackendSite.Service.BLL
             return result;
         }
         
+        public async Task<GetStickerCountResponse> GetStickerCount(GetStickerCountRequest request )
+        {
+            var result = await _eventService.GetStickerCount(request);
+            
+            return result;
+        }
+        
+        public async Task<int> SetStickerCount(SetStickerCountRequest request )
+        {
+            var result = await _eventService.SetStickerCount(request);
+            
+            return result;
+        }
+        
         public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request)
         {
             var responses = _eventService.GetEventRestrictionList(request);
