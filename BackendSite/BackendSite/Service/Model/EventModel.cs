@@ -13,6 +13,23 @@ namespace BackendSite.Service.Model
         public DateTime EndDate{ get; set; }
     }
     
+    public class GetLotteryEventRateRequest
+    {
+        public int Sq { get; set; }
+    }
+    
+    public class GetLotteryEventRateResponse
+    {
+        public DateTime RateDate { get; set; }
+        public decimal Rate { get; set; }
+        /// <summary>
+        /// 1 : 乘 , -1 : 除
+        /// </summary>
+        public int RateFunction { get; set; } = 1;
+        public int TargetCurrencyId { get; set; }
+        public string IsoCode { get; set; }
+    }
+    
     public class LotteryEventResponse
     {
         public int Sq { get; set; }
@@ -24,6 +41,8 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public string ExcludeSetting { get; set; }
         public List<string> ExcludeSettingList => JsonConvert.DeserializeObject<List<string>>(ExcludeSetting);
+        public string ExcludeTagSetting { get; set; }
+        public List<string> ExcludeTagList => JsonConvert.DeserializeObject<List<string>>(ExcludeTagSetting);
         public string Updator { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }
@@ -41,6 +60,7 @@ namespace BackendSite.Service.Model
         public int ThirdPrize { get; set; }
         public int Consolation { get; set; }
         public int Small { get; set; }
+        public IEnumerable<int> ExcludeTagList { get; set; } = new List<int>();
     }
     
     public class AddLotteryEventRequest
@@ -54,6 +74,7 @@ namespace BackendSite.Service.Model
         public int ThirdPrize { get; set; }
         public int Consolation { get; set; }
         public int Small { get; set; }
+        public IEnumerable<int> ExcludeTagList { get; set; } = new List<int>();
     }
     
     public class LotteryTicketHistoryRequest
@@ -82,7 +103,6 @@ namespace BackendSite.Service.Model
     public class GetRaffleTicketStickerRequest
     {
         public int SiteId { get; set; }
-        public DateTime Time => DateTime.UtcNow.AddHours(8);
     }
     
     public class SetRaffleTicketStickerRequest
@@ -90,6 +110,7 @@ namespace BackendSite.Service.Model
         public int SiteId { get; set; }
         public int CurrencyId { get; set; }
         public decimal StickerPrize { get; set; }
+        public int StickerCount { get; set; }
         public decimal TurnOver { get; set; }
     }
     
@@ -99,6 +120,7 @@ namespace BackendSite.Service.Model
         public int CurrencyId { get; set; }
         public string IsoCode { get; set; }
         public decimal StickerPrize { get; set; }
+        public int StickerCount { get; set; }
         public decimal NextTurnOver { get; set; }
         public decimal TurnOver { get; set; }
         public string Updator { get; set; }

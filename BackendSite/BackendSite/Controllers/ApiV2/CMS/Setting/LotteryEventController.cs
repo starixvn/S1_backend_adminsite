@@ -186,6 +186,26 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
+        public ApiResult<IEnumerable<GetLotteryEventRateResponse>> GetLotteryRate(GetLotteryEventRateRequest request)
+        {
+            var apiResult = new ApiResult<IEnumerable<GetLotteryEventRateResponse>>();
+            try
+            {
+                var responseData = _eventBll.GetLotteryRate(request.Sq);
+                apiResult.Data = responseData;
+                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+            }
+
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 158, 1 })]
         public ApiResult<IEnumerable<RaffleTicketStickerResponse>> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<RaffleTicketStickerResponse>>();

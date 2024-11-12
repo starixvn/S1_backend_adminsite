@@ -174,7 +174,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<LotteryEventResponse>("Admin_LotteryEventDrawSettingBySQ_Get", p);
         }
         
-        public async Task<int> SetLotteryEventSetting(int sq, DateTime startDate , DateTime endDate , DateTime drawDate , int isSuspend , string excludeSetting ,string updator)
+        public async Task<int> SetLotteryEventSetting(int sq, DateTime startDate , DateTime endDate , DateTime drawDate , int isSuspend , string excludeSetting , string excludeTagList,string updator)
         {
             var p = new DynamicParameters();
             p.Add("_SQ", sq, dbType: DbType.Int32);
@@ -183,11 +183,12 @@ namespace BackendSite.Service.DAL
             p.Add("_DrawDate", drawDate, dbType: DbType.DateTime);
             p.Add("_IsSuspend", isSuspend, dbType: DbType.String);
             p.Add("_ExcludeSetting", excludeSetting, dbType: DbType.String);
+            p.Add("_ExcludeTagList", excludeTagList, dbType: DbType.String);
             p.Add("_Updator", updator, dbType: DbType.String);
             return await _mainDbClient.ExecuteAsync("Admin_LotteryEventDrawSetting_Set", p);
         }
         
-        public async Task<int> AddLotteryEvent(int siteId, DateTime startDate , DateTime endDate , DateTime drawDate , string excludeSetting ,string updator)
+        public async Task<int> AddLotteryEvent(int siteId, DateTime startDate , DateTime endDate , DateTime drawDate , string excludeSetting ,string excludeTagList , string updator)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
@@ -195,6 +196,7 @@ namespace BackendSite.Service.DAL
             p.Add("_EndDate", endDate, dbType: DbType.DateTime);
             p.Add("_DrawDate", drawDate, dbType: DbType.DateTime);
             p.Add("_ExcludeSetting", excludeSetting, dbType: DbType.String);
+            p.Add("_ExcludeTagList", excludeTagList, dbType: DbType.String);
             p.Add("_Updator", updator, dbType: DbType.String);
             return await _mainDbClient.ExecuteAsync("Admin_LotteryEventDrawSetting_Ins", p);
         }
@@ -204,11 +206,11 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<LotteryTicketHistory>("Service_LotteryTicketHistory_Get", new { _SiteId = siteId , _RoundId = roundId });
         }
 
-        public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
+        public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(int siteId)
         {
             var p = new DynamicParameters();
-            p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
-            p.Add("_Time", request.Time, dbType: DbType.DateTime);
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_Time", DateTime.UtcNow.AddHours(8), dbType: DbType.DateTime);
             return _reportDbClient.Query<RaffleTicketStickerResponse>("Service_RaffleTicketStickerSetting_Get" , p);
         }
         
@@ -218,6 +220,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", request.SiteId, dbType: DbType.Int32);
             p.Add("_CurrencyId", request.CurrencyId, dbType: DbType.Int32);
             p.Add("_StickerPrize", request.StickerPrize, dbType: DbType.Decimal);
+            p.Add("_StickerCount", request.StickerCount, dbType: DbType.Int32);
             p.Add("_TurnOver", request.TurnOver, dbType: DbType.Decimal);
             p.Add("_Updator", updator, dbType: DbType.String);
             return await _mainDbClient.ExecuteAsync("Admin_RaffleTicketSticker_Set", p);

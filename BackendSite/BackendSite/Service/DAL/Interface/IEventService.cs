@@ -44,12 +44,11 @@ namespace BackendSite.Service.DAL.Interface
         #region Lottery
 
         public IEnumerable<LotteryEventResponse> GetLotteryEventSetting(GetLotteryEventRequest request);
-
         public LotteryEventResponse GetLotteryEventSettingBySq(int sq);
-        public Task<int> SetLotteryEventSetting(int sq, DateTime startDate, DateTime endDate, DateTime drawDate, int isSuspend, string excludeSetting, string updator);
-        public Task<int> AddLotteryEvent(int siteId, DateTime startDate, DateTime endDate, DateTime drawDate, string excludeSetting, string updator);
+        public Task<int> SetLotteryEventSetting(int sq, DateTime startDate, DateTime endDate, DateTime drawDate, int isSuspend, string excludeSetting,string excludeTagList, string updator);
+        public Task<int> AddLotteryEvent(int siteId, DateTime startDate, DateTime endDate, DateTime drawDate, string excludeSetting, string excludeTagList, string updator);
         public LotteryTicketHistory GetLotteryTicketHistory(int siteId, int roundId);
-        public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request);
+        public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(int siteId);
         public Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request, string updator);
         public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request);
         public Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator);
