@@ -1,4 +1,5 @@
-﻿using BackendSite.Service.DAL.Interface;
+﻿using BackendSite.Service.DAL;
+using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
 using Newtonsoft.Json;
 
@@ -7,11 +8,13 @@ namespace BackendSite.Service.BLL
     public class EventBLL
     {
         private readonly IEventService _eventService;
+        private readonly MpaCommonService _mpaCommonService;
         private readonly ILogger<EventBLL> _logger;
-        public EventBLL(IEventService eventService, ILogger<EventBLL> logger)
+        public EventBLL(IServiceProvider provider)
         {
-            _eventService = eventService;
-            _logger = logger;
+            _eventService = provider.GetRequiredService<IEventService>();
+            _mpaCommonService = provider.GetRequiredService<MpaCommonService>();
+            _logger = provider.GetRequiredService<ILogger<EventBLL>>();
         }
 
         #region CupEvent
@@ -244,7 +247,7 @@ namespace BackendSite.Service.BLL
                 request.Small
             };
             var excludeSetting = JsonConvert.SerializeObject(setting);
-            var result = await _eventService.SetLotteryEventSetting(request.Sq, request.StartDate, request.EndDate ,request.DrawDate ,request.IsSuspend , excludeSetting ,updator);
+            var result = await _eventService.SetLotteryEventSetting(request.Sq, request.StartDate, request.EndDate ,request.DrawDate ,request.IsSuspend , excludeSetting ,  JsonConvert.SerializeObject(request.ExcludeTagList),updator);
             
             return result;
         }
@@ -260,7 +263,7 @@ namespace BackendSite.Service.BLL
                 request.Small
             };
             var excludeSetting = JsonConvert.SerializeObject(setting);
-            var result = await _eventService.AddLotteryEvent(request.SiteId, request.StartDate, request.EndDate ,request.DrawDate , excludeSetting ,updator);
+            var result = await _eventService.AddLotteryEvent(request.SiteId, request.StartDate, request.EndDate ,request.DrawDate , excludeSetting , JsonConvert.SerializeObject(request.ExcludeTagList),updator);
             
             return result;
         }
@@ -272,9 +275,46 @@ namespace BackendSite.Service.BLL
             return responses;
         }
         
+        public IEnumerable<GetLotteryEventRateResponse> GetLotteryRate(int sq)
+        {
+            var data = _eventService.GetLotteryEventSettingBySq(sq);
+            var rateDate = new DateTimeOffset(new DateTime(data.StartDate.Year, data.StartDate.Month, 1), new TimeSpan(8,0,0));
+            var rateList = _mpaCommonService.GetRate(rateDate.DateTime, rateDate.DateTime, 2).Result.ToList();
+            
+            var responses = _eventService.GetRaffleTicketStickerSetting(data.SiteId)
+                .Select(x => new GetLotteryEventRateResponse 
+                {
+                    RateDate = rateDate.DateTime,
+                    TargetCurrencyId = x.CurrencyId,
+                    IsoCode = x.IsoCode
+                }).ToList();
+            
+            foreach (var responseData in responses)
+            {
+                var rateDto = rateList.FirstOrDefault(x => x.CurrencyId == 3 && x.TargetCurrencyId == responseData.TargetCurrencyId);
+
+                if (rateDto is null)
+                {
+                    rateDto = rateList.FirstOrDefault(x => x.CurrencyId == responseData.TargetCurrencyId && x.TargetCurrencyId == 3);
+                    if (rateDto is null)
+                    {
+                        continue;
+                    }
+                    responseData.Rate = rateDto.Rate;
+                    responseData.RateFunction = -1;
+                }
+                else
+                {
+                    responseData.Rate = rateDto.Rate;
+                }
+            }
+            
+            return responses;
+        }
+        
         public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(GetRaffleTicketStickerRequest request)
         {
-            var responses = _eventService.GetRaffleTicketStickerSetting(request);
+            var responses = _eventService.GetRaffleTicketStickerSetting(request.SiteId);
            
             return responses;
         }
@@ -282,6 +322,20 @@ namespace BackendSite.Service.BLL
         public async Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request , string updator)
         {
             var result = await _eventService.SetRaffleTicketStickerSetting(request ,updator);
+            
+            return result;
+        }
+        
+        public async Task<GetStickerCountResponse> GetStickerCount(GetStickerCountRequest request )
+        {
+            var result = await _eventService.GetStickerCount(request);
+            
+            return result;
+        }
+        
+        public async Task<int> SetStickerCount(SetStickerCountRequest request )
+        {
+            var result = await _eventService.SetStickerCount(request);
             
             return result;
         }
