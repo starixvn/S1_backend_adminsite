@@ -605,10 +605,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                                     _ = Task.Run(() =>
                                     {
                                         var pixelEvent = new List<FaceBookPixel> { FaceBookPixel.withdraw };
-                                        var pixelRequest = _faceBookPixelBll.CreatePixelRequest(withdrawalData.SiteId, withdrawalData.CustId, withdrawalData.CurrencyId, withdrawalData.Amount, pixelEvent);
+                                        var pixelRequest = _faceBookPixelBll.CreatePixelRequest(request.TransId ,withdrawalData.SiteId, withdrawalData.CustId, withdrawalData.Amount, pixelEvent);
                                         _ = _faceBookPixelBll.Send(pixelRequest);
                                     });
-
+                                    
                                     _ = Task.Run(() =>
                                     {
                                         var para = new CRMRequest()
