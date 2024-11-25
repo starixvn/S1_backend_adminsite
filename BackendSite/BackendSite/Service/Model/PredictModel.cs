@@ -20,13 +20,14 @@ namespace BackendSite.Service.Model
             get => _endTime;
             set => _endTime = new DateTimeOffset(value.ToUniversalTime().DateTime, TimeSpan.Zero);
         }
-        
     }
-    public class CustPromotionPredictScore
+    
+    public class CustPromotionPredictScoreBase
     {
         public int CustId { get; set; }
-        public string Currency { get; set; }
-        public string UserName { get; set; }
+        public int CurrencyId { get; set; }
+        public int MatchId { get; set; }
+        public string BonusCode { get; set; }
         /// <summary>
         /// 預測主隊分數
         /// </summary>
@@ -39,10 +40,18 @@ namespace BackendSite.Service.Model
         /// 發送reward沒
         /// </summary>
         public bool IsPayout { get; set; }
+        /// <summary>
+        /// 比賽結果出爐沒
+        /// </summary>
+        public bool Result { get; set; }
         public DateTime PredictTime { get; set; }
+    }
+
+    public class CustPromotionPredictScore : CustPromotionPredictScoreBase
+    {
+        public string Currency { get; set; }
+        public string UserName { get; set; }
         public decimal Bonus { get; set; }
-        public string BonusCode { get; set; }
-        public int MatchId { get; set; }
         public int DepositCountAchieved { get; set; }
         public int DepositTermPeriodDays { get; set; }
         /// <summary>
@@ -53,10 +62,6 @@ namespace BackendSite.Service.Model
         /// 客隊結果比分
         /// </summary>
         public int AwayScore { get; set; }
-        /// <summary>
-        /// 比賽結果出爐沒
-        /// </summary>
-        public bool Result { get; set; }
         /// <summary>
         /// 預測結果輸贏 0: Running , 1:Lose , 2: Win
         /// </summary>
@@ -99,8 +104,6 @@ namespace BackendSite.Service.Model
         /// </summary>
         public string AwayTeamName { get; set; }
         public bool Result { get; set; }
-        // public int DepositCountAchieved { get; set; }
-        // public int DepositTermPeriodDays { get; set; }
         public List<CustPromotionPredictScoreByCurrency> ResponseByCurrency { get; set; }
     }
     
@@ -112,6 +115,7 @@ namespace BackendSite.Service.Model
     
     public class CustPromotionPredictScoreByUser
     {
+        public int CustId { get; set; }
         public string UserName { get; set; }
         public decimal Bonus { get; set; }
         public DateTime PredictTime { get; set; }
@@ -182,7 +186,8 @@ namespace BackendSite.Service.Model
     
     public class ClaimPredictPromotionReq
     {
-        public int CustId { get; set; }
+        public List<int> CustIdList { get; set; }
+        public int CurrencyId { get; set; }
         public int MatchId { get; set; }
         public string BonusCode { get; set; }
     }

@@ -56,5 +56,13 @@ namespace BackendSite.Service.DAL
             return result;
         }
         
+        public List<CustPromotionPredictScoreBase> GetCustPromotionPredictScoreByMatch( int matchId )
+        {
+            var p = new DynamicParameters();
+            p.Add("_MatchId", matchId, dbType: DbType.Int64);
+
+            var result = _reportDbClient.Query<CustPromotionPredictScoreBase>("Service_CustPromotionPredictScoreByMatch_Get", p).ToList();
+            return result;
+        }
     }
 }
