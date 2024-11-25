@@ -25,6 +25,7 @@ namespace BackendSite.Service.Model
     public class CustPromotionPredictScoreBase
     {
         public int CustId { get; set; }
+        public int CurrencyId { get; set; }
         public int MatchId { get; set; }
         public string BonusCode { get; set; }
         /// <summary>
@@ -114,6 +115,7 @@ namespace BackendSite.Service.Model
     
     public class CustPromotionPredictScoreByUser
     {
+        public int CustId { get; set; }
         public string UserName { get; set; }
         public decimal Bonus { get; set; }
         public DateTime PredictTime { get; set; }
@@ -184,7 +186,8 @@ namespace BackendSite.Service.Model
     
     public class ClaimPredictPromotionReq
     {
-        public int CustId { get; set; }
+        public List<int> CustIdList { get; set; }
+        public int CurrencyId { get; set; }
         public int MatchId { get; set; }
         public string BonusCode { get; set; }
     }

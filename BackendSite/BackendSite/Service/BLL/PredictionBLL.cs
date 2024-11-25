@@ -44,6 +44,7 @@ namespace BackendSite.Service.BLL
                             Currency = currencyGroup.Key,
                             ResponseByUsers = currencyGroup.Select(c => new CustPromotionPredictScoreByUser
                             {
+                                CustId = c.CustId,
                                 UserName = c.UserName,
                                 Bonus = c.Bonus,
                                 PredictTime = c.PredictTime,
@@ -112,9 +113,8 @@ namespace BackendSite.Service.BLL
             return dataList;
         }
         
-        public async Task<ApiResult> ClaimPredictPromotion(Customer custInfo , AuthData authData, string bonusCode , int matchId)
+        public async Task<bool> ClaimPredictPromotion(Customer custInfo , AuthData authData, string bonusCode , int matchId)
         {
-            var apiResult = new ApiResult();
             var bonusUrl = $"{_bonusApiUrl}SetAdjustBonus";
             
             var setAdjustBonusReq = new SetAdjustBonusReq
@@ -129,21 +129,15 @@ namespace BackendSite.Service.BLL
             if (apiOnlineResult.ErrorCode == (int)ErrorCodeEnum.Success)
             {
                 _predictionService.SetClaimPredictPromotionStatus(custInfo.CustId, matchId);
-                apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
-                apiResult.Message = "Success.";
-            }
-            else
-            {
-                apiResult.ErrorCode = apiOnlineResult.ErrorCode;
-                apiResult.Message = apiOnlineResult.Message;
+                return true;
             }
 
-            return apiResult;
+            return false;
         }
         
-        public List<CustPromotionPredictScoreBase> GetCustPromotionPredictScoreByCust(int custId, int matchId )
+        public List<CustPromotionPredictScoreBase> GetCustPromotionPredictScoreByMatch( int matchId )
         {
-            var result = _predictionService.GetCustPromotionPredictScoreByCust(custId, matchId);
+            var result = _predictionService.GetCustPromotionPredictScoreByMatch(matchId);
             
             return result;
         }

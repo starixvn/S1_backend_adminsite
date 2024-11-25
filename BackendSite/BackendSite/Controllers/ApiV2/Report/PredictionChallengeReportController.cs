@@ -64,57 +64,81 @@ namespace BackendSite.Controllers.ApiV2.Report
         public async Task<ApiResult> ClaimPredictPromotion(ClaimPredictPromotionReq request)
         {
             var apiResult = new ApiResult();
+            var result = true;
+            var errorMsg = string.Empty;
             try
             {
                 var authData = _authorizeBll.GetAuthData();
-                var custInfo = _custInfoBll.GetCustInfoWithCache(request.CustId);
-                var detailInfo = new
-                {
-                    custInfo.UserName,
-                    request.BonusCode,
-                    request.MatchId,
-                    PromotionType = PromotionTypeEnum.PredictionEvent.ToString()
-                };
 
-                var custPromotionPredictScore = _predictionBll.GetCustPromotionPredictScoreByCust(request.CustId, request.MatchId);
-                var matchData = custPromotionPredictScore.FirstOrDefault(x => x.BonusCode == request.BonusCode && x.MatchId == request.MatchId);
-
-                if (matchData is null || !matchData.Result)
+                var promotionPredictScore = _predictionBll.GetCustPromotionPredictScoreByMatch(request.MatchId);
+                var claimed = promotionPredictScore.Where(x => x.BonusCode == request.BonusCode && x.MatchId == request.MatchId && x.CurrencyId == request.CurrencyId && x.IsPayout).ToList();
+                if (claimed.Count + request.CustIdList.Count > 5)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "No Match Found or Match not end.";
+                    apiResult.Message = "Exceeded the maximum number.";
                     return apiResult;
                 }
 
-                if (matchData.IsPayout)
+                foreach (var custId in request.CustIdList)
                 {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "Already claimed.";
-                    return apiResult;
-                }
-                
-                var logResult =
-                    _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                    var custInfo = _custInfoBll.GetCustInfoWithCache(custId);
+                    var matchData = promotionPredictScore.FirstOrDefault(x => x.BonusCode == request.BonusCode && x.MatchId == request.MatchId && x.CustId == custId);
+                    if (matchData is null || !matchData.Result)
                     {
-                        Operator = authData.UserName,
-                        SiteId = custInfo.SiteId,
-                        CurrencyId = custInfo.CurrencyId,
-                        ActionType = ActionType.Create,
-                        MenuEnum = AdminAdjustmentLogMenuEnum.ClaimPredictPromotion,
-                        BeforeDetailInfo = null,
-                        AfterDetailInfo = JsonConvert.SerializeObject(detailInfo),
-                        RefTransId = string.Empty
-                    });
+                        errorMsg += $"UserName: {custInfo.UserName},No Match Found or Match not completed. \n\r";
+                        result = false;
+                        continue;
+                    }
 
-                if (!logResult)
-                {
-                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
-                    apiResult.Message = "Insert log error.";
-                    return apiResult;
+                    if (matchData.IsPayout)
+                    {
+                        errorMsg += $"UserName: {custInfo.UserName},Already claimed. \n\r";
+                        result = false;
+                        continue;
+                    }
+                    
+                    #region AdminAdjustmentInfoLog
+                    
+                    var detailInfo = new
+                    {
+                        custInfo.UserName,
+                        request.BonusCode,
+                        request.MatchId,
+                        PromotionType = PromotionTypeEnum.PredictionEvent.ToString()
+                    };
+                    
+                    var logResult =
+                        _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
+                        {
+                            Operator = authData.UserName,
+                            SiteId = custInfo.SiteId,
+                            CurrencyId = custInfo.CurrencyId,
+                            ActionType = ActionType.Create,
+                            MenuEnum = AdminAdjustmentLogMenuEnum.ClaimPredictPromotion,
+                            BeforeDetailInfo = null,
+                            AfterDetailInfo = JsonConvert.SerializeObject(detailInfo),
+                            RefTransId = string.Empty
+                        });
+
+                    if (!logResult)
+                    {
+                        errorMsg += $"UserName: {custInfo.UserName},Insert log error. \n\r";
+                        result = false;
+                        continue;
+                    }
+                    
+                    #endregion
+                    
+                    var claimedResult = await _predictionBll.ClaimPredictPromotion(custInfo, authData, request.BonusCode, request.MatchId);
+                    if (!claimedResult)
+                    {
+                        errorMsg += $"UserName: {custInfo.UserName},Claim promotion error. \n\r";
+                        result = false;
+                    }
                 }
                 
-                apiResult = await _predictionBll.ClaimPredictPromotion(custInfo, authData, request.BonusCode, request.MatchId);
-                
+                apiResult.Message = errorMsg;
+                apiResult.ErrorCode = result ? (int)ErrorCodeEnum.Success : (int)ErrorCodeEnum.Fail;
             }
             catch (Exception ex)
             {
