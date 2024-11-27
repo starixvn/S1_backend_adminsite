@@ -38,10 +38,11 @@ namespace BackendSite.Service.BLL
                     AwayTeamName = g.Key.AwayTeamName,
                     Result = g.Key.Result,
                     ResponseByCurrency = g
-                        .GroupBy(c => c.Currency) // 按 Currency 分組
+                        .GroupBy(c => new {c.Currency , c.CurrencyId}) // 按 Currency 分組
                         .Select(currencyGroup => new CustPromotionPredictScoreByCurrency
                         {
-                            Currency = currencyGroup.Key,
+                            Currency = currencyGroup.Key.Currency,
+                            CurrencyId = currencyGroup.Key.CurrencyId,
                             ResponseByUsers = currencyGroup.Select(c => new CustPromotionPredictScoreByUser
                             {
                                 CustId = c.CustId,

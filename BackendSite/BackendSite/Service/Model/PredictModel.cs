@@ -110,6 +110,7 @@ namespace BackendSite.Service.Model
     public class CustPromotionPredictScoreByCurrency
     {
         public string Currency { get; set; }
+        public int CurrencyId { get; set; }
         public List<CustPromotionPredictScoreByUser> ResponseByUsers { get; set; }
     }
     
