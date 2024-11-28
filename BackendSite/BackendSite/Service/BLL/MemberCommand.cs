@@ -157,17 +157,24 @@ public class MemberCommand : IMemberCommand
         return true;
     }
 
-    public async Task<int> EditEmailAsync(int custId, string email,string verifyEmail, string @operator,AuthData authData)
+    public async Task<bool> Verification(int custId,VerificationInfoType type, string verificationInfo)
     {
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
-        var loginUser = _adminBll.GetUserV2(authData.UserId,authData.SiteId);
-        var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
+        switch (type)
+        {
+            case VerificationInfoType.Email:
+                return (customer.Email == verificationInfo);
+            case VerificationInfoType.Phone:
+                return (customer.PhoneNo == verificationInfo);
+        }
+        return false;
+    }
+    public async Task<int> EditEmailAsync(int custId, string email, string @operator,AuthData authData)
+    {
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
 
         if (await _memberService.IsExistsEmail(custId, email, customer.SiteId))
-            return -1;
-        if (!hasPermission && customer.Email != verifyEmail)
-            return - 2;
-        
+            return -1;   
 
         var beforeEmail = customer.Email;
         var result = await _memberService.EditEmailAsync(custId, email);
@@ -183,19 +190,15 @@ public class MemberCommand : IMemberCommand
     }
 
 
-    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo,string verifyPhone, string @operator, AuthData authData)
+    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator, AuthData authData)
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
-        var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
-        var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
 
         if (long.TryParse(phoneNo, out var phoneNoLong))
         {
             phoneNo = phoneNoLong.ToString();
             if (await _memberService.IsExistsPhoneNo(custId, customer.SiteId, customer.AreaCode, phoneNo)) 
                 return -1;
-            if (!hasPermission && customer.PhoneNo != verifyPhone)
-                return -2;
         }
         else
         {

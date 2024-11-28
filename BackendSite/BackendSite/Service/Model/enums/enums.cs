@@ -2179,4 +2179,12 @@ namespace BackendSite.Service.Model.enums
         TESLA,
         Web0S,
     }
+    /// <summary>
+    /// 驗證類型
+    /// </summary>
+    public enum VerificationInfoType 
+    {
+        Email =1,
+        Phone =2
+    }
 }
