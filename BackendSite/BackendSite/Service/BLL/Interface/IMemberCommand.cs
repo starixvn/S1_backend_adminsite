@@ -9,8 +9,8 @@ public interface IMemberCommand
     Task<int> RemoveCustTagAsync(int custId, int tagId, string @operator);
     Task<IEnumerable<SimilarAccountInfo>> GetDuplicateAccountInfoAsync(int siteId, int custId, string accountName);
     Task<bool> EditFullNameAsync(int custId, string fullName, string @operator);
-    Task<int> EditEmailAsync(int custId, string email,string verifyemail, string @operator,AuthData authData);
-    Task<int> EditPhoneNoAsync(int custId, string phoneNo,string verifyPhone, string @operator,AuthData authData);
+    Task<int> EditEmailAsync(int custId, string email, string @operator,AuthData authData);
+    Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator,AuthData authData);
     Task<int> EditBirthdayAsync(int custId, int year, int month, int date, string @operator);
     Task<int> EditAddressAsync(int custId, string country, string state, string postCode, string city, string line1, string line2, string @operator);
     Task<int> SwitchKycAsync(int custId, int status, string @operator);
@@ -31,4 +31,5 @@ public interface IMemberCommand
         MemberTypeEnum memberType, string areaCode, string phoneNo, string affCode, string signupUrl,string realName,
         string @operator);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, CustTpGameTypeSettingGetType setDataType, IEnumerable<int> tpGameTypes, string @operator);
+    Task<bool> Verification(int custId , VerificationInfoType type, string verificationInfo);
 }

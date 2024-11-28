@@ -2044,4 +2044,12 @@ namespace BackendSite.Service.Model.enums
         Common = 1,
         FreeSpin = 2
     }
+    /// <summary>
+    /// 驗證類型
+    /// </summary>
+    public enum VerificationInfoType 
+    {
+        Email =1,
+        Phone =2
+    }
 }
