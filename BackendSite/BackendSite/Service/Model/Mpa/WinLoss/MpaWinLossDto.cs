@@ -397,6 +397,8 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string TpUserName { get; set; }
 
         public string Currency { get; set; }
+
+        public string VIPLevel { get; set; }
     }
 
     public class MpaWinLossByCurrencyDtoExport : MpaWinLossDisplay
