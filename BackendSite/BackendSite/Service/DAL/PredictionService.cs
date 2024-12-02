@@ -24,7 +24,7 @@ namespace BackendSite.Service.DAL
             p.Add("_SiteId", request.SiteId, dbType: DbType.String);
             p.Add("_CurrencyIds", JsonConvert.SerializeObject(request.CurrencyIds));
             p.Add("_PredictStatusList", JsonConvert.SerializeObject(request.PredictStatusList));
-            p.Add("_UserName", request.UserName);
+            p.Add("_UserName", string.IsNullOrEmpty(request.UserName) ? null : request.UserName);
             p.Add("_StartTime", request.StartTime.DateTime);
             p.Add("_EndTime", request.EndTime.DateTime);
             
