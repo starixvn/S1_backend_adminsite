@@ -521,6 +521,18 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         [HttpPost]
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 161, 1 })]
+        public ApiResult<IEnumerable<GetLotteryEventRoundResponse>> GetLotteryEventRoundList()
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var apiResult = new ApiResult<IEnumerable<GetLotteryEventRoundResponse>>
+            {
+                Data = _eventBll.GetLotteryEventRoundList(authData.SiteId)
+            };
+            return apiResult;
+        }
+        
+        [HttpPost]
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 161, 1 })]
         public ApiResult<IEnumerable<GetCustLotteryTicket>> GetCustLotteryTicket(GetCustLotteryTicketRequest request)
         {
             var apiResult = new ApiResult<IEnumerable<GetCustLotteryTicket>>();

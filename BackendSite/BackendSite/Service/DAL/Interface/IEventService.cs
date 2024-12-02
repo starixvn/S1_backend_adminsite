@@ -43,6 +43,7 @@ namespace BackendSite.Service.DAL.Interface
 
         #region Lottery
 
+        public IEnumerable<GetLotteryEventRoundData> GetLotteryEventRoundList(int siteId);
         public IEnumerable<LotteryEventResponse> GetLotteryEventSetting(GetLotteryEventRequest request);
         public LotteryEventResponse GetLotteryEventSettingBySq(int sq);
         public Task<int> SetLotteryEventSetting(int sq, DateTime startDate, DateTime endDate, DateTime drawDate, int isSuspend, string excludeSetting,string excludeTagList, string updator);
