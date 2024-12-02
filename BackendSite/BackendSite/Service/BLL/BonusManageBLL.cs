@@ -238,6 +238,10 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.GetBonusCustUsingDetail(siteId, bonusCode);
         }
+        public bool UploadPromotionCustList(List<PromotionCustList> list)
+        {
+            return _bonusManageService.UploadPromotionCustList(list);
+        }
     }
 
 }

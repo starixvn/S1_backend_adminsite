@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 
 using OfficeOpenXml;
+using System.Security.Policy;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
@@ -125,7 +126,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int SiteId { get; set; }
             public string BonusCode { get; set; }
         }
-
+        public class UploadPromotionCustListRequest 
+        {
+            public int SiteId { get; set; }
+            public string BonusCode { get; set; }
+            public PromotionTypeEnum PromotionType { get; set; }
+            public IFormFile excelUpload { get; set; }
+        }
         #region ScratchCard
 
         public class GetScratchCardListRequest : ApiRequestPageModel
@@ -605,6 +612,103 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
 
+        /// <summary>
+        /// BonusManagement/UploadPromotionCustList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Edit]
+        /// </remarks>
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 3 })]
+        [HttpPost]
+        public async Task<ApiResult<int>> UploadPromotionCustList([FromForm] UploadPromotionCustListRequest req)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var excelList = new List<PromotionCustList>();
+            var result = false;
+            bool isSpecialBonus = req.PromotionType == PromotionTypeEnum.SpecialBonus;
+            _logger.LogInformation($@"UploadPromotionCustList Start At {DateTime.UtcNow}.");
+
+            if (req.excelUpload != null)
+            {
+                if (_excelBll.IsValidFile(req.excelUpload.ContentType))
+                {
+                    var excelPkg = new ExcelPackage(req.excelUpload.OpenReadStream());
+                    var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+                    var isLastRow = false;
+                    var rowId = 2; // 因為有標題列，所以從第2列開始讀起
+
+                    do // 讀取資料，直到讀到空白列為止
+                    {
+                        var userName = sheet.Cells[rowId, 1].Text.Trim();
+                        var amount = sheet.Cells[rowId, 2].Text.Trim();
+                        var rollover = isSpecialBonus ? sheet.Cells[rowId, 3].Text.Trim() : null;
+                        var tempExpiryDate = isSpecialBonus ? sheet.Cells[rowId, 4].Text.Trim() : sheet.Cells[rowId, 3].Text.Trim();
+                        var custInfo = _custInfoBll.GetCustInfoDetails(null, userName, req.SiteId);
+
+                        if (DateTimeOffset.TryParse(tempExpiryDate, out DateTimeOffset expiryDate))
+                        {
+                            if (string.IsNullOrEmpty(userName))
+                            {
+                                isLastRow = true;
+                            }
+                            else
+                            {
+                                if (custInfo is not null)
+                                {
+                                    var data = new PromotionCustList
+                                    {
+                                        BonusCode = req.BonusCode,
+                                        SiteId = req.SiteId,
+                                        CustId = custInfo.CustId,
+                                        Bonus = decimal.Parse(amount),
+                                        RollOver = isSpecialBonus ? int.Parse(rollover) : 0,
+                                        ExpiryDate = expiryDate
+                                    };
+                                    excelList.Add(data);
+                                }
+                                rowId += 1;
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    } while (!isLastRow);
+
+                    result = _bonusManageBll.UploadPromotionCustList(excelList);
+
+                    _logger.LogInformation($@"UploadPromotionCustList End At {DateTime.UtcNow}.");
+                }
+                else
+                {
+                    return new ApiResult<int>()
+                    {
+                        ErrorCode = -1,
+                        Message = "File Type Error"
+                    };
+                }
+            }
+
+            if (result)
+            {
+                return new ApiResult<int>()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Upload Finish."
+                };
+            }
+            else
+            {
+                return new ApiResult<int>()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Upload Fail."
+                };
+            }
+        }
         #endregion
 
         #endregion

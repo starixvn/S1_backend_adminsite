@@ -139,4 +139,13 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int Status { get; set; }
     }
+    public class PromotionCustList
+    {
+        public string BonusCode { get; set; }
+        public int SiteId { get; set; }
+        public int CustId { get; set; }
+        public int RollOver { get; set; }
+        public decimal Bonus { get; set; }
+        public DateTimeOffset ExpiryDate { get; set; }
+    }
 }
