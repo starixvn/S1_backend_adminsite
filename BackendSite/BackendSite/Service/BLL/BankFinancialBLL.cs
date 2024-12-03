@@ -73,12 +73,6 @@ namespace BackendSite.Service.BLL
             return _paymentManageService.GetPayList();
         }
 
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
-        {
-            return _bankFinancialService.GetTransferAccountList();
-        }
-
-
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId)
         {
             return _bankFinancialService.GetTransferAccountList(siteId, new[]
@@ -1700,20 +1694,11 @@ namespace BackendSite.Service.BLL
             var withdrawal = await _bankFinancialService.GetFinancialReportWithdrawalAsync(input);
             var transfer = await _bankFinancialService.GetFinancialReportTransferAsync(input);
             var data = deposit.Union(withdrawal).Union(transfer);
-            var ids = data.Select(x => x.FinancialId).Distinct();
-
-            var openBalanceList = await _bankFinancialService.GetFinancialAccountOpenBalanceAsync(
-                new GetFinancialAccountOpenBalanceParams
-                {
-                    SiteId = input.SiteId,
-                    FinancialIds = JsonConvert.SerializeObject(ids),
-                    StartTime = input.StartTime
-                });
 
             return new BankFinancialReportResult
             {
                 Data = data,
-                AccountInfoList = openBalanceList
+                AccountInfoList = Array.Empty<FinancialAccountOpenBalanceResult>()
             };
         }
 

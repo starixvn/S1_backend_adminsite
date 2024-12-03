@@ -226,13 +226,6 @@ namespace BackendSite.Service.DAL
 
             return _mainDbClient.Execute(SpName, parameters);
         }
-
-        public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountList()
-        {
-            var SpName = "Admin_BankFinancialTransferAccount_GetForList";
-            return _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(SpName);
-        }
-
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
         {
             var parameters = new DynamicParameters(new
@@ -595,19 +588,6 @@ namespace BackendSite.Service.DAL
                 });
 
             return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Transfer_Get_V3", parameters);
-        }
-
-        public async Task<IEnumerable<FinancialAccountOpenBalanceResult>> GetFinancialAccountOpenBalanceAsync(GetFinancialAccountOpenBalanceParams input)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _SiteId = input.SiteId,
-                    _FinancialIds = input.FinancialIds,
-                    _StartTime = input.StartTime
-                });
-
-            return await _reportDbClient.QueryAsync<FinancialAccountOpenBalanceResult>("Admin_BankFinancialReport_OpenBalance_Get", parameters);
         }
 
         #endregion
