@@ -13,6 +13,7 @@ using MySql.Data.MySqlClient;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using static BackendSite.Controllers.ApiV2.Marketing.Bonus.BonusController;
 
 namespace BackendSite.Service.DAL
 {
@@ -606,11 +607,30 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<int>("Admin_PromotionExists_Get", p);
         }
 
-        public bool UploadPromotionCustList(List<PromotionCustList> list)
+        public bool UploadPromotionCustList(List<PromotionCustUploadList> list)
         {
             var result = _mainDbClient.Execute("Admin_PromotionCustList_Set", list);
 
             return result > 0;
+        }
+
+        public IEnumerable<PromotionCustList> GetPromotionCustList(int siteId, string bonusCode)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_BonusCode", bonusCode);
+            var result = _reportDbClient.Query<PromotionCustList>("Admin_PromotionCustList_Get", p);
+
+            return result;
+        }
+        public int DeletePromotionCustList(DeletePromotionCustListRequest req)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", req.SiteId);
+            p.Add("_BonusCode", req.BonusCode);
+            p.Add("_CustId", req.CustId);
+
+            return _mainDbClient.Execute("Admin_PromotionCustList_Del", p);
         }
         #endregion
 

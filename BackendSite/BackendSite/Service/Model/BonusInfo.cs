@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.Model.enums;
+using System.ComponentModel;
 
 namespace BackendSite.Service.Model
 {
@@ -139,7 +140,7 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
         public int Status { get; set; }
     }
-    public class PromotionCustList
+    public class PromotionCustUploadList
     {
         public string BonusCode { get; set; }
         public int SiteId { get; set; }
@@ -147,5 +148,16 @@ namespace BackendSite.Service.Model
         public int RollOver { get; set; }
         public decimal Bonus { get; set; }
         public DateTimeOffset ExpiryDate { get; set; }
+    }
+    public class PromotionCustList
+    {
+        public string UserName { get; set; }
+        public int CustId { get; set; }
+        public int RollOver { get; set; }
+        public decimal Bonus { get; set; }
+        public DateTimeOffset ExpiryDate { get; set; }
+
+        [Description("是否領取過: 0.不是 1.是")]
+        public bool Status { get; set; }
     }
 }

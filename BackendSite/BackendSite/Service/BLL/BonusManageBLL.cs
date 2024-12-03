@@ -6,6 +6,7 @@ using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PromotionDisplayCondition;
 
 using Newtonsoft.Json;
+using static BackendSite.Controllers.ApiV2.Marketing.Bonus.BonusController;
 
 namespace BackendSite.Service.BLL
 {
@@ -238,9 +239,18 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.GetBonusCustUsingDetail(siteId, bonusCode);
         }
-        public bool UploadPromotionCustList(List<PromotionCustList> list)
+        public bool UploadPromotionCustList(List<PromotionCustUploadList> list)
         {
             return _bonusManageService.UploadPromotionCustList(list);
+        }
+
+        public IEnumerable<PromotionCustList> GetPromotionCustList(int siteId, string bonusCode)
+        {
+            return _bonusManageService.GetPromotionCustList(siteId, bonusCode);
+        }
+        public int DeletePromotionCustList(DeletePromotionCustListRequest req)
+        {
+            return _bonusManageService.DeletePromotionCustList(req);
         }
     }
 

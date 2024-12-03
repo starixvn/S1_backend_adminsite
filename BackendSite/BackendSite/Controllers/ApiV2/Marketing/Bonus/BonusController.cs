@@ -126,12 +126,21 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int SiteId { get; set; }
             public string BonusCode { get; set; }
         }
-        public class UploadPromotionCustListRequest 
+        public class UploadPromotionCustListRequest
         {
             public int SiteId { get; set; }
             public string BonusCode { get; set; }
             public PromotionTypeEnum PromotionType { get; set; }
             public IFormFile excelUpload { get; set; }
+        }
+        public class PromotionCustListRequest
+        {
+            public int SiteId { get; set; }
+            public string BonusCode { get; set; }
+        }
+        public class DeletePromotionCustListRequest: PromotionCustListRequest
+        {
+            public int CustId { get; set; }
         }
         #region ScratchCard
 
@@ -290,22 +299,22 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
                 switch (request.PromotionInfo.PromotionType)
                 {
-                    case   (int)PromotionTypeEnum.FreeBet 
+                    case (int)PromotionTypeEnum.FreeBet
                         or (int)PromotionTypeEnum.Cashback
                         or (int)PromotionTypeEnum.RetentionFreeBet:
-                        
+
                         if (request.PromotionInfo.Specific.Any(specific =>
                                     specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                     CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
-                            {
-                                return apiResult;
-                            }
+                        {
+                            return apiResult;
+                        }
 
                         break;
-                    case   (int)PromotionTypeEnum.FstDeposit
-                        or (int)PromotionTypeEnum.ReDeposit 
+                    case (int)PromotionTypeEnum.FstDeposit
+                        or (int)PromotionTypeEnum.ReDeposit
                         or (int)PromotionTypeEnum.MissionBonus:
-                        
+
                         if (request.PromotionInfo.Specific.Any(specific =>
                                 specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 specific.TierAmountList.Any(tierAmount =>
@@ -626,7 +635,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public async Task<ApiResult<int>> UploadPromotionCustList([FromForm] UploadPromotionCustListRequest req)
         {
             var authData = _authorizeBll.GetAuthData();
-            var excelList = new List<PromotionCustList>();
+            var excelList = new List<PromotionCustUploadList>();
             var result = false;
             bool isSpecialBonus = req.PromotionType == PromotionTypeEnum.SpecialBonus;
             _logger.LogInformation($@"UploadPromotionCustList Start At {DateTime.UtcNow}.");
@@ -658,7 +667,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                             {
                                 if (custInfo is not null)
                                 {
-                                    var data = new PromotionCustList
+                                    var data = new PromotionCustUploadList
                                     {
                                         BonusCode = req.BonusCode,
                                         SiteId = req.SiteId,
@@ -708,6 +717,61 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     Message = "Upload Fail."
                 };
             }
+        }
+
+        /// <summary>
+        /// BonusManagement/GetPromotionCustList 取得 PromotionCustList允許名單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Edit] > [Member List]
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 1 })]
+        [HttpPost]
+        public List<PromotionCustList> GetPromotionCustList(PromotionCustListRequest req)
+        {
+            var result = _bonusManageBll.GetPromotionCustList(req.SiteId, req.BonusCode).ToList();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Banner/UpdateStatus 更新橫幅狀態
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing >  Banner Management > Delete
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public ApiResult DeletePromotionCustList(DeletePromotionCustListRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var result = _bonusManageBll.DeletePromotionCustList(request) >= 0;
+
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
         }
         #endregion
 
