@@ -80,12 +80,14 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
             UserName = m.UserName;
             SabaId = m.TpUserName;
             CustId = m.CustId;
+            VIPLevel = m.VIPLevel;
         }
 
         public string UserName { get; set; }
         public string CustId { get; set; }
 
         public string SabaId { get; set; }
+        public string VIPLevel { get; set; }
 
         public decimal ClosingBalance { get; set; }
     }
@@ -291,10 +293,10 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string TotalWithDrawAmount { get; set; }
 
         public string NetCash { get; set; }
-        
+
         public string TotalBonus { get; set; }
 
-        
+
 
     }
 
@@ -393,6 +395,7 @@ namespace BackendSite.Service.Model.Mpa.WinLoss
         public string UserName { get; set; }
 
         public string TpUserName { get; set; }
+        public string VIPLevel { get; set; }
 
         public string Currency { get; set; }
     }

@@ -15,24 +15,24 @@ namespace BackendSite.Service.DAL
             _reportDbClient = sqlClients.First(p => p.DataBase == DataBase.Report);
         }
 
-        public Task<IEnumerable<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountSummaryAsync(string siteList, DateTime startTime, DateTime endTime)
+        public async Task<IEnumerable<MpaMarketingWithdrawalAmountSummaryDto>> GetWithdrawalAmountSummaryAsync(string siteList, DateTime startTime, DateTime endTime)
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteList);
             p.Add("_StartTime", startTime);
             p.Add("_EndTime", endTime);
 
-            return _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountSummaryDto>("Admin_MpaMarketingWithdrawalAmountSummary_Get_V2", p);
+            return await _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountSummaryDto>("Admin_MpaMarketingWithdrawalAmountSummary_Get_V2", p);
         }
 
-        public Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(string siteList, DateTime startTime, DateTime endTime)
+        public async Task<IEnumerable<MpaMarketingWithdrawalAmountDetailDto>> GetWithdrawalAmountDetailAsync(string siteList, DateTime startTime, DateTime endTime)
         {
             var p = new DynamicParameters();
             p.Add("_SiteIds", siteList);
             p.Add("_StartTime", startTime);
             p.Add("_EndTime", endTime);
 
-            return _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountDetailDto>("Admin_MpaMarketingWithdrawalAmountDetail_Get_V2", p);
+            return await _reportDbClient.QueryAsync<MpaMarketingWithdrawalAmountDetailDto>("Admin_MpaMarketingWithdrawalAmountDetail_Get_V2", p);
         }
     }
 }

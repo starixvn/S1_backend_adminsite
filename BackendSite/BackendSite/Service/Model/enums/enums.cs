@@ -1842,7 +1842,9 @@ namespace BackendSite.Service.Model.enums
         [Description("Bank System Unstable")]
         BankSystemUnstable = 4,
         [Description("Withdrawal limit exceeded INR")]
-        WithdrawalLimitExceededINR = 5
+        WithdrawalLimitExceededINR = 5,
+        [Description("Withdrawal Restrictions Bank Card Withdrawals")]
+        WithdrawalRestrictionsBankCardWithdrawals = 6,
     }
 
     public enum MpaTransactionRelaySummaryTypeEnum
@@ -2115,5 +2117,13 @@ namespace BackendSite.Service.Model.enums
         openSUSE,
         TESLA,
         Web0S,
+    }
+    /// <summary>
+    /// 驗證類型
+    /// </summary>
+    public enum VerificationInfoType 
+    {
+        Email =1,
+        Phone =2
     }
 }

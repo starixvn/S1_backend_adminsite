@@ -426,7 +426,12 @@ public class SetFullNameRequest
     public int CustId { get; set; }
     public string FullName { get; set; }
 }
-
+public class VerificationRequest
+{
+    public VerificationInfoType VerificationType { get; set; }
+    public int CustId { get; set; }
+    public string VerificationInfo { get; set; }
+}
 public class SetEmailRequest
 {
     public int CustId { get; set; }
