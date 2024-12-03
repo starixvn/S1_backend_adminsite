@@ -158,6 +158,13 @@ namespace BackendSite.Service.DAL
 
         #region Lottery
 
+        public IEnumerable<GetLotteryEventRoundData> GetLotteryEventRoundList(int siteId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            return _reportDbClient.Query<GetLotteryEventRoundData>("Admin_LotteryEventDrawRoundList_Get", p);
+        }
+        
         public IEnumerable<LotteryEventResponse> GetLotteryEventSetting(GetLotteryEventRequest request)
         {
             var p = new DynamicParameters();

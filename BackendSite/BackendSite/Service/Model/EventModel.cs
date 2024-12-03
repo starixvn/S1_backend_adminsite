@@ -6,6 +6,19 @@ namespace BackendSite.Service.Model
 {
     #region Lottery
     
+    public class GetLotteryEventRoundData
+    {
+        public int RoundId { get; set; }
+        public string StartDate{ get; set; }
+        public string EndDate{ get; set; }
+    }
+    
+    public class GetLotteryEventRoundResponse
+    {
+        public int RoundId { get; set; }
+        public string RoundName{ get; set; }
+    }
+    
     public class GetLotteryEventRequest
     {
         public int SiteId { get; set; }

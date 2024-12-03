@@ -222,6 +222,18 @@ namespace BackendSite.Service.BLL
         
         #region Lottery
 
+        public IEnumerable<GetLotteryEventRoundResponse> GetLotteryEventRoundList(int siteId)
+        {
+            var data = _eventService.GetLotteryEventRoundList(siteId);
+            var result = data.Select(x => new GetLotteryEventRoundResponse
+            {
+                RoundId = x.RoundId,
+                RoundName = $"Round {x.RoundId} ({x.StartDate} - {x.EndDate})"
+            });
+            
+            return result;
+        }
+        
         public IEnumerable<LotteryEventResponse> GetLotteryEventSetting(GetLotteryEventRequest request)
         {
             var responses = _eventService.GetLotteryEventSetting(request);
