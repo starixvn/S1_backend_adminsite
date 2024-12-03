@@ -526,7 +526,8 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             var authData = _authorizeBll.GetAuthData();
             var apiResult = new ApiResult<IEnumerable<GetLotteryEventRoundResponse>>
             {
-                Data = _eventBll.GetLotteryEventRoundList(authData.SiteId)
+                Data = _eventBll.GetLotteryEventRoundList(authData.SiteId),
+                ErrorCode = (int)ErrorCodeEnum.Success
             };
             return apiResult;
         }
