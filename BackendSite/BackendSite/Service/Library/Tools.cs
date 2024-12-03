@@ -225,8 +225,7 @@ namespace BackendSite.Service.Library
             if (string.IsNullOrEmpty(phone))
                 return phone;
 
-            var pattern = @"(?<=[\w]{3})[\w-\._\+%]*(?=[\w]{3})";
-            return Regex.Replace(phone, pattern, m => new string('*', m.Length));
+            return new string('*', phone.Length);
         }
 
         /// <summary>
@@ -239,7 +238,7 @@ namespace BackendSite.Service.Library
             if (string.IsNullOrEmpty(email))
                 return email;
 
-            var pattern = @"(?<=[\w]{1})[\w-\._\+%]*(?=[\w]{1}@)";
+            var pattern = @"^[^@]+(?=@)";
             return Regex.Replace(email, pattern, m => new string('*', m.Length));
         }
 

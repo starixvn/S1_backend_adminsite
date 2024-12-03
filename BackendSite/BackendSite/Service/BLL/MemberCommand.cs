@@ -20,6 +20,8 @@ public class MemberCommand : IMemberCommand
     private readonly IBonusApiService _bonusApi;
     private readonly ILogger<MemberCommand> _logger;
     private readonly ServerInfoBLL _ServerInfoBll;
+    private readonly AdminBLL _adminBll;
+    private readonly PermissionBLL _permissionBll;
 
     public MemberCommand(IMemberService memberService,
         CodeGenerator codeGenerator,
@@ -28,7 +30,10 @@ public class MemberCommand : IMemberCommand
         ILogger<MemberCommand> logger,
         IBonusApiService bonusApi,
         CustInfoBLL custInfoBll,
-        VerificationRewardService verificationRewardService, ServerInfoBLL serverInfoBll)
+        VerificationRewardService verificationRewardService,
+        ServerInfoBLL serverInfoBll,
+        AdminBLL adminBll,
+        PermissionBLL permissionBll)
     {
         _memberService = memberService;
         _codeGenerator = codeGenerator;
@@ -39,6 +44,8 @@ public class MemberCommand : IMemberCommand
         _custInfoBll = custInfoBll;
         _verificationRewardService = verificationRewardService;
         _ServerInfoBll = serverInfoBll;
+        _adminBll = adminBll;
+        _permissionBll = permissionBll;
     }
 
     public async Task<int> AddCustTagAsync(int custId, int tagId, string @operator)
@@ -150,12 +157,24 @@ public class MemberCommand : IMemberCommand
         return true;
     }
 
-    public async Task<int> EditEmailAsync(int custId, string email, string @operator)
+    public async Task<bool> Verification(int custId,VerificationInfoType type, string verificationInfo)
+    {
+        var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
+        switch (type)
+        {
+            case VerificationInfoType.Email:
+                return (customer.Email == verificationInfo);
+            case VerificationInfoType.Phone:
+                return (customer.PhoneNo == verificationInfo);
+        }
+        return false;
+    }
+    public async Task<int> EditEmailAsync(int custId, string email, string @operator,AuthData authData)
     {
         var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
 
         if (await _memberService.IsExistsEmail(custId, email, customer.SiteId))
-            return -1;
+            return -1;   
 
         var beforeEmail = customer.Email;
         var result = await _memberService.EditEmailAsync(custId, email);
@@ -170,7 +189,8 @@ public class MemberCommand : IMemberCommand
         return result;
     }
 
-    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator)
+
+    public async Task<int> EditPhoneNoAsync(int custId, string phoneNo, string @operator, AuthData authData)
     {
         var customer = _custInfoBll.GetCustInfoWithCache(custId);
         if (long.TryParse(phoneNo, out var phoneNoLong))
@@ -195,6 +215,7 @@ public class MemberCommand : IMemberCommand
 
         return result;
     }
+
 
     public async Task<int> EditBirthdayAsync(int custId, int year, int month, int date, string @operator)
     {
