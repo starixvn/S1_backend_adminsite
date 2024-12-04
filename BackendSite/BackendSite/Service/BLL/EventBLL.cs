@@ -259,7 +259,7 @@ namespace BackendSite.Service.BLL
                 request.Small
             };
             var excludeSetting = JsonConvert.SerializeObject(setting);
-            var result = await _eventService.SetLotteryEventSetting(request.Sq, request.StartDate, request.EndDate ,request.DrawDate ,request.IsSuspend , excludeSetting ,  JsonConvert.SerializeObject(request.ExcludeTagList),updator);
+            var result = await _eventService.SetLotteryEventSetting(request.Sq, request.StartDate, request.EndDate ,request.DrawDate ,request.IsSuspend , excludeSetting ,updator);
             
             return result;
         }
@@ -275,7 +275,7 @@ namespace BackendSite.Service.BLL
                 request.Small
             };
             var excludeSetting = JsonConvert.SerializeObject(setting);
-            var result = await _eventService.AddLotteryEvent(request.SiteId, request.StartDate, request.EndDate ,request.DrawDate , excludeSetting , JsonConvert.SerializeObject(request.ExcludeTagList),updator);
+            var result = await _eventService.AddLotteryEvent(request.SiteId, request.StartDate, request.EndDate ,request.DrawDate , excludeSetting ,updator);
             
             return result;
         }
@@ -373,6 +373,20 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
+        public IEnumerable<LotteryEventTagExcludeResponse> GetLotteryEventTagExclude(int siteId)
+        {
+            var responses = _eventService.GetLotteryEventTagExclude(siteId);
+           
+            return responses;
+        }
+        
+        public async Task<int> SetLotteryEventTagExclude(int siteId, string tagExcludeList ,string creator)
+        {
+            var result = await _eventService.SetLotteryEventTagExclude(siteId ,tagExcludeList ,creator);
+            
+            return result;
+        }
+        
         public async Task<GetStickerReportResponse> GetStickerReport(GetStickerReportRequest request)
         {
             var currencyTotalAmount = new List<StickerReportCurrencyTotal>();

@@ -46,8 +46,8 @@ namespace BackendSite.Service.DAL.Interface
         public IEnumerable<GetLotteryEventRoundData> GetLotteryEventRoundList(int siteId);
         public IEnumerable<LotteryEventResponse> GetLotteryEventSetting(GetLotteryEventRequest request);
         public LotteryEventResponse GetLotteryEventSettingBySq(int sq);
-        public Task<int> SetLotteryEventSetting(int sq, DateTime startDate, DateTime endDate, DateTime drawDate, int isSuspend, string excludeSetting,string excludeTagList, string updator);
-        public Task<int> AddLotteryEvent(int siteId, DateTime startDate, DateTime endDate, DateTime drawDate, string excludeSetting, string excludeTagList, string updator);
+        public Task<int> SetLotteryEventSetting(int sq, DateTime startDate, DateTime endDate, DateTime drawDate, int isSuspend, string excludeSetting, string updator);
+        public Task<int> AddLotteryEvent(int siteId, DateTime startDate, DateTime endDate, DateTime drawDate, string excludeSetting, string updator);
         public LotteryTicketHistory GetLotteryTicketHistory(int siteId, int roundId);
         public IEnumerable<RaffleTicketStickerResponse> GetRaffleTicketStickerSetting(int siteId);
         public Task<int> SetRaffleTicketStickerSetting(SetRaffleTicketStickerRequest request, string updator);
@@ -56,6 +56,8 @@ namespace BackendSite.Service.DAL.Interface
         public IEnumerable<EventRestrictionResponse> GetEventRestrictionList(GetEventRestrictionRequest request);
         public Task<int> InsEventRestriction(int siteId, int currencyId, int custId ,string reason ,string creator);
         public Task<int> DelEventRestriction(int custId);
+        public IEnumerable<LotteryEventTagExcludeResponse> GetLotteryEventTagExclude(int siteId);
+        public Task<int> SetLotteryEventTagExclude(int siteId, string tagExcludeList ,string creator);
         public Task<GetStickerReportResponse> GetStickerReport(GetStickerReportRequest request);
         public IEnumerable<GetCustLotteryTicket> GetCustLotteryTicket(int siteId, string currencyIds, string userName, int roundId, string ticketNo);
 
