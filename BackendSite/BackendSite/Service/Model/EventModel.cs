@@ -54,8 +54,6 @@ namespace BackendSite.Service.Model
         public int Status { get; set; }
         public string ExcludeSetting { get; set; }
         public List<string> ExcludeSettingList => JsonConvert.DeserializeObject<List<string>>(ExcludeSetting);
-        public string ExcludeTagSetting { get; set; }
-        public List<string> ExcludeTagList => JsonConvert.DeserializeObject<List<string>>(ExcludeTagSetting);
         public string Updator { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }
@@ -73,7 +71,6 @@ namespace BackendSite.Service.Model
         public int ThirdPrize { get; set; }
         public int Consolation { get; set; }
         public int Small { get; set; }
-        public IEnumerable<int> ExcludeTagList { get; set; } = new List<int>();
     }
     
     public class AddLotteryEventRequest
@@ -87,7 +84,6 @@ namespace BackendSite.Service.Model
         public int ThirdPrize { get; set; }
         public int Consolation { get; set; }
         public int Small { get; set; }
-        public IEnumerable<int> ExcludeTagList { get; set; } = new List<int>();
     }
     
     public class LotteryTicketHistoryRequest
@@ -196,6 +192,19 @@ namespace BackendSite.Service.Model
         public string UserName { get; set; }
     }
 
+    public class SetLotteryEventTagExcludeRequest
+    {
+        public IEnumerable<int> TagExcludeList { get; set; } = new List<int>();
+    }
+    
+    public class LotteryEventTagExcludeResponse
+    {
+        public int Id { get; set; }
+        public string TagName { get; set; }
+        public string Description { get; set; }
+        public string TagColour { get; set; }
+    }
+    
     public class GetStickerReportRequest : ApiRequestPageModel
     {
         public IEnumerable<int> SiteIds { get; set; }

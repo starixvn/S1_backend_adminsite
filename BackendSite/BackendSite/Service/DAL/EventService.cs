@@ -181,7 +181,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<LotteryEventResponse>("Admin_LotteryEventDrawSettingBySQ_Get", p);
         }
         
-        public async Task<int> SetLotteryEventSetting(int sq, DateTime startDate , DateTime endDate , DateTime drawDate , int isSuspend , string excludeSetting , string excludeTagList,string updator)
+        public async Task<int> SetLotteryEventSetting(int sq, DateTime startDate , DateTime endDate , DateTime drawDate , int isSuspend , string excludeSetting ,string updator)
         {
             var p = new DynamicParameters();
             p.Add("_SQ", sq, dbType: DbType.Int32);
@@ -190,12 +190,11 @@ namespace BackendSite.Service.DAL
             p.Add("_DrawDate", drawDate, dbType: DbType.DateTime);
             p.Add("_IsSuspend", isSuspend, dbType: DbType.String);
             p.Add("_ExcludeSetting", excludeSetting, dbType: DbType.String);
-            p.Add("_ExcludeTagList", excludeTagList, dbType: DbType.String);
             p.Add("_Updator", updator, dbType: DbType.String);
             return await _mainDbClient.ExecuteAsync("Admin_LotteryEventDrawSetting_Set", p);
         }
         
-        public async Task<int> AddLotteryEvent(int siteId, DateTime startDate , DateTime endDate , DateTime drawDate , string excludeSetting ,string excludeTagList , string updator)
+        public async Task<int> AddLotteryEvent(int siteId, DateTime startDate , DateTime endDate , DateTime drawDate , string excludeSetting, string updator)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId, dbType: DbType.Int32);
@@ -203,7 +202,6 @@ namespace BackendSite.Service.DAL
             p.Add("_EndDate", endDate, dbType: DbType.DateTime);
             p.Add("_DrawDate", drawDate, dbType: DbType.DateTime);
             p.Add("_ExcludeSetting", excludeSetting, dbType: DbType.String);
-            p.Add("_ExcludeTagList", excludeTagList, dbType: DbType.String);
             p.Add("_Updator", updator, dbType: DbType.String);
             return await _mainDbClient.ExecuteAsync("Admin_LotteryEventDrawSetting_Ins", p);
         }
@@ -274,7 +272,23 @@ namespace BackendSite.Service.DAL
             p.Add("_CustId", custId, dbType: DbType.Int32);
             return await _mainDbClient.ExecuteAsync("Admin_EventRestriction_Del", p);
         }
-
+        
+        public IEnumerable<LotteryEventTagExcludeResponse> GetLotteryEventTagExclude(int siteId)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            return _reportDbClient.Query<LotteryEventTagExcludeResponse>("Admin_LotteryEventTagExclude_Get" , p);
+        }
+        
+        public async Task<int> SetLotteryEventTagExclude(int siteId, string tagExcludeList ,string updater)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId, dbType: DbType.Int32);
+            p.Add("_TagExcludeList", tagExcludeList, dbType: DbType.String);
+            p.Add("_Updater", updater, dbType: DbType.String);
+            return await _mainDbClient.ExecuteAsync("Admin_LotteryEventTagExclude_Set", p);
+        }
+        
         public async Task<GetStickerReportResponse> GetStickerReport(GetStickerReportRequest request)
         {
             var result = new GetStickerReportResponse
