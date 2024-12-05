@@ -137,7 +137,7 @@ namespace BackendSite.Service.Model
         public IEnumerable<int> PromotionCategoryGameTypeList { get; set; } = new List<int>();
 
         [Description("是否以Upload List的方式指定特定User才能領取: 0.不是 1.是")]
-        public bool PromotionCustList { get; set; }
+        public bool IsPromotionUploadCustList { get; set; }
     }
 
     public class PromotionInfoReq

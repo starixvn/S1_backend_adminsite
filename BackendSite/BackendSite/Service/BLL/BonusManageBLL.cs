@@ -239,18 +239,18 @@ namespace BackendSite.Service.BLL
         {
             return _bonusManageService.GetBonusCustUsingDetail(siteId, bonusCode);
         }
-        public bool UploadPromotionCustList(List<PromotionCustUploadList> list)
+        public bool UploadPromotionUploadCustList(List<PromotionCustUploadList> list)
         {
-            return _bonusManageService.UploadPromotionCustList(list);
+            return _bonusManageService.UploadPromotionUploadCustList(list);
         }
 
-        public IEnumerable<PromotionCustList> GetPromotionCustList(int siteId, string bonusCode)
+        public IEnumerable<PromotionCustList> GetPromotionUploadCustList(int siteId, string bonusCode)
         {
-            return _bonusManageService.GetPromotionCustList(siteId, bonusCode);
+            return _bonusManageService.GetPromotionUploadCustList(siteId, bonusCode);
         }
-        public int DeletePromotionCustList(DeletePromotionCustListRequest req)
+        public int DeletePromotionUploadCustList(DeletePromotionCustListRequest req)
         {
-            return _bonusManageService.DeletePromotionCustList(req);
+            return _bonusManageService.DeletePromotionUploadCustList(req);
         }
     }
 

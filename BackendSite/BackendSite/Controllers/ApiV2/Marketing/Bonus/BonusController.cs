@@ -632,13 +632,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <param name="req"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 3 })]
         [HttpPost]
-        public async Task<ApiResult<int>> UploadPromotionCustList([FromForm] UploadPromotionCustListRequest req)
+        public async Task<ApiResult<int>> UploadPromotionUploadCustList([FromForm] UploadPromotionCustListRequest req)
         {
             var authData = _authorizeBll.GetAuthData();
             var excelList = new List<PromotionCustUploadList>();
             var result = false;
             bool isSpecialBonus = req.PromotionType == PromotionTypeEnum.SpecialBonus;
-            _logger.LogInformation($@"UploadPromotionCustList Start At {DateTime.UtcNow}.");
+            _logger.LogInformation($@"UploadPromotionUploadCustList Start At {DateTime.UtcNow}.");
 
             if (req.excelUpload != null)
             {
@@ -652,9 +652,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                     do // 讀取資料，直到讀到空白列為止
                     {
                         var userName = sheet.Cells[rowId, 1].Text.Trim();
-                        var amount = sheet.Cells[rowId, 2].Text.Trim();
-                        var rollover = isSpecialBonus ? sheet.Cells[rowId, 3].Text.Trim() : null;
-                        var tempExpiryDate = isSpecialBonus ? sheet.Cells[rowId, 4].Text.Trim() : sheet.Cells[rowId, 3].Text.Trim();
+                        var amount = isSpecialBonus ? sheet.Cells[rowId, 2].Text.Trim() : "0";
+                        var rollover = isSpecialBonus ? sheet.Cells[rowId, 3].Text.Trim() : "0";
+                        var tempExpiryDate = isSpecialBonus ? sheet.Cells[rowId, 4].Text.Trim() : sheet.Cells[rowId, 2].Text.Trim();
                         var custInfo = _custInfoBll.GetCustInfoDetails(null, userName, req.SiteId);
 
                         if (DateTimeOffset.TryParse(tempExpiryDate, out DateTimeOffset expiryDate))
@@ -673,7 +673,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                                         SiteId = req.SiteId,
                                         CustId = custInfo.CustId,
                                         Bonus = decimal.Parse(amount),
-                                        RollOver = isSpecialBonus ? int.Parse(rollover) : 0,
+                                        RollOver = int.Parse(rollover),
                                         ExpiryDate = expiryDate
                                     };
                                     excelList.Add(data);
@@ -687,9 +687,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         }
                     } while (!isLastRow);
 
-                    result = _bonusManageBll.UploadPromotionCustList(excelList);
+                    result = _bonusManageBll.UploadPromotionUploadCustList(excelList);
 
-                    _logger.LogInformation($@"UploadPromotionCustList End At {DateTime.UtcNow}.");
+                    _logger.LogInformation($@"UploadPromotionUploadCustList End At {DateTime.UtcNow}.");
                 }
                 else
                 {
@@ -731,15 +731,13 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// <returns></returns>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 1 })]
         [HttpPost]
-        public List<PromotionCustList> GetPromotionCustList(PromotionCustListRequest req)
+        public List<PromotionCustList> GetPromotionUploadCustList(PromotionCustListRequest req)
         {
-            var result = _bonusManageBll.GetPromotionCustList(req.SiteId, req.BonusCode).ToList();
-
-            return result;
+            return  _bonusManageBll.GetPromotionUploadCustList(req.SiteId, req.BonusCode).ToList();
         }
 
         /// <summary>
-        /// Banner/UpdateStatus 更新橫幅狀態
+        /// BonusManagement/DeletePromotionUploadCustList 移除名單內的cust
         /// </summary>
         /// <remarks>
         /// Http Method：POST
@@ -748,12 +746,12 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         /// </remarks>
         /// <param name="request"></param>
         [HttpPost]
-        public ApiResult DeletePromotionCustList(DeletePromotionCustListRequest request)
+        public ApiResult DeletePromotionUploadCustList(DeletePromotionCustListRequest request)
         {
             var apiResult = new ApiResult();
             try
             {
-                var result = _bonusManageBll.DeletePromotionCustList(request) >= 0;
+                var result = _bonusManageBll.DeletePromotionUploadCustList(request) >= 0;
 
                 if (result)
                 {

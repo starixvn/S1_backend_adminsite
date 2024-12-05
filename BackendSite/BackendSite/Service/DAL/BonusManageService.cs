@@ -607,30 +607,30 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.Query<int>("Admin_PromotionExists_Get", p);
         }
 
-        public bool UploadPromotionCustList(List<PromotionCustUploadList> list)
+        public bool UploadPromotionUploadCustList(List<PromotionCustUploadList> list)
         {
-            var result = _mainDbClient.Execute("Admin_PromotionCustList_Set", list);
+            var result = _mainDbClient.Execute("Admin_PromotionUploadCustList_Set", list);
 
             return result > 0;
         }
 
-        public IEnumerable<PromotionCustList> GetPromotionCustList(int siteId, string bonusCode)
+        public IEnumerable<PromotionCustList> GetPromotionUploadCustList(int siteId, string bonusCode)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", siteId);
             p.Add("_BonusCode", bonusCode);
-            var result = _reportDbClient.Query<PromotionCustList>("Admin_PromotionCustList_Get", p);
+            var result = _reportDbClient.Query<PromotionCustList>("Admin_PromotionUploadCustList_Get", p);
 
             return result;
         }
-        public int DeletePromotionCustList(DeletePromotionCustListRequest req)
+        public int DeletePromotionUploadCustList(DeletePromotionCustListRequest req)
         {
             var p = new DynamicParameters();
             p.Add("_SiteId", req.SiteId);
             p.Add("_BonusCode", req.BonusCode);
             p.Add("_CustId", req.CustId);
 
-            return _mainDbClient.Execute("Admin_PromotionCustList_Del", p);
+            return _mainDbClient.Execute("Admin_PromotionUploadCustList_Del", p);
         }
         #endregion
 
