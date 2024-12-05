@@ -679,7 +679,7 @@ namespace BackendSite.Service.DAL
             p.Add("_PromotionAction", promotion.PromotionAction);
             p.Add("_AutoExtend", promotion.AutoExtend);
             p.Add("_IsPopUp", promotion.IsPopUp);
-            p.Add("_PromotionCustList", promotion.PromotionCustList);
+            p.Add("_IsPromotionUploadCustList", promotion.IsPromotionUploadCustList);
 
 
 
