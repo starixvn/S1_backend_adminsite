@@ -13,6 +13,7 @@ using MySql.Data.MySqlClient;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using static BackendSite.Controllers.ApiV2.Marketing.Bonus.BonusController;
 
 namespace BackendSite.Service.DAL
 {
@@ -613,6 +614,32 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<int>("Admin_PromotionExists_Get", p);
         }
+
+        public bool UploadPromotionUploadCustList(List<PromotionCustUploadList> list)
+        {
+            var result = _mainDbClient.Execute("Admin_PromotionUploadCustList_Set", list);
+
+            return result > 0;
+        }
+
+        public IEnumerable<PromotionCustList> GetPromotionUploadCustList(int siteId, string bonusCode)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", siteId);
+            p.Add("_BonusCode", bonusCode);
+            var result = _reportDbClient.Query<PromotionCustList>("Admin_PromotionUploadCustList_Get", p);
+
+            return result;
+        }
+        public int DeletePromotionUploadCustList(DeletePromotionCustListRequest req)
+        {
+            var p = new DynamicParameters();
+            p.Add("_SiteId", req.SiteId);
+            p.Add("_BonusCode", req.BonusCode);
+            p.Add("_CustId", req.CustId);
+
+            return _mainDbClient.Execute("Admin_PromotionUploadCustList_Del", p);
+        }
         #endregion
 
         #region Private Methods
@@ -652,6 +679,9 @@ namespace BackendSite.Service.DAL
             p.Add("_PromotionAction", promotion.PromotionAction);
             p.Add("_AutoExtend", promotion.AutoExtend);
             p.Add("_IsPopUp", promotion.IsPopUp);
+            p.Add("_PromotionCustList", promotion.PromotionCustList);
+
+
 
             //啟用限制條件，可用次數下限為1
             var _sameDeviceIDAvailableCount = promotion.SameDeviceIDRestrict && promotion.SameDeviceIDAvailableCount < 1 ? 1 : promotion.SameDeviceIDAvailableCount;
@@ -668,7 +698,7 @@ namespace BackendSite.Service.DAL
             p.Add("_HideForUnlogin", promotion.HideForUnlogin);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_Promotion_Set_V8", transaction, p);
+            _mainDbClient.Execute("Admin_Promotion_Set_V9", transaction, p);
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount;
