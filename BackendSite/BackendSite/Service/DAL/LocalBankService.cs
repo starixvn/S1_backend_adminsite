@@ -29,7 +29,7 @@ namespace BackendSite.Service.DAL
                 _CurrencyId = currencyId
             });
 
-            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get_V2", p);
+            var a = _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get_V3", p);
 
             return a;
         }

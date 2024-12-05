@@ -13,7 +13,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public int SiteId { get; set; }
         public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> Channels { get; set; }
-        public string Agent { get; set; }
+        public int AgentId { get; set; }
         public IEnumerable<int> Status { get; set; }
         public IEnumerable<int> Purposes { get; set; }
         public IEnumerable<int> SysIds { get; set; }

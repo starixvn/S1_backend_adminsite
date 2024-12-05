@@ -2126,4 +2126,10 @@ namespace BackendSite.Service.Model.enums
         Email =1,
         Phone =2
     }
+    
+    public enum PaymentAgentEnum 
+    {
+        Internal = 0,
+        OutSource = 1
+    }
 }

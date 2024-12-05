@@ -113,7 +113,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public int SiteId { get; set; }
             public string DepositId { get; set; }
             public string UserName { get; set; }
-            public string Agent { get; set; }
+            public int AgentId { get; set; }
             public IEnumerable<int> DepositTypes { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate
@@ -144,7 +144,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             public int SiteId { get; set; }
             public string DepositId { get; set; }
             public string UserName { get; set; }
-            public string Agent { get; set; }
+            public int AgentId { get; set; }
             public IEnumerable<int> DepositTypes { get; set; }
             public IEnumerable<int> CurrencyIds { get; set; }
             public DateTimeOffset StartDate
@@ -231,7 +231,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.DateType,
                 request.DepositId,
                 userNames,
-                request.Agent,
+                request.AgentId,
                 request.CurrencyIds,
                 request.Statuses,
                 request.LevelStatuses,
@@ -295,7 +295,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                 request.DateType,
                 request.DepositId,
                 userNames,
-                string.IsNullOrEmpty(request.Agent) ? null : request.Agent,
+                request.AgentId,
                 request.CurrencyIds.Any() ? JsonConvert.SerializeObject(request.CurrencyIds) : null,
                 JsonConvert.SerializeObject(request.Statuses),
                 request.LevelStatuses.Any() ? JsonConvert.SerializeObject(request.LevelStatuses) : null,

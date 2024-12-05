@@ -12,7 +12,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrStatus = "[]";
             StrPurposes = "[]";
             StrSysIds = "[]";
-            Agent = string.Empty;
+            AgentId = 0;
             AccountNo = string.Empty;
             Id = id;
         }
@@ -25,7 +25,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrStatus = JsonConvert.SerializeObject(req.Status);
             StrPurposes = req.Purposes.Any() ? JsonConvert.SerializeObject(req.Purposes) : "[]";
             StrSysIds = req.SysIds.Any() ? JsonConvert.SerializeObject(req.SysIds) : "[]";
-            Agent = req.Agent ?? string.Empty;
+            AgentId = req.AgentId;
             AccountNo = req.AccountNo ?? string.Empty;
         }
 
@@ -33,7 +33,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public int SiteId { get; set; }
         public string StrCurrencyIds { get; set; }
         public string StrChannels { get; set; }
-        public string Agent { get; set; }
+        public int AgentId { get; set; }
         public string StrStatus { get; set; }
         public string StrPurposes { get; set; }
         public string StrSysIds { get; set; }

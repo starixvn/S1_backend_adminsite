@@ -64,12 +64,23 @@ namespace BackendSite.Service.Model
         public string BankCode { get; set; }
         public string BankName { get; set; }
         public string BankLoginUrl { get; set; }
+        public string JsonBankLoginInfo { get; set; }
+        public IEnumerable<BankLoginInfo> BankLoginInfos =>
+            JsonConvert.DeserializeObject<IEnumerable<BankLoginInfo>>(JsonBankLoginInfo ?? "[]");
+        //todo: remove
         public string BankLoginAccount { get; set; }
         public string BankLoginPassword { get; set; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }
         public string CorporateID { get; set; }
+    }
+
+    public class BankLoginInfo
+    {
+        
+        public string Account { get; set; }
+        public string Password { get; set; }
     }
 
     public class BankCodeModel

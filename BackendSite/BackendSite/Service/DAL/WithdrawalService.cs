@@ -54,7 +54,7 @@ namespace BackendSite.Service.DAL
             WithdrawalMethodEnum withdrawalMethod,
             IEnumerable<string> selectBankCode,
             IEnumerable<int> selectCalCode,
-            string agent,
+            int agent,
             out int totalPages,
             out int rowCount,
             ref List<TotalAmount> currencyAmount)
@@ -85,16 +85,16 @@ namespace BackendSite.Service.DAL
                 _PageSize = pageSize,
                 _StartAmount = startAmount,
                 _EndAmount = endAmount,
-                _Agent = string.IsNullOrEmpty(agent) ? null : agent,
+                _AgentId = agent,
                 _WithdrawalMethod = withdrawalMethod
             });
 
-            currencyAmount = _reportDbClient.RetryQuery<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V7", p, 3).ToList();
+            currencyAmount = _reportDbClient.RetryQuery<TotalAmount>("Admin_WithdrawalTotalAmount_Get_V8", p, 3).ToList();
 
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var result = _reportDbClient.RetryQuery<WithdrawalRequest>("Admin_WithdrawalList_Get_V12", p, 3);
+            var result = _reportDbClient.RetryQuery<WithdrawalRequest>("Admin_WithdrawalList_Get_V13", p, 3);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
@@ -176,7 +176,7 @@ namespace BackendSite.Service.DAL
             decimal endAmount,
             string selectBankCode,
             string selectCalCode,
-            string agent,
+            int agent,
             WithdrawalMethodEnum withdrawalMethod)
         {
             var withdrawalId = 0;
@@ -203,11 +203,11 @@ namespace BackendSite.Service.DAL
                 _EndAmount = endAmount,
                 _SelectBankCode = selectBankCode,
                 _SelectCalCode = selectCalCode,
-                _Agent = agent,
+                _AgentId = agent,
                 _WithdrawalMethod = withdrawalMethod
             });
 
-            var depositList = _reportDbClient.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V10", p);
+            var depositList = _reportDbClient.Query<WithdrawalInfoForExport>("Admin_WithdrawalListExport_Get_V11", p);
             return depositList;
         }
 

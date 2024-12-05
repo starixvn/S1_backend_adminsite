@@ -23,7 +23,7 @@ public class GetFinancialReportRequest
     public DateTimeOffset StartTime { get; set; }
     public DateTimeOffset EndTime { get; set; }
     public IEnumerable<TransferChannelEnum> Channel { get; set; }
-    public IEnumerable<string> Agents { get; set; }
+    public IEnumerable<int> AgentIds { get; set; }
     public IEnumerable<int> FinancialAccountIds { get; set; }
 }
 
@@ -33,8 +33,8 @@ public class GetFinancialReportParams
     {
         SiteId = req.SiteId;
         CurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds.OrderBy(x => x));
-        Agents = req.Agents == null
-            ? null : JsonConvert.SerializeObject(req.Agents.OrderBy(x => x));
+        Agents = req.AgentIds == null
+            ? null : JsonConvert.SerializeObject(req.AgentIds);
         Channel = req.Channel == null
             ? null : JsonConvert.SerializeObject(req.Channel.OrderBy(x => x));
         FinancialAccountIds = req.FinancialAccountIds == null

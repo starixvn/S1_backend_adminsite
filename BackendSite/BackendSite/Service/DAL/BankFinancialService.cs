@@ -79,7 +79,7 @@ namespace BackendSite.Service.DAL
                     _SiteId = input.SiteId,
                     _CurrencyIds = input.StrCurrencyIds,
                     _Channels = input.StrChannels,
-                    _Agent = input.Agent,
+                    _AgentId = input.AgentId,
                     _Status = input.StrStatus,
                     _Purposes = input.StrPurposes,
                     _SysIds = input.StrSysIds,
@@ -88,8 +88,8 @@ namespace BackendSite.Service.DAL
                 });
 
             return _reportbackupDbClient != null
-                    ? _reportbackupDbClient.RetryQuery<BankFinancialTransferAccountDetailModel>("Admin_BankFinancialTransferAccount_Get_V4", parameters)
-                    : _reportDbClient.Query<BankFinancialTransferAccountDetailModel>("Admin_BankFinancialTransferAccount_Get_V4", parameters);
+                    ? _reportbackupDbClient.RetryQuery<BankFinancialTransferAccountDetailModel>("Admin_BankFinancialTransferAccount_Get_V5", parameters)
+                    : _reportDbClient.Query<BankFinancialTransferAccountDetailModel>("Admin_BankFinancialTransferAccount_Get_V5", parameters);
         }
 
         public IEnumerable<string> GetTransferAccountAgentList(int siteId)
@@ -192,40 +192,11 @@ namespace BackendSite.Service.DAL
                     _Updator = bankFinancialTransferAccount.Updator
                 });
 
-            var SpName = "Admin_BankFinancialTransferAccount_Upd_V9";
+            var SpName = "Admin_BankFinancialTransferAccount_Set";
 
             return _mainDbClient.Execute(SpName, parameters);
         }
 
-        public int InsertTransferAccountLog(ActionType action, BankFinancialTransferAccountModel bankFinancialTransferAccount)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _SiteId = bankFinancialTransferAccount.SiteId,
-                    _SiteName = bankFinancialTransferAccount.SiteName,
-                    _CurrencyId = bankFinancialTransferAccount.CurrencyId,
-                    _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = bankFinancialTransferAccount.Purpose,
-                    _Channel = bankFinancialTransferAccount.Channel,
-                    _Agent = bankFinancialTransferAccount.Agent,
-                    _PayId = bankFinancialTransferAccount.PayId,
-                    _AccountNo = bankFinancialTransferAccount.AccountNo,
-                    _AccountName = bankFinancialTransferAccount.AccountName,
-                    _DisplayName = bankFinancialTransferAccount.DisplayName,
-                    _InitialAmount = bankFinancialTransferAccount.InitialAmount,
-                    _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
-                    _Reason = bankFinancialTransferAccount.Reason,
-                    _Remark = bankFinancialTransferAccount.Remark,
-                    _Status = bankFinancialTransferAccount.Status,
-                    _Operator = bankFinancialTransferAccount.Updator,
-                    _Action = action
-                });
-
-            var SpName = "Admin_BankFinancialTransferAccountLog_Ins_V2";
-
-            return _mainDbClient.Execute(SpName, parameters);
-        }
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
         {
             var parameters = new DynamicParameters(new
@@ -234,26 +205,7 @@ namespace BackendSite.Service.DAL
                 _Purposes = purposes == null ? null : JsonConvert.SerializeObject(purposes)
             });
             return _reportDbClient
-                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V4", parameters);
-        }
-
-        public int GetTransferDataCount(string accountNo)
-        {
-            var count = 0;
-
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _AccountNo = accountNo,
-                });
-            parameters.Add("_Count", count, DbType.Int32, ParameterDirection.InputOutput);
-
-            var SpName = "Admin_BankFinancialTransferInfo_ByAccountNo_Get";
-            _mainDbClient.Execute(SpName, parameters);
-
-            count = parameters.Get<int?>("_Count") ?? 0;
-
-            return count;
+                .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V5", parameters);
         }
 
         public int UpdateTransferInfo(BankFinancialTransferAccountModel bankFinancialTransferAccount, BankFinancialTransferAccountDetailModel oldData)
@@ -553,7 +505,7 @@ namespace BackendSite.Service.DAL
                     _EndTime = input.EndTime
                 });
 
-            return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Deposit_Get_V3", parameters);
+            return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Deposit_Get_V4", parameters);
         }
 
         public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportWithdrawalAsync(GetFinancialReportParams input)
@@ -570,7 +522,7 @@ namespace BackendSite.Service.DAL
                     _EndTime = input.EndTime
                 });
 
-            return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Withdrawal_Get_V3", parameters);
+            return await _reportDbClient.QueryAsync<FinancialReportResult>("Admin_BankFinancialReport_Withdrawal_Get_V4", parameters);
         }
 
         public async Task<IEnumerable<FinancialReportResult>> GetFinancialReportTransferAsync(GetFinancialReportParams input)

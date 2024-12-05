@@ -314,8 +314,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 foreach (var d in data)
                 {
-                    d.BankLoginAccount = _cryptor.Decrypt(d.BankLoginAccount);
-                    d.BankLoginPassword = _cryptor.Decrypt(d.BankLoginPassword);
+                    foreach (var info in d.BankLoginInfos)
+                    {
+                        info.Account = _cryptor.Decrypt(info.Account);
+                        info.Password = _cryptor.Decrypt(info.Password);
+                    }
                     d.TransferPin = _cryptor.Decrypt(d.TransferPin);
                     d.LoginPin = _cryptor.Decrypt(d.LoginPin);
                     d.MobilePin = _cryptor.Decrypt(d.MobilePin);
@@ -350,8 +353,11 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 foreach (var d in data)
                 {
-                    d.BankLoginAccount = _cryptor.Decrypt(d.BankLoginAccount);
-                    d.BankLoginPassword = _cryptor.Decrypt(d.BankLoginPassword);
+                    foreach (var info in d.BankLoginInfos)
+                    {
+                        info.Account = _cryptor.Decrypt(info.Account);
+                        info.Password = _cryptor.Decrypt(info.Password);
+                    }
                     d.TransferPin = _cryptor.Decrypt(d.TransferPin);
                     d.LoginPin = _cryptor.Decrypt(d.LoginPin);
                     d.MobilePin = _cryptor.Decrypt(d.MobilePin);

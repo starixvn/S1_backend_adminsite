@@ -178,7 +178,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public WithdrawalMethodEnum WithdrawalMethod { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
             public IEnumerable<int> SelectCalCode { get; set; }
-            public string Agent { get; set; }
+            public int AgentId { get; set; }
             public decimal StartAmount { get; set; }
             public decimal EndAmount { get; set; }
 
@@ -209,7 +209,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             public WithdrawalMethodEnum WithdrawalMethod { get; set; }
             public IEnumerable<string> SelectBankCode { get; set; }
             public IEnumerable<int> SelectCalCode { get; set; }
-            public string Agent { get; set; }
+            public int AgentId { get; set; }
             public decimal StartAmount { get; set; }
             public decimal EndAmount { get; set; }
 
@@ -279,7 +279,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.WithdrawalMethod,
                 request.SelectBankCode,
                 request.SelectCalCode,
-                request.Agent,
+                request.AgentId,
                 out var totalPages, out var rowCount, ref currencyAmount);
 
             var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(
@@ -343,7 +343,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                 request.EndAmount,
                 request.SelectBankCode.Any() ? JsonConvert.SerializeObject(request.SelectBankCode) : null,
                 request.SelectCalCode.Any() ? JsonConvert.SerializeObject(request.SelectCalCode) : null,
-                string.IsNullOrEmpty(request.Agent) ? null : request.Agent,
+                request.AgentId,
                 request.WithdrawalMethod);
 
             var msgs = _withdrawalBll.GetWithdrawalMessageByWithdrawalIds(

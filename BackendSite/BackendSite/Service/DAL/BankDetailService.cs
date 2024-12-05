@@ -36,12 +36,12 @@ namespace BackendSite.Service.DAL
             para.Add("_VipLevels", input.VipLevels.Any() ? JsonConvert.SerializeObject(input.VipLevels) : "[]", DbType.String);
             para.Add("_PointLevels", input.PointLevels.Any() ? JsonConvert.SerializeObject(input.PointLevels) : "[]", DbType.String);
             para.Add("_AccountNo", input.AccountNo ?? string.Empty);
-            para.Add("_Agent", input.Agent ?? string.Empty);
+            para.Add("_AgentId", input.AgentId);
             para.Add("_Channels", input.SupportChannels.Any() ? JsonConvert.SerializeObject(input.SupportChannels) : "[]", DbType.String);
             
             var result = _reportbackupDbClient != null
-                ? await _reportbackupDbClient.RetryQueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V4", para)
-                : await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V4", para);
+                ? await _reportbackupDbClient.RetryQueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V5", para)
+                : await _reportDbClient.QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_Get_V5", para);
 
             return result;
         }
@@ -52,7 +52,7 @@ namespace BackendSite.Service.DAL
             para.Add("_FinancialAccountId", id);
 
             var result = await _reportDbClient
-                .QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_GetById_V2", para);
+                .QueryAsync<OfflineBankingSetting>("Admin_OfflineBankingSetting_GetById_V3", para);
 
             return result.FirstOrDefault();
         }

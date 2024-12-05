@@ -1,5 +1,4 @@
 ﻿using BackendSite.ExceptionHandling;
-using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
