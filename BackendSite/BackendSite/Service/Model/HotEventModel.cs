@@ -50,6 +50,7 @@ namespace BackendSite.Service.Model
         [JsonProperty("awayTeamNameId")]
         public int AwayTeamNameId { get; set; }
         public bool IsLiveStreaming { get; set; }
+        public bool IsPrediction { get; set; }
         public string Currency { get; set; }
 
         public IEnumerable<int> ICurrencyList
@@ -101,6 +102,7 @@ namespace BackendSite.Service.Model
         [JsonProperty("awayTeamNameId")]
         public int AwaySportTeamId { get; set; }
         public bool IsLiveStreaming { get; set; }
+        public bool IsPrediction { get; set; }
         public string Currency { get; set; }
 
         public IEnumerable<int> ICurrencyList
@@ -225,6 +227,7 @@ namespace BackendSite.Service.Model
         [JsonProperty("awayTeamNameId")]
         public int AwayTeamNameId { get; set; }
         public bool IsLiveStreaming { get; set; }
+        public bool IsPrediction { get; set; }
         public IEnumerable<int> ICurrencyList { get; set; }
     }
 
@@ -263,6 +266,8 @@ namespace BackendSite.Service.Model
         [JsonProperty("lastUpdateTime")]
         public string LastUpdateTime { get; set; }
         public bool IsLiveStreaming { get; set; }
+        public bool IsPrediction { get; set; }
+        public string BonusCode { get; set; }
         public IEnumerable<int> ICurrencyList { get; set; }
     }
 
@@ -303,6 +308,7 @@ namespace BackendSite.Service.Model
         public int AwaySportTeamId { get; set; }
         public bool IsLiveStreaming { get; set; }
         public string Currency { get; set; }
+        public string BonusCode { get; set; }
 
         public IEnumerable<int> ICurrencyList
         {
@@ -348,6 +354,7 @@ namespace BackendSite.Service.Model
         public DateTime LastUpdateTime { get; set; }
         public bool IsLiveStreaming { get; set; }
         public string Currency { get; set; }
+        public string BonusCode { get; set; }
 
         public IEnumerable<int> ICurrencyList
         {
