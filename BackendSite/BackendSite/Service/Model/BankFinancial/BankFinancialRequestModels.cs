@@ -15,7 +15,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public IEnumerable<int> Channels { get; set; }
         public int AgentId { get; set; }
         public IEnumerable<int> Status { get; set; }
-        public IEnumerable<int> Purposes { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
         public IEnumerable<int> SysIds { get; set; }
         public string AccountNo { get; set; }
     }

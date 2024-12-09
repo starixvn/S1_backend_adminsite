@@ -81,15 +81,19 @@ namespace BackendSite.Service.DAL
                     _Channels = input.StrChannels,
                     _AgentId = input.AgentId,
                     _Status = input.StrStatus,
-                    _Purposes = input.StrPurposes,
                     _SysIds = input.StrSysIds,
                     _AccountNo = input.AccountNo,
                     _Id = input.Id
                 });
 
-            return _reportbackupDbClient != null
-                    ? _reportbackupDbClient.RetryQuery<BankFinancialTransferAccountDetailModel>("Admin_BankFinancialTransferAccount_Get_V5", parameters)
-                    : _reportDbClient.Query<BankFinancialTransferAccountDetailModel>("Admin_BankFinancialTransferAccount_Get_V5", parameters);
+            const string spName = "Admin_BankFinancialTransferAccount_Get_V5";
+            var result = _reportbackupDbClient != null
+                ? _reportbackupDbClient.RetryQuery<BankFinancialTransferAccountDetailModel>(spName, parameters)
+                : _reportDbClient.Query<BankFinancialTransferAccountDetailModel>(spName, parameters);
+
+            return input.Purposes.Any()
+                ? result.Where(x => !input.Purposes.Except(x.Purposes).Any())
+                : result;
         }
 
         public IEnumerable<string> GetTransferAccountAgentList(int siteId)
@@ -201,11 +205,15 @@ namespace BackendSite.Service.DAL
         {
             var parameters = new DynamicParameters(new
             {
-                _SiteId = siteId,
-                _Purposes = purposes == null ? null : JsonConvert.SerializeObject(purposes)
+                _SiteId = siteId
             });
-            return _reportDbClient
+            
+            var result = _reportDbClient
                 .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V5", parameters);
+            
+            return purposes.Any()
+                ? result.Where(x => !purposes.Except(x.Purposes).Any())
+                : result;
         }
 
         public int UpdateTransferInfo(BankFinancialTransferAccountModel bankFinancialTransferAccount, BankFinancialTransferAccountDetailModel oldData)

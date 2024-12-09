@@ -1,3 +1,4 @@
+using BackendSite.Service.Model.enums;
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.Model.BankFinancial
@@ -10,7 +11,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrCurrencyIds = "[]";
             StrChannels = "[]";
             StrStatus = "[]";
-            StrPurposes = "[]";
+            Purposes = Array.Empty<TransferAccountPurposeEnum>();
             StrSysIds = "[]";
             AgentId = 0;
             AccountNo = string.Empty;
@@ -23,7 +24,7 @@ namespace BackendSite.Service.Model.BankFinancial
             StrCurrencyIds = JsonConvert.SerializeObject(req.CurrencyIds);
             StrChannels = JsonConvert.SerializeObject(req.Channels);
             StrStatus = JsonConvert.SerializeObject(req.Status);
-            StrPurposes = req.Purposes.Any() ? JsonConvert.SerializeObject(req.Purposes) : "[]";
+            Purposes = req.Purposes;
             StrSysIds = req.SysIds.Any() ? JsonConvert.SerializeObject(req.SysIds) : "[]";
             AgentId = req.AgentId;
             AccountNo = req.AccountNo ?? string.Empty;
@@ -35,7 +36,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public string StrChannels { get; set; }
         public int AgentId { get; set; }
         public string StrStatus { get; set; }
-        public string StrPurposes { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
         public string StrSysIds { get; set; }
         public string AccountNo { get; set; }
         public int Id { get; set; }

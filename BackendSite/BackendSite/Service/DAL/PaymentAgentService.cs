@@ -1,6 +1,6 @@
 using BackendSite.Service.Library;
-using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
+using BackendSite.Service.Model.PaymentAgent;
 using Dapper;
 using Newtonsoft.Json;
 
@@ -19,15 +19,8 @@ public class PaymentAgentService
         _logger = provider.GetRequiredService<ILogger<PaymentAgentService>>();
     }
     
-    public IEnumerable<PaymentAgent> GetPaymentAgentList(IEnumerable<int> siteIds, IEnumerable<int> types)
+    public IEnumerable<PaymentAgentInfo> GetPaymentAgentList()
     {
-        var p = new DynamicParameters(
-            new
-            {
-                _SiteIds = JsonConvert.SerializeObject(siteIds),
-                _Types = JsonConvert.SerializeObject(types)
-            });
-
-        return _reportDbClient.Query<PaymentAgent>("Admin_PaymentAgentList_Get", p);
+        return _reportDbClient.Query<PaymentAgentInfo>("Admin_PaymentAgentList_Get");
     }
 }

@@ -2,7 +2,7 @@
   "profiles": {
     "BackendSite": {
       "commandName": "Project",
-      "commandLineArgs": "Nova-uat", // Nova or Leobet
+      "commandLineArgs": "Nova", // Nova or Leobet
       "launchBrowser": true,
       "applicationUrl": "http://localhost:9158",
       "environmentVariables": {

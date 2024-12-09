@@ -14,9 +14,6 @@ namespace BackendSite.Service.BLL
         //private ConcurrentDictionary<int, ServerInfo> rm = new ConcurrentDictionary<int, ResourceManager>();
         private ServerInfo serverInfo;/*Single Site*/
         private IMemoryCache cache;
-        private readonly AdminUserService adminUserService;
-        private readonly AuthorizeBLL authorizeBLL;
-        private readonly PermissionBLL permissionBLL;
         private readonly NewAuthorizeBLL newAuthorizeBLL;
         private readonly NewAdminUserService newAdminUserService;
 
@@ -25,9 +22,6 @@ namespace BackendSite.Service.BLL
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
             this.cache = cache;
-            this.adminUserService = adminUserService;
-            this.authorizeBLL = authorizeBLL;
-            this.permissionBLL = permissionBLL;
             this.newAuthorizeBLL = newAuthorizeBLL;
             this.newAdminUserService = newAdminUserService;
         }
@@ -59,46 +53,11 @@ namespace BackendSite.Service.BLL
             return SiteList;
         }
 
-        public IEnumerable<ServerInfo> GetSiteListByLoginUser()
-        {
-            var authData = authorizeBLL.GetAuthData();
-            if (authData != null)
-            {
-                var sServerInfoListKey = $"ServerInfoList_UserId_{authData.UserId}";
-                var userSiteList = cache.Get<IEnumerable<ServerInfo>>(sServerInfoListKey);
-                if (userSiteList == null)
-                {
-                    var loginUser = adminUserService.GetUser(authData.UserId);
-                    if (loginUser.IsSuper)
-                    {
-                        userSiteList = serverInfoService.GetSiteList();
-                    }
-                    else
-                    {
-                        var assignSites = adminUserService.GetAssignSiteList(authData.UserId);
-                        userSiteList = assignSites != null && assignSites.Any() ? serverInfoService.GetSiteList().Where(x => assignSites.Any(y => y.SiteId == x.SiteId)) : null;
-                    }
-
-                    if (userSiteList != null)
-                    {
-                        cache.Set(sServerInfoListKey, userSiteList, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(2)));
-                    }
-                }
-                return userSiteList;
-            }
-
-            return null;
-        }
-
         public int AdminOperateLog(int? SiteId, int? CustId, string Menu, ActionType ActionType, Dictionary<string, dynamic> DetailInfo, string Operator)
         {
             return AddAdminOperateLog(SiteId, CustId, Menu, ActionType, DetailInfo, null, Operator);
         }
-        public int AdminOperateLog(int? SiteId, int? CustId, string Menu, ActionType ActionType, string DetailInfo, string Operator)
-        {
-            return AddAdminOperateLog(SiteId, CustId, Menu, ActionType, null, DetailInfo, Operator);
-        }
-
+        
         private int AddAdminOperateLog(int? SiteId, int? CustId, string Menu, ActionType ActionType, Dictionary<string, dynamic> DetailInfo, string DetailInfos, string Operator)
         {
             string newDetailInfo = null;
@@ -122,44 +81,6 @@ namespace BackendSite.Service.BLL
             };
             return serverInfoService.AddAdminOperateLog(addAdminOperateLog);
         }
-        public IEnumerable<GetAdminOperateLog> GetAdminOperateLog(int CustId,
-            string Menu,
-            string Operator,
-            DateTimeOffset StartDate,
-            DateTimeOffset EndDate,
-            int pageSize,
-            ref int pageNumber,
-            out int totalPages,
-            out int rowCount)
-        {
-            var permissionJson = permissionBLL.GetPermissionJSONData();
-            var dictKeys = new Dictionary<string, string>();
-
-            foreach (var permission in permissionJson)
-            {
-                //dictKeys.Add(permission.FuncKey, permission.DisplayKey);
-                permissionLoop(permission.Settings, ref dictKeys);
-            }
-
-            var returndata = serverInfoService.GetAdminOperateLog(CustId,
-                Menu,
-                Operator,
-                StartDate,
-                EndDate,
-                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                Math.Abs(pageSize),
-                out totalPages,
-                out rowCount);
-
-            foreach (var data in returndata)
-            {
-                dictKeys.TryGetValue(data.Menu, out var displayKey);
-                data.Menu = displayKey;
-            }
-
-            return returndata;
-        }
-
         public void permissionLoop(IEnumerable<FuncPermissionSettings> settings, ref Dictionary<string, string> dictKeys)
         {
             if (settings != null && settings.Any())

@@ -46,10 +46,10 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 目的
         /// 1=Deposit,2=Withdrawal,3=Transfer
         /// </summary>
-        public string Purpose { get; set; }
+        public string JsonPurpose { get; set; }
 
         public IEnumerable<TransferAccountPurposeEnum> Purposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(Purpose ?? "[]");
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(JsonPurpose ?? "[]");
 
         /// <summary>
         /// 讀寫 付款方式
@@ -293,5 +293,10 @@ namespace BackendSite.Service.Model.BankFinancial
         public string AccountName { get; set; }
         public string DisplayName { get; set; }
         public TransferAccountStatusEnum Status { get; set; }
+        public string JsonPurpose { get; set; }
+        [JsonIgnore]
+        public IEnumerable<TransferAccountPurposeEnum> Purposes =>
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(JsonPurpose ?? "[]");
+        
     }
 }

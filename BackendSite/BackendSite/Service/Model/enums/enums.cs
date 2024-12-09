@@ -2127,9 +2127,16 @@ namespace BackendSite.Service.Model.enums
         Phone =2
     }
     
-    public enum PaymentAgentEnum 
+    public enum PaymentAgentTypeEnum 
     {
         Internal = 0,
         OutSource = 1
+    }
+    
+    public enum PaymentAgentStatusEnum 
+    {
+        Active = 1,
+        Suspend = 2,
+        Closed = 3
     }
 }
