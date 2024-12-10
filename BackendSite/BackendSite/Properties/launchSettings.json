@@ -3,7 +3,7 @@
     "BackendSite": {
       "commandName": "Project",
       "commandLineArgs": "Nova", // Nova or Leobet
-      "launchBrowser": true,
+      "launchBrowser": false,
       "applicationUrl": "http://localhost:9158",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Local"

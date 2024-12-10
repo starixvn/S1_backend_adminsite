@@ -35,7 +35,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 目的
         /// 1=Deposit,2=Withdrawal,3=Transfer
         /// </summary>
-        public List<int> Purpose { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purpose { get; set; }
 
         /// <summary>
         /// 讀寫 付款方式
@@ -46,6 +46,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 代理人
         /// </summary>
         public string Agent { get; set; }
+        public int AgentId { get; set; }
 
         /// <summary>
         /// 讀寫 第三方支付ID
@@ -70,8 +71,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// </summary>
         public string AccountCode { get; set; }
         public string BankLoginUrl { get; set; }
-        public string BankLoginAccount { get; set; }
-        public string BankLoginPassword { get; set; }
+        public IEnumerable<BankLoginInfo> BankLoginInfo { get; set; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }

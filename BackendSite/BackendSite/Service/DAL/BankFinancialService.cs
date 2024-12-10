@@ -106,99 +106,43 @@ namespace BackendSite.Service.DAL
 
             return _reportDbClient.Query<string>("Admin_BankFinancialTransferAccountAgent_Get", p);
         }
+        
 
-        public bool CheckTransferAccountExists(int siteId, string accountNo)
+        public int SetTransferAccount(BankFinancialTransferAccountModel input)
         {
             var parameters = new DynamicParameters(
                 new
                 {
-                    _SiteId = siteId,
-                    _AccountNo = accountNo,
+                    _Id = input.Id,
+                    _SiteId = input.SiteId,
+                    _CurrencyId = input.CurrencyId,
+                    _SysId = input.SysId ?? 0,
+                    _Purpose = JsonConvert.SerializeObject(input.Purpose),
+                    _Channel = input.Channel,
+                    _AgentId = input.AgentId,
+                    _PayId = input.PayId ?? 0,
+                    _CryptoCurrencyId = input.CryptoCurrencyId ?? 0,
+                    _Network = input.Network?.ToString(),
+                    _AccountNo = input.AccountNo ?? string.Empty,
+                    _AccountName = input.AccountName ?? string.Empty,
+                    _AccountCode = input.AccountCode ?? string.Empty,
+                    _DisplayName = input.DisplayName ?? string.Empty,
+                    _FrontendDisplayName = input.FrontendDisplayName ?? string.Empty,
+                    _InitialAmount = input.InitialAmount,
+                    _InitialTime = input.InitialTime.UtcDateTime,
+                    _MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
+                    _Reason = input.Reason ?? 0,
+                    _Remark = input.Remark ?? string.Empty,
+                    _Status = input.Status,
+                    _BankLoginUrl = input.BankLoginUrl,
+                    _BankLoginInfo = JsonConvert.SerializeObject(input.BankLoginInfo),
+                    _TransferPin = input.TransferPin,
+                    _LoginPin = input.LoginPin,
+                    _MobilePin = input.MobilePin,
+                    _CorporateID = input.CorporateID
                 });
 
-            var result = _mainDbClient.Query<int>("Admin_BankFinancialTransferAccount_Check", parameters);
-
-            return result.Any();
-        }
-
-        public int InsertTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _SiteId = bankFinancialTransferAccount.SiteId,
-                    _SiteName = bankFinancialTransferAccount.SiteName,
-                    _CurrencyId = bankFinancialTransferAccount.CurrencyId,
-                    _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
-                    _Channel = bankFinancialTransferAccount.Channel,
-                    _Agent = bankFinancialTransferAccount.Agent,
-                    _PayId = bankFinancialTransferAccount.PayId,
-                    _CryptoCurrencyId = bankFinancialTransferAccount.CryptoCurrencyId,
-                    _Network = bankFinancialTransferAccount.Network?.ToString(),
-                    _AccountNo = bankFinancialTransferAccount.AccountNo,
-                    _AccountName = bankFinancialTransferAccount.AccountName,
-                    _AccountCode = bankFinancialTransferAccount.AccountCode,
-                    _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
-                    _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
-                    _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
-                    _DisplayName = bankFinancialTransferAccount.DisplayName,
-                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
-                    _InitialAmount = bankFinancialTransferAccount.InitialAmount,
-                    _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
-                    _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
-                    _TransferPin = bankFinancialTransferAccount.TransferPin,
-                    _LoginPin = bankFinancialTransferAccount.LoginPin,
-                    _MobilePin = bankFinancialTransferAccount.MobilePin,
-                    _CorporateID = bankFinancialTransferAccount.CorporateID,
-                    _Reason = bankFinancialTransferAccount.Reason,
-                    _Remark = bankFinancialTransferAccount.Remark,
-                    _Status = bankFinancialTransferAccount.Status,
-                    _Creator = bankFinancialTransferAccount.Creator,
-                    _Updator = bankFinancialTransferAccount.Updator
-                });
-
-            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Ins_V8", parameters);
-        }
-
-        public int UpdateTransferAccount(BankFinancialTransferAccountModel bankFinancialTransferAccount)
-        {
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _Id = bankFinancialTransferAccount.Id,
-                    _CurrencyId = bankFinancialTransferAccount.CurrencyId,
-                    _SysId = bankFinancialTransferAccount.SysId,
-                    _Purpose = JsonConvert.SerializeObject(bankFinancialTransferAccount.Purpose),
-                    _Channel = bankFinancialTransferAccount.Channel,
-                    _Agent = bankFinancialTransferAccount.Agent,
-                    _PayId = bankFinancialTransferAccount.PayId,
-                    _CryptoCurrencyId = bankFinancialTransferAccount.CryptoCurrencyId,
-                    _Network = bankFinancialTransferAccount.Network?.ToString(),
-                    _AccountNo = bankFinancialTransferAccount.AccountNo,
-                    _AccountName = bankFinancialTransferAccount.AccountName,
-                    _AccountCode = bankFinancialTransferAccount.AccountCode,
-                    _DisplayName = bankFinancialTransferAccount.DisplayName,
-                    _FrontendDisplayName = bankFinancialTransferAccount.FrontendDisplayName,
-                    _BankLoginUrl = bankFinancialTransferAccount.BankLoginUrl,
-                    _BankLoginAccount = bankFinancialTransferAccount.BankLoginAccount,
-                    _BankLoginPassword = bankFinancialTransferAccount.BankLoginPassword,
-                    _InitialAmount = bankFinancialTransferAccount.InitialAmount,
-                    _InitialTime = bankFinancialTransferAccount.InitialTime.UtcDateTime,
-                    _TransferPin = bankFinancialTransferAccount.TransferPin,
-                    _LoginPin = bankFinancialTransferAccount.LoginPin,
-                    _MobilePin = bankFinancialTransferAccount.MobilePin,
-                    _CorporateID = bankFinancialTransferAccount.CorporateID,
-                    _MaxBalanceAlertAmount = bankFinancialTransferAccount.MaxBalanceAlertAmount,
-                    _Reason = bankFinancialTransferAccount.Reason,
-                    _Remark = bankFinancialTransferAccount.Remark,
-                    _Status = bankFinancialTransferAccount.Status,
-                    _Updator = bankFinancialTransferAccount.Updator
-                });
-
-            var SpName = "Admin_BankFinancialTransferAccount_Set";
-
-            return _mainDbClient.Execute(SpName, parameters);
+            return _mainDbClient.Execute("Admin_BankFinancialTransferAccount_Set", parameters);
         }
 
         public IEnumerable<BankFinancialTransferAccount> GetTransferAccountList(int siteId, IEnumerable<TransferAccountPurposeEnum> purposes)
@@ -215,38 +159,6 @@ namespace BackendSite.Service.DAL
                 ? result.Where(x => !purposes.Except(x.Purposes).Any())
                 : result;
         }
-
-        public int UpdateTransferInfo(BankFinancialTransferAccountModel bankFinancialTransferAccount, BankFinancialTransferAccountDetailModel oldData)
-        {
-            var affectCount = 0;
-            var parameters = new DynamicParameters(
-                new
-                {
-                    _OldChannel = oldData.Channel,
-                    _OldAgent = oldData.Agent,
-                    _OldPayId = oldData.PayId,
-                    _OldCurrencyId = oldData.CurrencyId,
-                    _OldSysId = oldData.SysId,
-                    _OldAccountNo = oldData.AccountNo,
-                    _OldAccountDisplayName = oldData.DisplayName,
-                    _NewChannel = bankFinancialTransferAccount.Channel,
-                    _NewAgent = bankFinancialTransferAccount.Agent,
-                    _NewPayId = bankFinancialTransferAccount.PayId,
-                    _NewCurrencyId = bankFinancialTransferAccount.CurrencyId,
-                    _NewSysId = bankFinancialTransferAccount.SysId,
-                    _NewAccountNo = bankFinancialTransferAccount.AccountNo,
-                    _NewAccountDisplayName = bankFinancialTransferAccount.DisplayName,
-                });
-
-            parameters.Add("_AffectCount", affectCount, DbType.Int32, ParameterDirection.InputOutput);
-            var SpName = "Admin_BankFinancialTransferInfo_ByAccountNo_Set";
-            _mainDbClient.Execute(SpName, parameters);
-
-            affectCount = parameters.Get<int?>("_AffectCount") ?? 0;
-
-            return affectCount;
-        }
-
 
         #endregion
 

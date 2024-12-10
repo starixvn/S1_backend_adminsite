@@ -60,6 +60,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// 讀寫 代理人
         /// </summary>
         public string Agent { get; set; }
+        public int AgentId { get; set; }
 
         /// <summary>
         /// 讀寫 第三方支付ID
@@ -154,8 +155,9 @@ namespace BackendSite.Service.Model.BankFinancial
         public string UpdatorName { get; set; }
 
         public string BankLoginUrl { get; set; }
-        public string BankLoginAccount { get; set; }
-        public string BankLoginPassword { get; set; }
+        [JsonIgnore]
+        public string JsonBankLoginInfo { get; set; }
+        public IEnumerable<BankLoginInfo> BankLoginInfo { get; set; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }
@@ -265,8 +267,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public decimal MaxBalanceAlertAmount { get; set; }
         public string Remark { get; set; }
         public string BankLoginUrl { get; set; }
-        public string BankLoginAccount { get; set; }
-        public string BankLoginPassword { get; set; }
+        public string BankLoginInfo { get; set; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }

@@ -314,7 +314,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 foreach (var d in data)
                 {
-                    foreach (var info in d.BankLoginInfos)
+                    foreach (var info in d.BankLoginInfo)
                     {
                         info.Account = _cryptor.Decrypt(info.Account);
                         info.Password = _cryptor.Decrypt(info.Password);
@@ -353,7 +353,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
             {
                 foreach (var d in data)
                 {
-                    foreach (var info in d.BankLoginInfos)
+                    foreach (var info in d.BankLoginInfo)
                     {
                         info.Account = _cryptor.Decrypt(info.Account);
                         info.Password = _cryptor.Decrypt(info.Password);

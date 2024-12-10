@@ -53,7 +53,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 代理人
         /// </summary>
-        public string Agent { get; set; }
+        public int AgentId { get; set; }
 
         /// <summary>
         /// 讀寫 第三方支付ID
@@ -111,8 +111,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public TransferAccountStatusEnum Status { get; set; }
 
         public string BankLoginUrl { get; set; }
-        public string BankLoginAccount { get; set; }
-        public string BankLoginPassword { get; set; }
+        public IEnumerable<BankLoginInfo> BankLoginInfo { get; set; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }

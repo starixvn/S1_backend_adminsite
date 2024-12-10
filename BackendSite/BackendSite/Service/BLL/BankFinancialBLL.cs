@@ -92,7 +92,14 @@ namespace BackendSite.Service.BLL
 
         public IEnumerable<BankFinancialTransferAccountDetailModel> GetTransferAccountInfoList(GetTransferAccountInfoListParams input)
         {
-            return _bankFinancialService.GetTransferAccountInfoListV2(input);
+            var result = _bankFinancialService.GetTransferAccountInfoListV2(input);
+            foreach (var item in result)
+            {
+                item.BankLoginInfo =
+                    JsonConvert.DeserializeObject<IEnumerable<BankLoginInfo>>(item.JsonBankLoginInfo ?? "[]");
+            }
+            
+            return result;
         }
 
         public IEnumerable<string> GetTransferAccountAgentList(int siteId)
@@ -101,19 +108,34 @@ namespace BackendSite.Service.BLL
                 .Where(x => !string.IsNullOrEmpty(x));
         }
 
-        public (bool Status, int Count, string Message) SetTransferAccount(BankFinancialTransferAccountModel input, string updater)
+        public IEnumerable<BankLoginInfo> CryptBankLoginInfo(IEnumerable<BankLoginInfo> infos, bool isEncrypt)
         {
-            var count = 0;
-            var updateTransferDataFlag = false;
-            var affectTransferData = 0;
+            infos ??= Array.Empty<BankLoginInfo>();
+
+            if (!infos.Any())
+                return infos;
+
+            foreach (var info in infos)
+            {
+                if (isEncrypt)
+                {
+                    info.Account = _cryptor.Encrypt(info.Account);
+                    info.Password = _cryptor.Encrypt(info.Password);
+                }
+                else
+                {
+                    info.Account = _cryptor.Decrypt(info.Account);
+                    info.Password = _cryptor.Decrypt(info.Password);
+                }
+            }
+
+            return infos;
+        }
+
+        public (bool Status, string Message) SetTransferAccount(BankFinancialTransferAccountModel input, string updater)
+        {
             var oldData = new BankFinancialTransferAccountDetailModel();
             var isCreate = input.Id == 0;
-            var siteIds = _serverInfoBll.GetSiteList().Select(x => x.SiteId);
-
-            if (!CheckParameterForSetTransferAccount(input, siteIds, out var message))
-            {
-                return (false, count, message);
-            }
 
             if (!isCreate)
             {
@@ -121,7 +143,7 @@ namespace BackendSite.Service.BLL
                     .FirstOrDefault();
             }
 
-            var transferAccountModel = new BankFinancialTransferAccountModel
+            var data = new BankFinancialTransferAccountModel
             {
                 Id = input.Id,
                 SiteId = input.SiteId,
@@ -130,18 +152,17 @@ namespace BackendSite.Service.BLL
                 SysId = input.SysId,
                 Purpose = input.Purpose,
                 Channel = input.Channel,
-                Agent = input.Agent == "" ? null : input.Agent,
-                PayId = input.PayId == 0 ? null : input.PayId,
+                AgentId = input.AgentId,
+                PayId = input.PayId,
                 CryptoCurrencyId = input.CryptoCurrencyId,
                 Network = input.Network,
-                AccountCode = string.IsNullOrWhiteSpace(input.AccountCode) ? string.Empty : input.AccountCode,
-                AccountNo = string.IsNullOrWhiteSpace(input.AccountNo) ? string.Empty : input.AccountNo,
+                AccountCode = input.AccountCode,
+                AccountNo = input.AccountNo,
                 AccountName = input.AccountName,
                 DisplayName = input.DisplayName,
-                FrontendDisplayName = input.FrontendDisplayName ?? string.Empty,
-                BankLoginUrl = string.IsNullOrWhiteSpace(input.BankLoginUrl) ? string.Empty : input.BankLoginUrl,
-                BankLoginAccount = string.IsNullOrWhiteSpace(input.BankLoginAccount) ? string.Empty : _cryptor.Encrypt(input.BankLoginAccount),
-                BankLoginPassword = string.IsNullOrWhiteSpace(input.BankLoginPassword) ? string.Empty : _cryptor.Encrypt(input.BankLoginPassword),
+                FrontendDisplayName = input.FrontendDisplayName,
+                BankLoginUrl = input.BankLoginUrl,
+                BankLoginInfo = CryptBankLoginInfo(input.BankLoginInfo, true),
                 LoginPin = string.IsNullOrWhiteSpace(input.LoginPin) ? string.Empty : _cryptor.Encrypt(input.LoginPin),
                 MobilePin = string.IsNullOrWhiteSpace(input.MobilePin) ? string.Empty : _cryptor.Encrypt(input.MobilePin),
                 TransferPin = string.IsNullOrWhiteSpace(input.TransferPin) ? string.Empty : _cryptor.Encrypt(input.TransferPin),
@@ -149,11 +170,9 @@ namespace BackendSite.Service.BLL
                 InitialAmount = input.InitialAmount,
                 InitialTime = input.InitialTime,
                 MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
-                Reason = input.Reason == 0 ? null : input.Reason,
+                Reason = input.Reason,
                 Remark = input.Remark,
-                Status = input.Status,
-                Creator = isCreate ? input.Updator : oldData.Creator,
-                Updator = input.Updator
+                Status = input.Status
             };
 
             var logParams = new CreateAdminAdjustmentInfoLogInput
@@ -166,7 +185,7 @@ namespace BackendSite.Service.BLL
                 BeforeDetailInfo = isCreate ? null : JsonConvert.SerializeObject(new
                 {
                     Id = oldData.Id,
-                    Purpose = GetPurpose(oldData.Purposes.Select(p => (int)p).OrderBy(p => p)),
+                    Purpose = string.Join(",", oldData.Purposes.Select(p => p.ToString())),
                     Channel = oldData.Channel.ToString(),
                     Agent = oldData.Agent,
                     AccountNo = oldData.AccountNo,
@@ -174,8 +193,7 @@ namespace BackendSite.Service.BLL
                     DisplayName = oldData.DisplayName,
                     oldData.FrontendDisplayName,
                     oldData.BankLoginUrl,
-                    BankLoginAccount = oldData.BankLoginAccount,
-                    BankLoginPassword = oldData.BankLoginPassword,
+                    oldData.BankLoginInfo,
                     TransferPin = oldData.TransferPin,
                     MobilePin = oldData.MobilePin,
                     LoginPin = oldData.LoginPin,
@@ -188,96 +206,41 @@ namespace BackendSite.Service.BLL
                 }),
                 AfterDetailInfo = JsonConvert.SerializeObject(new
                 {
-                    Purpose = GetPurpose(input.Purpose),
+                    Purpose = string.Join(",", oldData.Purposes.Select(p => p.ToString())),
                     Channel = input.Channel.ToString(),
-                    Agent = input.Agent,
-                    AccountNo = input.AccountNo,
-                    AccountName = input.AccountName,
-                    DisplayName = input.DisplayName,
-                    input.FrontendDisplayName,
-                    input.BankLoginUrl,
-                    transferAccountModel.BankLoginAccount,
-                    transferAccountModel.BankLoginPassword,
-                    transferAccountModel.TransferPin,
-                    transferAccountModel.MobilePin,
-                    transferAccountModel.LoginPin,
-                    transferAccountModel.CorporateID,
-                    InitialAmount = input.InitialAmount,
+                    input.Agent,
+                    input.AccountNo,
+                    input.AccountName,
+                    input.DisplayName,
+                    data.FrontendDisplayName,
+                    data.BankLoginUrl,
+                    data.BankLoginInfo,
+                    data.TransferPin,
+                    data.MobilePin,
+                    data.LoginPin,
+                    data.CorporateID,
+                    input.InitialAmount,
                     InitialTime = input.InitialTime.ToString("yyyy-MM-ddTHH:mm:ss+00:00"),
-                    MaxBalanceAlertAmount = input.MaxBalanceAlertAmount,
-                    Remark = input.Remark,
+                    input.MaxBalanceAlertAmount,
+                    input.Remark,
                     Status = input.Status.ToString()
                 })
             };
 
-            if (isCreate)
+            using (var scope = new TransactionScope())
             {
-                if (input.Channel == TransferChannelEnum.LocalBank
-                    && _bankFinancialService.CheckTransferAccountExists(input.SiteId, transferAccountModel.AccountNo))
-                {
-                    return (false, count, $"AccountNo: {transferAccountModel.AccountNo} already exists.");
-                }
-
-                using (var scope = new TransactionScope())
-                {
-                    if (_bankFinancialService.InsertTransferAccount(transferAccountModel) != 1)
-                    {
-                        scope.Dispose();
-
-                        return (false, count, "Insert Transfer Account Fail. Duplicate AccountNo.");
-                    }
-
-                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
-                    {
-                        scope.Dispose();
-
-                        return (false, count, "Insert Activity Log Fail.");
-                    }
-
-                    scope.Complete();
-                }
-
-                count = 1;
-                message = "Insert Transfer Account And Insert Log Success.";
-            }
-            else
-            {
-                using (var scope = new TransactionScope())
-                {
-                    if (_bankFinancialService.UpdateTransferAccount(transferAccountModel) != 1)
-                    {
-                        scope.Dispose();
-
-                        return (false, count, "Update Transfer Account Fail.");
-                    }
-
-                    if (updateTransferDataFlag)
-                    {
-                        if (_bankFinancialService.UpdateTransferInfo(input, oldData) != affectTransferData)
-                        {
-                            scope.Dispose();
-
-                            return (false, count, "Update Transfer Data Fail.");
-                        }
-                    }
-
-                    if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
-                    {
-                        scope.Dispose();
-
-                        return (false, count, "Insert Activity Log Fail.");
-                    }
-
-                    scope.Complete();
-                }
-
-                count = 1;
-                message = "Update Transfer Account And Insert Log Success.";
+                if (_bankFinancialService.SetTransferAccount(data) != 1)
+                    return (false, "Update Transfer Account Fail.");
+                
+                if (!_adjustmentLogReportService.CreateAdminAdjustmentInfoLog(logParams))
+                    return (false, "Insert Activity Log Fail.");
+                
+                scope.Complete();
             }
 
             _ = _cacheHelper.KeyDeleteByPattern($"LocalPaySetting:{input.SiteId}:{input.CurrencyId}*", RedisDataBase.Member);
 
-            return (true, count, message);
+            return (true, string.Empty);
         }
 
         #region Private Methods For GetTransferAccountInfoList
@@ -291,181 +254,7 @@ namespace BackendSite.Service.BLL
         }
 
         #endregion
-
-        #region Private Methods Set TransferAccount
-
-        private bool CheckParameterForSetTransferAccount(BankFinancialTransferAccountModel input,
-            IEnumerable<int> SiteIds,
-            out string message)
-        {
-            message = string.Empty;
-
-            if (input == null)
-            {
-                message = "Data Invalid.";
-
-                return false;
-            }
-
-            #region Parameter Values Check
-
-            if (input.Id == null)
-            {
-                message = "Data-[Id] invalid.Notify admin please.";
-                return false;
-            }
-
-            if (input.SiteId == null)
-            {
-                message = "Data-[Site] invalid.";
-                return false;
-            }
-
-            if (!SiteIds.Contains(input.SiteId))
-            {
-                message = "Data-[Site] not match.";
-
-                return false;
-            }
-
-            if (input.SiteName == null)
-            {
-                message = "Data-[SiteName] Invalid.";
-
-                return false;
-            }
-
-            if (input.CurrencyId == null || input.CurrencyId == 0)
-            {
-                message = "Data-[Currency] invalid.";
-
-                return false;
-            }
-
-            if (input.Channel == TransferChannelEnum.LocalBank && (input.SysId == null || input.SysId == 0))
-            {
-                message = "Data-[Bank Code] invalid.";
-
-                return false;
-            }
-
-            if (input.Channel == null || input.Channel == 0)
-            {
-                message = "Data-[Channel] invalid.";
-
-                return false;
-            }
-
-            if (input.Channel == TransferChannelEnum.PSP &&
-                (input.PayId == null || input.PayId == 0))
-            {
-                message = "Data-[Channel] is PSP.But [Pay] is invalid.";
-
-                return false;
-            }
-
-            if ((input.Channel == TransferChannelEnum.LocalBank || input.Channel == TransferChannelEnum.HeadOffice) &&
-               input.Agent == null)
-            {
-                message = "Data-[Channel] is Local Bank or Head Office.But [Agent] is invalid.";
-
-                return false;
-            }
-
-            if (input.AccountNo == null)
-            {
-                message = "Data-[AccountNo] invalid.";
-
-                return false;
-            }
-
-            if (input.AccountName == null)
-            {
-                message = "Data-[AccountName] invalid.";
-
-                return false;
-            }
-
-            if (input.DisplayName == null)
-            {
-                message = "Data-[DisplayName] invalid.";
-
-                return false;
-            }
-
-            if (input.InitialAmount == null || input.InitialAmount < 0)
-            {
-                message = "Data-[InitialAmount] invalid.";
-
-                return false;
-            }
-
-            if (input.MaxBalanceAlertAmount == null || input.MaxBalanceAlertAmount < 0)
-            {
-                message = "Data-[MaxBalanceAlertAmount] invalid.";
-
-                return false;
-            }
-
-            if (input.Status == null)
-            {
-                message = "Data-[Status] invalid.";
-
-                return false;
-            }
-
-            if (input.CreateTime == null)
-            {
-                message = "Data-CreateTime invalid.Notify admin please.";
-
-                return false;
-            }
-
-            if (input.Creator == null)
-            {
-                message = "Data-Creator invalid.Notify admin please.";
-
-                return false;
-            }
-
-            if (input.UpdateTime == null)
-            {
-                message = "Data-UpdateTime invalid.Notify admin please.";
-
-                return false;
-            }
-
-            if (input.Updator == null)
-            {
-                message = "Data-Updator invalid.Notify admin please.";
-
-                return false;
-            }
-
-            #endregion
-
-
-            return true;
-        }
-
-        private string GetPurpose(IEnumerable<int> purpose)
-        {
-            var result = string.Empty;
-            foreach (var i in purpose)
-            {
-                switch (i)
-                {
-                    case 1: result += ",Deposit"; break;
-                    case 2: result += ",Withdrawal"; break;
-                    case 3: result += ",Transfer"; break;
-                }
-
-            }
-            return result.Substring(1);
-        }
-
-        #endregion
-
+        
         #endregion
 
         #region Transfer Info Management
