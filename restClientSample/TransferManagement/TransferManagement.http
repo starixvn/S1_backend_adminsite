@@ -76,7 +76,7 @@ Content-Type: application/json
 # sysId 在 channel 為 1(LocalBank) 時才必填
 # cryptoCurrencyId、network在 channel 為 6(CryptoWallet)時必填
 # agent 改為 agentId，沒選帶 0
-# bankLoginAccount，bankLoginPassword 改為 bankLoginInfo
+# bankLoginAccount，bankLoginPassword 改為 bankLoginInfo[]
 POST {{url}}/apiV2/BankTransferAccount/Set HTTP/1.1
 Content-Type: application/json
 
@@ -103,10 +103,10 @@ Content-Type: application/json
     "remark": null,
     "status": 2,
     "bankLoginUrl": "",
-    "bankLoginInfo": {
+    "bankLoginInfo": [{
         "account": "test1234",
         "password": "1234qwer"
-    },
+    }],
     "transferPin": "",
     "loginPin": "",
     "mobilePin": "",

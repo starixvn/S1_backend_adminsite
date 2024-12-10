@@ -101,8 +101,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     MaxBalanceAlertAmount = x.MaxBalanceAlertAmount,
                     Remark = x.Remark,
                     BankLoginUrl = x.BankLoginUrl,
-                    /*BankLoginInfo = string.Join("|", _bankFinancialBll.CryptBankLoginInfo(x.BankLoginInfo, false)
-                        .Select(y => $"acc:{y.Account}, pw:{y.Password}")),*/
+                    BankLoginInfo = JsonConvert.SerializeObject(x.BankLoginInfo), //todo: 不知為啥解密完會噴錯，到時候再改
                     TransferPin = _cryptor.Decrypt(x.TransferPin),
                     LoginPin = _cryptor.Decrypt(x.LoginPin),
                     MobilePin = _cryptor.Decrypt(x.MobilePin),
