@@ -14,7 +14,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public IEnumerable<int> PointLevels { get; set; }
         public IEnumerable<BankCardManagementSupportChannelEnum> SupportChannels { get; set; }
         public string AccountNo { get; set; }
-        public string Agent { get; set; }
+        public int AgentId { get; set; }
     }
 
     public class SetOfflineBankingSettingRequest

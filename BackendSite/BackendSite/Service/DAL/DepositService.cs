@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using BackendSite.Extensions;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
+using BackendSite.Service.Model.BankFinancial;
 using BackendSite.Service.Model.enums;
 
 using Dapper;
@@ -44,7 +45,7 @@ namespace BackendSite.Service.DAL
             DepositDateTypeEnum dateType,
             string transId,
             IEnumerable<string> userNames,
-            string agent,
+            int agentId,
             IEnumerable<int> currencyId,
             IEnumerable<int> status,
             IEnumerable<int> levelStatus,
@@ -75,7 +76,7 @@ namespace BackendSite.Service.DAL
                 _DepositId = depositId,
                 _TransId = string.IsNullOrEmpty(transId) ? null : transId,
                 _UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
-                _Agent = string.IsNullOrEmpty(agent) ? null : agent,
+                _AgentId = agentId,
                 _CurrencyId = currencyId.Any() ? JsonConvert.SerializeObject(currencyId) : null,
                 _Status = JsonConvert.SerializeObject(status),
                 _VipStatus = levelStatus.Any() ? JsonConvert.SerializeObject(levelStatus) : null,
@@ -85,14 +86,14 @@ namespace BackendSite.Service.DAL
                 _PayIds = payIds.Any() ? JsonConvert.SerializeObject(payIds) : null
             });
 
-            currencyAmountRecord = _reportDbClient.RetryQuery<TotalAmount>("Admin_DepositTotalAmount_Get_V10", p, 3).ToList();
+            currencyAmountRecord = _reportDbClient.RetryQuery<TotalAmount>("Admin_DepositTotalAmount_Get_V11", p, 3).ToList();
 
             p.Add("_PageSize", pageSize, DbType.Int32, ParameterDirection.Input);
             p.Add("_StartIndex", Math.Abs(pageNumber - 1) * Math.Abs(pageSize), DbType.Int32, ParameterDirection.Input);
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            var depositList = _reportDbClient.RetryQuery<DepositRequest>("Admin_DepositList_Get_V14", p, 3);
+            var depositList = _reportDbClient.RetryQuery<DepositRequest>("Admin_DepositList_Get_V15", p, 3);
 
             totalPages = p.Get<int?>("_TotalPages") ?? 0;
             rowCount = p.Get<int?>("_RowCount") ?? 0;
@@ -373,17 +374,14 @@ namespace BackendSite.Service.DAL
                 {
                     if (status is (DepositStatusEnum.Draft or DepositStatusEnum.Approved or DepositStatusEnum.OnHold) && calCodeInfo != null)
                     {
-                        var calCodeList = _bankFinancialService.GetTransferAccountList();
-                        calCodeInfo.DisplayName = calCodeList.FirstOrDefault(x => x.Id == calCodeInfo.BankId)?.DisplayName;
+                        calCodeInfo.DisplayName = _bankFinancialService
+                            .GetTransferAccountInfoListV2(new GetTransferAccountInfoListParams(calCodeInfo.BankId ?? -1))
+                            .FirstOrDefault(x => x.Id == calCodeInfo.BankId)
+                            ?.DisplayName;
 
-                        if (status == DepositStatusEnum.Draft)
-                        {
-                            comment = $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName} , After:{calCodeInfo.DisplayName}] , StatementTime : [Before:{beforeDepositData.StatementTime} , After:{calCodeInfo.StatementTime}] ]";
-                        }
-                        else
-                        {
-                            comment = $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName}, After:{calCodeInfo.DisplayName}] ";
-                        }
+                        comment = status == DepositStatusEnum.Draft
+                            ? $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName} , After:{calCodeInfo.DisplayName}] , StatementTime : [Before:{beforeDepositData.StatementTime} , After:{calCodeInfo.StatementTime}] ]"
+                            : $"Comment : {comment} , CalCode :[Before:{beforeDepositData.DisplayName}, After:{calCodeInfo.DisplayName}] ";
                     }
 
                     result = SetDepositLog(depositId, siteId, comment, (int)status, actualDeposit, @operator, trans);
@@ -439,13 +437,13 @@ namespace BackendSite.Service.DAL
                         {
                             var p2 = new DynamicParameters(new
                             {
-                                DepositId = depositId,
-                                SiteId = siteId,
-                                StatementTime = status == DepositStatusEnum.Draft ? calCodeInfo.StatementTime?.DateTime : null,
-                                BankId = calCodeInfo.BankId,
-                                Operator = @operator
+                                _DepositId = depositId,
+                                _SiteId = siteId,
+                                _StatementTime = status == DepositStatusEnum.Draft ? calCodeInfo.StatementTime?.DateTime : null,
+                                _BankId = calCodeInfo.BankId,
+                                _Operator = @operator
                             });
-                            result = _mainDbClient.Execute("Admin_DepositInfoDraft_Set", trans, p2);
+                            result = _mainDbClient.Execute("Admin_DepositInfoDraft_Set_V2", trans, p2);
                         }
                     }
                     if (result > 0)
@@ -516,7 +514,7 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<DepositReceipt>("Admin_DepositReceiptByNo_Get", new DynamicParameters(new { DepositId = depositId, ReceiptNo = receiptNo, SiteId = siteId }));
         }
 
-        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string DepositId, IEnumerable<string> userNames, string agent, string currencyId, string status, string levelStatus, decimal startAmount, decimal endAmount, string payIds)
+        public IEnumerable<DepositInfoForExport> GetDepositExportList(string selectSite, string selectBankCode, string selectCalCode, string depositType, DateTime startDate, DateTime endDate, DepositDateTypeEnum dateType, string DepositId, IEnumerable<string> userNames, int agent, string currencyId, string status, string levelStatus, decimal startAmount, decimal endAmount, string payIds)
         {
             var depositId = 0;
             if (!string.IsNullOrWhiteSpace(DepositId))
@@ -537,7 +535,7 @@ namespace BackendSite.Service.DAL
                 DepositId = depositId,
                 TransId = DepositId,
                 UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
-                Agent = agent,
+                AgentId = agent,
                 CurrencyId = currencyId,
                 Status = status,
                 VipStatus = levelStatus,
@@ -545,7 +543,7 @@ namespace BackendSite.Service.DAL
                 EndAmount = endAmount,
                 PayIds = payIds
             });
-            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V14", p);
+            var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V15", p);
             return depositList;
         }
 

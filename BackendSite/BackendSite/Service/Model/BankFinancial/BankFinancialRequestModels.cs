@@ -13,9 +13,9 @@ namespace BackendSite.Service.Model.BankFinancial
         public int SiteId { get; set; }
         public IEnumerable<int> CurrencyIds { get; set; }
         public IEnumerable<int> Channels { get; set; }
-        public string Agent { get; set; }
+        public int AgentId { get; set; }
         public IEnumerable<int> Status { get; set; }
-        public IEnumerable<int> Purposes { get; set; }
+        public IEnumerable<TransferAccountPurposeEnum> Purposes { get; set; }
         public IEnumerable<int> SysIds { get; set; }
         public string AccountNo { get; set; }
     }
@@ -53,7 +53,7 @@ namespace BackendSite.Service.Model.BankFinancial
         /// <summary>
         /// 讀寫 代理人
         /// </summary>
-        public string Agent { get; set; }
+        public int AgentId { get; set; }
 
         /// <summary>
         /// 讀寫 第三方支付ID
@@ -111,8 +111,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public TransferAccountStatusEnum Status { get; set; }
 
         public string BankLoginUrl { get; set; }
-        public string BankLoginAccount { get; set; }
-        public string BankLoginPassword { get; set; }
+        public IEnumerable<BankLoginInfo> BankLoginInfo { get; set; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }

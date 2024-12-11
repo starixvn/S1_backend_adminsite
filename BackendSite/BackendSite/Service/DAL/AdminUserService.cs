@@ -25,11 +25,6 @@ namespace BackendSite.Service.DAL
             return _reportDbClient.QueryFirst<AdminUser>("LoginAdminUser_Get", para);
         }
 
-        public IEnumerable<AssignSites> GetAssignSiteList(int userId)
-        {
-            return _mainDbClient.Query<AssignSites>("Admin_AuthorSite_Get", new DynamicParameters(new { UserId = userId }));
-        }
-
         public AdminUser GetUser(int userId)
         {
             return _mainDbClient.QueryFirst<AdminUser>("Admin_User_Get", new DynamicParameters(new { UserId = userId }));

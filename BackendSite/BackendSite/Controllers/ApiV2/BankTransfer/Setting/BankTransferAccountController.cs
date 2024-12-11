@@ -1,5 +1,4 @@
 ﻿using BackendSite.ExceptionHandling;
-using BackendSite.Extensions;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -8,6 +7,7 @@ using BackendSite.Service.Model.enums;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
 {
@@ -101,8 +101,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     MaxBalanceAlertAmount = x.MaxBalanceAlertAmount,
                     Remark = x.Remark,
                     BankLoginUrl = x.BankLoginUrl,
-                    BankLoginAccount = _cryptor.Decrypt(x.BankLoginAccount),
-                    BankLoginPassword = _cryptor.Decrypt(x.BankLoginPassword),
+                    BankLoginInfo = JsonConvert.SerializeObject(x.BankLoginInfo), //todo: 不知為啥解密完會噴錯，到時候再改
                     TransferPin = _cryptor.Decrypt(x.TransferPin),
                     LoginPin = _cryptor.Decrypt(x.LoginPin),
                     MobilePin = _cryptor.Decrypt(x.MobilePin),
@@ -134,8 +133,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
             }
 
             var data = result.FirstOrDefault();
-            data.BankLoginAccount = _cryptor.Decrypt(data.BankLoginAccount);
-            data.BankLoginPassword = _cryptor.Decrypt(data.BankLoginPassword);
+            data.BankLoginInfo = _bankFinancialBll.CryptBankLoginInfo(data.BankLoginInfo, false);
             data.TransferPin = _cryptor.Decrypt(data.TransferPin);
             data.LoginPin = _cryptor.Decrypt(data.LoginPin);
             data.MobilePin = _cryptor.Decrypt(data.MobilePin);
@@ -159,15 +157,15 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         {
             var authData = _authorizeBll.GetAuthData();
             var siteName = _serverInfoBll.GetServerInfo(req.SiteId).SiteName;
-            var (status, count, message) = _bankFinancialBll.SetTransferAccount(new BankFinancialTransferAccountModel
+            var (status, message) = _bankFinancialBll.SetTransferAccount(new BankFinancialTransferAccountModel
             {
                 Id = req.Id,
                 SiteId = req.SiteId,
                 SiteName = siteName,
                 CurrencyId = req.CurrencyId,
-                Agent = req.Agent,
+                AgentId = req.AgentId,
                 Channel = req.Channel,
-                Purpose = req.Purposes.Select(p => (int)p).OrderBy(p => p).ToList(),
+                Purpose = req.Purposes,
                 Reason = req.Reason,
                 Remark = req.Remark,
                 Status = req.Status,
@@ -183,8 +181,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                 SysId = req.SysId,
                 Updator = authData.UserId,
                 BankLoginUrl = req.BankLoginUrl,
-                BankLoginAccount = req.BankLoginAccount,
-                BankLoginPassword = req.BankLoginPassword,
+                BankLoginInfo = req.BankLoginInfo,
                 TransferPin = req.TransferPin,
                 LoginPin = req.LoginPin,
                 MobilePin = req.MobilePin,

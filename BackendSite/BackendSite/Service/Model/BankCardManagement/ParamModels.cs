@@ -16,7 +16,7 @@ namespace BackendSite.Service.Model.BankCardManagement
             VipLevels = req.VipLevels;
             PointLevels = req.PointLevels;
             AccountNo = req.AccountNo;
-            Agent = req.Agent;
+            AgentId = req.AgentId;
             SupportChannels = req.SupportChannels.Select(x => (int)x);
         }
         public int SiteId { get; set; }
@@ -30,7 +30,7 @@ namespace BackendSite.Service.Model.BankCardManagement
         public IEnumerable<int> SupportChannels { get; set; }
         public string AccountNo { get; set; }
 
-        public string Agent { get; set; }
+        public int AgentId { get; set; }
     }
 
     public class SetOfflineBankingSettingParams

@@ -88,7 +88,7 @@ namespace BackendSite.Service.BLL
             WithdrawalMethodEnum withdrawalMethod,
             IEnumerable<string> selectBankCode,
             IEnumerable<int> selectCalCode,
-            string agent,
+            int agent,
             out int totalPages,
             out int rowCount,
             ref List<TotalAmount> currencyAmount)
@@ -174,7 +174,7 @@ namespace BackendSite.Service.BLL
             decimal endAmount,
             string selectBankCode,
             string selectCalCode,
-            string agent,
+            int agent,
             WithdrawalMethodEnum withdrawalMethod)
         {
             return _withdrawalService.GetWithdrawalExportList(
