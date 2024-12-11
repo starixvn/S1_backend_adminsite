@@ -86,4 +86,11 @@ namespace BackendSite.Service.Model
         public int Level { get; set; }
         public string LevelValue { get; set; }
     }
+
+    public class VipLevelName
+    {
+        public int Level { get; set; }
+        public string LevelName { get; set; }
+
+    }
 }
