@@ -639,6 +639,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             var result = false;
             bool isSpecialBonus = req.PromotionType == PromotionTypeEnum.SpecialBonus;
             _logger.LogInformation($@"UploadPromotionUploadCustList Start At {DateTime.UtcNow}.");
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             if (req.excelUpload != null)
             {
@@ -657,33 +658,26 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         var tempExpiryDate = isSpecialBonus ? sheet.Cells[rowId, 4].Text.Trim() : sheet.Cells[rowId, 2].Text.Trim();
                         var custInfo = _custInfoBll.GetCustInfoDetails(null, userName, req.SiteId);
 
-                        if (DateTimeOffset.TryParse(tempExpiryDate, out DateTimeOffset expiryDate))
+                        if (string.IsNullOrEmpty(userName))
                         {
-                            if (string.IsNullOrEmpty(userName))
-                            {
-                                isLastRow = true;
-                            }
-                            else
-                            {
-                                if (custInfo is not null)
-                                {
-                                    var data = new PromotionCustUploadList
-                                    {
-                                        BonusCode = req.BonusCode,
-                                        SiteId = req.SiteId,
-                                        CustId = custInfo.CustId,
-                                        Bonus = decimal.Parse(amount),
-                                        RollOver = int.Parse(rollover),
-                                        ExpiryDate = expiryDate
-                                    };
-                                    excelList.Add(data);
-                                }
-                                rowId += 1;
-                            }
+                            isLastRow = true;
                         }
                         else
                         {
-                            continue;
+                            if (custInfo is not null && DateTime.TryParse(tempExpiryDate, out DateTime expiryDate))
+                            {
+                                var data = new PromotionCustUploadList
+                                {
+                                    BonusCode = req.BonusCode,
+                                    SiteId = req.SiteId,
+                                    CustId = custInfo.CustId,
+                                    Bonus = decimal.Parse(amount),
+                                    RollOver = int.Parse(rollover),
+                                    ExpiryDate = expiryDate
+                                };
+                                excelList.Add(data);
+                            }
+                            rowId += 1;
                         }
                     } while (!isLastRow);
 
