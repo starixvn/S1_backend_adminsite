@@ -147,7 +147,7 @@ namespace BackendSite.Service.Model
         public int CustId { get; set; }
         public int RollOver { get; set; }
         public decimal Bonus { get; set; }
-        public DateTimeOffset ExpiryDate { get; set; }
+        public DateTime ExpiryDate { get; set; }
     }
     public class PromotionCustList
     {
