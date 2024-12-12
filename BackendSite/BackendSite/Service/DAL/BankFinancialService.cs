@@ -155,7 +155,7 @@ namespace BackendSite.Service.DAL
             var result = _reportDbClient
                 .Query<BankFinancialTransferAccount>("Admin_BankFinancialTransferAccount_GetForList_V5", parameters);
             
-            return purposes.Any()
+            return purposes != null && purposes.Any()
                 ? result.Where(x => !purposes.Except(x.Purposes).Any())
                 : result;
         }
