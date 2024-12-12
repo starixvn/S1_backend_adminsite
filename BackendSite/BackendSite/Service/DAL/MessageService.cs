@@ -214,7 +214,7 @@ namespace BackendSite.Service.DAL
             props.Add("_IsPayoutRewardPoint", isPayoutRewardPoint);
             props.Add("_Operator", Operator);
             props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            _ = _reportDbClient.Execute("Admin_Change_VipLevel_Batch_V2", props);
+            _ = _mainDbClient.Execute("Admin_Change_VipLevel_Batch_V2", props);
             
             var result = props.Get<int?>("_Result") ?? -1;
 
