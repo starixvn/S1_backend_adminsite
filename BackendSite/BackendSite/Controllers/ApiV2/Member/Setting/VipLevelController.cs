@@ -106,6 +106,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             var apiResult = new List<ApiResult>();
             var authData = _authorizeBll.GetAuthData();
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             try
             {
                 if (request.ExcelUpload.ContentType.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", StringComparison.OrdinalIgnoreCase)
@@ -136,6 +137,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                         var _custId = int.TryParse(m.Value, out var custId) ? custId : (int?)null;
                         int.TryParse(sheet.Cells[rowId, 3].Text.Trim(), out var vipLevel);
                         var memo = sheet.Cells[rowId, 4].Text.Trim();
+                        var isPayoutReward = string.Equals(sheet.Cells[rowId, 5].Text.Trim(), "V", StringComparison.OrdinalIgnoreCase);
+                        var isPayoutRewardPoint = string.Equals(sheet.Cells[rowId, 6].Text.Trim(), "V", StringComparison.OrdinalIgnoreCase);
+                        
                         if (string.IsNullOrEmpty(custUsername) && _custId == null)
                         {
                             isLastRow = true;
@@ -152,7 +156,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
                             {
                                 try
                                 {
-                                    if (_messageBll.ChangeVipLevelBatch(custInfoDetail.SiteId, custInfoDetail.CustId, custInfoDetail.UserName, vipLevel, memo, authData.UserName) > 0)
+                                    if (_messageBll.ChangeVipLevelBatch(custInfoDetail.SiteId, custInfoDetail.CurrencyId, custInfoDetail.CustId, custInfoDetail.UserName, vipLevel, memo, isPayoutReward, isPayoutRewardPoint, authData.UserName) > 0)
                                     {
                                         apiResult.Add(new ApiResult() { ErrorCode = (int)ErrorCodeEnum.Success, Message = $"Success. Username: {custUsername}. SabaId: {sabaId}. " });
                                     }

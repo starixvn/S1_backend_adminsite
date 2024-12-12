@@ -198,9 +198,9 @@ namespace BackendSite.Service.BLL
                 return false;
             }
         }
-        public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
+        public int ChangeVipLevelBatch(int siteId, int currencyId ,int custId, string userName, int vipLevel, string memo, bool isPayoutReward, bool isPayoutRewardPoint, string Operator)
         {
-            return messageService.ChangeVipLevelBatch(siteId, custId, userName, vipLevel, memo, Operator);
+            return messageService.ChangeVipLevelBatch(siteId, currencyId, custId, userName, vipLevel, memo, isPayoutReward, isPayoutRewardPoint, Operator);
         }
         public bool NewBatchMessage(int siteId, string author, bool isPopup, string personalMsg, ref int batchId)
         {
