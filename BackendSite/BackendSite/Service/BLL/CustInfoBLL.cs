@@ -41,7 +41,7 @@ namespace BackendSite.Service.BLL
         private readonly string _backOfficeS3Url;
         private readonly string _backOfficeS3BucketName;
         private readonly string _environment;
-        private readonly TagBLL _tagll;
+        private readonly TagBLL _tagBll;
         public CustInfoBLL(IServiceProvider provider)
         {
             _custInfoService = provider.GetRequiredService<CustInfoService>();
@@ -72,7 +72,7 @@ namespace BackendSite.Service.BLL
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             var env = provider.GetRequiredService<IWebHostEnvironment>();
             _environment = env.IsProduction() || env.EnvironmentName == "Release" ? "PRD" : "DEV";
-            _tagll = provider.GetRequiredService<TagBLL>();
+            _tagBll = provider.GetRequiredService<TagBLL>();
         }
 
         public Customer GetCustInfoWithCache(int custId)
@@ -82,6 +82,11 @@ namespace BackendSite.Service.BLL
                 RedisDataBase.Shared);
         }
 
+        public Customer GetCustInfo(int custId)
+        {
+            return _custInfoService.GetCustInfo(custId);
+        }
+        
         public int GetPointLevelWithCache(int custId)
         {
             return _redisHelper.TryGetOrCreate($"PointLevel:{custId}", TimeSpan.FromMinutes(1),
@@ -1074,7 +1079,7 @@ namespace BackendSite.Service.BLL
                     try
                     {
                         var custInfo = _custInfoService.GetCustByExcel(new ImportDataByExcelModel() { SiteId = siteId, CustIdList = JsonConvert.SerializeObject(custIdList.Distinct()), UserNameList = JsonConvert.SerializeObject(userNameList.Distinct()) });
-                        var allTagList = await _tagll.GetAllTag();
+                        var allTagList = await _tagBll.GetAllTag();
                         var serverInfo = _serverInfoBll.GetServerInfo(siteId);
                         var data = custInfo.Select(a => new MemberExportData()
                         {

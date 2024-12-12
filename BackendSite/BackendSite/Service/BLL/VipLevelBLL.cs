@@ -5,7 +5,6 @@ using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
-
 using Newtonsoft.Json;
 
 namespace BackendSite.Service.BLL
@@ -48,6 +47,7 @@ namespace BackendSite.Service.BLL
             return new MemberVipLevelInfo()
             {
                 Manually = data.Manually,
+                DefaultLevel = data.DefaultLevel,
                 VipLevel = data.VipLevel,
                 QualifiedTime = data.QualifiedTime
             }; ;
@@ -99,6 +99,18 @@ namespace BackendSite.Service.BLL
             return await _vipLevelService.SetVipLevelManuallyAsync(siteId, custId, userName, manually, $"{updator} Update Manually", updator);
         }
 
+        public async Task<int> SetVipLevelDefaultAsync(int siteId, int custId, string userName, int oldLevel, DefaultVIPLevel defaultLevel, string updator)
+        {
+            var newLevel = (oldLevel, defaultLevel) switch
+            {
+                ((int)DefaultVIPLevel.BlackTortoise, DefaultVIPLevel.Qilin) => (int)DefaultVIPLevel.Qilin,
+                ((int)DefaultVIPLevel.Qilin, DefaultVIPLevel.BlackTortoise) => (int)DefaultVIPLevel.BlackTortoise,
+                _ => oldLevel
+            };
+            
+            return await _vipLevelService.SetVipLevelDefaultAsync(siteId, custId, userName, oldLevel , newLevel, (int)defaultLevel , $"{updator} Update Default {defaultLevel.ToString()}", updator);
+        }
+        
         public async Task<int> VipAutomationExclusion(int custId, bool enable, string updator)
         {
             var customer = await _memberService.GetCustomerBasicInfoAsync(custId);

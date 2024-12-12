@@ -11,12 +11,14 @@ namespace BackendSite.Service.Model
     public class MemberVipLevelInfo
     {
         public string VipLevel { get; set; }
+        public int DefaultLevel { get; set; }
         public int Manually { get; set; }
         public DateTimeOffset QualifiedTime { get; set; }
     }
     public class VipLevelInfoDto
     {
         public string VipLevel { get; set; }
+        public int DefaultLevel { get; set; }
         public int Manually { get; set; }
         public DateTime QualifiedTime { get; set; }
     }
