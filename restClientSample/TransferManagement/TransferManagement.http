@@ -45,7 +45,7 @@ Content-Type: application/json
     "siteId": 1,
     "currencyIds": [2, 4, 15, 51],
     "channels": [1, 2, 3, 6],
-    "agentId": 0,
+    "agentId": 28,
     "status": [0, 1, 2, 3],
     "purposes": [],
     "sysIds": [],

@@ -75,3 +75,12 @@ Content-Type: application/json
     "siteId": 1,
     "purposes": null
 }
+
+
+
+###
+# 取得 FinancialAccount 下拉
+POST {{url}}/apiV2/BaseData/GetFinancialAccountList HTTP/1.1
+Content-Type: application/json
+
+{"siteId":1,"purposes":null}
