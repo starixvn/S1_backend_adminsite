@@ -201,9 +201,24 @@ namespace BackendSite.Service.DAL
             p.Add("_IsPopup", isPopup);
             return await _mainDbClient.ExecuteAsync("Admin_Msg_Batch_Ins_V3", p);
         }
-        public int ChangeVipLevelBatch(int siteId, int custId, string userName, int vipLevel, string memo, string Operator)
+        public int ChangeVipLevelBatch(int siteId, int currencyId ,int custId, string userName, int vipLevel, string memo, bool isPayoutReward, bool isPayoutRewardPoint, string Operator)
         {
-            return _mainDbClient.Execute("Admin_Change_VipLevel_Batch", new { SiteId = siteId, CustId = custId, UserName = userName, VipLevel = vipLevel, Memo = memo, Operator = Operator });
+            var props = new DynamicParameters();
+            props.Add("_SiteId", siteId);
+            props.Add("_CurrencyId", currencyId);
+            props.Add("_CustId", custId);
+            props.Add("_UserName", userName);
+            props.Add("_VipLevel", vipLevel);
+            props.Add("_Memo", memo);
+            props.Add("_IsPayoutReward", isPayoutReward);
+            props.Add("_IsPayoutRewardPoint", isPayoutRewardPoint);
+            props.Add("_Operator", Operator);
+            props.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            _ = _reportDbClient.Execute("Admin_Change_VipLevel_Batch_V2", props);
+            
+            var result = props.Get<int?>("_Result") ?? -1;
+
+            return result;
         }
         public bool NewBatchMessage(int siteId, string author, string personalMsg, bool isPopup, ref int batchId)
         {
