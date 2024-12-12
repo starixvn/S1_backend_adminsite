@@ -246,6 +246,12 @@ namespace BackendSite.Service.Model.enums
         Enable = 1
     }
 
+    public enum DefaultVIPLevel
+    {
+        BlackTortoise = 1,
+        Qilin = 2
+    }
+    
     #endregion
 
     #region CustTpGameTypeSetting

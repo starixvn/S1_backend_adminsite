@@ -1,25 +1,21 @@
 ﻿using System.Data;
-
 using BackendSite.Extensions;
 using BackendSite.Service.DAL.Interface;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.CustVipLevel;
 using BackendSite.Service.Model.enums;
-
 using Dapper;
 
 namespace BackendSite.Service.DAL
 {
     public class VipLevelService : IVipLevelService
     {
-        private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
 
         public VipLevelService(IServiceProvider provider)
         {
-            _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
@@ -112,6 +108,22 @@ namespace BackendSite.Service.DAL
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevelManually_Set", p);
         }
 
+        public async Task<int> SetVipLevelDefaultAsync(int siteId, int custId, string userName, int oldLevel , int newLevel , int defaultLevel, string memo, string updator)
+        {
+            var p = new DynamicParameters(new
+            {
+                _SiteId = siteId,
+                _CustId = custId,
+                _UserName = userName,
+                _OldLevel = oldLevel,
+                _NewLevel = newLevel,
+                _DefaultLevel = defaultLevel,
+                _Memo = memo,
+                _Operator = updator
+            });
+            return await _mainDbClient.ExecuteAsync("Admin_CustVipLevelDefault_Set", p);
+        }
+        
         public Task<int> SetAutoCustVipExclusionAsync(int siteId, int custId, string userName, int exclusive)
         {
             return _mainDbClient.ExecuteAsync("Admin_AutoCustVipExclusion_Set", new

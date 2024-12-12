@@ -10,7 +10,6 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.Option;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -41,7 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly DateTimeHelper _dateTimeHelper;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly TpBLL _tpBll;
-        private readonly StringVaildHelper _stringVaildHelper;
+        private readonly StringVaildHelper _stringValidHelper;
 
         public MemberController(IServiceProvider provider)
         {
@@ -67,7 +66,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _dateTimeHelper = provider.GetRequiredService<DateTimeHelper>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _tpBll = provider.GetRequiredService<TpBLL>();
-            _stringVaildHelper = provider.GetRequiredService<StringVaildHelper>();
+            _stringValidHelper = provider.GetRequiredService<StringVaildHelper>();
         }
 
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 32 })]
@@ -543,6 +542,35 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel Manually fail");
         }
 
+        /// <summary>
+        /// Member/SetVipLevelDefault 設定VIP預設等級
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Http Method：POST
+        /// 
+        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > VIP Level > Cust Level > Click [Default]
+        /// 
+        /// </remarks>
+        /// <param name="custIdReq"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 22, 3 })]
+        [HttpPost]
+        public async Task<ApiResult> SetVipLevelDefault(SetVipLevelDefaultRequest custIdReq)
+        {
+            var custInfo = _custInfoBll.GetCustInfo(custIdReq.CustId);
+            var result = await _vipLevelBll.SetVipLevelDefaultAsync(custInfo.SiteId, custInfo.CustId, custInfo.UserName, custInfo.UserLevel, custIdReq.VipLevel, User.Identity.Name);
+            if (result > 0)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Set VipLevel Default Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Set VipLevel Default fail");
+        }
+        
         /// <summary>
         /// Member/VipAutomationExclusion 設定VIP自動降級排除
         /// </summary>
@@ -1505,7 +1533,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         public async Task<ApiResult> RegisterMember(RegisterCustomerRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.RealName)
-                || !_stringVaildHelper.VaildAccountNameForSetProfile(request.RealName))
+                || !_stringValidHelper.VaildAccountNameForSetProfile(request.RealName))
             {
                 throw new AdminException(ErrorCodeEnum.Fail, "RealName Wrong Format.");
             }

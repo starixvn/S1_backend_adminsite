@@ -398,6 +398,12 @@ public class SetVipLevelManuallyRequest
     public int Manually { get; set; }
 }
 
+public class SetVipLevelDefaultRequest
+{
+    public int CustId { get; set; }
+    public DefaultVIPLevel VipLevel { get; set; } = DefaultVIPLevel.BlackTortoise;
+}
+
 public class AutoVipDowngradeExclusionRequest
 {
     public int CustId { get; set; }
