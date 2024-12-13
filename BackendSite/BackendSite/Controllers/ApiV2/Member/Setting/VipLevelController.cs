@@ -231,5 +231,15 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             };
             return apiListResult;
         }
+
+        public async Task<ApiResult<IEnumerable<VipLevelName>>> GetVipLevelName(GetUpgradeSettingRequest request)
+        {
+            var apiListResult = new ApiResult<IEnumerable<VipLevelName>>
+            {
+                Data = await _vipLevelBll.GetVipLevelName(request.SiteId),
+                ErrorCode = 0
+            };
+            return apiListResult;
+        }
     }
 }
