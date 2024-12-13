@@ -309,9 +309,9 @@ namespace BackendSite.Service.BLL
             return vipSystem.GroupBy(y => y.CurrencyId).Select(x => x.Key);
         }
 
-        public async Task<IEnumerable<VipLevelName>> GetVipLevelName(int siteId, int currencyId)
+        public async Task<IEnumerable<VipLevelName>> GetVipLevelName(int siteId)
         {
-            return await _vipLevelService.GetVipLevelName(siteId,currencyId);
+            return await _vipLevelService.GetVipLevelName(siteId);
         }
         #endregion
 

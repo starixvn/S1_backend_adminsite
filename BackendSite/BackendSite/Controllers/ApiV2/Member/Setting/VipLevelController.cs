@@ -232,7 +232,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         {
             var apiListResult = new ApiResult<IEnumerable<VipLevelName>>
             {
-                Data = await _vipLevelBll.GetVipLevelName(request.SiteId,request.CurrencyId),
+                Data = await _vipLevelBll.GetVipLevelName(request.SiteId),
                 ErrorCode = 0
             };
             return apiListResult;

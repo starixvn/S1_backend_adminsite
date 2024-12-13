@@ -285,10 +285,10 @@ namespace BackendSite.Service.DAL
             return result;
         }
 
-        public async Task<IEnumerable<VipLevelName>> GetVipLevelName(int siteId, int currencyId)
+        public async Task<IEnumerable<VipLevelName>> GetVipLevelName(int siteId)
         {
             return await _reportDbClient.QueryAsync<VipLevelName>("Service_VipLevelName_Get",
-                new DynamicParameters(new { siteId = siteId, CurrencyId = currencyId}));
+                new DynamicParameters(new { _SiteId = siteId}));
         }
         #region Private Methods
 
