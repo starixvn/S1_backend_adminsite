@@ -1,8 +1,8 @@
 # localhost
-# @url=http://localhost:5070
+@url=http://localhost:5070
 
 # AdminSite DEV
-@url=http://admin.nova88dev.com
+# @url=http://admin.nova88dev.com
 
 ###
 # Login V2
