@@ -180,6 +180,7 @@ namespace BackendSite.Service.Model.BankFinancial
             Purposes = data.Purposes;
             Channel = data.Channel;
             Agent = data.Agent;
+            AgentId = data.AgentId;
             PayId = data.PayId;
             PayName = data.PayName;
             AccountNo = data.AccountNo;
@@ -216,6 +217,7 @@ namespace BackendSite.Service.Model.BankFinancial
         public TransferChannelEnum Channel { get; set; }
 
         public string Agent { get; set; }
+        public int AgentId { get; set; }
 
         public int PayId { get; set; }
 

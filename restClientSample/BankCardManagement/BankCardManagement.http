@@ -1,8 +1,8 @@
 # localhost
-@url=http://localhost:9158
+@url=http://localhost:5070
 
 # AdminSite DEV
-# @url=http://admin.n88dev.com
+# @url=http://admin.nova88dev.com
 
 ###
 # Login V2
@@ -17,6 +17,7 @@ Content-Type: application/json
 ###
 # 取得 Offline 銀行卡設定清單
 # purposes，sysIds，vipLevels，pointLevels，supportChannels 這幾項要撈全部請帶空陣列 []
+# agent 改為 agentId，沒選帶 0
 POST {{url}}/apiV2/BankCardManagement/GetList HTTP/1.1
 Content-Type: application/json
 
@@ -29,10 +30,10 @@ Content-Type: application/json
     "vipLevels": [],
     "pointLevels": [],
     "accountNo": "",
-    "agent": "",
+    "agentId": 28,
     "supportChannels": [1],
     "pageNumber": 1,
-    "pageSize": 10
+    "pageSize": 25
 }
 
 ###
