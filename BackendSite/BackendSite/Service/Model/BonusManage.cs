@@ -297,7 +297,8 @@ namespace BackendSite.Service.Model
         public int DepositCountAchieved { get; set; }
         [Description("多少期間內的天數 須達成存款單筆數")]
         public int DepositTermPeriodDays { get; set; }
-        
+        [Description("RequiredAmount 跟 DepositCountAchieved , One of the Following or Both")]
+        public int DepositConditionStatus { get; set; }
         /// <summary>
         /// 目前應該都固定帶1
         /// </summary>
