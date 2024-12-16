@@ -422,6 +422,7 @@ namespace BackendSite.Service.DAL
                     RequiredAmount = specific.RequiredAmount,
                     DepositCountAchieved = specific.DepositCountAchieved,
                     DepositTermPeriodDays = specific.DepositTermPeriodDays,
+                    DepositConditionStatus = specific.DepositConditionStatus,
                     LockedType = specific.LockedType,
                     MinPayout = specific.MinPayout,
                     VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes)
