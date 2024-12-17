@@ -12,18 +12,26 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentAgent;
 [ApiController]
 public class PaymentAgentController : ControllerBase
 {
+    private readonly NewAuthorizeBLL _newAuthorizeBLL;
+    private readonly AuthorizeBLL _authorizeBll;
     private readonly PaymentAgentBLL _paymentAgentBll;
     
     public PaymentAgentController(IServiceProvider provider)
     {
         _paymentAgentBll = provider.GetRequiredService<PaymentAgentBLL>();
+        _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
+        _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
     }
     
     [HttpPost]
     public ApiResult GetList(GetListRequest req)
     {
-        var result = _paymentAgentBll.GetPaymentAgents();
-
+        var authData = _authorizeBll.GetAuthData();
+        var siteList = _newAuthorizeBLL.GetAssignSiteListV2(authData.UserId)
+            .Select(x => x.SiteId);
+        
+        var result = _paymentAgentBll.GetPaymentAgents(siteList, req.Types, req.Status);
+        
         return new ApiResult<IEnumerable<PaymentAgentInfo>>
         {
             Data = result,
@@ -34,8 +42,12 @@ public class PaymentAgentController : ControllerBase
     [HttpPost]
     public ApiResult GetSelectList()
     {
+        var authData = _authorizeBll.GetAuthData();
+        var siteList = _newAuthorizeBLL.GetAssignSiteListV2(authData.UserId)
+            .Select(x => x.SiteId);
+        
         var result = _paymentAgentBll
-            .GetPaymentAgents()
+            .GetPaymentAgents(siteList)
             .OrderBy(x => x.AgentName)
             .Select(x => new SelectListItem
             {

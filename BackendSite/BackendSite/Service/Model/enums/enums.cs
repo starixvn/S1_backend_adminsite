@@ -2139,4 +2139,10 @@ namespace BackendSite.Service.Model.enums
         Suspend = 2,
         Closed = 3
     }
+    
+    public enum AdminUserTypeEnum 
+    {
+        Admin = 0,
+        PaymentAgent = 1
+    }
 }

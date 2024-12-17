@@ -15,10 +15,15 @@ public class PaymentAgentBLL
         _paymentAgentService = provider.GetRequiredService<PaymentAgentService>();
     }
 
-    public IEnumerable<PaymentAgentInfo> GetPaymentAgents()//IEnumerable<int> siteIds, IEnumerable<PaymentAgentTypeEnum> types)
+    public IEnumerable<PaymentAgentInfo> GetPaymentAgents(IEnumerable<int> siteIds = null,
+        IEnumerable<PaymentAgentTypeEnum> types = null,
+        IEnumerable<PaymentAgentStatusEnum> status = null)
     {
-        var result = _paymentAgentService.GetPaymentAgentList();
-            //.Where(x => siteIds.Contains(x.SiteId) && types.Contains(x.Type));
+        var result = _paymentAgentService.GetPaymentAgentList()
+            .Where(x => 
+                (siteIds == null || x.SiteIds.Intersect(siteIds).Any()) && 
+                (types == null || types.Contains(x.Type)) &&
+                (status == null || status.Contains(x.Status)));
 
         return result;
     }

@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using BackendSite.Service.Model.enums;
+
+namespace BackendSite.Service.Model
 {
     public class NewAdminUser
     {
@@ -10,5 +12,6 @@
         public DateTime CreateTime { get; set; }
         public string CurrencyList { get; set; }
         public int SiteId { get; set; }
+        public AdminUserTypeEnum UserType { get; set; }
     }
 }
