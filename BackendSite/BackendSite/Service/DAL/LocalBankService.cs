@@ -3,6 +3,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
 using Dapper;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -28,8 +29,17 @@ namespace BackendSite.Service.DAL
                 _SiteId = siteId,
                 _CurrencyId = currencyId
             });
+            
+            var result =
+                _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get_V3", p);
 
-            return _reportDbClient.Query<OfflineBankAccount>("Admin_OfflineBankAccount_Get_V3", p);
+            foreach (var item in result)
+            {
+                item.BankLoginInfo =
+                    JsonConvert.DeserializeObject<IEnumerable<BankLoginInfo>>(item.JsonBankLoginInfo);
+            }
+            
+            return result;
         }
 
         public IEnumerable<BankCodeModel> GetBankCodeList(int siteId)
