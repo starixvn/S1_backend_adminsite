@@ -48,14 +48,14 @@ namespace BackendSite.Service.Model
         public string Purpose { get; set; }
 
         public IEnumerable<TransferAccountPurposeEnum> Purposes =>
-            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(Purpose ?? "[]");
+            JsonConvert.DeserializeObject<IEnumerable<TransferAccountPurposeEnum>>(Purpose);
 
         public string JsonPointLevels { set; get; }
         public IEnumerable<int> PointLevels =>
-            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonPointLevels ?? "[]");
+            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonPointLevels);
         public string JsonVipLevels { set; get; }
         public IEnumerable<int> VipLevels =>
-            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels ?? "[]");
+            JsonConvert.DeserializeObject<IEnumerable<int>>(JsonVipLevels);
 
         public decimal MinAmount { set; get; }
         public decimal MaxAmount { set; get; }
@@ -64,10 +64,9 @@ namespace BackendSite.Service.Model
         public string BankCode { get; set; }
         public string BankName { get; set; }
         public string BankLoginUrl { get; set; }
-        [JsonIgnore]
         public string JsonBankLoginInfo { get; set; }
-        public IEnumerable<BankLoginInfo> BankLoginInfo =>
-            JsonConvert.DeserializeObject<IEnumerable<BankLoginInfo>>(JsonBankLoginInfo ?? "[]");
+        public IEnumerable<BankLoginInfo> BankLoginInfo
+            => JsonConvert.DeserializeObject<IEnumerable<BankLoginInfo>>(JsonBankLoginInfo);
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }
@@ -76,7 +75,6 @@ namespace BackendSite.Service.Model
 
     public class BankLoginInfo
     {
-        
         public string Account { get; set; }
         public string Password { get; set; }
     }

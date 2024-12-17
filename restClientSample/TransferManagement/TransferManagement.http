@@ -156,10 +156,6 @@ POST {{url}}/apiV2/BankTransferAccount/GetPayList HTTP/1.1
 Content-Type: application/json
 
 ###
-# 取得 Agent 列表
-POST {{url}}/apiV2/BankTransferAccount/GetAgentList HTTP/1.1
+# 取得 PaymentAgent 下拉選單 
+POST {{url}}/apiV2/PaymentAgent/GetSelectList HTTP/1.1
 Content-Type: application/json
-
-{
-    "siteId": 1
-}
