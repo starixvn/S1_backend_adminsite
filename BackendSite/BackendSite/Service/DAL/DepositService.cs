@@ -525,23 +525,23 @@ namespace BackendSite.Service.DAL
 
             var p = new DynamicParameters(new
             {
-                SelectSite = selectSite,
-                SelectBankCode = selectBankCode,
-                SelectCalCode = selectCalCode,
-                DepositType = depositType,
-                StartDate = startDate,
-                EndDate = endDate,
-                DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int)dateType,
-                DepositId = depositId,
-                TransId = DepositId,
-                UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
-                AgentId = agent,
-                CurrencyId = currencyId,
-                Status = status,
-                VipStatus = levelStatus,
-                StartAmount = startAmount,
-                EndAmount = endAmount,
-                PayIds = payIds
+                _SelectSite = selectSite,
+                _SelectBankCode = selectBankCode,
+                _SelectCalCode = selectCalCode,
+                _DepositType = depositType,
+                _StartDate = startDate,
+                _EndDate = endDate,
+                _DateType = (int)dateType == 0 ? (int)DepositDateTypeEnum.CreateTime : (int)dateType,
+                _DepositId = depositId,
+                _TransId = DepositId,
+                _UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
+                _AgentId = agent,
+                _CurrencyId = currencyId,
+                _Status = status,
+                _VipStatus = levelStatus,
+                _StartAmount = startAmount,
+                _EndAmount = endAmount,
+                _PayIds = payIds
             });
             var depositList = _reportDbClient.Query<DepositInfoForExport>("Admin_DepositListForExport_Get_V15", p);
             return depositList;
