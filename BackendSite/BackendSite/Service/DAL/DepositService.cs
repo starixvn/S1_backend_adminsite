@@ -536,7 +536,7 @@ namespace BackendSite.Service.DAL
                 _TransId = DepositId,
                 _UserNames = userNames.Any() ? JsonConvert.SerializeObject(userNames) : null,
                 _AgentId = agent,
-                _CurrencyId = currencyId,
+                _CurrencyIds = currencyId,
                 _Status = status,
                 _VipStatus = levelStatus,
                 _StartAmount = startAmount,

@@ -24,7 +24,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
         private readonly AuthorizeBLL _authorizeBll;
         private readonly AdminBLL _adminBll;
         private readonly PermissionBLL _permissionBll;
-        private readonly MenuBLL _menuBll;
         private readonly ServerInfoBLL _serverInfoBll;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
         private readonly ConfigBLL _adminRole;
@@ -38,7 +37,6 @@ namespace BackendSite.Controllers.ApiV2.Admin.Permission
             _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _adminBll = provider.GetRequiredService<AdminBLL>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
-            _menuBll = provider.GetRequiredService<MenuBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
             _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
             _adminRole = provider.GetRequiredService<ConfigBLL>();
