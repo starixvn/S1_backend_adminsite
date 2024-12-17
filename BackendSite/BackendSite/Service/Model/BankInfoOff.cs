@@ -65,8 +65,7 @@ namespace BackendSite.Service.Model
         public string BankName { get; set; }
         public string BankLoginUrl { get; set; }
         public string JsonBankLoginInfo { get; set; }
-        public IEnumerable<BankLoginInfo> BankLoginInfo
-            => JsonConvert.DeserializeObject<IEnumerable<BankLoginInfo>>(JsonBankLoginInfo);
+        public IEnumerable<BankLoginInfo> BankLoginInfo { get; set; }
         public string TransferPin { get; set; }
         public string LoginPin { get; set; }
         public string MobilePin { get; set; }
