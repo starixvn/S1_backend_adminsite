@@ -96,7 +96,7 @@ namespace BackendSite.Service.BLL
             foreach (var item in result)
             {
                 item.BankLoginInfo =
-                    JsonConvert.DeserializeObject<IEnumerable<BankLoginInfo>>(item.JsonBankLoginInfo ?? "[]");
+                    JsonConvert.DeserializeObject<IEnumerable<BankLoginInfo>>(item.JsonBankLoginInfo);
             }
             
             return result;
