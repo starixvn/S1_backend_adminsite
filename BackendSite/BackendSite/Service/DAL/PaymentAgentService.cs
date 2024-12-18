@@ -19,8 +19,9 @@ public class PaymentAgentService
         _logger = provider.GetRequiredService<ILogger<PaymentAgentService>>();
     }
     
-    public IEnumerable<PaymentAgentInfo> GetPaymentAgentList()
+    public IEnumerable<PaymentAgentInfo> GetPaymentAgentList(int agentId = 0)
     {
-        return _reportDbClient.Query<PaymentAgentInfo>("Admin_PaymentAgentList_Get");
+        return _reportDbClient.Query<PaymentAgentInfo>("Admin_PaymentAgentList_Get",
+            new { _AgentId = agentId });
     }
 }
