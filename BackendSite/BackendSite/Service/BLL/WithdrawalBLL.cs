@@ -664,52 +664,6 @@ namespace BackendSite.Service.BLL
 
         #region WithdrawalBankAccounting
 
-        public GetWithdrawalInfoAndAccountingListModel GetWithdrawalInfoAndAccountingList(
-            IEnumerable<int> siteIds,
-            IEnumerable<int> currencyIds,
-            DateTime startDate,
-            DateTime endDate,
-            string transId,
-            string userName,
-            int pageNumber,
-            int pageSize)
-        {
-            var data = GetWithdrawalInfoAndAccountingData(siteIds,
-                currencyIds,
-                startDate,
-                endDate,
-                transId,
-                userName,
-                pageNumber,
-                pageSize,
-                out var totalPages,
-                out var rowCount);
-
-            return new GetWithdrawalInfoAndAccountingListModel()
-            {
-                Datas = data.ToList(),
-                PageNumber = Math.Abs(pageNumber),
-                RowCount = rowCount,
-                TotalPages = totalPages
-            };
-        }
-
-        public IEnumerable<WithdrawalInfoAndAccountingListForExportModel> GetWithdrawalInfoAndAccountingListForExport(
-            string siteIds,
-            string currencyIds,
-            DateTime startDate,
-            DateTime endDate,
-            string transId,
-            string userName)
-        {
-            return GetWithdrawalInfoAndAccountingDataForExport(siteIds,
-                currencyIds,
-                startDate,
-                endDate,
-                transId,
-                userName);
-        }
-
         //For Old Code
         //現行前端要求拆兩隻API
         public bool GetAccountingListByTransId(string transId, out GetWithdrawalInfoAndAccountingModel data)
@@ -910,71 +864,9 @@ namespace BackendSite.Service.BLL
             return result;
         }
 
-        private IEnumerable<WithdrawalInfoAndAccountingListModel> GetWithdrawalInfoAndAccountingData(
-            IEnumerable<int> siteIds,
-            IEnumerable<int> currencyIds,
-            DateTime startDate,
-            DateTime endDate,
-            string transId,
-            string userName,
-            int pageNumber,
-            int pageSize,
-            out int totalPages,
-            out int rowCount)
-        {
-            return _withdrawalBankAccountingService.GetWithdrawalInfoAndAccountingList(
-                JsonConvert.SerializeObject(siteIds),
-                JsonConvert.SerializeObject(currencyIds),
-                startDate,
-                endDate,
-                string.IsNullOrEmpty(transId) ? null : transId,
-                string.IsNullOrEmpty(userName) ? null : userName,
-                Math.Abs(pageSize),
-                (Math.Abs(pageNumber) - 1) * Math.Abs(pageSize),
-                out totalPages,
-                out rowCount);
-        }
-
-        private IEnumerable<WithdrawalInfoAndAccountingListForExportModel> GetWithdrawalInfoAndAccountingDataForExport(
-            string siteIds,
-            string currencyIds,
-            DateTime startDate,
-            DateTime endDate,
-            string transId,
-            string userName)
-        {
-            return _withdrawalBankAccountingService.GetWithdrawalInfoAndAccountingListForExport(
-                siteIds,
-                currencyIds,
-                startDate,
-                endDate,
-                string.IsNullOrEmpty(transId) ? null : transId,
-                string.IsNullOrEmpty(userName) ? null : userName);
-        }
-
         private IEnumerable<GetWithdrawalBankAccountingModel> GetAccountingList(string transId, int siteId, int currencyId)
         {
             return _withdrawalBankAccountingService.GetAccountingListByTransId(transId, siteId, currencyId);
-        }
-
-        private GetWithdrawalBankAccountingModel GetAccountingById(int id)
-        {
-            return _withdrawalBankAccountingService.GetById(id);
-        }
-
-        private bool InsertWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
-        {
-            return _withdrawalBankAccountingService.SetFlow(ActionType.Create, model);
-        }
-
-        private bool UpdateWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
-        {
-            return _withdrawalBankAccountingService.SetFlow(ActionType.Update, model);
-        }
-
-        private bool DeleteWithdrawalBankAccounting(WithdrawalBankAccountingModel model)
-        {
-            return _withdrawalBankAccountingService.SetFlow(ActionType.Delete, model);
         }
 
         #region Withdrawal Submission

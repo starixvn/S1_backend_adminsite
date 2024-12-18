@@ -4,6 +4,7 @@ using BackendSite.Service.Model.PaymentAgent;
 using BackendSite.Service.Model.enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SetRequest = BackendSite.Service.Model.PaymentAgent.SetRequest;
 
 namespace BackendSite.Controllers.ApiV2.Finance.PaymentAgent;
 
@@ -12,14 +13,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentAgent;
 [ApiController]
 public class PaymentAgentController : ControllerBase
 {
-    private readonly NewAuthorizeBLL _newAuthorizeBLL;
+    private readonly NewAuthorizeBLL _newAuthBll;
     private readonly AuthorizeBLL _authorizeBll;
     private readonly PaymentAgentBLL _paymentAgentBll;
     
     public PaymentAgentController(IServiceProvider provider)
     {
         _paymentAgentBll = provider.GetRequiredService<PaymentAgentBLL>();
-        _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
+        _newAuthBll = provider.GetRequiredService<NewAuthorizeBLL>();
         _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
     }
     
@@ -27,7 +28,7 @@ public class PaymentAgentController : ControllerBase
     public ApiResult GetList(GetListRequest req)
     {
         var authData = _authorizeBll.GetAuthData();
-        var siteList = _newAuthorizeBLL.GetAssignSiteListV2(authData.UserId)
+        var siteList = _newAuthBll.GetAssignSiteListV2(authData.UserId)
             .Select(x => x.SiteId);
         
         var result = _paymentAgentBll.GetPaymentAgents(siteList, req.Types, req.Status);
@@ -43,7 +44,7 @@ public class PaymentAgentController : ControllerBase
     public ApiResult GetSelectList()
     {
         var authData = _authorizeBll.GetAuthData();
-        var siteList = _newAuthorizeBLL.GetAssignSiteListV2(authData.UserId)
+        var siteList = _newAuthBll.GetAssignSiteListV2(authData.UserId)
             .Select(x => x.SiteId);
         
         var result = _paymentAgentBll
@@ -58,6 +59,41 @@ public class PaymentAgentController : ControllerBase
         return new ApiResult<IEnumerable<SelectListItem>>
         {
             Data = result,
+            ErrorCode = (int)ErrorCodeEnum.Success
+        };
+    }
+    
+    [HttpPost]
+    public ApiResult SetStatus(SetStatusRequest req)
+    {
+        var authData = _authorizeBll.GetAuthData();
+        _ = _paymentAgentBll.SetPaymentAgentStatus(req.AgentId, req.Status, authData.UserName);
+        
+        return new ApiResult
+        {
+            ErrorCode = (int)ErrorCodeEnum.Success
+        };
+    }
+    
+    [HttpPost]
+    public ApiResult Set(SetRequest req)
+    {
+        var authData = _authorizeBll.GetAuthData();
+        _ = _paymentAgentBll.SetPaymentAgent(new SetParams(req), authData.UserName);
+        
+        return new ApiResult
+        {
+            ErrorCode = (int)ErrorCodeEnum.Success
+        };
+    }
+    
+    [HttpPost]
+    public ApiResult SetUser(SetUserRequest req)
+    {
+        
+        
+        return new ApiResult
+        {
             ErrorCode = (int)ErrorCodeEnum.Success
         };
     }
