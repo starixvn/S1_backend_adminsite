@@ -679,7 +679,8 @@ namespace BackendSite.Service.Model.enums
         SpecialBonus = 8,
         RetentionFreeBet = 9,
         DeviceBonus = 10,
-        MissionBonus = 11
+        MissionBonus = 11,
+        PredictionEvent = 12
     }
 
     public enum PromotionCategoryEnum
@@ -974,7 +975,8 @@ namespace BackendSite.Service.Model.enums
         SetBigWinSetting = 96,
         LeaderboardPointCalculation = 97,
         LeaderboardRankingBonus = 98,
-        SetSlotGame = 99
+        SetSlotGame = 99,
+        ClaimPredictPromotion = 100
     }
 
     #region BankFinancialTransferInfoLog
@@ -2117,5 +2119,13 @@ namespace BackendSite.Service.Model.enums
         openSUSE,
         TESLA,
         Web0S,
+    }
+    /// <summary>
+    /// 驗證類型
+    /// </summary>
+    public enum VerificationInfoType 
+    {
+        Email =1,
+        Phone =2
     }
 }

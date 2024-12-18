@@ -51,7 +51,8 @@ namespace BackendSite.Service.BLL
                 HomeTeamNameId = data.HomeSportTeamId,
                 AwayTeamNameId = data.AwaySportTeamId,
                 ICurrencyList = data.ICurrencyList,
-                IsLiveStreaming = data.IsLiveStreaming
+                IsLiveStreaming = data.IsLiveStreaming,
+                IsPrediction = !string.IsNullOrEmpty(data.BonusCode)
             };
         }
 
@@ -75,7 +76,9 @@ namespace BackendSite.Service.BLL
                     LastUpdateUser = r.LastUpdateUser,
                     LastUpdateTime = DatetimeFormat(r.LastUpdateTime),
                     ICurrencyList = r.ICurrencyList,
-                    IsLiveStreaming = r.IsLiveStreaming
+                    IsLiveStreaming = r.IsLiveStreaming,
+                    IsPrediction = !string.IsNullOrEmpty(r.BonusCode),
+                    BonusCode = r.BonusCode
                 }),
                 RowCount = queryResult.RowCount,
                 TotalPages = queryResult.TotalPages

@@ -25,13 +25,13 @@ public class FaceBookPixelBLL
         return result;
     }
 
-    public PixelRequest CreatePixelRequest(int siteId ,int custId, int currencyId, decimal? value, IEnumerable<FaceBookPixel> pixelEvent)
+    public PixelRequest CreatePixelRequest( string transId ,int siteId ,int custId, decimal? value, IEnumerable<FaceBookPixel> pixelEvent)
     {
         return new PixelRequest
         {
+            TransId = transId,
             SiteId = siteId,
             CustId = custId,
-            CurrencyId = currencyId,
             Value = value,
             PixelEvent = pixelEvent
         };

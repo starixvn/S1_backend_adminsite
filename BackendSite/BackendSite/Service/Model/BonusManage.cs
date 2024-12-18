@@ -297,8 +297,13 @@ namespace BackendSite.Service.Model
         [Description("幣別啟用開關, 1.開, 2.關")]
         public int Status { get; set; }
 
-        [Description("達到多少存款金額才可領, PromotionType = 1,2 時必填,PromotionType = 11 選填, 其餘皆傳0")]
+        [Description("達到多少存款金額才可領, PromotionType = 1,2,12 時必填,PromotionType = 11 選填, 其餘皆傳0")]
         public decimal RequiredAmount { get; set; }
+        [Description("須達成存款單筆數")]
+        public int DepositCountAchieved { get; set; }
+        [Description("多少期間內的天數 須達成存款單筆數")]
+        public int DepositTermPeriodDays { get; set; }
+        
         /// <summary>
         /// 目前應該都固定帶1
         /// </summary>

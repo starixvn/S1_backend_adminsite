@@ -686,7 +686,26 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 Data = result.Where(x => x.CustId != request.CustId)
             };
         }
+        /// <summary>
+        /// 修改email/phone前驗證
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ApiResult> VerificationInfo(VerificationRequest request)
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            var result = await _memberCommand.Verification(request.CustId,request.VerificationType,request.VerificationInfo);
 
+            if (result)
+            {
+                return new ApiResult
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Verification Success."
+                };
+            }
+            throw new AdminException(ErrorCodeEnum.Fail, "Verification Fail.");
+        }
         /// <summary>
         /// Member/EditEmail 修改用戶Email
         /// </summary>
@@ -701,7 +720,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditEmail(SetEmailRequest request)
         {
-            var result = await _memberCommand.EditEmailAsync(request.CustId, request.Email, User.Identity.Name);
+            var authData = _newAuthorizeBll.GetAuthData();
+            var result = await _memberCommand.EditEmailAsync(request.CustId, request.Email, User.Identity.Name, authData);
 
             if (result > 0)
             {
@@ -729,7 +749,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult> EditPhoneNo(SetPhoneNoRequest request)
         {
-            var result = await _memberCommand.EditPhoneNoAsync(request.CustId, request.PhoneNo, User.Identity.Name);
+            var authData = _newAuthorizeBll.GetAuthData();
+            var result = await _memberCommand.EditPhoneNoAsync(request.CustId, request.PhoneNo, User.Identity.Name, authData);
 
             if (result > 0)
             {

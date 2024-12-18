@@ -366,8 +366,9 @@ namespace BackendSite.Service.DAL
             using var conn = _mainDbClient.GetMySqlConnection();
             conn.Open();
             using var trans = conn.BeginTransaction();
-
-            //Step1:Set Promotion
+            
+            #region Step1:Set Promotion
+            
             var setAffectCount = SetPromotion(promotion, trans);
 
             if (setAffectCount == 0)
@@ -381,11 +382,11 @@ namespace BackendSite.Service.DAL
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return false;
             }
-
             var isUpdate = setAffectCount == 2;
-
-            //Setp:inset AdjustmentinfoLog
-            #region
+            
+            #endregion
+            
+            #region Step2:inset AdjustmentinfoLog
             var insertCount = InsertAdjustmentInfoLog(promotion, trans, Operator);
             if (insertCount == 0)
             {
@@ -393,10 +394,10 @@ namespace BackendSite.Service.DAL
                 return false;
             }
             #endregion
-
-
+            
+            #region Step2-1:Set Promotion Specific
+            
             var specificList = new List<PromotionSpecific>();
-
             foreach (var specific in promotion.Specific)
             {
                 var maxBonus = specific.BonusType == (int)BonusTypeEnum.Amount ? specific.Bonus : specific.MaxBonus;
@@ -419,6 +420,8 @@ namespace BackendSite.Service.DAL
                     Usage = specific.Usage,
                     Details = specific.Details,
                     RequiredAmount = specific.RequiredAmount,
+                    DepositCountAchieved = specific.DepositCountAchieved,
+                    DepositTermPeriodDays = specific.DepositTermPeriodDays,
                     LockedType = specific.LockedType,
                     MinPayout = specific.MinPayout,
                     VN_AffCodes = !string.IsNullOrEmpty(specific.VN_AffCodes)
@@ -429,21 +432,24 @@ namespace BackendSite.Service.DAL
                     TurnoverTpGameTypes = specific.TurnoverTpGameTypeList is not null ? JsonConvert.SerializeObject(specific.TurnoverTpGameTypeList) : "[]",
                 });
             }
-
-            //Step2-1:Set Promotion Specific
+            
             if (!SetPromotionSpecific(promotion.BonusCode, promotion.SiteId, specificList, trans))
             {
                 _mainDbClient.RollbackAndDisposeConnection(conn, trans);
                 return false;
             }
+            
+            #endregion
 
-            //Step2-2:If Update,Delete old Promotion Specific
+            #region Step2-2:If Update,Delete old Promotion Specific
             if (isUpdate)
             {
                 DeletePromotionSpecific(promotion.BonusCode, promotion.SiteId, specificList, trans);
             }
-
-            //Step3-1:Set Promotion Display Condition
+            #endregion
+            
+            #region Step3-1:Set Promotion Display Condition
+            
             //Display Condition Logic Process
             var promotionDisplayConditionList = new List<PromotionDisplayConditionModel>();
             if (vipLevelCondition.IsForVipLevel)
@@ -463,13 +469,15 @@ namespace BackendSite.Service.DAL
                     return false;
                 }
             }
+            #endregion
 
-            //Step3-2:If Update,Delete old Promotion Display Condition
+            #region Step3-2:If Update,Delete old Promotion Display Condition
             if (isUpdate)
             {
                 DeletePromotionDisplayCondition(promotion.BonusCode, promotion.SiteId, promotionDisplayConditionList, trans);
             }
-
+            #endregion
+            
             if (promotion.PromotionType == (int)PromotionTypeEnum.Cashback)
             {
                 var cashBackList = new List<PromotionCashBackSetting>();
@@ -715,24 +723,22 @@ namespace BackendSite.Service.DAL
             p.Add("_SpecificList", JsonConvert.SerializeObject(specificList));
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V7", transaction, p);
+            _mainDbClient.Execute("Admin_PromotionSpecific_Set_V8", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
 
             return affectCount > 0;
         }
-
+        
         /// <summary>
         /// 刪除促銷規則??
         /// </summary>
         /// <param name="bonusCode"></param>
         /// <param name="siteId"></param>
         /// <param name="specificList"></param>
-        /// <param name="expectedRow"></param>
         /// <param name="transaction"></param>
         /// <returns></returns>
-        private int DeletePromotionSpecific(string bonusCode, int siteId, List<PromotionSpecific> specificList,
-            MySqlTransaction transaction)
+        private int DeletePromotionSpecific(string bonusCode, int siteId, List<PromotionSpecific> specificList, MySqlTransaction transaction)
         {
             var p = new DynamicParameters();
 
@@ -747,7 +753,7 @@ namespace BackendSite.Service.DAL
 
             return affectCount;
         }
-
+        
         /// <summary>
         /// 設定促銷顯示條件
         /// </summary>

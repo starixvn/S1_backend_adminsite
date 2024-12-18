@@ -458,9 +458,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                                 FaceBookPixel.purchase,
                                 refreshDepositInfoData.FirstDeposit == 1 ? FaceBookPixel.startTrial : FaceBookPixel.redeposit
                             };
-                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(depositRequest.SiteId, depositRequest.CustId, depositRequest.CurrencyId, depositRequest.ActualDeposit, pixelEvent);
+                            var pixelRequest = _faceBookPixelBll.CreatePixelRequest(request.TransId, depositRequest.SiteId, depositRequest.CustId, depositRequest.ActualDeposit, pixelEvent);
                             _ = _faceBookPixelBll.Send(pixelRequest);
-
+                      
                             var para = new CRMRequest()
                             {
                                 Event = (int)CRMEvent.deposit_successful,

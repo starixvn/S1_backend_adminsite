@@ -301,8 +301,9 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                 {
                     case (int)PromotionTypeEnum.FreeBet
                         or (int)PromotionTypeEnum.Cashback
-                        or (int)PromotionTypeEnum.RetentionFreeBet:
-
+                        or (int)PromotionTypeEnum.RetentionFreeBet
+                        or (int)PromotionTypeEnum.PredictionEvent:
+                        
                         if (request.PromotionInfo.Specific.Any(specific =>
                                     specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                     CheckRollover(specific.RollOver, specific.WinOver, apiResult)))

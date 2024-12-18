@@ -189,6 +189,7 @@ namespace BackendSite.Service.BLL.Mpa
                 r.UserName = x.UserName;
                 r.TpUserName = x.TpUserName;
                 r.Currency = x.ChildKey;
+                r.VIPLevel = x.VIPLevel;
 
                 return r;
             });

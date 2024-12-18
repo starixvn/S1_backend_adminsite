@@ -49,7 +49,7 @@ namespace BackendSite.Service.DAL
             p.Add("_StartIndex", (Math.Abs(request.PageNumber) - 1) * Math.Abs(request.PageSize));
             p.Add("_TotalPages", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_RowCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            result.Data = await _reportDbClient.QueryAsync<HotEventDataListDto>("Admin_HotEventDataList_Get", p);
+            result.Data = await _reportDbClient.QueryAsync<HotEventDataListDto>("Admin_HotEventDataList_Get_V2", p);
             result.TotalPages = p.Get<int?>("_TotalPages") ?? 0;
             result.RowCount = p.Get<int?>("_RowCount") ?? 0;
             return result;
@@ -59,7 +59,7 @@ namespace BackendSite.Service.DAL
         {
             var p = new DynamicParameters();
             p.Add("_SQ", id);
-            return _reportDbClient.QueryFirstAsync<HotEventDetailDto>("Admin_HotEventDetail_Get", p);
+            return _reportDbClient.QueryFirstAsync<HotEventDetailDto>("Admin_HotEventDetail_Get_V2", p);
         }
 
         public Task CreateHotEventAsync(CreateHotEventRequest request, string createUser)
@@ -79,8 +79,9 @@ namespace BackendSite.Service.DAL
             p.Add("_AwaySportTeamId", request.AwayTeamNameId);
             p.Add("_CreateUser", createUser);
             p.Add("_IsLiveStreaming", request.IsLiveStreaming);
+            p.Add("_IsPrediction", request.IsPrediction);
             p.Add("_Currency", JsonConvert.SerializeObject(request.ICurrencyList));
-            return _mainDbClient.ExecuteAsync("Admin_HotEventInfo_Ins_V2", p);
+            return _mainDbClient.ExecuteAsync("Admin_HotEventInfo_Ins_V3", p);
         }
 
         public Task SetHotEventDataAsync(SetHotEventDataRequest request, string updateUser)
@@ -98,8 +99,9 @@ namespace BackendSite.Service.DAL
             p.Add("_AwaySportTeamId", request.AwaySportTeamId);
             p.Add("_UpdateUser", updateUser);
             p.Add("_IsLiveStreaming", request.IsLiveStreaming);
+            p.Add("_IsPrediction", request.IsPrediction);
             p.Add("_Currency", JsonConvert.SerializeObject(request.ICurrencyList));
-            return _mainDbClient.ExecuteAsync("Admin_HotEventData_Set_V2", p);
+            return _mainDbClient.ExecuteAsync("Admin_HotEventData_Set_V3", p);
         }
 
         public Task SetHotEventStatusAsync(SetHotEventStatusRequest request, string updateUser)
