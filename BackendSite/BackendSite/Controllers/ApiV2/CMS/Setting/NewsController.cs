@@ -17,8 +17,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
 
         private readonly NewsBLL _newsBll;
-        private readonly ServerInfoBLL _serverInfoBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly ILogger<NewsController> _logger;
 
         #endregion
@@ -28,8 +27,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public NewsController(IServiceProvider provider)
         {
             _newsBll = provider.GetRequiredService<NewsBLL>();
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<NewsController>>();
         }
 

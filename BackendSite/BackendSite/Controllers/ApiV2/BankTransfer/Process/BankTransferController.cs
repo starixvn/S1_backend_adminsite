@@ -19,7 +19,7 @@ public class BankTransferController : ControllerBase
 
     public BankTransferController(IServiceProvider provider)
     {
-        _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+        _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         _excelBll = provider.GetRequiredService<ExcelBLL>();
         _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
@@ -29,7 +29,7 @@ public class BankTransferController : ControllerBase
 
     #region Fields
 
-    private readonly AuthorizeBLL _authorizeBll;
+    private readonly NewAuthorizeBLL _authorizeBll;
     private readonly BankFinancialBLL _bankFinancialBll;
     private readonly ExcelBLL _excelBll;
     private readonly ServerInfoBLL _serverInfoBll;

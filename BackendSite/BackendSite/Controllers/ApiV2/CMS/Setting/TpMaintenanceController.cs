@@ -21,7 +21,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         private readonly TpMaintainBLL _tpMaintainBll;
         private readonly ServerInfoBLL _serverInfoBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly ILogger<TpMaintenanceController> _logger;
 
         #endregion
@@ -32,7 +32,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             _tpMaintainBll = provider.GetRequiredService<TpMaintainBLL>();
             _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<TpMaintenanceController>>();
         }
 

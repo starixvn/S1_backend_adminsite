@@ -18,10 +18,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
     {
         #region Fields
 
-        private readonly ExcelBLL _excelBll;
         private readonly LeaderBoardBLL _leaderBoardBll;
-        private readonly AuthorizeBLL _authorizeBll;
-        private readonly CustInfoBLL _custInfoBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly ILogger<LeaderBoardAdjustmentController> _logger;
 
         #endregion
@@ -30,10 +28,8 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
         public LeaderBoardManagementController(IServiceProvider provider)
         {
-            _excelBll = provider.GetRequiredService<ExcelBLL>();
             _leaderBoardBll = provider.GetRequiredService<LeaderBoardBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
-            _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<LeaderBoardAdjustmentController>>();
         }
 

@@ -26,14 +26,6 @@ namespace BackendSite.Service.DAL
             this.tools = tools;
         }
 
-        public string GetPermissionJSONData()
-        {
-            var contentRootPath = env.ContentRootPath;
-            var initPermissionData = File.ReadAllText($"{contentRootPath}/App_Data/FunctionPermission.json");
-
-            return initPermissionData;
-        }
-
         public IEnumerable<RolePermission> GetRolePermission(int role)
         {
             return _reportDbClient.Query<RolePermission>("Admin_RolePermission_Get", new DynamicParameters(new { Role = role }));

@@ -16,11 +16,10 @@ namespace BackendSite.Service.BLL
     public class DepositBLL
     {
         private readonly DepositService depositService;
-        private readonly ServerInfoService serverInfoService;
         private readonly DepositAccountingService _depositAccountingService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly CustInfoBLL custInfoBLL;
-        private readonly AuthorizeBLL authorizeBLL;
+        private readonly NewAuthorizeBLL authorizeBLL;
         private readonly Common common;
         private readonly CustInfoService custInfoService;
         private readonly CourierAdapter _courierAdapter;
@@ -35,11 +34,9 @@ namespace BackendSite.Service.BLL
         public DepositBLL(IServiceProvider provider)
         {
             depositService = provider.GetRequiredService<DepositService>();
-            serverInfoService = provider.GetRequiredService<ServerInfoService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _depositAccountingService = provider.GetRequiredService<DepositAccountingService>();
             custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
-            authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
             common = provider.GetRequiredService<Common>();
             custInfoService = provider.GetRequiredService<CustInfoService>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();

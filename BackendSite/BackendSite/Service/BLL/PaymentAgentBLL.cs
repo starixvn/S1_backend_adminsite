@@ -93,6 +93,7 @@ public class PaymentAgentBLL
                     oldData.AgentName,
                     oldData.AgentId,
                     oldData.SiteIds,
+                    oldData.CurrencyIds,
                     Type = oldData.Type.ToString(),
                     Status = oldData.Status.ToString()
                 }),
@@ -101,6 +102,7 @@ public class PaymentAgentBLL
                     input.AgentName,
                     input.AgentId,
                     input.SiteIds,
+                    input.CurrencyIds,
                     Type = input.Type.ToString(),
                     Status = input.Status.ToString()
                 })

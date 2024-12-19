@@ -14,7 +14,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     [ApiController]
     public class LineChannelController : ControllerBase
     {
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly LineChannelBLL _lineChannelBll;
 
 
@@ -22,7 +22,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         public LineChannelController(IServiceProvider provider)
         {
-            _authorizeBll = provider.GetService<AuthorizeBLL>();
+            _authorizeBll = provider.GetService<NewAuthorizeBLL>();
             _lineChannelBll = provider.GetService<LineChannelBLL>();
         }
 

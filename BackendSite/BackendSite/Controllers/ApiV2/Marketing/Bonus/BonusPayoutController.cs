@@ -19,7 +19,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
     public class BonusPayoutController : ControllerBase
     {
         #region Fields
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly string _bonusApiUrl;
@@ -32,7 +32,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #region Constructors
         public BonusPayoutController(IServiceProvider provider, IConfiguration configuration)
         {
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
 

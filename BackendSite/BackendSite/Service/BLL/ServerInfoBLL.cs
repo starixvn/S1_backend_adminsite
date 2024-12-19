@@ -11,13 +11,12 @@ namespace BackendSite.Service.BLL
     public class ServerInfoBLL
     {
         private readonly ServerInfoService serverInfoService;
-        //private ConcurrentDictionary<int, ServerInfo> rm = new ConcurrentDictionary<int, ResourceManager>();
         private ServerInfo serverInfo;/*Single Site*/
         private IMemoryCache cache;
         private readonly NewAuthorizeBLL newAuthorizeBLL;
         private readonly NewAdminUserService newAdminUserService;
 
-        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, AdminUserService adminUserService, AuthorizeBLL authorizeBLL, PermissionBLL permissionBLL, NewAuthorizeBLL newAuthorizeBLL, NewAdminUserService newAdminUserService)
+        public ServerInfoBLL(IMemoryCache cache, ServerInfoService serverInfoService, NewAuthorizeBLL newAuthorizeBLL, NewAdminUserService newAdminUserService)
         {
             this.serverInfoService = serverInfoService;
             this.serverInfo = null;
@@ -80,17 +79,6 @@ namespace BackendSite.Service.BLL
                 Operator = Operator
             };
             return serverInfoService.AddAdminOperateLog(addAdminOperateLog);
-        }
-        public void permissionLoop(IEnumerable<FuncPermissionSettings> settings, ref Dictionary<string, string> dictKeys)
-        {
-            if (settings != null && settings.Any())
-            {
-                foreach (var s in settings)
-                {
-                    dictKeys.Add(s.FuncKey, s.DisplayKey);
-                    permissionLoop(s.FuncKeys, ref dictKeys);
-                }
-            }
         }
 
         public async Task<IEnumerable<string>> GetLanguageList(int siteId, int currencyId)

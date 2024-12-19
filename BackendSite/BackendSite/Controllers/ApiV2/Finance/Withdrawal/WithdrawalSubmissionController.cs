@@ -18,7 +18,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
         private readonly WithdrawalBLL _withdrawalBll;
         private readonly SelLangBLL _selLangBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly BankDetailBLL _bankDetailBll;
@@ -34,7 +34,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion

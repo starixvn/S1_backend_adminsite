@@ -10,38 +10,16 @@ namespace BackendSite.Service.BLL
     public class PendingFundBLL
     {
         private readonly CourierAdapter courierAdapter;
-        private readonly IConfiguration configuration;
         private readonly Tools tools;
-        private readonly PendingFundService pendingFundService;
-        private readonly ServerInfoService serverInfoService;
         private readonly string _tpServiceApiUrl;
-        private readonly WalletService walletService;
-        private readonly BonusInfoService bonusInfoService;
-        private readonly ServerInfoBLL _serverInfoBLL;
-        private readonly AuthorizeBLL _authorizeBLL;
         private readonly BonusInfoBLL _bonusInfoBLL;
 
 
         public PendingFundBLL(CourierAdapter courierAdapter,
-            IConfiguration configuration,
-            Tools tools,
-            PendingFundService pendingFundService,
-            ServerInfoService serverInfoService,
-            WalletService walletService,
-            BonusInfoService bonusInfoService,
-            ServerInfoBLL serverInfoBLL,
-            AuthorizeBLL authorizeBLL,
             BonusInfoBLL bonusInfoBLL,
             ConfigBLL configBll)
         {
             this.courierAdapter = courierAdapter;
-            this.configuration = configuration;
-            this.pendingFundService = pendingFundService;
-            this.serverInfoService = serverInfoService;
-            this.walletService = walletService;
-            this.bonusInfoService = bonusInfoService;
-            _serverInfoBLL = serverInfoBLL;
-            _authorizeBLL = authorizeBLL;
             _bonusInfoBLL = bonusInfoBLL;
 
             _tpServiceApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").TpService;

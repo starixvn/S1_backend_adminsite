@@ -17,7 +17,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
 
         private readonly AppLinkTableBLL _appLinkTableBll;
         private readonly SelLangBLL _selLangBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
 
 
         #endregion
@@ -28,7 +28,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         {
             _appLinkTableBll = provider.GetRequiredService<AppLinkTableBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion

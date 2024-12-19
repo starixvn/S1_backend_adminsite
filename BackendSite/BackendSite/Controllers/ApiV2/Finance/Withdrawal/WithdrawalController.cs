@@ -42,7 +42,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly MessageBLL _messageBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly BankDetailBLL _bankDetailBll;
-        private readonly AuthorizeBLL _authorizeBll;
         private readonly CourierAdapter _courierAdapter;
         private readonly AWSS3Helper _s3Helper;
         private readonly PermissionBLL _permissionBll;
@@ -76,7 +75,6 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _bankDetailBll = provider.GetRequiredService<BankDetailBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
@@ -494,7 +492,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
             var apiResult = new ApiResult(_selLangBll);
-            var authData = _authorizeBll.GetAuthData();
+            var authData = _newAuthorizeBll.GetAuthData();
             var withdrawConfirmResult = -1;
 
             //第一把鎖，鎖定後臺同一操作者短時間操作相同單號單
@@ -706,7 +704,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 if (response.ErrorCode == 0)
                 {
-                    var authData = _authorizeBll.GetAuthData();
+                    var authData = _newAuthorizeBll.GetAuthData();
 
                     //解除鎖定
                     var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(para.TransId, authData.SiteId);
@@ -749,7 +747,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
 
                 if (response.ErrorCode == 0)
                 {
-                    var authData = _authorizeBll.GetAuthData();
+                    var authData = _newAuthorizeBll.GetAuthData();
 
                     //解除鎖定
                     var _ = await _withdrawalReceiveBll.UnLockWithdrawalTicketAsync(para.TransId, authData.SiteId);
@@ -1086,7 +1084,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             if (!lockExists) //沒有人Lok
                 return new List<WithdrawalActionEnum>() { WithdrawalActionEnum.Draft, WithdrawalActionEnum.Receive };
 
-            var authData = _authorizeBll.GetAuthData();
+            var authData = _newAuthorizeBll.GetAuthData();
             var lockUser = await _redisHelper.StringGetAsync(key);
             var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
 

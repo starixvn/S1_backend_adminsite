@@ -22,7 +22,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
 
         private readonly PaymentBLL _paymentBll;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly BankFinancialBLL _bankFinancialBll;
         private readonly CourierAdapter _courierAdapter;
         private readonly Common _common;
@@ -37,7 +37,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
         {
             _paymentBll = provider.GetRequiredService<PaymentBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
             _common = provider.GetRequiredService<Common>();
             _courierAdapter = provider.GetRequiredService<CourierAdapter>();

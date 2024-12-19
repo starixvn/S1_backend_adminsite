@@ -18,7 +18,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
     {
         private readonly CustInfoBLL _custInfoBLL;
         private readonly AdjustWithdrawalLimitBLL _adjustWithdrawalLimitBLL;
-        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly NewAuthorizeBLL _authorizeBLL;
         private readonly CustVerifyBLL _custVerifyBll;
         private readonly BankFinancialBLL _bankFinancialBll;
 
@@ -27,7 +27,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Adjustment
             _custInfoBLL = provider.GetRequiredService<CustInfoBLL>();
             _custVerifyBll = provider.GetRequiredService<CustVerifyBLL>();
             _adjustWithdrawalLimitBLL = provider.GetRequiredService<AdjustWithdrawalLimitBLL>();
-            _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
             _bankFinancialBll = provider.GetRequiredService<BankFinancialBLL>();
         }
 

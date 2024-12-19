@@ -18,7 +18,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         #region Fields
 
         private readonly MessageBLL _messageBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly ILogger<AnnouncementController> _logger;
 
         #endregion
@@ -28,7 +28,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         public AnnouncementController(IServiceProvider provider)
         {
             _messageBll = provider.GetRequiredService<MessageBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _logger = provider.GetRequiredService<ILogger<AnnouncementController>>();
         }
 

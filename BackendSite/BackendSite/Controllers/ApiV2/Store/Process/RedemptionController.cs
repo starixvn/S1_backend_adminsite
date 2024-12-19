@@ -15,13 +15,13 @@ namespace BackendSite.Controllers.ApiV2.Store.Process
     public class RedemptionController : ControllerBase
     {
         private readonly RedemptionBLL _redemptionBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly ExcelBLL _excelBll;
 
         public RedemptionController(IServiceProvider provider)
         {
             _redemptionBll = provider.GetRequiredService<RedemptionBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
         }
 
