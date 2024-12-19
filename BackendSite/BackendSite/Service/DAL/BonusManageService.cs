@@ -826,7 +826,7 @@ namespace BackendSite.Service.DAL
             p.Add("_NewSpecialCode", newSpecialCode);
             p.Add("_IsSpecial", isSpecial ? 1 : 0);
             p.Add("_AffectCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            _mainDbClient.Execute("Admin_PromotionDuplicate_Set_V3", transaction, p);
+            _mainDbClient.Execute("Admin_PromotionDuplicate_Set_V4", transaction, p);
 
             var affectCount = p.Get<int?>("_AffectCount") == null ? 0 : p.Get<int>("_AffectCount");
             return affectCount == 1;
