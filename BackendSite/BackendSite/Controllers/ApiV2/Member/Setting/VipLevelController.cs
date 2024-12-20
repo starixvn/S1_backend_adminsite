@@ -21,12 +21,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
     {
         #region Fields
 
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly MessageBLL _messageBll;
         private readonly IVipLevelBLL _vipLevelBll;
 
-        public VipLevelController(AuthorizeBLL authorizeBll, CustInfoBLL custInfoBll, MessageBLL messageBll, IVipLevelBLL vipLevelBll)
+        public VipLevelController(NewAuthorizeBLL authorizeBll, CustInfoBLL custInfoBll, MessageBLL messageBll, IVipLevelBLL vipLevelBll)
         {
             _authorizeBll = authorizeBll;
             _custInfoBll = custInfoBll;

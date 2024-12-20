@@ -1010,7 +1010,9 @@ namespace BackendSite.Service.Model.enums
         LeaderboardPointCalculation = 97,
         LeaderboardRankingBonus = 98,
         SetSlotGame = 99,
-        ClaimPredictPromotion = 100
+        ClaimPredictPromotion = 100,
+        SetPaymentAgent = 101,
+        SetSpecialAdminUser = 102
     }
 
     #region BankFinancialTransferInfoLog
@@ -2205,5 +2207,11 @@ namespace BackendSite.Service.Model.enums
         Active = 1,
         Suspend = 2,
         Closed = 3
+    }
+    
+    public enum AdminUserTypeEnum 
+    {
+        Admin = 0,
+        PaymentAgent = 1
     }
 }

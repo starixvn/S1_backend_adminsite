@@ -16,7 +16,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
     {
         #region Fields
         private readonly DeepLinkBLL _deepLinkBLL;
-        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly NewAuthorizeBLL _authorizeBLL;
         private readonly SelLangBLL _selLangBll;
         #endregion
 
@@ -24,7 +24,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public DeepLinkController(IServiceProvider provider)
         {
             _deepLinkBLL = provider.GetRequiredService<DeepLinkBLL>();
-            _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
         }
         #endregion

@@ -25,7 +25,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #region Fields
 
         private readonly BonusManageBLL _bonusManageBll;
-        private readonly AuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly Common _common;
         private readonly ExcelBLL _excelBll;
@@ -39,7 +38,6 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public BonusController(IServiceProvider provider)
         {
             _bonusManageBll = provider.GetRequiredService<BonusManageBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _common = provider.GetRequiredService<Common>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
@@ -441,7 +439,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<ApiResult<int>> SendBonusUsingList([FromForm] SendBonusUsingListRequest req)
         {
-            var authData = _authorizeBll.GetAuthData();
+            var authData = _newAuthorizeBll.GetAuthData();
             var excelList = new List<BonusCustUsing>();
             var result = false;
             _logger.LogInformation($@"SendBonusUsingList-Read Excel And Send Start At {DateTime.UtcNow}.");
@@ -635,7 +633,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         [HttpPost]
         public async Task<ApiResult<int>> UploadPromotionUploadCustList([FromForm] UploadPromotionCustListRequest req)
         {
-            var authData = _authorizeBll.GetAuthData();
+            var authData = _newAuthorizeBll.GetAuthData();
             var excelList = new List<PromotionCustUploadList>();
             var result = false;
             bool isSpecialBonus = req.PromotionType == PromotionTypeEnum.SpecialBonus;

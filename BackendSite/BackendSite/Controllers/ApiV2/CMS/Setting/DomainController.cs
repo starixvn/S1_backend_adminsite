@@ -19,7 +19,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         #region Fields
 
         private readonly DomainTableBLL _domainTableBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly SelLangBLL _selLangBll;
 
         #endregion
@@ -29,7 +29,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         public DomainController(IServiceProvider provider)
         {
             _domainTableBll = provider.GetRequiredService<DomainTableBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _selLangBll = provider.GetRequiredService<SelLangBLL>();
         }
 

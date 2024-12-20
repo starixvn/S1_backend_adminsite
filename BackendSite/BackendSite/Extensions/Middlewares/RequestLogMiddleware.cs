@@ -18,7 +18,7 @@ namespace BackendSite.Extensions.Middlewares
 
         private readonly ILogger _logger;
         private readonly RequestDelegate _next;
-        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly NewAuthorizeBLL _authorizeBLL;
         private readonly Tools _tools;
 
         #endregion
@@ -27,8 +27,7 @@ namespace BackendSite.Extensions.Middlewares
 
         public RequestLogMiddleware(RequestDelegate next,
                                     ILoggerFactory factory,
-                                    AuthorizeBLL authorizeBLL,
-                                    ServerInfoBLL serverInfoBLL,
+                                    NewAuthorizeBLL authorizeBLL,
                                     Tools tools)
         {
             _next = next;

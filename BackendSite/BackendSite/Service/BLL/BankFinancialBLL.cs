@@ -20,7 +20,6 @@ namespace BackendSite.Service.BLL
 
         private readonly BankFinancialService _bankFinancialService;
         private readonly PaymentManageService _paymentManageService;
-        private readonly ReportService _reportService;
         private readonly AdjustmentLogReportService _adjustmentLogReportService;
         private readonly AWSS3Helper _awsS3Helper;
         private readonly ICacheHelper _cacheHelper;
@@ -28,7 +27,6 @@ namespace BackendSite.Service.BLL
         private readonly string _bucketUrl;
         private readonly string _folder;
         private readonly Cryptor _cryptor;
-        private readonly ServerInfoBLL _serverInfoBll;
         
         #endregion
 
@@ -38,7 +36,6 @@ namespace BackendSite.Service.BLL
         {
             _bankFinancialService = provider.GetRequiredService<BankFinancialService>();
             _paymentManageService = provider.GetRequiredService<PaymentManageService>();
-            _reportService = provider.GetRequiredService<ReportService>();
             _adjustmentLogReportService = provider.GetRequiredService<AdjustmentLogReportService>();
             _awsS3Helper = provider.GetRequiredService<AWSS3Helper>();
             _cacheHelper = provider.GetRequiredService<ICacheHelper>();
@@ -47,7 +44,6 @@ namespace BackendSite.Service.BLL
             _bucketUrl = configBll.GetConfigValue("AWSBackOfficeBucketUrl");
             _folder = configBll.GetConfigValue("AWSFinanceFolderName");
             _cryptor = provider.GetRequiredService<Cryptor>();
-            _serverInfoBll = provider.GetRequiredService<ServerInfoBLL>();
         }
 
         #endregion

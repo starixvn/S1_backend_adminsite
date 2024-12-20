@@ -18,7 +18,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
         private readonly EventBLL _eventBll;
         private readonly ExcelBLL _excelBll;
         private readonly CustInfoBLL _custInfoBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly ICacheHelper _redisHelper;
         
         public LotteryEventController(IServiceProvider provider)
@@ -26,7 +26,7 @@ namespace BackendSite.Controllers.ApiV2.CMS.Setting
             _eventBll = provider.GetRequiredService<EventBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 

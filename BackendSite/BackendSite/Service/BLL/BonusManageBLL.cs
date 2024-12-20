@@ -13,14 +13,12 @@ namespace BackendSite.Service.BLL
     public class BonusManageBLL
     {
         private readonly BonusManageService _bonusManageService;
-        private readonly ServerInfoBLL _serverInfoBLL;
-        private readonly AuthorizeBLL _authorizeBLL;
+        private readonly NewAuthorizeBLL _authorizeBLL;
 
         public BonusManageBLL(IServiceProvider provider)
         {
             _bonusManageService = provider.GetRequiredService<BonusManageService>();
-            _serverInfoBLL = provider.GetRequiredService<ServerInfoBLL>();
-            _authorizeBLL = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         public IEnumerable<PromotionInfo> GetPromotionList(IEnumerable<int> siteIds,

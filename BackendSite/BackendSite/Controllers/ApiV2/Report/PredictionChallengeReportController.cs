@@ -17,7 +17,7 @@ namespace BackendSite.Controllers.ApiV2.Report
 
         private readonly PredictionBLL _predictionBll;
         private readonly ExcelBLL _excelBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
 
@@ -29,7 +29,7 @@ namespace BackendSite.Controllers.ApiV2.Report
         {
             _predictionBll = provider.GetRequiredService<PredictionBLL>();
             _excelBll = provider.GetRequiredService<ExcelBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
         }

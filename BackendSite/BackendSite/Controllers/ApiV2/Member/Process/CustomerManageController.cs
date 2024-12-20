@@ -31,7 +31,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly PaymentBLL _paymentBll;
         private readonly ExcelBLL _excelBll;
         private readonly VipLevelBLL _vipLevelBll;
-        private readonly AuthorizeBLL _authorizeBll;
         private readonly MessageBLL _messageBll;
         private readonly ReferralManagementBLL _referralManagementBll;
         private readonly DepositBLL _depositBll;
@@ -70,7 +69,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _vipLevelBll = provider.GetRequiredService<VipLevelBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
             _messageBll = provider.GetRequiredService<MessageBLL>();
             _referralManagementBll = provider.GetRequiredService<ReferralManagementBLL>();
             _depositBll = provider.GetRequiredService<DepositBLL>();
@@ -189,115 +187,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
         #endregion
 
-        public class CustInfoListRequest : ApiRequestPageModel
-        {
-            private DateTimeOffset _startDate;
-            private DateTimeOffset _endDate;
-            private DateTimeOffset _tagStartDate;
-            private DateTimeOffset _tagEndDate;
-            private DateTimeOffset _statusStartDate;
-            private DateTimeOffset _statusEndDate;
-            public IEnumerable<int> SiteIds { get; set; }
-            public IEnumerable<int> CurrencyIds { get; set; }
-            public DateTimeOffset? StartDate
-            {
-                get => _startDate;
-                set
-                {
-                    if (value != null)
-                        _startDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? EndDate
-            {
-                get => _endDate;
-                set
-                {
-                    if (value != null)
-                        _endDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? TagStartDate
-            {
-                get => _tagStartDate;
-                set
-                {
-                    if (value != null)
-                        _tagStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? TagEndDate
-            {
-                get => _tagEndDate;
-                set
-                {
-                    if (value != null)
-                        _tagEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? StatusStartDate
-            {
-                get => _statusStartDate;
-                set
-                {
-                    if (value != null)
-                        _statusStartDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public DateTimeOffset? StatusEndDate
-            {
-                get => _statusEndDate;
-                set
-                {
-                    if (value != null)
-                        _statusEndDate = new DateTimeOffset(value.Value.ToUniversalTime().DateTime, TimeSpan.Zero);
-                }
-            }
-            public int? BirDate { get; set; }
-            public int? BirMonth { get; set; }
-            public int? BirYear { get; set; }
-            public string UserName { get; set; }
-            public string AccountName { get; set; }
-            public string LoginIp { get; set; }
-            public string TransId { get; set; }
-            public string TpUserName { get; set; }
-            public string Email { get; set; }
-            public string PhoneNo { get; set; }
-            public string AffCode { get; set; }
-            public string BankAccountNumber { get; set; }
-            public IEnumerable<int> Statuses { get; set; }
-            public IEnumerable<int> SelectTag { get; set; }
-            public bool ExportTransferWallet { get; set; } = false;
-        }
-
         public class CustIdWithReasonRequest : CustIdRequest
         {
             /// <summary>
             /// 異動原因
             /// </summary>
             public string Reason { get; set; }
-        }
-
-        public class SetCustomerStatusRequest : CustIdWithReasonRequest
-        {
-
-            public CustomerStatusEnum CurrentStatus { get; set; }
-        }
-
-        public class CustIdWithVipLevelRequest : CustIdRequest
-        {
-            /// <summary>
-            /// VIP等級
-            /// </summary>
-            public int VipLevel { get; set; }
-        }
-
-        public class CustIdWithVipLevelManuallyRequest : CustIdRequest
-        {
-            /// <summary>
-            /// 手動否
-            /// </summary>
-            public ManuallyEnum Manually { get; set; }
         }
 
         public class DeleteMessageRequest
@@ -612,101 +507,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             {
                 Data = data,
                 ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-
-        /// <summary>
-        /// CustomerManage/SetCustStatusSwitch 設定客戶狀態開關(客戶驗證、風險、電話驗證、Email驗證)
-        /// </summary>
-        /// <remarks>
-        /// Http Method：POST
-        /// 
-        /// Func Path：CSD >  Customer Administration > Click[UserName] > CustInfo > [Switch] IsKyc、IsRisk、PhoneVerified、EmailVerified
-        /// </remarks>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ApiResult SetCustStatusSwitch(CustStatusSwitchRequest request)
-        {
-            var apiResult = new ApiResult<bool>();
-            int OldStatus = 0;
-            int NewStatus = 0;
-            var custSwitchInfo = _custInfoBll.GetCustSwitchStatus(request.CustId);
-            switch (request.Option)
-            {
-                case CustStatusSwitchOptionEnum.IsKyc:
-                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_isKyc"))
-                    {
-                        throw new AdminException(ErrorCodeEnum.PermissionDenied);
-                    }
-                    OldStatus = custSwitchInfo.IsKyc;
-                    break;
-                case CustStatusSwitchOptionEnum.IsRisk:
-                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_isRisk"))
-                    {
-                        throw new AdminException(ErrorCodeEnum.PermissionDenied);
-                    }
-                    OldStatus = custSwitchInfo.IsRisk;
-                    break;
-                case CustStatusSwitchOptionEnum.PhoneVerified:
-                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_phoneVerified"))
-                    {
-                        throw new AdminException(ErrorCodeEnum.PermissionDenied);
-                    }
-                    OldStatus = custSwitchInfo.PhoneVerified;
-                    break;
-                case CustStatusSwitchOptionEnum.EmailVerified:
-                    if (!_permissionBll.CheckPermission("CustManage/CustInfoList", "ca_emailVerified"))
-                    {
-                        throw new AdminException(ErrorCodeEnum.PermissionDenied);
-                    }
-                    OldStatus = custSwitchInfo.EmailVerified;
-                    break;
-                default:
-                    throw new AdminException(ErrorCodeEnum.Fail);
-                    break;
-            }
-            NewStatus = request.Status;
-            var data = _custInfoBll.SetCustStatusSwitch(request.CustId, (int)request.Option) > 0;
-
-            if (!data)
-            {
-                throw new AdminException(ErrorCodeEnum.Fail, "Update Fail.");
-            }
-
-            var Menu = "CustManage/CustInfoList";
-            var Info = new Dictionary<string, dynamic>();
-            Info.Add("MenuName", "Customer Info");
-            if (request.Option == CustStatusSwitchOptionEnum.IsKyc)
-            {
-                Info.Add("Action", "Change IsKyc Status");
-                Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
-                Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
-            }
-            else if (request.Option == CustStatusSwitchOptionEnum.IsRisk)
-            {
-                Info.Add("Action", "Change IsRisk Status");
-                Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
-                Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
-            }
-            else if (request.Option == CustStatusSwitchOptionEnum.PhoneVerified)
-            {
-                Info.Add("Action", "Change PhoneVerified Status");
-                Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
-                Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
-            }
-            else if (request.Option == CustStatusSwitchOptionEnum.EmailVerified)
-            {
-                Info.Add("Action", "Change EmailVerified Status");
-                Info.Add("OldStatus", OldStatus == 0 ? "NO" : "YES");
-                Info.Add("NewStatus", NewStatus == 0 ? "NO" : "YES");
-            }
-            _serverInfoBll.AdminOperateLog(null, request.CustId, Menu, ActionType.Update, Info, User.Identity.Name);
-
-            return new ApiResult
-            {
-                ErrorCode = (int)ErrorCodeEnum.Success,
-                Message = "Update Success."
             };
         }
 
@@ -1956,7 +1756,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var apiResult = new ApiResult();
             try
             {
-                var authData = _authorizeBll.GetAuthData();
+                var authData = _newAuthorizeBll.GetAuthData();
                 if (await _messageBll.SendMessageToPlayer(authData.UserName, request.Title, request.Content, request.IsPopup, request.PopupMessage, request.CustId) == 0)
                 {
                     apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;

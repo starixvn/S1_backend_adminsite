@@ -15,7 +15,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         #region Fields
 
         private readonly ReasonManagementBLL _reasonManagementBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
 
         #endregion
 
@@ -24,7 +24,7 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
         public ReasonController(IServiceProvider provider)
         {
             _reasonManagementBll = provider.GetRequiredService<ReasonManagementBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion

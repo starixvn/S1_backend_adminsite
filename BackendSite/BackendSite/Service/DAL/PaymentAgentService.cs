@@ -1,8 +1,6 @@
 using BackendSite.Service.Library;
 using BackendSite.Service.Model.enums;
 using BackendSite.Service.Model.PaymentAgent;
-using Dapper;
-using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL;
 
@@ -21,7 +19,33 @@ public class PaymentAgentService
     
     public IEnumerable<PaymentAgentInfo> GetPaymentAgentList(int agentId = 0)
     {
-        return _reportDbClient.Query<PaymentAgentInfo>("Admin_PaymentAgentList_Get",
-            new { _AgentId = agentId });
+        return _reportDbClient.Query<PaymentAgentInfo>("Admin_PaymentAgentList_Get"
+            , new { _AgentId = agentId });
     }
+    
+    public bool SetPaymentAgentStatus(int agentId, PaymentAgentStatusEnum status)
+    {
+        return _mainDbClient
+            .Execute("Admin_PaymentAgentList_SetStatus", new
+            {
+                _AgentId = agentId,
+                _Status = (int)status
+            }) > 0;
+    }
+    
+    public bool SetPaymentAgent(SetParams input)
+    {
+        return _mainDbClient
+            .Execute("Admin_PaymentAgentList_Set", new
+            {
+                _AgentId = input.AgentId,
+                _AgentName = input.AgentName,
+                _SiteIds = input.SiteIds,
+                _CurrencyIds = input.CurrencyIds,
+                _Status = (int)input.Status,
+                _Type = (int)input.Type,
+            }) > 0;
+    }
+    
+    
 }

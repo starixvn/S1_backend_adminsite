@@ -23,7 +23,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
 
         private readonly ExcelBLL _excelBll;
         private readonly LeaderBoardBLL _leaderBoardBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly ILogger<LeaderBoardAdjustmentController> _logger;
 
@@ -35,7 +35,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Setting
         {
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _leaderBoardBll = provider.GetRequiredService<LeaderBoardBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _custInfoBll = provider.GetRequiredService<CustInfoBLL>();
             _logger = provider.GetRequiredService<ILogger<LeaderBoardAdjustmentController>>();
         }

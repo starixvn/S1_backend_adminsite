@@ -16,7 +16,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         #region Fields
 
         private readonly RebateManageBLL _rebateManageBll;
-        private readonly AuthorizeBLL _authorizeBll;
+        private readonly NewAuthorizeBLL _authorizeBll;
 
         #endregion
 
@@ -25,7 +25,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
         public RebateForVipController(IServiceProvider provider)
         {
             _rebateManageBll = provider.GetRequiredService<RebateManageBLL>();
-            _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
+            _authorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
         }
 
         #endregion
