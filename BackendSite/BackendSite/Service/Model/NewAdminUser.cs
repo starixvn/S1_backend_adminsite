@@ -22,12 +22,15 @@ namespace BackendSite.Service.Model
         public int UserId { set; get; }
         public string UserName { set; get; }
         public int Status { set; get; }
+        [JsonIgnore]
         public string JsonCurrencyIds { get; set; }
         public IEnumerable<int> CurrencyIds
             => JsonConvert.DeserializeObject<IEnumerable<int>>(JsonCurrencyIds);
+        [JsonIgnore]
         public string JsonGroupIds { get; set; }
         public IEnumerable<int> GroupIds
             => JsonConvert.DeserializeObject<IEnumerable<int>>(JsonGroupIds);
+        [JsonIgnore]
         public string JsonSiteIds { get; set; }
         public IEnumerable<int> SiteIds
             => JsonConvert.DeserializeObject<IEnumerable<int>>(JsonSiteIds);
