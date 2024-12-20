@@ -1,3 +1,4 @@
+using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.PaymentAgent;
@@ -14,20 +15,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentAgent;
 public class PaymentAgentController : ControllerBase
 {
     private readonly NewAuthorizeBLL _newAuthBll;
-    private readonly AuthorizeBLL _authorizeBll;
     private readonly PaymentAgentBLL _paymentAgentBll;
     
     public PaymentAgentController(IServiceProvider provider)
     {
         _paymentAgentBll = provider.GetRequiredService<PaymentAgentBLL>();
         _newAuthBll = provider.GetRequiredService<NewAuthorizeBLL>();
-        _authorizeBll = provider.GetRequiredService<AuthorizeBLL>();
     }
     
+    
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 164, 1 })]
     [HttpPost]
     public ApiResult GetList(GetListRequest req)
     {
-        var authData = _authorizeBll.GetAuthData();
+        var authData = _newAuthBll.GetAuthData();
         var siteList = _newAuthBll.GetAssignSiteListV2(authData.UserId)
             .Select(x => x.SiteId);
         
@@ -43,7 +44,7 @@ public class PaymentAgentController : ControllerBase
     [HttpPost]
     public ApiResult GetSelectList()
     {
-        var authData = _authorizeBll.GetAuthData();
+        var authData = _newAuthBll.GetAuthData();
         var siteList = _newAuthBll.GetAssignSiteListV2(authData.UserId)
             .Select(x => x.SiteId);
         
@@ -63,10 +64,11 @@ public class PaymentAgentController : ControllerBase
         };
     }
     
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 164, 3 })]
     [HttpPost]
     public ApiResult SetStatus(SetStatusRequest req)
     {
-        var authData = _authorizeBll.GetAuthData();
+        var authData = _newAuthBll.GetAuthData();
         _ = _paymentAgentBll.SetPaymentAgentStatus(req.AgentId, req.Status, authData.UserName);
         
         return new ApiResult
@@ -75,10 +77,11 @@ public class PaymentAgentController : ControllerBase
         };
     }
     
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 164, 3 })]
     [HttpPost]
     public ApiResult Set(SetRequest req)
     {
-        var authData = _authorizeBll.GetAuthData();
+        var authData = _newAuthBll.GetAuthData();
         _ = _paymentAgentBll.SetPaymentAgent(new SetParams(req), authData.UserName);
         
         return new ApiResult
@@ -87,10 +90,52 @@ public class PaymentAgentController : ControllerBase
         };
     }
     
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 164, 1 })]
+    [HttpPost]
+    public ApiResult GetUser(GetUserRequest req)
+    {
+        var result = _newAuthBll
+            .GetSpecialAdminUserById(req.AgentId, AdminUserTypeEnum.PaymentAgent, req.UserId);
+        
+        return new ApiResult<SpecialAdminUser>
+        {
+            Data = result,
+            ErrorCode = (int)ErrorCodeEnum.Success
+        };
+    }
+    
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 164, 1 })]
+    [HttpPost]
+    public ApiResult GetUserList(GetUserListRequest req)
+    {
+        var result = _newAuthBll
+            .GetSpecialAdminUserList(req.AgentId, AdminUserTypeEnum.PaymentAgent);
+        
+        return new ApiResult<IEnumerable<SpecialAdminUser>>
+        {
+            Data = result,
+            ErrorCode = (int)ErrorCodeEnum.Success
+        };
+    }
+    
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 164, 92 })]
     [HttpPost]
     public ApiResult SetUser(SetUserRequest req)
     {
+        var authData = _newAuthBll.GetAuthData();
         
+        _ = _newAuthBll.SetSpecialAdminUser(new SetSpecialAdminUserParams
+        {
+            SiteIds = req.SiteIds,
+            CurrencyIds = req.CurrencyIds,
+            UserName = req.UserName,
+            Userpwd = req.Password,
+            UserId = req.UserId,
+            GroupIds = req.GroupIds,
+            UserType = AdminUserTypeEnum.PaymentAgent,
+            RefId = req.AgentId,
+            Operator = authData.UserName
+        });
         
         return new ApiResult
         {

@@ -975,7 +975,8 @@ namespace BackendSite.Service.Model.enums
         LeaderboardPointCalculation = 97,
         LeaderboardRankingBonus = 98,
         SetSlotGame = 99,
-        SetPaymentAgent = 100
+        SetPaymentAgent = 100,
+        SetSpecialAdminUser = 101
     }
 
     #region BankFinancialTransferInfoLog

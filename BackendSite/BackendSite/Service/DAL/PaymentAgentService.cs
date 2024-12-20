@@ -36,11 +36,12 @@ public class PaymentAgentService
     public bool SetPaymentAgent(SetParams input)
     {
         return _mainDbClient
-            .Execute("Admin_PaymentAgentList_SetStatus", new
+            .Execute("Admin_PaymentAgentList_Set", new
             {
                 _AgentId = input.AgentId,
                 _AgentName = input.AgentName,
                 _SiteIds = input.SiteIds,
+                _CurrencyIds = input.CurrencyIds,
                 _Status = (int)input.Status,
                 _Type = (int)input.Type,
             }) > 0;

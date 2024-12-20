@@ -5,6 +5,7 @@ using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
 using Dapper;
+using Newtonsoft.Json;
 
 namespace BackendSite.Service.DAL
 {
@@ -13,12 +14,14 @@ namespace BackendSite.Service.DAL
         private readonly IConfiguration _configuration;
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
+        private readonly ILogger<NewAdminUserService> _logger;
 
         public NewAdminUserService(IServiceProvider provider)
         {
             _configuration = provider.GetRequiredService<IConfiguration>();
             _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _logger = provider.GetRequiredService<ILogger<NewAdminUserService>>();
         }
         public NewAdminUser GetAdminUserByUserName(string userName)
         {
@@ -56,5 +59,45 @@ namespace BackendSite.Service.DAL
             Md5Userpwd = p.Get<string>("Md5Userpwd");
             return result > 0;
         }
+        
+        public IEnumerable<SpecialAdminUser> GetSpecialAdminUserList(int refId, AdminUserTypeEnum userType, int userId = 0)
+        {
+            return _reportDbClient.Query<SpecialAdminUser>("Admin_SpecialAdminUserList_Get",
+                    new
+                    { 
+                        _RefId = refId,
+                        _UserType = (int)userType,
+                        _UserId = userId
+                    });
+        }
+        
+        public (bool Success, int UserId) CreateSpecialAdminUser(SetSpecialAdminUserParams input)
+        {
+            var p = new DynamicParameters(new
+            { 
+                _UserName = input.UserName,
+                _Userpwd = input.Userpwd,
+                _UserType = (int)input.UserType,
+                _RefId = input.RefId,
+                _SiteIds = JsonConvert.SerializeObject(input.SiteIds),
+                _CurrencyIds = JsonConvert.SerializeObject(input.CurrencyIds),
+                _GroupIds = JsonConvert.SerializeObject(input.GroupIds),
+                _Operator = input.Operator
+            });
+            
+            p.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("_UserId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            _ = _mainDbClient.Execute("Admin_SpecialAdminUser_Ins", p);
+            
+            var resultCode = p.Get<int>("_Result");
+            var userId = p.Get<int>("_UserId");
+            
+            if(resultCode != 0)
+                _logger.LogError($"Admin_SpecialAdminUser_Ins failed, resultCode={resultCode}");
+            
+            return (resultCode == 0, userId);
+        }
+        
     }
 }
