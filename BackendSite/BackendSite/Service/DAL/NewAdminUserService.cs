@@ -73,6 +73,10 @@ namespace BackendSite.Service.DAL
         
         public (bool Success, int UserId) CreateSpecialAdminUser(SetSpecialAdminUserParams input)
         {
+            var conn = _mainDbClient.GetMySqlConnection();
+            conn.OpenAsync();
+            using var trans = conn.BeginTransaction();
+            
             var p = new DynamicParameters(new
             { 
                 _UserName = input.UserName,
@@ -88,15 +92,18 @@ namespace BackendSite.Service.DAL
             p.Add("_Result", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("_UserId", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-            _ = _mainDbClient.Execute("Admin_SpecialAdminUser_Ins", p);
+            _ = _mainDbClient.Execute("Admin_SpecialAdminUser_Ins", trans, p);
             
             var resultCode = p.Get<int>("_Result");
             var userId = p.Get<int>("_UserId");
+            var success = resultCode == 0;
             
-            if(resultCode != 0)
+            if(success)
+                trans.Commit();
+            else
                 _logger.LogError($"Admin_SpecialAdminUser_Ins failed, resultCode={resultCode}");
             
-            return (resultCode == 0, userId);
+            return (success, userId);
         }
         
     }
