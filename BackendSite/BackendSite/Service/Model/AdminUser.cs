@@ -1,4 +1,6 @@
-﻿namespace BackendSite.Service.Model
+﻿using BackendSite.Service.Model.enums;
+
+namespace BackendSite.Service.Model
 {
     public class AdminUserWithAllowSite : AdminUser
     {
@@ -49,6 +51,7 @@
         public int Status { set; get; }
         public DateTime CreateTime { set; get; }
         public string Role { get; set; }
+        public AdminUserTypeEnum UserType { get; set; }
         public string CurrencyList { get; set; }
         public int SiteId { get; set; }
         public DateTime? LoginTime { set; get; }
