@@ -92,48 +92,21 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
         ///     }
         ///
         /// </remarks>
-        /// <param name="req">參數</param>
+        /// <param name="loginModel">參數</param>
         /// <returns>結果</returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ApiResult<string>> Signin(LoginRequest req)
+        public async Task<ApiResult<string>> Signin(LoginRequest loginModel)
         {
-            var adminUser = await Signin(req, AdminUserTypeEnum.Admin);
-            
-            return new ApiResult<string>
-            {
-                Data = adminUser.UserName,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
-        
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ApiResult<string>> SigninPaymentAgent(LoginRequest req)
-        {
-            var adminUser = await Signin(req, AdminUserTypeEnum.PaymentAgent);
-            
-            return new ApiResult<string>
-            {
-                Data = adminUser.UserName,
-                ErrorCode = (int)ErrorCodeEnum.Success
-            };
-        }
 
-        #region Signin
-
-        private async Task<NewAdminUser> Signin(LoginRequest req, AdminUserTypeEnum type)
-        {
             NewAdminUser adminUser = null;
 
-            var userLoginResult = 
-                _newAuthorizeBLL.UserLogin(req.UserName,
-                    req.UserPwd,
-                    _tools.GetClientIP(HttpContext),
-                    _tools.GetFromUrl(HttpContext),
-                    Request.Headers["User-Agent"],
-                    type,
-                    ref adminUser);
+            var userLoginResult = _newAuthorizeBLL.UserLogin(loginModel.UserName,
+                                                          loginModel.UserPwd,
+                                                          _tools.GetClientIP(HttpContext),
+                                                          _tools.GetFromUrl(HttpContext),
+                                                          Request.Headers["User-Agent"],
+                                                          ref adminUser);
 
             if (userLoginResult != ErrorCodeEnum.Success)
             {
@@ -147,26 +120,29 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                 throw new AdminException(ErrorCodeEnum.AccountError);
             }
 
+
             _newAuthorizeBLL.SetLoginTime(adminUser.UserId);
 
             await HttpContext.SignOutAsync("backendV2");
 
             var claims = new List<Claim>
             {
-                new (ClaimTypes.Name, adminUser.UserName),
-                new (ClaimTypes.NameIdentifier, adminUser.UserId.ToString()),
-                new (ClaimTypes.Thumbprint, siteList.First().SiteId.ToString()),
-                new (ClaimTypes.Role, ((int)adminUser.UserType).ToString())
+                new Claim(ClaimTypes.Name,adminUser.UserName ),
+                new Claim(ClaimTypes.NameIdentifier,adminUser.UserId.ToString()),
+                new Claim(ClaimTypes.Thumbprint, siteList.FirstOrDefault().SiteId.ToString())
+                //new Claim("LangId",? ),
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, "backendV2");
             await HttpContext.SignInAsync("backendV2",
-                new ClaimsPrincipal(claimsIdentity));
+                                 new ClaimsPrincipal(claimsIdentity));
 
-            return adminUser;
+            return new ApiResult<string>
+            {
+                Data = adminUser.UserName,
+                ErrorCode = (int)ErrorCodeEnum.Success
+            };
         }
-
-        #endregion
 
         /// <summary>
         /// Home/CheckSignIn 登入檢查
@@ -186,8 +162,10 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
             {
                 return new ApiResult<string> { Data = User.Identity.Name, ErrorCode = (int)ErrorCodeEnum.Success };
             }
-            
-            throw new AdminException(ErrorCodeEnum.Fail);
+            else
+            {
+                throw new AdminException(ErrorCodeEnum.Fail);
+            }
         }
 
         /// <summary>

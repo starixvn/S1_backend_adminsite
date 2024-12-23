@@ -23,13 +23,11 @@ namespace BackendSite.Service.DAL
             _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
             _logger = provider.GetRequiredService<ILogger<NewAdminUserService>>();
         }
-        public IEnumerable<NewAdminUser> GetAdminUserByUserName(string userName)
+        public NewAdminUser GetAdminUserByUserName(string userName)
         {
             var props = new DynamicParameters();
             props.Add("UserName", userName);
-            
-            return _reportDbClient
-                .Query<NewAdminUser>("LoginNewAdminUser_Get", props);
+            return _reportDbClient.QueryFirst<NewAdminUser>("LoginNewAdminUser_Get", props);
         }
 
         public int SetLoginTime(int userId)

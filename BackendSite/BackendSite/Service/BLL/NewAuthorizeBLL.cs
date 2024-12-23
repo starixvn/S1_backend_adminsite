@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using BackendSite.ExceptionHandling;
-using BackendSite.Service.BLL.Infrastructure;
 using BackendSite.Service.DAL;
 using BackendSite.Service.Library;
 using BackendSite.Service.Model;
@@ -13,7 +12,6 @@ namespace BackendSite.Service.BLL
     {
         private readonly NewAdminUserService _newAdminUserService;
         private readonly AdjustmentLogReportService _adminLogService;
-        private readonly ConfigBLL _configBll;
         private readonly Tools _tools;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -21,7 +19,6 @@ namespace BackendSite.Service.BLL
         {
             _newAdminUserService = provider.GetRequiredService<NewAdminUserService>();
             _adminLogService = provider.GetRequiredService<AdjustmentLogReportService>();
-            _configBll = provider.GetRequiredService<ConfigBLL>();
             _tools = provider.GetRequiredService<Tools>();
             _httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
         }
@@ -31,69 +28,54 @@ namespace BackendSite.Service.BLL
                                               string ip,
                                               string fromUrl,
                                               string userAgent,
-                                              AdminUserTypeEnum type,
                                               ref NewAdminUser adminUser)
         {
             if (string.IsNullOrEmpty(userName))
             {
                 return ErrorCodeEnum.AccountInvalid;
             }
-            
             if (string.IsNullOrEmpty(pwd))
             {
                 return ErrorCodeEnum.PasswordInvalid;
             }
 
-            // 檢查 userType => domain
-            var domains = _configBll
-                .GetRawConfigValues<Dictionary<AdminUserTypeEnum, IEnumerable<string>>>("AdminTypeDomain")
-                .First()
-                .FirstOrDefault(x => x.Key == type);
-
-            if (!domains.Value.Contains(fromUrl))
-            {
-                return ErrorCodeEnum.AccountInvalid;
-            }
-
-            adminUser = _newAdminUserService
-                .GetAdminUserByUserName(userName)
-                .FirstOrDefault(x => x.UserType == type);
+            adminUser = _newAdminUserService.GetAdminUserByUserName(userName);
 
             if (adminUser == null)
             {
                 return ErrorCodeEnum.AccountError;
             }
-
-            if (adminUser.Userpwd != _tools.MD5Encrypt(pwd))
+            else if (adminUser.Userpwd != _tools.MD5Encrypt(pwd))
             {
                 return ErrorCodeEnum.PasswordError;
             }
-
-            if (adminUser.Status != (int)AdminUserStatusEnum.Running)
+            else if (adminUser.Status != (int)AdminUserStatusEnum.Running)
             {
                 return ErrorCodeEnum.AccountLocked;
             }
-
-            return ErrorCodeEnum.Success;
+            else
+            {
+                return ErrorCodeEnum.Success;
+            }
         }
 
         public AuthData GetAuthData()
         {
-            if (!_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                return null;
-            
-            _ = int.TryParse(_httpContextAccessor.HttpContext.User.Claims
-                .FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier)?.Value, out var userId);
-                
-            _ = int.TryParse(_httpContextAccessor.HttpContext.User.Claims
-                .FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint)?.Value, out var siteId);
-
-            return new AuthData
+            AuthData authData = null;
+            if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
             {
-                UserId = userId,
-                UserName = _httpContextAccessor.HttpContext.User.Identity.Name,
-                SiteId = siteId
-            };
+                int.TryParse(_httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.NameIdentifier).Value, out var userId);
+                int.TryParse(_httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint)?.Value, out var siteId);
+
+                authData = new AuthData
+                {
+                    UserId = userId,
+                    UserName = _httpContextAccessor.HttpContext.User.Identity.Name,
+                    SiteId = siteId
+                };
+            }
+
+            return authData;
         }
 
         public int SetLoginTime(int userId)

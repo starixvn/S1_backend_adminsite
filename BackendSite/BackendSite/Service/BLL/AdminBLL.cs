@@ -14,12 +14,17 @@ namespace BackendSite.Service.BLL
     {
         private readonly Tools tools;
         private readonly AdminService adminService;
+        private readonly AdminUserService adminUserService;
+        private readonly ServerInfoService serverInfoService;
         private readonly NewAdminUserService newAdminUserService;
         private readonly PermissionBLL permissionBLL;
+        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHostEnvironment environment;
 
         public AdminBLL(Tools tools,
             AdminService adminService,
             ServerInfoService serverInfoService,
+            AdminUserService adminUserService,
             NewAdminUserService newAdminUserService,
             PermissionBLL permissionBLL,
             IHttpContextAccessor httpContextAccessor,
@@ -27,8 +32,17 @@ namespace BackendSite.Service.BLL
         {
             this.tools = tools;
             this.adminService = adminService;
+            this.serverInfoService = serverInfoService;
+            this.adminUserService = adminUserService;
             this.newAdminUserService = newAdminUserService;
             this.permissionBLL = permissionBLL;
+            this.httpContextAccessor = httpContextAccessor;
+            this.environment = environment;
+        }
+
+        public AdminUser GetUser(int userId)
+        {
+            return adminUserService.GetUser(userId);
         }
 
         public SpecialPasswordManagement GetSpecialPasswordData(int sitId)
@@ -218,7 +232,7 @@ namespace BackendSite.Service.BLL
         }
         public bool CheckAdminUserDuplicate(string userName)
         {
-            return newAdminUserService.GetAdminUserByUserName(userName).Any();
+            return newAdminUserService.GetAdminUserByUserName(userName) != null;
         }
         public AdminUserData GetUserV2(int userId)
         {
