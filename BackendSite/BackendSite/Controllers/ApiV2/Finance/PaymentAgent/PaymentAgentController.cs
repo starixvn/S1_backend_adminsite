@@ -16,12 +16,14 @@ public class PaymentAgentController : ControllerBase
 {
     private readonly NewAuthorizeBLL _newAuthBll;
     private readonly PermissionBLL _permissionBll;
+    private readonly AdminBLL _adminBll;
     private readonly PaymentAgentBLL _paymentAgentBll;
     
     public PaymentAgentController(IServiceProvider provider)
     {
         _paymentAgentBll = provider.GetRequiredService<PaymentAgentBLL>();
         _newAuthBll = provider.GetRequiredService<NewAuthorizeBLL>();
+        _adminBll = provider.GetRequiredService<AdminBLL>();
         _permissionBll = provider.GetRequiredService<PermissionBLL>();
     }
     
@@ -124,6 +126,15 @@ public class PaymentAgentController : ControllerBase
     [HttpPost]
     public ApiResult SetUser(SetUserRequest req)
     {
+        if (_adminBll.CheckAdminUserDuplicate(req.UserName))
+        {
+            return new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.DuplicateData,
+                Message = $"UserName={req.UserName} already exists."
+            };
+        }
+        
         var authData = _newAuthBll.GetAuthData();
         
         _ = _newAuthBll.SetSpecialAdminUser(new SetSpecialAdminUserParams
