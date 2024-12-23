@@ -138,18 +138,24 @@ namespace BackendSite.Service.Library
             return (userIp >= begin) && (userIp <= end);
         }
         #endregion
-        public string GetFromUrl(HttpContext context, bool isCheckReferer = true)
+        public string GetHost(HttpContext context, bool isCheckReferer = true)
         {
-            var fromUrl = "";
-            if (isCheckReferer && context.Request.Headers.ContainsKey("Referer"))
+            var host = string.Empty;
+            
+            if (isCheckReferer && context.Request.Headers.TryGetValue("Referer", out var referer))
             {
-                fromUrl = context.Request.Headers["Referer"].ToString();
+                host = new Uri(referer).Host;
+            }
+            
+            if (isCheckReferer && context.Request.Headers.TryGetValue("Origin", out var origin))
+            {
+                host = new Uri(origin).Host;
             }
 
-            if (string.IsNullOrWhiteSpace(fromUrl))
-                fromUrl = context.Request.Host.ToString();
+            if (string.IsNullOrWhiteSpace(host))
+                host = context.Request.Host.ToString();
 
-            return fromUrl;
+            return host;
         }
 
         /// <summary>
