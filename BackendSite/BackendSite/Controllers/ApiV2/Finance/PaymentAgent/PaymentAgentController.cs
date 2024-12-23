@@ -15,12 +15,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.PaymentAgent;
 public class PaymentAgentController : ControllerBase
 {
     private readonly NewAuthorizeBLL _newAuthBll;
+    private readonly PermissionBLL _permissionBll;
     private readonly PaymentAgentBLL _paymentAgentBll;
     
     public PaymentAgentController(IServiceProvider provider)
     {
         _paymentAgentBll = provider.GetRequiredService<PaymentAgentBLL>();
         _newAuthBll = provider.GetRequiredService<NewAuthorizeBLL>();
+        _permissionBll = provider.GetRequiredService<PermissionBLL>();
     }
     
     
@@ -141,5 +143,35 @@ public class PaymentAgentController : ControllerBase
         {
             ErrorCode = (int)ErrorCodeEnum.Success
         };
+    }
+    
+    [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 164, 92 })]
+    [HttpPost]
+    public ApiResult SetUserStatus(SetAdminUserStatusReq request)
+    {
+        var authInfo = _newAuthBll.GetAuthData();
+        var result = _permissionBll.SetAdminUserStatus(new ParamsWithLog<SetAdminUserStatusReq>(
+            new ParamsWithLog<SetAdminUserStatusReq>
+            {
+                Before = new SetAdminUserStatusReq
+                {
+                    UserId = request.UserId,
+                    Status = request.Status == AdminUserV2StatusEnum.Able
+                        ? AdminUserV2StatusEnum.Disable
+                        : AdminUserV2StatusEnum.Able
+                },
+                After = request
+            }, authInfo.UserName));
+        
+        return result
+            ? new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.Success,
+            }
+            : new ApiResult
+            {
+                ErrorCode = (int)ErrorCodeEnum.UpdateFailed,
+                Message = "Set user status failed."
+            };
     }
 }
