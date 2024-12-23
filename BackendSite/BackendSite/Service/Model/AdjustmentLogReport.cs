@@ -61,6 +61,10 @@ namespace BackendSite.Service.Model
 
     public class ParamsWithLog<T> : ApiRequestWithLog<T>
     {
+        public ParamsWithLog()
+        {
+        }
+
         public ParamsWithLog(ApiRequestWithLog<T> request, string @operator)
         {
             base.SiteId = request.SiteId;
