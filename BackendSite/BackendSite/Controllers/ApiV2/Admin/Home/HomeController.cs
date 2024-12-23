@@ -130,7 +130,7 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                 _newAuthorizeBLL.UserLogin(req.UserName,
                     req.UserPwd,
                     _tools.GetClientIP(HttpContext),
-                    _tools.GetFromUrl(HttpContext),
+                    _tools.GetHost(HttpContext),
                     Request.Headers["User-Agent"],
                     type,
                     ref adminUser);
