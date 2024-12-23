@@ -58,22 +58,13 @@ namespace BackendSite.Service.Library
             return mPwd.Success;
         }
 
-        public string GetToken()
-        {
-            var g = Guid.NewGuid();
-            var GuidString = Convert.ToBase64String(g.ToByteArray());
-            GuidString = GuidString.Replace("=", "");
-            GuidString = GuidString.Replace("+", "");
-
-            return GuidString;
-        }
         #region GetClientIP
         /// <summary>
         /// 获取客户端IP
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public string GetClientIP(Microsoft.AspNetCore.Http.HttpContext context)
+        public string GetClientIP(HttpContext context)
         {
             var HeaderNames = new string[] { "HTTP_X_FORWARDED_FOR", "HTTP_INCAP_CLIENT_IP", "HTTP_TRUE_CLIENT_IP", "HTTP_X_REAL_IP", "REMOTE_ADDR", "X-Forwarded-For" };
 

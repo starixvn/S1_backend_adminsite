@@ -1573,7 +1573,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                 request.AreaCode,
                 request.PhoneNo,
                 request.AffCode,
-                _tools.GetFromUrl(HttpContext, false),
+                Tools.GetFromUrl(HttpContext, false),
                 request.RealName,
                 User.Identity.Name);
 

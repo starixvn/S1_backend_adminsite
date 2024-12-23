@@ -16,6 +16,7 @@ namespace BackendSite.Service.BLL
         private readonly ConfigBLL _configBll;
         private readonly Tools _tools;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<NewAuthorizeBLL> _logger;
 
         public NewAuthorizeBLL(IServiceProvider provider)
         {
@@ -24,6 +25,7 @@ namespace BackendSite.Service.BLL
             _configBll = provider.GetRequiredService<ConfigBLL>();
             _tools = provider.GetRequiredService<Tools>();
             _httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
+            _logger = provider.GetRequiredService<ILogger<NewAuthorizeBLL>>();
         }
 
         public ErrorCodeEnum UserLogin(string userName,
@@ -52,7 +54,8 @@ namespace BackendSite.Service.BLL
 
             if (!domains.Value.Contains(fromUrl))
             {
-                return ErrorCodeEnum.AccountInvalid;
+                _logger.LogError($"fromUrl={fromUrl}, type={type}, has no valid domain.");
+                return ErrorCodeEnum.AccountError;
             }
 
             adminUser = _newAdminUserService
