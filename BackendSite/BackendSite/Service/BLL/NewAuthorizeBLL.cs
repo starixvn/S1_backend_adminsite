@@ -90,12 +90,20 @@ namespace BackendSite.Service.BLL
                 
             _ = int.TryParse(_httpContextAccessor.HttpContext.User.Claims
                 .FirstOrDefault(m => m.Type == ClaimTypes.Thumbprint)?.Value, out var siteId);
+            
+            _ = int.TryParse(_httpContextAccessor.HttpContext.User.Claims
+                .FirstOrDefault(m => m.Type == ClaimTypes.Role)?.Value, out var userType);
+            
+            _ = int.TryParse(_httpContextAccessor.HttpContext.User.Claims
+                .FirstOrDefault(m => m.Type == ClaimTypes.GroupSid)?.Value, out var refId);
 
             return new AuthData
             {
                 UserId = userId,
                 UserName = _httpContextAccessor.HttpContext.User.Identity.Name,
-                SiteId = siteId
+                SiteId = siteId,
+                UserType = (AdminUserTypeEnum)userType,
+                RefId = refId
             };
         }
 

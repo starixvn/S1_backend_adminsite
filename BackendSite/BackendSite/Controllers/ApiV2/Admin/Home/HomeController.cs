@@ -156,7 +156,8 @@ namespace BackendSite.Controllers.ApiV2.Admin.Home
                 new (ClaimTypes.Name, adminUser.UserName),
                 new (ClaimTypes.NameIdentifier, adminUser.UserId.ToString()),
                 new (ClaimTypes.Thumbprint, siteList.First().SiteId.ToString()),
-                new (ClaimTypes.Role, ((int)adminUser.UserType).ToString())
+                new (ClaimTypes.Role, ((int)adminUser.UserType).ToString()),
+                new (ClaimTypes.GroupSid, adminUser.RefId.ToString())
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, "backendV2");

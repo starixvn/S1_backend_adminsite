@@ -1,4 +1,5 @@
 ﻿using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.enums;
 
@@ -13,6 +14,7 @@ namespace BackendSite.Service.BLL
         private readonly AdminService _adminService;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly NewAdminUserService _newAdminUserService;
+        private readonly ICacheHelper _redisHelper;
 
         public PermissionBLL(IServiceProvider provider)
         {
@@ -21,6 +23,7 @@ namespace BackendSite.Service.BLL
             _adminService = provider.GetRequiredService<AdminService>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _newAdminUserService = provider.GetRequiredService<NewAdminUserService>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public bool CheckPermission(AdminUserV2 loginUser, int menuId, int permissionId)
@@ -1043,25 +1046,31 @@ namespace BackendSite.Service.BLL
 
         #region Check Permission New
 
-        public IEnumerable<UserAllPremission> GetUserAllPermission()
+        public IEnumerable<UserAllPremission> GetUserAllPermission(int userId, int siteId)
         {
-            var authData = _newAuthorizeBll.GetAuthData();
-            var siteId = _newAuthorizeBll.CheckBrand();
-            var loginUser = _newAdminUserService.GetUserV2(authData.UserId, siteId);
+            var loginUser = _newAdminUserService.GetUserV2(userId, siteId);
 
             if (loginUser.Role == null)
             {
-                return GetUserAllPremission(null, authData.UserId, siteId);
+                return GetUserAllPremission(null, userId, siteId);
             }
 
             var userRole = JsonConvert.DeserializeObject<IEnumerable<int>>(loginUser.Role);
 
-            return GetUserAllPremission(userRole?.FirstOrDefault(), authData.UserId, siteId);
+            return GetUserAllPremission(userRole?.FirstOrDefault(), userId, siteId);
+        }
+
+        private IEnumerable<UserAllPremission> GetUserAllPermissionWithCache()
+        {
+            var authData = _newAuthorizeBll.GetAuthData();
+            return _redisHelper.TryGetOrCreate($"UserAllPermission:{authData.UserId}:{authData.SiteId}",
+                TimeSpan.FromMinutes(1),
+                () => GetUserAllPermission(authData.UserId, authData.SiteId));
         }
 
         public IEnumerable<int> GetUserPermissionByMenuId(int menuId)
         {
-            var permissions = GetUserAllPermission();
+            var permissions = GetUserAllPermissionWithCache();
 
             return permissions.FirstOrDefault(x => x.MenuId == menuId)?.Permission;
         }
