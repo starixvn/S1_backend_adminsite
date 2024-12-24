@@ -19,8 +19,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
 
-using Org.BouncyCastle.Ocsp;
-
 using static BackendSite.Controllers.ApiV2.SystemFunc.EnumController;
 
 namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
@@ -42,6 +40,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly MessageBLL _messageBll;
         private readonly CustInfoBLL _custInfoBll;
         private readonly BankDetailBLL _bankDetailBll;
+        private readonly PaymentAgentBLL _paymentAgentBll;
         private readonly CourierAdapter _courierAdapter;
         private readonly AWSS3Helper _s3Helper;
         private readonly PermissionBLL _permissionBll;
@@ -58,6 +57,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         private readonly FaceBookPixelBLL _faceBookPixelBll;
         private readonly CRMBLL _cRMBLL;
         private readonly IWebHostEnvironment _environment;
+        private readonly IEnumerable<int> _agentStatusType;
 
         #endregion
 
@@ -81,6 +81,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             _cryptor = provider.GetRequiredService<Cryptor>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _redisHelper = provider.GetRequiredService<ICacheHelper>();
+            _paymentAgentBll = provider.GetRequiredService<PaymentAgentBLL>();
 
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _payApiUrl = configBll.GetConfigValueByEnvironment<ServiceHostConfig>("ServiceHost").PayService;
@@ -144,6 +145,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     WithdrawalActionEnum.Pending,
                     WithdrawalActionEnum.Rejected
                 }}
+            };
+
+            // agent 可看到的 status
+            _agentStatusType = new[]
+            {
+                (int) WithdrawalStatusEnum.Approved,
+                (int) WithdrawalStatusEnum.Rejected,
+                (int) WithdrawalStatusEnum.Process
             };
         }
 
@@ -250,9 +259,31 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
         {
             var apiListResult = new ApiListResultCurrencyAmount<WithdrawalRequest>();
             var currencyAmount = new List<TotalAmount>();
+
+            var authData = _newAuthorizeBll.GetAuthData();
+            if (authData.UserType == AdminUserTypeEnum.PaymentAgent)
+            {
+                var (agentExists, agentInfo) = _paymentAgentBll.GetPaymentAgentById(authData.RefId);
+                if (agentExists && agentInfo.Status == PaymentAgentStatusEnum.Suspend)
+                    return new ApiListResultCurrencyAmount<WithdrawalRequest>
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Success,
+                        Data = Array.Empty<WithdrawalRequest>(),
+                        CurrencyAmountRecord = new List<TotalAmount>()
+                    };
+                
+                request.WithdrawalTypes = new[]
+                {
+                    (int)WithdrawalTypeEnum.LocalBank,
+                    (int)WithdrawalTypeEnum.CryptoWallet
+                };
+                request.AgentId = authData.RefId;
+                request.Statuses = request.Statuses.Intersect(_agentStatusType);
+            }
+            
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
             var selectSites = new List<int> { request.SiteId };
-
+            
             if (request.SiteId == 0)
             {
                 selectSites = GetSelectSites();
@@ -322,6 +353,18 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             if (request.SiteId == 0)
             {
                 selectSites = GetSelectSites();
+            }
+            
+            var authData = _newAuthorizeBll.GetAuthData();
+            if (authData.UserType == AdminUserTypeEnum.PaymentAgent)
+            {
+                request.WithdrawalTypes = new[]
+                {
+                    (int)WithdrawalTypeEnum.LocalBank,
+                    (int)WithdrawalTypeEnum.CryptoWallet
+                };
+                request.AgentId = authData.RefId;
+                request.Statuses = request.Statuses.Intersect(_agentStatusType);
             }
 
             var exportWithdrawal = _withdrawalBll.GetWithdrawalExportList(
@@ -497,6 +540,20 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
             var lockExpiry = TimeSpan.FromSeconds(15); //lock 15 sec        
             if (await _redisHelper.TryCreateLockAsync(lockKey, lockValue, lockExpiry))
             {
+                var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                var permissionList = _permissionBll.GetUserPermissionByMenuId(28);
+                var canForceProceed = permissionList.Any(x => x == 83);
+                
+                if (!canForceProceed
+                    && authData.UserType == AdminUserTypeEnum.Admin
+                    && withdrawalData.AgentType == PaymentAgentTypeEnum.OutSource
+                    && withdrawalData.AgentStatus == PaymentAgentStatusEnum.Active)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                    apiResult.Message = $"{request.TransId} is processing by out source agent.";
+                    return apiResult;
+                }
+                
                 //第二把鎖，鎖定後臺不同操作者操作相同單號
                 var key = $"lock:withdrawalTransId:{request.TransId}";
                 var lockUser = await _redisHelper.StringGetAsync(key);
@@ -509,8 +566,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Withdrawal
                     apiResult.Message = $"{request.TransId} Now OnUser is {lockUser}";
                     return apiResult;
                 }
-
-                var withdrawalData = _withdrawalBll.GetWithdrawalRequest(request.TransId);
+                
                 switch (request.Action)
                 {
                     case WithdrawalStatusEnum.Draft:

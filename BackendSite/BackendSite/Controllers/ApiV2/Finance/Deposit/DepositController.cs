@@ -30,13 +30,14 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         private readonly CustInfoBLL _custInfoBll;
         private readonly ExcelBLL _excelBll;
         private readonly PermissionBLL _permissionBll;
+        private readonly PaymentAgentBLL _paymentAgentBll;
         private readonly Dictionary<DepositStatusEnum, List<DepositActionEnum>> _usableActionType;
         private readonly NewAuthorizeBLL _newAuthorizeBll;
         private readonly AWSS3Helper _s3Helper;
         private readonly string _awsDepositUrl;
         private readonly string _awsDepositFolder;
         private readonly string _awsDepositBucketName;
-        private readonly VerificationRewardBLL _verificationRewardBLL;
+        private readonly VerificationRewardBLL _verificationRewardBll;
         private readonly IGaBLL _gaBll;
         private readonly ILogger<DepositController> _logger;
         private readonly FaceBookPixelBLL _faceBookPixelBll;
@@ -58,7 +59,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _permissionBll = provider.GetRequiredService<PermissionBLL>();
             _newAuthorizeBll = provider.GetRequiredService<NewAuthorizeBLL>();
             _s3Helper = provider.GetRequiredService<AWSS3Helper>();
-            _verificationRewardBLL = provider.GetRequiredService<VerificationRewardBLL>();
+            _verificationRewardBll = provider.GetRequiredService<VerificationRewardBLL>();
             _gaBll = provider.GetRequiredService<IGaBLL>();
             var configBll = provider.GetRequiredService<ConfigBLL>();
             _awsDepositBucketName = configBll.GetConfigValue("AWSPaymentBucketName");
@@ -67,6 +68,7 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             _faceBookPixelBll = provider.GetRequiredService<FaceBookPixelBLL>();
             _cRMBLL = provider.GetRequiredService<CRMBLL>();
             _environment = provider.GetRequiredService<IWebHostEnvironment>();
+            _paymentAgentBll = provider.GetRequiredService<PaymentAgentBLL>();
 
             _usableActionType = new Dictionary<DepositStatusEnum, List<DepositActionEnum>>
             {
@@ -211,10 +213,32 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         [HttpPost]
         public ApiListResultCurrencyAmount<DepositRequest> GetList(GetListRequest request)
         {
+            var authData = _newAuthorizeBll.GetAuthData();
             var apiListResult = new ApiListResultCurrencyAmount<DepositRequest>();
             var currencyAmountRecord = new List<TotalAmount>();
             var userNames = FormatExtension.SplitRemoveSpace(request.UserName, ',');
             var selectSites = new List<int> { request.SiteId };
+
+            if (authData.UserType == AdminUserTypeEnum.PaymentAgent)
+            {
+                var (agentExists, agentInfo) = _paymentAgentBll.GetPaymentAgentById(authData.RefId);
+                if (agentExists && agentInfo.Status == PaymentAgentStatusEnum.Suspend)
+                    return new ApiListResultCurrencyAmount<DepositRequest>
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Success,
+                        Data = Array.Empty<DepositRequest>(),
+                        CurrencyAmountRecord = new List<TotalAmount>()
+                    };
+                
+                request.DepositTypes = new[]
+                {
+                    (int)DepositTypeEnum.LocalBanking,
+                    (int)DepositTypeEnum.CryptoWallet
+                };
+                request.SelectPayId = Array.Empty<int>();
+                request.LevelStatuses = Array.Empty<int>();
+                request.AgentId = authData.RefId;
+            }
 
             if (request.SiteId == 0)
             {
@@ -283,6 +307,19 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             if (request.SiteId == 0)
             {
                 selectSites = GetSelectSites();
+            }
+            
+            var authData = _newAuthorizeBll.GetAuthData();
+            if (authData.UserType == AdminUserTypeEnum.PaymentAgent)
+            {
+                request.DepositTypes = new[]
+                {
+                    (int)DepositTypeEnum.LocalBanking,
+                    (int)DepositTypeEnum.CryptoWallet
+                };
+                request.SelectPayId = Array.Empty<int>();
+                request.LevelStatuses = Array.Empty<int>();
+                request.AgentId = authData.RefId;
             }
 
             var exportDeposit = _depositBll.GetDepositExportList(
@@ -396,8 +433,21 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
         public async Task<ApiResult> SendToNextAsync(SendToNextRequest request)
         {
             var apiResult = new ApiResult(_selLangBll);
+            var authData = _newAuthorizeBll.GetAuthData();
             var depositConfirmResult = (int)ErrorCodeEnum.Fail;
             var depositRequest = _depositBll.GetDepositRequest(request.TransId);
+            var permissionList = _permissionBll.GetUserPermissionByMenuId(27);
+            var canForceProceed = permissionList.Any(x => x == 83);
+            
+            if (!canForceProceed
+                && authData.UserType == AdminUserTypeEnum.Admin
+                && depositRequest.AgentType == PaymentAgentTypeEnum.OutSource
+                && depositRequest.AgentStatus == PaymentAgentStatusEnum.Active)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.UpdateFailed;
+                apiResult.Message = $"{request.TransId} is processing by out source agent.";
+                return apiResult;
+            }
 
             var calCodeInfo = new DepositCalCodeSetRequest()
             {
@@ -434,10 +484,10 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
                     await _messageBll.SendMessageAsync(new Message(sender, depositRequest.CustId, userLang, title, content));
 
                     // verification job queue
-                    var custVerificationReward = _verificationRewardBLL.GetCustVerificationRewardByCust(depositRequest.CustId);
+                    var custVerificationReward = _verificationRewardBll.GetCustVerificationRewardByCust(depositRequest.CustId);
                     if (custVerificationReward is null or { EmailVerified: true, EmailReward: 0 } or { PhoneVerified: true, PhoneReward: 0 })
                     {
-                        _verificationRewardBLL.InsertQueueJob(depositRequest.CustId, QueueJob.Verification, string.Empty);
+                        _verificationRewardBll.InsertQueueJob(depositRequest.CustId, QueueJob.Verification, string.Empty);
                     }
 
                     // send GA Purchase
@@ -926,14 +976,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             var usableActionButton = usableList
                 .Where(item => permissionList.Contains((int)item)).ToList();
 
-            if (depositRequest.DepositType is DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet)
-            {
-                usableActionButton.Remove(DepositActionEnum.ManualApproved);
-            }
-            else if (depositRequest.DepositType is not (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet))
-            {
-                usableActionButton.Remove(DepositActionEnum.Approved);
-            }
+            usableActionButton.Remove(isLocalPayment(depositRequest.DepositType)
+                ? DepositActionEnum.ManualApproved
+                : DepositActionEnum.Approved);
 
             return usableActionButton;
         }
@@ -963,6 +1008,9 @@ namespace BackendSite.Controllers.ApiV2.Finance.Deposit
             };
             return eventData;
         }
+
+        private static bool isLocalPayment(DepositTypeEnum type)
+            => type is (DepositTypeEnum.LocalBanking or DepositTypeEnum.CryptoWallet);
 
         #endregion
 

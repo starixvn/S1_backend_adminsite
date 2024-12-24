@@ -944,7 +944,9 @@ namespace BackendSite.Controllers.ApiV2.SystemFunc
                 .Where(x => x.Purposes.Contains(request.Purpose)
                             && x.AccountStatus == TransferAccountStatusEnum.Open
                             && x.Channel != TransferChannelEnum.PSP
-                            && x.Channel != TransferChannelEnum.CryptoWallet)
+                            && x.Channel != TransferChannelEnum.CryptoWallet
+                            && (authData.UserType == AdminUserTypeEnum.Admin
+                                || (authData.UserType == AdminUserTypeEnum.PaymentAgent && x.AgentId == authData.RefId)))
                 .OrderBy(x => x.SettingStatus);
 
             var data = accountList

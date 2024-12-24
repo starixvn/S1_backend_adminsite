@@ -151,6 +151,10 @@ namespace BackendSite.Service.Model
 
         public string OnUser { get; set; }
         public IEnumerable<WithdrawalMessage> WithdrawalMessageList { set; get; }
+        
+        public int AgentId { set; get; }
+        public PaymentAgentTypeEnum AgentType { set; get; }
+        public PaymentAgentStatusEnum AgentStatus { set; get; }
     }
     public class WithdrawalInfo
     {

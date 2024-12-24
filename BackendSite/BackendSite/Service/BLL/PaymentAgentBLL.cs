@@ -30,6 +30,15 @@ public class PaymentAgentBLL
 
         return result;
     }
+    
+    public (bool exists, PaymentAgentInfo) GetPaymentAgentById(int agentId)
+    {
+        var result = _paymentAgentService
+            .GetPaymentAgentList(agentId)
+            .FirstOrDefault();
+
+        return (result != null, result);
+    }
 
     public bool SetPaymentAgentStatus(int agentId, PaymentAgentStatusEnum status, string @operator)
     {

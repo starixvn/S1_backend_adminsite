@@ -25,6 +25,8 @@ namespace BackendSite.Service.Model
         public string UserName { set; get; }
         public string LangId { set; get; }
         public int SiteId { get; set; }
+        public AdminUserTypeEnum UserType { get; set; }
+        public int RefId { get; set; }
     }
 
     public class ChangePwd
@@ -72,6 +74,8 @@ namespace BackendSite.Service.Model
         public bool IsSuper { set; get; }
         public DateTime? LoginTime { set; get; }
         public int Status { set; get; }
+        public AdminUserTypeEnum UserType { get; set; }
+        public int RefId { get; set; }
     }
 
     public class GetLanguageListRequest

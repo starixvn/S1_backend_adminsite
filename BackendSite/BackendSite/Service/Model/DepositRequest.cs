@@ -124,6 +124,10 @@ namespace BackendSite.Service.Model
         public string Network { set; get; }
         public string Remark { set; get; }
         public IEnumerable<DepositMessage> DepositMessageList { set; get; }
+        
+        public int AgentId { set; get; }
+        public PaymentAgentTypeEnum AgentType { set; get; }
+        public PaymentAgentStatusEnum AgentStatus { set; get; }
     }
 
     public class DepositInfoForExport
