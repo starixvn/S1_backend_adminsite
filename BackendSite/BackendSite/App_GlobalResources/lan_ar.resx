@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="lbl_WithdrawalApprovedTitle"><value>تمت الموافقة على طلب السحب الخاص بك {0}!</value></data>
+  <data name="lbl_CancelBonusTitle"><value>إشعار بانتهاء صلاحية العرض الترويجي</value></data>
+  <data name="lbl_DepositApprovedContent"><value>تهانينا! تم اعتماد إيداعك {0}، والمبلغ الآن مضاف إلى حسابك. نتمنى لك كل التوفيق في رهاناتك</value></data>
+  <data name="lbl_WithdrawalRejectTitle"><value>تم رفض طلب السحب الخاص بك {0}!</value></data>
+  <data name="lbl_WithdrawalRejectContent"><value>نأسف لإبلاغك بأن طلب السحب الخاص بك {0} قد تم رفضه. إذا كانت لديك أي استفسارات إضافية، يرجى التواصل مع خدمة العملاء للحصول على المزيد من التفاصيل.</value></data>
+  <data name="lbl_CancelBonus1"><value>تم إلغاء عرض البونص الخاص بك.</value></data>
+  <data name="lbl_DepositRejectTitle"><value>تم رفض إيداعك {0}!</value></data>
+  <data name="lbl_WithdrawalApprovedContent"><value>شكرًا للعبك معنا! تم اعتماد طلب السحب الخاص بك {0}، ونأمل أن نراك مرة أخرى قريبًا!</value></data>
+  <data name="lbl_DepositApprovedTitle"><value>تم اعتماد إيداعك {0}!</value></data>
+  <data name="lbl_DepositRejectContent"><value>نأسف لإبلاغك بأن إيداعك {0} قد تم رفضه. إذا كانت لديك أي استفسارات إضافية، يرجى التواصل مع خدمة العملاء للحصول على المزيد من التفاصيل.</value></data>
+  <data name="lbl_Success"><value>نجاح</value></data>
+  <data name="CurrencyWithdrawal_2"><value>MYR GMT ({0})</value></data>
+  <data name="CurrencyWithdrawal_3"><value>USD GMT ({0})</value></data>
+  <data name="CurrencyWithdrawal_4"><value>THB GMT ({0})</value></data>
+  <data name="lbl_Paid"><value>تم الدفع</value></data>
+  <data name="lbl_Save"><value>حفظ</value></data>
+  <data name="lbl_Role"><value>الدور</value></data>
+  <data name="lbl_Edit"><value>تحرير</value></data>
+  <data name="lbl_AreYouSure"><value>هل أنت متأكد؟</value></data>
+  <data name="lbl_MobilePayment"><value>الدفع عبر الجوال</value></data>
+  <data name="lbl_ConfirmPwd"><value>تأكيد كلمة المرور</value></data>
+  <data name="lbl_Finance"><value>المالية</value></data>
+  <data name="lbl_DepositStatus4"><value>مرفوض</value></data>
+  <data name="lbl_DepositStatus5"><value>ملغى</value></data>
+  <data name="lbl_DepositStatus6"><value>منتهي الصلاحية</value></data>
+  <data name="lbl_DepositStatus7"><value>قيد الانتظار</value></data>
+  <data name="lbl_DepositStatus0"><value>مسودة</value></data>
+  <data name="lbl_DepositStatus1"><value>قيد المراجعة</value></data>
+  <data name="lbl_DepositStatus2"><value>تم الدفع</value></data>
+  <data name="lbl_DepositStatus3"><value>معتمد</value></data>
+  <data name="lbl_AccountList"><value>قائمة الحسابات</value></data>
+  <data name="lbl_AccountName"><value>اسم الحساب</value></data>
+  <data name="lbl_WireTransfer"><value>التحويل البنكي</value></data>
+  <data name="lbl_AdjustCategory10"><value>السحب</value></data>
+  <data name="lbl_AdjustCategory11"><value>أخرى</value></data>
+  <data name="lbl_Approve"><value>اعتماد</value></data>
+  <data name="CurrencyWithdrawal_13"><value>CNY GMT({0})</value></data>
+  <data name="CurrencyWithdrawal_15"><value>IDR GMT({0})</value></data>
+  <data name="CurrencyWithdrawal_74"><value>BDT GMT({0})</value></data>
+  <data name="CurrencyWithdrawal_61"><value>INR GMT({0})</value></data>
+  <data name="CurrencyWithdrawal_51"><value>VND GMT({0})</value></data>
+  <data name="lbl_DepositSubmission"><value>إرسال الإيداع</value></data>
+  <data name="Currency_96"><value>USDT</value></data>
+  <data name="Currency_41"><value>CHF</value></data>
+  <data name="Currency_40"><value>WON</value></data>
+  <data name="Currency_45"><value>VND</value></data>
+  <data name="Currency_51"><value>INR</value></data>
+  <data name="Currency_61"><value>BDT</value></data>
+  <data name="Currency_74"><value>IDR</value></data>
+  <data name="Currency_15"><value>GBP</value></data>
+  <data name="Currency_12"><value>CNY</value></data>
+  <data name="Currency_13"><value>UUS</value></data>
+  <data name="Currency_20"><value>JPY</value></data>
+  <data name="Currency_32"><value>KHUSD</value></data>
+  <data name="Currency_72"><value>طلب السحب</value></data>
+  <data name="lbl_WithdrawalRequest"><value>نوع السحب</value></data>
+  <data name="lbl_WithdrawalType"><value>النظام</value></data>
+  <data name="lbl_MessageDepositWithdrawalSender"><value>إضافة مستوى نقطة جديد</value></data>
+  <data name="lbl_AddNewPointLevel"><value>مرفوض</value></data>
+  <data name="lbl_Rejected"><value>مستوى النقطة</value></data>
+  <data name="lbl_PointLevel"><value>منتهي الصلاحية</value></data>
+  <data name="lbl_Expired"><value>إضافة حساب</value></data>
+  <data name="lbl_AddAccount"><value>ملاحظات</value></data>
+  <data name="lbl_Postscript"><value>إضافة بطاقة مصرفية جديدة</value></data>
+  <data name="lbl_AddBank"><value>تعديل الحساب</value></data>
+  <data name="lbl_EditAccount"><value>نشط</value></data>
+  <data name="lbl_BonusStatus1"><value>تاريخ الانتهاء</value></data>
+  <data name="lbl_BonusStatus3"><value>ملغي</value></data>
+  <data name="lbl_BonusStatus2"><value>منجز</value></data>
+  <data name="lbl_BonusStatus4"><value>تعطيل</value></data>
+  <data name="lbl_Disable"><value>نشط</value></data>
+  <data name="lbl_Running"><value>الإيداع الفعلي</value></data>
+  <data name="lbl_ActualDeposit"><value>خطأ</value></data>
+  <data name="lbl_DepositStatus99"><value>تعديل</value></data>
+  <data name="lbl_DepositStatus98"><value>العملة</value></data>
+  <data name="lbl_Currency"><value>إدارة العملاء</value></data>
+  <data name="lbl_CustomerAdministration"><value>قيد الانتظار</value></data>
+  <data name="lbl_Pending"><value>CSD</value></data>
+  <data name="lbl_CSD"><value>عميل إيداع</value></data>
+  <data name="lbl_ActStatus2"><value>عميل غير مخصص للإيداع</value></data>
+  <data name="lbl_ActStatus1"><value>تغيير كلمة المرور</value></data>
+  <data name="lbl_ChangeUserpwd"><value>معالجة</value></data>
+  <data name="lbl_Process"><value>موافقة الإيداع</value></data>
+  <data name="lbl_DepositApproval"><value>رسوم الشحن</value></data>
+  <data name="lbl_ChargeFee"><value>رقم تعريف السحب</value></data>
+  <data name="lbl_WithdrawalId"><value>الحالة</value></data>
+  <data name="lbl_Status"><value>رفض</value></data>
+  <data name="lbl_Reject"><value>قائمة الأموال قيد الانتظار</value></data>
+  <data name="lbl_PendingList"><value>تم التحقق</value></data>
+  <data name="lbl_WithdrawalStatus3"><value>قيد الانتظار</value></data>
+  <data name="lbl_WithdrawalStatus2"><value>مسودة</value></data>
+  <data name="lbl_WithdrawalStatus1"><value>مرفوض</value></data>
+  <data name="lbl_WithdrawalStatus0"><value>معتمد</value></data>
+  <data name="lbl_WithdrawalStatus7"><value>ملغي</value></data>
+  <data name="lbl_WithdrawalStatus6"><value>عملية</value></data>
+  <data name="lbl_WithdrawalStatus5"><value>إلى KYC</value></data>
+  <data name="lbl_WithdrawalStatus4"><value>إسقاط الجائزة</value></data>
+  <data name="lbl_WithdrawalStatus8"><value>مكافأة ترقية VIP</value></data>
+  <data name="lbl_AdjustCategory5"><value>اختبار</value></data>
+  <data name="lbl_AdjustCategory4"><value>مشكلة تقنية بدون تأثير</value></data>
+  <data name="lbl_AdjustCategory7"><value>لا شيء - (افتراضي)</value></data>
+  <data name="lbl_AdjustCategory6"><value>مكافأة يدوية (مكافأة خاصة)</value></data>
+  <data name="lbl_AdjustCategory1"><value>مكافأة الاحتفاظ</value></data>
+  <data name="lbl_AdjustCategory3"><value>الإيداع</value></data>
+  <data name="lbl_AdjustCategory2"><value>خطأ من البائع</value></data>
+  <data name="lbl_AdjustCategory9"><value>طلب الإيداع</value></data>
+  <data name="lbl_AdjustCategory8"><value>النقطة</value></data>
+  <data name="lbl_DepositRequest"><value>رقم المرجع</value></data>
+  <data name="lbl_Point"><value>تسجيل الدخول</value></data>
+  <data name="lbl_RefNo"><value>مسودة</value></data>
+  <data name="lbl_Login"><value>مسؤول</value></data>
+  <data name="lbl_Draft"><value>نشط</value></data>
+  <data name="lbl_Admin"><value>مغلق</value></data>
+  <data name="lbl_CustStatus1"><value>تعليق</value></data>
+  <data name="lbl_CustStatus3"><value>خطأ</value></data>
+  <data name="lbl_CustStatus2"><value>تعليق</value></data>
+  <data name="lbl_Error"><value>تأكيد</value></data>
+  <data name="lbl_Comment"><value>الحد الأدنى للمبلغ</value></data>
+  <data name="lbl_Confirm"><value>الإدارة</value></data>
+  <data name="lbl_MinAmount"><value>إضافة بطاقة مصرفية</value></data>
+  <data name="lbl_Administration"><value>تم {0} إيداعك {1}</value></data>
+  <data name="lbl_AddBankCard"><value>رهان مجاني</value></data>
+  <data name="lbl_MessageDepositTitle"><value>إيداع جديد</value></data>
+  <data name="lbl_PromotionType3"><value>الإيداع الأول</value></data>
+  <data name="lbl_PromotionType2"><value>إيداع جديد</value></data>
+  <data name="lbl_PromotionType1"><value>الإيداع الأول</value></data>
+  <data name="lbl_PromotionType7"><value>استرداد نقدي</value></data>
+  <data name="lbl_PromotionType6"><value>استرداد نقدي</value></data>
+  <data name="lbl_PromotionType5"><value>مكافأة المحفظة</value></data>
+  <data name="lbl_PromotionType4"><value>خاص</value></data>
+  <data name="lbl_PromotionType9"><value>مكافأة الاستبقاء</value></data>
+  <data name="lbl_PromotionType8"><value>مكافأة يدوية (صفحة ثابتة)</value></data>
+  <data name="lbl_NewPwd"><value>كلمة مرور جديدة</value></data>
+  <data name="lbl_Delete"><value>حذف</value></data>
+  <data name="lbl_Create"><value>إنشاء</value></data>
+  <data name="lbl_Cancel"><value>إلغاء</value></data>
+  <data name="lbl_Closed"><value>مغلق</value></data>
+  <data name="lbl_AdjustmentType6"><value>إضافة طرف ثالث</value></data>
+  <data name="lbl_AdjustmentType5"><value>خصم طرف ثالث</value></data>
+  <data name="lbl_AdjustmentType4"><value>تقليل المكافأة</value></data>
+  <data name="lbl_AdjustmentType3"><value>زيادة المكافأة</value></data>
+  <data name="lbl_AdjustmentType2"><value>خصم</value></data>
+  <data name="lbl_AdjustmentType1"><value>دفع</value></data>
+  <data name="lbl_WithdrawalType5"><value>محفظة إلكترونية</value></data>
+  <data name="lbl_WithdrawalType4"><value>دفع بالعملات الرقمية</value></data>
+  <data name="lbl_WithdrawalType2"><value>البنك المحلي</value></data>
+  <data name="lbl_WithdrawalType1"><value>الدفع عبر الإنترنت</value></data>
+  <data name="lbl_WithdrawalType0"><value>غير معرف</value></data>
+  <data name="lbl_UserStatus1"><value>قيد التنفيذ</value></data>
+  <data name="lbl_UserStatus3"><value>مغلق</value></data>
+  <data name="lbl_UserStatus2"><value>معلق</value></data>
+  <data name="lbl_Amount"><value>المبلغ</value></data>
+  <data name="lbl_Action"><value>الإجراء</value></data>
+  <data name="lbl_TransId"><value>رقم المعاملة</value></data>
+  <data name="lbl_Enable"><value>تمكين</value></data>
+  <data name="lbl_DepositType"><value>نوع الإيداع</value></data>
+  <data name="lbl_DepositTime"><value>وقت الإيداع</value></data>
+  <data name="lbl_WithdrawalApproval"><value>موافقة السحب</value></data>
+  <data name="lbl_ChangeUserPwdAlert"><value>هل أنت متأكد من تغيير كلمة مرور المستخدم؟</value></data>
+  <data name="lbl_OnlineBanking"><value>الخدمات المصرفية عبر الإنترنت</value></data>
+  <data name="lbl_SelectSite"><value>اختيار الموقع</value></data>
+  <data name="lbl_AccountNo"><value>رقم الحساب</value></data>
+  <data name="lbl_Userpwd"><value>كلمة مرور المستخدم</value></data>
+  <data name="lbl_ChangePwd"><value>تغيير كلمة المرور</value></data>
+  <data name="lbl_Canceled"><value>ملغي</value></data>
+  <data name="lbl_DepositLeast"><value>أدنى إيداع</value></data>
+  <data name="lbl_BankCardList"><value>إدارة بطاقات البنك</value></data>
+  <data name="lbl_DepositType1"><value>الخدمات المصرفية عبر الإنترنت</value></data>
+  <data name="lbl_DepositType2"><value>الدفع عبر الهاتف المحمول</value></data>
+  <data name="lbl_DepositType3"><value>البنك المحلي</value></data>
+  <data name="lbl_DepositType4"><value>العملات الرقمية</value></data>
+  <data name="lbl_DepositType5"><value>شحن البطاقة</value></data>
+  <data name="lbl_DepositType6"><value>دفع عبر QRPay</value></data>
+  <data name="lbl_DepositType7"><value>قناة البنك التلقائية</value></data>
+  <data name="Currency_9"><value>دولار أسترالي</value></data>
+  <data name="Currency_4"><value>بات تايلاندي</value></data>
+  <data name="Currency_6"><value>اليورو</value></data>
+  <data name="Currency_1"><value>دولار سنغافوري</value></data>
+  <data name="Currency_3"><value>دولار أمريكي</value></data>
+  <data name="Currency_2"><value>رينغيت ماليزي</value></data>
+  <data name="lbl_OK"><value>موافق</value></data>
+  <data name="lbl_No"><value>#</value></data>
+  <data name="lbl_CreateTime"><value>وقت الإنشاء</value></data>
+  <data name="lbl_BankSlip"><value>إيصال البنك</value></data>
+  <data name="lbl_BankName"><value>اسم البنك</value></data>
+  <data name="lbl_Approved"><value>موافق عليه</value></data>
+  <data name="lbl_AddPointLevel"><value>إضافة مستوى نقاط</value></data>
+  <data name="lbl_MessageWithdrawalTitle"><value>تمت الموافقة على سحبك {0} وتم {1}</value></data>
+  <data name="lbl_WithdrawalStatus99"><value>خطأ</value></data>
+  <data name="lbl_UserName"><value>اسم المستخدم</value></data>
+  <data name="lbl_BetLeast"><value>أدنى رهان</value></data>
+  <data name="lbl_CurrentPwd"><value>كلمة المرور الحالية</value></data>
+  <data name="lbl_Direction1"><value>ائتمان</value></data>
+  <data name="lbl_Direction2"><value>خصم</value></data>
+  <data name="lbl_Balance"><value>الرصيد</value></data>
+  <data name="lbl_AdjustmentStatus3"><value>مرفوض</value></data>
+  <data name="lbl_AdjustmentStatus2"><value>موافق عليه</value></data>
+  <data name="lbl_AdjustmentStatus1"><value>معلق</value></data>
+  <data name="lbl_MaxAmount"><value>أقصى المبلغ</value></data>
+  <data name="lbl_Suspend"><value>معلق</value></data>
+  </root>
