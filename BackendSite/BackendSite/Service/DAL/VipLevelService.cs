@@ -66,13 +66,7 @@ namespace BackendSite.Service.DAL
             return await _reportDbClient.QueryAsync<VipLevelLogDto>("Admin_CustVipLevelLog_Get_V5",
                 new DynamicParameters(new { CustId = custId }));
         }
-
-        public int SetVipLevel(int SiteId, int CustId, string UserName, int VipLevel, string Memo, string Operator)
-        {
-            var result = _mainDbClient.Execute("Admin_CustVipLevel_Set", new { SiteId, CustId, UserName, VipLevel, Memo, Operator });
-            return result;
-        }
-
+        
         public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string memo, string updator)
         {
             var p = new DynamicParameters(new
@@ -86,14 +80,7 @@ namespace BackendSite.Service.DAL
             });
             return await _mainDbClient.ExecuteAsync("Admin_CustVipLevel_Set", p);
         }
-
-        public int SetVipLevelManually(int SiteId, int CustId, string UserName, int Manually, string Memo,
-            string Operator)
-        {
-            var result = _mainDbClient.Execute("Admin_CustVipLevelManually_Set", new { SiteId, CustId, UserName, Manually, Memo, Operator });
-            return result;
-        }
-
+        
         public async Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string memo, string updator)
         {
             var p = new DynamicParameters(new
@@ -248,6 +235,10 @@ namespace BackendSite.Service.DAL
                         p.Add("_UpDeposit", decimal.Parse(x.LevelValue));
                         sp = "Admin_UpDeposit_Set";
                         break;
+                    case UpgradeSettingEnum.UpTurnover:
+                        p.Add("_UpTurnover", decimal.Parse(x.LevelValue));
+                        sp = "Admin_UpTurnover_Set";
+                        break;
                     case UpgradeSettingEnum.UpBonus:
                         p.Add("_UpBonus", decimal.Parse(x.LevelValue));
                         sp = "Admin_UpBonus_Set";
@@ -296,8 +287,5 @@ namespace BackendSite.Service.DAL
 
             return result;
         }
-        #region Private Methods
-
-        #endregion
     }
 }

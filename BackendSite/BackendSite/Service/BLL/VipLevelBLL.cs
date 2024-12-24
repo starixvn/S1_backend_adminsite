@@ -16,6 +16,19 @@ namespace BackendSite.Service.BLL
         private readonly IAdminLogService _adminLogService;
         private readonly ILogger<VipLevelBLL> _logger;
 
+        private readonly List<VipLevelSettingDto> _vipLevelSettingList = new()
+        {
+            new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.UpBonus, TypeName = "Tier Upgrade Bonus" },
+            new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.UpDeposit, TypeName = "Monthly Minimum Deposit" },
+            new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.UpTurnover, TypeName = "Monthly Minimum Turnover" },
+            new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.DownDeposit, TypeName = "Minimum Deposit Within Validity Period" },
+            new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.DownTurnover, TypeName = "Minimum Turnover Within Validity Period" },
+            new VipLevelSettingDto { SiteId = 101, Type = UpgradeSettingEnum.UpDeposit, TypeName = "Deposit Requirement" },
+            new VipLevelSettingDto { SiteId = 101, Type = UpgradeSettingEnum.UpTurnover, TypeName = "Turnover Requirement" },
+            new VipLevelSettingDto { SiteId = 101, Type = UpgradeSettingEnum.DownDeposit, TypeName = "Retain Deposit" },
+            new VipLevelSettingDto { SiteId = 101, Type = UpgradeSettingEnum.DownTurnover, TypeName = "Retain Turnover" }
+        };
+
         public VipLevelBLL(VipLevelService vipLevelService, IMemberService memberService, IAdminLogService adminLogService, ILogger<VipLevelBLL> logger)
         {
             _vipLevelService = vipLevelService;
@@ -76,24 +89,12 @@ namespace BackendSite.Service.BLL
             });
             return vipLevelLog;
         }
-
-        public int SetVipLevel(int siteId, int custId, string userName, int vipLevel, string updator)
-        {
-            return _vipLevelService.SetVipLevel(siteId, custId, userName, vipLevel, $"{updator} Update VipLevel",
-                updator);
-        }
-
+        
         public async Task<int> SetVipLevelAsync(int siteId, int custId, string userName, int vipLevel, string updator)
         {
             return await _vipLevelService.SetVipLevelAsync(siteId, custId, userName, vipLevel, $"{updator} Update VipLevel", updator);
         }
-
-        public int SetVipLevelManually(int siteId, int custId, string userName, int manually, string updator)
-        {
-            return _vipLevelService.SetVipLevelManually(siteId, custId, userName, manually,
-                $"{updator} Update Manually", updator);
-        }
-
+        
         public async Task<int> SetVipLevelManuallyAsync(int siteId, int custId, string userName, int manually, string updator)
         {
             return await _vipLevelService.SetVipLevelManuallyAsync(siteId, custId, userName, manually, $"{updator} Update Manually", updator);
@@ -130,47 +131,7 @@ namespace BackendSite.Service.BLL
                 custId, $"Edit Exclusive \"{afterStatus}\"");
             return result;
         }
-
-        // public VipUpgradeReviewData GetVipUpgradeReview(string yearMonth, int siteId, int pageNumber, int pageSize,
-        //     int status, string userName)
-        // {
-        //     var vipUpgradeReviewData =
-        //         _vipLevelService.GetVipUpgradeReview(yearMonth, siteId, pageNumber, pageSize, status, userName);
-        //     vipUpgradeReviewData.VipUpgradeList.ForEach(x =>
-        //     {
-        //         x.CalculateTime = Convert.ToDateTime(x.CalculateTime).ToString("yyyy/MM/dd HH:mm:ss");
-        //         x.SettleTime = string.IsNullOrWhiteSpace(x.SettleTime)
-        //             ? x.SettleTime
-        //             : Convert.ToDateTime(x.SettleTime).ToString("yyyy/MM/dd HH:mm:ss");
-        //     });
-        //     return vipUpgradeReviewData;
-        // }
-
-        // public IEnumerable<VipUpgradeExport> GetVipUpgradedata(int siteId, string yearMonth, int status,
-        //     string userName)
-        // {
-        //     var exportedDatas = _vipLevelService.GetVipUpgradedata(siteId, yearMonth, status, userName);
-        //     exportedDatas.ToList().ForEach(x =>
-        //     {
-        //         x.CalculateTime = Convert.ToDateTime(x.CalculateTime).ToString("yyyy/MM/dd HH:mm:ss");
-        //         x.SettleTime = string.IsNullOrWhiteSpace(x.SettleTime)
-        //             ? x.SettleTime
-        //             : Convert.ToDateTime(x.SettleTime).ToString("yyyy/MM/dd HH:mm:ss");
-        //     });
-        //     return exportedDatas;
-        // }
-
-        //public bool CanUpgradeVip(string month)
-        //{
-        //    var currentTime = DateTime.UtcNow.AddHours(8);
-        //    var previousDateTime = currentTime.AddMonths(-1);
-        //    var CanUpgradeMonth =
-        //        new DateTime(previousDateTime.Year, previousDateTime.Month, 1).Date.ToString("yyyyMM");
-        //    var day = currentTime.Day;
-        //    //只有當月的5號前，可以更新上個月的VipUpgradeReview狀態
-        //    return CanUpgradeMonth == month && day <= 5;
-        //}
-
+        
         #region Public Methods
 
         public GetVipUpgradeReviewListModel GetVipUpgradeReviewList(int siteId, string calculateYearMonth, string selectStatus, string userName, int pageNumber, int pageSize, string currencyIds)
@@ -279,34 +240,46 @@ namespace BackendSite.Service.BLL
             var vipSystem = await _vipLevelService.GetVipSystem(siteId);
             var currencyVipSystem = vipSystem.ToList().FindAll(x => x.CurrencyId == currencyId);
             var result = new List<VipUpgradeSetting>();
-            var typeList = new List<UpgradeSettingEnum>();
-            typeList.Add(UpgradeSettingEnum.UpBonus);
-            typeList.Add(UpgradeSettingEnum.UpDeposit);
-            typeList.Add(UpgradeSettingEnum.DownDeposit);
-            typeList.Add(UpgradeSettingEnum.DownTurnover);
-
-            typeList.ForEach(x =>
+           
+            foreach (UpgradeSettingEnum type in Enum.GetValues(typeof(UpgradeSettingEnum)))
             {
-                var detail = x switch
+                var detail = currencyVipSystem.Select(o => new VipUpgradeSettingDetail
                 {
-                    UpgradeSettingEnum.UpBonus => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.UpBonus.ToString() }).ToList(),
-                    UpgradeSettingEnum.UpDeposit => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.UpDeposit.ToString() }).ToList(),
-                    UpgradeSettingEnum.DownDeposit => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.DownDeposit is null ? null : o.DownDeposit.ToString() }).ToList(),
-                    UpgradeSettingEnum.DownTurnover => currencyVipSystem.Select(o => new VipUpgradeSettingDetail { Level = o.Level, LevelValue = o.DownTurnover is null ? null : o.DownTurnover.ToString() }).ToList()
-                };
-                //Leve1跟6沒有提供設定,這邊寫死資料讓前端顯示用
-                detail.Add(new VipUpgradeSettingDetail() { Level = 1, LevelValue = null });
-                detail.Add(new VipUpgradeSettingDetail() { Level = 6, LevelValue = "By Invitation" });
-                result.Add(new VipUpgradeSetting()
-                {
-                    SiteId = siteId,
-                    CurrencyId = currencyId,
-                    Type = x,
-                    TypeName = x.GetDescription(),
-                    Detail = detail.OrderBy(y => y.Level)
-                });
-            });
+                    Level = o.Level,
+                    LevelValue = type switch
+                    {
+                        UpgradeSettingEnum.UpBonus => o.UpBonus.ToString(),
+                        UpgradeSettingEnum.UpDeposit => o.UpDeposit.ToString(),
+                        UpgradeSettingEnum.UpTurnover => o.UpTurnover.ToString(),
+                        UpgradeSettingEnum.DownDeposit => o.DownDeposit?.ToString(),
+                        UpgradeSettingEnum.DownTurnover => o.DownTurnover?.ToString(),
+                        _ => null
+                    }
+                }).ToList();
 
+                if (siteId != 101)
+                {
+                    //Leve1跟6沒有提供設定,這邊寫死資料讓前端顯示用
+                    detail.Add(new VipUpgradeSettingDetail { Level = 1, LevelValue = null });
+                    detail.Add(new VipUpgradeSettingDetail { Level = 6, LevelValue = "By Invitation" });
+                }
+                
+                var setting = _vipLevelSettingList
+                    .Where(x => x.Type == type && (x.SiteId == siteId || x.SiteId == 0))
+                    .OrderByDescending(x => x.SiteId)
+                    .FirstOrDefault();
+
+                if (setting != null)
+                    result.Add(new VipUpgradeSetting()
+                    {
+                        SiteId = siteId,
+                        CurrencyId = currencyId,
+                        Type = setting.Type,
+                        TypeName = setting.TypeName,
+                        Detail = detail.OrderBy(y => y.Level)
+                    });
+            }
+            
             return result.OrderBy(x => x.Type);
         }
 

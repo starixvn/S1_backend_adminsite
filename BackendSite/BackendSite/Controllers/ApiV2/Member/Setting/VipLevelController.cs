@@ -1,15 +1,12 @@
 ﻿using System.Text.RegularExpressions;
-
 using BackendSite.Attributes;
 using BackendSite.Service.BLL;
 using BackendSite.Service.BLL.Interface;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using OfficeOpenXml;
 
 namespace BackendSite.Controllers.ApiV2.Member.Setting
@@ -36,11 +33,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
 
         #endregion
 
-        #region Constructor
-
-
-        #endregion
-
         #region API Model
 
         public class ChangeVipLevelBatchRequest
@@ -54,15 +46,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
             public int SiteId { get; set; }
             public int CurrencyId { get; set; }
         }
-
-        public class SetUpgradeSettingRequest
-        {
-            public int Level { get; set; }
-            public decimal UpDeposit { get; set; }
-            public decimal UpBonus { get; set; }
-            public decimal DownDeposit { get; set; }
-            public decimal DownTurnover { get; set; }
-        }
+        
         #endregion
 
         /// <summary>
@@ -98,8 +82,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Setting
         /// 
         /// Func Path：CSD > Change Vip Level Batch > [Submit]
         /// </remarks>
-        /// <param name="siteId"></param>
-        /// <param name="excelUpload"></param>
         [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 51, 3 })]
         [HttpPost]
         public async Task<List<ApiResult>> ChangeVipLevelBatchAsync([FromForm] ChangeVipLevelBatchRequest request)
