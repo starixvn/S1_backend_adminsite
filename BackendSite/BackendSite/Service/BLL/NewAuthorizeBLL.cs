@@ -47,7 +47,7 @@ namespace BackendSite.Service.BLL
             }
 
             // 檢查 userType => domain
-            var domains = _configBll
+            /*var domains = _configBll
                 .GetRawConfigValues<Dictionary<AdminUserTypeEnum, IEnumerable<string>>>("AdminTypeDomain")
                 .First()
                 .FirstOrDefault(x => x.Key == type);
@@ -56,7 +56,7 @@ namespace BackendSite.Service.BLL
             {
                 _logger.LogError($"fromUrl={fromUrl}, type={type}, has no valid domain.");
                 return ErrorCodeEnum.AccountError;
-            }
+            }*/
 
             adminUser = _newAdminUserService
                 .GetAdminUserByUserName(userName)
