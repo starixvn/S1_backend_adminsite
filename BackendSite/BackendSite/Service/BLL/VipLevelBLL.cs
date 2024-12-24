@@ -20,7 +20,6 @@ namespace BackendSite.Service.BLL
         {
             new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.UpBonus, TypeName = "Tier Upgrade Bonus" },
             new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.UpDeposit, TypeName = "Monthly Minimum Deposit" },
-            new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.UpTurnover, TypeName = "Monthly Minimum Turnover" },
             new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.DownDeposit, TypeName = "Minimum Deposit Within Validity Period" },
             new VipLevelSettingDto { SiteId = 0, Type = UpgradeSettingEnum.DownTurnover, TypeName = "Minimum Turnover Within Validity Period" },
             new VipLevelSettingDto { SiteId = 101, Type = UpgradeSettingEnum.UpDeposit, TypeName = "Deposit Requirement" },
@@ -243,6 +242,16 @@ namespace BackendSite.Service.BLL
            
             foreach (UpgradeSettingEnum type in Enum.GetValues(typeof(UpgradeSettingEnum)))
             {
+                var setting = _vipLevelSettingList
+                    .Where(x => x.Type == type && (x.SiteId == siteId || x.SiteId == 0))
+                    .OrderByDescending(x => x.SiteId)
+                    .FirstOrDefault();
+                
+                if (setting is null)
+                {
+                    continue;
+                }
+                
                 var detail = currencyVipSystem.Select(o => new VipUpgradeSettingDetail
                 {
                     Level = o.Level,
@@ -264,20 +273,14 @@ namespace BackendSite.Service.BLL
                     detail.Add(new VipUpgradeSettingDetail { Level = 6, LevelValue = "By Invitation" });
                 }
                 
-                var setting = _vipLevelSettingList
-                    .Where(x => x.Type == type && (x.SiteId == siteId || x.SiteId == 0))
-                    .OrderByDescending(x => x.SiteId)
-                    .FirstOrDefault();
-
-                if (setting != null)
-                    result.Add(new VipUpgradeSetting()
-                    {
-                        SiteId = siteId,
-                        CurrencyId = currencyId,
-                        Type = setting.Type,
-                        TypeName = setting.TypeName,
-                        Detail = detail.OrderBy(y => y.Level)
-                    });
+                result.Add(new VipUpgradeSetting()
+                {
+                    SiteId = siteId,
+                    CurrencyId = currencyId,
+                    Type = setting.Type,
+                    TypeName = setting.TypeName,
+                    Detail = detail.OrderBy(y => y.Level)
+                });
             }
             
             return result.OrderBy(x => x.Type);
