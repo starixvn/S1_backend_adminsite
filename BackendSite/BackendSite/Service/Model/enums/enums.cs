@@ -2023,14 +2023,11 @@ namespace BackendSite.Service.Model.enums
 
     public enum UpgradeSettingEnum
     {
-        [Description("Monthly Minimum Deposit")]
-        UpDeposit = 0,
-        [Description("Tier Upgrade Bonus")]
-        UpBonus = 1,
-        [Description("Minimum Deposit Within Validity Period")]
-        DownDeposit = 2,
-        [Description("Minimum Turnover Within Validity Period")]
-        DownTurnover = 3,
+        UpDeposit = 0, 
+        UpTurnover = 1,
+        UpBonus = 2,
+        DownDeposit = 3,
+        DownTurnover = 4,
     }
     
     public enum AutoType
@@ -2039,11 +2036,6 @@ namespace BackendSite.Service.Model.enums
         AutoApproved = 2
     }
 
-    public enum CashBackPeriodTypeEnum
-    {
-        Daily = 1,
-        Weekly = 2
-    }
     /// <summary>
     /// Balance Adjustment頁面 > MethodType
     /// </summary>
