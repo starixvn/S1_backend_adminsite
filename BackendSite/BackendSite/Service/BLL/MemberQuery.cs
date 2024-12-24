@@ -235,6 +235,7 @@ namespace BackendSite.Service.BLL
             var customer = await _memberService.GetCustomerBasicInfoAsync(custId);
             var isOnline = await _cacheHelper.KeyExistsAsync(custId.ToString(), RedisDataBase.Token);
             var custLineProfile = await _memberService.GetCustLineProfileAsync(custId, null);
+            var cashBackLevel = await _memberService.GetCustomerCashBackLevel(custId);
 
             var loginUser = _adminBll.GetUserV2(authData.UserId, authData.SiteId);
             var hasPermission = _permissionBll.CheckPermission(loginUser, 22, 39);
@@ -297,7 +298,11 @@ namespace BackendSite.Service.BLL
                 PhoneVerifyTime = customer.PhoneVerifyTime.ToOffset(TimeSpan.Zero),
                 EmailVerifyTime = customer.EmailVerifyTime.ToOffset(TimeSpan.Zero),
                 MemberType = customer.MemberType,
-                Exclusive = customer.Exclusive
+                Exclusive = customer.Exclusive,
+                CashBackStatus = cashBackLevel.CashBackStatus,
+                CashBackLevelName = cashBackLevel.CashBackLevelName,
+                Rate = cashBackLevel.Rate,
+                ActiveMonths = cashBackLevel.ActiveMonths
             };
             if (!string.IsNullOrEmpty(customer.AffPlayerName))
             {

@@ -753,4 +753,10 @@ public class MemberService : IMemberService
             new { CustId = custId, UserName = userName, SiteId = siteId });
     }
 
-}
+    public async Task<CustomerCashBackLevel> GetCustomerCashBackLevel(int custId)
+    {
+        return await _reportDbClient.QueryFirstAsync<CustomerCashBackLevel>("admin_CustActiveMonthsLevel_Get",
+            new {_custId = custId});
+    }
+
+} 

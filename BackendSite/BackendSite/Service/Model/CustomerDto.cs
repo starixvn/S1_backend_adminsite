@@ -330,6 +330,10 @@ public class CustomerBasicInfo
     public DateTimeOffset? EmailVerifyTime { get; set; }
     public int MemberType { get; set; }
     public int Exclusive { get; set; }
+    public int CashBackStatus { get; set; }
+    public string CashBackLevelName { get; set; }
+    public decimal Rate { get; set; }
+    public int ActiveMonths { get; set; }
 }
 
 public class AffInfo

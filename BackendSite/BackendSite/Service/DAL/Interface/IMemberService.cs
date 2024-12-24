@@ -55,4 +55,5 @@ public interface IMemberService
     Task<IEnumerable<CustTpGameTypeSettingDto>> GetCustTpGameTypeSettingAsync(int custId);
     Task<bool> SetCustTpGameTypeSettingAsync(int custId, IEnumerable<int> deleteTpGameTypes, IEnumerable<int> addTpGameTypes, CustTpGameTypeSettingTypeEnum type);
     Task<CustomerForRisk> GetCustId(int? custId, string userName, int? siteId);
+    Task<CustomerCashBackLevel> GetCustomerCashBackLevel(int custId);
 }

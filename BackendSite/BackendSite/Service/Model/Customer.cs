@@ -663,4 +663,12 @@ namespace BackendSite.Service.Model
         public string Url { get; set; }
         public string Memo { get; set; }
     }
+
+    public class CustomerCashBackLevel
+    {
+        public int CashBackStatus { get; set; }
+        public string CashBackLevelName { get; set; }
+        public decimal Rate { get; set; }
+        public int ActiveMonths { get; set; }
+    }
 }
