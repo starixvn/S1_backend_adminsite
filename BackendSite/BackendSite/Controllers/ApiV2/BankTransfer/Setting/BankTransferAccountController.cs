@@ -76,10 +76,16 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
         [HttpPost]
         public IActionResult Export(GetTransferAccountInfoListRequest request)
         {
-            var datas =
-                _bankFinancialBll.GetTransferAccountInfoList(new GetTransferAccountInfoListParams(request));
+            var list = _bankFinancialBll
+                .GetTransferAccountInfoList(new GetTransferAccountInfoListParams(request))
+                .ToList();
+            
+            list.ForEach(x =>
+            {
+                x.BankLoginInfo = _bankFinancialBll.CryptBankLoginInfo(x.BankLoginInfo, false);
+            });
 
-            var result = datas.Select(x =>
+            var result = list.Select(x =>
                 new BankFinancialTransferAccountExportModel
                 {
                     Id = x.Id,
@@ -101,7 +107,7 @@ namespace BackendSite.Controllers.ApiV2.BankTransfer.Setting
                     MaxBalanceAlertAmount = x.MaxBalanceAlertAmount,
                     Remark = x.Remark,
                     BankLoginUrl = x.BankLoginUrl,
-                    BankLoginInfo = JsonConvert.SerializeObject(x.BankLoginInfo), //todo: 不知為啥解密完會噴錯，到時候再改
+                    BankLoginInfo = JsonConvert.SerializeObject(x.BankLoginInfo),
                     TransferPin = _cryptor.Decrypt(x.TransferPin),
                     LoginPin = _cryptor.Decrypt(x.LoginPin),
                     MobilePin = _cryptor.Decrypt(x.MobilePin),
