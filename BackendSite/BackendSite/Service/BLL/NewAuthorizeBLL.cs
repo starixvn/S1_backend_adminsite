@@ -60,7 +60,8 @@ namespace BackendSite.Service.BLL
 
             adminUser = _newAdminUserService
                 .GetAdminUserByUserName(userName)
-                .FirstOrDefault(x => x.UserType == type);
+                .FirstOrDefault();
+                //.FirstOrDefault(x => x.UserType == type);
 
             if (adminUser == null)
             {
