@@ -135,6 +135,9 @@ namespace BackendSite.Service.Model
 
         [Description("PromotionCategory支援的GameTypeList")]
         public IEnumerable<int> PromotionCategoryGameTypeList { get; set; } = new List<int>();
+
+        [Description("是否以Upload List的方式指定特定User才能領取: 0.不是 1.是")]
+        public bool IsPromotionUploadCustList { get; set; }
     }
 
     public class PromotionInfoReq
@@ -251,6 +254,9 @@ namespace BackendSite.Service.Model
 
         [Description("前台是否會以PopUp的方式顯示: 0.不會 1.會")]
         public bool IsPopUp { get; set; }
+
+        [Description("是否以Upload List的方式指定特定User才能領取: 0.不是 1.是")]
+        public bool IsPromotionUploadCustList { get; set; }
     }
 
     public class PromotionSpecific

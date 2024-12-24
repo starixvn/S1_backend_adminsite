@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 
 using OfficeOpenXml;
+using System.Security.Policy;
 
 namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 {
@@ -125,7 +126,22 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             public int SiteId { get; set; }
             public string BonusCode { get; set; }
         }
-
+        public class UploadPromotionCustListRequest
+        {
+            public int SiteId { get; set; }
+            public string BonusCode { get; set; }
+            public PromotionTypeEnum PromotionType { get; set; }
+            public IFormFile excelUpload { get; set; }
+        }
+        public class PromotionCustListRequest
+        {
+            public int SiteId { get; set; }
+            public string BonusCode { get; set; }
+        }
+        public class DeletePromotionCustListRequest: PromotionCustListRequest
+        {
+            public int CustId { get; set; }
+        }
         #region ScratchCard
 
         public class GetScratchCardListRequest : ApiRequestPageModel
@@ -283,7 +299,7 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
 
                 switch (request.PromotionInfo.PromotionType)
                 {
-                    case   (int)PromotionTypeEnum.FreeBet 
+                    case (int)PromotionTypeEnum.FreeBet
                         or (int)PromotionTypeEnum.Cashback
                         or (int)PromotionTypeEnum.RetentionFreeBet
                         or (int)PromotionTypeEnum.PredictionEvent:
@@ -291,15 +307,15 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
                         if (request.PromotionInfo.Specific.Any(specific =>
                                     specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                     CheckRollover(specific.RollOver, specific.WinOver, apiResult)))
-                            {
-                                return apiResult;
-                            }
+                        {
+                            return apiResult;
+                        }
 
                         break;
-                    case   (int)PromotionTypeEnum.FstDeposit
-                        or (int)PromotionTypeEnum.ReDeposit 
+                    case (int)PromotionTypeEnum.FstDeposit
+                        or (int)PromotionTypeEnum.ReDeposit
                         or (int)PromotionTypeEnum.MissionBonus:
-                        
+
                         if (request.PromotionInfo.Specific.Any(specific =>
                                 specific.Status == (int)PromotionSpecificStatusEnum.Active &&
                                 specific.TierAmountList.Any(tierAmount =>
@@ -606,6 +622,150 @@ namespace BackendSite.Controllers.ApiV2.Marketing.Bonus
             return apiResult;
         }
 
+        /// <summary>
+        /// BonusManagement/UploadPromotionCustList
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Edit]
+        /// </remarks>
+        /// <param name="req"></param>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 3 })]
+        [HttpPost]
+        public async Task<ApiResult<int>> UploadPromotionUploadCustList([FromForm] UploadPromotionCustListRequest req)
+        {
+            var authData = _authorizeBll.GetAuthData();
+            var excelList = new List<PromotionCustUploadList>();
+            var result = false;
+            bool isSpecialBonus = req.PromotionType == PromotionTypeEnum.SpecialBonus;
+            _logger.LogInformation($@"UploadPromotionUploadCustList Start At {DateTime.UtcNow}.");
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            if (req.excelUpload != null)
+            {
+                if (_excelBll.IsValidFile(req.excelUpload.ContentType))
+                {
+                    var excelPkg = new ExcelPackage(req.excelUpload.OpenReadStream());
+                    var sheet = excelPkg.Workbook.Worksheets.First(); //取得Sheet1
+                    var isLastRow = false;
+                    var rowId = 2; // 因為有標題列，所以從第2列開始讀起
+
+                    do // 讀取資料，直到讀到空白列為止
+                    {
+                        var userName = sheet.Cells[rowId, 1].Text.Trim();
+                        var amount = isSpecialBonus ? sheet.Cells[rowId, 2].Text.Trim() : "0";
+                        var rollover = isSpecialBonus ? sheet.Cells[rowId, 3].Text.Trim() : "0";
+                        var tempExpiryDate = isSpecialBonus ? sheet.Cells[rowId, 4].Text.Trim() : sheet.Cells[rowId, 2].Text.Trim();
+                        var custInfo = _custInfoBll.GetCustInfoDetails(null, userName, req.SiteId);
+
+                        if (string.IsNullOrEmpty(userName))
+                        {
+                            isLastRow = true;
+                        }
+                        else
+                        {
+                            if (custInfo is not null && DateTime.TryParse(tempExpiryDate, out DateTime expiryDate))
+                            {
+                                var data = new PromotionCustUploadList
+                                {
+                                    BonusCode = req.BonusCode,
+                                    SiteId = req.SiteId,
+                                    CustId = custInfo.CustId,
+                                    Bonus = decimal.Parse(amount),
+                                    RollOver = int.Parse(rollover),
+                                    ExpiryDate = expiryDate
+                                };
+                                excelList.Add(data);
+                            }
+                            rowId += 1;
+                        }
+                    } while (!isLastRow);
+
+                    result = _bonusManageBll.UploadPromotionUploadCustList(excelList);
+
+                    _logger.LogInformation($@"UploadPromotionUploadCustList End At {DateTime.UtcNow}.");
+                }
+                else
+                {
+                    return new ApiResult<int>()
+                    {
+                        ErrorCode = -1,
+                        Message = "File Type Error"
+                    };
+                }
+            }
+
+            if (result)
+            {
+                return new ApiResult<int>()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Success,
+                    Message = "Upload Finish."
+                };
+            }
+            else
+            {
+                return new ApiResult<int>()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message = "Upload Fail."
+                };
+            }
+        }
+
+        /// <summary>
+        /// BonusManagement/GetPromotionCustList 取得 PromotionCustList允許名單
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing  > Bonus Management > [Edit] > [Member List]
+        /// </remarks>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        [TypeFilter(typeof(AuthorizeByPermissionAttribute), Arguments = new object[] { 45, 1 })]
+        [HttpPost]
+        public List<PromotionCustList> GetPromotionUploadCustList(PromotionCustListRequest req)
+        {
+            return  _bonusManageBll.GetPromotionUploadCustList(req.SiteId, req.BonusCode).ToList();
+        }
+
+        /// <summary>
+        /// BonusManagement/DeletePromotionUploadCustList 移除名單內的cust
+        /// </summary>
+        /// <remarks>
+        /// Http Method：POST
+        /// 
+        /// Func Path：Marketing >  Banner Management > Delete
+        /// </remarks>
+        /// <param name="request"></param>
+        [HttpPost]
+        public ApiResult DeletePromotionUploadCustList(DeletePromotionCustListRequest request)
+        {
+            var apiResult = new ApiResult();
+            try
+            {
+                var result = _bonusManageBll.DeletePromotionUploadCustList(request) >= 0;
+
+                if (result)
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Success;
+                }
+                else
+                {
+                    apiResult.ErrorCode = (int)ErrorCodeEnum.Fail;
+                }
+            }
+            catch (Exception ex)
+            {
+                apiResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                apiResult.Message = ex.Message;
+                apiResult.RawMessage = ex.ToString();
+            }
+
+            return apiResult;
+        }
         #endregion
 
         #endregion
