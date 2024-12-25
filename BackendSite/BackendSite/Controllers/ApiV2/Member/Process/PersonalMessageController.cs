@@ -2,6 +2,7 @@
 using BackendSite.ExceptionHandling;
 using BackendSite.Service.BLL;
 using BackendSite.Service.DAL;
+using BackendSite.Service.Library;
 using BackendSite.Service.Model;
 using BackendSite.Service.Model.ApiModel;
 using BackendSite.Service.Model.enums;
@@ -26,7 +27,8 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         private readonly ExcelBLL _excelBll;
         private readonly AdjustmentLogReportBLL _adjustmentLogReportBll;
         private readonly NewAuthorizeBLL _newAuthorizeBLL;
-
+        private readonly ICacheHelper _redisHelper;
+        
         public PersonalMessageController(IServiceProvider provider)
         {
             _messageBll = provider.GetRequiredService<MessageBLL>();
@@ -36,6 +38,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             _excelBll = provider.GetRequiredService<ExcelBLL>();
             _adjustmentLogReportBll = provider.GetRequiredService<AdjustmentLogReportBLL>();
             _newAuthorizeBLL = provider.GetRequiredService<NewAuthorizeBLL>();
+            _redisHelper = provider.GetRequiredService<ICacheHelper>();
         }
 
         public class ExportMessageBatchReq
@@ -134,6 +137,16 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             else
             {
+                // check wait time key
+                var redisKey = "PersonalMessage:SendMessageBatch:WaitTimeKey";
+                if (await _redisHelper.KeyExistsAsync(redisKey))
+                {
+                    return new ApiResult<int>()
+                    {
+                        ErrorCode = (int)ErrorCodeEnum.Fail,
+                        Message ="Database synchronization time, please wait 3 minutes."
+                    };
+                }
                 #region checkMsg
 
                 var (result, errorMsg) = _messageBll.CheckBatchMessage(req.currency, req.personalMsg);
@@ -148,7 +161,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
 
                 #endregion
 
-                _ = Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
                     var userSiteList = _serverInfoService.GetSiteList();
                     var langList = new List<string>();
@@ -176,7 +189,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                             _custInfoBll.SendMessageBatch(batchPersonalMsg);
                         }
                     }
-
+                    
+                    var waitTime = TimeSpan.FromMinutes(3); 
+                    await _redisHelper.StringSetAsync(redisKey, JsonConvert.SerializeObject(req), waitTime);
                     _messageBll.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
                     _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
 
