@@ -116,6 +116,33 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
         [HttpPost]
         public async Task<ApiResult<int>> SendMessageBatch([FromForm] SendMessageBatchRequest req)
         {
+            // check wait time key
+            var redisKey = "PersonalMessage:SendMessageBatch:WaitTimeKey";
+            if (await _redisHelper.KeyExistsAsync(redisKey))
+            {
+                return new ApiResult<int>()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message ="Database synchronization time, please wait 3 minutes."
+                };
+            }
+            
+            //Check Status
+            var totalPages = 0;
+            var rowCount = 0;
+            var pageNumber = 0;
+            var siteIdList = new List<int> { req.optSite };
+            var startDate = DateTimeOffset.UtcNow .AddMinutes(-30);
+            var batchMessageList = _messageBll.GetBatchMessageList(siteIdList, startDate, DateTimeOffset.UtcNow, 20, ref pageNumber, ref totalPages, ref rowCount);
+            if (batchMessageList.Any((i => i.Status == 0)))
+            {
+                return new ApiResult<int>()
+                {
+                    ErrorCode = (int)ErrorCodeEnum.Fail,
+                    Message ="Message unfinish, please wait finish."
+                };
+            }
+            
             var authData = _newAuthorizeBLL.GetAuthData();
             var batchId = await _messageBll.NewBatchMessage(req.optSite, req.currency, authData.UserName, req.IsPopup, req.personalMsg);
             _logger.LogInformation($@"MessageService-Read Excel And Send Start At {DateTime.UtcNow}.");
@@ -137,16 +164,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             }
             else
             {
-                // check wait time key
-                var redisKey = "PersonalMessage:SendMessageBatch:WaitTimeKey";
-                if (await _redisHelper.KeyExistsAsync(redisKey))
-                {
-                    return new ApiResult<int>()
-                    {
-                        ErrorCode = (int)ErrorCodeEnum.Fail,
-                        Message ="Database synchronization time, please wait 3 minutes."
-                    };
-                }
                 #region checkMsg
 
                 var (result, errorMsg) = _messageBll.CheckBatchMessage(req.currency, req.personalMsg);
@@ -194,7 +211,6 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
                     await _redisHelper.StringSetAsync(redisKey, JsonConvert.SerializeObject(req), waitTime);
                     _messageBll.UpdateBatchMessageStatus((int)SendBatchMessageStatus.Finished, batchId);
                     _logger.LogInformation($@"MessageService-Filter Account And Send End At {DateTime.UtcNow}.");
-
                 });
             }
             _adjustmentLogReportBll.CreateAdminAdjustmentInfoLog(new CreateAdminAdjustmentInfoLogInput
