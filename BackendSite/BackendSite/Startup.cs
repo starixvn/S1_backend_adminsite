@@ -174,13 +174,14 @@ namespace BackendSite
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseStaticFiles();
-            app.UseRouting();
-            app.UseHttpMetrics();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseRequestLogMiddleware();
-            app.UseResponseLogMiddleware();
+            app.UseRouting(); // 設定路由
+            app.UseExceptionHandlingMiddleware(); // 捕捉所有例外
+            app.UseHttpMetrics(); // 記錄 HTTP Metrics
+            app.UseStaticFiles(); // 靜態檔案處理
+            app.UseRequestLogMiddleware(); // 請求日誌記錄
+            app.UseAuthentication(); // 驗證
+            app.UseAuthorization(); // 授權
+            app.UseResponseLogMiddleware(); // 回應日誌記錄
 
             if (!env.IsProduction())
             {
