@@ -134,13 +134,12 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var siteIdList = new List<int> { req.optSite };
             var startDate = DateTimeOffset.UtcNow.AddMinutes(-30);
             var batchMessageList = _messageBll.GetBatchMessageList(siteIdList, startDate, DateTimeOffset.UtcNow, 20, ref pageNumber, ref totalPages, ref rowCount);
-            _logger.LogInformation(JsonConvert.SerializeObject(batchMessageList));
             if (batchMessageList.Any(i => i.Status == 0))
             {
                 return new ApiResult<int>()
                 {
                     ErrorCode = (int)ErrorCodeEnum.Fail,
-                    Message ="Message unfinish, please wait finish."
+                    Message ="Message status is not finish ,  please wait for Finished."
                 };
             }
             
