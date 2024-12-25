@@ -130,7 +130,7 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             //Check Status
             var totalPages = 0;
             var rowCount = 0;
-            var pageNumber = 0;
+            var pageNumber = 1;
             var siteIdList = new List<int> { req.optSite };
             var startDate = DateTimeOffset.UtcNow.AddMinutes(-30);
             var batchMessageList = _messageBll.GetBatchMessageList(siteIdList, startDate, DateTimeOffset.UtcNow, 20, ref pageNumber, ref totalPages, ref rowCount);
