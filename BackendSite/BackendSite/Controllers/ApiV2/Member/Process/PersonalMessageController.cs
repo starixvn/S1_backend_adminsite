@@ -134,9 +134,9 @@ namespace BackendSite.Controllers.ApiV2.Member.Process
             var siteIdList = new List<int> { req.optSite };
             var startDate = DateTimeOffset.UtcNow.AddMinutes(-30);
             var batchMessageList = _messageBll.GetBatchMessageList(siteIdList, startDate, DateTimeOffset.UtcNow, 20, ref pageNumber, ref totalPages, ref rowCount);
-            if (batchMessageList.Any((i => i.Status == 0)))
+            _logger.LogInformation(JsonConvert.SerializeObject(batchMessageList));
+            if (batchMessageList.Any(i => i.Status == 0))
             {
-                _logger.LogInformation(JsonConvert.SerializeObject(batchMessageList));
                 return new ApiResult<int>()
                 {
                     ErrorCode = (int)ErrorCodeEnum.Fail,
